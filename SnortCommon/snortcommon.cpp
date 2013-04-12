@@ -1,46 +1,118 @@
 #include "stdafx.h"
 #include "snortcommon.h"
 
+COMMONSC CStateSet::CStateSet()
+{
+	m_pSet = new std::vector<size_t>;
+}
+
+COMMONSC CStateSet::~CStateSet()
+{
+	delete m_pSet;
+}
+
+COMMONSC CStateSet::CStateSet(const CStateSet &other)
+{
+	m_pSet = new std::vector<size_t>;
+	*this = other;
+}
+
+COMMONSC const CStateSet& CStateSet::operator = (const CStateSet &other)
+{
+	*m_pSet = *other.m_pSet;
+	return *this;
+}
+
+COMMONSC size_t& CStateSet::operator[](size_t nIdx)
+{
+	return (*m_pSet)[nIdx];
+}
+
+COMMONSC const size_t& CStateSet::operator[](size_t nIdx) const
+{
+	return (*m_pSet)[nIdx];
+}
+
+COMMONSC bool CStateSet::operator == (const CStateSet &other)
+{
+	return *m_pSet == *other.m_pSet;
+}
+
+COMMONSC const size_t CStateSet::Size() const
+{
+	return m_pSet->size();
+}
+
+COMMONSC void CStateSet::PopBack()
+{
+	m_pSet->pop_back();
+}
+
+COMMONSC void CStateSet::PushBack(size_t nState)
+{
+	m_pSet->push_back(nState);
+}
+
+COMMONSC void CStateSet::Reserve(size_t nCount)
+{
+	m_pSet->reserve(nCount);
+}
+
+COMMONSC void CStateSet::Resize(size_t nSize)
+{
+	m_pSet->resize(nSize);
+}
+
+COMMONSC size_t& CStateSet::Back()
+{
+	return m_pSet->back();
+}
+
+COMMONSC void CStateSet::Sort()
+{
+	std::sort(m_pSet->begin(), m_pSet->end());
+}
+
+COMMONSC void CStateSet::Unique()
+{
+	Sort();
+	m_pSet->erase(std::unique(m_pSet->begin(), m_pSet->end()), m_pSet->end());
+}
+
 COMMONSC CNfaRow::CNfaRow()
 {
-	for (size_t i = 0; i < CHARSETSIZE; ++i)
-	{
-		m_pDestSet[i] = new std::vector<size_t>;
-	}
 }
 
 COMMONSC CNfaRow::~CNfaRow()
 {
-	for (size_t i = 0; i < CHARSETSIZE; ++i)
-	{
-		delete m_pDestSet[i];
-	}
 }
 
 COMMONSC size_t CNfaRow::GetSetSize(size_t nChar)
 {
-	return m_pDestSet[nChar]->size();
+	return m_pDestSet[nChar].Size();
 }
 
 COMMONSC void CNfaRow::GetSet(size_t nChar, size_t *pSet)
 {
-	for (std::vector<size_t>::iterator i = m_pDestSet[nChar]->begin(); i != m_pDestSet[nChar]->end(); ++i)
+	//for (std::vector<size_t>::iterator i = m_pDestSet[nChar]->begin(); i != m_pDestSet[nChar]->end(); ++i)
+	for (size_t i = 0; i < m_pDestSet[nChar].Size(); ++i)
 	{
-		*(pSet++) = *i;
+		*(pSet++) = m_pDestSet[nChar][i];
 	}
 }
 
-COMMONSC std::vector<size_t> &CNfaRow::operator[](size_t nChar)
+COMMONSC CStateSet& CNfaRow::operator[](size_t nChar)
 {
-	return *(m_pDestSet[nChar]);
+	return m_pDestSet[nChar];
+}
+
+COMMONSC const CStateSet& CNfaRow::operator[](size_t nChar) const
+{
+	return m_pDestSet[nChar];
 }
 
 COMMONSC CNfaRow::CNfaRow(const CNfaRow &other)
 {
-	for (size_t i = 0; i < CHARSETSIZE; ++i)
-	{
-		m_pDestSet[i] = new std::vector<size_t>;
-	}
 	*this = other;
 }
 
@@ -48,7 +120,7 @@ COMMONSC CNfaRow& CNfaRow::operator=(const CNfaRow &other)
 {
 	for (size_t i = 0; i < CHARSETSIZE; ++i)
 	{
-		*m_pDestSet[i] = *other.m_pDestSet[i];
+		m_pDestSet[i] = other.m_pDestSet[i];
 	}
 
 	return *this;
@@ -84,12 +156,17 @@ COMMONSC size_t CNfa::size() const
 	return m_pNfa->size();
 }
 
-COMMONSC CNfaRow &CNfa::back()
+COMMONSC CNfaRow& CNfa::back()
 {
 	return m_pNfa->back();
 }
 
-COMMONSC CNfaRow &CNfa::operator[](size_t index)
+COMMONSC CNfaRow& CNfa::operator[](size_t index)
+{
+	return (*m_pNfa)[index];
+}
+
+COMMONSC const CNfaRow& CNfa::operator[](size_t index) const
 {
 	return (*m_pNfa)[index];
 }
@@ -109,3 +186,135 @@ COMMONSC void CNfa::pop_back()
 {
 	m_pNfa->pop_back();
 }
+
+COMMONSC void CNfa::push_back(const CNfaRow &row)
+{
+	m_pNfa->push_back(row);
+}
+
+COMMONSC CDfaRow::CDfaRow()
+	: nFlag(NORMAL)
+{
+	std::fill(m_pDest, m_pDest + CHARSETSIZE, size_t(-1));
+}
+
+COMMONSC CDfaRow::~CDfaRow()
+{
+	
+}
+COMMONSC CDfaRow::CDfaRow(const CDfaRow &other)
+{
+	*this = other;
+}
+
+COMMONSC CDfaRow& CDfaRow::operator=(const CDfaRow &other)
+{
+	CopyMemory(m_pDest, other.m_pDest, CHARSETSIZE * sizeof(size_t));
+	nFlag = other.nFlag;
+	return *this;
+}
+
+COMMONSC size_t& CDfaRow::operator[](size_t index)
+{
+	return m_pDest[index];
+}
+
+COMMONSC void CDfaRow::SetnFlag(unsigned long flag)
+{
+	nFlag = flag;
+}
+
+COMMONSC unsigned long CDfaRow::GetnFlag()
+{
+	return nFlag;
+}
+
+COMMONSC CDfa::CDfa()
+{
+	m_pDfa = new std::vector<CDfaRow>;
+}
+
+COMMONSC CDfa::~CDfa()
+{
+	delete m_pDfa;
+}
+
+COMMONSC CDfa::CDfa(const CDfa &other)
+{
+	m_pDfa = new std::vector<CDfaRow>;
+	*this = other;
+}
+
+COMMONSC CDfa& CDfa::operator=(const CDfa &other)
+{
+	*m_pDfa = *other.m_pDfa;
+	return *this;
+}
+
+COMMONSC void CDfa::reserve(size_t _Count)
+{
+	m_pDfa->reserve(_Count);
+}
+
+COMMONSC void CDfa::resize(size_t _Newsize)
+{
+	m_pDfa->resize(_Newsize);
+}
+
+COMMONSC size_t CDfa::size() const
+{
+	return m_pDfa->size();
+}
+
+COMMONSC CDfaRow &CDfa::back()
+{
+	return m_pDfa->back();
+}
+
+COMMONSC CDfaRow& CDfa::operator[](size_t index)
+{
+	return (*m_pDfa)[index];
+}
+
+COMMONSC CNfaTree::CNfaTree()
+{
+	m_pTree = new std::vector<std::vector<CNfa>>;
+}
+
+COMMONSC CNfaTree::~CNfaTree()
+{
+	delete m_pTree;
+}
+
+COMMONSC CNfaTree::CNfaTree(const CNfaTree &other)
+{
+	m_pTree = new std::vector<std::vector<CNfa>>;
+	*this = other;
+}
+
+COMMONSC const CNfaTree& CNfaTree::operator = (const CNfaTree &other)
+{
+	*m_pTree = *other.m_pTree;
+	return *this;
+}
+
+COMMONSC size_t CNfaTree::Size() const
+{
+	return m_pTree->size();
+}
+
+COMMONSC size_t CNfaTree::ChainSize(size_t nChain) const
+{
+	return (*m_pTree)[nChain].size();
+}
+
+COMMONSC CNfa& CNfaTree::GetNfa(size_t nChain, size_t nNfa)
+{
+	return (*m_pTree)[nChain][nNfa];
+}
+
+COMMONSC const CNfa& CNfaTree::GetNfa(size_t nChain, size_t nNfa) const
+{
+	return (*m_pTree)[nChain][nNfa];
+}
+

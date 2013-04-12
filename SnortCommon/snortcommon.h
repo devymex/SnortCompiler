@@ -7,6 +7,29 @@
 #define COMMONSC __declspec(dllexport)
 #endif
 
+class COMMONSC CStateSet
+{
+public:
+	CStateSet();
+	~CStateSet();
+	CStateSet(const CStateSet &other);
+	const CStateSet& operator = (const CStateSet &other);
+	size_t& operator[](size_t nIdx);
+	const size_t& operator[](size_t nIdx) const;
+	bool operator == (const CStateSet &other);
+
+	const size_t Size() const;
+	void PopBack();
+	void PushBack(size_t nState);
+	void Reserve(size_t nCount);
+	void Resize(size_t nSize);
+	size_t& Back();
+	void Sort();
+	void Unique();
+private:
+	std::vector<size_t> *m_pSet;
+};
+
 class COMMONSC CNfaRow
 {
 public:
@@ -16,9 +39,11 @@ public:
 	CNfaRow& operator=(const CNfaRow &other);
 	size_t GetSetSize(size_t nChar);
 	void GetSet(size_t nChar, size_t *pSet);
-	std::vector<size_t> &operator[](size_t nChar);
+
+	CStateSet& operator[](size_t nChar);
+	const CStateSet& operator[](size_t nChar) const;
 private:
-	std::vector<size_t> *m_pDestSet[CHARSETSIZE];
+	CStateSet m_pDestSet[CHARSETSIZE];
 };
 
 class COMMONSC CNfa
@@ -32,9 +57,65 @@ public:
 	void reserve(size_t _Count);
 	void resize(size_t _Newsize);
 	size_t size() const;
+	void push_back(const CNfaRow &row);
+
 	CNfaRow &back();
 	CNfaRow &operator[](size_t index);
+	const CNfaRow &operator[](size_t index) const;
 	void pop_back();
 private:
 	std::vector<CNfaRow> *m_pNfa;
+};
+
+class COMMONSC CDfaRow
+{
+public:
+	enum STATEFLAG
+	{
+		NORMAL   = 1 << 0,
+		START    = 1 << 1,
+		TERMINAL = 1 << 2
+	};
+	CDfaRow();
+	~CDfaRow();
+	CDfaRow(const CDfaRow &other);
+	CDfaRow& operator=(const CDfaRow &other);
+	size_t& operator[](size_t index);
+	void SetnFlag(unsigned long flag);
+	unsigned long GetnFlag();
+private:
+	unsigned long nFlag;
+	size_t m_pDest[CHARSETSIZE];
+};
+
+class COMMONSC CDfa
+{
+public:
+	CDfa();
+	~CDfa();
+	CDfa(const CDfa &other);
+	CDfa& operator=(const CDfa &other);
+	void reserve(size_t _Count);
+	void resize(size_t _Newsize);
+	size_t size() const;
+	CDfaRow &back();
+	CDfaRow& operator[](size_t index);
+private:
+	std::vector<CDfaRow> *m_pDfa;
+};
+
+class COMMONSC CNfaTree
+{
+public:
+	CNfaTree();
+	~CNfaTree();
+	CNfaTree(const CNfaTree &other);
+	const CNfaTree& operator = (const CNfaTree &other);
+
+	size_t Size() const;
+	size_t ChainSize(size_t nChain) const;
+	CNfa& GetNfa(size_t nChain, size_t nNfa);
+	const CNfa& GetNfa(size_t nChain, size_t nNfa) const;
+private:
+	std::vector<std::vector<CNfa>> *m_pTree;
 };
