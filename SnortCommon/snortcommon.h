@@ -104,6 +104,21 @@ private:
 	std::vector<CDfaRow> *m_pDfa;
 };
 
+class COMMONSC CNfaChain
+{
+public:
+	CNfaChain();
+	~CNfaChain();
+	CNfaChain(const CNfaChain &other);
+	const CNfaChain& operator = (const CNfaChain &other);
+
+	size_t Size() const;
+	CNfa& operator[](size_t nIdx);
+	const CNfa& operator[](size_t nIdx) const;
+private:
+	std::vector<CNfa> *m_pChain;
+};
+
 class COMMONSC CNfaTree
 {
 public:
@@ -113,9 +128,9 @@ public:
 	const CNfaTree& operator = (const CNfaTree &other);
 
 	size_t Size() const;
-	size_t ChainSize(size_t nChain) const;
-	CNfa& GetNfa(size_t nChain, size_t nNfa);
-	const CNfa& GetNfa(size_t nChain, size_t nNfa) const;
+	CNfaChain& operator[](size_t nIdx);
+	const CNfaChain& operator[](size_t nIdx) const;
+
 private:
-	std::vector<std::vector<CNfa>> *m_pTree;
+	std::vector<CNfaChain> *m_pTree;
 };
