@@ -1,6 +1,10 @@
 #include "stdafx.h"
 #include "snortcommon.h"
 
+RULEOPTION::~RULEOPTION()
+{
+}
+
 COMMONSC CStateSet::CStateSet()
 {
 	m_pSet = new std::vector<size_t>;

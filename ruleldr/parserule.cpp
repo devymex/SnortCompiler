@@ -163,7 +163,7 @@ bool QuotedContext(_Iter &beg, _Iter &end)
 template<typename _Iter>
 int FormatPcre (_Iter pBeg, _Iter pEnd, OPTIONPCRE &pcre)
 {
-	pcre.dwFlags = 0;
+	pcre.nFlags = 0;
 	//If rule includes '!',we should delete this rule
 	if (*std::find_if_not(pBeg, pEnd, ISSPACE()) == '!')
 	{
@@ -195,67 +195,67 @@ int FormatPcre (_Iter pBeg, _Iter pEnd, OPTIONPCRE &pcre)
 		switch (*j)
 		{
 		case 'i':
-			pcre.dwFlags |= PF_i;
+			pcre.nFlags |= PF_i;
 			continue;
 		case 's':
-			pcre.dwFlags |= PF_s;
+			pcre.nFlags |= PF_s;
 			continue;
 		case 'm':
-			pcre.dwFlags |= PF_m;
+			pcre.nFlags |= PF_m;
 			continue;
 		case 'x':
-			pcre.dwFlags |= PF_x;
+			pcre.nFlags |= PF_x;
 			continue;
 		case 'A':
-			pcre.dwFlags |= PF_A;
+			pcre.nFlags |= PF_A;
 			continue;
 		case 'E':
-			pcre.dwFlags |= PF_E;
+			pcre.nFlags |= PF_E;
 			continue;
 		case 'G':
-			pcre.dwFlags |= PF_G;
+			pcre.nFlags |= PF_G;
 			continue;
 		case 'R':
-			pcre.dwFlags |= PF_R;
+			pcre.nFlags |= PF_R;
 			continue;
 		case 'U':
-			pcre.dwFlags |= PF_U;
+			pcre.nFlags |= PF_U;
 			continue;
 		case 'B':
-			pcre.dwFlags |= PF_B;
+			pcre.nFlags |= PF_B;
 			continue;
 		case 'P':
-			pcre.dwFlags |= PF_P;
+			pcre.nFlags |= PF_P;
 			continue;
 		case 'H':
-			pcre.dwFlags |= PF_H;
+			pcre.nFlags |= PF_H;
 			continue;
 		case 'M':
-			pcre.dwFlags |= PF_M;
+			pcre.nFlags |= PF_M;
 			continue;
 		case 'C':
-			pcre.dwFlags |= PF_C;
+			pcre.nFlags |= PF_C;
 			continue;
 		case 'O':
-			pcre.dwFlags |= PF_O;
+			pcre.nFlags |= PF_O;
 			continue;
 		case 'I':
-			pcre.dwFlags |= PF_I;
+			pcre.nFlags |= PF_I;
 			continue;
 		case 'D':
-			pcre.dwFlags |= PF_D;
+			pcre.nFlags |= PF_D;
 			continue;
 		case 'K':
-			pcre.dwFlags |= PF_K;
+			pcre.nFlags |= PF_K;
 			continue;
 		case 'S':
-			pcre.dwFlags |= PF_S;
+			pcre.nFlags |= PF_S;
 			continue;
 		case 'Y':
-			pcre.dwFlags |= PF_Y;
+			pcre.nFlags |= PF_Y;
 			continue;			
 		default:
-			pcre.dwFlags |= 0;
+			pcre.nFlags |= 0;
 		}
 	}
 	return TRUE;
@@ -340,7 +340,7 @@ int FormatOptionContent (_Iter cBeg, _Iter cEnd, std::vector<BYTE> &content)
 template<typename _Iter>
 int ExtractOptionContent(_Iter &iBeg, _Iter &iEnd, OPTIONCONTENT &opCont)
 {
-	opCont.dwFlags = 0;
+	opCont.nFlags = 0;
 	opCont.nOffset = 0;
 	opCont.nDepth =0;
 	opCont.nDistance = 0;
@@ -360,27 +360,27 @@ int ExtractOptionContent(_Iter &iBeg, _Iter &iEnd, OPTIONCONTENT &opCont)
 		}
 		else if (0 == stricmp("nocase", i->name.c_str()))
 		{
-			opCont.dwFlags |= CF_NOCASE;
+			opCont.nFlags |= CF_NOCASE;
 		}
 		else if (0 == stricmp("offset", i->name.c_str()))
 		{
 			*(int*)(&opCont.nOffset) = atoi(&*iValueBeg);
-			opCont.dwFlags |= CF_OFFSET;
+			opCont.nFlags |= CF_OFFSET;
 		}
 		else if (0 == stricmp("depth", i->name.c_str()))
 		{
 			*(int*)(&opCont.nDepth) = atoi(&*iValueBeg);
-			opCont.dwFlags |= CF_DEPTH;
+			opCont.nFlags |= CF_DEPTH;
 		}
 		else if (0 == stricmp("distance", i->name.c_str()))
 		{
 			*(int*)(&opCont.nDistance) = atoi(&*iValueBeg);
-			opCont.dwFlags |= CF_DISTANCE;
+			opCont.nFlags |= CF_DISTANCE;
 		}
 		else if (0 == stricmp("within", i->name.c_str()))
 		{
 			*(int*)(&opCont.nWithin) = atoi(&*iValueBeg);
-			opCont.dwFlags |= CF_WITHIN;
+			opCont.nFlags |= CF_WITHIN;
 		}	
 	}
 	return TRUE;
@@ -394,7 +394,7 @@ DWORD ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
 	//Mark process mode, "0" is error ,"1" is normal
 	DWORD dwResult = DWORD(-1);
 
-	//snortRule.dwFlags = 0;
+	//snortRule.nFlags = 0;
 
 	//Read one rule and only store "sid","pcre","content" and related options
 

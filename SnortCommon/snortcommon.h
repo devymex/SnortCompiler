@@ -140,7 +140,7 @@ private:
 struct COMMONSC RULEOPTION
 {
 	virtual ~RULEOPTION();
-	DWORD dwFlags;
+	size_t nFlags;
 };
 
 enum OPTIONCONTENTFLAGS
