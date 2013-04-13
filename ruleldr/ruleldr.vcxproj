@@ -12,7 +12,8 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{90CCDB22-8109-4C0B-99DE-68811174819F}</ProjectGuid>
-    <RootNamespace>ruleloader</RootNamespace>
+    <RootNamespace>ruleldr</RootNamespace>
+    <ProjectName>ruleldr</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

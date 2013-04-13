@@ -6,3 +6,5 @@
 #include <algorithm>
 
 #define PARSERULE_H_
+
+#pragma warning (disable: 4996)
