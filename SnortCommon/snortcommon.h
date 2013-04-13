@@ -19,6 +19,7 @@ public:
 	bool operator == (const CStateSet &other);
 
 	const size_t Size() const;
+	void SetStaSet(std::vector<size_t> &staSet);
 	void PopBack();
 	void PushBack(size_t nState);
 	void Reserve(size_t nCount);
@@ -104,6 +105,22 @@ private:
 	std::vector<CDfaRow> *m_pDfa;
 };
 
+class COMMONSC CNfaChain
+{
+public:
+	CNfaChain();
+	~CNfaChain();
+	CNfaChain(const CNfaChain &other);
+	const CNfaChain& operator = (const CNfaChain &other);
+
+	size_t Size() const;
+	void PushBack(CNfa &cnfa);
+	CNfa& operator[](size_t nIdx);
+	const CNfa& operator[](size_t nIdx) const;
+private:
+	std::vector<CNfa> *m_pChain;
+};
+
 class COMMONSC CNfaTree
 {
 public:
@@ -113,13 +130,12 @@ public:
 	const CNfaTree& operator = (const CNfaTree &other);
 
 	size_t Size() const;
-	size_t ChainSize(size_t nChain) const;
-	CNfa& GetNfa(size_t nChain, size_t nNfa);
-	const CNfa& GetNfa(size_t nChain, size_t nNfa) const;
-private:
-	std::vector<std::vector<CNfa>> *m_pTree;
-};
+	CNfaChain& operator[](size_t nIdx);
+	const CNfaChain& operator[](size_t nIdx) const;
 
+private:
+	std::vector<CNfaChain> *m_pTree;
+};
 
 struct COMMONSC RULEOPTION
 {
@@ -174,4 +190,5 @@ private:
 	size_t m_nSid;
 	std::vector<RULEOPTION*> *m_pOptions;
 };
+
 

@@ -68,13 +68,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="CombineTree.h" />
     <ClInclude Include="CreDfa.h" />
+    <ClInclude Include="nfa2dfa.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="CombineTree.cpp" />
     <ClCompile Include="CreDfa.cpp" />
+    <ClCompile Include="nfa2dfa.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>

@@ -1,35 +1,15 @@
 #pragma once
 //#include "stdafx.h"
-#include "CreDfa.h"
+//#include "CreDfa.h"
 
 #include "../SnortCommon/snortcommon.h"
 
-#ifndef CREDFA_H_
-#define CREDFA __declspec(dllimport)
-#else
-#define CREDFA __declspec(dllexport)
-#endif
-
 #define CHARSETSIZE 260
 
-//struct CNfaRow
-//{
-//	std::vector<size_t> CharSet[CHARSETSIZE];
-//};
-//
-//
-//
-//typedef std::vector<CNfaRow> NFA;
-
-
-
-typedef std::vector<CNfa> SERIALIZEDNFA;
-
-void SerializeNfa(std::vector<CNfa*> &braNfaList, CNfa &seriaNfa);
 
 void IncreNfaStaNum(int increNum, CNfa &curNfa);
 
-void SetPoEdge(CNfa &seriaNfa, int begin, int end);
+//void SetPoEdge(CNfa &seriaNfa, int begin, int end);
 
 //CNfa IntersectNfa(CNfa &firNfa, CNfa &secNfa);
 
@@ -40,9 +20,6 @@ void SetPoEdge(CNfa &seriaNfa, int begin, int end);
 //void HalfRowIntersection(bool fORs, CNfaRow &newSta, CNfaRow fORSSta, size_t fORsSize, std::map<_int64, size_t> newIdMap);
 
 //void combineNfaTree(std::vector<std::vector<CNfa>> &nfaTree, CNfa &lastNfa);
-CREDFA void combineNfaTree(CNfaTree &nfaTree, std::vector<CDfa> &dfaVec);
-
-void InitialNfaTree(CNfaTree &nfaTree);
 
 //////////////////////////////////////////////////////////////////
 

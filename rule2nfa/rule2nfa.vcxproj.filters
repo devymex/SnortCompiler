@@ -15,28 +15,28 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="rule2nfa.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CreDfa.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="nfa2dfa.h">
+    <ClInclude Include="CombineTree.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="CreDfa.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="nfa2dfa.cpp">
+    <ClCompile Include="CombineTree.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="rule2nfa.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="CreDfa.def" />
+    <None Include="rule2nfa.def" />
   </ItemGroup>
 </Project>
