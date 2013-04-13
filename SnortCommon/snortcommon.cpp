@@ -266,10 +266,13 @@ COMMONSC size_t CDfa::size() const
 	return m_pDfa->size();
 }
 
+
 COMMONSC CDfaRow &CDfa::back()
 {
 	return m_pDfa->back();
 }
+
+
 
 COMMONSC CDfaRow& CDfa::operator[](size_t index)
 {
