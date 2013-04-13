@@ -20,6 +20,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nfa2dfa", "nfa2dfa\nfa2dfa.
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nfa2dfatest", "nfa2dfatest\nfa2dfatest.vcxproj", "{AD1C44F7-4BD9-4A62-9236-0F5F2F325268}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ruleloader", "ruleloader\ruleloader.vcxproj", "{90CCDB22-8109-4C0B-99DE-68811174819F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{0C639590-DE81-4AB4-AA71-6CE6CAB424E4} = {0C639590-DE81-4AB4-AA71-6CE6CAB424E4}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -46,6 +51,10 @@ Global
 		{AD1C44F7-4BD9-4A62-9236-0F5F2F325268}.Debug|Win32.Build.0 = Debug|Win32
 		{AD1C44F7-4BD9-4A62-9236-0F5F2F325268}.Release|Win32.ActiveCfg = Release|Win32
 		{AD1C44F7-4BD9-4A62-9236-0F5F2F325268}.Release|Win32.Build.0 = Release|Win32
+		{90CCDB22-8109-4C0B-99DE-68811174819F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{90CCDB22-8109-4C0B-99DE-68811174819F}.Debug|Win32.Build.0 = Debug|Win32
+		{90CCDB22-8109-4C0B-99DE-68811174819F}.Release|Win32.ActiveCfg = Release|Win32
+		{90CCDB22-8109-4C0B-99DE-68811174819F}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

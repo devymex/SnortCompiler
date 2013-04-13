@@ -1,6 +1,10 @@
 #include "stdafx.h"
 #include "snortcommon.h"
 
+RULEOPTION::~RULEOPTION()
+{
+}
+
 COMMONSC CStateSet::CStateSet()
 {
 	m_pSet = new std::vector<size_t>;
@@ -318,3 +322,37 @@ COMMONSC const CNfa& CNfaTree::GetNfa(size_t nChain, size_t nNfa) const
 	return (*m_pTree)[nChain][nNfa];
 }
 
+COMMONSC CSnortRule::CSnortRule()
+	: m_nSid(0)
+{
+	m_pOptions = new std::vector<RULEOPTION*>;
+}
+
+COMMONSC CSnortRule::CSnortRule(const CSnortRule &other)
+{
+	m_pOptions = new std::vector<RULEOPTION*>;
+	*this = other;
+}
+COMMONSC CSnortRule::~CSnortRule()
+{
+	delete m_pOptions;
+}
+
+COMMONSC void CSnortRule::SetSid(size_t sid)
+{
+	m_nSid = sid;
+}
+
+COMMONSC void CSnortRule::PushBack(RULEOPTION* ruleoption)
+{
+	m_pOptions->push_back(ruleoption);
+}
+COMMONSC void CSnortRule::PopBack()
+{
+	m_pOptions->pop_back();
+}
+
+COMMONSC size_t CSnortRule::Size() const
+{
+	return m_pOptions->size();
+}
