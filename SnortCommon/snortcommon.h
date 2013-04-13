@@ -19,6 +19,7 @@ public:
 	bool operator == (const CStateSet &other);
 
 	const size_t Size() const;
+	void SetStaSet(std::vector<size_t> &staSet);
 	void PopBack();
 	void PushBack(size_t nState);
 	void Reserve(size_t nCount);
@@ -113,6 +114,7 @@ public:
 	const CNfaChain& operator = (const CNfaChain &other);
 
 	size_t Size() const;
+	void PushBack(CNfa &cnfa);
 	CNfa& operator[](size_t nIdx);
 	const CNfa& operator[](size_t nIdx) const;
 private:

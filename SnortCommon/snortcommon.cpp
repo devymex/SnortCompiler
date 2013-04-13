@@ -272,39 +272,44 @@ COMMONSC CDfaRow &CDfa::back()
 	return m_pDfa->back();
 }
 
-CNfaChain::CNfaChain()
+COMMONSC CNfaChain::CNfaChain()
 {
 	m_pChain = new std::vector<CNfa>;
 }
 
-CNfaChain::~CNfaChain()
+COMMONSC CNfaChain::~CNfaChain()
 {
 	delete m_pChain;
 }
 
-CNfaChain::CNfaChain(const CNfaChain &other)
+COMMONSC CNfaChain::CNfaChain(const CNfaChain &other)
 {
 	m_pChain = new std::vector<CNfa>;
 	*this = other;
 }
 
-const CNfaChain& CNfaChain::operator = (const CNfaChain &other)
+COMMONSC const CNfaChain& CNfaChain::operator = (const CNfaChain &other)
 {
 	*m_pChain = *other.m_pChain;
 	return *this;
 }
 
-size_t CNfaChain::Size() const
+COMMONSC size_t CNfaChain::Size() const
 {
 	return m_pChain->size();
 }
 
-CNfa& CNfaChain::operator[](size_t nIdx)
+COMMONSC void CNfaChain::PushBack(CNfa &cnfa)
+{
+	m_pChain->push_back(cnfa);
+}
+
+COMMONSC CNfa& CNfaChain::operator[](size_t nIdx)
 {
 	return (*m_pChain)[nIdx];
 }
 
-const CNfa& CNfaChain::operator[](size_t nIdx) const
+COMMONSC const CNfa& CNfaChain::operator[](size_t nIdx) const
 {
 	return (*m_pChain)[nIdx];
 }
