@@ -360,7 +360,7 @@ const CNfaChain& CNfaTree::operator[](size_t nIdx) const
 }
 
 COMMONSC CSnortRule::CSnortRule()
-	: m_nSid(0)
+	: m_nSid(0), m_nFlag(0)
 {
 	m_pOptions = new std::vector<RULEOPTION*>;
 }

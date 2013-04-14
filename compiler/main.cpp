@@ -16,29 +16,32 @@ struct RES
 	std::vector<SNORTIDDFAIDS> m_sidDfaIds;
 	std::vector<size_t> m_errorIds;
 	std::vector<size_t> m_exceedIds;
+	std::vector<size_t> m_hasbyteIds;
+	std::vector<size_t> m_hasnotIds;
 	std::vector<size_t> m_emptyIds;
 };
 
 void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 {
-	if (rule.GetFlag() & CSnortRule::RULE_HASBYTE)
+	RES &result = *(RES*)lpVoid;
+	size_t nSid = rule.GetSid();
+	size_t nFlag = rule.GetFlag();
+	if (nFlag & CSnortRule::RULE_HASBYTE)
 	{
-		
+		result.m_hasbyteIds.push_back(nSid);
 	}
-	else if (rule.GetFlag() & CSnortRule::RULE_HASNOT)
+	else if (nFlag & CSnortRule::RULE_HASNOT)
 	{
-		
+		result.m_hasnotIds.push_back(nSid);
 	}
 	else if (rule.Size() == 0)
 	{
-		
+		result.m_emptyIds.push_back(nSid);
 	}
 	else
 	{
-		RES &result = *(RES*)lpVoid;
 		CNfaTree nfatree;
 		size_t flag = InterpretRule(rule, nfatree);
-		size_t nSid = rule.GetSid();
 		if (flag == SC_ERROR)
 		{
 			result.m_errorIds.push_back(nSid);
