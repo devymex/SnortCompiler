@@ -464,7 +464,7 @@ DWORD ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
 * then process the rules to CSnortRule
 * callback function RECIEVER to handle CSnortRule
 */
-PARSERULE size_t ParseRule(tstring fileName, RECIEVER recv)
+PARSERULE size_t ParseRule(LPCTSTR fileName, RECIEVER recv)
 {
 	if(recv == NULL)
 	{
