@@ -1,4 +1,7 @@
 #pragma once
+
+#include <vector>
+
 #define CHARSETSIZE 260
 
 #ifndef COMMON_H_

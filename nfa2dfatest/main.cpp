@@ -1,7 +1,7 @@
-#include "../pcre2nfa/pcre2nfa.h"
 #include <iostream>
-#include "../nfa2dfa/nfa2dfa.h"
 #include "../SnortCommon/snortcommon.h"
+#include "../pcre2nfa/pcre2nfa.h"
+#include "../nfa2dfa/nfa2dfa.h"
 
 void main()
 {
