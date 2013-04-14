@@ -47,14 +47,14 @@ void AvaiEdges(CNfa &oneNfaTab, std::vector<std::vector<size_t>> &charGroups)
 	for(size_t charNum = 0; charNum < CHARSETSIZE - 4; ++charNum)
 	{
 		column[charNum].reserve(20000);
-		for(size_t i = 0; i < oneNfaTab.size(); ++i)
+		for(size_t i = 0; i < oneNfaTab.Size(); ++i)
 		{
 			CStateSet &elem = oneNfaTab[i][charNum];
 			elem.Sort();
 			column[charNum].push_back(&elem);
 			for (size_t j = 0; j < elem.Size(); ++j)
 			{
-				if(elem[j] > oneNfaTab.size())
+				if(elem[j] > oneNfaTab.Size())
 				{
 					std::cout << "overflow" << std::endl;
 					return;
@@ -106,7 +106,7 @@ void NextNfaSet(const CNfa &oneNfaTab, const std::vector<size_t> &curNfaVec, siz
 
 	for(std::vector<size_t>::const_iterator vecIter = curNfaVec.begin(); vecIter != curNfaVec.end(); ++vecIter)
 	{
-		if(*vecIter == oneNfaTab.size())
+		if(*vecIter == oneNfaTab.Size())
 		{
 			continue;
 		}
@@ -139,7 +139,7 @@ void EClosure(const CNfa &oneNfaTab, const std::vector<size_t> &curNfaVec, std::
 	{
 		eStack.push_back(*vecIter);
 		eNfaVec.push_back(*vecIter);
-		if(*vecIter == oneNfaTab.size())
+		if(*vecIter == oneNfaTab.Size())
 		{
 			continue;
 		}
@@ -152,7 +152,7 @@ void EClosure(const CNfa &oneNfaTab, const std::vector<size_t> &curNfaVec, std::
 			if(caledStat[curSta] == 0)
 			{
 				caledStat[curSta] = 1;
-				if(curSta < oneNfaTab.size())
+				if(curSta < oneNfaTab.Size())
 				{
 					const CStateSet &eTempVec = oneNfaTab[curSta][cEmptyEdge];
 					if(eTempVec.Size() != 0)
@@ -173,7 +173,7 @@ void EClosure(const CNfa &oneNfaTab, const std::vector<size_t> &curNfaVec, std::
 
 	for(std::vector<size_t>::iterator iter = eNfaVec.begin(); iter != eNfaVec.end(); ++iter)
 	{
-		if(*iter == oneNfaTab.size())
+		if(*iter == oneNfaTab.Size())
 		{
 			finFlag = 1;
 			break;
@@ -232,7 +232,7 @@ void printNfa(CNfa oneNfaTab)
 
 void printDfa(CDfa dfaTab)
 {
-	int tabSize = dfaTab.size();
+	int tabSize = dfaTab.Size();
 	std::vector<std::vector<std::vector<size_t>>> matrix;
 	std::vector<std::vector<size_t>> matRow;
 	std::vector<size_t> matRowRow;
@@ -245,7 +245,7 @@ void printDfa(CDfa dfaTab)
 		}
 	}
 
-		for(size_t s = 0; s < dfaTab.size(); ++s)
+		for(size_t s = 0; s < dfaTab.Size(); ++s)
 	{
 		for(int i = 0 ; i < CHARSETSIZE - 4; ++i)
 		{

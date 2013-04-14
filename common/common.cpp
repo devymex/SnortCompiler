@@ -91,20 +91,6 @@ COMMONSC CNfaRow::~CNfaRow()
 {
 }
 
-COMMONSC size_t CNfaRow::GetSetSize(size_t nChar)
-{
-	return m_pDestSet[nChar].Size();
-}
-
-COMMONSC void CNfaRow::GetSet(size_t nChar, size_t *pSet)
-{
-	//for (std::vector<size_t>::iterator i = m_pDestSet[nChar]->begin(); i != m_pDestSet[nChar]->end(); ++i)
-	for (size_t i = 0; i < m_pDestSet[nChar].Size(); ++i)
-	{
-		*(pSet++) = m_pDestSet[nChar][i];
-	}
-}
-
 COMMONSC CStateSet& CNfaRow::operator[](size_t nChar)
 {
 	return m_pDestSet[nChar];
@@ -145,22 +131,22 @@ COMMONSC size_t CNfa::GetRowNum(void)
 	return m_pNfa->size();
 }
 
-COMMONSC void CNfa::reserve(size_t _Count)
+COMMONSC void CNfa::Reserve(size_t _Count)
 {
 	m_pNfa->reserve(_Count);
 }
 
-COMMONSC void CNfa::resize(size_t _Newsize)
+COMMONSC void CNfa::Resize(size_t _Newsize)
 {
 	m_pNfa->resize(_Newsize);
 }
 
-COMMONSC size_t CNfa::size() const
+COMMONSC size_t CNfa::Size() const
 {
 	return m_pNfa->size();
 }
 
-COMMONSC CNfaRow& CNfa::back()
+COMMONSC CNfaRow& CNfa::Back()
 {
 	return m_pNfa->back();
 }
@@ -186,18 +172,18 @@ COMMONSC CNfa& CNfa::operator=(const CNfa &other)
 	return *this;
 }
 
-COMMONSC void CNfa::pop_back()
+COMMONSC void CNfa::PopBack()
 {
 	m_pNfa->pop_back();
 }
 
-COMMONSC void CNfa::push_back(const CNfaRow &row)
+COMMONSC void CNfa::PushBack(const CNfaRow &row)
 {
 	m_pNfa->push_back(row);
 }
 
 COMMONSC CDfaRow::CDfaRow()
-	: nFlag(NORMAL)
+	: m_nFlag(NORMAL)
 {
 	std::fill(m_pDest, m_pDest + CHARSETSIZE, size_t(-1));
 }
@@ -214,7 +200,7 @@ COMMONSC CDfaRow::CDfaRow(const CDfaRow &other)
 COMMONSC CDfaRow& CDfaRow::operator=(const CDfaRow &other)
 {
 	CopyMemory(m_pDest, other.m_pDest, CHARSETSIZE * sizeof(size_t));
-	nFlag = other.nFlag;
+	m_nFlag = other.m_nFlag;
 	return *this;
 }
 
@@ -223,14 +209,14 @@ COMMONSC size_t& CDfaRow::operator[](size_t index)
 	return m_pDest[index];
 }
 
-COMMONSC void CDfaRow::SetnFlag(unsigned long flag)
+COMMONSC void CDfaRow::SetFlag(size_t nFlag)
 {
-	nFlag = flag;
+	m_nFlag = nFlag;
 }
 
-COMMONSC unsigned long CDfaRow::GetnFlag()
+COMMONSC size_t CDfaRow::GetFlag()
 {
-	return nFlag;
+	return m_nFlag;
 }
 
 COMMONSC CDfa::CDfa()
@@ -255,23 +241,23 @@ COMMONSC CDfa& CDfa::operator=(const CDfa &other)
 	return *this;
 }
 
-COMMONSC void CDfa::reserve(size_t _Count)
+COMMONSC void CDfa::Reserve(size_t _Count)
 {
 	m_pDfa->reserve(_Count);
 }
 
-COMMONSC void CDfa::resize(size_t _Newsize)
+COMMONSC void CDfa::Resize(size_t _Newsize)
 {
 	m_pDfa->resize(_Newsize);
 }
 
-COMMONSC size_t CDfa::size() const
+COMMONSC size_t CDfa::Size() const
 {
 	return m_pDfa->size();
 }
 
 
-COMMONSC CDfaRow &CDfa::back()
+COMMONSC CDfaRow &CDfa::Back()
 {
 	return m_pDfa->back();
 }

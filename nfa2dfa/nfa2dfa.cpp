@@ -27,14 +27,14 @@ CREDFA void NfaToDfa(CNfa &oneNfaTab, CDfa &dfaTab)
 	//ssh.insert(std::make_pair(startEVec, ssh.size()));
 	ssh[startEVec] = ssh.size();
 
-	size_t nCursize = dfaTab.size();
-	dfaTab.resize(nCursize + 1);
+	size_t nCursize = dfaTab.Size();
+	dfaTab.Resize(nCursize + 1);
 
-	dfaTab.back().SetnFlag(dfaTab.back().GetnFlag() | dfaTab.back().START);
+	dfaTab.Back().SetFlag(dfaTab.Back().GetFlag() | dfaTab.Back().START);
 
 	if(finFlag == 1)
 	{
-		dfaTab.back().SetnFlag(dfaTab.back().GetnFlag() | dfaTab.back().TERMINAL);
+		dfaTab.Back().SetFlag(dfaTab.Back().GetFlag() | dfaTab.Back().TERMINAL);
 		finFlag = 0;
 	}
 	std::vector<size_t> curNfaVec;
@@ -48,7 +48,7 @@ CREDFA void NfaToDfa(CNfa &oneNfaTab, CDfa &dfaTab)
 		for(std::vector<std::vector<size_t>>::iterator group = charGroups.begin();
 			group != charGroups.end(); ++group)
 		{
-			if( dfaTab.size() > 30000)
+			if( dfaTab.Size() > 30000)
 			{
 				return;
 			}
@@ -72,15 +72,15 @@ CREDFA void NfaToDfa(CNfa &oneNfaTab, CDfa &dfaTab)
 					size_t nextSta = ssh.size();
 					ssh[nextNfaVec] = nextSta;
 
-					size_t nCursize = dfaTab.size();
-					dfaTab.resize(nCursize + 1);
+					size_t nCursize = dfaTab.Size();
+					dfaTab.Resize(nCursize + 1);
 					for(std::vector<size_t>::iterator iter = group->begin(); iter != group->end(); ++iter )
 					{
 						dfaTab[curStaNum][*iter] = nextSta;
 					}
 					if(finFlag == 1)
 					{
-						dfaTab.back().SetnFlag(dfaTab.back().GetnFlag() | dfaTab.back().TERMINAL);
+						dfaTab.Back().SetFlag(dfaTab.Back().GetFlag() | dfaTab.Back().TERMINAL);
 						finFlag = 0;
 					}
 					nfaStasStack.push(nextNfaVec);
@@ -95,13 +95,4 @@ CREDFA void NfaToDfa(CNfa &oneNfaTab, CDfa &dfaTab)
 			}
 		}
 	}
-
-	//printDfa(dfaTab);
-	//std::string str = "BMbb";
-
-	//size_t reNum = MatchDfa(dfaTab, str.begin(), str.end());
-
-	//size_t falg = dfaTab[reNum].GetnFlag();
-	//dAll = t.Reset();
-
 }
