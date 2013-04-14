@@ -1,5 +1,5 @@
 #include <iostream>
-#include "../SnortCommon/snortcommon.h"
+#include "../common/common.h"
 #include "../pcre2nfa/pcre2nfa.h"
 #include "../nfa2dfa/nfa2dfa.h"
 

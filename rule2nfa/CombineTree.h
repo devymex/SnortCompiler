@@ -2,7 +2,7 @@
 //#include "stdafx.h"
 //#include "CreDfa.h"
 
-#include "../SnortCommon/snortcommon.h"
+#include "../common/common.h"
 
 #define CHARSETSIZE 260
 

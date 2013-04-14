@@ -2,7 +2,7 @@
 
 #define ONEPCRETONFA_H_
 #include "pcre2nfa.h"
-#include "../SnortCommon/snortcommon.h"
+#include "../common/common.h"
 
 #define SC_LIMIT 100
 

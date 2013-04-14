@@ -1,7 +1,7 @@
 #pragma once
 
 #include <vector>
-#include "../SnortCommon/snortcommon.h"
+#include "../common/common.h"
 
 #ifndef PCRETONFA_H_
 #define PCRETONFA __declspec(dllimport)

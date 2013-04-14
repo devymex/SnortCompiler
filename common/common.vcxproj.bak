@@ -13,6 +13,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{0C639590-DE81-4AB4-AA71-6CE6CAB424E4}</ProjectGuid>
     <RootNamespace>SnortCommon</RootNamespace>
+    <ProjectName>common</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
