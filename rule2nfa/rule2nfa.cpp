@@ -420,80 +420,82 @@ size_t ExtractOptionContent(_Iter &iBeg, _Iter &iEnd, OPTIONCONTENT &opCont)
 	return 0;
 }
 
-DWORD ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
+size_t ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
 {
-	std::vector<RULEOPTIONRAW> options;
-	ExtractOption(ruleOptions, options);
+	//std::vector<RULEOPTIONRAW> options;
+	//ExtractOption(ruleOptions, options);
 
-	//Mark process mode, "0" is error ,"1" is normal
-	DWORD dwResult = DWORD(-1);
+	////Mark process mode, "0" is error ,"1" is normal
+	//size_t nResult = size_t(-1);
 
-	//snortRule.nFlags = 0;
+	////snortRule.nFlags = 0;
 
-	//Read one rule and only store "sid","pcre","content" and related options
+	////Read one rule and only store "sid","pcre","content" and related options
 
-	size_t nFlag = 0;
-	if (std::find_if (options.begin(), options.end(), SEARCHBYTEOPTION()) == options.end())
-	{
-		nFlag |= CSnortRule::RULE_HASBYTE;
-	}
-	for(std::vector<RULEOPTIONRAW>::iterator i = options.begin(); ;)
-	{
-		std::vector<RULEOPTIONRAW>::iterator iBeg = std::find_if(i, options.end(), SEARCHOPTIONS());
-		if (iBeg == options.end())
-		{
-			dwResult = 0;
-			break;
-		}
-		std::vector<RULEOPTIONRAW>::iterator iEnd = std::find_if(iBeg + 1, options.end(), SEARCHOPTIONS());		
+	//size_t nFlag = 0;
+	//if (std::find_if (options.begin(), options.end(), SEARCHBYTEOPTION()) == options.end())
+	//{
+	//	nFlag |= CSnortRule::RULE_HASBYTE;
+	//}
+	//for(std::vector<RULEOPTIONRAW>::iterator i = options.begin(); ;)
+	//{
+	//	std::vector<RULEOPTIONRAW>::iterator iBeg = std::find_if(i, options.end(), SEARCHOPTIONS());
+	//	if (iBeg == options.end())
+	//	{
+	//		nResult = 0;
+	//		break;
+	//	}
+	//	std::vector<RULEOPTIONRAW>::iterator iEnd = std::find_if(iBeg + 1, options.end(), SEARCHOPTIONS());		
 
-		if (0 == stricmp("sid", iBeg->name.c_str()))
-		{
-			std::string::iterator opValueBeg = iBeg->value.begin();
-			std::string::iterator opValueEnd = iBeg->value.end();
-			opValueBeg = std::find_if_not(opValueBeg, opValueEnd, ISSPACE());
-			//*(int*)(&snortRule.Sid) = atoi(&*opValueBeg);
-			snortRule.SetSid(atoi(&*opValueBeg));
-		}
-		else if (0 == stricmp("pcre", iBeg->name.c_str()))
-		{
-			std::string::iterator opValueBeg = iBeg->value.begin();
-			std::string::iterator opValueEnd = iBeg->value.end();
-			opValueBeg = std::find_if_not(opValueBeg, opValueEnd, ISSPACE());
+	//	if (0 == stricmp("sid", iBeg->name.c_str()))
+	//	{
+	//		std::string::iterator opValueBeg = iBeg->value.begin();
+	//		std::string::iterator opValueEnd = iBeg->value.end();
+	//		opValueBeg = std::find_if_not(opValueBeg, opValueEnd, ISSPACE());
+	//		//*(int*)(&snortRule.Sid) = atoi(&*opValueBeg);
+	//		snortRule.SetSid(atoi(&*opValueBeg));
+	//	}
+	//	else if (0 == stricmp("pcre", iBeg->name.c_str()))
+	//	{
+	//		std::string::iterator opValueBeg = iBeg->value.begin();
+	//		std::string::iterator opValueEnd = iBeg->value.end();
+	//		opValueBeg = std::find_if_not(opValueBeg, opValueEnd, ISSPACE());
 
-			OPTIONPCRE *pPcre = new OPTIONPCRE;
-			size_t nr = FormatPcre(opValueBeg, opValueEnd, *pPcre);
-			if (nr != 0)
-			{
-				if (nr == size_t(-2))
-				{
-					nFlag |= CSnortRule::RULE_HASNOT;
-				}
-				delete pPcre;
-				break;
-			}
-			snortRule.PushBack(pPcre);
-		}
-		else if (0 == stricmp("content", iBeg->name.c_str()) ||
-			0 == stricmp("uricontent", iBeg->name.c_str()))
-		{
-			OPTIONCONTENT *pContent = new OPTIONCONTENT;
-			size_t nr = ExtractOptionContent(iBeg, iEnd, *pContent);
-			if (nr != 0)
-			{
-				if (nr == size_t(-2))
-				{
-					nFlag |= CSnortRule::RULE_HASNOT;
-				}
-				delete pContent;
-				break;
-			}
-			snortRule.PushBack(pContent);
-		}
-		i = iEnd;
-	}
-	snortRule.SetFlag(nFlag);
-	return dwResult;
+	//		OPTIONPCRE *pPcre = new OPTIONPCRE;
+	//		size_t nr = FormatPcre(opValueBeg, opValueEnd, *pPcre);
+	//		if (nr != 0)
+	//		{
+	//		}
+	//			if (nr == size_t(-2))
+	//			{
+	//				nFlag |= CSnortRule::RULE_HASNOT;
+	//			}
+	//			delete pPcre;
+	//			break;
+	//		}
+	//		snortRule.PushBack(pPcre);
+	//	}
+	//	else if (0 == stricmp("content", iBeg->name.c_str()) ||
+	//		0 == stricmp("uricontent", iBeg->name.c_str()))
+	//	{
+	//		OPTIONCONTENT *pContent = new OPTIONCONTENT;
+	//		size_t nr = ExtractOptionContent(iBeg, iEnd, *pContent);
+	//		if (nr != 0)
+	//		{
+	//			if (nr == size_t(-2))
+	//			{
+	//				nFlag |= CSnortRule::RULE_HASNOT;
+	//			}
+	//			delete pContent;
+	//			break;
+	//		}
+	//		snortRule.PushBack(pContent);
+	//	}
+	//	i = iEnd;
+	//}
+	//snortRule.SetFlag(nFlag);
+	//return nResult;
+	return 0;
 }
 
 
