@@ -3,7 +3,7 @@
 #include <vector>
 
 #define CHARSETSIZE 260
-
+#define EMPTYEDGE 256
 
 #ifndef COMMON_H_
 #define COMMONSC __declspec(dllimport)
@@ -115,6 +115,7 @@ public:
 	const CNfaChain& operator = (const CNfaChain &other);
 
 	size_t Size() const;
+	CNfa& Back();
 	void PushBack(CNfa &cnfa);
 	CNfa& operator[](size_t nIdx);
 	const CNfa& operator[](size_t nIdx) const;
@@ -131,6 +132,8 @@ public:
 	const CNfaTree& operator = (const CNfaTree &other);
 
 	size_t Size() const;
+	CNfaChain& Back();
+	void PushBack(CNfaChain &cnfachain);
 	CNfaChain& operator[](size_t nIdx);
 	const CNfaChain& operator[](size_t nIdx) const;
 
@@ -142,6 +145,20 @@ struct COMMONSC RULEOPTION
 {
 	virtual ~RULEOPTION();
 	size_t nFlags;
+};
+
+struct OPTIONCONTENT : public RULEOPTION
+{
+	std::vector<BYTE> vecconts;
+	int nOffset;
+	int nDepth;
+	int nDistance;
+	int nWithin;
+};
+
+struct OPTIONPCRE : public RULEOPTION
+{
+	std::string strPattern;
 };
 
 enum OPTIONCONTENTFLAGS
@@ -187,6 +204,7 @@ public:
 	void PushBack(RULEOPTION* ruleoption);
 	void PopBack();
 	size_t Size() const;
+	RULEOPTION*& operator[](size_t nIdx) const;
 private:
 	size_t m_nSid;
 	std::vector<RULEOPTION*> *m_pOptions;

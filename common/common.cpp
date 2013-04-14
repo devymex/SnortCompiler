@@ -288,6 +288,10 @@ COMMONSC size_t CNfaChain::Size() const
 {
 	return m_pChain->size();
 }
+COMMONSC CNfa& CNfaChain::Back()
+{
+	return m_pChain->back();
+}
 
 COMMONSC void CNfaChain::PushBack(CNfa &cnfa)
 {
@@ -337,6 +341,14 @@ COMMONSC size_t CNfaTree::Size() const
 	return m_pTree->size();
 }
 
+COMMONSC CNfaChain& CNfaTree::Back()
+{
+	return m_pTree->back();
+}
+COMMONSC void CNfaTree::PushBack(CNfaChain &cnfachain)
+{
+	m_pTree->push_back(cnfachain);
+}
 CNfaChain& CNfaTree::operator[](size_t nIdx)
 {
 	return (*m_pTree)[nIdx];
@@ -380,4 +392,9 @@ COMMONSC void CSnortRule::PopBack()
 COMMONSC size_t CSnortRule::Size() const
 {
 	return m_pOptions->size();
+}
+
+COMMONSC RULEOPTION*& CSnortRule::operator[](size_t nIdx) const
+{
+	return (*m_pOptions)[nIdx];
 }
