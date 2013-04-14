@@ -2,7 +2,6 @@
 #include "../SnortCommon/snortcommon.h"
 #include <windows.h>
 #ifndef PARSERULE_H_
-
 #define PARSERULE __declspec(dllimport)
 #else
 #define PARSERULE __declspec(dllexport)

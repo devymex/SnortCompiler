@@ -91,7 +91,7 @@ size_t LoadFile(LPCTSTR fileName, std::vector<std::string> &rules)
 	std::ifstream fin(fileName);
 	if(!fin)
 	{
-		std::cerr << "Open file " << fileName << " Failed!" << std::endl;
+		std::cerr << "Open file Failed!" << std::endl;
 		return -1;
 	}
 	for (std::string strRule; std::getline(fin, strRule);)
@@ -464,7 +464,7 @@ DWORD ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
 * then process the rules to CSnortRule
 * callback function RECIEVER to handle CSnortRule
 */
-PARSERULE size_t ParseRule(LPCTSTR fileName, RECIEVER recv)
+PARSERULE size_t ParseRule(tstring fileName, RECIEVER recv)
 {
 	if(recv == NULL)
 	{
