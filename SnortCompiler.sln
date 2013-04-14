@@ -37,6 +37,12 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Compiler", "Compiler\Compil
 		{0C639590-DE81-4AB4-AA71-6CE6CAB424E4} = {0C639590-DE81-4AB4-AA71-6CE6CAB424E4}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "loadRuleTest", "loadRuleTest\loadRuleTest.vcxproj", "{257F6C1E-723B-44FF-AD05-21A02F1BF40A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{90CCDB22-8109-4C0B-99DE-68811174819F} = {90CCDB22-8109-4C0B-99DE-68811174819F}
+		{0C639590-DE81-4AB4-AA71-6CE6CAB424E4} = {0C639590-DE81-4AB4-AA71-6CE6CAB424E4}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -71,6 +77,10 @@ Global
 		{007BB919-C1A5-401E-A7D8-8FE20C65D132}.Debug|Win32.Build.0 = Debug|Win32
 		{007BB919-C1A5-401E-A7D8-8FE20C65D132}.Release|Win32.ActiveCfg = Release|Win32
 		{007BB919-C1A5-401E-A7D8-8FE20C65D132}.Release|Win32.Build.0 = Release|Win32
+		{257F6C1E-723B-44FF-AD05-21A02F1BF40A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{257F6C1E-723B-44FF-AD05-21A02F1BF40A}.Debug|Win32.Build.0 = Debug|Win32
+		{257F6C1E-723B-44FF-AD05-21A02F1BF40A}.Release|Win32.ActiveCfg = Release|Win32
+		{257F6C1E-723B-44FF-AD05-21A02F1BF40A}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
