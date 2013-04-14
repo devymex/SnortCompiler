@@ -11,23 +11,23 @@ CRECHANFA void SerializeNfa(CNfaChain &nfaChain, CNfa &seriaNfa)
 {
 	const size_t cEmptyEdge = 256;
 	CNfaRow oneSta;
-	size_t staNum = seriaNfa.size();
+	size_t staNum = seriaNfa.Size();
 	for(size_t n = 0; n < nfaChain.Size(); ++n)
 	{
 
-		IncreNfaStaNum(seriaNfa.size(), nfaChain[n]);
-		for (size_t i = 0; i < nfaChain[n].size(); ++i)
+		IncreNfaStaNum(seriaNfa.Size(), nfaChain[n]);
+		for (size_t i = 0; i < nfaChain[n].Size(); ++i)
 		{
-			seriaNfa.push_back(nfaChain[n][i]);
+			seriaNfa.PushBack(nfaChain[n][i]);
 		}
 
 		if(n != nfaChain.Size() - 1)
 		{
-			seriaNfa.back()[cEmptyEdge].PushBack(seriaNfa.size());
-			seriaNfa.push_back(oneSta);
-			seriaNfa.back()[cEmptyEdge].PushBack(seriaNfa.size());
+			seriaNfa.Back()[cEmptyEdge].PushBack(seriaNfa.Size());
+			seriaNfa.PushBack(oneSta);
+			seriaNfa.Back()[cEmptyEdge].PushBack(seriaNfa.Size());
 		}		
 
-		staNum = seriaNfa.size();
+		staNum = seriaNfa.Size();
 	}
 }

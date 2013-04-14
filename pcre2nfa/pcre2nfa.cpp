@@ -141,7 +141,7 @@ PCRETONFA size_t PcreToNFA(const char *pPcre, CNfa &nfa)
 	{
 		return SC_EXCEED;
 	}
-	nfa.reserve(10000);
+	nfa.Reserve(10000);
 	size_t flag = ProcessPcre(Beg, End, nfa);
 
 	if (flag != SC_SUCCESS)

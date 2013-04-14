@@ -41,8 +41,6 @@ public:
 	~CNfaRow();
 	CNfaRow(const CNfaRow &other);
 	CNfaRow& operator=(const CNfaRow &other);
-	size_t Size(size_t nChar);
-	void GetSet(size_t nChar, size_t *pSet);
 
 	CStateSet& operator[](size_t nChar);
 	const CStateSet& operator[](size_t nChar) const;
@@ -58,15 +56,15 @@ public:
 	CNfa(const CNfa &other);
 	CNfa& operator=(const CNfa &other);
 	size_t GetRowNum(void);
-	void reserve(size_t _Count);
-	void resize(size_t _Newsize);
-	size_t size() const;
-	void push_back(const CNfaRow &row);
+	void Reserve(size_t _Count);
+	void Resize(size_t _Newsize);
+	size_t Size() const;
+	void PushBack(const CNfaRow &row);
+	void PopBack();
 
-	CNfaRow &back();
+	CNfaRow &Back();
 	CNfaRow &operator[](size_t index);
 	const CNfaRow &operator[](size_t index) const;
-	void pop_back();
 private:
 	std::vector<CNfaRow> *m_pNfa;
 };
@@ -85,10 +83,10 @@ public:
 	CDfaRow(const CDfaRow &other);
 	CDfaRow& operator=(const CDfaRow &other);
 	size_t& operator[](size_t index);
-	void SetnFlag(unsigned long flag);
-	unsigned long GetnFlag();
+	void SetFlag(size_t nFlag);
+	size_t GetFlag();
 private:
-	unsigned long nFlag;
+	size_t m_nFlag;
 	size_t m_pDest[CHARSETSIZE];
 };
 
@@ -99,10 +97,10 @@ public:
 	~CDfa();
 	CDfa(const CDfa &other);
 	CDfa& operator=(const CDfa &other);
-	void reserve(size_t _Count);
-	void resize(size_t _Newsize);
-	size_t size() const;
-	CDfaRow &back();
+	void Reserve(size_t _Count);
+	void Resize(size_t _Newsize);
+	size_t Size() const;
+	CDfaRow &Back();
 	CDfaRow& operator[](size_t index);
 private:
 	std::vector<CDfaRow> *m_pDfa;

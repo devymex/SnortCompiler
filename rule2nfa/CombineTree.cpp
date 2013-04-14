@@ -11,7 +11,7 @@ void IncreNfaStaNum(int increNum, CNfa &curNfa)
 		return;
 	}
 
-	for (size_t i = 0; i < curNfa.size(); ++i)
+	for (size_t i = 0; i < curNfa.Size(); ++i)
 	{
 		for(size_t charNum = 0; charNum < CHARSETSIZE -3; ++charNum)
 		{
