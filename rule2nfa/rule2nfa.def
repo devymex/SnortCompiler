@@ -1,0 +1,3 @@
+LIBRARY rule2nfa
+EXPORTS
+SerializeNfa @1

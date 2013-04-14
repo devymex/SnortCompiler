@@ -1,6 +1,10 @@
 #include "stdafx.h"
 #include "snortcommon.h"
 
+RULEOPTION::~RULEOPTION()
+{
+}
+
 COMMONSC CStateSet::CStateSet()
 {
 	m_pSet = new std::vector<size_t>;
@@ -266,10 +270,54 @@ COMMONSC size_t CDfa::size() const
 	return m_pDfa->size();
 }
 
+
 COMMONSC CDfaRow &CDfa::back()
 {
 	return m_pDfa->back();
 }
+
+COMMONSC CNfaChain::CNfaChain()
+{
+	m_pChain = new std::vector<CNfa>;
+}
+
+COMMONSC CNfaChain::~CNfaChain()
+{
+	delete m_pChain;
+}
+
+COMMONSC CNfaChain::CNfaChain(const CNfaChain &other)
+{
+	m_pChain = new std::vector<CNfa>;
+	*this = other;
+}
+
+COMMONSC const CNfaChain& CNfaChain::operator = (const CNfaChain &other)
+{
+	*m_pChain = *other.m_pChain;
+	return *this;
+}
+
+COMMONSC size_t CNfaChain::Size() const
+{
+	return m_pChain->size();
+}
+
+COMMONSC void CNfaChain::PushBack(CNfa &cnfa)
+{
+	m_pChain->push_back(cnfa);
+}
+
+COMMONSC CNfa& CNfaChain::operator[](size_t nIdx)
+{
+	return (*m_pChain)[nIdx];
+}
+
+COMMONSC const CNfa& CNfaChain::operator[](size_t nIdx) const
+{
+	return (*m_pChain)[nIdx];
+}
+
 
 COMMONSC CDfaRow& CDfa::operator[](size_t index)
 {
@@ -278,7 +326,7 @@ COMMONSC CDfaRow& CDfa::operator[](size_t index)
 
 COMMONSC CNfaTree::CNfaTree()
 {
-	m_pTree = new std::vector<std::vector<CNfa>>;
+	m_pTree = new std::vector<CNfaChain>;
 }
 
 COMMONSC CNfaTree::~CNfaTree()
@@ -288,7 +336,7 @@ COMMONSC CNfaTree::~CNfaTree()
 
 COMMONSC CNfaTree::CNfaTree(const CNfaTree &other)
 {
-	m_pTree = new std::vector<std::vector<CNfa>>;
+	m_pTree = new std::vector<CNfaChain>;
 	*this = other;
 }
 
@@ -303,18 +351,47 @@ COMMONSC size_t CNfaTree::Size() const
 	return m_pTree->size();
 }
 
-COMMONSC size_t CNfaTree::ChainSize(size_t nChain) const
+CNfaChain& CNfaTree::operator[](size_t nIdx)
 {
-	return (*m_pTree)[nChain].size();
+	return (*m_pTree)[nIdx];
 }
 
-COMMONSC CNfa& CNfaTree::GetNfa(size_t nChain, size_t nNfa)
+const CNfaChain& CNfaTree::operator[](size_t nIdx) const
 {
-	return (*m_pTree)[nChain][nNfa];
+	return (*m_pTree)[nIdx];
 }
 
-COMMONSC const CNfa& CNfaTree::GetNfa(size_t nChain, size_t nNfa) const
+COMMONSC CSnortRule::CSnortRule()
+	: m_nSid(0)
 {
-	return (*m_pTree)[nChain][nNfa];
+	m_pOptions = new std::vector<RULEOPTION*>;
 }
 
+COMMONSC CSnortRule::CSnortRule(const CSnortRule &other)
+{
+	m_pOptions = new std::vector<RULEOPTION*>;
+	*this = other;
+}
+COMMONSC CSnortRule::~CSnortRule()
+{
+	delete m_pOptions;
+}
+
+COMMONSC void CSnortRule::SetSid(size_t sid)
+{
+	m_nSid = sid;
+}
+
+COMMONSC void CSnortRule::PushBack(RULEOPTION* ruleoption)
+{
+	m_pOptions->push_back(ruleoption);
+}
+COMMONSC void CSnortRule::PopBack()
+{
+	m_pOptions->pop_back();
+}
+
+COMMONSC size_t CSnortRule::Size() const
+{
+	return m_pOptions->size();
+}
