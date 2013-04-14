@@ -9,7 +9,7 @@ void printNfa(CNfa &nfa)
 			std::cout << j << ": ";
 			for (size_t k = 0; k < CHARSETSIZE; ++k)
 			{
-				for (size_t l = 0; l < nfa[j].GetSetSize(k); ++l)
+				for (size_t l = 0; l < nfa[j][k].Size(); ++l)
 				{
 					std::cout << "(" << k << "," << nfa[j][k][l] << ")";
 				}

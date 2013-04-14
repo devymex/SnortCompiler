@@ -8,7 +8,7 @@
 #endif
 
 
-typedef void (CALLBACK *RECIEVER)(const CSnortRule &rule);
+typedef void (CALLBACK *RECIEVER)(const CSnortRule &rule, LPVOID lpVoid);
 
-PARSERULE size_t ParseRule(LPCTSTR fileName, RECIEVER recv);
+PARSERULE size_t ParseRule(LPCTSTR fileName, RECIEVER recv, LPVOID lpUser);
 
