@@ -2,7 +2,7 @@
 #include "rule2nfa.h"
 #include "CombineTree.h"
 
-CRECHANFA size_t InterpretRule(LPCSTR lpRule, CNfaTree &outTree)
+CRECHANFA size_t InterpretRule(const CSnortRule &rule, CNfaTree &outTree)
 {
 	return size_t(-1);
 }
