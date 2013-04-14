@@ -180,16 +180,20 @@ enum PCREFLAGS
 class COMMONSC CSnortRule
 {
 public:
+	enum {RULE_HASBYTE = 0x0001, RULE_HASNOT = 0x0002, RULE_EMPTY = 0x0004};
 	CSnortRule();
 	CSnortRule(const CSnortRule &other);
 	~CSnortRule();
 	void SetSid(size_t sid);
 	size_t GetSid() const;
+	void SetFlag(size_t flag);
+	size_t GetFlag() const;
 	void PushBack(RULEOPTION* ruleoption);
 	void PopBack();
 	size_t Size() const;
 private:
 	size_t m_nSid;
+	size_t m_nFlag;
 	std::vector<RULEOPTION*> *m_pOptions;
 };
 

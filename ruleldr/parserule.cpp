@@ -23,17 +23,7 @@ struct RULEOPTIONRAW
 
 struct ISSPACE
 {
-	static char g_map[256];
-	bool operator()(char c)
-	{
-		return g_map[c] == 1;
-	}
-	struct ISSPACECTOR
-	{
-		ISSPACECTOR(){ ISSPACE::Init(); }
-	};
-private:
-	static void Init()
+	ISSPACE()
 	{
 		ZeroMemory(g_map, sizeof(g_map) / sizeof(g_map[0]));
 		g_map[' '] = 1;
@@ -41,9 +31,13 @@ private:
 		g_map['\n'] = 1;
 		g_map['\r'] = 1;
 	}
+	bool operator()(char c)
+	{
+		return g_map[c] == 1;
+	}
+private:
+	char g_map[256];
 };
-
-char ISSPACE::g_map[256];
 
 struct EMPTYRULE
 {
@@ -116,7 +110,7 @@ void ExtractOption(std::string &ruleOptions, std::vector<RULEOPTIONRAW> &options
 		if (*(iComma - 1) != '\\')
 		{
 			RULEOPTIONRAW or;
-			std::string::iterator iNameBeg = std::find_if_not(i, iComma, ISSPACE());
+			std::string::iterator iNameBeg = std::find_if(i, iComma, isalpha);
 			std::string::iterator iValueBeg = std::find(iNameBeg + 1, iComma, ':');
 
 			// Get the end position of option name and assign into RULEOPTIONRAW
@@ -161,17 +155,17 @@ bool QuotedContext(_Iter &beg, _Iter &end)
 
 //Extract pcre string and mark process mode
 template<typename _Iter>
-int FormatPcre (_Iter pBeg, _Iter pEnd, OPTIONPCRE &pcre)
+size_t FormatPcre (_Iter pBeg, _Iter pEnd, OPTIONPCRE &pcre)
 {
 	pcre.nFlags = 0;
 	//If rule includes '!',we should delete this rule
 	if (*std::find_if_not(pBeg, pEnd, ISSPACE()) == '!')
 	{
-		return FALSE;
+		return size_t(-2);
 	}
 	if (!QuotedContext(pBeg, pEnd))
 	{
-		return FALSE;
+		return size_t(-1);
 	}
 
 	_Iter iPcreBeg = std::find(pBeg, pEnd, '/');
@@ -180,7 +174,7 @@ int FormatPcre (_Iter pBeg, _Iter pEnd, OPTIONPCRE &pcre)
 
 	if ((iPcreBeg + 1) > iPcreEnd)
 	{
-		return FALSE;
+		return size_t(-1);
 	}
 	else
 	{
@@ -258,7 +252,7 @@ int FormatPcre (_Iter pBeg, _Iter pEnd, OPTIONPCRE &pcre)
 			pcre.nFlags |= 0;
 		}
 	}
-	return TRUE;
+	return 0;
 }
 
 inline char HexBit(char value)
@@ -294,15 +288,15 @@ inline BYTE HexByte(const char *p2Bytes)
 
 //The string type is converted into unsigned char type
 template<typename _Iter>
-int FormatOptionContent (_Iter cBeg, _Iter cEnd, std::vector<BYTE> &content)
+size_t FormatOptionContent (_Iter cBeg, _Iter cEnd, std::vector<BYTE> &content)
 {
 	if (*std::find_if_not(cBeg, cEnd, ISSPACE()) == '!')
 	{
-		return FALSE;
+		return size_t(-2);
 	}
 	if (!QuotedContext(cBeg, cEnd))
 	{
-		return FALSE;
+		return size_t(-1);
 	}
 
 	//Transform ducted data into hex number
@@ -333,12 +327,12 @@ int FormatOptionContent (_Iter cBeg, _Iter cEnd, std::vector<BYTE> &content)
 			content.push_back(*i);
 		}
 	}
-	return TRUE;
+	return 0;
 }
 
 //Extract OPTIONCONTENT string and related options
 template<typename _Iter>
-int ExtractOptionContent(_Iter &iBeg, _Iter &iEnd, OPTIONCONTENT &opCont)
+size_t ExtractOptionContent(_Iter &iBeg, _Iter &iEnd, OPTIONCONTENT &opCont)
 {
 	opCont.nFlags = 0;
 	opCont.nOffset = 0;
@@ -350,13 +344,18 @@ int ExtractOptionContent(_Iter &iBeg, _Iter &iEnd, OPTIONCONTENT &opCont)
 		std::string::iterator iValueBeg = i->value.begin();
 		std::string::iterator iValueEnd = i->value.end();
 		iValueBeg = std::find_if_not(iValueBeg, iValueEnd, ISSPACE());
-		if (0 == stricmp("content", i->name.c_str()) && FormatOptionContent(iValueBeg, iValueEnd, opCont.vecconts) == 0)
+		size_t nr = FormatOptionContent(iValueBeg, iValueEnd, opCont.vecconts);
+		if (nr != 0)
 		{
-			return FALSE;
+			return nr;
 		}
-		else if (0 == stricmp("uricontent", i->name.c_str()) && FormatOptionContent(iValueBeg, iValueEnd, opCont.vecconts) == 0)
+		if (0 == stricmp("content", i->name.c_str()))
 		{
-			return FALSE;
+			return size_t(-1);
+		}
+		else if (0 == stricmp("uricontent", i->name.c_str()))
+		{
+			return size_t(-1);
 		}
 		else if (0 == stricmp("nocase", i->name.c_str()))
 		{
@@ -383,7 +382,7 @@ int ExtractOptionContent(_Iter &iBeg, _Iter &iEnd, OPTIONCONTENT &opCont)
 			opCont.nFlags |= CF_WITHIN;
 		}	
 	}
-	return TRUE;
+	return 0;
 }
 
 DWORD ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
@@ -398,63 +397,67 @@ DWORD ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
 
 	//Read one rule and only store "sid","pcre","content" and related options
 
+	size_t nFlag = 0;
 	if (std::find_if (options.begin(), options.end(), SEARCHBYTEOPTION()) == options.end())
 	{
-		for(std::vector<RULEOPTIONRAW>::iterator i = options.begin(); ;)
+		nFlag |= CSnortRule::RULE_HASBYTE;
+	}
+	for(std::vector<RULEOPTIONRAW>::iterator i = options.begin(); ;)
+	{
+		std::vector<RULEOPTIONRAW>::iterator iBeg = std::find_if(i, options.end(), SEARCHOPTIONS());
+		if (iBeg == options.end())
 		{
-			std::vector<RULEOPTIONRAW>::iterator iBeg = std::find_if(i, options.end(), SEARCHOPTIONS());
-			if (iBeg == options.end())
+			dwResult = 0;
+			break;
+		}
+		std::vector<RULEOPTIONRAW>::iterator iEnd = std::find_if(iBeg + 1, options.end(), SEARCHOPTIONS());		
+
+		if (0 == stricmp("sid", iBeg->name.c_str()))
+		{
+			std::string::iterator opValueBeg = iBeg->value.begin();
+			std::string::iterator opValueEnd = iBeg->value.end();
+			opValueBeg = std::find_if_not(opValueBeg, opValueEnd, ISSPACE());
+			//*(int*)(&snortRule.Sid) = atoi(&*opValueBeg);
+			snortRule.SetSid(atoi(&*opValueBeg));
+		}
+		else if (0 == stricmp("pcre", iBeg->name.c_str()))
+		{
+			std::string::iterator opValueBeg = iBeg->value.begin();
+			std::string::iterator opValueEnd = iBeg->value.end();
+			opValueBeg = std::find_if_not(opValueBeg, opValueEnd, ISSPACE());
+
+			OPTIONPCRE *pPcre = new OPTIONPCRE;
+			size_t nr = FormatPcre(opValueBeg, opValueEnd, *pPcre);
+			if (nr != 0)
 			{
-				dwResult = 0;
+				if (nr == size_t(-2))
+				{
+					nFlag |= CSnortRule::RULE_HASNOT;
+				}
+				delete pPcre;
 				break;
 			}
-			std::vector<RULEOPTIONRAW>::iterator iEnd = std::find_if(iBeg + 1, options.end(), SEARCHOPTIONS());		
-
-			if (0 == stricmp("sid", iBeg->name.c_str()))
+			snortRule.PushBack(pPcre);
+		}
+		else if (0 == stricmp("content", iBeg->name.c_str()) ||
+			0 == stricmp("uricontent", iBeg->name.c_str()))
+		{
+			OPTIONCONTENT *pContent = new OPTIONCONTENT;
+			size_t nr = ExtractOptionContent(iBeg, iEnd, *pContent);
+			if (nr != 0)
 			{
-				std::string::iterator opValueBeg = iBeg->value.begin();
-				std::string::iterator opValueEnd = iBeg->value.end();
-				opValueBeg = std::find_if_not(opValueBeg, opValueEnd, ISSPACE());
-				//*(int*)(&snortRule.Sid) = atoi(&*opValueBeg);
-				snortRule.SetSid(atoi(&*opValueBeg));
-			}
-			else if (0 == stricmp("pcre", iBeg->name.c_str()))
-			{
-				std::string::iterator opValueBeg = iBeg->value.begin();
-				std::string::iterator opValueEnd = iBeg->value.end();
-				opValueBeg = std::find_if_not(opValueBeg, opValueEnd, ISSPACE());
-
-				OPTIONPCRE *pPcre = new OPTIONPCRE;
-				if (FormatPcre(opValueBeg, opValueEnd, *pPcre) == 0)
+				if (nr == size_t(-2))
 				{
-					delete pPcre;
-					break;
+					nFlag |= CSnortRule::RULE_HASNOT;
 				}
-				snortRule.PushBack(pPcre);
+				delete pContent;
+				break;
 			}
-			else if (0 == stricmp("content", iBeg->name.c_str()))
-			{
-				OPTIONCONTENT *pContent = new OPTIONCONTENT;
-				if (ExtractOptionContent(iBeg, iEnd, *pContent) == 0)
-				{
-					delete pContent;
-					break;
-				}
-				snortRule.PushBack(pContent);
-			}
-			else if (0 == stricmp("uricontent", iBeg->name.c_str()))
-			{
-				OPTIONCONTENT *pContent = new OPTIONCONTENT;
-				if (ExtractOptionContent(iBeg, iEnd, *pContent) == 0)
-				{
-					delete pContent;
-					break;
-				}
-				snortRule.PushBack(pContent);
-			}
-			i = iEnd;
-		}	
+			snortRule.PushBack(pContent);
+		}
+		i = iEnd;
 	}
+	snortRule.SetFlag(nFlag);
 	return dwResult;
 }
 
@@ -483,12 +486,9 @@ PARSERULE size_t ParseRule(LPCTSTR fileName, RECIEVER recv, LPVOID lpUser)
 				rIt->erase(find(rIt->rbegin(), rIt->rend(), ')').base() - 1, rIt->end());
 
 				CSnortRule snortRule;
-				if (ProcessOption(*rIt, snortRule))
+				if (0 == ProcessOption(*rIt, snortRule))
 				{
-					if (snortRule.Size() != 0)
-					{
-						recv(snortRule, lpUser);
-					}
+					recv(snortRule, lpUser);
 				}
 			}
 		}

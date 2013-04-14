@@ -373,6 +373,16 @@ COMMONSC size_t CSnortRule::GetSid() const
 	return m_nSid;
 }
 
+COMMONSC void CSnortRule::SetFlag(size_t flag)
+{
+	m_nFlag = flag;
+}
+
+COMMONSC size_t CSnortRule::GetFlag() const
+{
+	return m_nFlag;
+}
+
 COMMONSC void CSnortRule::PushBack(RULEOPTION* ruleoption)
 {
 	m_pOptions->push_back(ruleoption);

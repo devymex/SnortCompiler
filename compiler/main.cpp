@@ -17,6 +17,7 @@ struct RES
 	std::vector<SNORTIDDFAIDS> m_sidDfaIds;
 	std::vector<size_t> m_errorIds;
 	std::vector<size_t> m_exceedIds;
+	std::vector<size_t> m_emptyIds;
 };
 
 void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
@@ -33,6 +34,11 @@ void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 	else if (flag == SC_EXCEED)
 	{
 		result.m_exceedIds.push_back(nSid);
+		return;
+	}
+	else if (flag == SC_EMPTY)
+	{
+		result.m_emptyIds.push_back(nSid);
 		return;
 	}
 	else
