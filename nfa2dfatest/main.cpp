@@ -9,8 +9,8 @@ void main()
 	CNfa nfa;
 	CDfa dfa;
 	PcreToNFA(a, nfa);
-	size_t nfasize = nfa.size();
+	size_t nfasize = nfa.Size();
 	NfaToDfa(nfa, dfa);
-	size_t dfasize = dfa.size();
+	size_t dfasize = dfa.Size();
 	system("pause");
 }

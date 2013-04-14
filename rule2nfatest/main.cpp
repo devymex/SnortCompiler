@@ -4,7 +4,7 @@
 
 void printNfa(CNfa &nfa)
 {
-	for (size_t j = 0; j < nfa.size(); ++j)
+	for (size_t j = 0; j < nfa.Size(); ++j)
 		{
 			std::cout << j << ": ";
 			for (size_t k = 0; k < CHARSETSIZE; ++k)
@@ -25,10 +25,10 @@ void main()
 	nfarow2[1].PushBack(1);
 	nfarow2[2].PushBack(2);
 	CNfa nfa1, nfa2;
-	nfa1.push_back(nfarow1);
-	nfa1.push_back(nfarow2);
-	nfa2.push_back(nfarow1);
-	nfa2.push_back(nfarow2);
+	nfa1.PushBack(nfarow1);
+	nfa1.PushBack(nfarow2);
+	nfa2.PushBack(nfarow1);
+	nfa2.PushBack(nfarow2);
 	
 	printNfa(nfa1);
 	printNfa(nfa2);
