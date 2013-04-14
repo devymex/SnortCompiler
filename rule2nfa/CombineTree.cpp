@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "../SnortCommon/snortcommon.h"
+#include "../common/common.h"
 #include "CombineTree.h"
 
 

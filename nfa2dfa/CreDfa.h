@@ -1,7 +1,7 @@
 #pragma once
 //#include "stdafx.h"
 
-#include "../SnortCommon/snortcommon.h"
+#include "../common/common.h"
 
 //以下注释用于测试
 //enum STATEFLAG

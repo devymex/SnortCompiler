@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "snortcommon.h"
+#include "common.h"
 
 RULEOPTION::~RULEOPTION()
 {

@@ -77,8 +77,53 @@ void PcreToCode(const std::string &OnePcre, std::vector<unsigned char> &code)
 	}
 }
 
+bool ExceedLimit(const std::string &OnePcre)
+{
+	size_t CurPos = OnePcre.find('{', 0);
+	size_t EndPos;
+	while (CurPos != std::string::npos)
+	{
+		if (OnePcre[CurPos - 1] != '\\')
+		{
+			EndPos = OnePcre.find('}', CurPos + 1);
+			std::string StrInBrace = OnePcre.substr(CurPos + 1, EndPos - CurPos - 1);
+			size_t commaPos = StrInBrace.find(',', 0);
+			if (commaPos == std::string::npos)
+			{
+				std::stringstream ss(StrInBrace);
+				size_t count = 0;
+				ss >> count;
+				if (count > SC_LIMIT)
+				{
+					return true;
+				}
+			}
+			else
+			{
+				std::string minstr = StrInBrace.substr(0, commaPos);
+				std::string maxstr = StrInBrace.substr(commaPos + 1, StrInBrace.size() - commaPos);
+				size_t min = 0;
+				size_t max = 0;
+				std::stringstream ss;
+				ss << minstr;
+				ss >> min;
+				ss.clear();
+				ss << maxstr;
+				ss >> max;
+				if (min > SC_LIMIT || max > SC_LIMIT)
+				{
+					return true;
+				}
+			}
+		}
+		CurPos = OnePcre.find('{', CurPos + 1);
+	}
+
+	return false;
+}
+
 //把单个pcre转化为NFA
-PCRETONFA bool PcreToNFA(const char *pPcre, CNfa &nfa)
+PCRETONFA size_t PcreToNFA(const char *pPcre, CNfa &nfa)
 {
 	std::vector<unsigned char> code;
 	std::string strPcre(pPcre);
@@ -88,11 +133,20 @@ PCRETONFA bool PcreToNFA(const char *pPcre, CNfa &nfa)
 	End = code.end();
 	if (!CanProcess(Beg, End))
 	{
-		return false;
+		return size_t(SC_ERROR);
 	}
 	Beg = code.begin();
 	End = code.end();
+	if (ExceedLimit(strPcre))
+	{
+		return SC_EXCEED;
+	}
 	nfa.reserve(10000);
-	ProcessPcre(Beg, End, nfa);
-	return true;
+	size_t flag = ProcessPcre(Beg, End, nfa);
+
+	if (flag != SC_SUCCESS)
+	{
+		return flag;
+	}
+	return SC_SUCCESS;
 }

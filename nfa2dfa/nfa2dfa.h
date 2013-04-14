@@ -1,7 +1,7 @@
 #pragma once
 //#include "stdafx.h"
 
-#include "../SnortCommon/snortcommon.h"
+#include "../common/common.h"
 
 #define HASHMODULO 1000000
 

@@ -31,6 +31,8 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="parserule.def" />
+    <None Include="parserule.def">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -1,3 +1,3 @@
-LIBRARY ruleldr
+LIBRARY ruleloader
 EXPORTS
 ParseRule @1

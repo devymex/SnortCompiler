@@ -1,4 +1,4 @@
-#include "../SnortCommon/snortcommon.h"
+#include "../common/common.h"
 
 #ifndef CRECHANFA_H_
 #define CRECHANFA

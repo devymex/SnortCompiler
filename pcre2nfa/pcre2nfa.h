@@ -1,7 +1,7 @@
 #pragma once
 
 #include <vector>
-#include "../SnortCommon/snortcommon.h"
+#include "../common/common.h"
 
 #ifndef PCRETONFA_H_
 #define PCRETONFA __declspec(dllimport)
@@ -9,5 +9,9 @@
 #define PCRETONFA __declspec(dllexport)
 #endif
 
+#define SC_SUCCESS 0
+#define SC_ERROR -1
+#define SC_EXCEED -2
+
 //把单个pcre转化为NFA
-PCRETONFA bool PcreToNFA(const char *pPcre, CNfa &nfa);
+PCRETONFA size_t PcreToNFA(const char *pPcre, CNfa &nfa);

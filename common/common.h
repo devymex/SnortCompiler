@@ -1,9 +1,11 @@
 #pragma once
+
+#include <vector>
+
 #define CHARSETSIZE 260
 
 
 #ifndef COMMON_H_
-#include <vector>
 #define COMMONSC __declspec(dllimport)
 #else
 #define COMMONSC __declspec(dllexport)
