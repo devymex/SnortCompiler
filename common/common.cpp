@@ -368,6 +368,11 @@ COMMONSC void CSnortRule::SetSid(size_t sid)
 	m_nSid = sid;
 }
 
+COMMONSC size_t CSnortRule::GetSid() const
+{
+	return m_nSid;
+}
+
 COMMONSC void CSnortRule::PushBack(RULEOPTION* ruleoption)
 {
 	m_pOptions->push_back(ruleoption);

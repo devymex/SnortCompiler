@@ -184,6 +184,7 @@ public:
 	CSnortRule(const CSnortRule &other);
 	~CSnortRule();
 	void SetSid(size_t sid);
+	size_t GetSid() const;
 	void PushBack(RULEOPTION* ruleoption);
 	void PopBack();
 	size_t Size() const;
