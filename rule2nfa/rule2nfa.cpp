@@ -87,31 +87,6 @@ struct EMPTYRULE
 	}
 };
 
-struct SEARCHOPTIONS
-{
-	bool operator()(RULEOPTIONRAW &rp)
-	{
-		if ((0 == stricmp("content", rp.name.c_str())) || (0 == stricmp("sid", rp.name.c_str()))
-			|| (0 == stricmp("pcre", rp.name.c_str())) || (0 == stricmp("uricontent", rp.name.c_str())))
-		{
-			return true;
-		}
-		return false;
-	}
-};
-
-struct SEARCHBYTEOPTION
-{
-	bool operator()(RULEOPTIONRAW &rp)
-	{
-		if ((0 == stricmp("byte_test", rp.name.c_str())) || (0 == stricmp("byte_jump", rp.name.c_str())))
-		{
-			return true;
-		}
-		return false;
-	}
-};
-
 /*
 * read rules from a file
 */
@@ -121,7 +96,7 @@ size_t LoadFile(LPCTSTR fileName, std::vector<std::string> &rules)
 	if(!fin)
 	{
 		std::cerr << "Open file Failed!" << std::endl;
-		return -1;
+		return (size_t)-1;
 	}
 	for (std::string strRule; std::getline(fin, strRule);)
 	{
@@ -300,15 +275,15 @@ inline char HexBit(char value)
 			ZeroMemory(m_CharMap, sizeof(m_CharMap));
 			for (int i = '0'; i <= '9'; ++i)
 			{
-				m_CharMap[i] = i - '0';
+				m_CharMap[i] = char(i - '0');
 			}
 			for (int i = 'A'; i <= 'F'; ++i)
 			{
-				m_CharMap[i] = i - 'A' + 10;
+				m_CharMap[i] = char(i - 'A' + 10);
 			}
 			for (int i = 'a'; i <= 'f'; ++i)
 			{
-				m_CharMap[i] = i - 'a' + 10;
+				m_CharMap[i] = char(i - 'a' + 10);
 			}
 		};
 	} hexbithash;
@@ -365,89 +340,28 @@ size_t FormatOptionContent (_Iter cBeg, _Iter cEnd, std::vector<BYTE> &content)
 	return 0;
 }
 
-//Extract OPTIONCONTENT string and related options
-template<typename _Iter>
-size_t ExtractOptionContent(_Iter &iBeg, _Iter &iEnd, OPTIONCONTENT &opCont)
-{
-	opCont.nFlags = 0;
-	opCont.nOffset = 0;
-	opCont.nDepth =0;
-	opCont.nDistance = 0;
-	opCont.nWithin = 0;
-	for (_Iter i = iBeg; i!= iEnd; ++i)
-	{
-		std::string::iterator iValueBeg = i->value.begin();
-		std::string::iterator iValueEnd = i->value.end();
-		iValueBeg = std::find_if_not(iValueBeg, iValueEnd, ISSPACE());
-		size_t nr = FormatOptionContent(iValueBeg, iValueEnd, opCont.vecconts);
-		if (nr != 0)
-		{
-			return nr;
-		}
-		if (0 == stricmp("content", i->name.c_str()))
-		{
-			return size_t(-1);
-		}
-		else if (0 == stricmp("uricontent", i->name.c_str()))
-		{
-			return size_t(-1);
-		}
-		else if (0 == stricmp("nocase", i->name.c_str()))
-		{
-			opCont.nFlags |= CF_NOCASE;
-		}
-		else if (0 == stricmp("offset", i->name.c_str()))
-		{
-			*(int*)(&opCont.nOffset) = atoi(&*iValueBeg);
-			opCont.nFlags |= CF_OFFSET;
-		}
-		else if (0 == stricmp("depth", i->name.c_str()))
-		{
-			*(int*)(&opCont.nDepth) = atoi(&*iValueBeg);
-			opCont.nFlags |= CF_DEPTH;
-		}
-		else if (0 == stricmp("distance", i->name.c_str()))
-		{
-			*(int*)(&opCont.nDistance) = atoi(&*iValueBeg);
-			opCont.nFlags |= CF_DISTANCE;
-		}
-		else if (0 == stricmp("within", i->name.c_str()))
-		{
-			*(int*)(&opCont.nWithin) = atoi(&*iValueBeg);
-			opCont.nFlags |= CF_WITHIN;
-		}	
-	}
-	return 0;
-}
 
 size_t ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
 {
 	std::vector<RULEOPTIONRAW> options;
 	ExtractOption(ruleOptions, options);
 
-	////Mark process mode, "0" is error ,"1" is normal
-	size_t nResult = size_t(-1);
-
-	////snortRule.nFlags = 0;
-
-	////Read one rule and only store "sid","pcre","content" and related options
+	//Mark process mode, "0" is error ,"1" is normal
+	size_t nResult = 0;
 
 	size_t nFlag = 0;
 	for(std::vector<RULEOPTIONRAW>::iterator iOp = options.begin(); iOp != options.end(); ++iOp)
 	{
+		std::string::iterator opValueBeg = iOp->value.begin();
+		std::string::iterator opValueEnd = iOp->value.end();
+		opValueBeg = std::find_if_not(opValueBeg, opValueEnd, ISSPACE());
+
 		if (0 == stricmp("sid", iOp->name.c_str()))
 		{
-			std::string::iterator opValueBeg = iOp->value.begin();
-			std::string::iterator opValueEnd = iOp->value.end();
-			opValueBeg = std::find_if_not(opValueBeg, opValueEnd, ISSPACE());
 			snortRule.SetSid(atoi(&*opValueBeg));
 		}
 		else if (0 == stricmp("pcre", iOp->name.c_str()))
 		{
-			std::string::iterator opValueBeg = iOp->value.begin();
-			std::string::iterator opValueEnd = iOp->value.end();
-			opValueBeg = std::find_if_not(opValueBeg, opValueEnd, ISSPACE());
-
 			OPTIONPCRE *pPcre = new OPTIONPCRE;
 			size_t nr = FormatPcre(opValueBeg, opValueEnd, *pPcre);
 			if (nr != 0)
@@ -456,6 +370,7 @@ size_t ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
 				{
 					nFlag |= CSnortRule::RULE_HASNOT;
 				}
+				nResult = size_t(-1);
 				delete pPcre;
 				break;
 			}
@@ -476,16 +391,14 @@ size_t ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
 			pContent->nDistance = 0;
 			pContent->nWithin = 0;
 
-			std::string::iterator iValueBeg = iOp->value.begin();
-			std::string::iterator iValueEnd = iOp->value.end();
-			iValueBeg = std::find_if_not(iValueBeg, iValueEnd, ISSPACE());
-			size_t nr = FormatOptionContent(iValueBeg, iValueEnd, pContent->vecconts);
+			size_t nr = FormatOptionContent(opValueBeg, opValueEnd, pContent->vecconts);
 			if (nr != 0)
 			{
 				if (nr == size_t(-2))
 				{
 					nFlag |= CSnortRule::RULE_HASNOT;
 				}
+				nResult = size_t(-1);
 				delete pContent;
 				break;
 			}
@@ -494,82 +407,80 @@ size_t ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
 		else if (0 == stricmp("nocase", iOp->name.c_str()))
 		{			
 			size_t last = snortRule.Size() - 1;
-			if (NULL != dynamic_cast<OPTIONCONTENT *>(snortRule[last]))
+			OPTIONCONTENT * temp = dynamic_cast<OPTIONCONTENT *>(snortRule[last]);
+			if (NULL == temp)
 			{
 				nResult = size_t(-1);
+				break;
 			}
 			else
 			{
-				snortRule[last]->nFlags |= CF_NOCASE;
+				temp->nFlags |= CF_NOCASE;
 			}
 		}
 		else if (0 == stricmp("offset", iOp->name.c_str()))
 		{
 			size_t last = snortRule.Size() - 1;
-			if (NULL != dynamic_cast<OPTIONCONTENT *>(snortRule[last]))
+			OPTIONCONTENT * temp = dynamic_cast<OPTIONCONTENT *>(snortRule[last]);
+			if (NULL == temp)
 			{
 				nResult = size_t(-1);
+				break;
 			}
 			else
 			{
-				std::string::iterator iValueBeg = iOp->value.begin();
-				std::string::iterator iValueEnd = iOp->value.end();
-				iValueBeg = std::find_if_not(iValueBeg, iValueEnd, ISSPACE());	
-				//*(int*)(&opCont.nOffset) = atoi(&*iValueBeg);
-				snortRule[last]->nFlags |= CF_OFFSET;
+				temp->nOffset = atoi(&*opValueBeg);
+				temp->nFlags |= CF_OFFSET;
 			}
 		}
 		else if (0 == stricmp("depth", iOp->name.c_str()))
 		{
 			size_t last = snortRule.Size() - 1;
-			if (NULL != dynamic_cast<OPTIONCONTENT *>(snortRule[last]))
+			OPTIONCONTENT * temp = dynamic_cast<OPTIONCONTENT *>(snortRule[last]);
+			if (NULL == temp)
 			{
 				nResult = size_t(-1);
+				break;
 			}
 			else
 			{
-				std::string::iterator iValueBeg = iOp->value.begin();
-				std::string::iterator iValueEnd = iOp->value.end();
-				iValueBeg = std::find_if_not(iValueBeg, iValueEnd, ISSPACE());	
-				//*(int*)(&opCont.nOffset) = atoi(&*iValueBeg);
-				snortRule[last]->nFlags |= CF_DEPTH;
+				temp->nOffset = atoi(&*opValueBeg);
+				temp->nFlags |= CF_DEPTH;
 			}
 		}
 		else if (0 == stricmp("distance", iOp->name.c_str()))
 		{
 			size_t last = snortRule.Size() - 1;
-			if (NULL != dynamic_cast<OPTIONCONTENT *>(snortRule[last]))
+			OPTIONCONTENT * temp = dynamic_cast<OPTIONCONTENT *>(snortRule[last]);
+			if (NULL == temp)
 			{
 				nResult = size_t(-1);
+				break;
 			}
 			else
 			{
-				std::string::iterator iValueBeg = iOp->value.begin();
-				std::string::iterator iValueEnd = iOp->value.end();
-				iValueBeg = std::find_if_not(iValueBeg, iValueEnd, ISSPACE());	
-				//*(int*)(&opCont.nOffset) = atoi(&*iValueBeg);
-				snortRule[last]->nFlags |= CF_DISTANCE;
+				temp->nOffset = atoi(&*opValueBeg);
+				temp->nFlags |= CF_DISTANCE;
 			}
 		}
 		else if (0 == stricmp("within", iOp->name.c_str()))
 		{
 			size_t last = snortRule.Size() - 1;
-			if (NULL != dynamic_cast<OPTIONCONTENT *>(snortRule[last]))
+			OPTIONCONTENT * temp = dynamic_cast<OPTIONCONTENT *>(snortRule[last]);
+			if (NULL == temp)
 			{
 				nResult = size_t(-1);
+				break;
 			}
 			else
 			{
-				std::string::iterator iValueBeg = iOp->value.begin();
-				std::string::iterator iValueEnd = iOp->value.end();
-				iValueBeg = std::find_if_not(iValueBeg, iValueEnd, ISSPACE());	
-				//*(int*)(&opCont.nOffset) = atoi(&*iValueBeg);
-				snortRule[last]->nFlags |= CF_WITHIN;
+				temp->nOffset = atoi(&*opValueBeg);
+				temp->nFlags |= CF_WITHIN;
 			}
 		}
 	}
 	snortRule.SetFlag(nFlag);
-	return 0;
+	return nResult;
 }
 
 
@@ -699,7 +610,7 @@ void contentToDefaultNFA(OPTIONCONTENT *content, CNfa &nfa)
 	for(std::vector<BYTE>::const_iterator iter = content->vecconts.begin();
 		iter != content->vecconts.end(); ++iter)
 	{
-		BYTE c = (content->nFlags & CF_NOCASE) ? tolower(*iter) : *iter;
+		BYTE c = BYTE((content->nFlags & CF_NOCASE) ? tolower(*iter) : *iter);
 		pattern.push_back(c);//如果content有nocase标记，则把模式串用字符的小写形式表示
 	}
 
@@ -715,7 +626,7 @@ void contentToDefaultNFA(OPTIONCONTENT *content, CNfa &nfa)
 			{
 				row[c].PushBack(stateID);
 			}
-			BYTE character = (content->nFlags & CF_NOCASE) ? tolower(c) : c;
+			BYTE character = BYTE((content->nFlags & CF_NOCASE) ? tolower(c) : c);
 			if(character == pattern[i])
 			{
 				row[c].PushBack(id);

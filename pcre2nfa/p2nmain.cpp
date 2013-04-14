@@ -2,6 +2,8 @@
 #include "p2nmain.h"
 #include "pcre2nfa.h"
 
+#pragma warning (push)
+#pragma warning (disable : 4100)
 const unsigned char Steps[] = { OP_LENGTHS };
 
 size_t OP_NOT_DIGIT_ELEMS[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 
@@ -503,7 +505,7 @@ size_t ProcessPcre(std::vector<unsigned char>::iterator &Beg, const std::vector<
 	bool ALTBeg = false;
 	std::vector<std::string> vecPath;
 	std::vector<size_t> PreStates;
-	return Process(Beg, End, nfa, CurState, PreStates, 0, ALTBeg, -1, false, false, false, vecPath);
+	return Process(Beg, End, nfa, CurState, PreStates, 0, ALTBeg, size_t(-1), false, false, false, vecPath);
 }
 
 size_t Process(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, std::vector<size_t> &PreStates, size_t ALTPreBeg, bool &ALTBeg, size_t ALTBeginState, bool CBRA, bool ALT, bool BRAZERO, std::vector<std::string> &vecPath)
@@ -516,7 +518,7 @@ size_t Process(std::vector<unsigned char>::iterator &Beg, const std::vector<unsi
 	}
 	else
 	{
-		CurPreState = -1;
+		CurPreState = size_t(-1);
 	}
 	size_t ALTPreState = ALTPreBeg;
 	bool IsCBRA = CBRA;
@@ -883,7 +885,7 @@ size_t OP_NOTI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector
 	unsigned char c = *(Beg + 1);
 	for (size_t j = 0; j < 256; ++j)
 	{
-		if (j != tolower(c) && j != toupper(c))
+		if (j != (size_t)tolower(c) && j != (size_t)toupper(c))
 		{
 			nfa.Back()[j].PushBack(CurState);
 		}
@@ -1223,7 +1225,7 @@ size_t OP_NOTSTARI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::ve
 	unsigned char c = *(Beg + 1);
 	for (size_t i = 0; i < 256; ++i)
 	{
-		if (i != tolower(c) && i != toupper(c))
+		if (i != (size_t)tolower(c) && i != (size_t)toupper(c))
 		{
 			nfa.Back()[i].PushBack(CurState);
 		}
@@ -1243,7 +1245,7 @@ size_t OP_NOTPLUSI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::ve
 	unsigned char c = *(Beg + 1);
 	for (size_t i = 0; i < 256; ++i)
 	{
-		if (i != tolower(c) && i != toupper(c))
+		if (i != (size_t)tolower(c) && i != (size_t)toupper(c))
 		{
 			nfa[nCursize][i].PushBack(CurState);
 			nfa.Back()[i].PushBack(CurState);
@@ -1264,7 +1266,7 @@ size_t OP_NOTQUERYI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::v
 	unsigned char c = *(Beg + 1);
 	for (size_t i = 0; i < 256; ++i)
 	{
-		if (i != tolower(c) && i != toupper(c))
+		if (i != (size_t)tolower(c) && i != (size_t)toupper(c))
 		{
 			nfa.Back()[i].PushBack(CurState);
 		}
@@ -1291,7 +1293,7 @@ size_t OP_NOTUPTOI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::ve
 		++CurState;
 		for (size_t j = 0; j < 256; ++j)
 		{
-			if (j != tolower(c) && j != toupper(c))
+			if (j != (size_t)tolower(c) && j != (size_t)toupper(c))
 			{
 				nfa[nCursize + i][j].PushBack(CurState);
 			}
@@ -1317,7 +1319,7 @@ size_t OP_NOTEXACTI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::v
 		++CurState;
 		for (size_t j = 0; j < 256; ++j)
 		{
-			if (j != tolower(c) && j != toupper(c))
+			if (j != (size_t)tolower(c) && j != (size_t)toupper(c))
 			{
 				nfa[nCursize + i][j].PushBack(CurState);
 			}
@@ -1878,3 +1880,5 @@ void OutPut(std::vector<PCRE>::iterator &Pcre, CNfa &nfa, size_t count)
 	fout.close();
 	fout.clear();
 }
+
+#pragma warning (pop)
