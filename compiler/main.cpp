@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "../common/common.h"
-#include "../ruleldr/parserule.h"
 #include "../rule2nfa/rule2nfa.h"
 #include "../nfa2dfa/nfa2dfa.h"
 #include "../pcre2nfa/pcre2nfa.h"

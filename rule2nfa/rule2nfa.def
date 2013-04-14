@@ -1,4 +1,5 @@
 LIBRARY rule2nfa
 EXPORTS
-InterpretRule @ 1
-SerializeNfa @ 2
+ParseRule @1
+InterpretRule @ 2
+SerializeNfa @3

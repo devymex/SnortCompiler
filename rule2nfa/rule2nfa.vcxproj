@@ -47,7 +47,7 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ModuleDefinitionFile>rule2nfa.def</ModuleDefinitionFile>
-      <AdditionalDependencies>$(SolutionDir)$(Configuration)\common.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(SolutionDir)$(Configuration)\common.lib;$(SolutionDir)$(Configuration)\pcre2nfa.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

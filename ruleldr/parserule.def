@@ -1,3 +1,0 @@
-LIBRARY ruleldr
-EXPORTS
-ParseRule @1
