@@ -163,6 +163,7 @@ public:
 	void PopBack();
 	size_t Size() const;
 	RULEOPTION*& operator[](size_t nIdx) const;
+	RULEOPTION*& Back();
 private:
 	size_t m_nSid;
 	size_t m_nFlag;

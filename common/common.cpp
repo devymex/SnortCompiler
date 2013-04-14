@@ -413,3 +413,8 @@ COMMONSC RULEOPTION*& CSnortRule::operator[](size_t nIdx) const
 {
 	return (*m_pOptions)[nIdx];
 }
+
+COMMONSC RULEOPTION*& CSnortRule::Back()
+{
+	return m_pOptions->back();
+}

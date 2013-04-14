@@ -422,79 +422,153 @@ size_t ExtractOptionContent(_Iter &iBeg, _Iter &iEnd, OPTIONCONTENT &opCont)
 
 size_t ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
 {
-	//std::vector<RULEOPTIONRAW> options;
-	//ExtractOption(ruleOptions, options);
+	std::vector<RULEOPTIONRAW> options;
+	ExtractOption(ruleOptions, options);
 
 	////Mark process mode, "0" is error ,"1" is normal
-	//size_t nResult = size_t(-1);
+	size_t nResult = size_t(-1);
 
 	////snortRule.nFlags = 0;
 
 	////Read one rule and only store "sid","pcre","content" and related options
 
-	//size_t nFlag = 0;
-	//if (std::find_if (options.begin(), options.end(), SEARCHBYTEOPTION()) == options.end())
-	//{
-	//	nFlag |= CSnortRule::RULE_HASBYTE;
-	//}
-	//for(std::vector<RULEOPTIONRAW>::iterator i = options.begin(); ;)
-	//{
-	//	std::vector<RULEOPTIONRAW>::iterator iBeg = std::find_if(i, options.end(), SEARCHOPTIONS());
-	//	if (iBeg == options.end())
-	//	{
-	//		nResult = 0;
-	//		break;
-	//	}
-	//	std::vector<RULEOPTIONRAW>::iterator iEnd = std::find_if(iBeg + 1, options.end(), SEARCHOPTIONS());		
+	size_t nFlag = 0;
+	for(std::vector<RULEOPTIONRAW>::iterator iOp = options.begin(); iOp != options.end(); ++iOp)
+	{
+		if (0 == stricmp("sid", iOp->name.c_str()))
+		{
+			std::string::iterator opValueBeg = iOp->value.begin();
+			std::string::iterator opValueEnd = iOp->value.end();
+			opValueBeg = std::find_if_not(opValueBeg, opValueEnd, ISSPACE());
+			snortRule.SetSid(atoi(&*opValueBeg));
+		}
+		else if (0 == stricmp("pcre", iOp->name.c_str()))
+		{
+			std::string::iterator opValueBeg = iOp->value.begin();
+			std::string::iterator opValueEnd = iOp->value.end();
+			opValueBeg = std::find_if_not(opValueBeg, opValueEnd, ISSPACE());
 
-	//	if (0 == stricmp("sid", iBeg->name.c_str()))
-	//	{
-	//		std::string::iterator opValueBeg = iBeg->value.begin();
-	//		std::string::iterator opValueEnd = iBeg->value.end();
-	//		opValueBeg = std::find_if_not(opValueBeg, opValueEnd, ISSPACE());
-	//		//*(int*)(&snortRule.Sid) = atoi(&*opValueBeg);
-	//		snortRule.SetSid(atoi(&*opValueBeg));
-	//	}
-	//	else if (0 == stricmp("pcre", iBeg->name.c_str()))
-	//	{
-	//		std::string::iterator opValueBeg = iBeg->value.begin();
-	//		std::string::iterator opValueEnd = iBeg->value.end();
-	//		opValueBeg = std::find_if_not(opValueBeg, opValueEnd, ISSPACE());
+			OPTIONPCRE *pPcre = new OPTIONPCRE;
+			size_t nr = FormatPcre(opValueBeg, opValueEnd, *pPcre);
+			if (nr != 0)
+			{
+				if (nr == size_t(-2))
+				{
+					nFlag |= CSnortRule::RULE_HASNOT;
+				}
+				delete pPcre;
+				break;
+			}
+			snortRule.PushBack(pPcre);
+		}
+		else if (0 == stricmp ("byte_jump", iOp->name.c_str()) ||
+			0 == stricmp("byte_test", iOp->name.c_str()))
+		{
+			nFlag |= CSnortRule::RULE_HASBYTE;
+		}
+		else if (0 == stricmp("content", iOp->name.c_str()) ||
+			0 == stricmp("uricontent", iOp->name.c_str()))
+		{
+			OPTIONCONTENT *pContent = new OPTIONCONTENT;
+			pContent->nFlags = 0;
+			pContent->nOffset = 0;
+			pContent->nDepth =0;
+			pContent->nDistance = 0;
+			pContent->nWithin = 0;
 
-	//		OPTIONPCRE *pPcre = new OPTIONPCRE;
-	//		size_t nr = FormatPcre(opValueBeg, opValueEnd, *pPcre);
-	//		if (nr != 0)
-	//		{
-	//		}
-	//			if (nr == size_t(-2))
-	//			{
-	//				nFlag |= CSnortRule::RULE_HASNOT;
-	//			}
-	//			delete pPcre;
-	//			break;
-	//		}
-	//		snortRule.PushBack(pPcre);
-	//	}
-	//	else if (0 == stricmp("content", iBeg->name.c_str()) ||
-	//		0 == stricmp("uricontent", iBeg->name.c_str()))
-	//	{
-	//		OPTIONCONTENT *pContent = new OPTIONCONTENT;
-	//		size_t nr = ExtractOptionContent(iBeg, iEnd, *pContent);
-	//		if (nr != 0)
-	//		{
-	//			if (nr == size_t(-2))
-	//			{
-	//				nFlag |= CSnortRule::RULE_HASNOT;
-	//			}
-	//			delete pContent;
-	//			break;
-	//		}
-	//		snortRule.PushBack(pContent);
-	//	}
-	//	i = iEnd;
-	//}
-	//snortRule.SetFlag(nFlag);
-	//return nResult;
+			std::string::iterator iValueBeg = iOp->value.begin();
+			std::string::iterator iValueEnd = iOp->value.end();
+			iValueBeg = std::find_if_not(iValueBeg, iValueEnd, ISSPACE());
+			size_t nr = FormatOptionContent(iValueBeg, iValueEnd, pContent->vecconts);
+			if (nr != 0)
+			{
+				if (nr == size_t(-2))
+				{
+					nFlag |= CSnortRule::RULE_HASNOT;
+				}
+				delete pContent;
+				break;
+			}
+			snortRule.PushBack(pContent);
+		}
+		else if (0 == stricmp("nocase", iOp->name.c_str()))
+		{			
+			size_t last = snortRule.Size() - 1;
+			if (NULL != dynamic_cast<OPTIONCONTENT *>(snortRule[last]))
+			{
+				nResult = size_t(-1);
+			}
+			else
+			{
+				snortRule[last]->nFlags |= CF_NOCASE;
+			}
+		}
+		else if (0 == stricmp("offset", iOp->name.c_str()))
+		{
+			size_t last = snortRule.Size() - 1;
+			if (NULL != dynamic_cast<OPTIONCONTENT *>(snortRule[last]))
+			{
+				nResult = size_t(-1);
+			}
+			else
+			{
+				std::string::iterator iValueBeg = iOp->value.begin();
+				std::string::iterator iValueEnd = iOp->value.end();
+				iValueBeg = std::find_if_not(iValueBeg, iValueEnd, ISSPACE());	
+				//*(int*)(&opCont.nOffset) = atoi(&*iValueBeg);
+				snortRule[last]->nFlags |= CF_OFFSET;
+			}
+		}
+		else if (0 == stricmp("depth", iOp->name.c_str()))
+		{
+			size_t last = snortRule.Size() - 1;
+			if (NULL != dynamic_cast<OPTIONCONTENT *>(snortRule[last]))
+			{
+				nResult = size_t(-1);
+			}
+			else
+			{
+				std::string::iterator iValueBeg = iOp->value.begin();
+				std::string::iterator iValueEnd = iOp->value.end();
+				iValueBeg = std::find_if_not(iValueBeg, iValueEnd, ISSPACE());	
+				//*(int*)(&opCont.nOffset) = atoi(&*iValueBeg);
+				snortRule[last]->nFlags |= CF_DEPTH;
+			}
+		}
+		else if (0 == stricmp("distance", iOp->name.c_str()))
+		{
+			size_t last = snortRule.Size() - 1;
+			if (NULL != dynamic_cast<OPTIONCONTENT *>(snortRule[last]))
+			{
+				nResult = size_t(-1);
+			}
+			else
+			{
+				std::string::iterator iValueBeg = iOp->value.begin();
+				std::string::iterator iValueEnd = iOp->value.end();
+				iValueBeg = std::find_if_not(iValueBeg, iValueEnd, ISSPACE());	
+				//*(int*)(&opCont.nOffset) = atoi(&*iValueBeg);
+				snortRule[last]->nFlags |= CF_DISTANCE;
+			}
+		}
+		else if (0 == stricmp("within", iOp->name.c_str()))
+		{
+			size_t last = snortRule.Size() - 1;
+			if (NULL != dynamic_cast<OPTIONCONTENT *>(snortRule[last]))
+			{
+				nResult = size_t(-1);
+			}
+			else
+			{
+				std::string::iterator iValueBeg = iOp->value.begin();
+				std::string::iterator iValueEnd = iOp->value.end();
+				iValueBeg = std::find_if_not(iValueBeg, iValueEnd, ISSPACE());	
+				//*(int*)(&opCont.nOffset) = atoi(&*iValueBeg);
+				snortRule[last]->nFlags |= CF_WITHIN;
+			}
+		}
+	}
+	snortRule.SetFlag(nFlag);
 	return 0;
 }
 
