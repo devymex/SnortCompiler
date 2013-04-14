@@ -7,6 +7,6 @@
 #define CRECHANFA
 #endif
 
-CRECHANFA size_t InterpretRule(LPCSTR lpRule, CNfaTree &outTree);
+CRECHANFA size_t InterpretRule(const CSnortRule &rule, CNfaTree &outTree);
 
 CRECHANFA void SerializeNfa(CNfaChain &nfaChain, CNfa &seriaNfa);

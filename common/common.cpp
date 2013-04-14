@@ -91,7 +91,7 @@ COMMONSC CNfaRow::~CNfaRow()
 {
 }
 
-COMMONSC size_t CNfaRow::GetSetSize(size_t nChar)
+COMMONSC size_t CNfaRow::Size(size_t nChar)
 {
 	return m_pDestSet[nChar].Size();
 }

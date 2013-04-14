@@ -41,7 +41,7 @@ public:
 	~CNfaRow();
 	CNfaRow(const CNfaRow &other);
 	CNfaRow& operator=(const CNfaRow &other);
-	size_t GetSetSize(size_t nChar);
+	size_t Size(size_t nChar);
 	void GetSet(size_t nChar, size_t *pSet);
 
 	CStateSet& operator[](size_t nChar);
