@@ -4,7 +4,9 @@
 
 #define CHARSETSIZE 260
 
+
 #ifndef COMMON_H_
+#include <vector>
 #define COMMONSC __declspec(dllimport)
 #else
 #define COMMONSC __declspec(dllexport)
@@ -22,7 +24,6 @@ public:
 	bool operator == (const CStateSet &other);
 
 	const size_t Size() const;
-	void SetStaSet(std::vector<size_t> &staSet);
 	void PopBack();
 	void PushBack(size_t nState);
 	void Reserve(size_t nCount);
