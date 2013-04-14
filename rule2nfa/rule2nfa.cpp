@@ -2,6 +2,11 @@
 #include "rule2nfa.h"
 #include "CombineTree.h"
 
+CRECHANFA size_t InterpretRule(LPCSTR lpRule, CNfaTree &outTree)
+{
+	return size_t(-1);
+}
+
 CRECHANFA void SerializeNfa(CNfaChain &nfaChain, CNfa &seriaNfa)
 {
 	const size_t cEmptyEdge = 256;
