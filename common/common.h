@@ -151,7 +151,7 @@ struct COMMONSC RULEOPTION
 class COMMONSC CSnortRule
 {
 public:
-	enum {RULE_HASBYTE = 0x0001, RULE_HASNOT = 0x0002, RULE_EMPTY = 0x0004};
+	enum {RULE_HASBYTE = 0x0001, RULE_HASNOT = 0x0002};
 	CSnortRule();
 	CSnortRule(const CSnortRule &other);
 	~CSnortRule();

@@ -21,41 +21,51 @@ struct RES
 
 void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 {
-	RES &result = *(RES*)lpVoid;
-	CNfaTree nfatree;
-	size_t flag = InterpretRule(rule, nfatree);
-	size_t nSid = rule.GetSid();
-	if (flag == SC_ERROR)
+	if (rule.GetFlag() & CSnortRule::RULE_HASBYTE)
 	{
-		result.m_errorIds.push_back(nSid);
-		return;
+		
 	}
-	else if (flag == SC_EXCEED)
+	else if (rule.GetFlag() & CSnortRule::RULE_HASNOT)
 	{
-		result.m_exceedIds.push_back(nSid);
-		return;
+		
 	}
-	else if (flag == SC_EMPTY)
+	else if (rule.Size() == 0)
 	{
-		result.m_emptyIds.push_back(nSid);
-		return;
+		
 	}
 	else
 	{
-		SNORTIDDFAIDS sidDfaIds;
-		sidDfaIds.m_nSid = nSid;
-		const size_t nCursize = result.m_dfaTbl.size();
-		const size_t nIncrement = nfatree.Size();
-		result.m_dfaTbl.resize(nCursize + nIncrement);
-		size_t nId;
-		for (size_t i = 0; i < nIncrement; ++i)
+		RES &result = *(RES*)lpVoid;
+		CNfaTree nfatree;
+		size_t flag = InterpretRule(rule, nfatree);
+		size_t nSid = rule.GetSid();
+		if (flag == SC_ERROR)
 		{
-			CNfa nfa;
-			SerializeNfa(nfatree[i], nfa);
-			nId = nCursize + i;
-			CDfa &dfa = result.m_dfaTbl[nId];
-			NfaToDfa(nfa, dfa);
-			sidDfaIds.m_dfaIds.push_back(nId);
+			result.m_errorIds.push_back(nSid);
+			return;
+		}
+		else if (flag == SC_EXCEED)
+		{
+			result.m_exceedIds.push_back(nSid);
+			return;
+		}
+		else
+		{
+			SNORTIDDFAIDS sidDfaIds;
+			sidDfaIds.m_nSid = nSid;
+			const size_t nCursize = result.m_dfaTbl.size();
+			const size_t nIncrement = nfatree.Size();
+			result.m_dfaTbl.resize(nCursize + nIncrement);
+			size_t nId;
+			for (size_t i = 0; i < nIncrement; ++i)
+			{
+				CNfa nfa;
+				SerializeNfa(nfatree[i], nfa);
+				nId = nCursize + i;
+				CDfa &dfa = result.m_dfaTbl[nId];
+				NfaToDfa(nfa, dfa);
+				sidDfaIds.m_dfaIds.push_back(nId);
+			}
 		}
 	}
 }
