@@ -80,10 +80,5 @@ void _tmain(int nArgs, TCHAR **pArgs)
 		return;
 	}
 
-	CString filename(pArgs[1]);
-	
-	RES result;
-	ParseRule(filename, Process, &result);
-
 	system("pause");
 }

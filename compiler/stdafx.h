@@ -6,7 +6,7 @@
 #define _WIN32_IE 0x0700
 
 #include <tchar.h>
-#include <afx.h>
+#include <windows.h>
 
 #include <algorithm>
 #include <vector>
@@ -16,3 +16,5 @@
 #include <fstream>
 #include <map>
 #include <set>
+
+#define COMPILER_H_

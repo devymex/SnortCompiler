@@ -5,79 +5,79 @@ RULEOPTION::~RULEOPTION()
 {
 }
 
-COMMONSC CStateSet::CStateSet()
+COMMONSC CVectorNumber::CVectorNumber()
 {
 	m_pSet = new std::vector<size_t>;
 }
 
-COMMONSC CStateSet::~CStateSet()
+COMMONSC CVectorNumber::~CVectorNumber()
 {
 	delete m_pSet;
 }
 
-COMMONSC CStateSet::CStateSet(const CStateSet &other)
+COMMONSC CVectorNumber::CVectorNumber(const CVectorNumber &other)
 {
 	m_pSet = new std::vector<size_t>;
 	*this = other;
 }
 
-COMMONSC const CStateSet& CStateSet::operator = (const CStateSet &other)
+COMMONSC const CVectorNumber& CVectorNumber::operator = (const CVectorNumber &other)
 {
 	*m_pSet = *other.m_pSet;
 	return *this;
 }
 
-COMMONSC size_t& CStateSet::operator[](size_t nIdx)
+COMMONSC size_t& CVectorNumber::operator[](size_t nIdx)
 {
 	return (*m_pSet)[nIdx];
 }
 
-COMMONSC const size_t& CStateSet::operator[](size_t nIdx) const
+COMMONSC const size_t& CVectorNumber::operator[](size_t nIdx) const
 {
 	return (*m_pSet)[nIdx];
 }
 
-COMMONSC bool CStateSet::operator == (const CStateSet &other)
+COMMONSC bool CVectorNumber::operator == (const CVectorNumber &other)
 {
 	return *m_pSet == *other.m_pSet;
 }
 
-COMMONSC const size_t CStateSet::Size() const
+COMMONSC const size_t CVectorNumber::Size() const
 {
 	return m_pSet->size();
 }
 
-COMMONSC void CStateSet::PopBack()
+COMMONSC void CVectorNumber::PopBack()
 {
 	m_pSet->pop_back();
 }
 
-COMMONSC void CStateSet::PushBack(size_t nState)
+COMMONSC void CVectorNumber::PushBack(size_t nState)
 {
 	m_pSet->push_back(nState);
 }
 
-COMMONSC void CStateSet::Reserve(size_t nCount)
+COMMONSC void CVectorNumber::Reserve(size_t nCount)
 {
 	m_pSet->reserve(nCount);
 }
 
-COMMONSC void CStateSet::Resize(size_t nSize)
+COMMONSC void CVectorNumber::Resize(size_t nSize)
 {
 	m_pSet->resize(nSize);
 }
 
-COMMONSC size_t& CStateSet::Back()
+COMMONSC size_t& CVectorNumber::Back()
 {
 	return m_pSet->back();
 }
 
-COMMONSC void CStateSet::Sort()
+COMMONSC void CVectorNumber::Sort()
 {
 	std::sort(m_pSet->begin(), m_pSet->end());
 }
 
-COMMONSC void CStateSet::Unique()
+COMMONSC void CVectorNumber::Unique()
 {
 	Sort();
 	m_pSet->erase(std::unique(m_pSet->begin(), m_pSet->end()), m_pSet->end());
