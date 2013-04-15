@@ -33,7 +33,6 @@ void main()
 			foutError << i - vecPcres.begin() + 1 << std::endl;
 		}
 		std::cout << i - vecPcres.begin() + 1 << std::endl;
-		size_t n = nfa.Size();
 		
 		//for (size_t j = 0; j < nfa.Size(); ++j)
 		//{
