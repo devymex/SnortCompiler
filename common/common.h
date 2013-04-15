@@ -90,6 +90,24 @@ private:
 	size_t m_pDest[CHARSETSIZE];
 };
 
+class COMMONSC CAndDfaRow : public CDfaRow
+{
+public:
+	enum DFAFLAG
+	{
+		NONE = 0,
+		FIRST = 1 << 0,
+		SECOND = 1 << 1,
+		ALL = 1 | 1 << 1
+	};
+	CAndDfaRow();
+	void SetDFlag(size_t cFlag);
+	char GetDFlag();
+private:
+	size_t m_cFlag;
+	size_t m_pAndDest[CHARSETSIZE];
+};
+
 class COMMONSC CDfa
 {
 public:
@@ -104,6 +122,22 @@ public:
 	CDfaRow& operator[](size_t index);
 private:
 	std::vector<CDfaRow> *m_pDfa;
+};
+
+class COMMONSC CAndDfa
+{
+public:
+	CAndDfa();
+	~CAndDfa();
+	CAndDfa(const CDfa &other);
+	CAndDfa& operator=(const CAndDfa &other);
+	void Reserve(size_t _Count);
+	void Resize(size_t _Newsize);
+	size_t Size() const;
+	CAndDfaRow &Back();
+	CAndDfaRow& operator[](size_t index);
+private:
+	std::vector<CAndDfaRow> *m_pAndDfa;
 };
 
 class COMMONSC CNfaChain
