@@ -37,4 +37,4 @@ struct COMPILER Res
 	CVectorNumber m_emptyIds;
 };
 
-COMPILER void compile(LPCTSTR filename, RES &result);
+//COMPILER void compile(LPCTSTR filename, RES &result);

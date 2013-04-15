@@ -1,3 +1,2 @@
 LIBRARY compiler
 EXPORTS
-compile @ 1
