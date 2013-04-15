@@ -51,6 +51,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "compilertest", "compilertes
 		{007BB919-C1A5-401E-A7D8-8FE20C65D132} = {007BB919-C1A5-401E-A7D8-8FE20C65D132}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mergedfastest", "mergedfastest\mergedfastest.vcxproj", "{F4B427C6-9EAE-4B72-AFD5-3B15D067C785}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -97,6 +99,10 @@ Global
 		{701614FF-3EC6-4B5C-B7CB-6AEBA0AF74A4}.Debug|Win32.Build.0 = Debug|Win32
 		{701614FF-3EC6-4B5C-B7CB-6AEBA0AF74A4}.Release|Win32.ActiveCfg = Release|Win32
 		{701614FF-3EC6-4B5C-B7CB-6AEBA0AF74A4}.Release|Win32.Build.0 = Release|Win32
+		{F4B427C6-9EAE-4B72-AFD5-3B15D067C785}.Debug|Win32.ActiveCfg = Debug|Win32
+		{F4B427C6-9EAE-4B72-AFD5-3B15D067C785}.Debug|Win32.Build.0 = Debug|Win32
+		{F4B427C6-9EAE-4B72-AFD5-3B15D067C785}.Release|Win32.ActiveCfg = Release|Win32
+		{F4B427C6-9EAE-4B72-AFD5-3B15D067C785}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

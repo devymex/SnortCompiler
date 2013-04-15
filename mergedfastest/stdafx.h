@@ -14,5 +14,3 @@
 #include <stack>
 #include <map>
 #include <hash_map>
-
-#define MERDFA_H_

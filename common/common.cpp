@@ -218,6 +218,21 @@ COMMONSC size_t CDfaRow::GetFlag()
 {
 	return m_nFlag;
 }
+COMMONSC CAndDfaRow::CAndDfaRow()
+	: m_cFlag(CAndDfaRow::DFAFLAG::NONE)
+{
+	std::fill(m_pAndDest, m_pAndDest + CHARSETSIZE, size_t(-1));
+}
+
+COMMONSC void CAndDfaRow::SetDFlag(size_t cFlag)
+{
+	m_cFlag = cFlag;
+}
+COMMONSC char CAndDfaRow::GetDFlag()
+{
+	return m_cFlag;
+}
+
 
 COMMONSC CDfa::CDfa()
 {
@@ -261,6 +276,51 @@ COMMONSC CDfaRow &CDfa::Back()
 {
 	return m_pDfa->back();
 }
+
+COMMONSC CDfaRow& CDfa::operator[](size_t index)
+{
+	return (*m_pDfa)[index];
+}
+
+COMMONSC CAndDfa::CAndDfa()
+{
+	m_pAndDfa = new std::vector<CAndDfaRow>;
+}
+COMMONSC CAndDfa::~CAndDfa()
+{
+	delete m_pAndDfa;
+}
+COMMONSC CAndDfa::CAndDfa(const CDfa &other)
+{
+	m_pAndDfa = new std::vector<CAndDfaRow>;
+	*this = other;
+}
+COMMONSC CAndDfa& CAndDfa::operator=(const CAndDfa &other)
+{
+	*m_pAndDfa = *other.m_pAndDfa;
+	return *this;
+}
+COMMONSC void CAndDfa::Reserve(size_t _Count)
+{
+	m_pAndDfa->reserve(_Count);
+}
+COMMONSC void CAndDfa::Resize(size_t _Newsize)
+{
+	m_pAndDfa->resize(_Newsize);
+}
+COMMONSC size_t CAndDfa::Size() const
+{
+	return m_pAndDfa->size();
+}
+COMMONSC CAndDfaRow& CAndDfa::Back()
+{
+	return m_pAndDfa->back();
+}
+COMMONSC CAndDfaRow& CAndDfa::operator[](size_t index)
+{
+	return (*m_pAndDfa)[index];
+}
+
 
 COMMONSC CNfaChain::CNfaChain()
 {
@@ -308,11 +368,6 @@ COMMONSC const CNfa& CNfaChain::operator[](size_t nIdx) const
 	return (*m_pChain)[nIdx];
 }
 
-
-COMMONSC CDfaRow& CDfa::operator[](size_t index)
-{
-	return (*m_pDfa)[index];
-}
 
 COMMONSC CNfaTree::CNfaTree()
 {
