@@ -13,7 +13,20 @@ class COMPILER SNORTIDDFAIDS
 	CVectorNumber m_dfaIds;
 };
 
-class COMPILER CRes
+class COMPILER CDfaTbl
+{
+
+private:
+	std::vector<CDfa> *m_dfaTbl;
+};
+
+class COMPILER CSidDfaIds
+{
+private:
+	std::vector<SNORTIDDFAIDS> *m_sidDfaIds;
+};
+
+struct COMPILER Res
 {
 	std::vector<CDfa> m_dfaTbl;
 	std::vector<SNORTIDDFAIDS> m_sidDfaIds;
