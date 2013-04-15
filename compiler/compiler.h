@@ -7,34 +7,67 @@
 #define COMPILER __declspec(dllexport)
 #endif
 
-class COMPILER SNORTIDDFAIDS
+struct COMPILER COMPILEDRULE
 {
+	enum
+	{
+		RES_SUCCESS = 0x0000,
+		RES_ERROR = 0x0001, 
+		RES_EXCEED = 0x0002, 
+		RES_HASBYTE = 0x0004, 
+		RES_HASNOT = 0x0008, 
+		RES_EMPTY = 0x0010
+	};
 	size_t m_nSid;
+	size_t m_nResult;
 	CVectorNumber m_dfaIds;
 };
 
 class COMPILER CDfaTbl
 {
-
+public:
+	CDfaTbl();
+	CDfaTbl(const CDfaTbl& other);
+	const CDfaTbl &operator=(const CDfaTbl &other);
+	~CDfaTbl();
+	CDfa& operator[](size_t index);
+	const CDfa& operator[](size_t index) const;
+	void Reserve(size_t nCount);
+	void Resize(size_t nSize);
+	const size_t Size() const;
+	void PushBack(const CDfa &dfa);
 private:
 	std::vector<CDfa> *m_dfaTbl;
 };
 
 class COMPILER CSidDfaIds
 {
+public:
+	CSidDfaIds();
+	CSidDfaIds(const CSidDfaIds& other);
+	const CSidDfaIds &operator=(const CSidDfaIds &other);
+	~CSidDfaIds();
+	COMPILEDRULE& operator[](size_t index);
+	const COMPILEDRULE& operator[](size_t index) const;
+	void Reserve(size_t nCount);
+	void Resize(size_t nSize);
+	const size_t Size() const;
+	void PushBack(const COMPILEDRULE &sidDfaIds);
+	COMPILEDRULE& Back();
 private:
-	std::vector<SNORTIDDFAIDS> *m_sidDfaIds;
+	std::vector<COMPILEDRULE> *m_ruleResult;
 };
 
-struct COMPILER Res
+class COMPILER CRes
 {
-	std::vector<CDfa> m_dfaTbl;
-	std::vector<SNORTIDDFAIDS> m_sidDfaIds;
-	CVectorNumber m_errorIds;
-	CVectorNumber m_exceedIds;
-	CVectorNumber m_hasbyteIds;
-	CVectorNumber m_hasnotIds;
-	CVectorNumber m_emptyIds;
+private:
+	CDfaTbl m_dfaTbl;
+	CSidDfaIds m_sidDfaIds;
+public:
+	CDfaTbl& GetDfaTable();
+	CSidDfaIds& GetSidDfaIds();
+	//void WriteToFile(LPCTSTR);
+	//void ReadFromFile(LPCTSTR);
 };
 
-//COMPILER void compile(LPCTSTR filename, RES &result);
+COMPILER void compile(LPCTSTR filename, CRes &result);
