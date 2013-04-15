@@ -4,7 +4,7 @@
 
 void main()
 {
-	RES result;
+	//RES result;
 	//compile(LPCTSTR("../allrules.rule"), result);
 
 	system("pause");
