@@ -11,7 +11,8 @@
 
 typedef void (CALLBACK *RECIEVER)(const CSnortRule &rule, LPVOID lpParam);
 
-CRECHANFA size_t ParseRule(LPCTSTR fileName, RECIEVER recv, LPVOID lpUser);
+CRECHANFA size_t CompileRuleSet(LPCTSTR fileName, RECIEVER recv, LPVOID lpUser);
+CRECHANFA void CompileRule(LPCSTR rule, RECIEVER recv, LPVOID lpUser);
 
 CRECHANFA size_t InterpretRule(const CSnortRule &rule, CNfaTree &outTree);
 

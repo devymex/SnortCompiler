@@ -59,5 +59,5 @@
 //
 //COMPILER void compile(LPCTSTR filename, RES &result)
 //{
-//	ParseRule(filename, Process, &result);
+//	CompileRuleSet(filename, Process, &result);
 //}

@@ -483,6 +483,22 @@ size_t ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
 	return nResult;
 }
 
+/*
+* process one rule
+*/
+CRECHANFA void CompileRule(LPCSTR rule, RECIEVER recv, LPVOID lpUser)
+{
+	//Delete the rule header, reserve the rule options
+	std::string strRule(rule);
+	strRule.erase(strRule.begin(), find(strRule.begin(), strRule.end(), '(') + 1);
+	strRule.erase(find(strRule.rbegin(), strRule.rend(), ')').base() - 1, strRule.end());
+
+	CSnortRule snortRule;
+	if (0 == ProcessOption(strRule, snortRule))
+	{
+		recv(snortRule, lpUser);
+	}
+}
 
 /*
 * read rules from a file
@@ -490,7 +506,7 @@ size_t ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
 * callback function RECIEVER to handle CSnortRule
 */
 
-CRECHANFA size_t ParseRule(LPCTSTR fileName, RECIEVER recv, LPVOID lpUser)
+CRECHANFA size_t CompileRuleSet(LPCTSTR fileName, RECIEVER recv, LPVOID lpUser)
 {
 	if(recv == NULL)
 	{
@@ -504,15 +520,16 @@ CRECHANFA size_t ParseRule(LPCTSTR fileName, RECIEVER recv, LPVOID lpUser)
 			for(std::vector<std::string>::iterator rIt = rules.begin();
 				rIt != rules.end(); ++rIt)
 			{
+				CompileRule(rIt->c_str(), recv, lpUser);
 				//Delete the rule header, reserve the rule options
-				rIt->erase(rIt->begin(), find(rIt->begin(), rIt->end(), '(') + 1);
-				rIt->erase(find(rIt->rbegin(), rIt->rend(), ')').base() - 1, rIt->end());
+				//rIt->erase(rIt->begin(), find(rIt->begin(), rIt->end(), '(') + 1);
+				//rIt->erase(find(rIt->rbegin(), rIt->rend(), ')').base() - 1, rIt->end());
 
-				CSnortRule snortRule;
-				if (0 == ProcessOption(*rIt, snortRule))
-				{
-					recv(snortRule, lpUser);
-				}
+				//CSnortRule snortRule;
+				//if (0 == ProcessOption(*rIt, snortRule))
+				//{
+				//	recv(snortRule, lpUser);
+				//}
 			}
 		}
 	}
@@ -520,7 +537,8 @@ CRECHANFA size_t ParseRule(LPCTSTR fileName, RECIEVER recv, LPVOID lpUser)
 }
 
 /*
-如果有depth或者within，则构造成线性的FA
+* content has depth or within constraint
+* construct it to linear NFA
 */
 void contentToLinearNFA(OPTIONCONTENT *content, CNfa &nfa)
 {
