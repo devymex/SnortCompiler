@@ -9,9 +9,9 @@
 #define PCRETONFA __declspec(dllexport)
 #endif
 
-#define SC_SUCCESS 0
-#define SC_ERROR -1
-#define SC_EXCEED -2
+#define SC_SUCCESS size_t(0)
+#define SC_ERROR size_t(-1)
+#define SC_EXCEED size_t(-2)
 
 //把单个pcre转化为NFA
 PCRETONFA size_t PcreToNFA(const char *pPcre, CNfa &nfa);

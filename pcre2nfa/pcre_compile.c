@@ -6797,7 +6797,10 @@ CHAR_GREATER_THAN_SIGN : CHAR_APOSTROPHE;
 						BOOL is_a_number = TRUE;
 						for (p = ptr + 1; *p != CHAR_NULL && *p != (pcre_uchar)terminator; p++)
 						{
+#pragma warning (push)
+#pragma warning (disable : 4127)
 							if (!MAX_255(*p)) { is_a_number = FALSE; break; }
+#pragma warning (pop)
 							if ((cd->ctypes[*p] & ctype_digit) == 0) is_a_number = FALSE;
 							if ((cd->ctypes[*p] & ctype_word) == 0) break;
 						}

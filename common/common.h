@@ -116,7 +116,7 @@ public:
 
 	size_t Size() const;
 	CNfa& Back();
-	void PushBack(CNfa &cnfa);
+	void PushBack(const CNfa &cnfa);
 	CNfa& operator[](size_t nIdx);
 	const CNfa& operator[](size_t nIdx) const;
 private:
@@ -133,7 +133,7 @@ public:
 
 	size_t Size() const;
 	CNfaChain& Back();
-	void PushBack(CNfaChain &cnfachain);
+	void PushBack(const CNfaChain &cnfachain);
 	CNfaChain& operator[](size_t nIdx);
 	const CNfaChain& operator[](size_t nIdx) const;
 
@@ -151,16 +151,21 @@ struct COMMONSC RULEOPTION
 class COMMONSC CSnortRule
 {
 public:
+	enum {RULE_HASBYTE = 0x0001, RULE_HASNOT = 0x0002};
 	CSnortRule();
 	CSnortRule(const CSnortRule &other);
 	~CSnortRule();
 	void SetSid(size_t sid);
+	size_t GetSid() const;
+	void SetFlag(size_t flag);
+	size_t GetFlag() const;
 	void PushBack(RULEOPTION* ruleoption);
 	void PopBack();
 	size_t Size() const;
-	RULEOPTION*& operator[](size_t nIdx) const;
+	RULEOPTION* operator[](size_t nIdx) const;
 private:
 	size_t m_nSid;
+	size_t m_nFlag;
 	std::vector<RULEOPTION*> *m_pOptions;
 };
 

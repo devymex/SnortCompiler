@@ -293,7 +293,7 @@ COMMONSC CNfa& CNfaChain::Back()
 	return m_pChain->back();
 }
 
-COMMONSC void CNfaChain::PushBack(CNfa &cnfa)
+COMMONSC void CNfaChain::PushBack(const CNfa &cnfa)
 {
 	m_pChain->push_back(cnfa);
 }
@@ -345,7 +345,7 @@ COMMONSC CNfaChain& CNfaTree::Back()
 {
 	return m_pTree->back();
 }
-COMMONSC void CNfaTree::PushBack(CNfaChain &cnfachain)
+COMMONSC void CNfaTree::PushBack(const CNfaChain &cnfachain)
 {
 	m_pTree->push_back(cnfachain);
 }
@@ -360,7 +360,7 @@ const CNfaChain& CNfaTree::operator[](size_t nIdx) const
 }
 
 COMMONSC CSnortRule::CSnortRule()
-	: m_nSid(0)
+	: m_nSid(0), m_nFlag(0)
 {
 	m_pOptions = new std::vector<RULEOPTION*>;
 }
@@ -380,6 +380,21 @@ COMMONSC void CSnortRule::SetSid(size_t sid)
 	m_nSid = sid;
 }
 
+COMMONSC size_t CSnortRule::GetSid() const
+{
+	return m_nSid;
+}
+
+COMMONSC void CSnortRule::SetFlag(size_t flag)
+{
+	m_nFlag = flag;
+}
+
+COMMONSC size_t CSnortRule::GetFlag() const
+{
+	return m_nFlag;
+}
+
 COMMONSC void CSnortRule::PushBack(RULEOPTION* ruleoption)
 {
 	m_pOptions->push_back(ruleoption);
@@ -394,7 +409,7 @@ COMMONSC size_t CSnortRule::Size() const
 	return m_pOptions->size();
 }
 
-COMMONSC RULEOPTION*& CSnortRule::operator[](size_t nIdx) const
+COMMONSC RULEOPTION* CSnortRule::operator[](size_t nIdx) const
 {
 	return (*m_pOptions)[nIdx];
 }
