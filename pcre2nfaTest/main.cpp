@@ -33,13 +33,14 @@ void main()
 			foutError << i - vecPcres.begin() + 1 << std::endl;
 		}
 		std::cout << i - vecPcres.begin() + 1 << std::endl;
+		size_t n = nfa.Size();
 		
-		//for (size_t j = 0; j < nfa.size(); ++j)
+		//for (size_t j = 0; j < nfa.Size(); ++j)
 		//{
 		//	std::cout << j << ": ";
 		//	for (size_t k = 0; k < CHARSETSIZE; ++k)
 		//	{
-		//		for (size_t l = 0; l < nfa[j].GetSetSize(k); ++l)
+		//		for (size_t l = 0; l < nfa[j][k].Size(); ++l)
 		//		{
 		//			std::cout << "(" << k << "," << nfa[j][k][l] << ")";
 		//		}

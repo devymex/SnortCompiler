@@ -66,8 +66,10 @@ private:
 public:
 	CDfaTbl& GetDfaTable();
 	CSidDfaIds& GetSidDfaIds();
-	//void WriteToFile(LPCTSTR);
-	//void ReadFromFile(LPCTSTR);
+	const CDfaTbl& GetDfaTable() const;
+	const CSidDfaIds& GetSidDfaIds() const;
+	size_t WriteToFile(LPCTSTR filename);
+	size_t ReadFromFile(LPCTSTR filename);
 };
 
 COMPILER void compile(LPCTSTR filename, CRes &result);

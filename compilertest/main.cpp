@@ -1,11 +1,13 @@
 #include <iostream>
+#include <tchar.h>
 #include <windows.h>
 #include "../compiler/compiler.h"
 
 void main()
 {
-	//RES result;
-	//compile(LPCTSTR("../allrules.rule"), result);
+	CRes result;
+	compile(_T("..\\testrules.rule"), result);
+	result.WriteToFile(_T("..\\result.cdt"));
 
 	system("pause");
 }

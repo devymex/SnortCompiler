@@ -5,7 +5,7 @@
 
 void main()
 {
-	const char* a = "/BM+.+b{2,}/";
+	const char* a = "/abcd.*ABCD{1024}/";
 	CNfa nfa;
 	CDfa dfa;
 	PcreToNFA(a, nfa);
