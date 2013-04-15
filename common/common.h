@@ -11,16 +11,16 @@
 #define COMMONSC __declspec(dllexport)
 #endif
 
-class COMMONSC CStateSet
+class COMMONSC CVectorNumber
 {
 public:
-	CStateSet();
-	~CStateSet();
-	CStateSet(const CStateSet &other);
-	const CStateSet& operator = (const CStateSet &other);
+	CVectorNumber();
+	~CVectorNumber();
+	CVectorNumber(const CVectorNumber &other);
+	const CVectorNumber& operator = (const CVectorNumber &other);
 	size_t& operator[](size_t nIdx);
 	const size_t& operator[](size_t nIdx) const;
-	bool operator == (const CStateSet &other);
+	bool operator == (const CVectorNumber &other);
 
 	const size_t Size() const;
 	void PopBack();
@@ -33,6 +33,8 @@ public:
 private:
 	std::vector<size_t> *m_pSet;
 };
+
+typedef CVectorNumber CStateSet;
 
 class COMMONSC CNfaRow
 {
@@ -168,5 +170,3 @@ private:
 	size_t m_nFlag;
 	std::vector<RULEOPTION*> *m_pOptions;
 };
-
-
