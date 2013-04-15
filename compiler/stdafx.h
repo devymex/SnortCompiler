@@ -16,3 +16,5 @@
 #include <fstream>
 #include <map>
 #include <set>
+
+#define COMPILER_H_

@@ -1,25 +1,9 @@
 #include "stdafx.h"
+#include "compiler.h"
 #include "../common/common.h"
 #include "../rule2nfa/rule2nfa.h"
 #include "../nfa2dfa/nfa2dfa.h"
 #include "../pcre2nfa/pcre2nfa.h"
-
-struct SNORTIDDFAIDS
-{
-	size_t m_nSid;
-	std::vector<size_t> m_dfaIds;
-};
-
-struct RES
-{
-	std::vector<CDfa> m_dfaTbl;
-	std::vector<SNORTIDDFAIDS> m_sidDfaIds;
-	std::vector<size_t> m_errorIds;
-	std::vector<size_t> m_exceedIds;
-	std::vector<size_t> m_hasbyteIds;
-	std::vector<size_t> m_hasnotIds;
-	std::vector<size_t> m_emptyIds;
-};
 
 void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 {
@@ -28,15 +12,15 @@ void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 	size_t nFlag = rule.GetFlag();
 	if (nFlag & CSnortRule::RULE_HASBYTE)
 	{
-		result.m_hasbyteIds.push_back(nSid);
+		result.m_hasbyteIds.PushBack(nSid);
 	}
 	else if (nFlag & CSnortRule::RULE_HASNOT)
 	{
-		result.m_hasnotIds.push_back(nSid);
+		result.m_hasnotIds.PushBack(nSid);
 	}
 	else if (rule.Size() == 0)
 	{
-		result.m_emptyIds.push_back(nSid);
+		result.m_emptyIds.PushBack(nSid);
 	}
 	else
 	{
@@ -44,12 +28,12 @@ void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 		size_t flag = InterpretRule(rule, nfatree);
 		if (flag == SC_ERROR)
 		{
-			result.m_errorIds.push_back(nSid);
+			result.m_errorIds.PushBack(nSid);
 			return;
 		}
 		else if (flag == SC_EXCEED)
 		{
-			result.m_exceedIds.push_back(nSid);
+			result.m_exceedIds.PushBack(nSid);
 			return;
 		}
 		else
@@ -67,23 +51,13 @@ void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 				nId = nCursize + i;
 				CDfa &dfa = result.m_dfaTbl[nId];
 				NfaToDfa(nfa, dfa);
-				sidDfaIds.m_dfaIds.push_back(nId);
+				sidDfaIds.m_dfaIds.PushBack(nId);
 			}
 		}
 	}
 }
 
-void _tmain(int nArgs, TCHAR **pArgs)
+COMPILER void compile(LPCTSTR filename, RES &result)
 {
-	if (nArgs != 2)
-	{
-		return;
-	}
-
-	CString filename(pArgs[1]);
-	
-	RES result;
 	ParseRule(filename, Process, &result);
-
-	system("pause");
 }
