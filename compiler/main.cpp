@@ -1,8 +1,8 @@
+#include "stdafx.h"
+#include "../common/common.h"
 #include "../rule2nfa/rule2nfa.h"
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <tchar.h>
+#include "../nfa2dfa/nfa2dfa.h"
+#include "../pcre2nfa/pcre2nfa.h"
 
 struct SNORTIDDFAIDS
 {
@@ -20,23 +20,6 @@ struct RES
 	std::vector<size_t> m_hasnotIds;
 	std::vector<size_t> m_emptyIds;
 };
-
-
-void printNfa(CNfa &nfa)
-{
-	for (size_t j = 0; j < nfa.Size(); ++j)
-		{
-			std::cout << j << ": ";
-			for (size_t k = 0; k < CHARSETSIZE; ++k)
-			{
-				for (size_t l = 0; l < nfa[j][k].Size(); ++l)
-				{
-					std::cout << "(" << k << "," << nfa[j][k][l] << ")";
-				}
-			}
-			std::cout << std::endl;
-		}
-}
 
 void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 {
@@ -82,18 +65,20 @@ void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 				CNfa nfa;
 				SerializeNfa(nfatree[i], nfa);
 				nId = nCursize + i;
-				//NfaToDfa(nfa, dfa);
+				CDfa &dfa = result.m_dfaTbl[nId];
+				NfaToDfa(nfa, dfa);
 				sidDfaIds.m_dfaIds.push_back(nId);
 			}
 		}
 	}
 }
 
-
-void main()
+void _tmain(int nArgs, TCHAR **pArgs)
 {
-	RES result;
-	CompileRuleSet(_T("..\\test.txt"), Process, &result);
-	system("pause");
+	if (nArgs != 2)
+	{
+		return;
+	}
 
+	system("pause");
 }

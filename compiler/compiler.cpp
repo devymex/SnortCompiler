@@ -183,5 +183,5 @@ void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 
 COMPILER void compile(LPCTSTR filename, CRes &result)
 {
-	ParseRule(filename, Process, &result);
+	CompileRuleSet(filename, Process, &result);
 }
