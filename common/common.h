@@ -118,7 +118,7 @@ public:
 
 	size_t Size() const;
 	CNfa& Back();
-	void PushBack(CNfa &cnfa);
+	void PushBack(const CNfa &cnfa);
 	CNfa& operator[](size_t nIdx);
 	const CNfa& operator[](size_t nIdx) const;
 private:
@@ -135,7 +135,7 @@ public:
 
 	size_t Size() const;
 	CNfaChain& Back();
-	void PushBack(CNfaChain &cnfachain);
+	void PushBack(const CNfaChain &cnfachain);
 	CNfaChain& operator[](size_t nIdx);
 	const CNfaChain& operator[](size_t nIdx) const;
 
@@ -164,7 +164,7 @@ public:
 	void PushBack(RULEOPTION* ruleoption);
 	void PopBack();
 	size_t Size() const;
-	RULEOPTION*& operator[](size_t nIdx) const;
+	RULEOPTION* operator[](size_t nIdx) const;
 private:
 	size_t m_nSid;
 	size_t m_nFlag;

@@ -43,7 +43,7 @@ them both to 0; an emulation function will be used. */
    EBCDIC_NL25, the adjustment of NEWLINE is automatic. */
 /* #undef EBCDIC_NL25 */
 
-#pragma warning (disable : 4146 4018)
+#pragma warning (disable : 4146 4018 4244)
 
 /* Define to 1 if you have the `bcopy' function. */
 #ifndef HAVE_BCOPY
