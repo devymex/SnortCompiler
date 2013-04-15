@@ -3,12 +3,11 @@
 #include "mergedfas.h"
 #include "../common/common.h"
 
-MERDFA void AndMerge(CDfa &dfa1, CDfa &dfa2, CAndDfa &andDfa)
+MERDFA void AndMerge(CDfa &dfa1, CDfa &dfa2, CDfa &andDfa, CVectorNumber &termFlag)
 {
 	std::unordered_map<_int64, size_t, _HASH> idMap;
 	std::vector<std::pair<std::pair<size_t, size_t>, size_t>> idVec;
 	idMap.rehash(_HASH::MAX_SIZE);
-
 	dfa1.Resize(dfa1.Size() + 1);
 	dfa2.Resize(dfa2.Size() + 1);
 
@@ -31,7 +30,6 @@ MERDFA void AndMerge(CDfa &dfa1, CDfa &dfa2, CAndDfa &andDfa)
 			}
 			else if(fir == dfa1.Size() - 1 && sec == dfa2.Size() - 1)
 			{
-				_int64 temp = _int64(size_t(-1)) << 32 | size_t(-1);
 				idMap[_int64(size_t(-1)) << 32 | size_t(-1)] = idMap.size();
 			}
 
@@ -39,6 +37,7 @@ MERDFA void AndMerge(CDfa &dfa1, CDfa &dfa2, CAndDfa &andDfa)
 		}
 	}
 
+	termFlag.Resize(dfa1.Size() * dfa2.Size());
 	andDfa.Resize(dfa1.Size() * dfa2.Size());
 
 	for(size_t d = 0; d < andDfa.Size(); ++d)
@@ -55,16 +54,29 @@ MERDFA void AndMerge(CDfa &dfa1, CDfa &dfa2, CAndDfa &andDfa)
 			
 			size_t firFlag = dfa1[fir].GetFlag();
 			size_t secFlag = dfa2[sec].GetFlag();
-			if((firFlag & CDfaRow::TERMINAL) != 0)
+			if((firFlag & CDfaRow::TERMINAL) != 0 && (secFlag & CDfaRow::TERMINAL) != 0)
 			{
-				size_t curDFlag = andDfa[d].GetDFlag();
-				andDfa[d].SetDFlag(curDFlag | CAndDfaRow::FIRST);
+				termFlag[d] = 3;
 			}
-			if((secFlag & CDfaRow::TERMINAL) != 0)
-			{
-				size_t curDFlag = andDfa[d].GetDFlag();
-				andDfa[d].SetDFlag(curDFlag | CAndDfaRow::SECOND);
-			}
+			else
+				if((firFlag & CDfaRow::TERMINAL) != 0 && (secFlag & CDfaRow::TERMINAL) == 0)
+				{
+					termFlag[d] = 1;
+				}
+				else
+					if((firFlag & CDfaRow::TERMINAL) == 0 && (secFlag & CDfaRow::TERMINAL) != 0)
+					{
+						termFlag[d] = 2;
+					}
+					else
+					{
+						termFlag[d] = 0;
+					}
 		}
 	}
+}
+
+MERDFA void OrMerge(std::vector<CDfa> &dfas, CDfa &lastDfa)
+{
+
 }

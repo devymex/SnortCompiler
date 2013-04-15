@@ -52,6 +52,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "compilertest", "compilertes
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mergedfastest", "mergedfastest\mergedfastest.vcxproj", "{F4B427C6-9EAE-4B72-AFD5-3B15D067C785}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7DD906EF-B11C-4EE6-8E95-D348A52DE6FF} = {7DD906EF-B11C-4EE6-8E95-D348A52DE6FF}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

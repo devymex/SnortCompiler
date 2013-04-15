@@ -55,8 +55,8 @@ void printDfa(_t dfaTab)
 
 void main()
 {
-	CDfa dfa1, dfa2;
-	CAndDfa dfa3;
+	CDfa dfa1, dfa2, dfa3;
+	CVectorNumber termFlag;
 	dfa1.Resize(2);
 	dfa2.Resize(2);
 	dfa1[0][97] =  0;
@@ -76,7 +76,7 @@ void main()
 	printDfa(dfa2);
 	std::cout << ".............." << std::endl;
 
-	AndMerge(dfa1, dfa2, dfa3);
+	AndMerge(dfa1, dfa2, dfa3, termFlag);
 	printDfa(dfa3);
 	std::cout << ".............." << std::endl;
 
