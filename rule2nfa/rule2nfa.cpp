@@ -444,7 +444,7 @@ size_t ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
 			}
 			else
 			{
-				temp->nOffset = atoi(&*opValueBeg);
+				temp->nDepth = atoi(&*opValueBeg);
 				temp->nFlags |= CF_DEPTH;
 			}
 		}
@@ -459,7 +459,7 @@ size_t ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
 			}
 			else
 			{
-				temp->nOffset = atoi(&*opValueBeg);
+				temp->nDistance = atoi(&*opValueBeg);
 				temp->nFlags |= CF_DISTANCE;
 			}
 		}
@@ -474,7 +474,7 @@ size_t ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
 			}
 			else
 			{
-				temp->nOffset = atoi(&*opValueBeg);
+				temp->nWithin = atoi(&*opValueBeg);
 				temp->nFlags |= CF_WITHIN;
 			}
 		}
@@ -677,6 +677,31 @@ CRECHANFA size_t InterpretRule(const CSnortRule &rule, CNfaTree &outTree)
 		OPTIONPCRE *pPcre = dynamic_cast<OPTIONPCRE*>(rule[i]);
 		if(pContent != NULL)
 		{
+			//Êä³ö²âÊÔ
+			//std::string content(pContent->vecconts.begin(), pContent->vecconts.end());
+			//std::cout << "content:" << content << "; ";
+			//if(pContent->nFlags & CF_NOCASE)
+			//{
+			//	std::cout << "nocase; ";
+			//}
+			//if(pContent->nFlags & CF_OFFSET)
+			//{
+			//	std::cout << "offset:" << pContent->nOffset << "; ";
+			//}
+			//if(pContent->nFlags & CF_DEPTH)
+			//{
+			//	std::cout << "depth:" << pContent->nDepth << "; ";
+			//}
+			//if(pContent->nFlags & CF_DISTANCE)
+			//{
+			//	std::cout << "distance:" << pContent->nDistance << "; ";
+			//}
+			//if(pContent->nFlags & CF_WITHIN)
+			//{
+			//	std::cout << "within:" << pContent->nWithin << "; ";
+			//}
+
+
 			if(!((pContent->nFlags & CF_DISTANCE) || (pContent->nFlags& CF_WITHIN)))
 			{
 				if(outTree.Back().Size() != 0)
@@ -689,6 +714,8 @@ CRECHANFA size_t InterpretRule(const CSnortRule &rule, CNfaTree &outTree)
 		}
 		else if(pPcre != NULL)
 		{
+			//std::cout << "pcre:" << pPcre->strPattern << "; ";//²âÊÔÊä³ö
+
 			if(!(pPcre->nFlags & PF_R))
 			{
 				if(outTree.Back().Size() != 0)

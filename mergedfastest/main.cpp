@@ -92,8 +92,6 @@ void main()
 	size = dfa2.Size();
 	size = lastdfa.Size();
 
-
-
 	//CDfa dfa1, dfa2, dfa3;
 	//CVectorNumber termFlag;
 	//dfa1.Resize(2);
