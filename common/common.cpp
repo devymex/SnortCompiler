@@ -184,6 +184,24 @@ COMMONSC size_t CNfa::Size() const
 	return m_pNfa->size();
 }
 
+COMMONSC void CNfa::FromDfa(CDfa &dfa)
+{
+	m_pNfa->clear();
+	Resize(dfa.Size());
+
+	for(size_t i = 0; i < dfa.Size(); ++i)
+	{
+		for(size_t charNum = 0; charNum < CHARSETSIZE; ++charNum)
+		{
+			if(dfa[i][charNum] != size_t(-1))
+			{
+				(*m_pNfa)[i][charNum].PushBack(dfa[i][charNum]);
+			}
+		}
+	}
+}
+
+
 COMMONSC CNfaRow& CNfa::Back()
 {
 	return m_pNfa->back();

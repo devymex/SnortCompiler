@@ -24,12 +24,18 @@
     <ClInclude Include="andDfa.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="orDfa.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="mergedfas.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="orDfa.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

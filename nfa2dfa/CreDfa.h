@@ -38,22 +38,6 @@ struct STATESET_HASH
 	}
 };
 
-template <typename _Iter>
-size_t MatchDfa(CDfa &dfaTab, _Iter _beg, _Iter _end)
-{
-	size_t curSta = 0;
-	for(_Iter iter = _beg; iter != _end && curSta != (size_t)-1; ++iter)
-	{
-		curSta = dfaTab[curSta][*iter];
-	}
-
-	if(curSta == (size_t)-1 || (dfaTab[curSta].GetnFlag() & CDfaRow::TERMINAL) == 0)
-	{
-		curSta = (size_t)-1;
-	}
-	return curSta;
-}
-
 void AvaiEdges(CNfa &oneNfaTab, std::vector<std::vector<size_t>> &avaiVec);
 
 void NextNfaSet(const CNfa &oneNfaTab, const std::vector<size_t> &curNfaVec,

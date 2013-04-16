@@ -51,27 +51,6 @@ private:
 	CStateSet m_pDestSet[CHARSETSIZE];
 };
 
-class COMMONSC CNfa
-{
-public:
-	CNfa();
-	~CNfa();
-	CNfa(const CNfa &other);
-	CNfa& operator=(const CNfa &other);
-	size_t GetRowNum(void);
-	void Reserve(size_t _Count);
-	void Resize(size_t _Newsize);
-	size_t Size() const;
-	void PushBack(const CNfaRow &row);
-	void PopBack();
-
-	CNfaRow &Back();
-	CNfaRow &operator[](size_t index);
-	const CNfaRow &operator[](size_t index) const;
-private:
-	std::vector<CNfaRow> *m_pNfa;
-};
-
 class COMMONSC CDfaRow
 {
 public:
@@ -94,6 +73,45 @@ private:
 	size_t m_pDest[CHARSETSIZE];
 };
 
+class COMMONSC CDfa
+{
+public:
+	CDfa();
+	~CDfa();
+	CDfa(const CDfa &other);
+	CDfa& operator=(const CDfa &other);
+	void Reserve(size_t _Count);
+	void Resize(size_t _Newsize);
+	size_t Size() const;
+	CDfaRow &Back();
+	CDfaRow& operator[](size_t index);
+	const CDfaRow& operator[](size_t index) const;
+private:
+	std::vector<CDfaRow> *m_pDfa;
+};
+
+class COMMONSC CNfa
+{
+public:
+	CNfa();
+	~CNfa();
+	CNfa(const CNfa &other);
+	CNfa& operator=(const CNfa &other);
+	size_t GetRowNum(void);
+	void Reserve(size_t _Count);
+	void Resize(size_t _Newsize);
+	size_t Size() const;
+	void FromDfa(CDfa &dfa);
+	void PushBack(const CNfaRow &row);
+	void PopBack();
+
+	CNfaRow &Back();
+	CNfaRow &operator[](size_t index);
+	const CNfaRow &operator[](size_t index) const;
+private:
+	std::vector<CNfaRow> *m_pNfa;
+};
+
 //class COMMONSC CAndDfaRow : public CDfaRow
 //{
 //public:
@@ -111,23 +129,6 @@ private:
 //	size_t m_cFlag;
 //	size_t m_pAndDest[CHARSETSIZE];
 //};
-
-class COMMONSC CDfa
-{
-public:
-	CDfa();
-	~CDfa();
-	CDfa(const CDfa &other);
-	CDfa& operator=(const CDfa &other);
-	void Reserve(size_t _Count);
-	void Resize(size_t _Newsize);
-	size_t Size() const;
-	CDfaRow &Back();
-	CDfaRow& operator[](size_t index);
-	const CDfaRow& operator[](size_t index) const;
-private:
-	std::vector<CDfaRow> *m_pDfa;
-};
 
 //class COMMONSC CAndDfa
 //{
