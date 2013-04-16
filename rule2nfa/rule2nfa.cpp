@@ -444,7 +444,7 @@ size_t ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
 			}
 			else
 			{
-				temp->nOffset = atoi(&*opValueBeg);
+				temp->nDepth = atoi(&*opValueBeg);
 				temp->nFlags |= CF_DEPTH;
 			}
 		}
@@ -459,7 +459,7 @@ size_t ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
 			}
 			else
 			{
-				temp->nOffset = atoi(&*opValueBeg);
+				temp->nDistance = atoi(&*opValueBeg);
 				temp->nFlags |= CF_DISTANCE;
 			}
 		}
@@ -474,7 +474,7 @@ size_t ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
 			}
 			else
 			{
-				temp->nOffset = atoi(&*opValueBeg);
+				temp->nWithin = atoi(&*opValueBeg);
 				temp->nFlags |= CF_WITHIN;
 			}
 		}
@@ -684,19 +684,19 @@ CRECHANFA size_t InterpretRule(const CSnortRule &rule, CNfaTree &outTree)
 			{
 				std::cout << "nocase; ";
 			}
-			else if(pContent->nFlags & CF_OFFSET)
+			if(pContent->nFlags & CF_OFFSET)
 			{
 				std::cout << "offset:" << pContent->nOffset << "; ";
 			}
-			else if(pContent->nFlags & CF_DEPTH)
+			if(pContent->nFlags & CF_DEPTH)
 			{
 				std::cout << "depth:" << pContent->nDepth << "; ";
 			}
-			else if(pContent->nFlags & CF_DISTANCE)
+			if(pContent->nFlags & CF_DISTANCE)
 			{
 				std::cout << "distance:" << pContent->nDistance << "; ";
 			}
-			else if(pContent->nFlags & CF_WITHIN)
+			if(pContent->nFlags & CF_WITHIN)
 			{
 				std::cout << "within:" << pContent->nWithin << "; ";
 			}
