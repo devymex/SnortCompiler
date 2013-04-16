@@ -16,7 +16,6 @@ struct OPTIONCONTENT : public RULEOPTION
 
 struct OPTIONPCRE : public RULEOPTION
 {
-	std::string strPattern;
 };
 
 enum OPTIONCONTENTFLAGS
@@ -190,8 +189,7 @@ size_t FormatPcre (_Iter pBeg, _Iter pEnd, OPTIONPCRE &pcre)
 	}
 	else
 	{
-		//pcre.strPattern = std::string(iPcreBeg + 1, iPcreEnd);
-		pcre.strPattern = std::string(iPcreBeg, pEnd);
+		pcre.SetPattern(std::string(iPcreBeg, pEnd).c_str());
 	}
 
 	std::string temp = std::string(iPcreEnd + 1, pEnd);
@@ -302,14 +300,6 @@ inline BYTE HexByte(const char *p2Bytes)
 template<typename _Iter>
 size_t FormatOptionContent (_Iter cBeg, _Iter cEnd, std::vector<BYTE> &content)
 {
-	if (*std::find_if_not(cBeg, cEnd, ISSPACE()) == '!')
-	{
-		return size_t(-2);
-	}
-	if (!QuotedContext(cBeg, cEnd))
-	{
-		return size_t(-1);
-	}
 
 	//Transform ducted data into hex number
 	for (_Iter i = cBeg; i != cEnd; ++i)
@@ -393,17 +383,23 @@ size_t ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
 			pContent->nDistance = 0;
 			pContent->nWithin = 0;
 
-			size_t nr = FormatOptionContent(opValueBeg, opValueEnd, pContent->vecconts);
-			if (nr != 0)
+			if (*std::find_if_not(opValueBeg, opValueEnd, ISSPACE()) == '!')
 			{
-				if (nr == size_t(-2))
-				{
-					nFlag |= CSnortRule::RULE_HASNOT;
-				}
+				nFlag |= CSnortRule::RULE_HASNOT;
+			}
+			else if (!QuotedContext(opValueBeg, opValueEnd))
+			{
 				nResult = size_t(-1);
 				delete pContent;
 				break;
 			}
+			else
+			{
+				std::string str(opValueBeg, opValueEnd);
+				pContent->SetPattern(str.c_str());
+				FormatOptionContent(opValueBeg, opValueEnd, pContent->vecconts);
+			}
+
 			snortRule.PushBack(pContent);
 		}
 		else if (0 == stricmp("nocase", iOp->name.c_str()))
@@ -688,13 +684,13 @@ void OutPutTest(CNfaTree &outTree)
 		{
 			for(size_t k = 0; k < CHARSETSIZE; ++k)
 			{
-				if(outTree[i][k].GetRowNum() == 0)
+				if(outTree[i][k].Size() == 0)
 				{
 					fout << -1 << "\t";
 				}
-				for(size_t m = 0; m < outTree[i][k].GetRowNum(); ++m)
+				for(size_t m = 0; m < outTree[i][k].Size(); ++m)
 				{
-					fout << outTree[i][k].
+					//fout << outTree[i][k].
 				}
 			}
 		}
@@ -754,7 +750,6 @@ CRECHANFA size_t InterpretRule(const CSnortRule &rule, CNfaTree &outTree)
 		}
 		else if(pPcre != NULL)
 		{
-			std::cout << "pcre:" << pPcre->strPattern << "; ";//²âÊÔÊä³ö
 
 			if(!(pPcre->nFlags & PF_R))
 			{
@@ -766,7 +761,13 @@ CRECHANFA size_t InterpretRule(const CSnortRule &rule, CNfaTree &outTree)
 			}
 			//outTree.Back().PushBack(CNfa());
 			outTree.Back().Resize(outTree.Back().Size() + 1);
-			flag = PcreToNFA(pPcre->strPattern.c_str(), outTree.Back().Back());
+			std::string strPattern;
+			strPattern.resize(pPcre->GetPattern(NULL, 0));
+			pPcre->GetPattern(&strPattern[0], strPattern.size());
+
+			std::cout << "pcre:" << strPattern << "; ";//²âÊÔÊä³ö
+
+			flag = PcreToNFA(strPattern.c_str(), outTree.Back().Back());
 			if(flag != 0)
 			{
 				return flag;

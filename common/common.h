@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Windows.h>
 #include <vector>
 
 #define CHARSETSIZE 260
@@ -50,27 +51,6 @@ private:
 	CStateSet m_pDestSet[CHARSETSIZE];
 };
 
-class COMMONSC CNfa
-{
-public:
-	CNfa();
-	~CNfa();
-	CNfa(const CNfa &other);
-	CNfa& operator=(const CNfa &other);
-	size_t GetRowNum(void);
-	void Reserve(size_t _Count);
-	void Resize(size_t _Newsize);
-	//size_t Size() const;
-	void PushBack(const CNfaRow &row);
-	void PopBack();
-
-	CNfaRow &Back();
-	CNfaRow &operator[](size_t index);
-	const CNfaRow &operator[](size_t index) const;
-private:
-	std::vector<CNfaRow> *m_pNfa;
-};
-
 class COMMONSC CDfaRow
 {
 public:
@@ -93,6 +73,45 @@ private:
 	size_t m_pDest[CHARSETSIZE];
 };
 
+class COMMONSC CDfa
+{
+public:
+	CDfa();
+	~CDfa();
+	CDfa(const CDfa &other);
+	CDfa& operator=(const CDfa &other);
+	void Reserve(size_t _Count);
+	void Resize(size_t _Newsize);
+	size_t Size() const;
+	CDfaRow &Back();
+	CDfaRow& operator[](size_t index);
+	const CDfaRow& operator[](size_t index) const;
+private:
+	std::vector<CDfaRow> *m_pDfa;
+};
+
+class COMMONSC CNfa
+{
+public:
+	CNfa();
+	~CNfa();
+	CNfa(const CNfa &other);
+	CNfa& operator=(const CNfa &other);
+	//size_t GetRowNum(void);
+	void Reserve(size_t _Count);
+	void Resize(size_t _Newsize);
+	size_t Size() const;
+	void FromDfa(CDfa &dfa);
+	void PushBack(const CNfaRow &row);
+	void PopBack();
+
+	CNfaRow &Back();
+	CNfaRow &operator[](size_t index);
+	const CNfaRow &operator[](size_t index) const;
+private:
+	std::vector<CNfaRow> *m_pNfa;
+};
+
 //class COMMONSC CAndDfaRow : public CDfaRow
 //{
 //public:
@@ -110,23 +129,6 @@ private:
 //	size_t m_cFlag;
 //	size_t m_pAndDest[CHARSETSIZE];
 //};
-
-class COMMONSC CDfa
-{
-public:
-	CDfa();
-	~CDfa();
-	CDfa(const CDfa &other);
-	CDfa& operator=(const CDfa &other);
-	void Reserve(size_t _Count);
-	void Resize(size_t _Newsize);
-	size_t Size() const;
-	CDfaRow &Back();
-	CDfaRow& operator[](size_t index);
-	const CDfaRow& operator[](size_t index) const;
-private:
-	std::vector<CDfaRow> *m_pDfa;
-};
 
 //class COMMONSC CAndDfa
 //{
@@ -184,8 +186,16 @@ private:
 
 struct COMMONSC RULEOPTION
 {
+	RULEOPTION();
+	RULEOPTION(const RULEOPTION &other);
+	const RULEOPTION& operator=(const RULEOPTION &other);
 	virtual ~RULEOPTION();
+
+	void SetPattern(LPCSTR lpStr);
+	size_t GetPattern(LPSTR lpStr, size_t nLen) const;
+
 	size_t nFlags;
+	std::string *m_pPattern;
 };
 
 
@@ -195,7 +205,9 @@ public:
 	enum {RULE_HASBYTE = 0x0001, RULE_HASNOT = 0x0002};
 	CSnortRule();
 	CSnortRule(const CSnortRule &other);
+	const CSnortRule& operator = (const CSnortRule &other);
 	~CSnortRule();
+	void Release();
 	void SetSid(size_t sid);
 	size_t GetSid() const;
 	void SetFlag(size_t flag);

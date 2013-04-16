@@ -42,3 +42,11 @@ output/*
 
 *.ini
 *.orig
+<<<<<<< HEAD
+*.tmp
+=======
+*.bak
+*.txt
+*.tmp
+*.cdt
+>>>>>>> 5fcc62b97072403962361855b6b330a1deda7351
