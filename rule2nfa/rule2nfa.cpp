@@ -712,28 +712,28 @@ CRECHANFA size_t InterpretRule(const CSnortRule &rule, CNfaTree &outTree)
 		if(pContent != NULL)
 		{
 			//Êä³ö²âÊÔ
-			std::string content(pContent->vecconts.begin(), pContent->vecconts.end());
-			std::cout << "content:" << content << "; ";
-			if(pContent->nFlags & CF_NOCASE)
-			{
-				std::cout << "nocase; ";
-			}
-			if(pContent->nFlags & CF_OFFSET)
-			{
-				std::cout << "offset:" << pContent->nOffset << "; ";
-			}
-			if(pContent->nFlags & CF_DEPTH)
-			{
-				std::cout << "depth:" << pContent->nDepth << "; ";
-			}
-			if(pContent->nFlags & CF_DISTANCE)
-			{
-				std::cout << "distance:" << pContent->nDistance << "; ";
-			}
-			if(pContent->nFlags & CF_WITHIN)
-			{
-				std::cout << "within:" << pContent->nWithin << "; ";
-			}
+			//std::string content(pContent->vecconts.begin(), pContent->vecconts.end());
+			//std::cout << "content:" << content << "; ";
+			//if(pContent->nFlags & CF_NOCASE)
+			//{
+			//	std::cout << "nocase; ";
+			//}
+			//if(pContent->nFlags & CF_OFFSET)
+			//{
+			//	std::cout << "offset:" << pContent->nOffset << "; ";
+			//}
+			//if(pContent->nFlags & CF_DEPTH)
+			//{
+			//	std::cout << "depth:" << pContent->nDepth << "; ";
+			//}
+			//if(pContent->nFlags & CF_DISTANCE)
+			//{
+			//	std::cout << "distance:" << pContent->nDistance << "; ";
+			//}
+			//if(pContent->nFlags & CF_WITHIN)
+			//{
+			//	std::cout << "within:" << pContent->nWithin << "; ";
+			//}
 
 
 			if(!((pContent->nFlags & CF_DISTANCE) || (pContent->nFlags& CF_WITHIN)))
@@ -765,7 +765,7 @@ CRECHANFA size_t InterpretRule(const CSnortRule &rule, CNfaTree &outTree)
 			strPattern.resize(pPcre->GetPattern(NULL, 0));
 			pPcre->GetPattern(&strPattern[0], strPattern.size());
 
-			std::cout << "pcre:" << strPattern << "; ";//²âÊÔÊä³ö
+			//std::cout << "pcre:" << strPattern << "; ";//²âÊÔÊä³ö
 
 			flag = PcreToNFA(strPattern.c_str(), outTree.Back().Back());
 			if(flag != 0)
@@ -775,7 +775,7 @@ CRECHANFA size_t InterpretRule(const CSnortRule &rule, CNfaTree &outTree)
 		}
 	}
 
-	OutPutTest(outTree);
+	//OutPutTest(outTree);
 	return 0;
 }
 
