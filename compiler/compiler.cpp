@@ -428,6 +428,10 @@ void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 				nId = nCursize + i;
 				CDfa &dfa = result.GetDfaTable()[nId];
 				NfaToDfa(nfa, dfa);
+				if (dfa.Size() > SC_STATELIMIT)
+				{
+					dfa.Clear();
+				}
 				ruleResult.m_dfaIds.PushBack(nId);
 			}
 		}
