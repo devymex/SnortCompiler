@@ -34,18 +34,18 @@ void main()
 		}
 		std::cout << i - vecPcres.begin() + 1 << std::endl;
 		
-		//for (size_t j = 0; j < nfa.Size(); ++j)
-		//{
-		//	std::cout << j << ": ";
-		//	for (size_t k = 0; k < CHARSETSIZE; ++k)
-		//	{
-		//		for (size_t l = 0; l < nfa[j][k].Size(); ++l)
-		//		{
-		//			std::cout << "(" << k << "," << nfa[j][k][l] << ")";
-		//		}
-		//	}
-		//	std::cout << std::endl;
-		//}
+		for (size_t j = 0; j < nfa.Size(); ++j)
+		{
+			std::cout << j << ": ";
+			for (size_t k = 0; k < CHARSETSIZE; ++k)
+			{
+				for (size_t l = 0; l < nfa[j][k].Size(); ++l)
+				{
+					std::cout << "(" << k << "," << nfa[j][k][l] << ")";
+				}
+			}
+			std::cout << std::endl;
+		}
 	}
 	foutExceed.close();
 	foutError.close();

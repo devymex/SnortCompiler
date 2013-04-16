@@ -5,6 +5,8 @@
 
 #define HASHMODULO 1000000
 
+#define SC_STATELIMIT 30000
+
 #define EMPTY 256
 
 #ifndef CREDFA_H_

@@ -349,6 +349,11 @@ COMMONSC const CDfaRow& CDfa::operator[](size_t index) const
 	return (*m_pDfa)[index];
 }
 
+COMMONSC void CDfa::Clear()
+{
+	m_pDfa->clear();
+}
+
 //COMMONSC CAndDfa::CAndDfa()
 //{
 //	m_pAndDfa = new std::vector<CAndDfaRow>;

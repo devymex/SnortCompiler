@@ -518,6 +518,7 @@ CRECHANFA size_t CompileRuleSet(LPCTSTR fileName, RECIEVER recv, LPVOID lpUser)
 			for(std::vector<std::string>::iterator rIt = rules.begin();
 				rIt != rules.end(); ++rIt)
 			{
+				std::cout << rIt - rules.begin() << std::endl;
 				CompileRule(rIt->c_str(), recv, lpUser);
 				//Delete the rule header, reserve the rule options
 				//rIt->erase(rIt->begin(), find(rIt->begin(), rIt->end(), '(') + 1);

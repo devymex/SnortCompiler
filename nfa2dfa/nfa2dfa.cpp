@@ -48,7 +48,7 @@ CREDFA void NfaToDfa(CNfa &oneNfaTab, CDfa &dfaTab)
 		for(std::vector<std::vector<size_t>>::iterator group = charGroups.begin();
 			group != charGroups.end(); ++group)
 		{
-			if( dfaTab.Size() > 30000)
+			if( dfaTab.Size() > SC_STATELIMIT)
 			{
 				return;
 			}
