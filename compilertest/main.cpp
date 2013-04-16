@@ -1,6 +1,7 @@
 #include <iostream>
 #include <tchar.h>
 #include <windows.h>
+#include <fstream>
 #include "../compiler/compiler.h"
 #include "../common/common.h"
 
@@ -10,25 +11,42 @@ void main()
 	compile(_T("..\\testrules.rule"), result);
 	result.WriteToFile(_T("..\\result.cdt"));
 
-	std::cout << result.GetDfaTable()[0].Size() << std::endl;
+	CRes readRes;
+	readRes.ReadFromFile(_T("..\\result.cdt"));
 
-	//std::cout << result.GetSidDfaIds()[0].m_dfaIds.Size() << std::endl;
+	std::ofstream foutBeforeWrite("..\\BeforeWrite.txt");
 
-	//for (size_t i = 0; i < result.GetDfaTable().Size(); ++i)
-	//{
-	//	for (size_t j = 0; j < result.GetDfaTable()[i].Size(); ++j)
-	//	{
-	//		std::cout << j << ":";
-	//		for (size_t k = 0; k < CHARSETSIZE; ++k)
-	//		{
-	//			if (result.GetDfaTable()[i][j][k] != 0 && result.GetDfaTable()[i][j][k] != -1)
-	//			{
-	//				std::cout << "(" << k << "," << result.GetDfaTable()[i][j][k] << ")";
-	//			}
-	//		}
-	//		std::cout << std::endl;
-	//	}
-	//}
+	for (size_t i = 0; i < result.GetDfaTable().Size(); ++i)
+	{
+		for (size_t j = 0; j < result.GetDfaTable()[i].Size(); ++j)
+		{
+			foutBeforeWrite << j << ":";
+			for (size_t k = 0; k < CHARSETSIZE; ++k)
+			{
+				foutBeforeWrite << "(" << k << "," << result.GetDfaTable()[i][j][k] << ")";
+			}
+			foutBeforeWrite << std::endl;
+		}
+	}
+	foutBeforeWrite.close();
+	foutBeforeWrite.clear();
+
+	std::ofstream foutAfterRead("..\\AfterRead.txt");
+
+	for (size_t i = 0; i < result.GetDfaTable().Size(); ++i)
+	{
+		for (size_t j = 0; j < result.GetDfaTable()[i].Size(); ++j)
+		{
+			foutAfterRead << j << ":";
+			for (size_t k = 0; k < CHARSETSIZE; ++k)
+			{
+				foutAfterRead << "(" << k << "," << result.GetDfaTable()[i][j][k] << ")";
+			}
+			foutAfterRead << std::endl;
+		}
+	}
+	foutAfterRead.close();
+	foutAfterRead.clear();
 
 	system("pause");
 }
