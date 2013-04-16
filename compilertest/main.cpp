@@ -8,8 +8,8 @@
 void main()
 {
 	CRes result;
-	compile(_T("..\\testrules.rule"), result);
-	result.WriteToFile(_T("..\\result.cdt"));
+	compile(_T("..\\..\\input\\test.rules"), result);
+	result.WriteToFile(_T("..\\result.cdt") );
 
 	CRes readRes;
 	readRes.ReadFromFile(_T("..\\result.cdt"));
