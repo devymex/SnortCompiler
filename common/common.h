@@ -86,6 +86,7 @@ public:
 	CDfaRow(const CDfaRow &other);
 	CDfaRow& operator=(const CDfaRow &other);
 	size_t& operator[](size_t index);
+	const size_t& operator[](size_t index) const;
 	void SetFlag(size_t nFlag);
 	size_t GetFlag();
 private:
@@ -123,6 +124,7 @@ public:
 	size_t Size() const;
 	CDfaRow &Back();
 	CDfaRow& operator[](size_t index);
+	const CDfaRow& operator[](size_t index) const;
 private:
 	std::vector<CDfaRow> *m_pDfa;
 };
