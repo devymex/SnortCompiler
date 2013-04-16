@@ -428,6 +428,7 @@ void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 				nId = nCursize + i;
 				CDfa &dfa = result.GetDfaTable()[nId];
 				NfaToDfa(nfa, dfa);
+				std::cout << "dfa.size(): " << dfa.Size() <<std::endl;
 				ruleResult.m_dfaIds.PushBack(nId);
 			}
 		}
