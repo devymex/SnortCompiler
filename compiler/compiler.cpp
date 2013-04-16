@@ -139,6 +139,50 @@ void WriteNum(std::ofstream &fout, _Ty _num, size_t nBytes = sizeof(_Ty))
 	fout.write((char*)&_num, nBytes);
 }
 
+bool ColumnEqual(const CDfa &dfa, size_t &c1, size_t &c2)
+{
+	for (size_t i = 0; i < dfa.Size(); ++i)
+	{
+		if (dfa[i][c1] != dfa[i][c2])
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
+void AvaiDfaEdges(const CDfa &dfa, std::vector<std::vector<size_t>> &charGroups)
+{
+	charGroups.clear();
+	std::vector<size_t> fullSet;
+
+	for (size_t i = 0; i < CHARSETSIZE - 4; ++i)
+	{
+		fullSet.push_back(i);
+	}
+
+	for (; !fullSet.empty();)
+	{
+		charGroups.push_back(std::vector<size_t>());
+		std::vector<size_t> &curGroup = charGroups.back();
+		curGroup.push_back(fullSet.front());
+		fullSet.erase(fullSet.begin());
+		for (std::vector<size_t>::iterator i = fullSet.begin(); i != fullSet.end() && !fullSet.empty();)
+		{
+			if (ColumnEqual(dfa, curGroup.front(), *i))
+			{
+				curGroup.push_back(*i);
+				i = fullSet.erase(i);
+			}
+			else
+			{
+				++i;
+			}
+		}
+	}
+}
+
 COMPILER size_t CRes::WriteToFile(LPCTSTR filename)
 {
 	std::ofstream fout(filename, std::ios::binary);
@@ -201,23 +245,34 @@ COMPILER size_t CRes::WriteToFile(LPCTSTR filename)
 		//dfaElemNumPos = fout.tellp();
 		//fout.seekp(4, std::ofstream::cur);
 		//写DFA跳转表
-		for (size_t j = 0; j < m_dfaTbl[i].Size(); ++j)
+		std::vector<std::vector<size_t>> charGroups;
+		AvaiDfaEdges(m_dfaTbl[i], charGroups);
+		//写分组
+		//写分组总数
+		WriteNum(fout, charGroups.size(), 4);
+		//每个组的列代表
+		std::vector<size_t> colIds;
+		for (size_t j = 0; j < charGroups.size(); ++j)
 		{
-			for (size_t k = 0; k < CHARSETSIZE; ++k)
+			//写每一组的个数
+			if (!charGroups[j].empty())
 			{
-				//if (m_dfaTbl[i][j][k] != size_t(-1))
-				//{
-				//	++nCnt;
-				//	WriteNum(fout, j, 4);
-				//	WriteNum(fout, k, 4);
-				//	WriteNum(fout, m_dfaTbl[i][j][k], 4);
-				//}
+				colIds.push_back(charGroups[j][0]);
+			}
+			WriteNum(fout, charGroups[j].size(), 4);
+			for (size_t k = 0; k < charGroups[j].size(); ++k)
+			{
+				//写组中的列号
+				WriteNum(fout, charGroups[j][k], 4);
+			}
+		}
+		for (size_t k = 0; k < colIds.size(); ++k)
+		{
+			for (size_t j = 0; j < m_dfaTbl[i].Size(); ++j)
+			{
 				WriteNum(fout, m_dfaTbl[i][j][k], 4);
 			}
 		}
-		//fout.seekp(dfaElemNumPos, std::ios::beg);
-		//WriteNum(fout, nCnt, 4);
-		//fout.seekp(0, std::ofstream::end);
 	}
 	//填写文件尺寸
 	endPos = fout.tellp();
