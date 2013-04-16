@@ -392,7 +392,7 @@ void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 	}
 	else if (nFlag & CSnortRule::RULE_HASNOT)
 	{
-		ruleResult.m_nResult = COMPILEDRULE::RES_HASNOT;
+		ruleResult.m_nResult = COMPILEDRULE::RES_HASNOT; 
 		return;
 	}
 	else if (rule.Size() == 0)
