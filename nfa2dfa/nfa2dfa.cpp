@@ -103,17 +103,15 @@ void RemoveUselessStates(CDfa &oneDfaTab, CNfa &RevDfa, std::vector<size_t> &Fin
 	std::vector<size_t> RevReachableStas;
 	
 	std::vector<size_t> nextStas;
-	std::vector<size_t> tmpReach;	
 	nextStas.push_back(0);
 	PosReachableStas.push_back(0);
 	for (; !nextStas.empty(); )
 	{
-		tmpReach = PosReachableStas;
-		std::sort(tmpReach.begin(), tmpReach.end());
 		std::vector<size_t> tmp;
 		for (std::vector<size_t>::iterator iter = nextStas.begin(); iter != nextStas.end(); ++iter)
 		{
-			for (size_t i = 0; i < CHARSETSIZE; ++i)
+			//for (size_t i = 0; i < CHARSETSIZE; ++i)
+			for (size_t i = 97; i < 99; ++i)
 			{
 				if (oneDfaTab[*iter][i] != -1)
 				{
@@ -122,26 +120,25 @@ void RemoveUselessStates(CDfa &oneDfaTab, CNfa &RevDfa, std::vector<size_t> &Fin
 			}
 		}
 		std::sort(tmp.begin(), tmp.end());
-		tmp.erase(std::unique(tmp.begin(), tmp.end()));
+		tmp.erase(std::unique(tmp.begin(), tmp.end()), tmp.end());
 		nextStas.clear();
-		std::set_difference(tmp.begin(), tmp.end(), tmpReach.begin(), tmpReach.end(), std::back_inserter(nextStas));
-		std::set_union(tmpReach.begin(),tmpReach.end(), nextStas.begin(), nextStas.end(), std::back_inserter(PosReachableStas));
-		tmpReach.clear();
+		std::set_difference(tmp.begin(), tmp.end(), PosReachableStas.begin(), PosReachableStas.end(), std::back_inserter(nextStas));
+		std::set_union(PosReachableStas.begin(),PosReachableStas.end(), nextStas.begin(), nextStas.end(), std::back_inserter(PosReachableStas));
+		std::sort(PosReachableStas.begin(), PosReachableStas.end());
+		PosReachableStas.erase(std::unique(PosReachableStas.begin(), PosReachableStas.end()), PosReachableStas.end());
 	}
 
-	tmpReach.clear();
 	std::vector<size_t> preStas = FinalStas;
 	RevReachableStas = FinalStas;
 	for (; !preStas.empty(); )
 	{
-		tmpReach = RevReachableStas;
-		std::sort(tmpReach.begin(), tmpReach.end());
 		std::vector<size_t> tmp;
 		for (std::vector<size_t>::iterator iter = preStas.begin(); iter != preStas.end(); ++iter)
 		{
-			for (size_t i = 0; i < CHARSETSIZE; ++i)	
+			//for (size_t i = 0; i < CHARSETSIZE; ++i)
+			for (size_t i = 97; i < 99; ++i)
 			{
-				if (!RevDfa[*iter][i].Empty())
+				if (RevDfa[*iter][i].Size() != 0)
 				{
 					for (size_t j = 0; j < RevDfa[*iter][i].Size(); ++j)
 					{
@@ -151,11 +148,12 @@ void RemoveUselessStates(CDfa &oneDfaTab, CNfa &RevDfa, std::vector<size_t> &Fin
 			}
 		}
 		std::sort(tmp.begin(), tmp.end());
-		tmp.erase(std::unique(tmp.begin(), tmp.end()));
+		tmp.erase(std::unique(tmp.begin(), tmp.end()), tmp.end());
 		preStas.clear();
-		std::set_difference(tmp.begin(), tmp.end(), tmpReach.begin(), tmpReach.end(), std::back_inserter(preStas));
-		std::set_union(tmpReach.begin(), tmpReach.end(), preStas.begin(), preStas.end(), std::back_inserter(RevReachableStas));
-		tmpReach.clear();
+		std::set_difference(tmp.begin(), tmp.end(), RevReachableStas.begin(), RevReachableStas.end(), std::back_inserter(preStas));
+		std::set_union(RevReachableStas.begin(), RevReachableStas.end(), preStas.begin(), preStas.end(), std::back_inserter(RevReachableStas));
+		std::sort(RevReachableStas.begin(), RevReachableStas.end());
+		RevReachableStas.erase(std::unique(RevReachableStas.begin(), RevReachableStas.end()), RevReachableStas.end());
 	}
 
 	std::set_intersection(PosReachableStas.begin(), PosReachableStas.end(), RevReachableStas.begin(), RevReachableStas.end(), std::back_inserter(Reachable));
@@ -172,8 +170,8 @@ void MergeReachable(CDfa &oneDfaTab, std::vector<size_t> &Reachable, CDfa &tmpDf
 	}
 	std::set_difference(full.begin(), full.end(), Reachable.begin(), Reachable.end(), std::back_inserter(difference));
 	tmpDfa.Resize(Reachable.size());
-	size_t k = 0;
-	for (size_t i = 0, j = 0; i < difference.size() && j < oneDfaTab.Size(); )
+	size_t i = 0, j = 0, k = 0;
+	for (; i < difference.size() && j < oneDfaTab.Size(); )
 	{
 		if (j != difference[i])
 		{
@@ -186,15 +184,31 @@ void MergeReachable(CDfa &oneDfaTab, std::vector<size_t> &Reachable, CDfa &tmpDf
 			++j;
 		}
 	}
-	for (std::vector<size_t>::iterator iter = difference.begin(); iter != difference.end(); ++iter)
+	for ( ; j < oneDfaTab.Size(); ++j)
+	{
+		tmpDfa[k++] = oneDfaTab[j];
+	}
+
+	for (size_t i = 0; i < tmpDfa.Size(); ++i)
+	{
+		for (size_t j = 97; j < 99; ++j)
+		{
+			std::cout << tmpDfa[i][j] << " "; 
+		}
+		std::cout << std::endl;
+	}
+	std::cout << std::endl;
+
+	for (std::vector<size_t>::iterator iter = Reachable.begin(); iter != Reachable.end(); ++iter)
 	{
 		for (size_t i = 0; i < tmpDfa.Size(); ++i)
 		{
-			for (size_t j = 0; j < CHARSETSIZE; ++j)
+			//for (size_t j = 0; j < CHARSETSIZE; ++j)
+			for (size_t j = 97; j < 99; ++j)
 			{
 				if (tmpDfa[i][j] == *iter)
 				{
-					tmpDfa[i][j] == size_t(-1); 
+					tmpDfa[i][j] = size_t(-1); 
 				}
 			}
 		}
@@ -297,7 +311,7 @@ void PartitionNonDisState(CDfa &tmpDfa, CNfa &RevTab, std::vector<std::vector<si
 			std::vector<size_t> equstates;
 			for (std::vector<size_t>::iterator iState = oneset.begin(); iState != oneset.end(); ++iState)
 			{
-				if (!RevTab[*iState][character].Empty)
+				if (RevTab[*iState][character].Size() != 0)
 				{
 					for (size_t i = 0; i < RevTab[*iState][character].Size(); ++i)
 					{
@@ -335,7 +349,8 @@ void MergeNonDisStates(CDfa &tmpDfa, std::vector<std::vector<size_t>> &Partition
 	{
 		if (j == Partition[i].front())
 		{
-			minDfaTab[k++] = tmpDfa[j];
+			minDfaTab[k++] = tmpDfa[j];			
+			minDfaTab[k-1].SetFlag(tmpDfa[j].GetFlag());
 			++i;
 			++j;
 		}
@@ -365,7 +380,7 @@ void MergeNonDisStates(CDfa &tmpDfa, std::vector<std::vector<size_t>> &Partition
 
 CREDFA size_t DfaMin(CDfa &oneDfaTab, CDfa &minDfaTab)
 {
-	if (oneDfaTab.Empty())
+	if (oneDfaTab.Size() == 0)
 	{
 		return size_t(-1);
 	}
@@ -374,7 +389,8 @@ CREDFA size_t DfaMin(CDfa &oneDfaTab, CDfa &minDfaTab)
 	RevTab.Resize(oneDfaTab.Size());
 	for (size_t i = 0; i < oneDfaTab.Size(); ++i)
 	{
-		for (size_t j = 0; j < CHARSETSIZE; ++j)
+		//for (size_t j = 0; j < CHARSETSIZE; ++j)
+		for (size_t j = 97; j < 99; ++j)
 		{
 			if (oneDfaTab[i][j] != -1)
 			{
@@ -383,11 +399,26 @@ CREDFA size_t DfaMin(CDfa &oneDfaTab, CDfa &minDfaTab)
 		}
 	}
 
+	for (size_t i = 0; i < oneDfaTab.Size(); ++i)
+	{
+		//for (size_t j = 0; j < CHARSETSIZE; ++j)
+		for (size_t j = 97; j < 99; ++j)
+		{
+			for (size_t k = 0; k < RevTab[i][j].Size(); ++k)
+			{
+				std::cout << RevTab[i][j][k];
+			}
+			std::cout << std::endl;
+		}
+		std::cout << std::endl;
+	}
+
+
 	std::vector<size_t> FinalStas;
 	std::vector<size_t> NormalStas;
 	for (size_t i = 0; i < oneDfaTab.Size(); ++i)
 	{
-		if ((oneDfaTab[i].GetFlag & oneDfaTab[i].TERMINAL) != 0)
+		if ((oneDfaTab[i].GetFlag() & oneDfaTab[i].TERMINAL) != 0)
 		{
 			FinalStas.push_back(i);
 		}
@@ -405,12 +436,14 @@ CREDFA size_t DfaMin(CDfa &oneDfaTab, CDfa &minDfaTab)
 	CDfa tmpDfa;
 	std::vector<size_t> Reachable;
 	RemoveUselessStates(oneDfaTab, RevTab, FinalStas, Reachable);
+	MergeReachable(oneDfaTab, Reachable, tmpDfa);
 
-	std::vector<std::vector<size_t>> Partition;
-	Partition.push_back(FinalStas);
-	Partition.push_back(NormalStas);
+	//std::vector<std::vector<size_t>> Partition;
+	//Partition.push_back(FinalStas);
+	//Partition.push_back(NormalStas);
 
-	PartitionNonDisState(tmpDfa, RevTab, Partition, FinalStas);
+	//PartitionNonDisState(tmpDfa, RevTab, Partition, FinalStas);
+	//MergeNonDisStates(tmpDfa, Partition, minDfaTab);
 
 	return 0;
 }

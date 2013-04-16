@@ -1,3 +1,4 @@
 LIBRARY mergedfas
 EXPORTS
 AndMerge @1
+OrMerge @2

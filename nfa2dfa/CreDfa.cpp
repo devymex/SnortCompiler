@@ -181,54 +181,6 @@ void EClosure(const CNfa &oneNfaTab, const std::vector<size_t> &curNfaVec, std::
 	}
 }
 
-void printNfa(CNfa oneNfaTab)
-{
-	//std::vector<std::vector<std::vector<size_t>>> allStas;
-	//for(int i = 0; i < oneNfaTab.size() + 1; ++i)
-	//{
-	//	std::vector<size_t> oneStaEdges;
-	//	std::vector<std::vector<size_t>>  allStaEdges;
-	//	allStas.push_back(allStaEdges);
-	//	for(int j = 0; j < oneNfaTab.size() + 1; ++j)
-	//	{
-	//		allStas[i].push_back(oneStaEdges);
-	//	}
-
-	//}
-	//for(size_t i = 0; i < oneNfaTab.size(); ++i)
-	//{
-	//	for(int j = 0; j < CHARSETSIZE; ++j)
-	//	{
-	//		if(oneNfaTab[i][j].size() > 0)
-	//		{
-	//			for(int k = 0; k < oneNfaTab[i][j].size(); ++k)
-	//			{
-	//				size_t oneSta = oneNfaTab[i][j][k];
-	//				allStas[i][oneSta].push_back(j);
-	//			}
-	//		}
-	//	}
-	//}
-
-	//for(std::vector<std::vector<std::vector<size_t>>>::iterator iter = allStas.begin(); iter != allStas.end(); ++iter)
-	//{
-	//	std::cout << iter - allStas.begin() << "  :  ";
-	//	for(std::vector<std::vector<size_t>>::iterator curIter = iter->begin(); curIter != iter->end(); ++curIter)
-	//	{
-	//		if(curIter->size() > 0)
-	//		{
-	//			std::cout << curIter - iter->begin() << " (";
-	//			for(std::vector<size_t>::iterator curcurIter = curIter->begin(); curcurIter != curIter->end(); ++curcurIter)
-	//			{
-	//				std::cout << *curcurIter << ",";
-	//			}
-	//			std::cout << ")  ";
-	//		}
-	//	}
-	//	std::cout << std::endl;
-
-	//}
-}
 
 void printDfa(CDfa dfaTab)
 {
