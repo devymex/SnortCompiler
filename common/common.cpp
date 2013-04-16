@@ -227,6 +227,11 @@ COMMONSC size_t& CDfaRow::operator[](size_t index)
 	return m_pDest[index];
 }
 
+COMMONSC const size_t& CDfaRow::operator[](size_t index) const
+{
+	return m_pDest[index];
+}
+
 COMMONSC void CDfaRow::SetFlag(size_t nFlag)
 {
 	m_nFlag = nFlag;
@@ -297,6 +302,11 @@ COMMONSC CDfaRow &CDfa::Back()
 }
 
 COMMONSC CDfaRow& CDfa::operator[](size_t index)
+{
+	return (*m_pDfa)[index];
+}
+
+COMMONSC const CDfaRow& CDfa::operator[](size_t index) const
 {
 	return (*m_pDfa)[index];
 }
