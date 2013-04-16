@@ -168,10 +168,10 @@ COMPILER size_t CRes::WriteToFile(LPCTSTR filename)
 	fout.seekp(4, std::ofstream::cur);
 	//填写规则偏移
 	std::streamoff endPos = fout.tellp();
-	fout.seekp(ruleOffsetPos, std::ios::beg);
+	fout.seekp(ruleOffsetPos, std::ofstream::beg);
 	WriteNum(fout, endPos, 4);
 	//定位文件到末尾
-	fout.seekp(0, std::ofstream::end);
+	fout.seekp(endPos, std::ofstream::beg);
 	//开始写规则表
 	for (size_t i = 0; i < m_sidDfaIds.Size(); ++i)
 	{
@@ -191,31 +191,39 @@ COMPILER size_t CRes::WriteToFile(LPCTSTR filename)
 	//定位文件到末尾
 	fout.seekp(0, std::ofstream::end);
 	//开始写DFAs
-	WriteNum(fout, m_dfaTbl.Size(), 4);
-	//记录元素数量偏移位置
-	std::streamoff dfaElemNumPos;
-	//记录元素数量
-	size_t nCnt = 0;
+	////记录元素数量偏移位置
+	//std::streamoff dfaElemNumPos;
+	////记录元素数量
+	//size_t nCnt = 0;
 	for (size_t i = 0; i < m_dfaTbl.Size(); ++i)
 	{
-		dfaElemNumPos = fout.tellp();
-		fout.seekp(4, std::ofstream::cur);
+		WriteNum(fout, m_dfaTbl[i].Size(), 4);
+		//dfaElemNumPos = fout.tellp();
+		//fout.seekp(4, std::ofstream::cur);
 		//写DFA跳转表
 		for (size_t j = 0; j < m_dfaTbl[i].Size(); ++j)
 		{
 			for (size_t k = 0; k < CHARSETSIZE; ++k)
 			{
+				//if (m_dfaTbl[i][j][k] != size_t(-1))
+				//{
+				//	++nCnt;
+				//	WriteNum(fout, j, 4);
+				//	WriteNum(fout, k, 4);
+				//	WriteNum(fout, m_dfaTbl[i][j][k], 4);
+				//}
 				WriteNum(fout, m_dfaTbl[i][j][k], 4);
 			}
 		}
-		fout.seekp(dfaElemNumPos, std::ios::beg);
-		WriteNum(fout, nCnt, 4);
-		fout.seekp(0, std::ofstream::end);
+		//fout.seekp(dfaElemNumPos, std::ios::beg);
+		//WriteNum(fout, nCnt, 4);
+		//fout.seekp(0, std::ofstream::end);
 	}
 	//填写文件尺寸
 	endPos = fout.tellp();
 	fout.seekp(fileSizePos, std::ofstream::beg);
 	WriteNum(fout, endPos, 4);
+	fout.seekp(0, std::ofstream::end);
 	fout.close();
 	fout.clear();
 
