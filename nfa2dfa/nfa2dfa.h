@@ -14,3 +14,4 @@
 #endif
 
 CREDFA void NfaToDfa(CNfa &oneNfaTab, CDfa &dfaTab);
+CREDFA size_t DfaMin(CDfa &oneDfaTab, CDfa &minDfaTab);

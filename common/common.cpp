@@ -72,6 +72,11 @@ COMMONSC size_t& CVectorNumber::Back()
 	return m_pSet->back();
 }
 
+COMMONSC bool CVectorNumber::Empty()
+{
+	return m_pSet->empty();
+}
+
 COMMONSC void CVectorNumber::Sort()
 {
 	std::sort(m_pSet->begin(), m_pSet->end());
@@ -272,6 +277,10 @@ COMMONSC size_t CDfa::Size() const
 	return m_pDfa->size();
 }
 
+COMMONSC bool CDfa::Empty()
+{
+	return m_pDfa->empty();
+}
 
 COMMONSC CDfaRow &CDfa::Back()
 {

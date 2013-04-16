@@ -23,6 +23,7 @@ public:
 	bool operator == (const CVectorNumber &other);
 
 	const size_t Size() const;
+	bool Empty();
 	void PopBack();
 	void PushBack(size_t nState);
 	void Reserve(size_t nCount);
@@ -120,6 +121,7 @@ public:
 	void Reserve(size_t _Count);
 	void Resize(size_t _Newsize);
 	size_t Size() const;
+	bool Empty();
 	CDfaRow &Back();
 	CDfaRow& operator[](size_t index);
 private:
