@@ -164,10 +164,10 @@ COMMONSC CNfa::~CNfa()
 	delete m_pNfa;
 }
 
-COMMONSC size_t CNfa::GetRowNum(void)
-{
-	return m_pNfa->size();
-}
+//COMMONSC size_t CNfa::GetRowNum(void)
+//{
+//	return m_pNfa->size();
+//}
 
 COMMONSC void CNfa::Reserve(size_t _Count)
 {
@@ -415,6 +415,11 @@ COMMONSC size_t CNfaChain::Size() const
 {
 	return m_pChain->size();
 }
+
+COMMONSC void CNfaChain::Resize(size_t nSize)
+{
+	m_pChain->resize(nSize);
+}
 COMMONSC CNfa& CNfaChain::Back()
 {
 	return m_pChain->back();
@@ -463,6 +468,15 @@ COMMONSC size_t CNfaTree::Size() const
 	return m_pTree->size();
 }
 
+COMMONSC void CNfaTree::Reserve(size_t nCount)
+{
+	m_pTree->reserve(nCount);
+}
+
+COMMONSC void CNfaTree::Resize(size_t nSize)
+{
+	m_pTree->resize(nSize);
+}
 COMMONSC CNfaChain& CNfaTree::Back()
 {
 	return m_pTree->back();

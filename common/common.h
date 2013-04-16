@@ -97,7 +97,7 @@ public:
 	~CNfa();
 	CNfa(const CNfa &other);
 	CNfa& operator=(const CNfa &other);
-	size_t GetRowNum(void);
+	//size_t GetRowNum(void);
 	void Reserve(size_t _Count);
 	void Resize(size_t _Newsize);
 	size_t Size() const;
@@ -155,6 +155,7 @@ public:
 	const CNfaChain& operator = (const CNfaChain &other);
 
 	size_t Size() const;
+	void Resize(size_t nSize);
 	CNfa& Back();
 	void PushBack(const CNfa &cnfa);
 	CNfa& operator[](size_t nIdx);
@@ -172,6 +173,8 @@ public:
 	const CNfaTree& operator = (const CNfaTree &other);
 
 	size_t Size() const;
+	void Reserve(size_t nCount);
+	void Resize(size_t nSize);
 	CNfaChain& Back();
 	void PushBack(const CNfaChain &cnfachain);
 	CNfaChain& operator[](size_t nIdx);
