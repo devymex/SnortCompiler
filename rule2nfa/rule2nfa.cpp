@@ -14,7 +14,6 @@ struct OPTIONCONTENT : public RULEOPTION
 
 struct OPTIONPCRE : public RULEOPTION
 {
-	std::string strPattern;
 };
 
 enum OPTIONCONTENTFLAGS
@@ -188,8 +187,7 @@ size_t FormatPcre (_Iter pBeg, _Iter pEnd, OPTIONPCRE &pcre)
 	}
 	else
 	{
-		//pcre.strPattern = std::string(iPcreBeg + 1, iPcreEnd);
-		pcre.strPattern = std::string(iPcreBeg, pEnd);
+		pcre.SetPattern(std::string(iPcreBeg, pEnd).c_str());
 	}
 
 	std::string temp = std::string(iPcreEnd + 1, pEnd);
@@ -300,14 +298,6 @@ inline BYTE HexByte(const char *p2Bytes)
 template<typename _Iter>
 size_t FormatOptionContent (_Iter cBeg, _Iter cEnd, std::vector<BYTE> &content)
 {
-	if (*std::find_if_not(cBeg, cEnd, ISSPACE()) == '!')
-	{
-		return size_t(-2);
-	}
-	if (!QuotedContext(cBeg, cEnd))
-	{
-		return size_t(-1);
-	}
 
 	//Transform ducted data into hex number
 	for (_Iter i = cBeg; i != cEnd; ++i)
@@ -391,17 +381,23 @@ size_t ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
 			pContent->nDistance = 0;
 			pContent->nWithin = 0;
 
-			size_t nr = FormatOptionContent(opValueBeg, opValueEnd, pContent->vecconts);
-			if (nr != 0)
+			if (*std::find_if_not(opValueBeg, opValueEnd, ISSPACE()) == '!')
 			{
-				if (nr == size_t(-2))
-				{
-					nFlag |= CSnortRule::RULE_HASNOT;
-				}
+				nFlag |= CSnortRule::RULE_HASNOT;
+			}
+			else if (!QuotedContext(opValueBeg, opValueEnd))
+			{
 				nResult = size_t(-1);
 				delete pContent;
 				break;
 			}
+			else
+			{
+				std::string str(opValueBeg, opValueEnd);
+				pContent->SetPattern(str.c_str());
+				FormatOptionContent(opValueBeg, opValueEnd, pContent->vecconts);
+			}
+
 			snortRule.PushBack(pContent);
 		}
 		else if (0 == stricmp("nocase", iOp->name.c_str()))
@@ -697,7 +693,10 @@ CRECHANFA size_t InterpretRule(const CSnortRule &rule, CNfaTree &outTree)
 				}
 			}
 			outTree.Back().PushBack(CNfa());
-			flag = PcreToNFA(pPcre->strPattern.c_str(), outTree.Back().Back());
+			std::string strPattern;
+			strPattern.resize(pPcre->GetPattern(NULL, 0));
+			pPcre->GetPattern(&strPattern[0], strPattern.size());
+			flag = PcreToNFA(strPattern.c_str(), outTree.Back().Back());
 			if(flag != 0)
 			{
 				return flag;

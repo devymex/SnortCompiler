@@ -1,8 +1,46 @@
 #include "stdafx.h"
 #include "common.h"
 
+RULEOPTION::RULEOPTION()
+{
+	m_pPattern = new std::string;
+}
+
+RULEOPTION::RULEOPTION(const RULEOPTION &other)
+{
+	m_pPattern = new std::string;
+	*this = other;
+}
+
 RULEOPTION::~RULEOPTION()
 {
+	delete m_pPattern;
+}
+
+const RULEOPTION& RULEOPTION::operator=(const RULEOPTION &other)
+{
+	*m_pPattern = *other.m_pPattern;
+	nFlags = other.nFlags;
+	return *this;
+}
+
+size_t RULEOPTION::GetPattern(LPSTR lpStr, size_t nLen) const
+{
+	if (lpStr == NULL || nLen == 0)
+	{
+		return m_pPattern->length();
+	}
+	if (nLen > m_pPattern->length())
+	{
+		nLen = m_pPattern->length();
+	}
+	CopyMemory(lpStr, &(*m_pPattern)[0], nLen);
+	return nLen;
+}
+
+void RULEOPTION::SetPattern(LPCSTR lpStr)
+{
+	*m_pPattern = lpStr;
 }
 
 COMMONSC CVectorNumber::CVectorNumber()
@@ -426,9 +464,28 @@ COMMONSC CSnortRule::CSnortRule(const CSnortRule &other)
 	m_pOptions = new std::vector<RULEOPTION*>;
 	*this = other;
 }
+
+const CSnortRule& CSnortRule::operator = (const CSnortRule &other)
+{
+	m_nSid = other.m_nSid;
+	m_nFlag = other.m_nFlag;
+	*m_pOptions = *other.m_pOptions;
+	return *this;
+}
+
 COMMONSC CSnortRule::~CSnortRule()
 {
 	delete m_pOptions;
+}
+
+void CSnortRule::Release()
+{
+	std::vector<RULEOPTION*> &opts = *m_pOptions;
+	for (std::vector<RULEOPTION*>::iterator i = opts.begin(); i != opts.end(); ++i)
+	{
+		delete *i;
+	}
+	opts.clear();
 }
 
 COMMONSC void CSnortRule::SetSid(size_t sid)

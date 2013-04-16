@@ -56,6 +56,17 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mergedfastest", "mergedfast
 		{7DD906EF-B11C-4EE6-8E95-D348A52DE6FF} = {7DD906EF-B11C-4EE6-8E95-D348A52DE6FF}
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{26C91374-F23D-4A57-A710-0F3AC1EF99FE}"
+	ProjectSection(SolutionItems) = preProject
+		allrules.rule = allrules.rule
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "grouping", "grouping\grouping.vcxproj", "{E6C145F2-A57F-48D4-8B34-EA8166B984F8}"
+	ProjectSection(ProjectDependencies) = postProject
+		{F95D1A40-7011-4922-BB31-5134A752F07E} = {F95D1A40-7011-4922-BB31-5134A752F07E}
+		{0C639590-DE81-4AB4-AA71-6CE6CAB424E4} = {0C639590-DE81-4AB4-AA71-6CE6CAB424E4}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -106,6 +117,10 @@ Global
 		{F4B427C6-9EAE-4B72-AFD5-3B15D067C785}.Debug|Win32.Build.0 = Debug|Win32
 		{F4B427C6-9EAE-4B72-AFD5-3B15D067C785}.Release|Win32.ActiveCfg = Release|Win32
 		{F4B427C6-9EAE-4B72-AFD5-3B15D067C785}.Release|Win32.Build.0 = Release|Win32
+		{E6C145F2-A57F-48D4-8B34-EA8166B984F8}.Debug|Win32.ActiveCfg = Debug|Win32
+		{E6C145F2-A57F-48D4-8B34-EA8166B984F8}.Debug|Win32.Build.0 = Debug|Win32
+		{E6C145F2-A57F-48D4-8B34-EA8166B984F8}.Release|Win32.ActiveCfg = Release|Win32
+		{E6C145F2-A57F-48D4-8B34-EA8166B984F8}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Windows.h>
 #include <vector>
 
 #define CHARSETSIZE 260
@@ -179,8 +180,16 @@ private:
 
 struct COMMONSC RULEOPTION
 {
+	RULEOPTION();
+	RULEOPTION(const RULEOPTION &other);
+	const RULEOPTION& operator=(const RULEOPTION &other);
 	virtual ~RULEOPTION();
+
+	void SetPattern(LPCSTR lpStr);
+	size_t GetPattern(LPSTR lpStr, size_t nLen) const;
+
 	size_t nFlags;
+	std::string *m_pPattern;
 };
 
 
@@ -190,7 +199,9 @@ public:
 	enum {RULE_HASBYTE = 0x0001, RULE_HASNOT = 0x0002};
 	CSnortRule();
 	CSnortRule(const CSnortRule &other);
+	const CSnortRule& operator = (const CSnortRule &other);
 	~CSnortRule();
+	void Release();
 	void SetSid(size_t sid);
 	size_t GetSid() const;
 	void SetFlag(size_t flag);
