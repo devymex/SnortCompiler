@@ -3,6 +3,8 @@
 #include "CombineTree.h"
 #include "stdafx.h"
 
+#define nfaTreeReserve 100
+
 struct OPTIONCONTENT : public RULEOPTION
 {
 	std::vector<BYTE> vecconts;
@@ -667,10 +669,46 @@ void content2Nfa(OPTIONCONTENT *content, CNfa &nfa)
 		contentToDefaultNFA(content, nfa);
 	}
 }
+
+//²âÊÔº¯Êý
+void OutPutTest(CNfaTree &outTree)
+{
+	for(size_t i = 0; i < outTree.Size(); ++i)
+	{
+		std::string str = "F:\\cppProject\\huawei\\PreciseMatch\\input\\";
+		str += "list_" + i;
+		str += ".txt";
+		std::ofstream fout(str.c_str());
+		if(!fout)
+		{
+			std::cerr << "open file failed!" << std::endl;
+			return;
+		}
+		for(size_t j = 0; j < outTree[i].Size(); ++j)
+		{
+			for(size_t k = 0; k < CHARSETSIZE; ++k)
+			{
+				if(outTree[i][k].GetRowNum() == 0)
+				{
+					fout << -1 << "\t";
+				}
+				for(size_t m = 0; m < outTree[i][k].GetRowNum(); ++m)
+				{
+					fout << outTree[i][k].
+				}
+			}
+		}
+		fout.close();
+	}
+}
+
 CRECHANFA size_t InterpretRule(const CSnortRule &rule, CNfaTree &outTree)
 {
+	outTree.Reserve(nfaTreeReserve);
+
 	size_t flag = 0;
-	outTree.PushBack(CNfaChain());
+	//outTree.PushBack(CNfaChain());
+	outTree.Resize(1);
 	for(size_t i = 0; i < rule.Size(); ++i)
 	{
 		OPTIONCONTENT *pContent = dynamic_cast<OPTIONCONTENT*>(rule[i]);
@@ -678,52 +716,56 @@ CRECHANFA size_t InterpretRule(const CSnortRule &rule, CNfaTree &outTree)
 		if(pContent != NULL)
 		{
 			//Êä³ö²âÊÔ
-			//std::string content(pContent->vecconts.begin(), pContent->vecconts.end());
-			//std::cout << "content:" << content << "; ";
-			//if(pContent->nFlags & CF_NOCASE)
-			//{
-			//	std::cout << "nocase; ";
-			//}
-			//if(pContent->nFlags & CF_OFFSET)
-			//{
-			//	std::cout << "offset:" << pContent->nOffset << "; ";
-			//}
-			//if(pContent->nFlags & CF_DEPTH)
-			//{
-			//	std::cout << "depth:" << pContent->nDepth << "; ";
-			//}
-			//if(pContent->nFlags & CF_DISTANCE)
-			//{
-			//	std::cout << "distance:" << pContent->nDistance << "; ";
-			//}
-			//if(pContent->nFlags & CF_WITHIN)
-			//{
-			//	std::cout << "within:" << pContent->nWithin << "; ";
-			//}
+			std::string content(pContent->vecconts.begin(), pContent->vecconts.end());
+			std::cout << "content:" << content << "; ";
+			if(pContent->nFlags & CF_NOCASE)
+			{
+				std::cout << "nocase; ";
+			}
+			if(pContent->nFlags & CF_OFFSET)
+			{
+				std::cout << "offset:" << pContent->nOffset << "; ";
+			}
+			if(pContent->nFlags & CF_DEPTH)
+			{
+				std::cout << "depth:" << pContent->nDepth << "; ";
+			}
+			if(pContent->nFlags & CF_DISTANCE)
+			{
+				std::cout << "distance:" << pContent->nDistance << "; ";
+			}
+			if(pContent->nFlags & CF_WITHIN)
+			{
+				std::cout << "within:" << pContent->nWithin << "; ";
+			}
 
 
 			if(!((pContent->nFlags & CF_DISTANCE) || (pContent->nFlags& CF_WITHIN)))
 			{
 				if(outTree.Back().Size() != 0)
 				{
-					outTree.PushBack(CNfaChain());
+					//outTree.PushBack(CNfaChain());
+					outTree.Resize(outTree.Size() + 1);
 				}
 			}
-			outTree.Back().PushBack(CNfa());
+			//outTree.Back().PushBack(CNfa());
+			outTree.Back().Resize(outTree.Back().Size() + 1);
 			content2Nfa(pContent, outTree.Back().Back());
 		}
 		else if(pPcre != NULL)
 		{
-			//std::cout << "pcre:" << pPcre->strPattern << "; ";//²âÊÔÊä³ö
+			std::cout << "pcre:" << pPcre->strPattern << "; ";//²âÊÔÊä³ö
 
 			if(!(pPcre->nFlags & PF_R))
 			{
 				if(outTree.Back().Size() != 0)
 				{
-					outTree.PushBack(CNfaChain());
+					//outTree.PushBack(CNfaChain());
+					outTree.Resize(outTree.Size() + 1);
 				}
 			}
-			outTree.Back().PushBack(CNfa());
+			//outTree.Back().PushBack(CNfa());
+			outTree.Back().Resize(outTree.Back().Size() + 1);
 			flag = PcreToNFA(pPcre->strPattern.c_str(), outTree.Back().Back());
 			if(flag != 0)
 			{
@@ -731,6 +773,8 @@ CRECHANFA size_t InterpretRule(const CSnortRule &rule, CNfaTree &outTree)
 			}
 		}
 	}
+
+	OutPutTest(outTree);
 	return 0;
 }
 

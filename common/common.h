@@ -60,7 +60,7 @@ public:
 	size_t GetRowNum(void);
 	void Reserve(size_t _Count);
 	void Resize(size_t _Newsize);
-	size_t Size() const;
+	//size_t Size() const;
 	void PushBack(const CNfaRow &row);
 	void PopBack();
 
@@ -153,6 +153,7 @@ public:
 	const CNfaChain& operator = (const CNfaChain &other);
 
 	size_t Size() const;
+	void Resize(size_t nSize);
 	CNfa& Back();
 	void PushBack(const CNfa &cnfa);
 	CNfa& operator[](size_t nIdx);
@@ -170,6 +171,8 @@ public:
 	const CNfaTree& operator = (const CNfaTree &other);
 
 	size_t Size() const;
+	void Reserve(size_t nCount);
+	void Resize(size_t nSize);
 	CNfaChain& Back();
 	void PushBack(const CNfaChain &cnfachain);
 	CNfaChain& operator[](size_t nIdx);
