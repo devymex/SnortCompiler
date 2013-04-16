@@ -42,3 +42,7 @@ output/*
 
 *.ini
 *.orig
+*.bak
+*.txt
+*.tmp
+*.cdt
