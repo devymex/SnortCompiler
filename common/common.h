@@ -36,6 +36,43 @@ private:
 
 typedef CVectorNumber CStateSet;
 
+class COMMONSC CDfaRow
+{
+public:
+	enum STATEFLAG
+	{
+		NORMAL   = 1 << 0,
+		START    = 1 << 1,
+		TERMINAL = 1 << 2
+	};
+	CDfaRow();
+	~CDfaRow();
+	CDfaRow(const CDfaRow &other);
+	CDfaRow& operator=(const CDfaRow &other);
+	size_t& operator[](size_t index);
+	void SetFlag(size_t nFlag);
+	size_t GetFlag();
+private:
+	size_t m_nFlag;
+	size_t m_pDest[CHARSETSIZE];
+};
+
+class COMMONSC CDfa
+{
+public:
+	CDfa();
+	~CDfa();
+	CDfa(const CDfa &other);
+	CDfa& operator=(const CDfa &other);
+	void Reserve(size_t _Count);
+	void Resize(size_t _Newsize);
+	size_t Size() const;
+	CDfaRow &Back();
+	CDfaRow& operator[](size_t index);
+private:
+	std::vector<CDfaRow> *m_pDfa;
+};
+
 class COMMONSC CNfaRow
 {
 public:
@@ -60,6 +97,7 @@ public:
 	size_t GetRowNum(void);
 	void Reserve(size_t _Count);
 	void Resize(size_t _Newsize);
+	void FromDfa(CDfa &dfa);
 	size_t Size() const;
 	void PushBack(const CNfaRow &row);
 	void PopBack();
@@ -69,27 +107,6 @@ public:
 	const CNfaRow &operator[](size_t index) const;
 private:
 	std::vector<CNfaRow> *m_pNfa;
-};
-
-class COMMONSC CDfaRow
-{
-public:
-	enum STATEFLAG
-	{
-		NORMAL   = 1 << 0,
-		START    = 1 << 1,
-		TERMINAL = 1 << 2
-	};
-	CDfaRow();
-	~CDfaRow();
-	CDfaRow(const CDfaRow &other);
-	CDfaRow& operator=(const CDfaRow &other);
-	size_t& operator[](size_t index);
-	void SetFlag(size_t nFlag);
-	size_t GetFlag();
-private:
-	size_t m_nFlag;
-	size_t m_pDest[CHARSETSIZE];
 };
 
 //class COMMONSC CAndDfaRow : public CDfaRow
@@ -109,22 +126,6 @@ private:
 //	size_t m_cFlag;
 //	size_t m_pAndDest[CHARSETSIZE];
 //};
-
-class COMMONSC CDfa
-{
-public:
-	CDfa();
-	~CDfa();
-	CDfa(const CDfa &other);
-	CDfa& operator=(const CDfa &other);
-	void Reserve(size_t _Count);
-	void Resize(size_t _Newsize);
-	size_t Size() const;
-	CDfaRow &Back();
-	CDfaRow& operator[](size_t index);
-private:
-	std::vector<CDfaRow> *m_pDfa;
-};
 
 //class COMMONSC CAndDfa
 //{

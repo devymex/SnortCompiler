@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "andDfa.h"
+#include "orDfa.h"
 #include "mergedfas.h"
+#include "../nfa2dfa/nfa2dfa.h"
 #include "../common/common.h"
 
 MERDFA void AndMerge(CDfa &dfa1, CDfa &dfa2, CDfa &andDfa, CVectorNumber &termFlag)
@@ -78,5 +80,22 @@ MERDFA void AndMerge(CDfa &dfa1, CDfa &dfa2, CDfa &andDfa, CVectorNumber &termFl
 
 MERDFA void OrMerge(std::vector<CDfa> &dfas, CDfa &lastDfa)
 {
+	std::vector<CNfa> nfas;
+	CNfa oneNfa;
+	size_t termSta = 0;
+	oneNfa.Resize(oneNfa.Size() + 1);
 
+	for(size_t i = 0; i < dfas.size(); ++i)
+	{
+		termSta += dfas[i].Size();
+	}
+	termSta += 1;
+
+	for(size_t i = 0; i < dfas.size(); ++i)
+	{
+		oneNfa[0][EMPTYEDGE].PushBack(oneNfa.Size());
+		IncreDfaNum(dfas[i], oneNfa.Size());
+		InsertDfa(dfas[i], oneNfa, termSta);
+	}
+	NfaToDfa(oneNfa, lastDfa);
 }
