@@ -822,5 +822,34 @@ CRECHANFA void SerializeNfa(CNfaChain &nfaChain, CNfa &seriaNfa)
 			seriaNfa.Back()[EMPTYEDGE].PushBack(seriaNfa.Size());
 		}		
 	}
+	std::cout << std::endl;
+		for (size_t j = 0; j < nfaChain[1].Size(); ++j)
+		{
+			std::cout << j << ": ";
+			for (size_t k = 0; k < CHARSETSIZE; ++k)
+			{
+				for (size_t l = 0; l < nfaChain[1][j][k].Size(); ++l)
+				{
+					std::cout << "(" << k << "," << nfaChain[1][j][k][l] << ")";
+				}
+			}
+			std::cout << std::endl;
+		}
+
+	for (size_t j = 0; j < seriaNfa.Size(); ++j)
+		{
+			std::cout << j << ": ";
+			for (size_t k = 0; k < CHARSETSIZE; ++k)
+			{
+				for (size_t l = 0; l < seriaNfa[j][k].Size(); ++l)
+				{
+					std::cout << "(" << k << "," << seriaNfa[j][k][l] << ")";
+				}
+			}
+			std::cout << std::endl;
+		}
+		std::cout << std::endl;
+
+
 }
 
