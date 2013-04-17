@@ -50,4 +50,3 @@ void main()
 
 	system("pause");
 }
-
