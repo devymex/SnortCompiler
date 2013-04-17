@@ -14,12 +14,8 @@ CREDFA void NfaToDfa(CNfa &oneNfaTab, CDfa &dfaTab)
 	STATESETHASH ssh;
 	ssh.rehash(STATESET_HASH::MAX_SIZE);
 
-	//std::stack<std::vector<size_t>> nfaStasStack;
-	std::vector<std::vector<size_t>> nfaSta;
-	nfaSta.reserve(SC_STATELIMIT + 1);
-	size_t nNfaCursize = nfaSta.size();
-	nfaSta.resize(nNfaCursize + 1);
-	std::vector<size_t> &startEVec = nfaSta.back();
+	std::stack<std::vector<size_t>> nfaStasStack;
+	std::vector<size_t> startEVec;
 	std::vector<size_t> startVec;
 
 	char finFlag = 0;
@@ -27,7 +23,7 @@ CREDFA void NfaToDfa(CNfa &oneNfaTab, CDfa &dfaTab)
 	EClosure(oneNfaTab, startVec, startEVec, finFlag);
 
 
-	//nfaStasStack.push(startEVec);
+	nfaStasStack.push(startEVec);
 	//ssh.insert(std::make_pair(startEVec, ssh.size()));
 	ssh[startEVec] = ssh.size();
 
@@ -41,15 +37,13 @@ CREDFA void NfaToDfa(CNfa &oneNfaTab, CDfa &dfaTab)
 		dfaTab.Back().SetFlag(dfaTab.Back().GetFlag() | dfaTab.Back().TERMINAL);
 		finFlag = 0;
 	}
-	//std::vector<size_t> curNfaVec;
+	std::vector<size_t> curNfaVec;
 
-	//while(nfaStasStack.size() > 0)
-	while (nfaSta.size() > 0)
+	while(nfaStasStack.size() > 0)
 	{
 		int curStaNum;
-		//curNfaVec = nfaStasStack.top();
-		//nfaStasStack.pop();
-		std::vector<size_t> &curNfaVec = nfaSta.back();
+		curNfaVec = nfaStasStack.top();
+		nfaStasStack.pop();
 
 		for(std::vector<std::vector<size_t>>::iterator group = charGroups.begin();
 			group != charGroups.end(); ++group)
@@ -68,10 +62,7 @@ CREDFA void NfaToDfa(CNfa &oneNfaTab, CDfa &dfaTab)
 			}
 			curStaNum = ir->second;
 
-			//std::vector<size_t> nextNfaVec;
-			nNfaCursize = nfaSta.size();
-			nfaSta.resize(nNfaCursize + 1);
-			std::vector<size_t> &nextNfaVec = nfaSta.back();
+			std::vector<size_t> nextNfaVec;
 			NextNfaSet(oneNfaTab, curNfaVec, nCurChar, nextNfaVec, finFlag);
 
 			if(!nextNfaVec.empty())
@@ -92,7 +83,7 @@ CREDFA void NfaToDfa(CNfa &oneNfaTab, CDfa &dfaTab)
 						dfaTab.Back().SetFlag(dfaTab.Back().GetFlag() | dfaTab.Back().TERMINAL);
 						finFlag = 0;
 					}
-					//nfaStasStack.push(nextNfaVec);
+					nfaStasStack.push(nextNfaVec);
 				}
 				else
 				{
@@ -100,15 +91,8 @@ CREDFA void NfaToDfa(CNfa &oneNfaTab, CDfa &dfaTab)
 					{
 						dfaTab[curStaNum][*iter] = ssh[nextNfaVec];
 					}
-					nfaSta.pop_back();
 				}
 			}
-			else
-			{
-				nfaSta.pop_back();
-			}
 		}
-		nfaSta.pop_back();
 	}
 }
-
