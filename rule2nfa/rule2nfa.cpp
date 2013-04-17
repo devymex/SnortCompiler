@@ -808,9 +808,11 @@ CRECHANFA void SerializeNfa(CNfaChain &nfaChain, CNfa &seriaNfa)
 	for(size_t n = 0; n < nfaChain.Size(); ++n)
 	{
 		size_t temp = seriaNfa.Size();
+		if(n != 0)
+		{
+			IncreNfaStaNum(seriaNfa.Size(), nfaChain[n]);
+		}
 		seriaNfa.Resize(temp + nfaChain[n].Size());
-
-		IncreNfaStaNum(seriaNfa.Size(), nfaChain[n]);
 		for (size_t i = 0; i < nfaChain[n].Size(); ++i)
 		{
 			seriaNfa[temp + i] = nfaChain[n][i];
@@ -823,34 +825,5 @@ CRECHANFA void SerializeNfa(CNfaChain &nfaChain, CNfa &seriaNfa)
 			seriaNfa.Back()[EMPTYEDGE].PushBack(seriaNfa.Size());
 		}		
 	}
-	std::cout << std::endl;
-		for (size_t j = 0; j < nfaChain[1].Size(); ++j)
-		{
-			std::cout << j << ": ";
-			for (size_t k = 0; k < CHARSETSIZE; ++k)
-			{
-				for (size_t l = 0; l < nfaChain[1][j][k].Size(); ++l)
-				{
-					std::cout << "(" << k << "," << nfaChain[1][j][k][l] << ")";
-				}
-			}
-			std::cout << std::endl;
-		}
-
-	for (size_t j = 0; j < seriaNfa.Size(); ++j)
-		{
-			std::cout << j << ": ";
-			for (size_t k = 0; k < CHARSETSIZE; ++k)
-			{
-				for (size_t l = 0; l < seriaNfa[j][k].Size(); ++l)
-				{
-					std::cout << "(" << k << "," << seriaNfa[j][k][l] << ")";
-				}
-			}
-			std::cout << std::endl;
-		}
-		std::cout << std::endl;
-
-
 }
 
