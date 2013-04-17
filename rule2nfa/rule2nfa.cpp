@@ -786,7 +786,7 @@ CRECHANFA size_t InterpretRule(const CSnortRule &rule, CNfaTree &outTree)
 			strPattern.resize(pPcre->GetPattern(NULL, 0));
 			pPcre->GetPattern(&strPattern[0], strPattern.size());
 
-			std::cout << "pcre:" << strPattern << "; ";//²âÊÔÊä³ö
+			//std::cout << "pcre:" << strPattern << "; ";//²âÊÔÊä³ö
 
 			flag = PcreToNFA(strPattern.c_str(), outTree.Back().Back());
 
@@ -805,6 +805,7 @@ CRECHANFA void SerializeNfa(CNfaChain &nfaChain, CNfa &seriaNfa)
 {
 	CNfaRow oneSta;
 	size_t staNum = seriaNfa.Size();
+	std::cout << nfaChain.Back().Size() << std::endl;
 	for(size_t n = 0; n < nfaChain.Size(); ++n)
 	{
 

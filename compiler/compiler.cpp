@@ -427,6 +427,7 @@ void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 				SerializeNfa(nfatree[i], nfa);
 				nId = nCursize + i;
 				CDfa &dfa = result.GetDfaTable()[nId];
+				std::cout << nfa.Size() << std::endl;
 				NfaToDfa(nfa, dfa);
 				if (dfa.Size() > SC_STATELIMIT)
 				{
