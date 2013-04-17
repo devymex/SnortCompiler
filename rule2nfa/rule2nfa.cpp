@@ -804,24 +804,26 @@ CRECHANFA size_t InterpretRule(const CSnortRule &rule, CNfaTree &outTree)
 CRECHANFA void SerializeNfa(CNfaChain &nfaChain, CNfa &seriaNfa)
 {
 	CNfaRow oneSta;
-	size_t staNum = seriaNfa.Size();
+
 	for(size_t n = 0; n < nfaChain.Size(); ++n)
 	{
-
-		IncreNfaStaNum(seriaNfa.Size(), nfaChain[n]);
+		size_t temp = seriaNfa.Size();
+		if(n != 0)
+		{
+			IncreNfaStaNum(seriaNfa.Size(), nfaChain[n]);
+		}
+		seriaNfa.Resize(temp + nfaChain[n].Size());
 		for (size_t i = 0; i < nfaChain[n].Size(); ++i)
 		{
-			seriaNfa.PushBack(nfaChain[n][i]);
+			seriaNfa[temp + i] = nfaChain[n][i];
 		}
 
 		if(n != nfaChain.Size() - 1)
 		{
 			seriaNfa.Back()[EMPTYEDGE].PushBack(seriaNfa.Size());
-			seriaNfa.PushBack(oneSta);
+			seriaNfa.Resize(seriaNfa.Size() + 1);
 			seriaNfa.Back()[EMPTYEDGE].PushBack(seriaNfa.Size());
 		}		
-
-		staNum = seriaNfa.Size();
 	}
 }
 

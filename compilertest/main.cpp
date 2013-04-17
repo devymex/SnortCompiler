@@ -8,7 +8,7 @@
 void main()
 {
 	CRes result;
-	compile(_T("..\\..\\input\\allrules.rule"), result);
+	compile(_T("..\\..\\input\\testrules.rule"), result);
 	result.WriteToFile(_T("..\\..\\output\\result.cdt") );
 
 	//CRes readRes;
@@ -50,4 +50,3 @@ void main()
 
 	system("pause");
 }
-
