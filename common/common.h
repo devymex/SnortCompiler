@@ -185,6 +185,21 @@ private:
 	std::vector<CNfaChain> *m_pTree;
 };
 
+class COMMONSC RegRule
+{
+public:
+	RegRule();
+	~RegRule();
+	RegRule(const RegRule &other);
+
+	size_t Size() const;
+	void PushBack(std::string &nRegStr);
+	std::string& operator[](size_t nIdx);
+	const RegRule& operator = (const RegRule &other);
+private:
+	std::vector<std::string> *m_pRegVec;
+};
+
 struct COMMONSC RULEOPTION
 {
 	RULEOPTION();

@@ -573,3 +573,40 @@ COMMONSC RULEOPTION* CSnortRule::operator[](size_t nIdx) const
 {
 	return (*m_pOptions)[nIdx];
 }
+
+COMMONSC RegRule::RegRule()
+{
+	m_pRegVec = new std::vector<std::string>;
+}
+
+COMMONSC RegRule::~RegRule()
+{
+	delete m_pRegVec;
+}
+
+COMMONSC RegRule::RegRule(const RegRule &other)
+{
+	m_pRegVec = new std::vector<std::string>;
+	*this = other;
+}
+
+COMMONSC void RegRule::PushBack(std::string &nRegStr)
+{
+	m_pRegVec->push_back(nRegStr);
+}
+
+COMMONSC size_t RegRule::Size() const
+{
+	return m_pRegVec->size();
+}
+
+COMMONSC std::string& RegRule::operator[](size_t nIdx)
+{
+	return (*m_pRegVec)[nIdx];
+}
+
+COMMONSC const RegRule& RegRule::operator=(const RegRule& other)
+{
+	*m_pRegVec = *other.m_pRegVec;
+	return *this;
+}
