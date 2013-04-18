@@ -519,7 +519,7 @@ CRECHANFA size_t CompileRuleSet(LPCTSTR fileName, RECIEVER recv, LPVOID lpUser)
 			for(std::vector<std::string>::iterator rIt = rules.begin();
 				rIt != rules.end(); ++rIt)
 			{
-				std::cout << rIt - rules.begin() << std::endl;
+				std::cout << rIt - rules.begin() + 1 << std::endl;
 				CompileRule(rIt->c_str(), recv, lpUser);
 				//Delete the rule header, reserve the rule options
 				//rIt->erase(rIt->begin(), find(rIt->begin(), rIt->end(), '(') + 1);
@@ -892,7 +892,7 @@ CRECHANFA size_t InterpretRule(const CSnortRule &rule, CNfaTree &outTree)
 			strPattern.resize(pPcre->GetPattern(NULL, 0));
 			pPcre->GetPattern(&strPattern[0], strPattern.size());
 
-			std::cout << "pcre:" << strPattern << "; ";//²âÊÔÊä³ö
+			//std::cout << "pcre:" << strPattern << "; ";//²âÊÔÊä³ö
 
 			flag = PcreToNFA(strPattern.c_str(), outTree.Back().Back());
 

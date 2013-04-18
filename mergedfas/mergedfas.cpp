@@ -97,5 +97,7 @@ MERDFA void OrMerge(std::vector<CDfa> &dfas, CDfa &lastDfa)
 		IncreDfaNum(dfas[i], oneNfa.Size());
 		InsertDfa(dfas[i], oneNfa, termSta);
 	}
+	size_t size = oneNfa.Size();
 	NfaToDfa(oneNfa, lastDfa);
+	size = lastDfa.Size();
 }

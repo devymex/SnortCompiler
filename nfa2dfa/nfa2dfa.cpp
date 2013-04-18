@@ -63,6 +63,7 @@ CREDFA void NfaToDfa(CNfa &oneNfaTab, CDfa &dfaTab)
 			curStaNum = ir->second;
 
 			std::vector<size_t> nextNfaVec;
+
 			NextNfaSet(oneNfaTab, curNfaVec, nCurChar, nextNfaVec, finFlag);
 
 			if(!nextNfaVec.empty())
@@ -96,4 +97,3 @@ CREDFA void NfaToDfa(CNfa &oneNfaTab, CDfa &dfaTab)
 		}
 	}
 }
-

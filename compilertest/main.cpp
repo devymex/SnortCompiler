@@ -7,12 +7,13 @@
 
 void main()
 {
-	CRes result;
-	compile(_T("..\\..\\input\\testrules.rule"), result);
-	result.WriteToFile(_T("..\\..\\output\\result.cdt") );
+	//CRes result;
+	//compile(_T("..\\..\\input\\allrules.rule"), result);
+	//result.WriteToFile(_T("..\\..\\output\\result.cdt"));
 
-	//CRes readRes;
-	//readRes.ReadFromFile(_T("..\\..\\output\\result.cdt"));
+	CRes readRes;
+	readRes.ReadFromFile(_T("..\\..\\output\\result.cdt"));
+	readRes.WriteToFile(_T("..\\..\\output\\WriteAfterRead.cdt"));
 
 	//std::ofstream foutBeforeWrite("..\\..\\output\\BeforeWrite.txt");
 
@@ -33,9 +34,9 @@ void main()
 
 	//std::ofstream foutAfterRead("..\\..\\output\\AfterRead.txt");
 
-	//for (size_t i = 0; i < result.GetDfaTable().Size(); ++i)
+	//for (size_t i = 0; i < readRes.GetDfaTable().Size(); ++i)
 	//{
-	//	for (size_t j = 0; j < result.GetDfaTable()[i].Size(); ++j)
+	//	for (size_t j = 0; j < readRes.GetDfaTable()[i].Size(); ++j)
 	//	{
 	//		foutAfterRead << j << ":";
 	//		for (size_t k = 0; k < CHARSETSIZE; ++k)
