@@ -97,4 +97,3 @@ CREDFA void NfaToDfa(CNfa &oneNfaTab, CDfa &dfaTab)
 		}
 	}
 }
-
