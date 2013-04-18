@@ -185,19 +185,38 @@ private:
 	std::vector<CNfaChain> *m_pTree;
 };
 
-class COMMONSC RegRule
+class COMMONSC CRegChain
 {
 public:
-	RegRule();
-	~RegRule();
-	RegRule(const RegRule &other);
+	CRegChain();
+	~CRegChain();
+	CRegChain(const CRegChain &other);
 
 	size_t Size() const;
-	void PushBack(std::string &nRegStr);
+	std::string& Back() const;
+	void PushBack(std::string &pcreStr);
 	std::string& operator[](size_t nIdx);
-	const RegRule& operator = (const RegRule &other);
+	const CRegChain& operator = (const CRegChain &other);
 private:
-	std::vector<std::string> *m_pRegVec;
+	std::vector<std::string> *m_pRegList;
+};
+
+class COMMONSC CRegRule
+{
+public:
+	CRegRule();
+	~CRegRule();
+	CRegRule(const CRegRule &other);
+
+	size_t Size() const;
+	CRegChain& Back() const;
+	void Reserve(size_t nCount);
+	void Resize(size_t nSize);
+	void PushBack(CRegChain &nRegChain);
+	CRegChain& operator[](size_t nIdx);
+	const CRegRule& operator = (const CRegRule &other);
+private:
+	std::vector<CRegChain> *m_pRegVec;
 };
 
 struct COMMONSC RULEOPTION

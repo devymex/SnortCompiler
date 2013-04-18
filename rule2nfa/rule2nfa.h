@@ -15,6 +15,8 @@ CRECHANFA size_t CompileRuleSet(LPCTSTR fileName, RECIEVER recv, LPVOID lpUser);
 
 CRECHANFA void CompileRule(LPCSTR rule, RECIEVER recv, LPVOID lpUser);
 
+CRECHANFA void Rule2PcreList(const CSnortRule &rule, CRegRule &regrule);
+
 CRECHANFA size_t InterpretRule(const CSnortRule &rule, CNfaTree &outTree);
 
 CRECHANFA void SerializeNfa(CNfaChain &nfaChain, CNfa &seriaNfa);

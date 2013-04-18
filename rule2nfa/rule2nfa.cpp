@@ -714,6 +714,112 @@ void outPut(CNfa &nfa, std::string &fileName)
 	fout.close();
 }
 
+void content2Pcre(OPTIONCONTENT *pContent, std::string &conPcreStr)
+{
+	std::stringstream ss;
+	conPcreStr = "/";
+	if(pContent->nFlags & CF_OFFSET)
+	{
+		ss << pContent->nOffset;
+		conPcreStr += ".{" + ss.str() + "}";
+	}
+	if(pContent->nFlags & CF_DISTANCE)
+	{
+		ss << pContent->nDistance;
+		conPcreStr += ".{" + ss.str() + "}";
+	}
+	if(pContent->nFlags & CF_DEPTH)
+	{
+		conPcreStr.insert(conPcreStr.begin() + 1, '^');
+		ss << (pContent->vecconts.size() - pContent->nDepth);
+		conPcreStr += ".{0," + ss.str() + "}";
+	}
+	if(pContent->nFlags & CF_WITHIN)
+	{
+		conPcreStr.insert(conPcreStr.begin() + 1, '^');
+		ss << (pContent->vecconts.size() - pContent->nWithin);
+		conPcreStr += ".{0," + ss.str() + "}";
+	}
+
+	for(std::vector<BYTE>::iterator iter = pContent->vecconts.begin();
+		iter != pContent->vecconts.end(); ++iter)
+	{
+		if(isalpha(*iter))
+		{
+			conPcreStr += *iter;
+		}
+		else if(isalnum(*iter))
+		{
+			ss << *iter;
+			conPcreStr += ss.str();
+		}
+		else
+		{
+			unsigned int cHex;
+			std::stringstream stream(*iter);
+			stream << std::hex << cHex;
+			conPcreStr += "\\0x" + cHex;
+		}
+	}
+	if(pContent->nFlags & CF_NOCASE)
+	{
+		conPcreStr += "/si";
+	}
+	else
+	{
+		conPcreStr += "/s";
+	}
+}
+
+//convert rule to pcre list
+CRECHANFA void Rule2PcreList(const CSnortRule &rule, CRegRule &regrule)
+{
+	regrule.Reserve(nfaTreeReserve);
+	size_t regChain_size = 0;
+	regrule.Resize(++regChain_size);
+	size_t reg_size = 0;
+
+	for(size_t i = 0; i < rule.Size(); ++i)
+	{
+		OPTIONCONTENT *pContent = dynamic_cast<OPTIONCONTENT*>(rule[i]);
+		OPTIONPCRE *pPcre = dynamic_cast<OPTIONPCRE*>(rule[i]);
+		
+		if(pContent != NULL)
+		{
+			if(!((pContent->nFlags & CF_DISTANCE) || (pContent->nFlags& CF_WITHIN)))
+			{
+				if(regrule.Back().Size() != 0)
+				{
+					regrule.Resize(++regChain_size);
+					reg_size = 0;
+				}
+			}
+			std::string conPcreStr = "";
+			content2Pcre(pContent, conPcreStr);
+			regrule.Back().PushBack(conPcreStr);
+		}
+		else if(pPcre != NULL)
+		{
+			if(!(pPcre->nFlags & PF_R))
+			{
+				if(regrule.Back().Size() != 0)
+				{
+					regrule.Resize(++regChain_size);
+					reg_size = 0;
+				}
+			}
+			std::string strPattern;
+			strPattern.resize(pPcre->GetPattern(NULL, 0));
+			pPcre->GetPattern(&strPattern[0], strPattern.size());
+			regrule.Back().PushBack(strPattern);
+
+			std::cout << "pcre:" << strPattern << "; ";//²âÊÔÊä³ö
+		}
+	}
+
+	regrule.Reserve(++regChain_size);
+}
+
 CRECHANFA size_t InterpretRule(const CSnortRule &rule, CNfaTree &outTree)
 {
 	outTree.Reserve(nfaTreeReserve);

@@ -574,39 +574,95 @@ COMMONSC RULEOPTION* CSnortRule::operator[](size_t nIdx) const
 	return (*m_pOptions)[nIdx];
 }
 
-COMMONSC RegRule::RegRule()
+COMMONSC CRegRule::CRegRule()
 {
-	m_pRegVec = new std::vector<std::string>;
+	m_pRegVec = new std::vector<CRegChain>;
 }
 
-COMMONSC RegRule::~RegRule()
+COMMONSC CRegRule::~CRegRule()
 {
 	delete m_pRegVec;
 }
 
-COMMONSC RegRule::RegRule(const RegRule &other)
+COMMONSC CRegRule::CRegRule(const CRegRule &other)
 {
-	m_pRegVec = new std::vector<std::string>;
+	m_pRegVec = new std::vector<CRegChain>;
 	*this = other;
 }
 
-COMMONSC void RegRule::PushBack(std::string &nRegStr)
+COMMONSC void CRegRule::PushBack(CRegChain &nRegChain)
 {
-	m_pRegVec->push_back(nRegStr);
+	m_pRegVec->push_back(nRegChain);
 }
 
-COMMONSC size_t RegRule::Size() const
+COMMONSC size_t CRegRule::Size() const
 {
 	return m_pRegVec->size();
 }
 
-COMMONSC std::string& RegRule::operator[](size_t nIdx)
+COMMONSC CRegChain& CRegRule::Back() const
+{
+	return m_pRegVec->back();
+}
+
+COMMONSC void CRegRule::Reserve(size_t nCount)
+{
+	m_pRegVec->reserve(nCount);
+}
+
+COMMONSC void CRegRule::Resize(size_t nSize)
+{
+	m_pRegVec->resize(nSize);
+}
+
+COMMONSC CRegChain& CRegRule::operator[](size_t nIdx)
 {
 	return (*m_pRegVec)[nIdx];
 }
 
-COMMONSC const RegRule& RegRule::operator=(const RegRule& other)
+COMMONSC const CRegRule& CRegRule::operator=(const CRegRule& other)
 {
 	*m_pRegVec = *other.m_pRegVec;
+	return *this;
+}
+
+COMMONSC CRegChain::CRegChain()
+{
+	m_pRegList = new std::vector<std::string>;
+}
+
+COMMONSC CRegChain::~CRegChain()
+{
+	delete m_pRegList;
+}
+
+COMMONSC CRegChain::CRegChain(const CRegChain &other)
+{
+	m_pRegList = new std::vector<std::string>;
+	*this = other;
+}
+
+COMMONSC size_t CRegChain::Size() const
+{
+	return m_pRegList->size();
+}
+
+COMMONSC std::string& CRegChain::Back() const
+{
+	return m_pRegList->back();
+}
+
+COMMONSC void CRegChain::PushBack(std::string &pcreStr)
+{
+	m_pRegList->push_back(pcreStr);
+}
+
+COMMONSC std::string& CRegChain::operator[](size_t nIdx)
+{
+	return (*m_pRegList)[nIdx];
+}
+COMMONSC const CRegChain& CRegChain::operator = (const CRegChain &other)
+{
+	*m_pRegList = *other.m_pRegList;
 	return *this;
 }

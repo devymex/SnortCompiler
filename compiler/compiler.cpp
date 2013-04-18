@@ -402,6 +402,10 @@ void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 	}
 	else
 	{
+		//convert a rule to pcre list
+		CRegRule regrule;
+		Rule2PcreList(rule, regrule);
+
 		CNfaTree nfatree;
 		size_t flag = InterpretRule(rule, nfatree);
 		if (flag == SC_ERROR)

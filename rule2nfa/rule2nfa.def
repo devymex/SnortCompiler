@@ -4,3 +4,4 @@ CompileRuleSet @ 1
 CompileRule @ 2
 InterpretRule @ 3
 SerializeNfa @ 4
+Rule2PcreList @ 5
