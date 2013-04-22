@@ -41,10 +41,11 @@ bool ColumnEqual(std::vector<CStateSet*> &c1, std::vector<CStateSet*>&c2)
 	return true;
 }
 
-void AvaiEdges(CNfa &oneNfaTab, std::vector<std::vector<size_t>> &charGroups)
+void AvaiEdges(CNfa &oneNfaTab, size_t *group)
 {
-	std::vector<CStateSet*> column[CHARSETSIZE - 4];
-	for(size_t charNum = 0; charNum < CHARSETSIZE - 4; ++charNum)
+	std::vector<std::vector<size_t>> charGroups;
+	std::vector<CStateSet*> column[CHARSETSIZE];
+	for(size_t charNum = 0; charNum < CHARSETSIZE; ++charNum)
 	{
 		column[charNum].reserve(20000);
 		for(size_t i = 0; i < oneNfaTab.Size(); ++i)
@@ -68,7 +69,7 @@ void AvaiEdges(CNfa &oneNfaTab, std::vector<std::vector<size_t>> &charGroups)
 
 	//std::cout << "columns complete" << std::endl;
 
-	for (size_t i = 0; i < CHARSETSIZE - 4; ++i)
+	for (size_t i = 0; i < CHARSETSIZE; ++i)
 	{
 		fullSet.push_back(i);
 	}
@@ -93,6 +94,14 @@ void AvaiEdges(CNfa &oneNfaTab, std::vector<std::vector<size_t>> &charGroups)
 		}
 	}
 	//std::cout << "grouping complete" << std::endl;
+
+	for(size_t i = 0; i < charGroups.size(); ++i)
+	{
+		for(size_t j = 0; j < charGroups[i].size(); ++j)
+		{
+			group[charGroups[i][j]] = i;
+		}
+	}
 }
 
 void NextNfaSet(const CNfa &oneNfaTab, const std::vector<size_t> &curNfaVec, size_t edge, std::vector<size_t> &nextENfaVec, char &finFlag)

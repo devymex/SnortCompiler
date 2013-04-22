@@ -4,8 +4,7 @@
 #include "../nfa2dfa/nfa2dfa.h"
 
 
-template <class _t>
-void printDfa(_t dfaTab)
+void printDfa(CDfa dfaTab)
 {
 	int tabSize = dfaTab.Size();
 	std::vector<std::vector<std::vector<size_t>>> matrix;
@@ -22,7 +21,7 @@ void printDfa(_t dfaTab)
 
 		for(size_t s = 0; s < dfaTab.Size(); ++s)
 	{
-		for(int i = 0 ; i < CHARSETSIZE - 4; ++i)
+		for(int i = 0 ; i < dfaTab.GetColNum(); ++i)
 		{
 			if(dfaTab[s][i] != size_t(-1))
 			{
