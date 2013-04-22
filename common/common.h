@@ -95,8 +95,8 @@ public:
 	STATEID& operator[](size_t index);
 	const STATEID& operator[](size_t index) const;
 	void SetFlag(size_t nFlag);
-	size_t GetFlag();
-	size_t GetColNum();
+	size_t GetFlag() const;
+	size_t GetColNum() const;
 private:
 	size_t m_nFlag;
 	size_t m_nColNum;

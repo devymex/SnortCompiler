@@ -293,12 +293,12 @@ COMMONSC void CDfaRow::SetFlag(size_t nFlag)
 	m_nFlag = nFlag;
 }
 
-COMMONSC size_t CDfaRow::GetFlag()
+COMMONSC size_t CDfaRow::GetFlag() const
 {
 	return m_nFlag;
 }
 
-COMMONSC size_t CDfaRow::GetColNum()
+COMMONSC size_t CDfaRow::GetColNum() const
 {
 	return m_nColNum;
 }
