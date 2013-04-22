@@ -34,6 +34,7 @@ public:
 	void Sort();
 	void Unique();
 	void Fill(size_t _Val);
+	void Clear();
 private:
 	std::vector<size_t> *m_pSet;
 };
@@ -118,12 +119,12 @@ public:
 	size_t GetId();
 	void SetId(size_t id);
 	size_t GetColNum();
-	void SetGroup(STATEID *pGroup);
-	STATEID* GetGroup();
+	void SetGroup(size_t *pGroup);
+	size_t GetGroup(size_t nIdx);
 private:
 	size_t m_nId;
 	size_t m_nColNum;
-	STATEID m_pGroup[CHARSETSIZE];
+	size_t m_pGroup[CHARSETSIZE];
 	std::vector<CDfaRow> *m_pDfa;
 };
 

@@ -432,11 +432,14 @@ void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 				SerializeNfa(nfatree[i], nfa);
 				nId = nCursize + i;
 				CDfa &dfa = result.GetDfaTable()[nId];
+				dfa.SetId(nId);
 				NfaToDfa(nfa, dfa);
 				if (dfa.Size() > SC_STATELIMIT)
 				{
 					ruleResult.m_nResult = COMPILEDRULE::RES_EXCEEDLIMIT;
-					dfa.Clear();
+					ruleResult.m_dfaIds.Clear();
+					result.GetDfaTable().Resize(nCursize);
+					break;
 				}
 				ruleResult.m_dfaIds.PushBack(nId);
 			}
