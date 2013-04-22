@@ -5,7 +5,7 @@
 
 #define HASHMODULO 1000000
 
-#define SC_STATELIMIT 30000
+#define SC_STATELIMIT 256
 
 #define EMPTY 256
 
@@ -31,5 +31,5 @@ size_t MatchDfa(CDfa &dfaTab, _Iter _beg, _Iter _end)
 	return curSta;
 }
 
-CREDFA void NfaToDfa(CNfa &oneNfaTab, CDfa &dfaTab);
+CREDFA size_t NfaToDfa(CNfa &oneNfaTab, CDfa &dfaTab);
 CREDFA size_t DfaMin(CDfa &oneDfaTab, CDfa &minDfaTab);

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "orDfa.h"
 
-void IncreDfaNum(CDfa &dfa, size_t num)
+void IncreDfaNum(CDfa &dfa, STATEID num)
 {
 	for(size_t i = 0; i < dfa.Size(); ++i)
 	{
