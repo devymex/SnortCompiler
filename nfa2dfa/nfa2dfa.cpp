@@ -2,14 +2,14 @@
 #include "CreDfa.h"
 #include "nfa2dfa.h"
 
-CREDFA void NfaToDfa(CNfa &oneNfaTab, CDfa &dfaTab)
+CREDFA size_t NfaToDfa(CNfa &oneNfaTab, CDfa &dfaTab)
 {
 	std::vector<std::vector<size_t>> charGroups;
 	AvaiEdges(oneNfaTab, charGroups);
 
 	//printNfa(oneNfaTab);
 	//std::vector<size_t> hashTable[HASHMODULO];
-	typedef std::unordered_map<std::vector<size_t>, size_t, STATESET_HASH> STATESETHASH;
+	typedef std::unordered_map<std::vector<size_t>, STATEID, STATESET_HASH> STATESETHASH;
 
 	STATESETHASH ssh;
 	ssh.rehash(STATESET_HASH::MAX_SIZE);
@@ -25,7 +25,7 @@ CREDFA void NfaToDfa(CNfa &oneNfaTab, CDfa &dfaTab)
 
 	nfaStasStack.push(startEVec);
 	//ssh.insert(std::make_pair(startEVec, ssh.size()));
-	ssh[startEVec] = ssh.size();
+	ssh[startEVec] = 0;
 
 	size_t nCursize = dfaTab.Size();
 	dfaTab.Resize(nCursize + 1);
@@ -50,7 +50,7 @@ CREDFA void NfaToDfa(CNfa &oneNfaTab, CDfa &dfaTab)
 		{
 			if( dfaTab.Size() > SC_STATELIMIT)
 			{
-				return;
+				return (size_t)-1;
 			}
 			size_t nCurChar = group->front();
 
@@ -70,7 +70,13 @@ CREDFA void NfaToDfa(CNfa &oneNfaTab, CDfa &dfaTab)
 			{
 				if(ssh.count(nextNfaVec) == 0)
 				{
-					size_t nextSta = ssh.size();
+#undef max
+					if (ssh.size() > std::numeric_limits<STATEID>::max())
+					{
+						std::cerr << "Fatal Error!" << std::endl;
+						return (size_t)-1;
+					}
+					STATEID nextSta = static_cast<STATEID>(ssh.size());
 					ssh[nextNfaVec] = nextSta;
 
 					size_t nCursize = dfaTab.Size();
@@ -96,6 +102,8 @@ CREDFA void NfaToDfa(CNfa &oneNfaTab, CDfa &dfaTab)
 			}
 		}
 	}
+
+	return 0;
 }
 //<<<<<<< HEAD
 
@@ -361,7 +369,7 @@ void MergeNonDisStates(CDfa &tmpDfa, std::vector<std::vector<size_t>> &Partition
 	}
 	for (std::vector<std::vector<size_t>>::iterator iP = Partition.begin(); iP != Partition.end(); ++iP)
 	{
-		size_t tmp = iP - Partition.begin();
+		STATEID tmp = (STATEID)(iP - Partition.begin());
 		for (std::vector<size_t>::iterator iS = iP->begin(); iS != iP->end(); ++iS)
 		{
 			for (size_t i = 0; i < minDfaTab.Size(); ++i)

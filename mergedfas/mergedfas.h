@@ -7,5 +7,5 @@
 #endif
 
 MERDFA void AndMerge(CDfa &dfa1, CDfa &dfa2, CDfa &andDfa, CVectorNumber &termFlag);
-MERDFA void OrMerge(std::vector<CDfa> &dfas, CDfa &lastDfa);
+MERDFA bool OrMerge(std::vector<CDfa> &dfas, CDfa &lastDfa);
 
