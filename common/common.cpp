@@ -333,7 +333,6 @@ COMMONSC size_t CDfa::Size() const
 	return m_pDfa->size();
 }
 
-
 COMMONSC CDfaRow &CDfa::Back()
 {
 	return m_pDfa->back();

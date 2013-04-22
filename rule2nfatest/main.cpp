@@ -93,7 +93,7 @@ void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 void main()
 {
 	RES result;
-	CompileRuleSet(_T("D:\\projects\\test.txt"), Process, &result);
+	CompileRuleSet(_T("F:\\wj\\compiler\\test.txt"), Process, &result);
 	system("pause");
 
 }

@@ -131,6 +131,7 @@ private:
 //	size_t m_pAndDest[CHARSETSIZE];
 //};
 
+
 //class COMMONSC CAndDfa
 //{
 //public:
@@ -240,7 +241,7 @@ struct COMMONSC RULEOPTION
 class COMMONSC CSnortRule
 {
 public:
-	enum {RULE_HASBYTE = 0x0001, RULE_HASNOT = 0x0002};
+	enum {RULE_HASBYTE = 0x0001, RULE_HASNOT = 0x0002, RULE_HASNOSIG = 0x0004};
 	CSnortRule();
 	CSnortRule(const CSnortRule &other);
 	const CSnortRule& operator = (const CSnortRule &other);
