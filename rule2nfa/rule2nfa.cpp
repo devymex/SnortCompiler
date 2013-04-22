@@ -359,6 +359,10 @@ size_t FormatOptionContent (_Iter cBeg, _Iter cEnd, std::vector<BYTE> &content, 
 			content.push_back(*i);
 		}
 	}
+	if(TYPE == CONPCRE)
+	{
+		content.push_back('\0');
+	}
 	return 0;
 }
 
@@ -745,31 +749,48 @@ void outPut(CNfa &nfa, std::string &fileName)
 	fout.close();
 }
 
-void content2Pcre(OPTIONCONTENT *pContent, std::string &pcreStr)
+size_t content2Pcre(OPTIONCONTENT *pContent, std::string &pcreStr)
 {
 	std::stringstream ss;
-	pcreStr = "/";
-	if(pContent->nFlags & CF_OFFSET)
+	pcreStr = "/^";
+	if((pContent->nFlags & CF_OFFSET) && pContent->nOffset > 0)
 	{
+		ss.str("");
 		ss << pContent->nOffset;
 		pcreStr += ".{" + ss.str() + "}";
 	}
-	if(pContent->nFlags & CF_DISTANCE)
+	if((pContent->nFlags & CF_DISTANCE) && pContent->nDistance > 0)
 	{
+		ss.str("");
 		ss << pContent->nDistance;
 		pcreStr += ".{" + ss.str() + "}";
 	}
-	if(pContent->nFlags & CF_DEPTH)
+	if(!((pContent->nFlags & CF_DEPTH) || pContent->nFlags & CF_WITHIN))
 	{
-		pcreStr.insert(pcreStr.begin() + 1, '^');
-		ss << (pContent->vecconts.size() - pContent->nDepth);
-		pcreStr += ".{0," + ss.str() + "}";
+		//既没有depth也没有within
+		pcreStr += ".*";
 	}
-	if(pContent->nFlags & CF_WITHIN)
+	else
 	{
-		pcreStr.insert(pcreStr.begin() + 1, '^');
-		ss << (pContent->vecconts.size() - pContent->nWithin);
-		pcreStr += ".{0," + ss.str() + "}";
+		int n = 0;
+		if((pContent->nFlags & CF_DEPTH))
+		{
+			n = pContent->nDepth - pContent->vecconts.size();
+		}
+		else if((pContent->nFlags & CF_WITHIN))
+		{
+			n = pContent->nWithin - pContent->vecconts.size();
+		}
+		if(n < 0)
+		{
+			return SC_ERROR;
+		}
+		else if(n > 0)
+		{
+			ss.str("");
+			ss << n;
+			pcreStr += ".{0," + ss.str() + "}";
+		}
 	}
 
 	//需处理管道
@@ -779,28 +800,9 @@ void content2Pcre(OPTIONCONTENT *pContent, std::string &pcreStr)
 	std::string::iterator  opValueBeg= con.begin(), opValueEnd = con.end();
 	std::vector<BYTE> conVec;
 	FormatOptionContent(opValueBeg, opValueEnd, conVec, CONPCRE);
-	pcreStr += (char*)&conVec[0];
+	char* str = (char*)&conVec[0];
+	pcreStr.append(str);
 
-	//for(std::vector<BYTE>::iterator iter = pContent->vecconts.begin();
-	//	iter != pContent->vecconts.end(); ++iter)
-	//{
-	//	if(isalpha(*iter))
-	//	{
-	//		pcreStr += *iter;
-	//	}
-	//	else if(isalnum(*iter))
-	//	{
-	//		ss << *iter;
-	//		pcreStr += ss.str();
-	//	}
-	//	else
-	//	{
-	//		unsigned int cHex;
-	//		std::stringstream stream(*iter);
-	//		stream << std::hex << cHex;
-	//		pcreStr += "\\0x" + cHex;
-	//	}
-	//}
 	if(pContent->nFlags & CF_NOCASE)
 	{
 		pcreStr += "/si";
@@ -809,6 +811,7 @@ void content2Pcre(OPTIONCONTENT *pContent, std::string &pcreStr)
 	{
 		pcreStr += "/s";
 	}
+	return 0;
 }
 
 //convert rule to pcre list
@@ -929,8 +932,11 @@ CRECHANFA size_t InterpretRule(const CSnortRule &rule, CNfaTree &outTree)
 	outTree.Reserve(nfaTreeReserve);
 
 	size_t flag = 0;
+	size_t cFlag = 0;
 	size_t nfaChain_size = 0;
 	outTree.Resize(++nfaChain_size);
+	outTree.Back().Reserve(nfaReserve);
+	std::string str = "";
 
 	for(size_t i = 0; i < rule.Size(); ++i)
 	{
@@ -943,10 +949,18 @@ CRECHANFA size_t InterpretRule(const CSnortRule &rule, CNfaTree &outTree)
 			{
 				if(outTree.Back().Size() != 0)
 				{
+					outTree.Back().Reserve(outTree.Back().Size() + 1);
+					outTree.Back().SetPcre(str.c_str());
+					str = "";
 					outTree.Resize(++nfaChain_size);
+					outTree.Back().Reserve(nfaReserve);
 				}
 			}
-			content2Pcre(pContent, pcreStr);
+			cFlag = content2Pcre(pContent, pcreStr);
+			if(cFlag != 0)
+			{
+				return cFlag;
+			}
 		}
 		else if(pPcre != NULL)
 		{
@@ -955,24 +969,43 @@ CRECHANFA size_t InterpretRule(const CSnortRule &rule, CNfaTree &outTree)
 			{
 				if(outTree.Back().Size() != 0)
 				{
+					outTree.Back().Reserve(outTree.Back().Size() + 1);
+					outTree.Back().SetPcre(str.c_str());
+					str = "";
 					outTree.Resize(++nfaChain_size);
+					outTree.Back().Reserve(nfaReserve);
 				}
 			}
 			pcreStr.resize(pPcre->GetPattern(NULL, 0));
 			pPcre->GetPattern(&pcreStr[0], pcreStr.size());
 		}
 		flag = PcreToNFA(pcreStr.c_str(), outTree.Back());
-		std::string str = outTree.Back().GetPcre();
-		str += pcreStr;
-		outTree.Back().SetPcre(str.c_str());
-
 		if(flag != 0)
 		{
 			return flag;
 		}
+
+		//std::string str = outTree.Back().GetPcre();
+
+		//erase header and tail of a pcre 
+		std::string::iterator it1 = std::find(pcreStr.begin(), pcreStr.end(), '/');
+		if(*(++it1) == '^')
+		{
+			pcreStr.erase(pcreStr.begin(), ++it1);
+		}
+		else
+		{
+			pcreStr.erase(pcreStr.begin(), it1);
+			std::string tmp = ".*";
+			pcreStr.insert(pcreStr.begin(), tmp.begin(), tmp.end());
+		}
+		pcreStr.erase(std::find(pcreStr.rbegin(), pcreStr.rend(), '/').base() - 1, pcreStr.end());
+
+		str += pcreStr;
 	}
 
 	outTree.Reserve(++nfaChain_size);
+	outTree.Back().SetPcre(str.c_str());
 	return 0;
 }
 
