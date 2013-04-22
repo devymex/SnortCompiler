@@ -31,6 +31,7 @@ public:
 	size_t& Back();
 	void Sort();
 	void Unique();
+	void Fill(size_t _Val);
 private:
 	std::vector<size_t> *m_pSet;
 };
@@ -51,6 +52,28 @@ private:
 	CStateSet m_pDestSet[CHARSETSIZE];
 };
 
+//class COMMONSC CDfaRow
+//{
+//public:
+//	enum STATEFLAG
+//	{
+//		NORMAL   = 1 << 0,
+//		START    = 1 << 1,
+//		TERMINAL = 1 << 2
+//	};
+//	CDfaRow();
+//	~CDfaRow();
+//	CDfaRow(const CDfaRow &other);
+//	CDfaRow& operator=(const CDfaRow &other);
+//	size_t& operator[](size_t index);
+//	const size_t& operator[](size_t index) const;
+//	void SetFlag(size_t nFlag);
+//	size_t GetFlag();
+//private:
+//	size_t m_nFlag;
+//	size_t m_pDest[CHARSETSIZE];
+//};
+
 class COMMONSC CDfaRow
 {
 public:
@@ -60,7 +83,8 @@ public:
 		START    = 1 << 1,
 		TERMINAL = 1 << 2
 	};
-	CDfaRow();
+	CDfaRow(size_t col);
+	void Fill(size_t _Val);
 	~CDfaRow();
 	CDfaRow(const CDfaRow &other);
 	CDfaRow& operator=(const CDfaRow &other);
@@ -68,9 +92,11 @@ public:
 	const size_t& operator[](size_t index) const;
 	void SetFlag(size_t nFlag);
 	size_t GetFlag();
+	size_t GetColNum();
 private:
 	size_t m_nFlag;
-	size_t m_pDest[CHARSETSIZE];
+	size_t m_nColNum;
+	CVectorNumber m_Dest;
 };
 
 class COMMONSC CDfa
@@ -87,7 +113,15 @@ public:
 	CDfaRow& operator[](size_t index);
 	const CDfaRow& operator[](size_t index) const;
 	void Clear();
+	size_t GetId();
+	void SetId(size_t id);
+	size_t GetColNum();
+	void SetGroup(size_t *pGroup);
+	size_t* GetGroup();
 private:
+	size_t m_nId;
+	size_t m_nColNum;
+	size_t m_pGroup[CHARSETSIZE];
 	std::vector<CDfaRow> *m_pDfa;
 };
 
@@ -110,8 +144,27 @@ public:
 	CNfaRow &operator[](size_t index);
 	const CNfaRow &operator[](size_t index) const;
 private:
+	//std::string *m_pRegex;
 	std::vector<CNfaRow> *m_pNfa;
 };
+
+//class COMMONSC CDfa
+//{
+//public:
+//	CDfa();
+//	~CDfa();
+//	CDfa(const CDfa &other);
+//	CDfa& operator=(const CDfa &other);
+//	void Reserve(size_t _Count);
+//	void Resize(size_t _Newsize);
+//	size_t Size() const;
+//	CDfaRow &Back();
+//	CDfaRow& operator[](size_t index);
+//	const CDfaRow& operator[](size_t index) const;
+//	void Clear();
+//private:
+//	std::vector<CDfaRow> *m_pDfa;
+//};
 
 //class COMMONSC CAndDfaRow : public CDfaRow
 //{
