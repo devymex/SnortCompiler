@@ -97,7 +97,6 @@ CREDFA void NfaToDfa(CNfa &oneNfaTab, CDfa &dfaTab)
 		}
 	}
 }
-//<<<<<<< HEAD
 
 void RemoveUnreachable(const CNfa &nfa, const std::vector<size_t> &fins, std::vector<BYTE> &reachable)
 {
@@ -124,96 +123,85 @@ void RemoveUnreachable(const CNfa &nfa, const std::vector<size_t> &fins, std::ve
 		}
 	}
 
-	reachable.resize(staFlags.size(), 0);
-	for (std::vector<BYTE>::iterator i = staFlags.begin(); i != staFlags.end(); ++i)
+	if (reachable.empty())
 	{
-		reachable[i - staFlags.begin()] |= *i;
+		reachable.resize(staFlags.size(), 0);
+		for (std::vector<BYTE>::iterator i = staFlags.begin(); i != staFlags.end(); ++i)
+		{
+			reachable[i - staFlags.begin()] |= *i;
+		}
+	}
+	else
+	{
+		for (std::vector<BYTE>::iterator i = staFlags.begin(); i != staFlags.end(); ++i)
+		{
+			reachable[i - staFlags.begin()] &= *i;
+		}
 	}
 }
 
-//void MergeReachable(CDfa &oneDfaTab, std::vector<BYTE> &reachable, CDfa &tmpDfa)
-//{
-//
-//
-//
-//	std::vector<size_t> full;
-//	std::vector<size_t> difference;
-//	for (size_t i = 0; i < oneDfaTab.Size(); ++i)
-//	{
-//		full.push_back(i);
-//	}
-//	std::set_difference(full.begin(), full.end(), Reachable.begin(), Reachable.end(), std::back_inserter(difference));
-//	tmpDfa.Resize(Reachable.size());
-//	size_t i = 0, j = 0, k = 0;
-//	for (; i < difference.size() && j < oneDfaTab.Size(); )
-//	{
-//		if (j != difference[i])
-//		{
-//			tmpDfa[k++] = oneDfaTab[j];
-//			tmpDfa[k].SetFlag(oneDfaTab[j].GetFlag());
-//			++j;
-//		}
-//		else
-//		{
-//			++i;
-//			++j;
-//		}
-//	}
-//	for ( ; j < oneDfaTab.Size(); ++j)
-//	{
-//		tmpDfa[k++] = oneDfaTab[j];
-//	}
-//
-//	for (size_t i = 0; i < tmpDfa.Size(); ++i)
-//	{
-//		for (size_t j = 97; j < 99; ++j)
-//		{
-//			std::cout << tmpDfa[i][j] << " "; 
-//		}
-//		std::cout << std::endl;
-//	}
-//	std::cout << std::endl;
-//
-//	for (std::vector<size_t>::iterator iter = difference.begin(); iter != difference.end(); ++iter)
-//	{
-//		for (size_t i = 0; i < tmpDfa.Size(); ++i)
-//		{
-//			//for (size_t j = 0; j < CHARSETSIZE; ++j)
-//			for (size_t j = 97; j < 99; ++j)
-//			{
-//				if (tmpDfa[i][j] == *iter)
-//				{
-//					tmpDfa[i][j] = size_t(-1); 
-//				}
-//			}
-//		}
-//	}
-//
-//	for (std::vector<size_t>::iterator iter = Reachable.begin(); iter != Reachable.end(); ++iter)
-//	{
-//		size_t index = iter - Reachable.begin();
-//		for (size_t i = 0; i < tmpDfa.Size(); ++i)
-//		{
-//			//for (size_t j = 0; j < CHARSETSIZE; ++j)
-//			for (size_t j = 97; j < 99; ++j)
-//			{
-//				if (tmpDfa[i][j] == *iter)
-//				{
-//					tmpDfa[i][j] = index; 
-//				}
-//			}
-//		}
-//	}
-//	for (size_t i = 0; i < tmpDfa.Size(); ++i)
-//	{
-//		for (size_t j = 97; j < 99; ++j)
-//		{
-//			std::cout << tmpDfa[i][j] << " "; 
-//		}
-//		std::cout << std::endl;
-//	}
-//	std::cout << std::endl;
-//}
+void MergeReachable(CDfa &oneDfaTab, std::vector<BYTE> &reachable, CDfa &tmpDfa)
+{
+	size_t num = 0;
+	for (std::vector<BYTE>::iterator iter = reachable.begin(); iter != reachable.end(); ++iter)
+	{
+		if (*iter != 0)
+		{
+			num++;
+		}
+	}
+	tmpDfa.Resize(num);
+	size_t index = 0;
+	for (std::vector<BYTE>::iterator iter = reachable.begin(); iter != reachable.end(); ++iter)
+	{
+		if (*iter != 0)
+		{
+			size_t stas = iter - reachable.begin();
+			tmpDfa[index++] = oneDfaTab[stas];
+			tmpDfa[index - 1].SetFlag(oneDfaTab[stas].GetFlag());			
+		}
+	}
+
+	for (std::vector<BYTE>::iterator iter = reachable.begin(); iter != reachable.end(); ++iter)
+	{
+		if (*iter == 0)
+		{
+			size_t stas = iter - reachable.begin();
+			for (size_t i = 0; i < tmpDfa.Size(); ++i)
+			{
+				//for (size_t j = 0; j < CHARSETSIZE; ++j)
+				for (size_t j = 97; j < 99; ++j)
+				{
+					if (tmpDfa[i][j] == stas)
+					{
+						tmpDfa[i][j] = size_t(-1); 
+					}
+				}
+			}
+		}
+	}
+
+	index = 0;
+	for (std::vector<BYTE>::iterator iter = reachable.begin(); iter != reachable.end(); ++iter)
+	{
+		if (*iter != 0)
+		{
+			size_t stas = iter - reachable.begin();
+			for (size_t i = 0; i < tmpDfa.Size(); ++i)
+			{
+				//for (size_t j = 0; j < CHARSETSIZE; ++j)
+				for (size_t j = 97; j < 99; ++j)
+				{
+					if (tmpDfa[i][j] == stas)
+					{
+						tmpDfa[i][j] = index; 
+					}
+				}
+			}
+			index++;
+		}
+	}
+}
 
 int SearchInSet(std::vector<size_t>::iterator beg, std::vector<size_t>::iterator end, std::vector<std::vector<size_t>> &NewSplitStates)
 {
@@ -407,9 +395,11 @@ CREDFA size_t DfaMin(CDfa &oneDfaTab, CDfa &minDfaTab)
 
 
 	std::vector<BYTE> reachable;
+	std::vector<size_t> StartStas;
+	StartStas.push_back(0);
 	CNfa nfaTab;
 	nfaTab.FromDfa(oneDfaTab);
-	RemoveUnreachable(nfaTab, FinalStas, reachable);
+	RemoveUnreachable(nfaTab, StartStas, reachable);
 
 	CNfa revTab;
 	revTab.Resize(oneDfaTab.Size());
@@ -426,7 +416,7 @@ CREDFA size_t DfaMin(CDfa &oneDfaTab, CDfa &minDfaTab)
 	RemoveUnreachable(revTab, FinalStas, reachable);
 
 	CDfa tmpDfa;
-	//MergeReachable(oneDfaTab, reachable, tmpDfa);
+	MergeReachable(oneDfaTab, reachable, tmpDfa);
 
 	//std::vector<std::vector<size_t>> Partition;
 	//Partition.push_back(FinalStas);
