@@ -106,14 +106,14 @@ CREDFA size_t NfaToDfa(CNfa &oneNfaTab, CDfa &dfaTab)
 	return 0;
 }
 
-void RemoveUnreachable(const CNfa &nfa, const std::vector<size_t> &fins, std::vector<BYTE> &reachable)
+void RemoveUnreachable(const CNfa &nfa, const std::vector<size_t> &begs, std::vector<BYTE> &reachable)
 {
 	std::vector<BYTE> staFlags(nfa.Size(), 0);
 
 	std::vector<size_t> staStack;
 	staStack.reserve(nfa.Size());
 
-	staStack.assign(fins.begin(), fins.end());
+	staStack.assign(begs.begin(), begs.end());
 	for (; !staStack.empty(); )
 	{
 		size_t nSta = staStack.back();
@@ -134,17 +134,10 @@ void RemoveUnreachable(const CNfa &nfa, const std::vector<size_t> &fins, std::ve
 	if (reachable.empty())
 	{
 		reachable.resize(staFlags.size(), 0);
-		for (std::vector<BYTE>::iterator i = staFlags.begin(); i != staFlags.end(); ++i)
-		{
-			reachable[i - staFlags.begin()] |= *i;
-		}
 	}
-	else
+	for (std::vector<BYTE>::iterator i = staFlags.begin(); i != staFlags.end(); ++i)
 	{
-		for (std::vector<BYTE>::iterator i = staFlags.begin(); i != staFlags.end(); ++i)
-		{
-			reachable[i - staFlags.begin()] &= *i;
-		}
+		reachable[i - staFlags.begin()] += *i;
 	}
 }
 
@@ -165,8 +158,8 @@ void MergeReachable(CDfa &oneDfaTab, std::vector<BYTE> &reachable, CDfa &tmpDfa)
 		if (*iter != 0)
 		{
 			size_t stas = iter - reachable.begin();
+			tmpDfa[index].SetFlag(oneDfaTab[stas].GetFlag());			
 			tmpDfa[index++] = oneDfaTab[stas];
-			tmpDfa[index - 1].SetFlag(oneDfaTab[stas].GetFlag());			
 		}
 	}
 
@@ -177,8 +170,7 @@ void MergeReachable(CDfa &oneDfaTab, std::vector<BYTE> &reachable, CDfa &tmpDfa)
 			size_t stas = iter - reachable.begin();
 			for (size_t i = 0; i < tmpDfa.Size(); ++i)
 			{
-				//for (size_t j = 0; j < CHARSETSIZE; ++j)
-				for (size_t j = 97; j < 99; ++j)
+				for (size_t j = 0; j < tmpDfa.GetColNum(); ++j)
 				{
 					if (tmpDfa[i][j] == stas)
 					{
@@ -197,8 +189,7 @@ void MergeReachable(CDfa &oneDfaTab, std::vector<BYTE> &reachable, CDfa &tmpDfa)
 			size_t stas = iter - reachable.begin();
 			for (size_t i = 0; i < tmpDfa.Size(); ++i)
 			{
-				//for (size_t j = 0; j < CHARSETSIZE; ++j)
-				for (size_t j = 97; j < 99; ++j)
+				for (size_t j = 0; j < tmpDfa.GetColNum(); ++j)
 				{
 					if (tmpDfa[i][j] == stas)
 					{
@@ -374,12 +365,16 @@ void MergeNonDisStates(CDfa &tmpDfa, std::vector<std::vector<size_t>> &Partition
 	}
 }
 
+#define CHAR256 256
+
 CREDFA size_t DfaMin(CDfa &oneDfaTab, CDfa &minDfaTab)
 {
 	if (oneDfaTab.Size() == 0)
 	{
 		return size_t(-1);
 	}
+
+	minDfaTab.SetId(oneDfaTab.GetId());
 
 	// Extract final states from a dfa;
 	std::vector<size_t> FinalStas;
@@ -402,22 +397,25 @@ CREDFA size_t DfaMin(CDfa &oneDfaTab, CDfa &minDfaTab)
 	}
 
 
+	CNfa nfaTab;
+	nfaTab.FromDfa(oneDfaTab);
+
 	std::vector<BYTE> reachable;
 	std::vector<size_t> StartStas;
 	StartStas.push_back(0);
-	CNfa nfaTab;
-	nfaTab.FromDfa(oneDfaTab);
+
 	RemoveUnreachable(nfaTab, StartStas, reachable);
 
 	CNfa revTab;
 	revTab.Resize(oneDfaTab.Size());
+	STATEID* tmpgroup = oneDfaTab.GetGroup();
 	for (size_t i = 0; i < oneDfaTab.Size(); ++i)
 	{
-		for (size_t j = 0; j < CHARSETSIZE; ++j)
+		for (size_t j = 0; j < CHAR256; ++j)
 		{
-			if (oneDfaTab[i][j] != -1)
+			if (oneDfaTab[i][tmpgroup[j]] != -1)
 			{
-				revTab[oneDfaTab[i][j]][j].PushBack(i);
+				revTab[oneDfaTab[i][tmpgroup[j]]][j].PushBack(i);
 			}
 		}
 	}

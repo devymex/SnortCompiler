@@ -194,13 +194,14 @@ COMMONSC void CNfa::FromDfa(CDfa &dfa)
 	m_pNfa->clear();
 	Resize(dfa.Size());
 
+	STATEID* tmpgroup = dfa.GetGroup();
 	for(size_t i = 0; i < dfa.Size(); ++i)
 	{
 		for(size_t charNum = 0; charNum < CHARSETSIZE; ++charNum)
 		{
-			if(dfa[i][charNum] != size_t(-1))
+			if(dfa[i][tmpgroup[charNum]] != size_t(-1))
 			{
-				(*m_pNfa)[i][charNum].PushBack(dfa[i][charNum]);
+				(*m_pNfa)[i][charNum].PushBack(dfa[i][tmpgroup[charNum]]);
 			}
 		}
 	}
