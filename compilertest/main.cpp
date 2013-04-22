@@ -43,7 +43,7 @@ void main()
 	dfa.Resize(1);
 	for (size_t i = 0; i < 6; ++i)
 	{
-		dfa[0][i] = i + 2;
+		dfa[0][i] = i;
 	}
 	Res.WriteToFile(_T("..\\..\\output\\result.cdt"));
 
