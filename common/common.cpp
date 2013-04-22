@@ -211,7 +211,6 @@ COMMONSC void CNfa::FromDfa(CDfa &dfa)
 	}
 }
 
-
 COMMONSC CNfaRow& CNfa::Back()
 {
 	return m_pNfa->back();
@@ -322,7 +321,7 @@ COMMONSC size_t CDfaRow::GetColNum()
 COMMONSC CDfa::CDfa()
 	: m_nId(size_t(-1)), m_nColNum(size_t(0))
 {
-	std::fill(m_pGroup, m_pGroup + CHARSETSIZE, STATEID(-1));
+	std::fill(m_pGroup, m_pGroup + DFACOLSIZE, BYTE(-1));
 	m_pDfa = new std::vector<CDfaRow>;
 }
 
@@ -341,7 +340,7 @@ COMMONSC CDfa& CDfa::operator=(const CDfa &other)
 {
 	m_nId = other.m_nId;
 	m_nColNum = other.m_nColNum;
-	CopyMemory(m_pGroup, other.m_pGroup, CHARSETSIZE * sizeof(STATEID));
+	CopyMemory(m_pGroup, other.m_pGroup, DFACOLSIZE * sizeof(BYTE));
 	*m_pDfa = *other.m_pDfa;
 	return *this;
 }
@@ -366,12 +365,12 @@ COMMONSC CDfaRow &CDfa::Back()
 	return m_pDfa->back();
 }
 
-COMMONSC CDfaRow& CDfa::operator[](size_t index)
+COMMONSC CDfaRow& CDfa::operator[](STATEID index)
 {
 	return (*m_pDfa)[index];
 }
 
-COMMONSC const CDfaRow& CDfa::operator[](size_t index) const
+COMMONSC const CDfaRow& CDfa::operator[](STATEID index) const
 {
 	return (*m_pDfa)[index];
 }
@@ -396,16 +395,16 @@ COMMONSC size_t CDfa::GetColNum()
 	return m_nColNum;
 }
 
-COMMONSC void CDfa::SetGroup(size_t *pGroup)
+COMMONSC void CDfa::SetGroup(BYTE *pGroup)
 {
-	std::vector<STATEID> tmpGroup;
-	std::copy(pGroup, pGroup + CHARSETSIZE, std::back_inserter(tmpGroup));
+	std::vector<BYTE> tmpGroup;
+	std::copy(pGroup, pGroup + DFACOLSIZE, std::back_inserter(tmpGroup));
 	std::sort(tmpGroup.begin(), tmpGroup.end());
 	tmpGroup.erase(std::unique(tmpGroup.begin(), tmpGroup.end()), tmpGroup.end());
 	if (tmpGroup.back() == tmpGroup.size() - 1)
 	{
 		m_nColNum = tmpGroup.size();
-		CopyMemory(m_pGroup, pGroup, CHARSETSIZE * sizeof(STATEID));
+		CopyMemory(m_pGroup, pGroup, DFACOLSIZE * sizeof(BYTE));
 	}
 	else
 	{
@@ -413,7 +412,7 @@ COMMONSC void CDfa::SetGroup(size_t *pGroup)
 	}
 }
 
-COMMONSC size_t CDfa::GetGroup(size_t nIdx)
+COMMONSC BYTE CDfa::GetGroup(size_t nIdx)
 {
 	return m_pGroup[nIdx];
 }

@@ -5,6 +5,7 @@
 
 #define CHARSETSIZE 260
 #define EMPTYEDGE 256
+#define DFACOLSIZE 256
 
 #ifndef COMMON_H_
 #define COMMONSC __declspec(dllimport)
@@ -113,18 +114,18 @@ public:
 	void Resize(size_t _Newsize);
 	size_t Size() const;
 	CDfaRow &Back();
-	CDfaRow& operator[](size_t index);
-	const CDfaRow& operator[](size_t index) const;
+	CDfaRow& operator[](STATEID index);
+	const CDfaRow& operator[](STATEID index) const;
 	void Clear();
 	size_t GetId();
 	void SetId(size_t id);
 	size_t GetColNum();
-	void SetGroup(size_t *pGroup);
-	size_t GetGroup(size_t nIdx);
+	void SetGroup(BYTE *pGroup);
+	BYTE GetGroup(size_t nIdx);
 private:
 	size_t m_nId;
 	size_t m_nColNum;
-	size_t m_pGroup[CHARSETSIZE];
+	BYTE m_pGroup[DFACOLSIZE];
 	std::vector<CDfaRow> *m_pDfa;
 };
 
