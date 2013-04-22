@@ -32,4 +32,4 @@ size_t MatchDfa(CDfa &dfaTab, _Iter _beg, _Iter _end)
 }
 
 CREDFA void NfaToDfa(CNfa &oneNfaTab, CDfa &dfaTab);
-
+CREDFA size_t DfaMin(CDfa &oneDfaTab, CDfa &minDfaTab);
