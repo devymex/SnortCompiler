@@ -266,11 +266,11 @@ COMPILER size_t CRes::WriteToFile(LPCTSTR filename)
 				WriteNum(fout, charGroups[j][k], 4);
 			}
 		}
-		for (size_t k = 0; k < colIds.size(); ++k)
+		for (size_t j = 0; j < m_dfaTbl[i].Size(); ++j)
 		{
-			for (size_t j = 0; j < m_dfaTbl[i].Size(); ++j)
+			for (size_t k = 0; k < colIds.size(); ++k)
 			{
-				WriteNum(fout, m_dfaTbl[i][j][k], 4);
+				WriteNum(fout, m_dfaTbl[i][j][colIds[k]], 4);
 			}
 		}
 	}
@@ -428,6 +428,10 @@ void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 				nId = nCursize + i;
 				CDfa &dfa = result.GetDfaTable()[nId];
 				NfaToDfa(nfa, dfa);
+				if (dfa.Size() > SC_STATELIMIT)
+				{
+					dfa.Clear();
+				}
 				ruleResult.m_dfaIds.PushBack(nId);
 			}
 		}

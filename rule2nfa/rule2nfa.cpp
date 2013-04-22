@@ -4,6 +4,7 @@
 #include "stdafx.h"
 
 #define nfaTreeReserve 100
+#define nfaReserve 10000
 
 struct OPTIONCONTENT : public RULEOPTION
 {
@@ -518,6 +519,7 @@ CRECHANFA size_t CompileRuleSet(LPCTSTR fileName, RECIEVER recv, LPVOID lpUser)
 			for(std::vector<std::string>::iterator rIt = rules.begin();
 				rIt != rules.end(); ++rIt)
 			{
+				std::cout << rIt - rules.begin() + 1 << std::endl;
 				CompileRule(rIt->c_str(), recv, lpUser);
 				//Delete the rule header, reserve the rule options
 				//rIt->erase(rIt->begin(), find(rIt->begin(), rIt->end(), '(') + 1);
@@ -540,6 +542,9 @@ CRECHANFA size_t CompileRuleSet(LPCTSTR fileName, RECIEVER recv, LPVOID lpUser)
 */
 void contentToLinearNFA(OPTIONCONTENT *content, CNfa &nfa)
 {
+	nfa.Reserve(nfaReserve);
+	size_t state_size = 0;
+
 	size_t patternLen = content->vecconts.size();
 	size_t mustCnt = 0, maxCnt = 0;//mustCnt和maxCnt分别代表经过任意字符跳转出现的最少和最多次数
 	if((content->nFlags & CF_DEPTH))
@@ -559,7 +564,8 @@ void contentToLinearNFA(OPTIONCONTENT *content, CNfa &nfa)
 	//mustCnt：0-255任意字符跳转，必须要跳转的状态数
 	for(size_t i = 0; i < (mustCnt + maxCnt); ++i)
 	{
-		nfa.PushBack(CNfaRow());
+		nfa.Resize(++state_size);
+		//nfa.PushBack(CNfaRow());
 		CNfaRow &row = nfa.Back();
 		size_t id = i + 1;
 		for(int j = 0; j < 256; ++j)
@@ -576,7 +582,8 @@ void contentToLinearNFA(OPTIONCONTENT *content, CNfa &nfa)
 	for(std::vector<BYTE>::const_iterator iter = content->vecconts.begin();
 		iter != content->vecconts.end(); ++iter)
 	{
-		nfa.PushBack(CNfaRow());
+		nfa.Resize(++state_size);
+		//nfa.PushBack(CNfaRow());
 		CNfaRow &row = nfa.Back();
 
 		if((content->nFlags & CF_NOCASE) && isalpha(*iter))
@@ -592,11 +599,15 @@ void contentToLinearNFA(OPTIONCONTENT *content, CNfa &nfa)
 		++stateID;
 	}
 
+	nfa.Reserve(++state_size);
 }
 
 //没有depth或者within标记的
 void contentToDefaultNFA(OPTIONCONTENT *content, CNfa &nfa)
 {
+	nfa.Reserve(nfaReserve);
+	size_t state_size = 0;
+
 	size_t mustCnt = 0;//经过的偏移字符个数
 	if((content->nFlags & CF_OFFSET))
 	{
@@ -610,7 +621,8 @@ void contentToDefaultNFA(OPTIONCONTENT *content, CNfa &nfa)
 
 	for(size_t i = 0; i < mustCnt; ++i)
 	{
-		nfa.PushBack(CNfaRow());
+		nfa.Resize(++state_size);
+		//nfa.PushBack(CNfaRow());
 		CNfaRow &row = nfa.Back();
 		
 		size_t id = i + 1;
@@ -633,7 +645,8 @@ void contentToDefaultNFA(OPTIONCONTENT *content, CNfa &nfa)
 	//在前面加.*
 	for(size_t i = 0; i < patternLen; ++i)
 	{
-		nfa.PushBack(CNfaRow());
+		nfa.Resize(++state_size);
+		//nfa.PushBack(CNfaRow());
 		CNfaRow &row = nfa.Back();
 		size_t id = stateID + i + 1;
 		for(size_t c = 0; c < 256; ++c)
@@ -649,6 +662,7 @@ void contentToDefaultNFA(OPTIONCONTENT *content, CNfa &nfa)
 			}
 		}
 	}
+	nfa.Reserve(++state_size);
 }
 
 void content2Nfa(OPTIONCONTENT *content, CNfa &nfa)
@@ -666,36 +680,38 @@ void content2Nfa(OPTIONCONTENT *content, CNfa &nfa)
 	}
 }
 
-//测试函数
-void OutPutTest(CNfaTree &outTree)
+//测试函数:输出一个nfa
+void outPut(CNfa &nfa, std::string &fileName)
 {
-	for(size_t i = 0; i < outTree.Size(); ++i)
+	size_t stateNum = nfa.Size();
+	std::ofstream fout(fileName);
+	fout << "\t";
+	for(size_t t = 0; t < 257; ++t)
 	{
-		std::string str = "F:\\cppProject\\huawei\\PreciseMatch\\input\\";
-		str += "list_" + i;
-		str += ".txt";
-		std::ofstream fout(str.c_str());
-		if(!fout)
+		fout << t << "\t";
+	}
+	fout << std::endl;
+	for(size_t i = 0; i < stateNum; ++i)
+	{
+		fout << i << "\t";
+		for(size_t j = 0; j < 257; ++j)
 		{
-			std::cerr << "open file failed!" << std::endl;
-			return;
-		}
-		for(size_t j = 0; j < outTree[i].Size(); ++j)
-		{
-			for(size_t k = 0; k < CHARSETSIZE; ++k)
+			if(nfa[i][j].Size() == 0)
 			{
-				if(outTree[i][k].Size() == 0)
+				fout << -1 << "\t";
+			}
+			else
+			{
+				for(size_t k = 0; k < nfa[i][j].Size(); ++k)
 				{
-					fout << -1 << "\t";
+					fout << nfa[i][j][k] << ", ";
 				}
-				for(size_t m = 0; m < outTree[i][k].Size(); ++m)
-				{
-					//fout << outTree[i][k].
-				}
+				fout << "\t";
 			}
 		}
-		fout.close();
+		fout << std::endl;
 	}
+	fout.close();
 }
 
 CRECHANFA size_t InterpretRule(const CSnortRule &rule, CNfaTree &outTree)
@@ -704,7 +720,10 @@ CRECHANFA size_t InterpretRule(const CSnortRule &rule, CNfaTree &outTree)
 
 	size_t flag = 0;
 	//outTree.PushBack(CNfaChain());
-	outTree.Resize(1);
+	size_t nfaChain_size = 0;
+	outTree.Resize(++nfaChain_size);
+	size_t nfa_size = 0;
+
 	for(size_t i = 0; i < rule.Size(); ++i)
 	{
 		OPTIONCONTENT *pContent = dynamic_cast<OPTIONCONTENT*>(rule[i]);
@@ -741,11 +760,12 @@ CRECHANFA size_t InterpretRule(const CSnortRule &rule, CNfaTree &outTree)
 				if(outTree.Back().Size() != 0)
 				{
 					//outTree.PushBack(CNfaChain());
-					outTree.Resize(outTree.Size() + 1);
+					outTree.Resize(++nfaChain_size);
+					nfa_size = 0;
 				}
 			}
 			//outTree.Back().PushBack(CNfa());
-			outTree.Back().Resize(outTree.Back().Size() + 1);
+			outTree.Back().Resize(++nfa_size);
 			content2Nfa(pContent, outTree.Back().Back());
 		}
 		else if(pPcre != NULL)
@@ -756,11 +776,12 @@ CRECHANFA size_t InterpretRule(const CSnortRule &rule, CNfaTree &outTree)
 				if(outTree.Back().Size() != 0)
 				{
 					//outTree.PushBack(CNfaChain());
-					outTree.Resize(outTree.Size() + 1);
+					outTree.Resize(++nfaChain_size);
+					nfa_size = 0;
 				}
 			}
 			//outTree.Back().PushBack(CNfa());
-			outTree.Back().Resize(outTree.Back().Size() + 1);
+			outTree.Back().Resize(++nfa_size);
 			std::string strPattern;
 			strPattern.resize(pPcre->GetPattern(NULL, 0));
 			pPcre->GetPattern(&strPattern[0], strPattern.size());
@@ -768,6 +789,7 @@ CRECHANFA size_t InterpretRule(const CSnortRule &rule, CNfaTree &outTree)
 			//std::cout << "pcre:" << strPattern << "; ";//测试输出
 
 			flag = PcreToNFA(strPattern.c_str(), outTree.Back().Back());
+
 			if(flag != 0)
 			{
 				return flag;
@@ -775,31 +797,33 @@ CRECHANFA size_t InterpretRule(const CSnortRule &rule, CNfaTree &outTree)
 		}
 	}
 
-	//OutPutTest(outTree);
+	outTree.Reserve(++nfaChain_size);
 	return 0;
 }
 
 CRECHANFA void SerializeNfa(CNfaChain &nfaChain, CNfa &seriaNfa)
 {
 	CNfaRow oneSta;
-	size_t staNum = seriaNfa.Size();
+
 	for(size_t n = 0; n < nfaChain.Size(); ++n)
 	{
-
-		IncreNfaStaNum(seriaNfa.Size(), nfaChain[n]);
+		size_t temp = seriaNfa.Size();
+		if(n != 0)
+		{
+			IncreNfaStaNum(seriaNfa.Size(), nfaChain[n]);
+		}
+		seriaNfa.Resize(temp + nfaChain[n].Size());
 		for (size_t i = 0; i < nfaChain[n].Size(); ++i)
 		{
-			seriaNfa.PushBack(nfaChain[n][i]);
+			seriaNfa[temp + i] = nfaChain[n][i];
 		}
 
 		if(n != nfaChain.Size() - 1)
 		{
 			seriaNfa.Back()[EMPTYEDGE].PushBack(seriaNfa.Size());
-			seriaNfa.PushBack(oneSta);
+			seriaNfa.Resize(seriaNfa.Size() + 1);
 			seriaNfa.Back()[EMPTYEDGE].PushBack(seriaNfa.Size());
 		}		
-
-		staNum = seriaNfa.Size();
 	}
 }
 

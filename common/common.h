@@ -86,6 +86,7 @@ public:
 	CDfaRow &Back();
 	CDfaRow& operator[](size_t index);
 	const CDfaRow& operator[](size_t index) const;
+	void Clear();
 private:
 	std::vector<CDfaRow> *m_pDfa;
 };

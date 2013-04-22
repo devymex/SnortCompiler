@@ -48,7 +48,7 @@ CREDFA void NfaToDfa(CNfa &oneNfaTab, CDfa &dfaTab)
 		for(std::vector<std::vector<size_t>>::iterator group = charGroups.begin();
 			group != charGroups.end(); ++group)
 		{
-			if( dfaTab.Size() > 30000)
+			if( dfaTab.Size() > SC_STATELIMIT)
 			{
 				return;
 			}
@@ -63,6 +63,7 @@ CREDFA void NfaToDfa(CNfa &oneNfaTab, CDfa &dfaTab)
 			curStaNum = ir->second;
 
 			std::vector<size_t> nextNfaVec;
+
 			NextNfaSet(oneNfaTab, curNfaVec, nCurChar, nextNfaVec, finFlag);
 
 			if(!nextNfaVec.empty())
@@ -96,6 +97,7 @@ CREDFA void NfaToDfa(CNfa &oneNfaTab, CDfa &dfaTab)
 		}
 	}
 }
+<<<<<<< HEAD
 
 void RemoveUnreachable(const CNfa &nfa, const std::vector<size_t> &fins, std::vector<BYTE> &reachable)
 {
@@ -435,3 +437,5 @@ CREDFA size_t DfaMin(CDfa &oneDfaTab, CDfa &minDfaTab)
 
 	return 0;
 }
+=======
+>>>>>>> 1a39530a29e07e1f49ecb54f49d06cccf07f0cbd
