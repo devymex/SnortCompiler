@@ -126,6 +126,11 @@ COMMONSC void CVectorNumber::Fill(size_t _Val)
 	std::fill(m_pSet->begin(), m_pSet->end(), _Val);
 }
 
+COMMONSC void CVectorNumber::Clear()
+{
+	m_pSet->clear();
+}
+
 COMMONSC CNfaRow::CNfaRow()
 {
 }
@@ -391,7 +396,7 @@ COMMONSC size_t CDfa::GetColNum()
 	return m_nColNum;
 }
 
-COMMONSC void CDfa::SetGroup(STATEID *pGroup)
+COMMONSC void CDfa::SetGroup(size_t *pGroup)
 {
 	std::vector<STATEID> tmpGroup;
 	std::copy(pGroup, pGroup + CHARSETSIZE, std::back_inserter(tmpGroup));
@@ -408,9 +413,9 @@ COMMONSC void CDfa::SetGroup(STATEID *pGroup)
 	}
 }
 
-COMMONSC STATEID* CDfa::GetGroup()
+COMMONSC size_t CDfa::GetGroup(size_t nIdx)
 {
-	return m_pGroup;
+	return m_pGroup[nIdx];
 }
 
 //COMMONSC CAndDfa::CAndDfa()
