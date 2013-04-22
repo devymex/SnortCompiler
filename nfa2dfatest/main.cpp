@@ -5,7 +5,7 @@
 
 void main()
 {
-	const char* a = "/abcd.*ABCD{1024}/";
+	const char* a = "/\\sCAPABILITY\\s[^\n]{100}/";
 	CNfa nfa;
 	CDfa dfa;
 	PcreToNFA(a, nfa);

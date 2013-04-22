@@ -9,11 +9,29 @@ void main()
 {
 	//CRes result;
 	//compile(_T("..\\..\\input\\allrules.rule"), result);
+	//size_t count = 0;
+	//for (size_t i = 0; i < result.GetSidDfaIds().Size(); ++i)
+	//{
+	//	if (result.GetSidDfaIds()[i].m_nResult == COMPILEDRULE::RES_SUCCESS)
+	//	{
+	//		++count;
+	//	}
+	//}
+	//std::cout << count << std::endl;
 	//result.WriteToFile(_T("..\\..\\output\\result.cdt"));
 
 	CRes readRes;
 	readRes.ReadFromFile(_T("..\\..\\output\\result.cdt"));
-	readRes.WriteToFile(_T("..\\..\\output\\WriteAfterRead.cdt"));
+	size_t count = 0;
+	for (size_t i = 0; i < readRes.GetSidDfaIds().Size(); ++i)
+	{
+		if (readRes.GetSidDfaIds()[i].m_nResult == COMPILEDRULE::RES_SUCCESS)
+		{
+			++count;
+		}
+	}
+	std::cout << count << std::endl;
+	//readRes.WriteToFile(_T("..\\..\\output\\WriteAfterRead.cdt"));
 
 	//std::ofstream foutBeforeWrite("..\\..\\output\\BeforeWrite.txt");
 
