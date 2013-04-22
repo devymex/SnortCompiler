@@ -7,7 +7,7 @@
 
 MERDFA void AndMerge(CDfa &dfa1, CDfa &dfa2, CDfa &andDfa, CVectorNumber &termFlag)
 {
-	std::unordered_map<_int64, size_t, _HASH> idMap;
+	std::unordered_map<_int64, STATEID, _HASH> idMap;
 	std::vector<std::pair<std::pair<size_t, size_t>, size_t>> idVec;
 	idMap.rehash(_HASH::MAX_SIZE);
 	dfa1.Resize(dfa1.Size() + 1);
@@ -20,19 +20,19 @@ MERDFA void AndMerge(CDfa &dfa1, CDfa &dfa2, CDfa &andDfa, CVectorNumber &termFl
 		{
 			if(fir != dfa1.Size() - 1 && sec != dfa2.Size() - 1)
 			{
-				idMap[_int64(fir) << 32 | sec] = idMap.size();
+				idMap[_int64(fir) << 32 | sec] = (STATEID)idMap.size();
 			}
 			else if(fir == dfa1.Size() - 1 && sec != dfa2.Size() - 1)
 			{
-				idMap[_int64(size_t(-1)) << 32 | sec] = idMap.size();
+				idMap[_int64(size_t(-1)) << 32 | sec] = (STATEID)idMap.size();
 			}
 			else if(fir != dfa1.Size() - 1 && sec == dfa2.Size() - 1)
 			{
-				idMap[_int64(fir) << 32 | size_t(-1)] = idMap.size();
+				idMap[_int64(fir) << 32 | size_t(-1)] = (STATEID)idMap.size();
 			}
 			else if(fir == dfa1.Size() - 1 && sec == dfa2.Size() - 1)
 			{
-				idMap[_int64(size_t(-1)) << 32 | size_t(-1)] = idMap.size();
+				idMap[_int64(size_t(-1)) << 32 | size_t(-1)] = (STATEID)idMap.size();
 			}
 
 			idVec.push_back(std::make_pair(std::make_pair(fir, sec), idMap.size() - 1));
@@ -78,12 +78,20 @@ MERDFA void AndMerge(CDfa &dfa1, CDfa &dfa2, CDfa &andDfa, CVectorNumber &termFl
 	}
 }
 
-MERDFA void OrMerge(std::vector<CDfa> &dfas, CDfa &lastDfa)
+MERDFA bool OrMerge(std::vector<CDfa> &dfas, CDfa &lastDfa)
 {
+#undef max
+	for(size_t i = 0; i < dfas.size(); ++i)
+	{
+		if(dfas[i].Size() > std::numeric_limits<STATEID>::max())
+		{
+			return false;
+		}
+	}
 	std::vector<CNfa> nfas;
-	CNfa oneNfa;
 	size_t termSta = 0;
-	oneNfa.Resize(oneNfa.Size() + 1);
+	CNfa oneNfa;
+	oneNfa.Resize(1);
 
 	for(size_t i = 0; i < dfas.size(); ++i)
 	{
@@ -94,10 +102,15 @@ MERDFA void OrMerge(std::vector<CDfa> &dfas, CDfa &lastDfa)
 	for(size_t i = 0; i < dfas.size(); ++i)
 	{
 		oneNfa[0][EMPTYEDGE].PushBack(oneNfa.Size());
-		IncreDfaNum(dfas[i], oneNfa.Size());
+		IncreDfaNum(dfas[i], (STATEID)oneNfa.Size());
 		InsertDfa(dfas[i], oneNfa, termSta);
 	}
-	size_t size = oneNfa.Size();
-	NfaToDfa(oneNfa, lastDfa);
-	size = lastDfa.Size();
+	if(NfaToDfa(oneNfa, lastDfa) == 0)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
