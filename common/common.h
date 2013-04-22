@@ -105,12 +105,15 @@ public:
 	void FromDfa(CDfa &dfa);
 	void PushBack(const CNfaRow &row);
 	void PopBack();
+	void SetPcre(const char* lpPcre);
+	const char* GetPcre() const;
 
 	CNfaRow &Back();
 	CNfaRow &operator[](size_t index);
 	const CNfaRow &operator[](size_t index) const;
 private:
 	std::vector<CNfaRow> *m_pNfa;
+	std::string *m_pPcre;
 };
 
 //class COMMONSC CAndDfaRow : public CDfaRow

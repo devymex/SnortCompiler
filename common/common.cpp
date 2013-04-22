@@ -157,11 +157,13 @@ COMMONSC CNfaRow& CNfaRow::operator=(const CNfaRow &other)
 COMMONSC CNfa::CNfa()
 {
 	m_pNfa = new std::vector<CNfaRow>;
+	m_pPcre = new std::string;
 }
 
 COMMONSC CNfa::~CNfa()
 {
 	delete m_pNfa;
+	delete m_pPcre;
 }
 
 //COMMONSC size_t CNfa::GetRowNum(void)
@@ -220,11 +222,13 @@ COMMONSC const CNfaRow& CNfa::operator[](size_t index) const
 COMMONSC CNfa::CNfa(const CNfa &other)
 {
 	m_pNfa = new std::vector<CNfaRow>;
+	m_pPcre = new std::string;
 	*this = other;
 }
 COMMONSC CNfa& CNfa::operator=(const CNfa &other)
 {
 	*this->m_pNfa = *other.m_pNfa;
+	*m_pPcre = *other.m_pPcre;
 	return *this;
 }
 
@@ -236,6 +240,16 @@ COMMONSC void CNfa::PopBack()
 COMMONSC void CNfa::PushBack(const CNfaRow &row)
 {
 	m_pNfa->push_back(row);
+}
+
+COMMONSC void CNfa::SetPcre(const char* lpPcre)
+{
+	*m_pPcre = lpPcre;
+}
+
+COMMONSC const char* CNfa::GetPcre() const
+{
+	return m_pPcre->c_str();
 }
 
 COMMONSC CDfaRow::CDfaRow()
