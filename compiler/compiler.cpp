@@ -385,9 +385,9 @@ void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 	result.GetSidDfaIds().Resize(nNewSize);
 	COMPILEDRULE &ruleResult = result.GetSidDfaIds().Back();
 	ruleResult.m_nSid = rule.GetSid();
-	if (nFlag & CSnortRule::RULE_HASBYTE)
+	if (rule.Size() == 0)
 	{
-		ruleResult.m_nResult = COMPILEDRULE::RES_HASBYTE;
+		ruleResult.m_nResult = COMPILEDRULE::RES_EMPTY;
 		return;
 	}
 	else if (nFlag & CSnortRule::RULE_HASNOT)
@@ -395,9 +395,14 @@ void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 		ruleResult.m_nResult = COMPILEDRULE::RES_HASNOT;
 		return;
 	}
-	else if (rule.Size() == 0)
+	else if (nFlag & CSnortRule::RULE_HASBYTE)
 	{
-		ruleResult.m_nResult = COMPILEDRULE::RES_EMPTY;
+		ruleResult.m_nResult = COMPILEDRULE::RES_HASBYTE;
+		return;
+	}
+	else if (nFlag & CSnortRule::RULE_HASNOSIG)
+	{
+		ruleResult.m_nResult = COMPILEDRULE::RES_HASNOSIG;
 		return;
 	}
 	else
@@ -430,6 +435,7 @@ void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 				NfaToDfa(nfa, dfa);
 				if (dfa.Size() > SC_STATELIMIT)
 				{
+					ruleResult.m_nResult = COMPILEDRULE::RES_EXCEEDLIMIT;
 					dfa.Clear();
 				}
 				ruleResult.m_dfaIds.PushBack(nId);
