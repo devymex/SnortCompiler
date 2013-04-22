@@ -3,4 +3,3 @@ EXPORTS
 CompileRuleSet @ 1
 CompileRule @ 2
 InterpretRule @ 3
-Rule2PcreList @ 4

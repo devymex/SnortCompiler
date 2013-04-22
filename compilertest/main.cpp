@@ -9,16 +9,47 @@ void main()
 {
 	CRes result;
 	compile(_T("..\\..\\input\\test.rules"), result);
-	size_t count = 0;
-	for (size_t i = 0; i < result.GetSidDfaIds().Size(); ++i)
+	//size_t count = 0;
+	//for (size_t i = 0; i < result.GetSidDfaIds().Size(); ++i)
+	//{
+	//	if (result.GetSidDfaIds()[i].m_nResult == COMPILEDRULE::RES_SUCCESS)
+	//	{
+	//		++count;
+	//	}
+	//}
+	//std::cout << count << std::endl;
+	//result.WriteToFile(_T("..\\..\\output\\result.cdt"));
+
+	CRes Res;
+	Res.GetSidDfaIds().Resize(1);
+	COMPILEDRULE &ruleResult = Res.GetSidDfaIds().Back();
+	ruleResult.m_nSid = 1292;
+	ruleResult.m_nResult = COMPILEDRULE::RES_SUCCESS;
+	ruleResult.m_dfaIds.PushBack(1);
+	Res.GetDfaTable().Resize(1);
+	CDfa &dfa = Res.GetDfaTable()[0];
+	BYTE pGroup[DFACOLSIZE];
+	pGroup[0] = 0;
+	pGroup[1] = 1;
+	pGroup[2] = 2;
+	pGroup[3] = 3;
+	pGroup[4] = 4;
+	for (size_t i = 5; i < DFACOLSIZE - 1; ++i)
 	{
-		if (result.GetSidDfaIds()[i].m_nResult == COMPILEDRULE::RES_SUCCESS)
-		{
-			++count;
-		}
+		pGroup[i] = 5;
 	}
-	std::cout << count << std::endl;
-	result.WriteToFile(_T("..\\..\\output\\result.cdt"));
+	pGroup[DFACOLSIZE - 1] = 0;
+	dfa.SetGroup(pGroup);
+	dfa.Resize(1);
+	for (size_t i = 0; i < 6; ++i)
+	{
+		dfa[0][i] = i + 2;
+	}
+	Res.WriteToFile(_T("..\\..\\output\\result.cdt"));
+
+	CRes readRes;
+	readRes.ReadFromFile(_T("..\\..\\output\\result.cdt"));
+	readRes.WriteToFile(_T("..\\..\\output\\result1.cdt"));
 
 	//CRes readRes;
 	//readRes.ReadFromFile(_T("..\\..\\output\\result.cdt"));
@@ -31,6 +62,8 @@ void main()
 	//	}
 	//}
 	//std::cout << count << std::endl;
+
+
 	//readRes.WriteToFile(_T("..\\..\\output\\WriteAfterRead.cdt"));
 
 	//std::ofstream foutBeforeWrite("..\\..\\output\\BeforeWrite.txt");

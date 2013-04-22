@@ -15,40 +15,53 @@ void ReadPcres(std::vector<std::string> &vecPcres)
 
 void main()
 {
-	//const char* a = "/^BM{101}/";
-	std::vector<std::string> vecPcres;
-	ReadPcres(vecPcres);
-	std::ofstream foutExceed("D:\\Exceed.txt");
-	std::ofstream foutError("D:\\Error.txt");
-	for (std::vector<std::string>::iterator i = vecPcres.begin(); i != vecPcres.end(); ++i)
+	const char* a = "/BM/";
+	CNfa nfa;
+	nfa.Resize(1);
+	PcreToNFA(a, nfa);
+	for (size_t i = 0; i < nfa.Size(); ++i)
 	{
-		CNfa nfa;
-		size_t res = PcreToNFA(i->c_str(), nfa);
-		if (res == SC_EXCEED)
+		for (size_t j = 0; j < CHARSETSIZE; ++j)
 		{
-			foutExceed << i - vecPcres.begin() + 1 << std::endl;
-		}
-		if (res == SC_ERROR)
-		{
-			foutError << i - vecPcres.begin() + 1 << std::endl;
-		}
-		std::cout << i - vecPcres.begin() + 1 << std::endl;
-		
-		for (size_t j = 0; j < nfa.Size(); ++j)
-		{
-			std::cout << j << ": ";
-			for (size_t k = 0; k < CHARSETSIZE; ++k)
+			for (size_t k = 0; k < nfa[i][j].Size(); ++k)
 			{
-				for (size_t l = 0; l < nfa[j][k].Size(); ++l)
-				{
-					std::cout << "(" << k << "," << nfa[j][k][l] << ")";
-				}
+				std::cout << "(" << i << "," << j << "," << nfa[i][j][k] << ")" << std::endl;
 			}
-			std::cout << std::endl;
 		}
 	}
-	foutExceed.close();
-	foutError.close();
+	//std::vector<std::string> vecPcres;
+	//ReadPcres(vecPcres);
+	//std::ofstream foutExceed("D:\\Exceed.txt");
+	//std::ofstream foutError("D:\\Error.txt");
+	//for (std::vector<std::string>::iterator i = vecPcres.begin(); i != vecPcres.end(); ++i)
+	//{
+	//	CNfa nfa;
+	//	size_t res = PcreToNFA(i->c_str(), nfa);
+	//	if (res == SC_EXCEED)
+	//	{
+	//		foutExceed << i - vecPcres.begin() + 1 << std::endl;
+	//	}
+	//	if (res == SC_ERROR)
+	//	{
+	//		foutError << i - vecPcres.begin() + 1 << std::endl;
+	//	}
+	//	std::cout << i - vecPcres.begin() + 1 << std::endl;
+	//	
+	//	for (size_t j = 0; j < nfa.Size(); ++j)
+	//	{
+	//		std::cout << j << ": ";
+	//		for (size_t k = 0; k < CHARSETSIZE; ++k)
+	//		{
+	//			for (size_t l = 0; l < nfa[j][k].Size(); ++l)
+	//			{
+	//				std::cout << "(" << k << "," << nfa[j][k][l] << ")";
+	//			}
+	//		}
+	//		std::cout << std::endl;
+	//	}
+	//}
+	//foutExceed.close();
+	//foutError.close();
 
 	system("pause");
 }
