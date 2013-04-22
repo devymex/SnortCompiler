@@ -38,7 +38,7 @@ struct STATESET_HASH
 	}
 };
 
-void AvaiEdges(CNfa &oneNfaTab, size_t *group);
+void AvaiEdges(CNfa &oneNfaTab, BYTE *group);
 
 void NextNfaSet(const CNfa &oneNfaTab, const std::vector<size_t> &curNfaVec,
 				size_t edge, std::vector<size_t> &nextENfaVec, char &finFlag);

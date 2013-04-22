@@ -4,7 +4,7 @@
 
 CREDFA size_t NfaToDfa(CNfa &oneNfaTab, CDfa &dfaTab)
 {
-	size_t groups[CHARSETSIZE];
+	BYTE groups[DFACOLSIZE];
 	AvaiEdges(oneNfaTab, groups);
 	dfaTab.SetGroup(groups);
 	//printNfa(oneNfaTab);
