@@ -394,61 +394,9 @@ COMMONSC void CDfa::Clear()
 //}
 
 
-COMMONSC CNfaChain::CNfaChain()
-{
-	m_pChain = new std::vector<CNfa>;
-}
-
-COMMONSC CNfaChain::~CNfaChain()
-{
-	delete m_pChain;
-}
-
-COMMONSC CNfaChain::CNfaChain(const CNfaChain &other)
-{
-	m_pChain = new std::vector<CNfa>;
-	*this = other;
-}
-
-COMMONSC const CNfaChain& CNfaChain::operator = (const CNfaChain &other)
-{
-	*m_pChain = *other.m_pChain;
-	return *this;
-}
-
-COMMONSC size_t CNfaChain::Size() const
-{
-	return m_pChain->size();
-}
-
-COMMONSC void CNfaChain::Resize(size_t nSize)
-{
-	m_pChain->resize(nSize);
-}
-COMMONSC CNfa& CNfaChain::Back()
-{
-	return m_pChain->back();
-}
-
-COMMONSC void CNfaChain::PushBack(const CNfa &cnfa)
-{
-	m_pChain->push_back(cnfa);
-}
-
-COMMONSC CNfa& CNfaChain::operator[](size_t nIdx)
-{
-	return (*m_pChain)[nIdx];
-}
-
-COMMONSC const CNfa& CNfaChain::operator[](size_t nIdx) const
-{
-	return (*m_pChain)[nIdx];
-}
-
-
 COMMONSC CNfaTree::CNfaTree()
 {
-	m_pTree = new std::vector<CNfaChain>;
+	m_pTree = new std::vector<CNfa>;
 }
 
 COMMONSC CNfaTree::~CNfaTree()
@@ -458,7 +406,7 @@ COMMONSC CNfaTree::~CNfaTree()
 
 COMMONSC CNfaTree::CNfaTree(const CNfaTree &other)
 {
-	m_pTree = new std::vector<CNfaChain>;
+	m_pTree = new std::vector<CNfa>;
 	*this = other;
 }
 
@@ -482,20 +430,20 @@ COMMONSC void CNfaTree::Resize(size_t nSize)
 {
 	m_pTree->resize(nSize);
 }
-COMMONSC CNfaChain& CNfaTree::Back()
+COMMONSC CNfa& CNfaTree::Back()
 {
 	return m_pTree->back();
 }
-COMMONSC void CNfaTree::PushBack(const CNfaChain &cnfachain)
+COMMONSC void CNfaTree::PushBack(const CNfa &cnfachain)
 {
 	m_pTree->push_back(cnfachain);
 }
-CNfaChain& CNfaTree::operator[](size_t nIdx)
+CNfa& CNfaTree::operator[](size_t nIdx)
 {
 	return (*m_pTree)[nIdx];
 }
 
-const CNfaChain& CNfaTree::operator[](size_t nIdx) const
+const CNfa& CNfaTree::operator[](size_t nIdx) const
 {
 	return (*m_pTree)[nIdx];
 }

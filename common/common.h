@@ -147,23 +147,25 @@ private:
 //	std::vector<CAndDfaRow> *m_pAndDfa;
 //};
 //
-class COMMONSC CNfaChain
-{
-public:
-	CNfaChain();
-	~CNfaChain();
-	CNfaChain(const CNfaChain &other);
-	const CNfaChain& operator = (const CNfaChain &other);
 
-	size_t Size() const;
-	void Resize(size_t nSize);
-	CNfa& Back();
-	void PushBack(const CNfa &cnfa);
-	CNfa& operator[](size_t nIdx);
-	const CNfa& operator[](size_t nIdx) const;
-private:
-	std::vector<CNfa> *m_pChain;
-};
+//class COMMONSC CNfaChain
+//{
+//public:
+//	CNfaChain();
+//	~CNfaChain();
+//	CNfaChain(const CNfaChain &other);
+//	const CNfaChain& operator = (const CNfaChain &other);
+//
+//	size_t Size() const;
+//	void Resize(size_t nSize);
+//	CNfa& Back();
+//	void PushBack(const CNfa &cnfa);
+//	CNfa& operator[](size_t nIdx);
+//	const CNfa& operator[](size_t nIdx) const;
+//private:
+//	std::vector<CNfa> *m_pChain;
+//};
+
 
 class COMMONSC CNfaTree
 {
@@ -176,13 +178,14 @@ public:
 	size_t Size() const;
 	void Reserve(size_t nCount);
 	void Resize(size_t nSize);
-	CNfaChain& Back();
-	void PushBack(const CNfaChain &cnfachain);
-	CNfaChain& operator[](size_t nIdx);
-	const CNfaChain& operator[](size_t nIdx) const;
+	CNfa& Back();
+	void PushBack(const CNfa &cnfachain);
+	CNfa& operator[](size_t nIdx);
+	const CNfa& operator[](size_t nIdx) const;
 
 private:
-	std::vector<CNfaChain> *m_pTree;
+	//std::vector<CNfaChain> *m_pTree;
+	std::vector<CNfa> *m_pTree;
 };
 
 class COMMONSC CRegChain
