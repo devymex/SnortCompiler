@@ -184,6 +184,7 @@ private:
 //	size_t m_pAndDest[CHARSETSIZE];
 //};
 
+
 //class COMMONSC CAndDfa
 //{
 //public:

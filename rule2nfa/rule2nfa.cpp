@@ -89,6 +89,19 @@ struct EMPTYRULE
 	}
 };
 
+struct CONTENTNUM
+{
+	bool operator()(RULEOPTIONRAW &rp)
+	{
+		if (0 == stricmp("content", rp.name.c_str()) ||
+			0 == stricmp("uricontent", rp.name.c_str()))
+		{
+			return true;
+		}
+		return false;
+	}
+};
+
 /*
 * read rules from a file
 */
@@ -339,10 +352,14 @@ size_t ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
 	std::vector<RULEOPTIONRAW> options;
 	ExtractOption(ruleOptions, options);
 
+	size_t nCONT = 0;
+	size_t sum = 0;
+	nCONT = std::count_if(options.begin(), options.end(), CONTENTNUM());
+
 	//Mark process mode, "0" is error ,"1" is normal
 	size_t nResult = 0;
-
 	size_t nFlag = 0;
+
 	for(std::vector<RULEOPTIONRAW>::iterator iOp = options.begin(); iOp != options.end(); ++iOp)
 	{
 		std::string::iterator opValueBeg = iOp->value.begin();
@@ -399,8 +416,11 @@ size_t ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
 				std::string str(opValueBeg, opValueEnd);
 				pContent->SetPattern(str.c_str());
 				FormatOptionContent(opValueBeg, opValueEnd, pContent->vecconts);
+				if (pContent->vecconts.size() < 4)
+				{
+					sum++;
+				}
 			}
-
 			snortRule.PushBack(pContent);
 		}
 		else if (0 == stricmp("nocase", iOp->name.c_str()))
@@ -477,6 +497,10 @@ size_t ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
 				temp->nFlags |= CF_WITHIN;
 			}
 		}
+	}
+	if (sum == nCONT)
+	{
+		nFlag |= CSnortRule::RULE_HASNOSIG;
 	}
 	snortRule.SetFlag(nFlag);
 	return nResult;
