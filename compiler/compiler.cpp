@@ -343,28 +343,28 @@ void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 		}
 		else
 		{
-			ruleResult.m_nResult = COMPILEDRULE::RES_SUCCESS;
-			const size_t nCursize = result.GetDfaTable().Size();
-			const size_t nIncrement = nfatree.Size();
-			result.GetDfaTable().Resize(nCursize + nIncrement);
-			size_t nId;
-			for (size_t i = 0; i < nIncrement; ++i)
-			{
-				CNfa nfa;
-				SerializeNfa(nfatree[i], nfa);
-				nId = nCursize + i;
-				CDfa &dfa = result.GetDfaTable()[nId];
-				dfa.SetId(nId);
-				NfaToDfa(nfa, dfa);
-				if (dfa.Size() > SC_STATELIMIT)
-				{
-					ruleResult.m_nResult = COMPILEDRULE::RES_EXCEEDLIMIT;
-					ruleResult.m_dfaIds.Clear();
-					result.GetDfaTable().Resize(nCursize);
-					break;
-				}
-				ruleResult.m_dfaIds.PushBack(nId);
-			}
+			//ruleResult.m_nResult = COMPILEDRULE::RES_SUCCESS;
+			//const size_t nCursize = result.GetDfaTable().Size();
+			//const size_t nIncrement = nfatree.Size();
+			//result.GetDfaTable().Resize(nCursize + nIncrement);
+			//size_t nId;
+			//for (size_t i = 0; i < nIncrement; ++i)
+			//{
+			//	CNfa nfa;
+			//	SerializeNfa(nfatree[i], nfa);
+			//	nId = nCursize + i;
+			//	CDfa &dfa = result.GetDfaTable()[nId];
+			//	dfa.SetId(nId);
+			//	NfaToDfa(nfa, dfa);
+			//	if (dfa.Size() > SC_STATELIMIT)
+			//	{
+			//		ruleResult.m_nResult = COMPILEDRULE::RES_EXCEEDLIMIT;
+			//		ruleResult.m_dfaIds.Clear();
+			//		result.GetDfaTable().Resize(nCursize);
+			//		break;
+			//	}
+			//	ruleResult.m_dfaIds.PushBack(nId);
+			//}
 		}
 	}
 }

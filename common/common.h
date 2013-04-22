@@ -143,6 +143,8 @@ public:
 	void FromDfa(CDfa &dfa);
 	void PushBack(const CNfaRow &row);
 	void PopBack();
+	void SetPcre(const char* lpPcre);
+	const char* GetPcre() const;
 
 	CNfaRow &Back();
 	CNfaRow &operator[](size_t index);
@@ -150,6 +152,7 @@ public:
 private:
 	//std::string *m_pRegex;
 	std::vector<CNfaRow> *m_pNfa;
+	std::string *m_pPcre;
 };
 
 //class COMMONSC CDfa
@@ -205,23 +208,25 @@ private:
 //	std::vector<CAndDfaRow> *m_pAndDfa;
 //};
 //
-class COMMONSC CNfaChain
-{
-public:
-	CNfaChain();
-	~CNfaChain();
-	CNfaChain(const CNfaChain &other);
-	const CNfaChain& operator = (const CNfaChain &other);
 
-	size_t Size() const;
-	void Resize(size_t nSize);
-	CNfa& Back();
-	void PushBack(const CNfa &cnfa);
-	CNfa& operator[](size_t nIdx);
-	const CNfa& operator[](size_t nIdx) const;
-private:
-	std::vector<CNfa> *m_pChain;
-};
+//class COMMONSC CNfaChain
+//{
+//public:
+//	CNfaChain();
+//	~CNfaChain();
+//	CNfaChain(const CNfaChain &other);
+//	const CNfaChain& operator = (const CNfaChain &other);
+//
+//	size_t Size() const;
+//	void Resize(size_t nSize);
+//	CNfa& Back();
+//	void PushBack(const CNfa &cnfa);
+//	CNfa& operator[](size_t nIdx);
+//	const CNfa& operator[](size_t nIdx) const;
+//private:
+//	std::vector<CNfa> *m_pChain;
+//};
+
 
 class COMMONSC CNfaTree
 {
@@ -234,13 +239,48 @@ public:
 	size_t Size() const;
 	void Reserve(size_t nCount);
 	void Resize(size_t nSize);
-	CNfaChain& Back();
-	void PushBack(const CNfaChain &cnfachain);
-	CNfaChain& operator[](size_t nIdx);
-	const CNfaChain& operator[](size_t nIdx) const;
+	CNfa& Back();
+	void PushBack(const CNfa &cnfachain);
+	CNfa& operator[](size_t nIdx);
+	const CNfa& operator[](size_t nIdx) const;
 
 private:
-	std::vector<CNfaChain> *m_pTree;
+	//std::vector<CNfaChain> *m_pTree;
+	std::vector<CNfa> *m_pTree;
+};
+
+class COMMONSC CRegChain
+{
+public:
+	CRegChain();
+	~CRegChain();
+	CRegChain(const CRegChain &other);
+
+	size_t Size() const;
+	std::string& Back() const;
+	void PushBack(std::string &pcreStr);
+	std::string& operator[](size_t nIdx);
+	const CRegChain& operator = (const CRegChain &other);
+private:
+	std::vector<std::string> *m_pRegList;
+};
+
+class COMMONSC CRegRule
+{
+public:
+	CRegRule();
+	~CRegRule();
+	CRegRule(const CRegRule &other);
+
+	size_t Size() const;
+	CRegChain& Back() const;
+	void Reserve(size_t nCount);
+	void Resize(size_t nSize);
+	void PushBack(CRegChain &nRegChain);
+	CRegChain& operator[](size_t nIdx);
+	const CRegRule& operator = (const CRegRule &other);
+private:
+	std::vector<CRegChain> *m_pRegVec;
 };
 
 struct COMMONSC RULEOPTION
