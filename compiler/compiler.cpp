@@ -193,19 +193,19 @@ COMPILER size_t CRes::WriteToFile(LPCTSTR filename)
 	//开始写DFAs
 	for (size_t i = 0; i < m_dfaTbl.Size(); ++i)
 	{
-		WriteNum(fout, m_dfaTbl[i].Size(), 4);
+		WriteNum(fout, m_dfaTbl[i].Size(), sizeof(STATEID));
 		//写分组
 		for (size_t j = 0; j < DFACOLSIZE; ++j)
 		{
-			WriteNum(fout, m_dfaTbl[i].GetGroup(j), 1);
+			WriteNum(fout, m_dfaTbl[i].GetGroup(j), sizeof(BYTE));
 		}
 		//写DFA跳转表
 		size_t nColNum = m_dfaTbl[i].GetColNum();
-		for (size_t j = 0; j < m_dfaTbl[i].Size(); ++j)
+		for (STATEID j = 0; j < m_dfaTbl[i].Size(); ++j)
 		{
 			for (size_t k = 0; k < nColNum; ++k)
 			{
-				WriteNum(fout, m_dfaTbl[i][j][k], sizeof(STATEID));
+				WriteNum(fout, m_dfaTbl[i][j][(BYTE)k], sizeof(STATEID));
 			}
 		}
 	}
@@ -270,26 +270,26 @@ COMPILER size_t CRes::ReadFromFile(LPCTSTR filename)
 	}
 	//开始读DFAs
 	m_dfaTbl.Resize(dfaNum);
-	size_t dfaSize;//一个DFA的状态数
+	STATEID dfaSize;//一个DFA的状态数
 	for (size_t i = 0; i < dfaNum; ++i)
 	{
 		CDfa &dfa = m_dfaTbl[i];
-		fin.read((char*)&dfaSize, 4);
+		fin.read((char*)&dfaSize, sizeof(STATEID));
 		//读分组
 		BYTE pGroup[DFACOLSIZE];
 		for (size_t j = 0; j < DFACOLSIZE; ++j)
 		{
-			fin.read((char*)&pGroup[j], 1);
+			fin.read((char*)&pGroup[j], sizeof(BYTE));
 		}
 		dfa.SetGroup(pGroup);
 		dfa.Resize(dfaSize);
 		//读DFA跳转表
 		size_t nColNum = dfa.GetColNum();
-		for (size_t j = 0; j < dfaSize; ++j)
+		for (STATEID j = 0; j < dfaSize; ++j)
 		{
 			for (size_t k = 0; k < nColNum; ++k)
 			{
-				fin.read((char*)&dfa[j][k], sizeof(STATEID));
+				fin.read((char*)&dfa[j][(BYTE)k], sizeof(STATEID));
 			}
 		}
 	}

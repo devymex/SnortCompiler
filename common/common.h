@@ -92,8 +92,8 @@ public:
 	~CDfaRow();
 	CDfaRow(const CDfaRow &other);
 	CDfaRow& operator=(const CDfaRow &other);
-	STATEID& operator[](size_t index);
-	const STATEID& operator[](size_t index) const;
+	STATEID& operator[](BYTE index);
+	const STATEID& operator[](BYTE index) const;
 	void SetFlag(size_t nFlag);
 	size_t GetFlag() const;
 	size_t GetColNum() const;
@@ -111,8 +111,8 @@ public:
 	CDfa(const CDfa &other);
 	CDfa& operator=(const CDfa &other);
 	void Reserve(size_t _Count);
-	void Resize(size_t _Newsize);
-	size_t Size() const;
+	void Resize(STATEID _Newsize);
+	STATEID Size() const;
 	CDfaRow &Back();
 	CDfaRow& operator[](STATEID index);
 	const CDfaRow& operator[](STATEID index) const;

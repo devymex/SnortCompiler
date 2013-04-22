@@ -278,12 +278,12 @@ COMMONSC CDfaRow& CDfaRow::operator=(const CDfaRow &other)
 	return *this;
 }
 
-COMMONSC STATEID& CDfaRow::operator[](size_t index)
+COMMONSC STATEID& CDfaRow::operator[](BYTE index)
 {
 	return (*m_pDest)[index];
 }
 
-COMMONSC const STATEID& CDfaRow::operator[](size_t index) const
+COMMONSC const STATEID& CDfaRow::operator[](BYTE index) const
 {
 	return (*m_pDest)[index];
 }
@@ -350,14 +350,14 @@ COMMONSC void CDfa::Reserve(size_t _Count)
 	m_pDfa->reserve(_Count);
 }
 
-COMMONSC void CDfa::Resize(size_t _Newsize)
+COMMONSC void CDfa::Resize(STATEID _Newsize)
 {
 	m_pDfa->resize(_Newsize, m_nColNum);
 }
 
-COMMONSC size_t CDfa::Size() const
+COMMONSC STATEID CDfa::Size() const
 {
-	return m_pDfa->size();
+	return (STATEID)m_pDfa->size();
 }
 
 COMMONSC CDfaRow &CDfa::Back()
