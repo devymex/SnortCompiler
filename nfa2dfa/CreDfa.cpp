@@ -104,7 +104,7 @@ void AvaiEdges(CNfa &oneNfaTab, STATEID *group)
 	}
 }
 
-void NextNfaSet(const CNfa &oneNfaTab, const std::vector<size_t> &curNfaVec, size_t edge, std::vector<size_t> &nextENfaVec, char &finFlag)
+void NextNfaSet(const CNfa &oneNfaTab, const std::vector<size_t> &curNfaVec, size_t edge, std::vector<size_t> &nextENfaVec, char &finFlag, size_t combineNum)
 {
 	if (edge >= CHARSETSIZE)
 	{
@@ -129,11 +129,11 @@ void NextNfaSet(const CNfa &oneNfaTab, const std::vector<size_t> &curNfaVec, siz
 	nextNfaVec.erase(std::unique(nextNfaVec.begin(), nextNfaVec.end()), nextNfaVec.end());
 	if(!nextNfaVec.empty())
 	{
-		EClosure(oneNfaTab, nextNfaVec, nextENfaVec, finFlag);
+		EClosure(oneNfaTab, nextNfaVec, nextENfaVec, finFlag, combineNum);
 	}
 }
 
-void EClosure(const CNfa &oneNfaTab, const std::vector<size_t> &curNfaVec, std::vector<size_t> &eNfaVec, char &finFlag)
+void EClosure(const CNfa &oneNfaTab, const std::vector<size_t> &curNfaVec, std::vector<size_t> &eNfaVec, char &finFlag, size_t combineNum)
 {
 	std::vector<size_t> eStack;
 	char caledStat[20000] = {0};

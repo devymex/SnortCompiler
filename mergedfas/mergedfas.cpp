@@ -89,23 +89,23 @@ MERDFA bool OrMerge(std::vector<CDfa> &dfas, CDfa &lastDfa)
 		}
 	}
 	std::vector<CNfa> nfas;
-	STATEID termSta = 0;
+	STATEID nTermSta = 0;
 	CNfa oneNfa;
 	oneNfa.Resize(1);
 
 	for(STATEID i = 0; i < dfas.size(); ++i)
 	{
-		termSta += dfas[i].Size();
+		nTermSta += dfas[i].Size();
 	}
-	termSta += 1;
+	nTermSta += 1;
 
 	for(STATEID i = 0; i < dfas.size(); ++i)
 	{
 		oneNfa[0][EMPTYEDGE].PushBack(oneNfa.Size());
 		IncreDfaNum(dfas[i], (STATEID)oneNfa.Size());
-		InsertDfa(dfas[i], oneNfa, termSta);
+		InsertDfa(dfas[i], oneNfa,nTermSta);
 	}
-	if(NfaToDfa(oneNfa, lastDfa) == 0)
+	if(NfaToDfa(oneNfa, lastDfa, dfas.size()) == 0)
 	{
 		return true;
 	}

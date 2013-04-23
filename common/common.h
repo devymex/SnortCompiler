@@ -122,11 +122,15 @@ public:
 	size_t GetColNum();
 	void SetGroup(BYTE *pGroup);
 	BYTE GetGroup(size_t nIdx);
+	STATEID GetStartId()const;
+	void SetStartId(STATEID id);
 private:
 	size_t m_nId;
 	size_t m_nColNum;
+	STATEID m_StartId;
 	BYTE m_pGroup[DFACOLSIZE];
 	std::vector<CDfaRow> *m_pDfa;
+	std::vector<std::pair<STATEID, size_t>> m_termSet;
 };
 
 class COMMONSC CNfa
@@ -144,6 +148,8 @@ public:
 	void PushBack(const CNfaRow &row);
 	void PopBack();
 	void SetPcre(const char* lpPcre);
+	void PushDfaTerms(std::pair<size_t, size_t> pair);
+	std::vector<std::pair<size_t, size_t>> GetDfaTerms();
 	const char* GetPcre() const;
 
 	CNfaRow &Back();
@@ -153,6 +159,8 @@ private:
 	//std::string *m_pRegex;
 	std::vector<CNfaRow> *m_pNfa;
 	std::string *m_pPcre;
+	//如果该nfa是由dfa合并过程中生成的，该成员用于记录哪个状态能够识别哪个dfa终态
+	std::vector<std::pair<size_t, size_t>> m_DfaTerms;
 };
 
 //class COMMONSC CDfa

@@ -260,6 +260,16 @@ COMMONSC const char* CNfa::GetPcre() const
 {
 	return m_pPcre->c_str();
 }
+COMMONSC  void CNfa::PushDfaTerms(std::pair<size_t, size_t> pair)
+{
+	m_DfaTerms.push_back(pair);
+}
+
+COMMONSC std::vector<std::pair<size_t, size_t>> CNfa::GetDfaTerms()
+{
+	return m_DfaTerms;
+}
+
 
 COMMONSC CDfaRow::CDfaRow(size_t col)
 	: m_nFlag(NORMAL), m_nColNum(col)
@@ -333,7 +343,7 @@ COMMONSC size_t CDfaRow::GetColNum() const
 //}
 
 COMMONSC CDfa::CDfa()
-	: m_nId(size_t(-1)), m_nColNum(size_t(0))
+	: m_nId(size_t(-1)), m_nColNum(size_t(0)), m_StartId(STATEID(0))
 {
 	std::fill(m_pGroup, m_pGroup + DFACOLSIZE, BYTE(-1));
 	m_pDfa = new std::vector<CDfaRow>;
@@ -431,6 +441,14 @@ COMMONSC BYTE CDfa::GetGroup(size_t nIdx)
 	return m_pGroup[nIdx];
 }
 
+COMMONSC STATEID CDfa::GetStartId()const
+{
+	return m_StartId;
+}
+COMMONSC void CDfa::SetStartId(STATEID id)
+{
+	m_StartId = id;
+}
 //COMMONSC CAndDfa::CAndDfa()
 //{
 //	m_pAndDfa = new std::vector<CAndDfaRow>;

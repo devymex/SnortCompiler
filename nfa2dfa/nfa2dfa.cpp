@@ -2,7 +2,7 @@
 #include "CreDfa.h"
 #include "nfa2dfa.h"
 
-CREDFA size_t NfaToDfa(CNfa &oneNfaTab, CDfa &dfaTab)
+CREDFA size_t NfaToDfa(CNfa &oneNfaTab, CDfa &dfaTab, size_t combineNum)
 {
 	BYTE groups[DFACOLSIZE];
 	AvaiEdges(oneNfaTab, groups);
@@ -70,7 +70,7 @@ CREDFA size_t NfaToDfa(CNfa &oneNfaTab, CDfa &dfaTab)
 
 			std::vector<size_t> nextNfaVec;
 
-			NextNfaSet(oneNfaTab, curNfaVec, nCurChar, nextNfaVec, finFlag);
+			NextNfaSet(oneNfaTab, curNfaVec, nCurChar, nextNfaVec, finFlag, combineNum);
 
 			if(!nextNfaVec.empty())
 			{
