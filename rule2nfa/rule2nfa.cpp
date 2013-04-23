@@ -6,6 +6,23 @@
 #define nfaTreeReserve 100
 #define nfaReserve 10000
 
+#define ANY '.'
+#define ESCAPE '\\'
+#define STAR '*'
+#define PLUS '+'
+#define OPT '?'
+#define OPEN_RBRACKET '('
+#define CLOSE_RBRACKET ')'
+#define OPEN_SBRACKET '['
+#define CLOSE_SBRACKET ']'
+#define OPEN_QBRACKET '{'
+#define CLOSE_QBRACKET '}'
+#define COMMA ','
+#define TILDE '^'
+#define OR '|'
+#define MINUS_RANGE '-'  
+
+
 enum CONTYPE
 {
 	CONBYTE,
@@ -329,6 +346,10 @@ size_t FormatOptionContent (_Iter cBeg, _Iter cEnd, std::vector<BYTE> &content, 
 		switch (*i)
 		{
 		case '\\':
+			if(TYPE == CONPCRE)
+			{
+				content.push_back(*i);
+			}
 			content.push_back(*++i);
 			break;
 		case '|':
@@ -356,6 +377,12 @@ size_t FormatOptionContent (_Iter cBeg, _Iter cEnd, std::vector<BYTE> &content, 
 			}
 			break;
 		default:
+			if(TYPE == CONPCRE && (*i == ANY ||	*i == ESCAPE || *i == STAR || *i == PLUS || *i == OPT
+				|| *i == OPEN_RBRACKET || *i == CLOSE_RBRACKET || *i == OPEN_SBRACKET || *i == CLOSE_SBRACKET
+				|| *i == OPEN_QBRACKET || *i == CLOSE_QBRACKET || *i == COMMA || *i == TILDE || *i == OR || *i == MINUS_RANGE))
+			{
+				content.push_back('\\');
+			}
 			content.push_back(*i);
 		}
 	}
