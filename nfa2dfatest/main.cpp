@@ -56,14 +56,14 @@
 
 void printDfa(CDfa &dfa)
 {
-	for (size_t j = 0; j < dfa.Size(); ++j)
+	for (STATEID j = 0; j < dfa.Size(); ++j)
 		{
-			std::cout << j << ": ";
-			for (size_t k = 0; k < dfa.GetColNum(); ++k)
+			std::cout << (int)j << ": ";
+			for (STATEID k = 0; k < dfa.GetColNum(); ++k)
 			{
 				if(dfa[j][k] != STATEID(-1))
 				{
-					std::cout << "(" << k << "," << (int)dfa[j][k]<< ")";
+					std::cout << "(" << (int)k << "," << (int)dfa[j][k]<< ")";
 				}
 
 			}
@@ -88,39 +88,6 @@ void printNfa(CNfa &nfa)
 }
 void main()
 {
-	//const char* a = "/abcd.*ABCD{1024}/";
-	//CNfa nfa;
-	//CDfa dfa;
-	//PcreToNFA(a, nfa);
-	//size_t nfasize = nfa.Size();
-	//NfaToDfa(nfa, dfa);
-	//size_t dfasize = dfa.Size();
-	/*CDfa dfa;
-	dfa.Resize(5);
-	dfa[0]['a'] = 1;
-	dfa[0]['b'] = 2;
-	dfa[1]['a'] = 1;
-	dfa[1]['b'] = 4;
-	dfa[2]['b'] = 2;
-	dfa[3]['a'] = 4;
-	dfa[3]['b'] = 1;
-	dfa[4].SetFlag(4);
-
-	for (size_t i = 0; i < 5; ++i)
-	{
-		for (size_t j = 97; j < 99; ++j)
-		{
-			std::cout << dfa[i][j] << " "; 
-		}
-		std::cout << std::endl;
-	}
-	std::cout << std::endl;
-
-	CDfa mindfa;
-	DfaMin(dfa, mindfa);
-
-	system("pause");*/
-
 	CNfa nfa;
 	CDfa dfa;
 	size_t size = dfa.Size();

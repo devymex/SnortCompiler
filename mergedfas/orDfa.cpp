@@ -25,12 +25,12 @@ void InsertDfa(CDfa &dfa, CNfa &nfa, STATEID termSta)
 		{
 			nfa[temp + i][EMPTYEDGE].PushBack(termSta);
 		}
-		for(STATEID charNum = 0; charNum < CHARSETSIZE; ++charNum)
+		for(size_t charNum = 0; charNum < DFACOLSIZE; ++charNum)
 		{
 			STATEID group = dfa.GetGroup(charNum);
 			if(dfa[i][group] != STATEID(-1))
 			{
-				nfa[i + temp][charNum].PushBack(dfa[i][charNum]);
+				nfa[i + temp][charNum].PushBack(dfa[i][group]);
 			}
 		}
 	}

@@ -45,7 +45,7 @@ CREDFA size_t NfaToDfa(CNfa &oneNfaTab, CDfa &dfaTab)
 		curNfaVec = nfaStasStack.top();
 		nfaStasStack.pop();
 
-		for(STATEID nCurChar = 0; nCurChar < CHARSETSIZE - 4; ++nCurChar)
+		for(size_t nCurChar = 0; nCurChar < DFACOLSIZE; ++nCurChar)
 		{
 			if( dfaTab.Size() > SC_STATELIMIT)
 			{
