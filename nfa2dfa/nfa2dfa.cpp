@@ -149,8 +149,10 @@ void MergeReachable(const CDfa &oneDfaTab, std::vector<BYTE> &reachable, CDfa &t
 {
 	size_t nRcbCnt = std::count(reachable.begin(), reachable.end(), 2);
 	tmpDfa.Resize(nRcbCnt);
+	tmpDfa.SetGroup(oneDfaTab.GetGroup());
 
-	STATEID nNewIdx = 0, nColNum = tmpDfa.GetColNum();
+	STATEID nNewIdx = 0;
+	size_t nColNum = tmpDfa.GetColNum();
 	for (std::vector<BYTE>::iterator iter = reachable.begin(); iter != reachable.end(); ++iter)
 	{
 		if (2 == *iter)
@@ -162,7 +164,7 @@ void MergeReachable(const CDfa &oneDfaTab, std::vector<BYTE> &reachable, CDfa &t
 		}
 		else
 		{
-			*iter = -1;
+			*iter = STATEID(-1);
 		}
 	}
 
@@ -171,9 +173,12 @@ void MergeReachable(const CDfa &oneDfaTab, std::vector<BYTE> &reachable, CDfa &t
 		CDfaRow &curRow = tmpDfa[i];
 		for (size_t j = 0; j < nColNum; ++j)
 		{
-			curRow[j] = reachable[curRow[j]];
+			if (curRow[j] != STATEID(-1))
+			{
+				curRow[j] = reachable[curRow[j]];
+			}
 		}
-	}
+	}	
 }
 
 void PartitionNonDisState(CDfa &tmpDfa, std::vector<STATEID> *pRevTbl, SETLIST &pSets)
@@ -195,7 +200,7 @@ void PartitionNonDisState(CDfa &tmpDfa, std::vector<STATEID> *pRevTbl, SETLIST &
 	for (; !wSets.empty(); )
 	{
 		STALIST curWSet = *wSets.front();
-		curWSet.pop_front();
+		wSets.pop_front();
 		for (BYTE byChar = 0; byChar < nColNum; ++byChar)
 		{
 			for (STALIST_ITER iSta = curWSet.begin(); iSta != curWSet.end(); ++iSta)
@@ -241,8 +246,9 @@ void PartitionNonDisState(CDfa &tmpDfa, std::vector<STATEID> *pRevTbl, SETLIST &
 					}
 					if (iCutBeg != iCutEnd)
 					{
+						SETLIST_ITER iOldSet = iPSet;
 						iPSet = pSets.insert(++iPSet, STALIST());
-						iPSet->splice(iPSet->begin(), *iPSet, iCutBeg, iCutEnd);
+						iPSet->splice(iPSet->begin(), *iOldSet, iCutBeg, iCutEnd);
 						wSets.push_back(iPSet);
 					}
 				}
@@ -257,18 +263,22 @@ void MergeNonDisStates(CDfa &tmpDfa, SETLIST &Partition, CDfa &minDfaTab)
 {
 	std::vector<STATEID> sta2Part(tmpDfa.Size());
 
-	size_t nSetIdx = 0, nStartIdx = 0;
+	minDfaTab.SetGroup(tmpDfa.GetGroup());
+	minDfaTab.Resize(Partition.size());
+
+	size_t nSetIdx = 0;
 	for (SETLIST_ITER iSet = Partition.begin(); iSet != Partition.end(); ++iSet)
 	{
-		for (STALIST_ITER iSta = iSet->begin(); iSta != iSet->end(); ++iSet)
+		for (STALIST_ITER iSta = iSet->begin(); iSta != iSet->end(); ++iSta)
 		{
 			sta2Part[*iSta] = nSetIdx;
+			if ((tmpDfa[*iSta].GetFlag & tmpDfa[*iSta].START) != 0)
+			{
+				minDfaTab.SetStartId(nSetIdx);
+			}
 		}
 		++nSetIdx;
 	}
-	minDfaTab.SetGroup(tmpDfa.GetGroup());
-
-	minDfaTab.Resize(Partition.size());
 
 	nSetIdx = 0;
 	for (SETLIST_ITER iSet = Partition.begin(); iSet != Partition.end(); ++iSet)
@@ -277,12 +287,13 @@ void MergeNonDisStates(CDfa &tmpDfa, SETLIST &Partition, CDfa &minDfaTab)
 		{
 			CDfaRow &orgRow = tmpDfa[iSet->front()];
 			STATEID nDest = -1;
-			if (orgRow[iCol] != -1)
+			if (orgRow[iCol] != STATEID(-1))
 			{
 				nDest = sta2Part[orgRow[iCol]];
 			}
 			minDfaTab[nSetIdx][iCol] = nDest;
 		}
+		minDfaTab[nSetIdx].SetFlag(tmpDfa[iSet->front()].GetFlag());
 		++nSetIdx;
 	}
 }
@@ -324,8 +335,8 @@ CREDFA size_t DfaMin(CDfa &oneDfaTab, CDfa &minDfaTab)
 	{
 		for (size_t j = 0; j < col; ++j)
 		{
-			STATEID nDest = oneDfaTab[i][oneDfaTab.GetGroup(j)];
-			if (nDest != -1)
+			STATEID nDest = oneDfaTab[i][j];
+			if (nDest != STATEID(-1))
 			{
 				pPosTab[i * col + j].push_back(nDest);
 			}
@@ -344,10 +355,10 @@ CREDFA size_t DfaMin(CDfa &oneDfaTab, CDfa &minDfaTab)
 	{
 		for (size_t j = 0; j < col; ++j)
 		{
-			STATEID nDest = oneDfaTab[i][oneDfaTab.GetGroup(j)];
-			if (nDest != -1)
+			STATEID nDest = oneDfaTab[i][j];
+			if (nDest != STATEID(-1))
 			{
-				pRevTab[nDest * col + j].push_back(i);
+				pRevTab[nDest * col + j].push_back(STATEID(i));
 			}
 		}
 	}
@@ -357,12 +368,43 @@ CREDFA size_t DfaMin(CDfa &oneDfaTab, CDfa &minDfaTab)
 	CDfa tmpDfa;
 	MergeReachable(oneDfaTab, reachable, tmpDfa);
 
+	for (STATEID j = 0; j < tmpDfa.Size(); ++j)
+	{
+		std::cout << (int)j << ": ";
+		for (STATEID k = 0; k < tmpDfa.GetColNum(); ++k)
+		{
+			if(tmpDfa[j][k] != STATEID(-1))
+			{
+				std::cout << "(" << (int)k << "," << (int)tmpDfa[j][k]<< ")";
+			}
+
+		}
+		std::cout << std::endl;
+	}
+	std::cout << std::endl;
+
 	PartitionNonDisState(tmpDfa, pRevTab, Partition);
 	MergeNonDisStates(tmpDfa, Partition, minDfaTab);
 
-	//minDfaTab.SetId(oneDfaTab.GetId());
+	minDfaTab.SetId(oneDfaTab.GetId());
+
+	for (STATEID j = 0; j < minDfaTab.Size(); ++j)
+	{
+		std::cout << (int)j << ": ";
+		for (STATEID k = 0; k < minDfaTab.GetColNum(); ++k)
+		{
+			if(minDfaTab[j][k] != STATEID(-1))
+			{
+				std::cout << "(" << (int)k << "," << (int)minDfaTab[j][k]<< ")";
+			}
+
+		}
+		std::cout << std::endl;
+	}
+	std::cout << std::endl;
 
 
 	delete []pRevTab;
 	return 0;
 }
+
