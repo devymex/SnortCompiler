@@ -5,7 +5,7 @@
 
 #define HASHMODULO 1000000
 
-#define SC_STATELIMIT 256
+#define SC_STATELIMIT 254
 
 #define EMPTY 256
 
