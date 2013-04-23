@@ -2,11 +2,13 @@
 #include "CreDfa.h"
 #include "nfa2dfa.h"
 
-CREDFA size_t NfaToDfa(CNfa &oneNfaTab, CDfa &dfaTab)
+CREDFA size_t NfaToDfa(CNfa &oneNfaTab, CDfa &dfaTab, bool combine)
 {
 	BYTE groups[DFACOLSIZE];
 	AvaiEdges(oneNfaTab, groups);
 	dfaTab.SetGroup(groups);
+
+	std::vector<std::pair<std::vector<size_t>, STATEID>> termStasVec;
 
 	typedef std::unordered_map<std::vector<size_t>, STATEID, STATESET_HASH> STATESETHASH;
 
@@ -26,7 +28,7 @@ CREDFA size_t NfaToDfa(CNfa &oneNfaTab, CDfa &dfaTab)
 	//ssh.insert(std::make_pair(startEVec, ssh.size()));
 	ssh[startEVec] = 0;
 
-	size_t nCursize = dfaTab.Size();
+	STATEID nCursize = dfaTab.Size();
 	dfaTab.Resize(nCursize + 1);
 
 	dfaTab.Back().SetFlag(dfaTab.Back().GetFlag() | dfaTab.Back().START);
@@ -41,18 +43,18 @@ CREDFA size_t NfaToDfa(CNfa &oneNfaTab, CDfa &dfaTab)
 	while(nfaStasStack.size() > 0)
 	{
 		compuFlag.clear();
-		int curStaNum;
+		STATEID curStaNum;
 		curNfaVec = nfaStasStack.top();
 		nfaStasStack.pop();
 
-		for(size_t nCurChar = 0; nCurChar < CHARSETSIZE - 4; ++nCurChar)
+		for(size_t nCurChar = 0; nCurChar < DFACOLSIZE; ++nCurChar)
 		{
 			if( dfaTab.Size() > SC_STATELIMIT)
 			{
 				return (size_t)-1;
 			}
 
-			size_t curGroup = dfaTab.GetGroup(nCurChar);
+			STATEID curGroup = dfaTab.GetGroup(nCurChar);
 			if(std::find(compuFlag.begin(), compuFlag.end(), curGroup) != compuFlag.end())
 			{
 				continue;
@@ -82,10 +84,10 @@ CREDFA size_t NfaToDfa(CNfa &oneNfaTab, CDfa &dfaTab)
 						std::cerr << "Fatal Error!" << std::endl;
 						return (size_t)-1;
 					}
-					STATEID nextSta = static_cast<STATEID>(ssh.size());
+					STATEID nextSta = (STATEID)ssh.size();
 					ssh[nextNfaVec] = nextSta;
 
-					size_t nCursize = dfaTab.Size();
+					STATEID nCursize = (STATEID)dfaTab.Size();
 					dfaTab.Resize(nCursize + 1);
 
 					dfaTab[curStaNum][curGroup] = nextSta;
@@ -94,6 +96,11 @@ CREDFA size_t NfaToDfa(CNfa &oneNfaTab, CDfa &dfaTab)
 					{
 						dfaTab.Back().SetFlag(dfaTab.Back().GetFlag() | dfaTab.Back().TERMINAL);
 						finFlag = 0;
+						if(combine)
+						{
+							termStasVec.push_back(std::make_pair(nextNfaVec, nextSta));
+						}
+
 					}
 					nfaStasStack.push(nextNfaVec);
 				}
@@ -105,6 +112,30 @@ CREDFA size_t NfaToDfa(CNfa &oneNfaTab, CDfa &dfaTab)
 		}
 	}
 
+	if(combine)
+	{
+		if(!termStasVec.empty())
+		{
+			std::vector<std::pair<size_t, size_t>> tempVec = oneNfaTab.GetDfaTerms();
+			for(size_t i = 0; i < tempVec.size(); ++i)
+			{
+				for(size_t j = 0; j < termStasVec.size(); ++j)
+				{
+					for(size_t k = 0; k < termStasVec[j].first.size(); ++k)
+					{
+						if(tempVec[i].first == termStasVec[j].first[k])
+						{
+							CDfa::TERMSET term;
+							term.dfaSta = termStasVec[j].second;
+							term.dfaId = tempVec[i].second;
+							dfaTab.PushTermSet(term);
+							break;
+						}
+					}
+				}
+			}
+		}
+	}
 	return 0;
 }
 //<<<<<<< HEAD

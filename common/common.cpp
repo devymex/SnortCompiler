@@ -201,11 +201,11 @@ COMMONSC void CNfa::FromDfa(CDfa &dfa)
 	m_pNfa->clear();
 	Resize(dfa.Size());
 
-	for(size_t i = 0; i < dfa.Size(); ++i)
+	for(STATEID i = 0; i < dfa.Size(); ++i)
 	{
-		for(size_t charNum = 0; charNum < CHARSETSIZE; ++charNum)
+		for(STATEID charNum = 0; charNum < CHARSETSIZE; ++charNum)
 		{
-			if(dfa[i][charNum] != size_t(-1))
+			if(dfa[i][charNum] != STATEID(-1))
 			{
 				(*m_pNfa)[i][charNum].PushBack(dfa[i][charNum]);
 			}
@@ -260,6 +260,16 @@ COMMONSC const char* CNfa::GetPcre() const
 {
 	return m_pPcre->c_str();
 }
+COMMONSC  void CNfa::PushDfaTerms(std::pair<size_t, size_t> pair)
+{
+	m_DfaTerms.push_back(pair);
+}
+
+COMMONSC std::vector<std::pair<size_t, size_t>> CNfa::GetDfaTerms()
+{
+	return m_DfaTerms;
+}
+
 
 COMMONSC CDfaRow::CDfaRow(size_t col)
 	: m_nFlag(NORMAL), m_nColNum(col)
@@ -333,20 +343,23 @@ COMMONSC size_t CDfaRow::GetColNum() const
 //}
 
 COMMONSC CDfa::CDfa()
-	: m_nId(size_t(-1)), m_nColNum(size_t(0))
+	: m_nId(size_t(-1)), m_nColNum(size_t(0)), m_StartId(STATEID(0))
 {
 	std::fill(m_pGroup, m_pGroup + DFACOLSIZE, BYTE(-1));
 	m_pDfa = new std::vector<CDfaRow>;
+	m_TermSet = new std::vector<TERMSET>;
 }
 
 COMMONSC CDfa::~CDfa()
 {
 	delete m_pDfa;
+	delete m_TermSet;
 }
 
 COMMONSC CDfa::CDfa(const CDfa &other)
 {
 	m_pDfa = new std::vector<CDfaRow>;
+	m_TermSet = new std::vector<TERMSET>;
 	*this = other;
 }
 
@@ -356,6 +369,7 @@ COMMONSC CDfa& CDfa::operator=(const CDfa &other)
 	m_nColNum = other.m_nColNum;
 	CopyMemory(m_pGroup, other.m_pGroup, DFACOLSIZE * sizeof(BYTE));
 	*m_pDfa = *other.m_pDfa;
+	*m_TermSet = *other.m_TermSet;
 	return *this;
 }
 
@@ -429,6 +443,20 @@ COMMONSC void CDfa::SetGroup(BYTE *pGroup)
 COMMONSC BYTE CDfa::GetGroup(size_t nIdx)
 {
 	return m_pGroup[nIdx];
+}
+
+COMMONSC STATEID CDfa::GetStartId()const
+{
+	return m_StartId;
+}
+COMMONSC void CDfa::SetStartId(STATEID id)
+{
+	m_StartId = id;
+}
+
+COMMONSC void CDfa::PushTermSet(TERMSET oneTerm)
+{
+	m_TermSet->push_back(oneTerm);
 }
 
 //COMMONSC CAndDfa::CAndDfa()
