@@ -32,5 +32,5 @@ STATEID MatchDfa(CDfa &dfaTab, _Iter _beg, _Iter _end)
 	return curSta;
 }
 
-CREDFA size_t NfaToDfa(CNfa &oneNfaTab,CDfa &dfaTab, size_t combineNum = 1);
+CREDFA size_t NfaToDfa(CNfa &oneNfaTab,CDfa &dfaTab, bool combine = false);
 CREDFA size_t DfaMin(CDfa &oneDfaTab, CDfa &minDfaTab);
