@@ -3,11 +3,11 @@
 
 void IncreDfaNum(CDfa &dfa, STATEID num)
 {
-	for(size_t i = 0; i < dfa.Size(); ++i)
+	for(STATEID i = 0; i < dfa.Size(); ++i)
 	{
-		for(size_t charNum = 0; charNum < CHARSETSIZE; ++charNum)
+		for(STATEID charNum = 0; charNum < dfa.GetColNum(); ++charNum)
 		{
-			if(dfa[i][charNum] != size_t(-1))
+			if(dfa[i][charNum] != STATEID(-1))
 			{
 				dfa[i][charNum] += num;
 			}
@@ -15,19 +15,20 @@ void IncreDfaNum(CDfa &dfa, STATEID num)
 	}
 }
 //termSta is the terminal state of nfa which is caculated in advance
-void InsertDfa(CDfa &dfa, CNfa &nfa, size_t termSta)
+void InsertDfa(CDfa &dfa, CNfa &nfa, STATEID termSta)
 {
-	size_t temp = nfa.Size();
+	STATEID temp = (STATEID)nfa.Size();
 	nfa.Resize(nfa.Size() + dfa.Size());
-	for(size_t i = 0; i < dfa.Size(); ++i)
+	for(STATEID i = 0; i < dfa.Size(); ++i)
 	{
 		if((dfa[i].GetFlag() & CDfaRow::TERMINAL) != 0)
 		{
 			nfa[temp + i][EMPTYEDGE].PushBack(termSta);
 		}
-		for(size_t charNum = 0; charNum < CHARSETSIZE; ++charNum)
+		for(STATEID charNum = 0; charNum < CHARSETSIZE; ++charNum)
 		{
-			if(dfa[i][charNum] != size_t(-1))
+			STATEID group = dfa.GetGroup(charNum);
+			if(dfa[i][group] != STATEID(-1))
 			{
 				nfa[i + temp][charNum].PushBack(dfa[i][charNum]);
 			}

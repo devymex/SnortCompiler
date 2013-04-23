@@ -41,7 +41,7 @@ bool ColumnEqual(std::vector<CStateSet*> &c1, std::vector<CStateSet*>&c2)
 	return true;
 }
 
-void AvaiEdges(CNfa &oneNfaTab, BYTE *group)
+void AvaiEdges(CNfa &oneNfaTab, STATEID *group)
 {
 	std::vector<std::vector<size_t>> charGroups;
 	std::vector<CStateSet*> column[DFACOLSIZE];
@@ -95,9 +95,9 @@ void AvaiEdges(CNfa &oneNfaTab, BYTE *group)
 	}
 	//std::cout << "grouping complete" << std::endl;
 
-	for(size_t i = 0; i < charGroups.size(); ++i)
+	for(STATEID i = 0; i < charGroups.size(); ++i)
 	{
-		for(size_t j = 0; j < charGroups[i].size(); ++j)
+		for(STATEID j = 0; j < charGroups[i].size(); ++j)
 		{
 			group[charGroups[i][j]] = i;
 		}

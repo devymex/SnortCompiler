@@ -73,16 +73,14 @@ void printNfa(CNfa &nfa)
 
 void main()
 {
-	const char *pcre1 = "/^cid=tb\\x2e(addr|sb)/";
-
-	const char *pcre2 = "/^abcdefghiijk/";
-	const char *pcre3 = "/^fghiijk/";
+	const char *pcre1 = "/^abcdefghiijk/";
+	const char *pcre2 = "/^fghiijk/";
 
 	std::vector<CDfa> dfaVec;
 	CDfa dfa1, dfa2,dfa3, lastdfa;
 	CNfa nfa1, nfa2, nfa3;
 	PcreToNFA(pcre1, nfa1);
-	//PcreToNFA(pcre2, nfa2);
+	PcreToNFA(pcre2, nfa2);
 	//PcreToNFA(pcre3, nfa3);
 
 	NfaToDfa(nfa1, dfa1);
