@@ -2,11 +2,13 @@
 #include "CreDfa.h"
 #include "nfa2dfa.h"
 
-CREDFA size_t NfaToDfa(CNfa &oneNfaTab, CDfa &dfaTab, size_t combineNum)
+CREDFA size_t NfaToDfa(CNfa &oneNfaTab, CDfa &dfaTab, bool combine)
 {
 	BYTE groups[DFACOLSIZE];
 	AvaiEdges(oneNfaTab, groups);
 	dfaTab.SetGroup(groups);
+
+	std::vector<std::pair<std::vector<size_t>, STATEID>> termStasVec;
 
 	typedef std::unordered_map<std::vector<size_t>, STATEID, STATESET_HASH> STATESETHASH;
 
@@ -70,7 +72,7 @@ CREDFA size_t NfaToDfa(CNfa &oneNfaTab, CDfa &dfaTab, size_t combineNum)
 
 			std::vector<size_t> nextNfaVec;
 
-			NextNfaSet(oneNfaTab, curNfaVec, nCurChar, nextNfaVec, finFlag, combineNum);
+			NextNfaSet(oneNfaTab, curNfaVec, nCurChar, nextNfaVec, finFlag);
 
 			if(!nextNfaVec.empty())
 			{
@@ -94,6 +96,11 @@ CREDFA size_t NfaToDfa(CNfa &oneNfaTab, CDfa &dfaTab, size_t combineNum)
 					{
 						dfaTab.Back().SetFlag(dfaTab.Back().GetFlag() | dfaTab.Back().TERMINAL);
 						finFlag = 0;
+						if(combine)
+						{
+							termStasVec.push_back(std::make_pair(nextNfaVec, nextSta));
+						}
+
 					}
 					nfaStasStack.push(nextNfaVec);
 				}
@@ -105,6 +112,30 @@ CREDFA size_t NfaToDfa(CNfa &oneNfaTab, CDfa &dfaTab, size_t combineNum)
 		}
 	}
 
+	if(combine)
+	{
+		if(!termStasVec.empty())
+		{
+			std::vector<std::pair<size_t, size_t>> tempVec = oneNfaTab.GetDfaTerms();
+			for(size_t i = 0; i < tempVec.size(); ++i)
+			{
+				for(size_t j = 0; j < termStasVec.size(); ++j)
+				{
+					for(size_t k = 0; k < termStasVec[j].first.size(); ++k)
+					{
+						if(tempVec[i].first == termStasVec[j].first[k])
+						{
+							CDfa::TERMSET term;
+							term.dfaSta = termStasVec[j].second;
+							term.dfaId = tempVec[i].second;
+							dfaTab.PushTermSet(term);
+							break;
+						}
+					}
+				}
+			}
+		}
+	}
 	return 0;
 }
 //<<<<<<< HEAD

@@ -106,6 +106,12 @@ private:
 class COMMONSC CDfa
 {
 public:
+	struct TERMSET
+	{
+		STATEID dfaSta;
+		size_t dfaId;
+	};
+
 	CDfa();
 	~CDfa();
 	CDfa(const CDfa &other);
@@ -124,13 +130,15 @@ public:
 	BYTE GetGroup(size_t nIdx);
 	STATEID GetStartId()const;
 	void SetStartId(STATEID id);
+	void PushTermSet(TERMSET oneTerm);
 private:
 	size_t m_nId;
 	size_t m_nColNum;
 	STATEID m_StartId;
 	BYTE m_pGroup[DFACOLSIZE];
 	std::vector<CDfaRow> *m_pDfa;
-	std::vector<std::pair<STATEID, size_t>> m_termSet;
+	//pair.first 用来存放dfa的某一终态, pair.second 用来存放该终态对应哪一个dfaid
+	std::vector<TERMSET> *m_TermSet;
 };
 
 class COMMONSC CNfa

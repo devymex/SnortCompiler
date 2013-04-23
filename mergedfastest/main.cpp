@@ -95,7 +95,7 @@ void main()
 	dfaVec.push_back(dfa2);
 	OrMerge(dfaVec, lastdfa);
 	size = lastdfa.Size();
-	std::string str1 = "fghi";
+	std::string str1 = "abcd";
 	size_t match = MatchDfa(dfa1, str1.begin(), str1.end());
 	match = MatchDfa(lastdfa, str1.begin(), str1.end());
 

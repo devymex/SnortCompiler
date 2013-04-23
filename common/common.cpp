@@ -347,16 +347,19 @@ COMMONSC CDfa::CDfa()
 {
 	std::fill(m_pGroup, m_pGroup + DFACOLSIZE, BYTE(-1));
 	m_pDfa = new std::vector<CDfaRow>;
+	m_TermSet = new std::vector<TERMSET>;
 }
 
 COMMONSC CDfa::~CDfa()
 {
 	delete m_pDfa;
+	delete m_TermSet;
 }
 
 COMMONSC CDfa::CDfa(const CDfa &other)
 {
 	m_pDfa = new std::vector<CDfaRow>;
+	m_TermSet = new std::vector<TERMSET>;
 	*this = other;
 }
 
@@ -366,6 +369,7 @@ COMMONSC CDfa& CDfa::operator=(const CDfa &other)
 	m_nColNum = other.m_nColNum;
 	CopyMemory(m_pGroup, other.m_pGroup, DFACOLSIZE * sizeof(BYTE));
 	*m_pDfa = *other.m_pDfa;
+	*m_TermSet = *other.m_TermSet;
 	return *this;
 }
 
@@ -449,6 +453,12 @@ COMMONSC void CDfa::SetStartId(STATEID id)
 {
 	m_StartId = id;
 }
+
+COMMONSC void CDfa::PushTermSet(TERMSET oneTerm)
+{
+	m_TermSet->push_back(oneTerm);
+}
+
 //COMMONSC CAndDfa::CAndDfa()
 //{
 //	m_pAndDfa = new std::vector<CAndDfaRow>;
