@@ -266,7 +266,7 @@ COMMONSC CDfaRow::CDfaRow(size_t col)
 {
 	m_pDest = new std::vector<STATEID>;
 	m_pDest->resize(m_nColNum);
-	//m_Dest.Fill(size_t(-1));
+	Fill(STATEID(-1));
 }
 
 COMMONSC void CDfaRow::Fill(STATEID _Val)

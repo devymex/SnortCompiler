@@ -7,8 +7,7 @@ CREDFA size_t NfaToDfa(CNfa &oneNfaTab, CDfa &dfaTab)
 	BYTE groups[DFACOLSIZE];
 	AvaiEdges(oneNfaTab, groups);
 	dfaTab.SetGroup(groups);
-	//printNfa(oneNfaTab);
-	//std::vector<size_t> hashTable[HASHMODULO];
+
 	typedef std::unordered_map<std::vector<size_t>, STATEID, STATESET_HASH> STATESETHASH;
 
 	STATESETHASH ssh;
@@ -41,6 +40,7 @@ CREDFA size_t NfaToDfa(CNfa &oneNfaTab, CDfa &dfaTab)
 	std::vector<size_t> compuFlag;
 	while(nfaStasStack.size() > 0)
 	{
+		compuFlag.clear();
 		int curStaNum;
 		curNfaVec = nfaStasStack.top();
 		nfaStasStack.pop();
@@ -104,70 +104,6 @@ CREDFA size_t NfaToDfa(CNfa &oneNfaTab, CDfa &dfaTab)
 			}
 		}
 	}
-
-	//	while(nfaStasStack.size() > 0)
-	//	{
-	//		int curStaNum;
-	//		curNfaVec = nfaStasStack.top();
-	//		nfaStasStack.pop();
-	//
-	//		for(std::vector<std::vector<size_t>>::iterator group = charGroups.begin();
-	//			group != charGroups.end(); ++group)
-	//		{
-	//			if( dfaTab.Size() > SC_STATELIMIT)
-	//			{
-	//				return (size_t)-1;
-	//			}
-	//			size_t nCurChar = group->front();
-	//
-	//			STATESETHASH::iterator ir = ssh.find(curNfaVec);
-	//			if (ir == ssh.end())
-	//			{
-	//				std::cout << "Fatal Error!" << std::endl;
-	//				break;
-	//			}
-	//			curStaNum = ir->second;
-	//
-	//			std::vector<size_t> nextNfaVec;
-	//
-	//			NextNfaSet(oneNfaTab, curNfaVec, nCurChar, nextNfaVec, finFlag);
-	//
-	//			if(!nextNfaVec.empty())
-	//			{
-	//				if(ssh.count(nextNfaVec) == 0)
-	//				{
-	//#undef max
-	//					if (ssh.size() > std::numeric_limits<STATEID>::max())
-	//					{
-	//						std::cerr << "Fatal Error!" << std::endl;
-	//						return (size_t)-1;
-	//					}
-	//					STATEID nextSta = static_cast<STATEID>(ssh.size());
-	//					ssh[nextNfaVec] = nextSta;
-	//
-	//					size_t nCursize = dfaTab.Size();
-	//					dfaTab.Resize(nCursize + 1);
-	//					for(std::vector<size_t>::iterator iter = group->begin(); iter != group->end(); ++iter )
-	//					{
-	//						dfaTab[curStaNum][*iter] = nextSta;
-	//					}
-	//					if(finFlag == 1)
-	//					{
-	//						dfaTab.Back().SetFlag(dfaTab.Back().GetFlag() | dfaTab.Back().TERMINAL);
-	//						finFlag = 0;
-	//					}
-	//					nfaStasStack.push(nextNfaVec);
-	//				}
-	//				else
-	//				{
-	//					for(std::vector<size_t>::iterator iter = group->begin(); iter != group->end(); ++iter )
-	//					{
-	//						dfaTab[curStaNum][*iter] = ssh[nextNfaVec];
-	//					}
-	//				}
-	//			}
-	//		}
-	//	}
 
 	return 0;
 }
