@@ -43,9 +43,9 @@ bool ColumnEqual(std::vector<CStateSet*> &c1, std::vector<CStateSet*>&c2)
 
 void AvaiEdges(CNfa &oneNfaTab, BYTE *group)
 {
-	std::vector<std::vector<BYTE>> charGroups;
-	std::vector<CStateSet*> column[CHARSETSIZE];
-	for(size_t charNum = 0; charNum < CHARSETSIZE; ++charNum)
+	std::vector<std::vector<size_t>> charGroups;
+	std::vector<CStateSet*> column[DFACOLSIZE];
+	for(size_t charNum = 0; charNum < DFACOLSIZE; ++charNum)
 	{
 		column[charNum].reserve(20000);
 		for(size_t i = 0; i < oneNfaTab.Size(); ++i)
@@ -69,15 +69,15 @@ void AvaiEdges(CNfa &oneNfaTab, BYTE *group)
 
 	//std::cout << "columns complete" << std::endl;
 
-	for (size_t i = 0; i < CHARSETSIZE; ++i)
+	for (size_t i = 0; i < DFACOLSIZE; ++i)
 	{
 		fullSet.push_back(i);
 	}
 
 	for (; !fullSet.empty();)
 	{
-		charGroups.push_back(std::vector<BYTE>());
-		std::vector<BYTE> &curGroup = charGroups.back();
+		charGroups.push_back(std::vector<size_t>());
+		std::vector<size_t> &curGroup = charGroups.back();
 		curGroup.push_back(fullSet.front());
 		fullSet.erase(fullSet.begin());
 		for (std::vector<size_t>::iterator i = fullSet.begin(); i != fullSet.end() && !fullSet.empty();)

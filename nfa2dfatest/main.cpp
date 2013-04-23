@@ -4,54 +4,71 @@
 #include "../nfa2dfa/nfa2dfa.h"
 
 
-void printDfa(CDfa dfaTab)
+//void printDfa(CDfa dfaTab)
+//{
+//	int tabSize = dfaTab.Size();
+//	std::vector<std::vector<std::vector<STATEID>>> matrix;
+//	std::vector<std::vector<STATEID>> matRow;
+//	std::vector<STATEID> matRowRow;
+//	for(int i = 0; i < tabSize; ++i)
+//	{
+//		matrix.push_back(matRow);
+//		for(int j = 0; j < tabSize; ++j)
+//		{
+//			matrix[i].push_back(matRowRow);
+//		}
+//	}
+//
+//		for(STATEID s = 0; s < dfaTab.Size(); ++s)
+//	{
+//		for(int i = 0 ; i < dfaTab.GetColNum(); ++i)
+//		{
+//			if(dfaTab[s][i] != STATEID(-1))
+//			{
+//				STATEID suf = dfaTab[s][i];
+//				matrix[s][suf].push_back(i);
+//			}
+//		}
+//
+//	}
+//
+//
+//	for(std::vector<std::vector<std::vector<STATEID>>>::iterator iter = matrix.begin(); iter != matrix.end(); ++iter)
+//	{
+//		std::cout << iter - matrix.begin() << "  :  ";
+//		for(std::vector<std::vector<STATEID>>::iterator curIter = iter->begin(); curIter != iter->end(); ++curIter)
+//		{
+//			if(curIter->size() > 0)
+//			{
+//				std::cout << curIter - iter->begin() << " (";
+//				for(std::vector<STATEID>::iterator curcurIter = curIter->begin(); curcurIter != curIter->end(); ++curcurIter)
+//				{
+//					std::cout << *curcurIter << ",";
+//				}
+//				std::cout << ")  ";
+//			}
+//		}
+//		std::cout << std::endl;
+//
+//	}
+//
+//}
+
+void printDfa(CDfa &dfa)
 {
-	int tabSize = dfaTab.Size();
-	std::vector<std::vector<std::vector<size_t>>> matrix;
-	std::vector<std::vector<size_t>> matRow;
-	std::vector<size_t> matRowRow;
-	for(int i = 0; i < tabSize; ++i)
-	{
-		matrix.push_back(matRow);
-		for(int j = 0; j < tabSize; ++j)
+	for (size_t j = 0; j < dfa.Size(); ++j)
 		{
-			matrix[i].push_back(matRowRow);
-		}
-	}
-
-		for(size_t s = 0; s < dfaTab.Size(); ++s)
-	{
-		for(int i = 0 ; i < dfaTab.GetColNum(); ++i)
-		{
-			if(dfaTab[s][i] != size_t(-1))
+			std::cout << j << ": ";
+			for (size_t k = 0; k < dfa.GetColNum(); ++k)
 			{
-				size_t suf = dfaTab[s][i];
-				matrix[s][suf].push_back(i);
-			}
-		}
-
-	}
-
-
-	for(std::vector<std::vector<std::vector<size_t>>>::iterator iter = matrix.begin(); iter != matrix.end(); ++iter)
-	{
-		std::cout << iter - matrix.begin() << "  :  ";
-		for(std::vector<std::vector<size_t>>::iterator curIter = iter->begin(); curIter != iter->end(); ++curIter)
-		{
-			if(curIter->size() > 0)
-			{
-				std::cout << curIter - iter->begin() << " (";
-				for(std::vector<size_t>::iterator curcurIter = curIter->begin(); curcurIter != curIter->end(); ++curcurIter)
+				if(dfa[j][k] != STATEID(-1))
 				{
-					std::cout << *curcurIter << ",";
+					std::cout << "(" << k << "," << (int)dfa[j][k]<< ")";
 				}
-				std::cout << ")  ";
+
 			}
+			std::cout << std::endl;
 		}
-		std::cout << std::endl;
-
-	}
-
 }
 
 void printNfa(CNfa &nfa)
