@@ -281,22 +281,6 @@ public:
 	CRegRule(const CRegRule &other);
 
 	size_t Size() const;
-	std::string& Back() const;
-	void PushBack(std::string &pcreStr);
-	std::string& operator[](size_t nIdx);
-	const CRegChain& operator = (const CRegChain &other);
-private:
-	std::vector<std::string> *m_pRegList;
-};
-
-class COMMONSC CRegRule
-{
-public:
-	CRegRule();
-	~CRegRule();
-	CRegRule(const CRegRule &other);
-
-	size_t Size() const;
 	CRegChain& Back() const;
 	void Reserve(size_t nCount);
 	void Resize(size_t nSize);
