@@ -8,7 +8,7 @@
 void main()
 {
 	CRes result;
-	compile(_T("..\\..\\input\\testrules.rule"), result);
+	compile(_T("..\\..\\input\\allrules.rule"), result);
 	size_t count = 0;
 	for (size_t i = 0; i < result.GetSidDfaIds().Size(); ++i)
 	{
