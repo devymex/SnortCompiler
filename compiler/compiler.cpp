@@ -139,50 +139,6 @@ void WriteNum(std::ofstream &fout, _Ty _num, size_t nBytes = sizeof(_Ty))
 	fout.write((char*)&_num, nBytes);
 }
 
-bool ColumnEqual(const CDfa &dfa, size_t &c1, size_t &c2)
-{
-	for (size_t i = 0; i < dfa.Size(); ++i)
-	{
-		if (dfa[i][c1] != dfa[i][c2])
-		{
-			return false;
-		}
-	}
-
-	return true;
-}
-
-void AvaiDfaEdges(const CDfa &dfa, std::vector<std::vector<size_t>> &charGroups)
-{
-	charGroups.clear();
-	std::vector<size_t> fullSet;
-
-	for (size_t i = 0; i < CHARSETSIZE - 4; ++i)
-	{
-		fullSet.push_back(i);
-	}
-
-	for (; !fullSet.empty();)
-	{
-		charGroups.push_back(std::vector<size_t>());
-		std::vector<size_t> &curGroup = charGroups.back();
-		curGroup.push_back(fullSet.front());
-		fullSet.erase(fullSet.begin());
-		for (std::vector<size_t>::iterator i = fullSet.begin(); i != fullSet.end() && !fullSet.empty();)
-		{
-			if (ColumnEqual(dfa, curGroup.front(), *i))
-			{
-				curGroup.push_back(*i);
-				i = fullSet.erase(i);
-			}
-			else
-			{
-				++i;
-			}
-		}
-	}
-}
-
 COMPILER size_t CRes::WriteToFile(LPCTSTR filename)
 {
 	std::ofstream fout(filename, std::ios::binary);
@@ -235,42 +191,21 @@ COMPILER size_t CRes::WriteToFile(LPCTSTR filename)
 	//定位文件到末尾
 	fout.seekp(0, std::ios_base::end);
 	//开始写DFAs
-	////记录元素数量偏移位置
-	//std::streamoff dfaElemNumPos;
-	////记录元素数量
-	//size_t nCnt = 0;
 	for (size_t i = 0; i < m_dfaTbl.Size(); ++i)
 	{
-		WriteNum(fout, m_dfaTbl[i].Size(), 4);
-		//dfaElemNumPos = fout.tellp();
-		//fout.seekp(4, std::ios_base::cur);
-		//写DFA跳转表
-		std::vector<std::vector<size_t>> charGroups;
-		AvaiDfaEdges(m_dfaTbl[i], charGroups);
+		WriteNum(fout, m_dfaTbl[i].Size(), sizeof(STATEID));
 		//写分组
-		//写分组总数
-		WriteNum(fout, charGroups.size(), 4);
-		//每个组的列代表
-		std::vector<size_t> colIds;
-		for (size_t j = 0; j < charGroups.size(); ++j)
+		for (size_t j = 0; j < DFACOLSIZE; ++j)
 		{
-			//写每一组的个数
-			if (!charGroups[j].empty())
-			{
-				colIds.push_back(charGroups[j][0]);
-			}
-			WriteNum(fout, charGroups[j].size(), 4);
-			for (size_t k = 0; k < charGroups[j].size(); ++k)
-			{
-				//写组中的列号
-				WriteNum(fout, charGroups[j][k], 4);
-			}
+			WriteNum(fout, m_dfaTbl[i].GetGroup(j), sizeof(BYTE));
 		}
-		for (size_t j = 0; j < m_dfaTbl[i].Size(); ++j)
+		//写DFA跳转表
+		size_t nColNum = m_dfaTbl[i].GetColNum();
+		for (STATEID j = 0; j < m_dfaTbl[i].Size(); ++j)
 		{
-			for (size_t k = 0; k < colIds.size(); ++k)
+			for (size_t k = 0; k < nColNum; ++k)
 			{
-				WriteNum(fout, m_dfaTbl[i][j][colIds[k]], 4);
+				WriteNum(fout, m_dfaTbl[i][j][(BYTE)k], sizeof(STATEID));
 			}
 		}
 	}
@@ -335,39 +270,26 @@ COMPILER size_t CRes::ReadFromFile(LPCTSTR filename)
 	}
 	//开始读DFAs
 	m_dfaTbl.Resize(dfaNum);
-	size_t dfaSize;//一个DFA的状态数
-	size_t groupNum;//分组个数
-	size_t groupSize;//一个分组里的列数
+	STATEID dfaSize;//一个DFA的状态数
 	for (size_t i = 0; i < dfaNum; ++i)
 	{
 		CDfa &dfa = m_dfaTbl[i];
-		fin.read((char*)&dfaSize, 4);
+		fin.read((char*)&dfaSize, sizeof(STATEID));
+		//读分组
+		BYTE pGroup[DFACOLSIZE];
+		for (size_t j = 0; j < DFACOLSIZE; ++j)
+		{
+			fin.read((char*)&pGroup[j], sizeof(BYTE));
+		}
+		dfa.SetGroup(pGroup);
 		dfa.Resize(dfaSize);
 		//读DFA跳转表
-		//读分组
-		//读分组总数
-		fin.read((char*)&groupNum, 4);
-		std::vector<std::vector<size_t>> charGroups(groupNum);//存放分组情况
-		for (size_t j = 0; j < groupNum; ++j)
+		size_t nColNum = dfa.GetColNum();
+		for (STATEID j = 0; j < dfaSize; ++j)
 		{
-			//读每一组的个数
-			fin.read((char*)&groupSize, 4);
-			charGroups[j].resize(groupSize);
-			for (size_t k = 0; k < groupSize; ++k)
+			for (size_t k = 0; k < nColNum; ++k)
 			{
-				//读组中的列号
-				fin.read((char*)&charGroups[j][k], 4);
-			}
-		}
-		for (size_t j = 0; j < dfaSize; ++j)
-		{
-			for (size_t k = 0; k < charGroups.size(); ++k)
-			{
-				fin.read((char*)&dfa[j][charGroups[k][0]], 4);
-				for (size_t c = 1; c < charGroups[k].size(); ++c)
-				{
-					dfa[j][charGroups[k][c]] = dfa[j][charGroups[k][0]];
-				}
+				fin.read((char*)&dfa[j][(BYTE)k], sizeof(STATEID));
 			}
 		}
 	}
@@ -428,15 +350,16 @@ void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 			size_t nId;
 			for (size_t i = 0; i < nIncrement; ++i)
 			{
-				CNfa nfa;
-				SerializeNfa(nfatree[i], nfa);
 				nId = nCursize + i;
 				CDfa &dfa = result.GetDfaTable()[nId];
-				NfaToDfa(nfa, dfa);
+				dfa.SetId(nId);
+				NfaToDfa(nfatree[i], dfa);
 				if (dfa.Size() > SC_STATELIMIT)
 				{
 					ruleResult.m_nResult = COMPILEDRULE::RES_EXCEEDLIMIT;
-					dfa.Clear();
+					ruleResult.m_dfaIds.Clear();
+					result.GetDfaTable().Resize(nCursize);
+					break;
 				}
 				ruleResult.m_dfaIds.PushBack(nId);
 			}
