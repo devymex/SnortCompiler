@@ -419,7 +419,7 @@ COMMONSC size_t CDfa::GetColNum()
 	return m_nColNum;
 }
 
-COMMONSC void CDfa::SetGroup(BYTE *pGroup)
+COMMONSC void CDfa::SetGroup(const BYTE *pGroup)
 {
 	std::vector<BYTE> tmpGroup;
 	std::copy(pGroup, pGroup + DFACOLSIZE, std::back_inserter(tmpGroup));
@@ -440,6 +440,12 @@ COMMONSC BYTE CDfa::GetGroup(size_t nIdx)
 {
 	return m_pGroup[nIdx];
 }
+
+COMMONSC const BYTE* CDfa::GetGroup() const
+{
+	return m_pGroup;
+}
+
 
 COMMONSC STATEID CDfa::GetStartId()const
 {

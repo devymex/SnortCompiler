@@ -7,6 +7,7 @@ typedef std::list<STATEID>::iterator STALIST_ITER;
 typedef std::list<std::list<STATEID>> SETLIST;
 typedef std::list<std::list<STATEID>>::iterator SETLIST_ITER;
 
+CREDFA size_t NfaToDfa(CNfa &oneNfaTab, CDfa &dfaTab, size_t combineNum)
 {
 	BYTE groups[DFACOLSIZE];
 	AvaiEdges(oneNfaTab, groups);
@@ -251,15 +252,6 @@ void PartitionNonDisState(CDfa &tmpDfa, std::vector<STATEID> *pRevTbl, SETLIST &
 		}
 	}
 }
-
-struct COMPARE
-{
-	bool operator()(std::vector<size_t> &x, std::vector<size_t> &y)
-	{
-		return x.front() < y.front();
-	}
-};
-
 
 void MergeNonDisStates(CDfa &tmpDfa, SETLIST &Partition, CDfa &minDfaTab)
 {
