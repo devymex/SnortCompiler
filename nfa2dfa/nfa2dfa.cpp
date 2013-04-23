@@ -7,7 +7,6 @@ typedef std::list<STATEID>::iterator STALIST_ITER;
 typedef std::list<std::list<STATEID>> SETLIST;
 typedef std::list<std::list<STATEID>>::iterator SETLIST_ITER;
 
-CREDFA size_t NfaToDfa(CNfa &oneNfaTab, CDfa &dfaTab)
 {
 	BYTE groups[DFACOLSIZE];
 	AvaiEdges(oneNfaTab, groups);
@@ -31,7 +30,7 @@ CREDFA size_t NfaToDfa(CNfa &oneNfaTab, CDfa &dfaTab)
 	//ssh.insert(std::make_pair(startEVec, ssh.size()));
 	ssh[startEVec] = 0;
 
-	size_t nCursize = dfaTab.Size();
+	STATEID nCursize = dfaTab.Size();
 	dfaTab.Resize(nCursize + 1);
 
 	dfaTab.Back().SetFlag(dfaTab.Back().GetFlag() | dfaTab.Back().START);
@@ -46,18 +45,18 @@ CREDFA size_t NfaToDfa(CNfa &oneNfaTab, CDfa &dfaTab)
 	while(nfaStasStack.size() > 0)
 	{
 		compuFlag.clear();
-		int curStaNum;
+		STATEID curStaNum;
 		curNfaVec = nfaStasStack.top();
 		nfaStasStack.pop();
 
-		for(size_t nCurChar = 0; nCurChar < CHARSETSIZE - 4; ++nCurChar)
+		for(size_t nCurChar = 0; nCurChar < DFACOLSIZE; ++nCurChar)
 		{
 			if( dfaTab.Size() > SC_STATELIMIT)
 			{
 				return (size_t)-1;
 			}
 
-			size_t curGroup = dfaTab.GetGroup(nCurChar);
+			STATEID curGroup = dfaTab.GetGroup(nCurChar);
 			if(std::find(compuFlag.begin(), compuFlag.end(), curGroup) != compuFlag.end())
 			{
 				continue;
@@ -75,7 +74,7 @@ CREDFA size_t NfaToDfa(CNfa &oneNfaTab, CDfa &dfaTab)
 
 			std::vector<size_t> nextNfaVec;
 
-			NextNfaSet(oneNfaTab, curNfaVec, nCurChar, nextNfaVec, finFlag);
+			NextNfaSet(oneNfaTab, curNfaVec, nCurChar, nextNfaVec, finFlag, combineNum);
 
 			if(!nextNfaVec.empty())
 			{
@@ -87,10 +86,10 @@ CREDFA size_t NfaToDfa(CNfa &oneNfaTab, CDfa &dfaTab)
 						std::cerr << "Fatal Error!" << std::endl;
 						return (size_t)-1;
 					}
-					STATEID nextSta = static_cast<STATEID>(ssh.size());
+					STATEID nextSta = (STATEID)ssh.size();
 					ssh[nextNfaVec] = nextSta;
 
-					size_t nCursize = dfaTab.Size();
+					STATEID nCursize = (STATEID)dfaTab.Size();
 					dfaTab.Resize(nCursize + 1);
 
 					dfaTab[curStaNum][curGroup] = nextSta;
@@ -257,7 +256,7 @@ struct COMPARE
 {
 	bool operator()(std::vector<size_t> &x, std::vector<size_t> &y)
 	{
-		 return x.front() < y.front();
+		return x.front() < y.front();
 	}
 };
 

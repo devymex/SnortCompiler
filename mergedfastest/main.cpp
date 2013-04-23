@@ -73,9 +73,9 @@ void printNfa(CNfa &nfa)
 
 void main()
 {
-	const char *pcre1 = "/^cid=tb\\x2e(addr|sb)/";
+	const char *pcre1 = "/^abcd/";
+	const char *pcre2 = "/^fghi/";
 
-	const char *pcre2 = "/^abcdefghiijk/";
 	const char *pcre3 = "/^fghiijk/";
 
 	std::vector<CDfa> dfaVec;
@@ -83,20 +83,23 @@ void main()
 	CNfa nfa1, nfa2, nfa3;
 	PcreToNFA(pcre1, nfa1);
 	//PcreToNFA(pcre2, nfa2);
-	//PcreToNFA(pcre3, nfa3);
-
+	printNfa(nfa1);
+	printNfa(nfa2);
 	NfaToDfa(nfa1, dfa1);
 	//NfaToDfa(nfa2, dfa2);
 	//NfaToDfa(nfa3, dfa3);
 
-	size_t size = dfa1.Size();
+	//size = dfa3.Size();
+	size_t size 
+		= dfa1.Size();
 	//size = dfa2.Size();
 	//size = dfa3.Size();
 	dfaVec.push_back(dfa1);
 	dfaVec.push_back(dfa2);
 	dfaVec.push_back(dfa3);
 	OrMerge(dfaVec, lastdfa);
-	std::string str1 = "cid=tb.addr";
+	size = lastdfa.Size();
+	std::string str1 = "fghi";
 	size_t match = MatchDfa(dfa1, str1.begin(), str1.end());
 	match = MatchDfa(lastdfa, str1.begin(), str1.end());
 
