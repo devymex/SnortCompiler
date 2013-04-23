@@ -126,6 +126,11 @@ COMMONSC void CVectorNumber::Fill(size_t _Val)
 	std::fill(m_pSet->begin(), m_pSet->end(), _Val);
 }
 
+COMMONSC void CVectorNumber::Clear()
+{
+	m_pSet->clear();
+}
+
 COMMONSC CNfaRow::CNfaRow()
 {
 }
@@ -162,16 +167,18 @@ COMMONSC CNfaRow& CNfaRow::operator=(const CNfaRow &other)
 COMMONSC CNfa::CNfa()
 {
 	m_pNfa = new std::vector<CNfaRow>;
+	m_pPcre = new std::string;
 }
 
 COMMONSC CNfa::~CNfa()
 {
 	delete m_pNfa;
+	delete m_pPcre;
 }
 
 //COMMONSC size_t CNfa::GetRowNum(void)
 //{
-//	return m_pNfa->size();
+// return m_pNfa->size();
 //}
 
 COMMONSC void CNfa::Reserve(size_t _Count)
@@ -194,19 +201,17 @@ COMMONSC void CNfa::FromDfa(CDfa &dfa)
 	m_pNfa->clear();
 	Resize(dfa.Size());
 
-	STATEID* tmpgroup = dfa.GetGroup();
 	for(size_t i = 0; i < dfa.Size(); ++i)
 	{
 		for(size_t charNum = 0; charNum < CHARSETSIZE; ++charNum)
 		{
-			if(dfa[i][tmpgroup[charNum]] != size_t(-1))
+			if(dfa[i][charNum] != size_t(-1))
 			{
-				(*m_pNfa)[i][charNum].PushBack(dfa[i][tmpgroup[charNum]]);
+				(*m_pNfa)[i][charNum].PushBack(dfa[i][charNum]);
 			}
 		}
 	}
 }
-
 
 COMMONSC CNfaRow& CNfa::Back()
 {
@@ -226,11 +231,13 @@ COMMONSC const CNfaRow& CNfa::operator[](size_t index) const
 COMMONSC CNfa::CNfa(const CNfa &other)
 {
 	m_pNfa = new std::vector<CNfaRow>;
+	m_pPcre = new std::string;
 	*this = other;
 }
 COMMONSC CNfa& CNfa::operator=(const CNfa &other)
 {
 	*this->m_pNfa = *other.m_pNfa;
+	*m_pPcre = *other.m_pPcre;
 	return *this;
 }
 
@@ -244,12 +251,22 @@ COMMONSC void CNfa::PushBack(const CNfaRow &row)
 	m_pNfa->push_back(row);
 }
 
+COMMONSC void CNfa::SetPcre(const char* lpPcre)
+{
+	*m_pPcre = lpPcre;
+}
+
+COMMONSC const char* CNfa::GetPcre() const
+{
+	return m_pPcre->c_str();
+}
+
 COMMONSC CDfaRow::CDfaRow(size_t col)
 	: m_nFlag(NORMAL), m_nColNum(col)
 {
 	m_pDest = new std::vector<STATEID>;
 	m_pDest->resize(m_nColNum);
-	//m_Dest.Fill(size_t(-1));
+	Fill(STATEID(-1));
 }
 
 COMMONSC void CDfaRow::Fill(STATEID _Val)
@@ -275,12 +292,12 @@ COMMONSC CDfaRow& CDfaRow::operator=(const CDfaRow &other)
 	return *this;
 }
 
-COMMONSC STATEID& CDfaRow::operator[](size_t index)
+COMMONSC STATEID& CDfaRow::operator[](BYTE index)
 {
 	return (*m_pDest)[index];
 }
 
-COMMONSC const STATEID& CDfaRow::operator[](size_t index) const
+COMMONSC const STATEID& CDfaRow::operator[](BYTE index) const
 {
 	return (*m_pDest)[index];
 }
@@ -290,35 +307,35 @@ COMMONSC void CDfaRow::SetFlag(size_t nFlag)
 	m_nFlag = nFlag;
 }
 
-COMMONSC size_t CDfaRow::GetFlag()
+COMMONSC size_t CDfaRow::GetFlag() const
 {
 	return m_nFlag;
 }
 
-COMMONSC size_t CDfaRow::GetColNum()
+COMMONSC size_t CDfaRow::GetColNum() const
 {
 	return m_nColNum;
 }
 
 //COMMONSC CAndDfaRow::CAndDfaRow()
-//	: m_cFlag(CAndDfaRow::DFAFLAG::NONE)
+// : m_cFlag(CAndDfaRow::DFAFLAG::NONE)
 //{
-//	std::fill(m_pAndDest, m_pAndDest + CHARSETSIZE, size_t(-1));
+// std::fill(m_pAndDest, m_pAndDest + CHARSETSIZE, size_t(-1));
 //}
 //
 //COMMONSC void CAndDfaRow::SetDFlag(size_t cFlag)
 //{
-//	m_cFlag = cFlag;
+// m_cFlag = cFlag;
 //}
 //COMMONSC char CAndDfaRow::GetDFlag()
 //{
-//	return m_cFlag;
+// return m_cFlag;
 //}
 
 COMMONSC CDfa::CDfa()
 	: m_nId(size_t(-1)), m_nColNum(size_t(0))
 {
-	std::fill(m_pGroup, m_pGroup + CHARSETSIZE, STATEID(-1));
+	std::fill(m_pGroup, m_pGroup + DFACOLSIZE, BYTE(-1));
 	m_pDfa = new std::vector<CDfaRow>;
 }
 
@@ -337,7 +354,7 @@ COMMONSC CDfa& CDfa::operator=(const CDfa &other)
 {
 	m_nId = other.m_nId;
 	m_nColNum = other.m_nColNum;
-	CopyMemory(m_pGroup, other.m_pGroup, CHARSETSIZE * sizeof(STATEID));
+	CopyMemory(m_pGroup, other.m_pGroup, DFACOLSIZE * sizeof(BYTE));
 	*m_pDfa = *other.m_pDfa;
 	return *this;
 }
@@ -347,14 +364,14 @@ COMMONSC void CDfa::Reserve(size_t _Count)
 	m_pDfa->reserve(_Count);
 }
 
-COMMONSC void CDfa::Resize(size_t _Newsize)
+COMMONSC void CDfa::Resize(STATEID _Newsize)
 {
 	m_pDfa->resize(_Newsize, m_nColNum);
 }
 
-COMMONSC size_t CDfa::Size() const
+COMMONSC STATEID CDfa::Size() const
 {
-	return m_pDfa->size();
+	return (STATEID)m_pDfa->size();
 }
 
 COMMONSC CDfaRow &CDfa::Back()
@@ -362,12 +379,12 @@ COMMONSC CDfaRow &CDfa::Back()
 	return m_pDfa->back();
 }
 
-COMMONSC CDfaRow& CDfa::operator[](size_t index)
+COMMONSC CDfaRow& CDfa::operator[](STATEID index)
 {
 	return (*m_pDfa)[index];
 }
 
-COMMONSC const CDfaRow& CDfa::operator[](size_t index) const
+COMMONSC const CDfaRow& CDfa::operator[](STATEID index) const
 {
 	return (*m_pDfa)[index];
 }
@@ -392,16 +409,16 @@ COMMONSC size_t CDfa::GetColNum()
 	return m_nColNum;
 }
 
-COMMONSC void CDfa::SetGroup(STATEID *pGroup)
+COMMONSC void CDfa::SetGroup(BYTE *pGroup)
 {
-	std::vector<STATEID> tmpGroup;
-	std::copy(pGroup, pGroup + CHARSETSIZE, std::back_inserter(tmpGroup));
+	std::vector<BYTE> tmpGroup;
+	std::copy(pGroup, pGroup + DFACOLSIZE, std::back_inserter(tmpGroup));
 	std::sort(tmpGroup.begin(), tmpGroup.end());
 	tmpGroup.erase(std::unique(tmpGroup.begin(), tmpGroup.end()), tmpGroup.end());
 	if (tmpGroup.back() == tmpGroup.size() - 1)
 	{
 		m_nColNum = tmpGroup.size();
-		CopyMemory(m_pGroup, pGroup, CHARSETSIZE * sizeof(STATEID));
+		CopyMemory(m_pGroup, pGroup, DFACOLSIZE * sizeof(BYTE));
 	}
 	else
 	{
@@ -409,106 +426,106 @@ COMMONSC void CDfa::SetGroup(STATEID *pGroup)
 	}
 }
 
-COMMONSC STATEID* CDfa::GetGroup()
+COMMONSC BYTE CDfa::GetGroup(size_t nIdx)
 {
-	return m_pGroup;
+	return m_pGroup[nIdx];
 }
 
 //COMMONSC CAndDfa::CAndDfa()
 //{
-//	m_pAndDfa = new std::vector<CAndDfaRow>;
+// m_pAndDfa = new std::vector<CAndDfaRow>;
 //}
 //COMMONSC CAndDfa::~CAndDfa()
 //{
-//	delete m_pAndDfa;
+// delete m_pAndDfa;
 //}
 //COMMONSC CAndDfa::CAndDfa(const CDfa &other)
 //{
-//	m_pAndDfa = new std::vector<CAndDfaRow>;
-//	*this = other;
+// m_pAndDfa = new std::vector<CAndDfaRow>;
+// *this = other;
 //}
 //COMMONSC CAndDfa& CAndDfa::operator=(const CAndDfa &other)
 //{
-//	*m_pAndDfa = *other.m_pAndDfa;
-//	return *this;
+// *m_pAndDfa = *other.m_pAndDfa;
+// return *this;
 //}
 //COMMONSC void CAndDfa::Reserve(size_t _Count)
 //{
-//	m_pAndDfa->reserve(_Count);
+// m_pAndDfa->reserve(_Count);
 //}
 //COMMONSC void CAndDfa::Resize(size_t _Newsize)
 //{
-//	m_pAndDfa->resize(_Newsize);
+// m_pAndDfa->resize(_Newsize);
 //}
 //COMMONSC size_t CAndDfa::Size() const
 //{
-//	return m_pAndDfa->size();
+// return m_pAndDfa->size();
 //}
 //COMMONSC CAndDfaRow& CAndDfa::Back()
 //{
-//	return m_pAndDfa->back();
+// return m_pAndDfa->back();
 //}
 //COMMONSC CAndDfaRow& CAndDfa::operator[](size_t index)
 //{
-//	return (*m_pAndDfa)[index];
+// return (*m_pAndDfa)[index];
 //}
 
 
-COMMONSC CNfaChain::CNfaChain()
-{
-	m_pChain = new std::vector<CNfa>;
-}
-
-COMMONSC CNfaChain::~CNfaChain()
-{
-	delete m_pChain;
-}
-
-COMMONSC CNfaChain::CNfaChain(const CNfaChain &other)
-{
-	m_pChain = new std::vector<CNfa>;
-	*this = other;
-}
-
-COMMONSC const CNfaChain& CNfaChain::operator = (const CNfaChain &other)
-{
-	*m_pChain = *other.m_pChain;
-	return *this;
-}
-
-COMMONSC size_t CNfaChain::Size() const
-{
-	return m_pChain->size();
-}
-
-COMMONSC void CNfaChain::Resize(size_t nSize)
-{
-	m_pChain->resize(nSize);
-}
-COMMONSC CNfa& CNfaChain::Back()
-{
-	return m_pChain->back();
-}
-
-COMMONSC void CNfaChain::PushBack(const CNfa &cnfa)
-{
-	m_pChain->push_back(cnfa);
-}
-
-COMMONSC CNfa& CNfaChain::operator[](size_t nIdx)
-{
-	return (*m_pChain)[nIdx];
-}
-
-COMMONSC const CNfa& CNfaChain::operator[](size_t nIdx) const
-{
-	return (*m_pChain)[nIdx];
-}
+//COMMONSC CNfaChain::CNfaChain()
+//{
+// m_pChain = new std::vector<CNfa>;
+//}
+//
+//COMMONSC CNfaChain::~CNfaChain()
+//{
+// delete m_pChain;
+//}
+//
+//COMMONSC CNfaChain::CNfaChain(const CNfaChain &other)
+//{
+// m_pChain = new std::vector<CNfa>;
+// *this = other;
+//}
+//
+//COMMONSC const CNfaChain& CNfaChain::operator = (const CNfaChain &other)
+//{
+// *m_pChain = *other.m_pChain;
+// return *this;
+//}
+//
+//COMMONSC size_t CNfaChain::Size() const
+//{
+// return m_pChain->size();
+//}
+//
+//COMMONSC void CNfaChain::Resize(size_t nSize)
+//{
+// m_pChain->resize(nSize);
+//}
+//COMMONSC CNfa& CNfaChain::Back()
+//{
+// return m_pChain->back();
+//}
+//
+//COMMONSC void CNfaChain::PushBack(const CNfa &cnfa)
+//{
+// m_pChain->push_back(cnfa);
+//}
+//
+//COMMONSC CNfa& CNfaChain::operator[](size_t nIdx)
+//{
+// return (*m_pChain)[nIdx];
+//}
+//
+//COMMONSC const CNfa& CNfaChain::operator[](size_t nIdx) const
+//{
+// return (*m_pChain)[nIdx];
+//}
 
 
 COMMONSC CNfaTree::CNfaTree()
 {
-	m_pTree = new std::vector<CNfaChain>;
+	m_pTree = new std::vector<CNfa>;
 }
 
 COMMONSC CNfaTree::~CNfaTree()
@@ -518,7 +535,7 @@ COMMONSC CNfaTree::~CNfaTree()
 
 COMMONSC CNfaTree::CNfaTree(const CNfaTree &other)
 {
-	m_pTree = new std::vector<CNfaChain>;
+	m_pTree = new std::vector<CNfa>;
 	*this = other;
 }
 
@@ -542,20 +559,20 @@ COMMONSC void CNfaTree::Resize(size_t nSize)
 {
 	m_pTree->resize(nSize);
 }
-COMMONSC CNfaChain& CNfaTree::Back()
+COMMONSC CNfa& CNfaTree::Back()
 {
 	return m_pTree->back();
 }
-COMMONSC void CNfaTree::PushBack(const CNfaChain &cnfachain)
+COMMONSC void CNfaTree::PushBack(const CNfa &cnfa)
 {
-	m_pTree->push_back(cnfachain);
+	m_pTree->push_back(cnfa);
 }
-CNfaChain& CNfaTree::operator[](size_t nIdx)
+CNfa& CNfaTree::operator[](size_t nIdx)
 {
 	return (*m_pTree)[nIdx];
 }
 
-const CNfaChain& CNfaTree::operator[](size_t nIdx) const
+const CNfa& CNfaTree::operator[](size_t nIdx) const
 {
 	return (*m_pTree)[nIdx];
 }
