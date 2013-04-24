@@ -20,6 +20,8 @@ struct DFANEWSC NFALOG
 
 struct DFANEWSC TERMSET
 {
+	TERMSET(STATEID dfaStateId, size_t nDfaId)
+		: dfaSta(dfaStateId), dfaId(nDfaId) {}
 	STATEID dfaSta;
 	size_t dfaId;
 };
