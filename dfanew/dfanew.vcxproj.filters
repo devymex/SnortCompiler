@@ -21,12 +21,18 @@
     <ClInclude Include="dfanew.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CreDfa.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="dfanew.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CreDfa.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
