@@ -5,7 +5,7 @@
 
 void main()
 {
-	const char* a = "/^BM/";
+	const char* a = "/BM/";
 	CNfa nfa;
 	PcreToNFA(a, nfa);
 	CDfanew dfa;
