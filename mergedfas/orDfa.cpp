@@ -24,7 +24,10 @@ void InsertDfa(CDfa &dfa, CNfa &nfa, STATEID nTermSta)
 		if((dfa[i].GetFlag() & CDfaRow::TERMINAL) != 0)
 		{
 			nfa[temp + i][EMPTYEDGE].PushBack(nTermSta);
-			nfa.PushDfaTerms(std::make_pair(temp + i, dfa.GetId()));
+			CNfa::DFATERMS dfaTerm;
+			dfaTerm.nfaSta = temp + i;
+			dfaTerm.dfaId =  dfa.GetId();
+			nfa.PushDfaTerms(dfaTerm);
 		}
 		for(size_t charNum = 0; charNum < DFACOLSIZE; ++charNum)
 		{

@@ -121,18 +121,20 @@ CREDFA size_t NfaToDfa(CNfa &oneNfaTab, CDfa &dfaTab, bool combine)
 	{
 		if(!termStasVec.empty())
 		{
-			std::vector<std::pair<size_t, size_t>> tempVec = oneNfaTab.GetDfaTerms();
-			for(size_t i = 0; i < tempVec.size(); ++i)
+			size_t tempNum = oneNfaTab.GetDfaTermsNum();
+			for(size_t i = 0; i < tempNum; ++i)
 			{
 				for(size_t j = 0; j < termStasVec.size(); ++j)
 				{
 					for(size_t k = 0; k < termStasVec[j].first.size(); ++k)
 					{
-						if(tempVec[i].first == termStasVec[j].first[k])
+						CNfa::DFATERMS dfaTerm;
+						dfaTerm = oneNfaTab.GetDfaTerms(i);
+						if(dfaTerm.nfaSta == termStasVec[j].first[k])
 						{
 							CDfa::TERMSET term;
 							term.dfaSta = termStasVec[j].second;
-							term.dfaId = tempVec[i].second;
+							term.dfaId = dfaTerm.dfaId;
 							dfaTab.PushTermSet(term);
 							break;
 						}
