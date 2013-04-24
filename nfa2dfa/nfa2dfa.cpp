@@ -179,7 +179,7 @@ void RemoveUnreachable(const std::vector<STATEID> *Tab, const STALIST &begs, con
 void MergeReachable(const CDfa &oneDfaTab, std::vector<BYTE> &reachable, CDfa &tmpDfa)
 {
 	size_t nRcbCnt = std::count(reachable.begin(), reachable.end(), 2);
-	tmpDfa.Resize(nRcbCnt);
+	tmpDfa.Resize((STATEID)nRcbCnt);
 	tmpDfa.SetGroup(oneDfaTab.GetGroup());
 
 	STATEID nNewIdx = 0;
@@ -199,10 +199,10 @@ void MergeReachable(const CDfa &oneDfaTab, std::vector<BYTE> &reachable, CDfa &t
 		}
 	}
 
-	for (size_t i = 0; i < nRcbCnt; ++i)
+	for (STATEID i = 0; i < nRcbCnt; ++i)
 	{
 		CDfaRow &curRow = tmpDfa[i];
-		for (size_t j = 0; j < nColNum; ++j)
+		for (STATEID j = 0; j < nColNum; ++j)
 		{
 			if (curRow[j] != STATEID(-1))
 			{
@@ -295,14 +295,15 @@ void MergeNonDisStates(CDfa &tmpDfa, SETLIST &Partition, CDfa &minDfaTab)
 	std::vector<STATEID> sta2Part(tmpDfa.Size());
 
 	minDfaTab.SetGroup(tmpDfa.GetGroup());
-	minDfaTab.Resize(Partition.size());
+	minDfaTab.Resize((STATEID)Partition.size());
 
-	size_t nSetIdx = 0;
+	//size_t nSetIdx = 0;
+	STATEID nSetIdx = 0;
 	for (SETLIST_ITER iSet = Partition.begin(); iSet != Partition.end(); ++iSet)
 	{
 		for (STALIST_ITER iSta = iSet->begin(); iSta != iSet->end(); ++iSta)
 		{
-			sta2Part[*iSta] = nSetIdx;
+			sta2Part[*iSta] = STATEID(nSetIdx);
 			if ((tmpDfa[*iSta].GetFlag() & tmpDfa[*iSta].START) != 0)
 			{
 				minDfaTab.SetStartId(nSetIdx);
@@ -317,7 +318,7 @@ void MergeNonDisStates(CDfa &tmpDfa, SETLIST &Partition, CDfa &minDfaTab)
 		for (BYTE iCol = 0; iCol != minDfaTab.GetColNum(); ++iCol)
 		{
 			CDfaRow &orgRow = tmpDfa[iSet->front()];
-			STATEID nDest = -1;
+			STATEID nDest = STATEID(-1);
 			if (orgRow[iCol] != STATEID(-1))
 			{
 				nDest = sta2Part[orgRow[iCol]];
@@ -362,9 +363,9 @@ CREDFA size_t DfaMin(CDfa &oneDfaTab, CDfa &minDfaTab)
 	size_t row = oneDfaTab.Size();
 	size_t col = oneDfaTab.GetColNum();
 	std::vector<STATEID> *pPosTab = new std::vector<STATEID>[row * col];
-	for (size_t i = 0; i < row; ++i)
+	for (STATEID i = 0; i < row; ++i)
 	{
-		for (size_t j = 0; j < col; ++j)
+		for (STATEID j = 0; j < col; ++j)
 		{
 			STATEID nDest = (STATEID)oneDfaTab[i][j];
 			if (nDest != STATEID(-1))
@@ -382,11 +383,11 @@ CREDFA size_t DfaMin(CDfa &oneDfaTab, CDfa &minDfaTab)
 	delete []pPosTab;
 
 	std::vector<STATEID> *pRevTab = new std::vector<STATEID>[row * col];
-	for (size_t i = 0; i < row; ++i)
+	for (STATEID i = 0; i < row; ++i)
 	{
-		for (size_t j = 0; j < col; ++j)
+		for (STATEID j = 0; j < col; ++j)
 		{
-			STATEID nDest = oneDfaTab[i][j];
+			STATEID nDest = (STATEID)oneDfaTab[i][j];
 			if (nDest != STATEID(-1))
 			{
 				pRevTab[nDest * col + j].push_back(STATEID(i));

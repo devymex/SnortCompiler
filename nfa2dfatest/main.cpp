@@ -116,33 +116,40 @@ void main()
 
 	dfa.SetId(1);
 	BYTE *pGroup = new BYTE[DFACOLSIZE];
-	std::fill(pGroup, pGroup + DFACOLSIZE, 2);
+	std::fill(pGroup, pGroup + DFACOLSIZE, 4);
 	pGroup['a'] = 0;
 	pGroup['b'] = 1;
+	pGroup['c'] = 2;
+	pGroup['d'] = 3;
 	dfa.SetGroup(pGroup);
 	
-	dfa.Resize(5);
-	for (size_t i = 0; i < 5; ++i)
+	dfa.Resize(7);
+	for (STATEID i = 0; i < 7; ++i)
 	{
-		dfa[i].Fill(-1);
+		dfa[i].Fill(STATEID(-1));
 	}
 
-	dfa[0][0] = 1;
-	dfa[0][1] = 2;
-	dfa[1][0] = 1;
-	dfa[1][1] = 3;
-	dfa[2][0] = 1;
-	dfa[2][1] = 2;
-	dfa[3][0] = 1;
-	dfa[3][1] = 4;
-	dfa[4][0] = 1;
-	dfa[4][1] = 2;
+	dfa[0][0] = 2;
+	dfa[0][1] = 1;
+	dfa[1][0] = 3;
+	dfa[1][1] = 1;
+	dfa[2][1] = 5;
+	dfa[2][2] = 2;
+	dfa[2][3] = 4;
+	dfa[3][1] = 6;
+	dfa[3][2] = 2;
+	dfa[3][3] = 4;
+	dfa[4][0] = 3;
+	dfa[5][1] = 5;
+	dfa[6][1] = 5;
 	
 	dfa[0].SetFlag(1);
 	dfa[1].SetFlag(2);
 	dfa[2].SetFlag(2);
 	dfa[3].SetFlag(2);
-	dfa[4].SetFlag(4);
+	dfa[4].SetFlag(2);
+	dfa[5].SetFlag(4);
+	dfa[6].SetFlag(4);
 
 	printDfa(dfa);
 	std::cout << std::endl;
