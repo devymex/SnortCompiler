@@ -178,6 +178,13 @@ DFANEWSC size_t CDfanew::FromNFA(CNfa &nfa, NFALOG *nfalog, size_t Count, bool c
 						{
 							termStasVec.push_back(std::make_pair(nextNfaVec, nextSta));
 						}
+						else
+						{
+							TERMSET term;
+							term.dfaSta = nextSta;
+							term.dfaId = m_nId;
+							m_TermSet->push_back(term);
+						}
 
 					}
 					nfaStasStack.push(nextNfaVec);
