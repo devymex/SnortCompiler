@@ -26,7 +26,7 @@ struct DFANEWSC NFALOG
 
 struct DFANEWSC TERMSET
 {
-	TERMSET(STATEID dfaStateId, size_t nDfaId)
+	TERMSET(STATEID dfaStateId = (STATEID)-1, size_t nDfaId = (size_t)-1)
 		: dfaSta(dfaStateId), dfaId(nDfaId) {}
 	STATEID dfaSta;
 	size_t dfaId;

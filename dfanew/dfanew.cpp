@@ -3,7 +3,7 @@
 #include "CreDfa.h"
 
 DFANEWSC CDfanew::CDfanew()
-	: m_nId(size_t(-1)), m_nColNum(size_t(0)), m_StartId(STATEID(-1))
+	: m_nId(size_t(-1)), m_nColNum(size_t(0)), m_StartId(STATEID(0))
 {
 	std::fill(m_pGroup, m_pGroup + DFACOLSIZE, BYTE(-1));
 	m_pDfa = new std::vector<CDfaRow>;
@@ -72,7 +72,7 @@ DFANEWSC void CDfanew::Clear()
 {
 	m_nId = size_t(-1);
 	m_nColNum = size_t(0);
-	m_StartId = STATEID(-1);
+	m_StartId = STATEID(0);
 	std::fill(m_pGroup, m_pGroup + DFACOLSIZE, BYTE(-1));
 	delete m_pDfa;
 	delete m_TermSet;
@@ -253,20 +253,30 @@ DFANEWSC size_t CDfanew::GetId()
 
 DFANEWSC size_t CDfanew::Process(BYTE *ByteStream, size_t len, CStateSet &StaSet)
 {
+	std::vector<bool> res(m_pDfa->size(), false);
 	STATEID ActiveState = m_StartId;
-	for (size_t i = 0; i < len; ++i)
+	size_t nPos = 0;
+	for (size_t nPos = 0; nPos < len; ++nPos)
 	{
-		if (ActiveState == STATEID(-1))
-		{
-			return i;
-		}
 		if ((*this)[ActiveState].GetFlag() & CDfaRow::TERMINAL)
 		{
-			StaSet.PushBack(ActiveState);
+			res[ActiveState] = true;
 		}
-		ActiveState = (*this)[ActiveState][m_pGroup[*(ByteStream + i)]];
+		ActiveState = (*this)[ActiveState][m_pGroup[*(ByteStream + nPos)]];
+		if (ActiveState == STATEID(-1))
+		{
+			break;
+		}
 	}
-	return len;
+	for (size_t i = 0; i < res.size(); ++i)
+	{
+		if (res[i])
+		{
+			StaSet.PushBack(i);
+		}
+	}
+
+	return nPos;
 }
 
 struct COMPFORSORT
