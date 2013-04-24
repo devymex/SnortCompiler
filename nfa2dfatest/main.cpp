@@ -140,8 +140,6 @@ void main()
 	dfa[3][2] = 2;
 	dfa[3][3] = 4;
 	dfa[4][0] = 3;
-	dfa[5][1] = 5;
-	dfa[6][1] = 5;
 	
 	dfa[0].SetFlag(1);
 	dfa[1].SetFlag(2);

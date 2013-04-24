@@ -232,32 +232,6 @@ void PartitionNonDisState(CDfa &tmpDfa, std::vector<STATEID> *pRevTbl, SETLIST &
 	SETLIST_ITER iLast = pSets.end();
 	--iLast;
 
-	//insert terminal states in the same DFA into one set
-	for (SETLIST_ITER iCurSet = pSets.begin(); iCurSet != iLast; ++iCurSet)
-	{
-		SETLIST_ITER iPre = iCurSet;
-		SETLIST_ITER iNxt = ++iCurSet;
-		STATEID preSta = iPre->front();
-		STATEID nxtSta = iNxt->front();
-		size_t preStaID, nxtStaID;
-		for (STATEID i = 0; i < tmpDfa.GetTermSetNum; ++i)
-		{
-			if (tmpDfa.GetTermSet(i).dfaSta == preSta)
-			{
-				preStaID = tmpDfa.GetTermSet(preSta).dfaId;
-			}
-			else if (tmpDfa.GetTermSet(i).dfaSta == nxtSta)
-			{
-				nxtStaID = tmpDfa.GetTermSet(nxtSta).dfaId;
-			}
-		}
-		if (preStaID == nxtStaID)
-		{
-			iCurSet = pSets.erase(iCurSet);
-			iPre->insert(iPre->begin(), nxtSta);
-		}
-	}
-
 	//initialize wSets with all final states
 	for (SETLIST_ITER iCurSet = pSets.begin(); iCurSet != iLast; ++iCurSet)
 	{
