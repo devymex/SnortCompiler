@@ -8,8 +8,9 @@
 #define BUFLEN 1024
 
 //使用Pcre8.32库解析单个pcre
-void PcreToCode(const std::string &OnePcre, std::vector<unsigned char> &code)
+size_t PcreToCode(const std::string &OnePcre, std::vector<unsigned char> &code)
 {
+	size_t nFromBeg = 0;
 	std::string Pcre;//pcre的具体内容
 	std::string attribute;//pcre之后的修饰
 
@@ -24,12 +25,13 @@ void PcreToCode(const std::string &OnePcre, std::vector<unsigned char> &code)
 	else
 	{
 		std::cout << "Input Pcre Error!" << std::endl;
-		return;
+		return size_t(-2);
 	}
 
 	if (!Pcre.empty() && Pcre[0] != '^')
 	{
-		Pcre = ".*(" + Pcre + ")";
+		nFromBeg = size_t(-1);
+		Pcre = "(" + Pcre + ")";
 	}
 	//至此pcre的具体内容已存放至变量Pcre中
 
@@ -62,7 +64,7 @@ void PcreToCode(const std::string &OnePcre, std::vector<unsigned char> &code)
 	{
 		std::cout << pattern << std::endl;
 		printf("PCRE compilation failed at offset %d: %s\n", erroffset, error);
-		return;
+		return size_t(-2);
 	}
 
 	unsigned int size;
@@ -75,6 +77,8 @@ void PcreToCode(const std::string &OnePcre, std::vector<unsigned char> &code)
 	{
 		code.push_back((unsigned char)*((unsigned char*)re + name_table_offset + i));
 	}
+
+	return nFromBeg;
 }
 
 bool ExceedLimit(const std::string &OnePcre)
@@ -127,7 +131,7 @@ PCRETONFA size_t PcreToNFA(const char *pPcre, CNfa &nfa)
 {
 	std::vector<unsigned char> code;
 	std::string strPcre(pPcre);
-	PcreToCode(strPcre, code);
+	size_t nFromBeg = PcreToCode(strPcre, code);
 	std::vector<unsigned char>::iterator Beg, End;
 	Beg = code.begin();
 	End = code.end();
@@ -141,12 +145,15 @@ PCRETONFA size_t PcreToNFA(const char *pPcre, CNfa &nfa)
 	{
 		return SC_EXCEED;
 	}
-	nfa.Reserve(10000);
-	size_t flag = ProcessPcre(Beg, End, nfa);
-
-	if (flag != SC_SUCCESS)
+	if (nFromBeg == size_t(-1))
 	{
-		return flag;
+		size_t nCursize = nfa.Size();
+		nfa.Resize(nCursize + 1);
+		for (size_t i = 0; i < EMPTY; ++i)
+		{
+			nfa.Back()[i].PushBack(nCursize);
+		}
+		nfa.Back()[EMPTY].PushBack(nCursize + 1);
 	}
-	return SC_SUCCESS;
+	return ProcessPcre(Beg, End, nfa);
 }

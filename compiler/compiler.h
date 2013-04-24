@@ -16,7 +16,9 @@ struct COMPILER COMPILEDRULE
 		RES_EXCEED = 0x0002, 
 		RES_HASBYTE = 0x0004, 
 		RES_HASNOT = 0x0008, 
-		RES_EMPTY = 0x0010
+		RES_EMPTY = 0x0010,
+		RES_HASNOSIG = 0x0020,
+		RES_EXCEEDLIMIT = 0x0040,
 	};
 	size_t m_nSid;
 	size_t m_nResult;

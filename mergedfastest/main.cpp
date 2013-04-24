@@ -73,54 +73,46 @@ void printNfa(CNfa &nfa)
 
 void main()
 {
-	const char *pcre1 = "/abc/";
-	const char *pcre2 = "/(\\x2Ecmdmailto|telnet|news|nntp|snews)\\x3A[^\\n]*[\\x25\\x22]/";
+	const char *pcre1 = "/^abcd/";
+	const char *pcre2 = "/^fghi/";
+
 	std::vector<CDfa> dfaVec;
-	CDfa dfa1, dfa2, lastdfa;
-	CNfa nfa1, nfa2;
+	CDfa dfa1, dfa2,lastdfa;
+
+	dfa1.SetId(1);
+	dfa2.SetId(2);
+	CNfa nfa1, nfa2, nfa3;
 	PcreToNFA(pcre1, nfa1);
 	PcreToNFA(pcre2, nfa2);
+	printNfa(nfa1);
+	printNfa(nfa2);
 	NfaToDfa(nfa1, dfa1);
 	NfaToDfa(nfa2, dfa2);
+	//NfaToDfa(nfa3, dfa3);
 
+	//size = dfa3.Size();
+	size_t size 
+		= dfa1.Size();
+	//size = dfa2.Size();
+	//size = dfa3.Size();
 	dfaVec.push_back(dfa1);
 	dfaVec.push_back(dfa2);
 	OrMerge(dfaVec, lastdfa);
-	std::string str1 = "telnet:abc%";
-	size_t match = MatchDfa(dfa2, str1.begin(), str1.end());
-	size_t size = dfa1.Size();
-	size = dfa2.Size();
+	size = lastdfa.Size();
+	size = lastdfa.GetTermSetNum();
+
+	for(int i = 0; i < size; ++i)
+	{
+		CDfa::TERMSET termset = lastdfa.GetTermSet(i);
+		std::cout << std::endl;
+	}
+
+	std::string str1 = "abcd";
+	std::string str2 = "fghi";
+	size_t match = MatchDfa(dfa1, str1.begin(), str1.end());
+	match = MatchDfa(lastdfa, str1.begin(), str1.end());
+	match = MatchDfa(lastdfa, str2.begin(), str2.end());
+
 	size = lastdfa.Size();
 
-	//CDfa dfa1, dfa2, dfa3;
-	//CVectorNumber termFlag;
-	//dfa1.Resize(2);
-	//dfa2.Resize(2);
-	//dfa1[0][97] =  0;
-	//dfa1[0][98] =  1;
-	//dfa1[1][98] =  1;
-
-	//dfa1[1].SetFlag(dfa1[1].GetFlag() | CDfaRow::TERMINAL);
-
-	//printDfa(dfa1);
-	//std::cout << ".............." << std::endl;
-
-	//dfa2[0][97] =  1;
-	//dfa2[0][98] =  1;
-	//dfa2[1][97] =  1;
-	//dfa2[1].SetFlag(dfa2[1].GetFlag() | CDfaRow::TERMINAL);
-
-	//printDfa(dfa2);
-	//std::cout << ".............." << std::endl;
-	////AndMerge(dfa1, dfa2, dfa3, termFlag);
-	//printDfa(dfa3);
-	//std::cout << ".............." << std::endl;
-
-	//std::vector<CDfa> dfaVec;
-	//CDfa lastDfa;
-	//dfaVec.push_back(dfa1);
-	//dfaVec.push_back(dfa2);
-	//OrMerge(dfaVec,lastDfa);
-	//printDfa(lastDfa);
-	//system("pause");
 }

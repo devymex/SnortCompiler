@@ -41,10 +41,11 @@ bool ColumnEqual(std::vector<CStateSet*> &c1, std::vector<CStateSet*>&c2)
 	return true;
 }
 
-void AvaiEdges(CNfa &oneNfaTab, std::vector<std::vector<size_t>> &charGroups)
+void AvaiEdges(CNfa &oneNfaTab, STATEID *group)
 {
-	std::vector<CStateSet*> column[CHARSETSIZE - 4];
-	for(size_t charNum = 0; charNum < CHARSETSIZE - 4; ++charNum)
+	std::vector<std::vector<size_t>> charGroups;
+	std::vector<CStateSet*> column[DFACOLSIZE];
+	for(size_t charNum = 0; charNum < DFACOLSIZE; ++charNum)
 	{
 		column[charNum].reserve(20000);
 		for(size_t i = 0; i < oneNfaTab.Size(); ++i)
@@ -68,7 +69,7 @@ void AvaiEdges(CNfa &oneNfaTab, std::vector<std::vector<size_t>> &charGroups)
 
 	//std::cout << "columns complete" << std::endl;
 
-	for (size_t i = 0; i < CHARSETSIZE - 4; ++i)
+	for (size_t i = 0; i < DFACOLSIZE; ++i)
 	{
 		fullSet.push_back(i);
 	}
@@ -93,6 +94,14 @@ void AvaiEdges(CNfa &oneNfaTab, std::vector<std::vector<size_t>> &charGroups)
 		}
 	}
 	//std::cout << "grouping complete" << std::endl;
+
+	for(STATEID i = 0; i < charGroups.size(); ++i)
+	{
+		for(STATEID j = 0; j < charGroups[i].size(); ++j)
+		{
+			group[charGroups[i][j]] = i;
+		}
+	}
 }
 
 void NextNfaSet(const CNfa &oneNfaTab, const std::vector<size_t> &curNfaVec, size_t edge, std::vector<size_t> &nextENfaVec, char &finFlag)
@@ -181,53 +190,3 @@ void EClosure(const CNfa &oneNfaTab, const std::vector<size_t> &curNfaVec, std::
 	}
 }
 
-
-void printDfa(CDfa dfaTab)
-{
-	int tabSize = dfaTab.Size();
-	std::vector<std::vector<std::vector<size_t>>> matrix;
-	std::vector<std::vector<size_t>> matRow;
-	std::vector<size_t> matRowRow;
-	for(int i = 0; i < tabSize; ++i)
-	{
-		matrix.push_back(matRow);
-		for(int j = 0; j < tabSize; ++j)
-		{
-			matrix[i].push_back(matRowRow);
-		}
-	}
-
-		for(size_t s = 0; s < dfaTab.Size(); ++s)
-	{
-		for(int i = 0 ; i < CHARSETSIZE - 4; ++i)
-		{
-			if(dfaTab[s][i] != size_t(-1))
-			{
-				size_t suf = dfaTab[s][i];
-				matrix[s][suf].push_back(i);
-			}
-		}
-
-	}
-
-
-	for(std::vector<std::vector<std::vector<size_t>>>::iterator iter = matrix.begin(); iter != matrix.end(); ++iter)
-	{
-		std::cout << iter - matrix.begin() << "  :  ";
-		for(std::vector<std::vector<size_t>>::iterator curIter = iter->begin(); curIter != iter->end(); ++curIter)
-		{
-			if(curIter->size() > 0)
-			{
-				std::cout << curIter - iter->begin() << " (";
-				for(std::vector<size_t>::iterator curcurIter = curIter->begin(); curcurIter != curIter->end(); ++curcurIter)
-				{
-					std::cout << *curcurIter << ",";
-				}
-				std::cout << ")  ";
-			}
-		}
-		std::cout << std::endl;
-
-	}
-
-}

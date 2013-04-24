@@ -71,20 +71,20 @@ void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 		}
 		else
 		{
-			SNORTIDDFAIDS sidDfaIds;
-			sidDfaIds.m_nSid = nSid;
-			const size_t nCursize = result.m_dfaTbl.size();
-			const size_t nIncrement = nfatree.Size();
-			result.m_dfaTbl.resize(nCursize + nIncrement);
-			size_t nId;
-			for (size_t i = 0; i < nIncrement; ++i)
-			{
-				CNfa nfa;
-				SerializeNfa(nfatree[i], nfa);
-				nId = nCursize + i;
-				//NfaToDfa(nfa, dfa);
-				sidDfaIds.m_dfaIds.push_back(nId);
-			}
+			//SNORTIDDFAIDS sidDfaIds;
+			//sidDfaIds.m_nSid = nSid;
+			//const size_t nCursize = result.m_dfaTbl.size();
+			//const size_t nIncrement = nfatree.Size();
+			//result.m_dfaTbl.resize(nCursize + nIncrement);
+			//size_t nId;
+			//for (size_t i = 0; i < nIncrement; ++i)
+			//{
+			//	CNfa nfa;
+			//	SerializeNfa(nfatree[i], nfa);
+			//	nId = nCursize + i;
+			//	//NfaToDfa(nfa, dfa);
+			//	sidDfaIds.m_dfaIds.push_back(nId);
+			//}
 		}
 	}
 }
@@ -93,7 +93,7 @@ void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 void main()
 {
 	RES result;
-	CompileRuleSet(_T("..\\test.txt"), Process, &result);
+	CompileRuleSet(_T("F:\\wj\\compiler\\test.txt"), Process, &result);
 	system("pause");
 
 }
