@@ -366,7 +366,7 @@ CREDFA size_t DfaMin(CDfa &oneDfaTab, CDfa &minDfaTab)
 	{
 		for (size_t j = 0; j < col; ++j)
 		{
-			STATEID nDest = oneDfaTab[i][j];
+			STATEID nDest = (STATEID)oneDfaTab[i][j];
 			if (nDest != STATEID(-1))
 			{
 				pPosTab[i * col + j].push_back(nDest);
