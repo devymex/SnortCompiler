@@ -232,6 +232,32 @@ void PartitionNonDisState(CDfa &tmpDfa, std::vector<STATEID> *pRevTbl, SETLIST &
 	SETLIST_ITER iLast = pSets.end();
 	--iLast;
 
+	//insert terminal states in the same DFA into one set
+	for (SETLIST_ITER iCurSet = pSets.begin(); iCurSet != iLast; ++iCurSet)
+	{
+		SETLIST_ITER iPre = iCurSet;
+		SETLIST_ITER iNxt = ++iCurSet;
+		STATEID preSta = iPre->front();
+		STATEID nxtSta = iNxt->front();
+		size_t preStaID, nxtStaID;
+		for (STATEID i = 0; i < tmpDfa.GetTermSetNum; ++i)
+		{
+			if (tmpDfa.GetTermSet(i).dfaSta == preSta)
+			{
+				preStaID = tmpDfa.GetTermSet(preSta).dfaId;
+			}
+			else if (tmpDfa.GetTermSet(i).dfaSta == nxtSta)
+			{
+				nxtStaID = tmpDfa.GetTermSet(nxtSta).dfaId;
+			}
+		}
+		if (preStaID == nxtStaID)
+		{
+			iCurSet = pSets.erase(iCurSet);
+			iPre->insert(iPre->begin(), nxtSta);
+		}
+	}
+
 	//initialize wSets with all final states
 	for (SETLIST_ITER iCurSet = pSets.begin(); iCurSet != iLast; ++iCurSet)
 	{
@@ -445,6 +471,21 @@ CREDFA size_t DfaMin(CDfa &oneDfaTab, CDfa &minDfaTab)
 	MergeNonDisStates(tmpDfa, Partition, minDfaTab);
 
 	minDfaTab.SetId(oneDfaTab.GetId());
+
+	for (STATEID j = 0; j < minDfaTab.Size(); ++j)
+	{
+		std::cout << (int)j << ": ";
+		for (STATEID k = 0; k < minDfaTab.GetColNum(); ++k)
+		{
+			if(minDfaTab[j][k] != STATEID(-1))
+			{
+				std::cout << "(" << (int)k << "," << (int)minDfaTab[j][k]<< ")";
+			}
+
+		}
+		std::cout << std::endl;
+	}
+
 
 	delete []pRevTab;
 	return 0;

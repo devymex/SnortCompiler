@@ -151,6 +151,13 @@ void main()
 	dfa[5].SetFlag(4);
 	dfa[6].SetFlag(4);
 
+	CDfa::TERMSET oneterm;
+	oneterm.dfaId = 1;
+	oneterm.dfaSta = STATEID(5);
+	dfa.PushTermSet(oneterm);
+	oneterm.dfaSta = STATEID(6);
+	dfa.PushTermSet(oneterm);
+
 	printDfa(dfa);
 	std::cout << std::endl;
 
