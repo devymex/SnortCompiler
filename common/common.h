@@ -132,6 +132,8 @@ public:
 	STATEID GetStartId()const;
 	void SetStartId(STATEID id);
 	void PushTermSet(TERMSET oneTerm);
+	STATEID GetTermSetNum();
+	TERMSET GetTermSet(STATEID num);
 private:
 	size_t m_nId;
 	size_t m_nColNum;
@@ -145,6 +147,11 @@ private:
 class COMMONSC CNfa
 {
 public:
+	struct DFATERMS
+	{
+		size_t nfaSta;
+		size_t dfaId;
+	};
 	CNfa();
 	~CNfa();
 	CNfa(const CNfa &other);
@@ -157,8 +164,9 @@ public:
 	void PushBack(const CNfaRow &row);
 	void PopBack();
 	void SetPcre(const char* lpPcre);
-	void PushDfaTerms(std::pair<size_t, size_t> pair);
-	std::vector<std::pair<size_t, size_t>> GetDfaTerms();
+	void PushDfaTerms(DFATERMS dfaTerms);
+	size_t GetDfaTermsNum();
+	DFATERMS GetDfaTerms(size_t num);
 	const char* GetPcre() const;
 
 	CNfaRow &Back();
@@ -169,7 +177,7 @@ private:
 	std::vector<CNfaRow> *m_pNfa;
 	std::string *m_pPcre;
 	//如果该nfa是由dfa合并过程中生成的，该成员用于记录哪个状态能够识别哪个dfa终态
-	std::vector<std::pair<size_t, size_t>> m_DfaTerms;
+	std::vector<DFATERMS> *m_DfaTerms;
 };
 
 //class COMMONSC CDfa

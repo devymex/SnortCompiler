@@ -105,6 +105,7 @@ MERDFA bool OrMerge(std::vector<CDfa> &dfas, CDfa &lastDfa)
 		IncreDfaNum(dfas[i], (STATEID)oneNfa.Size());
 		InsertDfa(dfas[i], oneNfa,nTermSta);
 	}
+
 	if(NfaToDfa(oneNfa, lastDfa, true) == 0)
 	{
 		return true;
