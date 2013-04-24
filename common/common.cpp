@@ -168,12 +168,14 @@ COMMONSC CNfa::CNfa()
 {
 	m_pNfa = new std::vector<CNfaRow>;
 	m_pPcre = new std::string;
+	m_DfaTerms = new std::vector<DFATERMS>;
 }
 
 COMMONSC CNfa::~CNfa()
 {
 	delete m_pNfa;
 	delete m_pPcre;
+	delete m_DfaTerms;
 }
 
 //COMMONSC size_t CNfa::GetRowNum(void)
@@ -238,6 +240,7 @@ COMMONSC CNfa& CNfa::operator=(const CNfa &other)
 {
 	*this->m_pNfa = *other.m_pNfa;
 	*m_pPcre = *other.m_pPcre;
+	*m_DfaTerms = *other.m_DfaTerms;
 	return *this;
 }
 
@@ -260,15 +263,20 @@ COMMONSC const char* CNfa::GetPcre() const
 {
 	return m_pPcre->c_str();
 }
-COMMONSC  void CNfa::PushDfaTerms(std::pair<size_t, size_t> pair)
+COMMONSC  void CNfa::PushDfaTerms(DFATERMS dfaTerms)
 {
-	m_DfaTerms.push_back(pair);
+	m_DfaTerms->push_back(dfaTerms);
 }
 
-COMMONSC std::vector<std::pair<size_t, size_t>> CNfa::GetDfaTerms()
+COMMONSC	size_t CNfa::GetDfaTermsNum()
 {
-	return m_DfaTerms;
+	return m_DfaTerms->size();
 }
+COMMONSC	CNfa::DFATERMS CNfa::GetDfaTerms(size_t num)
+{
+	return (*m_DfaTerms)[num];
+}
+
 
 
 COMMONSC CDfaRow::CDfaRow(size_t col)
@@ -463,6 +471,15 @@ COMMONSC void CDfa::SetStartId(STATEID id)
 COMMONSC void CDfa::PushTermSet(TERMSET oneTerm)
 {
 	m_TermSet->push_back(oneTerm);
+}
+
+COMMONSC	STATEID CDfa::GetTermSetNum()
+{
+	return m_TermSet->size();
+}
+COMMONSC	CDfa::TERMSET CDfa::GetTermSet(STATEID num)
+{
+	return (*m_TermSet)[num];
 }
 
 //COMMONSC CAndDfa::CAndDfa()

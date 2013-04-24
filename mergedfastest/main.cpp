@@ -76,17 +76,18 @@ void main()
 	const char *pcre1 = "/^abcd/";
 	const char *pcre2 = "/^fghi/";
 
-	const char *pcre3 = "/^fghiijk/";
-
 	std::vector<CDfa> dfaVec;
-	CDfa dfa1, dfa2,dfa3, lastdfa;
+	CDfa dfa1, dfa2,lastdfa;
+
+	dfa1.SetId(1);
+	dfa2.SetId(2);
 	CNfa nfa1, nfa2, nfa3;
 	PcreToNFA(pcre1, nfa1);
-	//PcreToNFA(pcre2, nfa2);
+	PcreToNFA(pcre2, nfa2);
 	printNfa(nfa1);
 	printNfa(nfa2);
 	NfaToDfa(nfa1, dfa1);
-	//NfaToDfa(nfa2, dfa2);
+	NfaToDfa(nfa2, dfa2);
 	//NfaToDfa(nfa3, dfa3);
 
 	//size = dfa3.Size();
@@ -96,12 +97,21 @@ void main()
 	//size = dfa3.Size();
 	dfaVec.push_back(dfa1);
 	dfaVec.push_back(dfa2);
-	dfaVec.push_back(dfa3);
 	OrMerge(dfaVec, lastdfa);
 	size = lastdfa.Size();
+	size = lastdfa.GetTermSetNum();
+
+	for(int i = 0; i < size; ++i)
+	{
+		CDfa::TERMSET termset = lastdfa.GetTermSet(i);
+		std::cout << std::endl;
+	}
+
 	std::string str1 = "abcd";
+	std::string str2 = "fghi";
 	size_t match = MatchDfa(dfa1, str1.begin(), str1.end());
 	match = MatchDfa(lastdfa, str1.begin(), str1.end());
+	match = MatchDfa(lastdfa, str2.begin(), str2.end());
 
 	size = lastdfa.Size();
 
