@@ -1033,6 +1033,7 @@ CRECHANFA size_t InterpretRule(const CSnortRule &rule, CNfaTree &outTree)
 
 	outTree.Reserve(++nfaChain_size);
 	outTree.Back().SetPcre(str.c_str());
+
 	return 0;
 }
 
