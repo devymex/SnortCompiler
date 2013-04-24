@@ -473,11 +473,11 @@ COMMONSC void CDfa::PushTermSet(TERMSET oneTerm)
 	m_TermSet->push_back(oneTerm);
 }
 
-COMMONSC	STATEID CDfa::GetTermSetNum()
+COMMONSC STATEID CDfa::GetTermSetNum()
 {
-	return m_TermSet->size();
+	return (STATEID)m_TermSet->size();
 }
-COMMONSC	CDfa::TERMSET CDfa::GetTermSet(STATEID num)
+COMMONSC CDfa::TERMSET CDfa::GetTermSet(STATEID num)
 {
 	return (*m_TermSet)[num];
 }
