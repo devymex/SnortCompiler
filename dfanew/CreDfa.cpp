@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "CreDfa.h"
-
+#include "dfanew.h"
 
 /* Following codes is a testing for unordered_map */
 /* DONT REMOVE */
@@ -186,6 +186,220 @@ void EClosure(const CNfa &oneNfaTab, const std::vector<size_t> &curNfaVec, std::
 			finFlag = 1;
 			break;
 		}
+	}
+}
+
+void RemoveUnreachable(const std::vector<STATEID> *Tab, const STALIST &begs, const size_t &col, std::vector<BYTE> &reachable)
+{
+	//mark state after traversal, 0 is unreachable and 1 is reachable
+	size_t stas = reachable.size();
+	std::vector<BYTE> staFlags(stas, 0);
+
+	//reserve current visited states
+	std::vector<size_t> staStack;
+	staStack.reserve(stas);
+
+	staStack.assign(begs.begin(), begs.end());
+	//extract each state in staStack until all states have visited
+	for (; !staStack.empty(); )
+	{
+		size_t nSta = staStack.back();
+		staStack.pop_back();
+		if (staFlags[nSta] == 0)
+		{
+			staFlags[nSta] = 1;
+			//according to each of transitions add states to staStack 
+			for (size_t i = 0; i < col; ++i)
+			{
+				for (size_t j = 0; j < Tab[nSta * col + i].size(); ++j)
+				{
+					staStack.push_back(Tab[nSta * col + i][j]);
+				}
+			}
+		}
+	}
+
+	for (std::vector<BYTE>::iterator i = staFlags.begin(); i != staFlags.end(); ++i)
+	{
+		reachable[i - staFlags.begin()] += *i;
+	}
+}
+
+void MergeReachable(const CDfanew &oneDfaTab, std::vector<BYTE> &reachable)
+{
+	//count reachable states 
+	size_t nRcbCnt = std::count(reachable.begin(), reachable.end(), 2);
+	std::vector<CDfaRow> *tmpDfa;
+	tmpDfa->resize(nRcbCnt);
+
+	STATEID nNewIdx = 0;
+	size_t nColNum = oneDfaTab.GetGroupCount();
+	//reachable states in old DFA copy to new DFA and renumber the new DFA
+	for (std::vector<BYTE>::iterator iter = reachable.begin(); iter != reachable.end(); ++iter)
+	{
+		if (2 == *iter)
+		{
+			STATEID nStaId = STATEID(iter - reachable.begin());
+			(*tmpDfa)[nNewIdx] = oneDfaTab[nStaId];
+			*iter = nNewIdx;
+			++nNewIdx;
+		}
+		else
+		{
+			*iter = STATEID(-1);
+		}
+	}
+
+	//the new number replace the old in new DFA
+	for (STATEID i = 0; i < nRcbCnt; ++i)
+	{
+		CDfaRow &curRow = (*tmpDfa)[i];
+		for (STATEID j = 0; j < nColNum; ++j)
+		{
+			if (curRow[j] != STATEID(-1))
+			{
+				curRow[j] = reachable[curRow[j]];
+			}
+		}
+	}	
+}
+
+void PartitionNonDisState(const size_t &groupnum, std::vector<STATEID> *pRevTbl, SETLIST &pSets)
+{
+	//store the iterator of patition will be visited into wSets
+	std::list<SETLIST_ITER> wSets;
+	SETLIST_ITER iLast = pSets.end();
+	--iLast;
+
+	//initialize wSets with all final states
+	for (SETLIST_ITER iCurSet = pSets.begin(); iCurSet != iLast; ++iCurSet)
+	{
+		wSets.push_back(iCurSet);
+	}
+
+	//each element in ableToW present a property of according state of tmpDfa,
+	//and has two labels, 0 and 1. 1 indicates the according state has the specific
+	//transition to one state of curWSet, 0 otherwise
+	STATEID size = sizeof(pRevTbl) / (STATEID)groupnum;
+	std::vector<BYTE> ableToW(size, 0);
+	bool bAllZero = true;
+	for (; !wSets.empty(); )
+	{
+		STALIST curWSet = *wSets.front();
+		wSets.pop_front();
+		for (BYTE byChar = 0; byChar < groupnum; ++byChar)
+		{
+			//initialize the ableToW
+			//for each state in curWSet find source states of it in pRecTbl
+			//if exist at last one source state to curWSet, the bAllZero is set to false
+			for (STALIST_ITER iSta = curWSet.begin(); iSta != curWSet.end(); ++iSta)
+			{
+				std::vector<STATEID> &ableToI = pRevTbl[*iSta * groupnum + byChar];
+				for (std::vector<STATEID>::iterator i = ableToI.begin(); i != ableToI.end(); ++i)
+				{
+					ableToW[*i] = 1;
+					bAllZero = false;
+				}
+			}
+			if (!bAllZero)
+			{
+				for (SETLIST_ITER iPSet = pSets.begin(); iPSet != pSets.end(); ++iPSet)
+				{
+					//each partition in pSets,according to the label of a state in partition adjust position 
+					//all unvisited states lie in the front of list, visited states locate
+					//at the rear end of list 
+					for (STALIST_ITER iCurSta = iPSet->begin(); iCurSta != iPSet->end(); )
+					{
+						if (ableToW[*iCurSta] == 0)
+						{
+							STATEID tmp = *iCurSta;
+							iCurSta = iPSet->erase(iCurSta);
+							iPSet->insert(iPSet->begin(), tmp);
+						}
+						else
+						{
+							++iCurSta;
+						}
+					} 
+
+					//mark the position of two new partition
+					size_t nUnableCnt = 0;
+					STALIST_ITER iCutBeg = iPSet->begin(), iCutEnd = iPSet->end();
+					for (; iCutBeg != iPSet->end(); ++iCutBeg)
+					{
+						if (ableToW[*iCutBeg] == 1)
+						{
+							break;
+						}
+						++nUnableCnt;
+					}
+
+					//record start position of the less partition 
+					if (nUnableCnt <= iPSet->size() / 2)
+					{
+						iCutEnd = iCutBeg;
+						iCutBeg = iPSet->begin();
+					}
+
+					//the less partition insert into pSets, its iterator insert into wSets
+					if (iCutBeg != iCutEnd)
+					{
+						SETLIST_ITER iOldSet = iPSet;
+						iPSet = pSets.insert(++iPSet, STALIST());
+						iPSet->splice(iPSet->begin(), *iOldSet, iCutBeg, iCutEnd);
+						wSets.push_back(iPSet);
+					}
+				}
+
+				//initialize ableToW and bAllZero before read the next char, 
+				ZeroMemory(&ableToW[0], ableToW.size());
+				bAllZero = true;
+			}
+		}
+	}
+}
+
+void MergeNonDisStates(CDfanew &tmpDfa, SETLIST &Partition, CDfanew &minDfaTab)
+{
+	std::vector<STATEID> sta2Part(tmpDfa.Size());
+
+	//set group of new DFA 
+	minDfaTab.Init(tmpDfa.GetGroup());
+	minDfaTab.Resize((STATEID)Partition.size());
+
+	//an old state which belongs to a new partition and set start state
+	STATEID nSetIdx = 0;
+	for (SETLIST_ITER iSet = Partition.begin(); iSet != Partition.end(); ++iSet)
+	{
+		for (STALIST_ITER iSta = iSet->begin(); iSta != iSet->end(); ++iSta)
+		{
+			sta2Part[*iSta] = nSetIdx;
+			if ((tmpDfa[*iSta].GetFlag() & tmpDfa[*iSta].START) != 0)
+			{
+				minDfaTab.SetStartId(nSetIdx);
+			}
+		}
+		++nSetIdx;
+	}
+
+	//set new DFA and modify new number
+	nSetIdx = 0;
+	for (SETLIST_ITER iSet = Partition.begin(); iSet != Partition.end(); ++iSet)
+	{
+		for (BYTE iCol = 0; iCol != minDfaTab.GetColNum(); ++iCol)
+		{
+			CDfaRow &orgRow = tmpDfa[iSet->front()];
+			STATEID nDest = STATEID(-1);
+			if (orgRow[iCol] != STATEID(-1))
+			{
+				nDest = sta2Part[orgRow[iCol]];
+			}
+			minDfaTab[nSetIdx][iCol] = nDest;
+		}
+
+		//set a state attribute
+		minDfaTab[nSetIdx].SetFlag(tmpDfa[iSet->front()].GetFlag());
+		++nSetIdx;
 	}
 }
 

@@ -207,10 +207,10 @@ DFANEWSC size_t CDfanew::FromNFA(CNfa &nfa, NFALOG *nfalog, size_t Count, bool c
 	return 0;
 }
 
-DFANEWSC size_t CDfanew::Minimize(CDfanew &oneDfaTab, CDfanew &minDfaTab)
+DFANEWSC size_t CDfanew::Minimize()
 {
-		//error: DFA is empty 
-	if (oneDfaTab.Size() == 0)
+	//error: DFA is empty 
+	if (m_pDfa->size() == 0)
 	{
 		return size_t(-1);
 	}
@@ -218,9 +218,9 @@ DFANEWSC size_t CDfanew::Minimize(CDfanew &oneDfaTab, CDfanew &minDfaTab)
 	// Extract terminal states from a dfa, initialize partition with terminal states and normal states
 	std::list<std::list<STATEID>> Partition(1);
 	std::list<STATEID> FinalStas;
-	for (STATEID i = 0; i < oneDfaTab.Size(); ++i)
+	for (STATEID i = 0; i < m_pDfa->size(); ++i)
 	{
-		if ((oneDfaTab[i].GetFlag() & oneDfaTab[i].TERMINAL) != 0)
+		if (((*m_pDfa)[i].GetFlag() & (*m_pDfa)[i].TERMINAL) != 0)
 		{
 			FinalStas.push_back(i);
 			Partition.push_front(std::list<STATEID>());
@@ -239,14 +239,14 @@ DFANEWSC size_t CDfanew::Minimize(CDfanew &oneDfaTab, CDfanew &minDfaTab)
 	}
 
 	//generate positive traverse table
-	size_t row = oneDfaTab.Size();
-	size_t col = oneDfaTab.GetColNum();
+	size_t row = m_pDfa->size();
+	size_t col = GetGroupCount();
 	std::vector<STATEID> *pPosTab = new std::vector<STATEID>[row * col];
 	for (STATEID i = 0; i < row; ++i)
 	{
 		for (STATEID j = 0; j < col; ++j)
 		{
-			STATEID nDest = (STATEID)oneDfaTab[i][j];
+			STATEID nDest = (STATEID)(*m_pDfa)[i][j];
 			if (nDest != STATEID(-1))
 			{
 				pPosTab[i * col + j].push_back(nDest);
@@ -254,7 +254,7 @@ DFANEWSC size_t CDfanew::Minimize(CDfanew &oneDfaTab, CDfanew &minDfaTab)
 		}
 	}
 
-	std::vector<BYTE> reachable(oneDfaTab.Size(), 0);
+	std::vector<BYTE> reachable(m_pDfa->size(), 0);
 	std::list<STATEID> StartStas;
 	StartStas.push_back(0);
 
@@ -268,7 +268,7 @@ DFANEWSC size_t CDfanew::Minimize(CDfanew &oneDfaTab, CDfanew &minDfaTab)
 	{
 		for (STATEID j = 0; j < col; ++j)
 		{
-			STATEID nDest = (STATEID)oneDfaTab[i][j];
+			STATEID nDest = (STATEID)(*m_pDfa)[i][j];
 			if (nDest != STATEID(-1))
 			{
 				pRevTab[nDest * col + j].push_back(STATEID(i));
@@ -280,31 +280,16 @@ DFANEWSC size_t CDfanew::Minimize(CDfanew &oneDfaTab, CDfanew &minDfaTab)
 	RemoveUnreachable(pRevTab, FinalStas, col, reachable);
 
 	//remove unreachable states, generate new DFA
-	CDfa tmpDfa;
-	MergeReachable(oneDfaTab, reachable, tmpDfa);
+	CDfanew tmpDfa;
+	MergeReachable(*this, reachable, tmpDfa);
 
 	//divide nondistinguishable states
-	PartitionNonDisState(tmpDfa, pRevTab, Partition);
+	PartitionNonDisState(GetGroupCount(), pRevTab, Partition);
 
 	//DFA minization
 	MergeNonDisStates(tmpDfa, Partition, minDfaTab);
 
 	minDfaTab.SetId(oneDfaTab.GetId());
-
-	for (STATEID j = 0; j < minDfaTab.Size(); ++j)
-	{
-		std::cout << (int)j << ": ";
-		for (STATEID k = 0; k < minDfaTab.GetColNum(); ++k)
-		{
-			if(minDfaTab[j][k] != STATEID(-1))
-			{
-				std::cout << "(" << (int)k << "," << (int)minDfaTab[j][k]<< ")";
-			}
-
-		}
-		std::cout << std::endl;
-	}
-
 
 	delete []pRevTab;
 	return 0;
