@@ -80,6 +80,12 @@ DFANEWSC void CDfanew::Clear()
 	m_TermSet = new std::vector<TERMSET>;
 }
 
+DFANEWSC void CDfanew::m_pDfaClear()
+{
+	delete m_pDfa;
+	m_pDfa = new std::vector<CDfaRow>;
+}
+
 DFANEWSC size_t CDfanew::FromNFA(CNfa &nfa, NFALOG *nfalog, size_t Count, bool combine)
 {
 	BYTE groups[DFACOLSIZE];
@@ -294,18 +300,30 @@ DFANEWSC size_t CDfanew::Minimize()
 
 	//record states that will be visited from reverse traverse table
 	RemoveUnreachable(pRevTab, FinalStas, col, reachable);
+	delete []pRevTab;
 
 	//remove unreachable states, generate new DFA
-	CDfanew tmpDfa;
-	MergeReachable(*this, reachable, tmpDfa);
+	MergeReachable(*this, reachable);
+
+	row = m_pDfa->size();
+	pRevTab = new std::vector<STATEID>[row * col];
+	for (STATEID i = 0; i < row; ++i)
+	{
+		for (STATEID j = 0; j < col; ++j)
+		{
+			STATEID nDest = (STATEID)(*m_pDfa)[i][j];
+			if (nDest != STATEID(-1))
+			{
+				pRevTab[nDest * col + j].push_back(STATEID(i));
+			}
+		}
+	}
 
 	//divide nondistinguishable states
 	PartitionNonDisState(GetGroupCount(), pRevTab, Partition);
 
 	//DFA minization
-	MergeNonDisStates(tmpDfa, Partition, minDfaTab);
-
-	minDfaTab.SetId(oneDfaTab.GetId());
+	MergeNonDisStates(*this, Partition);
 
 	delete []pRevTab;
 	return 0;
@@ -329,6 +347,11 @@ DFANEWSC const BYTE* CDfanew::GetGroup() const
 DFANEWSC STATEID CDfanew::GetStartId() const
 {
 	return m_StartId;
+}
+
+DFANEWSC void CDfanew::SetStartId(STATEID id)
+{
+	m_StartId = id;
 }
 
 DFANEWSC void CDfanew::SetId(size_t id)

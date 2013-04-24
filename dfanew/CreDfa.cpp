@@ -225,22 +225,25 @@ void RemoveUnreachable(const std::vector<STATEID> *Tab, const STALIST &begs, con
 	}
 }
 
-void MergeReachable(const CDfanew &oneDfaTab, std::vector<BYTE> &reachable)
+void MergeReachable(CDfanew &oneDfaTab, std::vector<BYTE> &reachable)
 {
-	//count reachable states 
+	//统计可达状态的数目
 	size_t nRcbCnt = std::count(reachable.begin(), reachable.end(), 2);
-	std::vector<CDfaRow> *tmpDfa;
-	tmpDfa->resize(nRcbCnt);
+
+	size_t nColNum = oneDfaTab.GetGroupCount();
+
+	//定义一个同CDfanew中成员变量m_pDfa类型相同的变量，用于存储删除多余状态后的DFA跳转表
+	std::vector<CDfaRow> tmpDfa;
+	tmpDfa.resize(nRcbCnt, nColNum);
 
 	STATEID nNewIdx = 0;
-	size_t nColNum = oneDfaTab.GetGroupCount();
-	//reachable states in old DFA copy to new DFA and renumber the new DFA
+	//将原DFA跳转表中的可达状态复制到tmpDfa中，并修改可达状态的编号
 	for (std::vector<BYTE>::iterator iter = reachable.begin(); iter != reachable.end(); ++iter)
 	{
 		if (2 == *iter)
 		{
 			STATEID nStaId = STATEID(iter - reachable.begin());
-			(*tmpDfa)[nNewIdx] = oneDfaTab[nStaId];
+			tmpDfa[nNewIdx] = oneDfaTab[nStaId];
 			*iter = nNewIdx;
 			++nNewIdx;
 		}
@@ -250,10 +253,10 @@ void MergeReachable(const CDfanew &oneDfaTab, std::vector<BYTE> &reachable)
 		}
 	}
 
-	//the new number replace the old in new DFA
+	//将新跳转表中的状态编号修改为新编号
 	for (STATEID i = 0; i < nRcbCnt; ++i)
 	{
-		CDfaRow &curRow = (*tmpDfa)[i];
+		CDfaRow &curRow = tmpDfa[i];
 		for (STATEID j = 0; j < nColNum; ++j)
 		{
 			if (curRow[j] != STATEID(-1))
@@ -261,7 +264,16 @@ void MergeReachable(const CDfanew &oneDfaTab, std::vector<BYTE> &reachable)
 				curRow[j] = reachable[curRow[j]];
 			}
 		}
-	}	
+	}
+
+	//复制新的跳转表给原DFA
+	oneDfaTab.m_pDfaClear();
+	nNewIdx = 0;
+	for (STATEID idx = 0; idx < nRcbCnt; ++idx)
+	{
+		oneDfaTab[nNewIdx] = tmpDfa[idx];
+		++nNewIdx;
+	}
 }
 
 void PartitionNonDisState(const size_t &groupnum, std::vector<STATEID> *pRevTbl, SETLIST &pSets)
@@ -359,24 +371,26 @@ void PartitionNonDisState(const size_t &groupnum, std::vector<STATEID> *pRevTbl,
 	}
 }
 
-void MergeNonDisStates(CDfanew &tmpDfa, SETLIST &Partition, CDfanew &minDfaTab)
+void MergeNonDisStates(CDfanew &oneDfaTab, SETLIST &Partition)
 {
-	std::vector<STATEID> sta2Part(tmpDfa.Size());
+	std::vector<STATEID> sta2Part(oneDfaTab.Size());
+	
+	STATEID nCol = (STATEID)oneDfaTab.GetGroupCount();
 
-	//set group of new DFA 
-	minDfaTab.Init(tmpDfa.GetGroup());
-	minDfaTab.Resize((STATEID)Partition.size());
+	//定义一个同CDfanew中成员变量m_pDfa类型相同的变量，用于存储删除多余状态后的DFA跳转表
+	std::vector<CDfaRow> tmpDfa;
+	tmpDfa.resize((STATEID)Partition.size(), nCol);
 
-	//an old state which belongs to a new partition and set start state
+	//等价的状态存于同一个partition中，标记原来的状态存在哪一个新的partition中，并修改新的起始状态编号
 	STATEID nSetIdx = 0;
 	for (SETLIST_ITER iSet = Partition.begin(); iSet != Partition.end(); ++iSet)
 	{
 		for (STALIST_ITER iSta = iSet->begin(); iSta != iSet->end(); ++iSta)
 		{
 			sta2Part[*iSta] = nSetIdx;
-			if ((tmpDfa[*iSta].GetFlag() & tmpDfa[*iSta].START) != 0)
+			if ((oneDfaTab[*iSta].GetFlag() & oneDfaTab[*iSta].START) != 0)
 			{
-				minDfaTab.SetStartId(nSetIdx);
+				oneDfaTab.SetStartId(nSetIdx);
 			}
 		}
 		++nSetIdx;
@@ -386,19 +400,28 @@ void MergeNonDisStates(CDfanew &tmpDfa, SETLIST &Partition, CDfanew &minDfaTab)
 	nSetIdx = 0;
 	for (SETLIST_ITER iSet = Partition.begin(); iSet != Partition.end(); ++iSet)
 	{
-		for (BYTE iCol = 0; iCol != minDfaTab.GetColNum(); ++iCol)
+		for (BYTE iCol = 0; iCol != nCol; ++iCol)
 		{
-			CDfaRow &orgRow = tmpDfa[iSet->front()];
+			CDfaRow &orgRow = oneDfaTab[iSet->front()];
 			STATEID nDest = STATEID(-1);
 			if (orgRow[iCol] != STATEID(-1))
 			{
 				nDest = sta2Part[orgRow[iCol]];
 			}
-			minDfaTab[nSetIdx][iCol] = nDest;
+			tmpDfa[nSetIdx][iCol] = nDest;
 		}
 
 		//set a state attribute
-		minDfaTab[nSetIdx].SetFlag(tmpDfa[iSet->front()].GetFlag());
+		tmpDfa[nSetIdx].SetFlag(oneDfaTab[iSet->front()].GetFlag());
+		++nSetIdx;
+	}
+
+	//复制新的跳转表给原DFA
+	oneDfaTab.m_pDfaClear();
+	nSetIdx = 0;
+	for (STATEID idx = 0; idx < nCol; ++idx)
+	{
+		oneDfaTab[nSetIdx] = tmpDfa[idx];
 		++nSetIdx;
 	}
 }

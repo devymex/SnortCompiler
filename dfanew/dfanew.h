@@ -44,12 +44,14 @@ public:
 	const CDfaRow& operator[](STATEID index) const;
 	void Init(BYTE *pGroup);
 	void Clear();
+	void m_pDfaClear();
 	size_t FromNFA(CNfa &nfa, NFALOG *nfalog, size_t Count, bool combine = false);
 	size_t Minimize();
 	size_t GetGroupCount() const;
 	BYTE Char2Group(BYTE nIdx);
 	const BYTE* GetGroup() const;
 	STATEID GetStartId() const;
+	void SetStartId(STATEID id);
 	void SetId(size_t id);
 	size_t GetId();
 	size_t Process(BYTE *ByteStream, size_t len, CStateSet &StaSet);

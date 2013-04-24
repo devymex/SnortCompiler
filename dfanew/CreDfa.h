@@ -2,6 +2,7 @@
 //#include "stdafx.h"
 
 #include "../common/common.h"
+#include "dfanew.h"
 
 //以下注释用于测试
 //enum STATEFLAG
@@ -54,8 +55,8 @@ void EClosure(const CNfa &oneNfaTab, const std::vector<size_t> &curNfaVec,
 void RemoveUnreachable(const std::vector<STATEID> *Tab, const STALIST &begs, 
 					   const size_t &col, std::vector<BYTE> &reachable);
 
-void MergeReachable(const CDfanew &oneDfaTab, std::vector<BYTE> &reachable, CDfanew &tmpDfa);
+void MergeReachable(CDfanew &oneDfaTab, std::vector<BYTE> &reachable);
 
 void PartitionNonDisState(const size_t &groupnum, std::vector<STATEID> *pRevTbl, SETLIST &pSets);
 
-void MergeNonDisStates(CDfanew &tmpDfa, SETLIST &Partition, CDfanew &minDfaTab);
+void MergeNonDisStates(CDfanew &oneDfaTab, SETLIST &Partition);
