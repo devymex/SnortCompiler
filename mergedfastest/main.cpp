@@ -101,7 +101,7 @@ void main()
 	size = lastdfa.Size();
 	size = lastdfa.GetTermSetNum();
 
-	for(size_t i = 0; i < size; ++i)
+	for(STATEID i = 0; i < size; ++i)
 	{
 		CDfa::TERMSET termset = lastdfa.GetTermSet(i);
 		std::cout << std::endl;

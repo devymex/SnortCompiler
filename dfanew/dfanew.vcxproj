@@ -66,11 +66,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\nfa2dfa\CreDfa.h" />
+    <ClInclude Include="CreDfa.h" />
     <ClInclude Include="dfanew.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CreDfa.cpp" />
     <ClCompile Include="dfanew.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

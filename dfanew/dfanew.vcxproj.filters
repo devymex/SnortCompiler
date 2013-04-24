@@ -21,7 +21,7 @@
     <ClInclude Include="dfanew.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\nfa2dfa\CreDfa.h">
+    <ClInclude Include="CreDfa.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -30,6 +30,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="dfanew.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CreDfa.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
