@@ -18,6 +18,12 @@ struct DFANEWSC NFALOG
 	size_t nfaId;
 };
 
+struct DFANEWSC TERMSET
+{
+	STATEID dfaSta;
+	size_t dfaId;
+};
+
 class DFANEWSC CDfanew
 {
 public:
@@ -46,4 +52,6 @@ private:
 	STATEID m_StartId;
 	BYTE m_pGroup[DFACOLSIZE];
 	std::vector<CDfaRow> *m_pDfa;
+	//pair.first 用来存放dfa的某一终态, pair.second 用来存放该终态对应哪一个dfaid
+	std::vector<TERMSET> *m_TermSet;
 };
