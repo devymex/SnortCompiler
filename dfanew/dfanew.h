@@ -37,7 +37,7 @@ public:
 	void Init(BYTE *pGroup);
 	void Clear();
 	size_t FromNFA(CNfa &nfa, NFALOG *nfalog, size_t Count);
-	size_t Minimize();
+	size_t Minimize(CDfanew &oneDfaTab, CDfanew &minDfaTab);
 	size_t GetGroupCount() const;
 	BYTE Char2Group(BYTE nIdx);
 	const BYTE* GetGroup() const;

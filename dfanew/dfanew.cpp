@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "dfanew.h"
+#include "CreDfa.h"
 
 DFANEWSC CDfanew::CDfanew()
 {
@@ -75,8 +76,106 @@ DFANEWSC size_t CDfanew::FromNFA(CNfa &nfa, NFALOG *nfalog, size_t Count)
 	return 0;
 }
 
-DFANEWSC size_t CDfanew::Minimize()
+DFANEWSC size_t CDfanew::Minimize(CDfanew &oneDfaTab, CDfanew &minDfaTab)
 {
+		//error: DFA is empty 
+	if (oneDfaTab.Size() == 0)
+	{
+		return size_t(-1);
+	}
+
+	// Extract terminal states from a dfa, initialize partition with terminal states and normal states
+	std::list<std::list<STATEID>> Partition(1);
+	std::list<STATEID> FinalStas;
+	for (STATEID i = 0; i < oneDfaTab.Size(); ++i)
+	{
+		if ((oneDfaTab[i].GetFlag() & oneDfaTab[i].TERMINAL) != 0)
+		{
+			FinalStas.push_back(i);
+			Partition.push_front(std::list<STATEID>());
+			Partition.front().push_back(i);
+		}
+		else
+		{
+			Partition.back().push_back(i);
+		}
+	}
+
+	//error: terminal states or normal states are empty
+	if (Partition.size() == 1 || Partition.back().empty())
+	{
+		return size_t(-2);
+	}
+
+	//generate positive traverse table
+	size_t row = oneDfaTab.Size();
+	size_t col = oneDfaTab.GetColNum();
+	std::vector<STATEID> *pPosTab = new std::vector<STATEID>[row * col];
+	for (STATEID i = 0; i < row; ++i)
+	{
+		for (STATEID j = 0; j < col; ++j)
+		{
+			STATEID nDest = (STATEID)oneDfaTab[i][j];
+			if (nDest != STATEID(-1))
+			{
+				pPosTab[i * col + j].push_back(nDest);
+			}
+		}
+	}
+
+	std::vector<BYTE> reachable(oneDfaTab.Size(), 0);
+	std::list<STATEID> StartStas;
+	StartStas.push_back(0);
+
+	//record states that will be visited from positive traverse table
+	RemoveUnreachable(pPosTab, StartStas, col, reachable);
+	delete []pPosTab;
+
+	//generate reverse traverse table	
+	std::vector<STATEID> *pRevTab = new std::vector<STATEID>[row * col];
+	for (STATEID i = 0; i < row; ++i)
+	{
+		for (STATEID j = 0; j < col; ++j)
+		{
+			STATEID nDest = (STATEID)oneDfaTab[i][j];
+			if (nDest != STATEID(-1))
+			{
+				pRevTab[nDest * col + j].push_back(STATEID(i));
+			}
+		}
+	}
+
+	//record states that will be visited from reverse traverse table
+	RemoveUnreachable(pRevTab, FinalStas, col, reachable);
+
+	//remove unreachable states, generate new DFA
+	CDfa tmpDfa;
+	MergeReachable(oneDfaTab, reachable, tmpDfa);
+
+	//divide nondistinguishable states
+	PartitionNonDisState(tmpDfa, pRevTab, Partition);
+
+	//DFA minization
+	MergeNonDisStates(tmpDfa, Partition, minDfaTab);
+
+	minDfaTab.SetId(oneDfaTab.GetId());
+
+	for (STATEID j = 0; j < minDfaTab.Size(); ++j)
+	{
+		std::cout << (int)j << ": ";
+		for (STATEID k = 0; k < minDfaTab.GetColNum(); ++k)
+		{
+			if(minDfaTab[j][k] != STATEID(-1))
+			{
+				std::cout << "(" << (int)k << "," << (int)minDfaTab[j][k]<< ")";
+			}
+
+		}
+		std::cout << std::endl;
+	}
+
+
+	delete []pRevTab;
 	return 0;
 }
 

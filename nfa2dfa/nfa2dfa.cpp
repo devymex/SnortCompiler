@@ -2,11 +2,6 @@
 #include "CreDfa.h"
 #include "nfa2dfa.h"
 
-typedef std::list<STATEID> STALIST;
-typedef std::list<STATEID>::iterator STALIST_ITER;
-typedef std::list<std::list<STATEID>> SETLIST;
-typedef std::list<std::list<STATEID>>::iterator SETLIST_ITER;
-
 CREDFA size_t NfaToDfa(CNfa &oneNfaTab, CDfa &dfaTab, bool combine)
 {
 	BYTE groups[DFACOLSIZE];
@@ -222,8 +217,10 @@ void MergeReachable(const CDfa &oneDfaTab, std::vector<BYTE> &reachable, CDfa &t
 }
 
 void PartitionNonDisState(CDfa &tmpDfa, std::vector<STATEID> *pRevTbl, SETLIST &pSets)
-{// every two states of the same partition are equivalent if they have the same behavior for all the input sequences,
- // and the partitions are reserved in pSets.
+{
+	//every two states in the same partition are equivalent 
+	//if they have the same behavior for all the input sequences,
+	//and the partitions are reserved in pSets.
 
 	size_t nColNum = tmpDfa.GetColNum();
 
@@ -238,18 +235,20 @@ void PartitionNonDisState(CDfa &tmpDfa, std::vector<STATEID> *pRevTbl, SETLIST &
 		wSets.push_back(iCurSet);
 	}
 
+	//each element in ableToW present a property of according state of tmpDfa,
+	//and has two labels, 0 and 1. 1 indicates the according state has the specific
+	//transition to one state of curWSet, 0 otherwise
 	std::vector<BYTE> ableToW(tmpDfa.Size(), 0);
 	bool bAllZero = true;
 	for (; !wSets.empty(); )
 	{
-		//choose and remove a partition from wSets
 		STALIST curWSet = *wSets.front();
 		wSets.pop_front();
 		for (BYTE byChar = 0; byChar < nColNum; ++byChar)
 		{
-			//each char in charset,label state for which a transition on char to a state in partition,
-			//1 is reachable and 0 is unreachable
-			//if no state reach to a state in partition, the bAllZero is true; else, the bAllZero is false.
+			//initialize the ableToW
+			//for each state in curWSet find source states of it in pRecTbl
+			//if exist at last one source state to curWSet, the bAllZero is set to false
 			for (STALIST_ITER iSta = curWSet.begin(); iSta != curWSet.end(); ++iSta)
 			{
 				std::vector<STATEID> &ableToI = pRevTbl[*iSta * nColNum + byChar];
@@ -445,21 +444,6 @@ CREDFA size_t DfaMin(CDfa &oneDfaTab, CDfa &minDfaTab)
 	MergeNonDisStates(tmpDfa, Partition, minDfaTab);
 
 	minDfaTab.SetId(oneDfaTab.GetId());
-
-	for (STATEID j = 0; j < minDfaTab.Size(); ++j)
-	{
-		std::cout << (int)j << ": ";
-		for (STATEID k = 0; k < minDfaTab.GetColNum(); ++k)
-		{
-			if(minDfaTab[j][k] != STATEID(-1))
-			{
-				std::cout << "(" << (int)k << "," << (int)minDfaTab[j][k]<< ")";
-			}
-
-		}
-		std::cout << std::endl;
-	}
-
 
 	delete []pRevTab;
 	return 0;
