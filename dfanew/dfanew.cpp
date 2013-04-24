@@ -3,7 +3,9 @@
 #include "CreDfa.h"
 
 DFANEWSC CDfanew::CDfanew()
+	: m_nId(size_t(-1)), m_nColNum(size_t(0)), m_StartId(STATEID(0))
 {
+	std::fill(m_pGroup, m_pGroup + DFACOLSIZE, BYTE(-1));
 	m_pDfa = new std::vector<CDfaRow>;
 	m_TermSet = new std::vector<TERMSET>;
 }
@@ -68,7 +70,14 @@ DFANEWSC void CDfanew::Init(BYTE *pGroup)
 
 DFANEWSC void CDfanew::Clear()
 {
-	
+	m_nId = size_t(-1);
+	m_nColNum = size_t(0);
+	m_StartId = STATEID(0);
+	std::fill(m_pGroup, m_pGroup + DFACOLSIZE, BYTE(-1));
+	delete m_pDfa;
+	delete m_TermSet;
+	m_pDfa = new std::vector<CDfaRow>;
+	m_TermSet = new std::vector<TERMSET>;
 }
 
 DFANEWSC size_t CDfanew::FromNFA(CNfa &nfa, NFALOG *nfalog, size_t Count, bool combine)
@@ -168,6 +177,13 @@ DFANEWSC size_t CDfanew::FromNFA(CNfa &nfa, NFALOG *nfalog, size_t Count, bool c
 						if(combine)
 						{
 							termStasVec.push_back(std::make_pair(nextNfaVec, nextSta));
+						}
+						else
+						{
+							TERMSET term;
+							term.dfaSta = nextSta;
+							term.dfaId = m_nId;
+							m_TermSet->push_back(term);
 						}
 
 					}
@@ -327,10 +343,70 @@ DFANEWSC size_t CDfanew::GetId()
 
 DFANEWSC size_t CDfanew::Process(BYTE *ByteStream, size_t len, CStateSet &StaSet)
 {
-	return 0;
+	std::vector<bool> res(m_pDfa->size(), false);
+	STATEID ActiveState = m_StartId;
+	size_t nPos = 0;
+	for (size_t nPos = 0; nPos < len; ++nPos)
+	{
+		if ((*this)[ActiveState].GetFlag() & CDfaRow::TERMINAL)
+		{
+			res[ActiveState] = true;
+		}
+		ActiveState = (*this)[ActiveState][m_pGroup[*(ByteStream + nPos)]];
+		if (ActiveState == STATEID(-1))
+		{
+			break;
+		}
+	}
+	for (size_t i = 0; i < res.size(); ++i)
+	{
+		if (res[i])
+		{
+			StaSet.PushBack(i);
+		}
+	}
+
+	return nPos;
 }
+
+struct COMPFORSORT
+{
+	bool operator()(const TERMSET &t1, const TERMSET &t2)
+	{
+		if (t1.dfaSta < t2.dfaSta || (t1.dfaSta == t2.dfaSta && t1.dfaId < t2.dfaId))
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+};
+
+struct COMP
+{
+	bool operator()(const TERMSET &t1, const TERMSET &t2)
+	{
+		if (t1.dfaSta < t2.dfaSta)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+};
 
 DFANEWSC void CDfanew::GetAcceptedId(STATEID id, CVectorNumber &dfaIds)
 {
-	
+	std::sort(m_TermSet->begin(), m_TermSet->end(), COMPFORSORT());
+	std::vector<TERMSET>::iterator Beg = std::lower_bound(m_TermSet->begin(), m_TermSet->end(), TERMSET(id, 0), COMP());
+	std::vector<TERMSET>::iterator End = std::upper_bound(m_TermSet->begin(), m_TermSet->end(), TERMSET(id, 0), COMP());
+	for (std::vector<TERMSET>::iterator i = Beg; i != End; ++i)
+	{
+		dfaIds.PushBack(i->dfaId);
+	}
+	dfaIds.Unique();
 }
