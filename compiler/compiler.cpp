@@ -351,8 +351,7 @@ void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 			for (size_t i = 0; i < nIncrement; ++i)
 			{
 				nId = nCursize + i;
-				CDfa &dfa = result.GetDfaTable()[nId];
-				dfa.SetId(nId);
+				CDfa dfa;
 				NfaToDfa(nfatree[i], dfa);
 				if (dfa.Size() > SC_STATELIMIT)
 				{
@@ -361,6 +360,9 @@ void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 					result.GetDfaTable().Resize(nCursize);
 					break;
 				}
+				CDfa &minDfa = result.GetDfaTable()[nId];
+				DfaMin(dfa, minDfa);
+				minDfa.SetId(nId);
 				ruleResult.m_dfaIds.PushBack(nId);
 			}
 		}

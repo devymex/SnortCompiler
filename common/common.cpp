@@ -477,7 +477,7 @@ COMMONSC STATEID CDfa::GetTermSetNum()
 {
 	return (STATEID)m_TermSet->size();
 }
-COMMONSC	CDfa::TERMSET CDfa::GetTermSet(STATEID num)
+COMMONSC CDfa::TERMSET CDfa::GetTermSet(STATEID num)
 {
 	return (*m_TermSet)[num];
 }
