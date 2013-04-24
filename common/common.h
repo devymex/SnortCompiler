@@ -126,8 +126,9 @@ public:
 	size_t GetId();
 	void SetId(size_t id);
 	size_t GetColNum();
-	void SetGroup(BYTE *pGroup);
+	void SetGroup(const BYTE *pGroup);
 	BYTE GetGroup(size_t nIdx);
+	const BYTE* GetGroup() const;
 	STATEID GetStartId()const;
 	void SetStartId(STATEID id);
 	void PushTermSet(TERMSET oneTerm);
@@ -271,7 +272,6 @@ public:
 	CRegChain();
 	~CRegChain();
 	CRegChain(const CRegChain &other);
-
 	size_t Size() const;
 	std::string& Back() const;
 	void PushBack(std::string &pcreStr);
