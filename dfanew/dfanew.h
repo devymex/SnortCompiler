@@ -6,6 +6,12 @@
 
 #define DFACOLSIZE 256
 
+#define HASHMODULO 1000000
+
+#define SC_STATELIMIT 254
+
+#define EMPTY 256
+
 #ifndef DFANEW_H_
 #define DFANEWSC __declspec(dllimport)
 #else
@@ -15,7 +21,7 @@
 struct DFANEWSC NFALOG
 {
 	size_t nfaStateId;
-	size_t nfaId;
+	size_t dfaId;
 };
 
 struct DFANEWSC TERMSET
@@ -36,7 +42,7 @@ public:
 	const CDfaRow& operator[](STATEID index) const;
 	void Init(BYTE *pGroup);
 	void Clear();
-	size_t FromNFA(CNfa &nfa, NFALOG *nfalog, size_t Count);
+	size_t FromNFA(CNfa &nfa, NFALOG *nfalog, size_t Count, bool combine = false);
 	size_t Minimize();
 	size_t GetGroupCount() const;
 	BYTE Char2Group(BYTE nIdx);
