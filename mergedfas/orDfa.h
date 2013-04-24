@@ -2,4 +2,4 @@
 
 void IncreDfaNum(CDfa &dfa, STATEID num);
 
-void InsertDfa(CDfa &dfa, CNfa &nfa, STATEID termSta);
+void InsertDfa(CDfa &dfa, CNfa &nfa, STATEID nTermSta);

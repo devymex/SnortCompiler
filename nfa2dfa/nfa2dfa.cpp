@@ -2,11 +2,18 @@
 #include "CreDfa.h"
 #include "nfa2dfa.h"
 
-CREDFA size_t NfaToDfa(CNfa &oneNfaTab, CDfa &dfaTab)
+typedef std::list<STATEID> STALIST;
+typedef std::list<STATEID>::iterator STALIST_ITER;
+typedef std::list<std::list<STATEID>> SETLIST;
+typedef std::list<std::list<STATEID>>::iterator SETLIST_ITER;
+
+CREDFA size_t NfaToDfa(CNfa &oneNfaTab, CDfa &dfaTab, bool combine)
 {
 	BYTE groups[DFACOLSIZE];
 	AvaiEdges(oneNfaTab, groups);
 	dfaTab.SetGroup(groups);
+
+	std::vector<std::pair<std::vector<size_t>, STATEID>> termStasVec;
 
 	typedef std::unordered_map<std::vector<size_t>, STATEID, STATESET_HASH> STATESETHASH;
 
@@ -94,6 +101,11 @@ CREDFA size_t NfaToDfa(CNfa &oneNfaTab, CDfa &dfaTab)
 					{
 						dfaTab.Back().SetFlag(dfaTab.Back().GetFlag() | dfaTab.Back().TERMINAL);
 						finFlag = 0;
+						if(combine)
+						{
+							termStasVec.push_back(std::make_pair(nextNfaVec, nextSta));
+						}
+
 					}
 					nfaStasStack.push(nextNfaVec);
 				}
@@ -105,18 +117,42 @@ CREDFA size_t NfaToDfa(CNfa &oneNfaTab, CDfa &dfaTab)
 		}
 	}
 
+	if(combine)
+	{
+		if(!termStasVec.empty())
+		{
+			std::vector<std::pair<size_t, size_t>> tempVec = oneNfaTab.GetDfaTerms();
+			for(size_t i = 0; i < tempVec.size(); ++i)
+			{
+				for(size_t j = 0; j < termStasVec.size(); ++j)
+				{
+					for(size_t k = 0; k < termStasVec[j].first.size(); ++k)
+					{
+						if(tempVec[i].first == termStasVec[j].first[k])
+						{
+							CDfa::TERMSET term;
+							term.dfaSta = termStasVec[j].second;
+							term.dfaId = tempVec[i].second;
+							dfaTab.PushTermSet(term);
+							break;
+						}
+					}
+				}
+			}
+		}
+	}
 	return 0;
 }
-//<<<<<<< HEAD
 
-void RemoveUnreachable(const CNfa &nfa, const std::vector<size_t> &fins, std::vector<BYTE> &reachable)
+void RemoveUnreachable(const std::vector<STATEID> *Tab, const STALIST &begs, const size_t &col, std::vector<BYTE> &reachable)
 {
-	std::vector<BYTE> staFlags(nfa.Size(), 0);
+	size_t stas = reachable.size();
+	std::vector<BYTE> staFlags(stas, 0);
 
 	std::vector<size_t> staStack;
-	staStack.reserve(nfa.Size());
+	staStack.reserve(stas);
 
-	staStack.assign(fins.begin(), fins.end());
+	staStack.assign(begs.begin(), begs.end());
 	for (; !staStack.empty(); )
 	{
 		size_t nSta = staStack.back();
@@ -124,269 +160,175 @@ void RemoveUnreachable(const CNfa &nfa, const std::vector<size_t> &fins, std::ve
 		if (staFlags[nSta] == 0)
 		{
 			staFlags[nSta] = 1;
-			for (size_t i = 0; i < CHARSETSIZE; ++i)
+			for (size_t i = 0; i < col; ++i)
 			{
-				for (size_t j = 0; j < nfa[nSta][i].Size(); ++j)
+				for (size_t j = 0; j < Tab[nSta * col + i].size(); ++j)
 				{
-					staStack.push_back(nfa[nSta][i][j]);
+					staStack.push_back(Tab[nSta * col + i][j]);
 				}
 			}
 		}
 	}
 
-	reachable.resize(staFlags.size(), 0);
 	for (std::vector<BYTE>::iterator i = staFlags.begin(); i != staFlags.end(); ++i)
 	{
-		reachable[i - staFlags.begin()] |= *i;
+		reachable[i - staFlags.begin()] += *i;
 	}
 }
 
-//void MergeReachable(CDfa &oneDfaTab, std::vector<BYTE> &reachable, CDfa &tmpDfa)
-//{
-//
-//
-//
-//	std::vector<size_t> full;
-//	std::vector<size_t> difference;
-//	for (size_t i = 0; i < oneDfaTab.Size(); ++i)
-//	{
-//		full.push_back(i);
-//	}
-//	std::set_difference(full.begin(), full.end(), Reachable.begin(), Reachable.end(), std::back_inserter(difference));
-//	tmpDfa.Resize(Reachable.size());
-//	size_t i = 0, j = 0, k = 0;
-//	for (; i < difference.size() && j < oneDfaTab.Size(); )
-//	{
-//		if (j != difference[i])
-//		{
-//			tmpDfa[k++] = oneDfaTab[j];
-//			tmpDfa[k].SetFlag(oneDfaTab[j].GetFlag());
-//			++j;
-//		}
-//		else
-//		{
-//			++i;
-//			++j;
-//		}
-//	}
-//	for ( ; j < oneDfaTab.Size(); ++j)
-//	{
-//		tmpDfa[k++] = oneDfaTab[j];
-//	}
-//
-//	for (size_t i = 0; i < tmpDfa.Size(); ++i)
-//	{
-//		for (size_t j = 97; j < 99; ++j)
-//		{
-//			std::cout << tmpDfa[i][j] << " "; 
-//		}
-//		std::cout << std::endl;
-//	}
-//	std::cout << std::endl;
-//
-//	for (std::vector<size_t>::iterator iter = difference.begin(); iter != difference.end(); ++iter)
-//	{
-//		for (size_t i = 0; i < tmpDfa.Size(); ++i)
-//		{
-//			//for (size_t j = 0; j < CHARSETSIZE; ++j)
-//			for (size_t j = 97; j < 99; ++j)
-//			{
-//				if (tmpDfa[i][j] == *iter)
-//				{
-//					tmpDfa[i][j] = size_t(-1); 
-//				}
-//			}
-//		}
-//	}
-//
-//	for (std::vector<size_t>::iterator iter = Reachable.begin(); iter != Reachable.end(); ++iter)
-//	{
-//		size_t index = iter - Reachable.begin();
-//		for (size_t i = 0; i < tmpDfa.Size(); ++i)
-//		{
-//			//for (size_t j = 0; j < CHARSETSIZE; ++j)
-//			for (size_t j = 97; j < 99; ++j)
-//			{
-//				if (tmpDfa[i][j] == *iter)
-//				{
-//					tmpDfa[i][j] = index; 
-//				}
-//			}
-//		}
-//	}
-//	for (size_t i = 0; i < tmpDfa.Size(); ++i)
-//	{
-//		for (size_t j = 97; j < 99; ++j)
-//		{
-//			std::cout << tmpDfa[i][j] << " "; 
-//		}
-//		std::cout << std::endl;
-//	}
-//	std::cout << std::endl;
-//}
-
-int SearchInSet(std::vector<size_t>::iterator beg, std::vector<size_t>::iterator end, std::vector<std::vector<size_t>> &NewSplitStates)
+void MergeReachable(const CDfa &oneDfaTab, std::vector<BYTE> &reachable, CDfa &tmpDfa)
 {
-	int post = 0;
-	if (!NewSplitStates.empty())
-	{
-		for (std::vector<std::vector<size_t>>::iterator i = NewSplitStates.begin(); i != NewSplitStates.end(); ++i)
-		{
-			std::vector<size_t>::iterator pos = std::search(i->begin(), i->end(), beg, end);
-			if (pos != i->end())
-			{
-				post = pos - i->begin();
-			}
-		}
-	}
-	return post;
-}
+	size_t nRcbCnt = std::count(reachable.begin(), reachable.end(), 2);
+	tmpDfa.Resize(nRcbCnt);
+	tmpDfa.SetGroup(oneDfaTab.GetGroup());
 
-void SubPartition(std::vector<std::vector<size_t>> &partition_states, std::vector<std::vector<size_t>> &NewSplitStates, std::vector<size_t> &equstates, std::vector<std::vector<size_t>> &NextPartition)
-{
-	std::vector<std::vector<size_t>> temp = NewSplitStates;
-	for (std::vector<std::vector<size_t>>::iterator iPS = partition_states.begin(); iPS != partition_states.end(); ++iPS)
+	STATEID nNewIdx = 0;
+	size_t nColNum = tmpDfa.GetColNum();
+	for (std::vector<BYTE>::iterator iter = reachable.begin(); iter != reachable.end(); ++iter)
 	{
-		std::vector<size_t> intersect;
-		std::vector<size_t> difference;
-		std::sort(iPS->begin(),iPS->end());
-		std::sort(equstates.begin(),equstates.end());
-		std::set_intersection(iPS->begin(), iPS->end(), equstates.begin(), equstates.end(), std::back_inserter(intersect));
-		std::set_difference(iPS->begin(), iPS->end(), equstates.begin(), equstates.end(), std::back_inserter(difference));
-		if (!intersect.empty())
+		if (2 == *iter)
 		{
-			NextPartition.push_back(intersect);
-			NextPartition.push_back(difference);
-			int post = SearchInSet(iPS->begin(), iPS->end(), temp);
-			if (post != 0)
-			{
-				NewSplitStates.erase(std::remove(NewSplitStates.begin(), NewSplitStates.end(), NewSplitStates[post]));
-				NewSplitStates.push_back(intersect);
-				NewSplitStates.push_back(difference);
-			}
-			else if (intersect.size() <= difference.size())
-			{
-				NewSplitStates.push_back(intersect);
-			}
-			else
-			{
-				NewSplitStates.push_back(difference);
-			}
-		}
-		else 
-		{
-			NextPartition.push_back(*iPS);
-		}
-	}
-
-	for (std::vector<std::vector<size_t>>::iterator i = NextPartition.begin(); i != NextPartition.end();)
-	{
-		if (i->size() == 0)
-		{
-			i = NextPartition.erase(i);
+			STATEID nStaId = STATEID(iter - reachable.begin());
+			tmpDfa[nNewIdx] = oneDfaTab[nStaId];
+			*iter = nNewIdx;
+			++nNewIdx;
 		}
 		else
 		{
-			++i;
+			*iter = STATEID(-1);
 		}
 	}
 
-	for (std::vector<std::vector<size_t>>::iterator i = NewSplitStates.begin(); i != NewSplitStates.end();)
+	for (size_t i = 0; i < nRcbCnt; ++i)
 	{
-		if (i->size() == 0)
+		CDfaRow &curRow = tmpDfa[i];
+		for (size_t j = 0; j < nColNum; ++j)
 		{
-			i = NewSplitStates.erase(i);
+			if (curRow[j] != STATEID(-1))
+			{
+				curRow[j] = reachable[curRow[j]];
+			}
 		}
-		else
-		{
-			++i;
-		}
-	}
+	}	
 }
 
-
-void PartitionNonDisState(CDfa &tmpDfa, CNfa &RevTab, std::vector<std::vector<size_t>> &partition, std::vector<size_t> &FinalStas)
+void PartitionNonDisState(CDfa &tmpDfa, std::vector<STATEID> *pRevTbl, SETLIST &pSets)
 {
-	std::vector<std::vector<size_t>> NewSplit;
-	CDfa tmp = tmpDfa;
 
-	for (NewSplit.push_back(FinalStas); !NewSplit.empty(); )
+	size_t nColNum = tmpDfa.GetColNum();
+
+	std::list<SETLIST_ITER> wSets;
+	SETLIST_ITER iLast = pSets.end();
+	--iLast;
+	
+	for (SETLIST_ITER iCurSet = pSets.begin(); iCurSet != iLast; ++iCurSet)
 	{
-		std::vector<size_t> oneset;
-		oneset = NewSplit.front();
-		NewSplit.erase(NewSplit.begin());
+		wSets.push_back(iCurSet);
+	}
 
-		for (size_t character = 0; character < CHARSETSIZE; ++character)
+	std::vector<BYTE> ableToW(tmpDfa.Size(), 0);
+	bool bAllZero = true;
+	for (; !wSets.empty(); )
+	{
+		STALIST curWSet = *wSets.front();
+		wSets.pop_front();
+		for (BYTE byChar = 0; byChar < nColNum; ++byChar)
 		{
-			std::vector<size_t> equstates;
-			for (std::vector<size_t>::iterator iState = oneset.begin(); iState != oneset.end(); ++iState)
+			for (STALIST_ITER iSta = curWSet.begin(); iSta != curWSet.end(); ++iSta)
 			{
-				if (RevTab[*iState][character].Size() != 0)
+				std::vector<STATEID> &ableToI = pRevTbl[*iSta * nColNum + byChar];
+				for (std::vector<STATEID>::iterator i = ableToI.begin(); i != ableToI.end(); ++i)
 				{
-					for (size_t i = 0; i < RevTab[*iState][character].Size(); ++i)
-					{
-						equstates.push_back(RevTab[*iState][character][i]);
-					}
+					ableToW[*i] = 1;
+					bAllZero = false;
 				}
 			}
-
-			if (!equstates.empty())
+			if (!bAllZero)
 			{
-				std::vector<std::vector<size_t>> NextPartition;
-				SubPartition(partition, NewSplit, equstates, NextPartition);
-				partition.clear();
-				partition = NextPartition;	
+				for (SETLIST_ITER iPSet = pSets.begin(); iPSet != pSets.end(); ++iPSet)
+				{
+					for (STALIST_ITER iCurSta = iPSet->begin(); iCurSta != iPSet->end(); )
+					{
+						if (ableToW[*iCurSta] == 0)
+						{
+							STATEID tmp = *iCurSta;
+							iCurSta = iPSet->erase(iCurSta);
+							iPSet->insert(iPSet->begin(), tmp);
+						}
+						else
+						{
+							++iCurSta;
+						}
+					} 
+					size_t nUnableCnt = 0;
+					STALIST_ITER iCutBeg = iPSet->begin(), iCutEnd = iPSet->end();
+					for (; iCutBeg != iPSet->end(); ++iCutBeg)
+					{
+						if (ableToW[*iCutBeg] == 1)
+						{
+							break;
+						}
+						++nUnableCnt;
+					}
+					if (nUnableCnt <= iPSet->size() / 2)
+					{
+						iCutEnd = iCutBeg;
+						iCutBeg = iPSet->begin();
+					}
+					if (iCutBeg != iCutEnd)
+					{
+						SETLIST_ITER iOldSet = iPSet;
+						iPSet = pSets.insert(++iPSet, STALIST());
+						iPSet->splice(iPSet->begin(), *iOldSet, iCutBeg, iCutEnd);
+						wSets.push_back(iPSet);
+					}
+				}
+				ZeroMemory(&ableToW[0], ableToW.size());
+				bAllZero = true;
 			}
 		}
 	}
 }
 
-struct COMPARE
+void MergeNonDisStates(CDfa &tmpDfa, SETLIST &Partition, CDfa &minDfaTab)
 {
-	bool operator()(std::vector<size_t> &x, std::vector<size_t> &y)
-	{
-		return x.front() < y.front();
-	}
-};
+	std::vector<STATEID> sta2Part(tmpDfa.Size());
 
-
-void MergeNonDisStates(CDfa &tmpDfa, std::vector<std::vector<size_t>> &Partition, CDfa &minDfaTab)
-{
-	std::sort(Partition.begin(), Partition.end(), COMPARE());
+	minDfaTab.SetGroup(tmpDfa.GetGroup());
 	minDfaTab.Resize(Partition.size());
-	size_t k = 0;
-	for (size_t i = 0, j = 0; i < Partition.size() && j < tmpDfa.Size(); )
+
+	size_t nSetIdx = 0;
+	for (SETLIST_ITER iSet = Partition.begin(); iSet != Partition.end(); ++iSet)
 	{
-		if (j == Partition[i].front())
+		for (STALIST_ITER iSta = iSet->begin(); iSta != iSet->end(); ++iSta)
 		{
-			minDfaTab[k++] = tmpDfa[j];			
-			minDfaTab[k-1].SetFlag(tmpDfa[j].GetFlag());
-			++i;
-			++j;
-		}
-		else
-		{
-			++j;
-		}
-	}
-	for (std::vector<std::vector<size_t>>::iterator iP = Partition.begin(); iP != Partition.end(); ++iP)
-	{
-		STATEID tmp = (STATEID)(iP - Partition.begin());
-		for (std::vector<size_t>::iterator iS = iP->begin(); iS != iP->end(); ++iS)
-		{
-			for (size_t i = 0; i < minDfaTab.Size(); ++i)
+			sta2Part[*iSta] = nSetIdx;
+			if ((tmpDfa[*iSta].GetFlag() & tmpDfa[*iSta].START) != 0)
 			{
-				for (size_t j = 0; j < CHARSETSIZE; ++j)
-				{
-					if (minDfaTab[i][j] == *iS)
-					{
-						minDfaTab[i][j] = tmp;
-					}
-				}
+				minDfaTab.SetStartId(nSetIdx);
 			}
 		}
+		++nSetIdx;
+	}
+
+	nSetIdx = 0;
+	for (SETLIST_ITER iSet = Partition.begin(); iSet != Partition.end(); ++iSet)
+	{
+		for (BYTE iCol = 0; iCol != minDfaTab.GetColNum(); ++iCol)
+		{
+			CDfaRow &orgRow = tmpDfa[iSet->front()];
+			STATEID nDest = -1;
+			if (orgRow[iCol] != STATEID(-1))
+			{
+				nDest = sta2Part[orgRow[iCol]];
+			}
+			minDfaTab[nSetIdx][iCol] = nDest;
+		}
+		minDfaTab[nSetIdx].SetFlag(tmpDfa[iSet->front()].GetFlag());
+		++nSetIdx;
 	}
 }
+
 
 CREDFA size_t DfaMin(CDfa &oneDfaTab, CDfa &minDfaTab)
 {
@@ -396,54 +338,73 @@ CREDFA size_t DfaMin(CDfa &oneDfaTab, CDfa &minDfaTab)
 	}
 
 	// Extract final states from a dfa;
-	std::vector<size_t> FinalStas;
-	std::vector<size_t> NormalStas;
-	for (size_t i = 0; i < oneDfaTab.Size(); ++i)
+	std::list<std::list<STATEID>> Partition(1);
+	std::list<STATEID> FinalStas;
+	for (STATEID i = 0; i < oneDfaTab.Size(); ++i)
 	{
 		if ((oneDfaTab[i].GetFlag() & oneDfaTab[i].TERMINAL) != 0)
 		{
 			FinalStas.push_back(i);
+			Partition.push_front(std::list<STATEID>());
+			Partition.front().push_back(i);
 		}
 		else
 		{
-			NormalStas.push_back(i);
+			Partition.back().push_back(i);
 		}
 	}
 
-	if (FinalStas.empty())
+	if (Partition.size() == 1 || Partition.back().empty())
 	{
 		return size_t(-2);
 	}
 
-
-	std::vector<BYTE> reachable;
-	CNfa nfaTab;
-	nfaTab.FromDfa(oneDfaTab);
-	RemoveUnreachable(nfaTab, FinalStas, reachable);
-
-	CNfa revTab;
-	revTab.Resize(oneDfaTab.Size());
-	for (size_t i = 0; i < oneDfaTab.Size(); ++i)
+	size_t row = oneDfaTab.Size();
+	size_t col = oneDfaTab.GetColNum();
+	std::vector<STATEID> *pPosTab = new std::vector<STATEID>[row * col];
+	for (size_t i = 0; i < row; ++i)
 	{
-		for (size_t j = 0; j < CHARSETSIZE; ++j)
+		for (size_t j = 0; j < col; ++j)
 		{
-			if (oneDfaTab[i][j] != -1)
+			STATEID nDest = oneDfaTab[i][j];
+			if (nDest != STATEID(-1))
 			{
-				revTab[oneDfaTab[i][j]][j].PushBack(i);
+				pPosTab[i * col + j].push_back(nDest);
 			}
 		}
 	}
-	RemoveUnreachable(revTab, FinalStas, reachable);
+
+	std::vector<BYTE> reachable(oneDfaTab.Size(), 0);
+	std::list<STATEID> StartStas;
+	StartStas.push_back(0);
+
+	RemoveUnreachable(pPosTab, StartStas, col, reachable);
+	delete []pPosTab;
+
+	std::vector<STATEID> *pRevTab = new std::vector<STATEID>[row * col];
+	for (size_t i = 0; i < row; ++i)
+	{
+		for (size_t j = 0; j < col; ++j)
+		{
+			STATEID nDest = oneDfaTab[i][j];
+			if (nDest != STATEID(-1))
+			{
+				pRevTab[nDest * col + j].push_back(STATEID(i));
+			}
+		}
+	}
+
+	RemoveUnreachable(pRevTab, FinalStas, col, reachable);
 
 	CDfa tmpDfa;
-	//MergeReachable(oneDfaTab, reachable, tmpDfa);
+	MergeReachable(oneDfaTab, reachable, tmpDfa);
 
-	//std::vector<std::vector<size_t>> Partition;
-	//Partition.push_back(FinalStas);
-	//Partition.push_back(NormalStas);
+	PartitionNonDisState(tmpDfa, pRevTab, Partition);
+	MergeNonDisStates(tmpDfa, Partition, minDfaTab);
 
-	//PartitionNonDisState(tmpDfa, RevTab, Partition, FinalStas);
-	//MergeNonDisStates(tmpDfa, Partition, minDfaTab);
+	minDfaTab.SetId(oneDfaTab.GetId());
 
+	delete []pRevTab;
 	return 0;
 }
+

@@ -15,7 +15,7 @@ void IncreDfaNum(CDfa &dfa, STATEID num)
 	}
 }
 //termSta is the terminal state of nfa which is caculated in advance
-void InsertDfa(CDfa &dfa, CNfa &nfa, STATEID termSta)
+void InsertDfa(CDfa &dfa, CNfa &nfa, STATEID nTermSta)
 {
 	STATEID temp = (STATEID)nfa.Size();
 	nfa.Resize(nfa.Size() + dfa.Size());
@@ -23,7 +23,8 @@ void InsertDfa(CDfa &dfa, CNfa &nfa, STATEID termSta)
 	{
 		if((dfa[i].GetFlag() & CDfaRow::TERMINAL) != 0)
 		{
-			nfa[temp + i][EMPTYEDGE].PushBack(termSta);
+			nfa[temp + i][EMPTYEDGE].PushBack(nTermSta);
+			nfa.PushDfaTerms(std::make_pair(temp + i, dfa.GetId()));
 		}
 		for(size_t charNum = 0; charNum < DFACOLSIZE; ++charNum)
 		{

@@ -40,10 +40,11 @@ struct STATESET_HASH
 
 void AvaiEdges(CNfa &oneNfaTab, BYTE *group);
 
-void NextNfaSet(const CNfa &oneNfaTab, const std::vector<size_t> &curNfaVec,
-				size_t edge, std::vector<size_t> &nextENfaVec, char &finFlag);
+void NextNfaSet(const CNfa &oneNfaTab, const std::vector<size_t> &curNfaVec, size_t edge,
+				std::vector<size_t> &nextENfaVec, char &finFlag);
 
-void EClosure(const CNfa &oneNfaTab, const std::vector<size_t> &curNfaVec, std::vector<size_t> &eNfaVec, char &finFlag);
+void EClosure(const CNfa &oneNfaTab, const std::vector<size_t> &curNfaVec, 
+			  std::vector<size_t> &eNfaVec, char &finFlag);
 
 void printNfa(CNfa oneNfaTab);
 

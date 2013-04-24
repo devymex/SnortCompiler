@@ -106,6 +106,12 @@ private:
 class COMMONSC CDfa
 {
 public:
+	struct TERMSET
+	{
+		STATEID dfaSta;
+		size_t dfaId;
+	};
+
 	CDfa();
 	~CDfa();
 	CDfa(const CDfa &other);
@@ -120,13 +126,20 @@ public:
 	size_t GetId();
 	void SetId(size_t id);
 	size_t GetColNum();
-	void SetGroup(BYTE *pGroup);
+	void SetGroup(const BYTE *pGroup);
 	BYTE GetGroup(size_t nIdx);
+	const BYTE* GetGroup() const;
+	STATEID GetStartId()const;
+	void SetStartId(STATEID id);
+	void PushTermSet(TERMSET oneTerm);
 private:
 	size_t m_nId;
 	size_t m_nColNum;
+	STATEID m_StartId;
 	BYTE m_pGroup[DFACOLSIZE];
 	std::vector<CDfaRow> *m_pDfa;
+	//pair.first 用来存放dfa的某一终态, pair.second 用来存放该终态对应哪一个dfaid
+	std::vector<TERMSET> *m_TermSet;
 };
 
 class COMMONSC CNfa
@@ -144,6 +157,8 @@ public:
 	void PushBack(const CNfaRow &row);
 	void PopBack();
 	void SetPcre(const char* lpPcre);
+	void PushDfaTerms(std::pair<size_t, size_t> pair);
+	std::vector<std::pair<size_t, size_t>> GetDfaTerms();
 	const char* GetPcre() const;
 
 	CNfaRow &Back();
@@ -153,6 +168,8 @@ private:
 	//std::string *m_pRegex;
 	std::vector<CNfaRow> *m_pNfa;
 	std::string *m_pPcre;
+	//如果该nfa是由dfa合并过程中生成的，该成员用于记录哪个状态能够识别哪个dfa终态
+	std::vector<std::pair<size_t, size_t>> m_DfaTerms;
 };
 
 //class COMMONSC CDfa
@@ -255,7 +272,6 @@ public:
 	CRegChain();
 	~CRegChain();
 	CRegChain(const CRegChain &other);
-
 	size_t Size() const;
 	std::string& Back() const;
 	void PushBack(std::string &pcreStr);
