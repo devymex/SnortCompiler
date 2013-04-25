@@ -47,8 +47,3 @@ void NextNfaSet(const CNfa &oneNfaTab, const std::vector<size_t> &curNfaVec, siz
 void EClosure(const CNfa &oneNfaTab, const std::vector<size_t> &curNfaVec, 
 			  std::vector<size_t> &eNfaVec, char &finFlag);
 
-void RemoveUnreachable(const std::vector<STATEID> *Tab, const STALIST &begs, 
-					   const size_t &col, std::vector<BYTE> &reachable);
-
-void PartitionNonDisState(const size_t &groupnum, const size_t &size, std::vector<STATEID> *pRevTbl, SETLIST &pSets);
-

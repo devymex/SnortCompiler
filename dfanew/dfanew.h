@@ -63,7 +63,10 @@ private:
 	//pair.first 用来存放dfa的某一终态, pair.second 用来存放该终态对应哪一个dfaid
 	std::vector<TERMSET> *m_TermSet;
 
+	void RemoveUnreachable(const std::vector<STATEID> *Tab, const STALIST &begs, 
+		const size_t &col, std::vector<BYTE> &reachable);
 	void MergeReachable(std::vector<BYTE> &reachable);
+	void PartitionNonDisState(std::vector<STATEID> *pRevTbl, SETLIST &pSets);
 	void MergeNonDisStates(SETLIST &Partition);
 
 };

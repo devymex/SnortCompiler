@@ -315,7 +315,7 @@ DFANEWSC size_t CDfanew::Minimize()
 	}
 
 	//divide nondistinguishable states
-	PartitionNonDisState(GetGroupCount(), m_pDfa->size(), pRevTab, Partition);
+	PartitionNonDisState(pRevTab, Partition);
 
 	//DFA minization
 	MergeNonDisStates(Partition);
@@ -424,6 +424,45 @@ DFANEWSC void CDfanew::GetAcceptedId(STATEID id, CVectorNumber &dfaIds)
 	dfaIds.Unique();
 }
 
+//删除不可达状态或者“死”状态，Tab表示传入一个DFA的正向访问表或一个DFA的逆向访问表
+//begs表示读Tab的起始位置
+//reachable表示可达状态集合，初始值为0，输出结果
+void CDfanew::RemoveUnreachable(const std::vector<STATEID> *Tab, const STALIST &begs, const size_t &col, std::vector<BYTE> &reachable)
+{
+	size_t stas = reachable.size();
+	//mark state after traversal, 0 is unreachable and 1 is reachable
+	std::vector<BYTE> staFlags(stas, 0);
+
+	//reserve current visited states
+	std::vector<size_t> staStack;
+	staStack.reserve(stas);
+
+	staStack.assign(begs.begin(), begs.end());
+	//extract each state in staStack until all states have visited
+	for (; !staStack.empty(); )
+	{
+		size_t nSta = staStack.back();
+		staStack.pop_back();
+		if (staFlags[nSta] == 0)
+		{
+			staFlags[nSta] = 1;
+			//according to each of transitions add states to staStack 
+			for (size_t i = 0; i < col; ++i)
+			{
+				for (size_t j = 0; j < Tab[nSta * col + i].size(); ++j)
+				{
+					staStack.push_back(Tab[nSta * col + i][j]);
+				}
+			}
+		}
+	}
+
+	for (std::vector<BYTE>::iterator i = staFlags.begin(); i != staFlags.end(); ++i)
+	{
+		reachable[i - staFlags.begin()] += *i;
+	}
+}
+
 //reachable中保留所有的可达状态，reachable中元素的取值有3个，
 //0 表示该状态为孤立状态，1 表示该状态为不可达状态或者“死”状态，2 表示该状态为可达状态
 void CDfanew::MergeReachable(std::vector<BYTE> &reachable)
@@ -493,6 +532,104 @@ void CDfanew::MergeReachable(std::vector<BYTE> &reachable)
 	{
 		(*m_pDfa)[nNewIdx] = tmpDfa[idx];
 		++nNewIdx;
+	}
+}
+
+//groupnum表示字符集长度，size表示原DFA的状态数，pRevTbl表示逆向访问表
+//pSets表示输入一个状态集的初始划分，输出一个状态集的最终划分结果
+//pSets初始值为终态和非终态集合，其中最后一个为非终态集合
+void CDfanew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, SETLIST &pSets)
+{
+	//将需要查找的划分的iterator存入wSets，初始化时只保存终态集合
+	std::list<SETLIST_ITER> wSets;
+	SETLIST_ITER iLast = pSets.end();
+	--iLast;
+
+	//initialize wSets
+	for (SETLIST_ITER iCurSet = pSets.begin(); iCurSet != iLast; ++iCurSet)
+	{
+		wSets.push_back(iCurSet);
+	}
+
+	//each element in ableToW present a property of according state of tmpDfa,
+	//and has two labels, 0 and 1. 1 indicates the according state has the specific
+	//transition to one state of curWSet, 0 otherwise
+	std::vector<BYTE> ableToW(m_pDfa->size(),BYTE(0));
+	bool bAllZero = true;
+	BYTE groupnum = (BYTE)GetGroupCount();
+	for (; !wSets.empty(); )
+	{
+		STALIST curWSet = *wSets.front();
+		wSets.pop_front();
+		for (BYTE byChar = 0; byChar < groupnum; ++byChar)
+		{
+			//initialize the ableToW
+			//for each state in curWSet find source states of it in pRecTbl
+			//if exist at last one source state to curWSet, the bAllZero is set to false
+			for (STALIST_ITER iSta = curWSet.begin(); iSta != curWSet.end(); ++iSta)
+			{
+				std::vector<STATEID> &ableToI = pRevTbl[*iSta * groupnum + byChar];
+				for (std::vector<STATEID>::iterator i = ableToI.begin(); i != ableToI.end(); ++i)
+				{
+					ableToW[*i] = 1;
+					bAllZero = false;
+				}
+			}
+			if (!bAllZero)
+			{
+				for (SETLIST_ITER iPSet = pSets.begin(); iPSet != pSets.end(); ++iPSet)
+				{
+					//each partition in pSets,according to the label of a state in partition adjust position 
+					//all unvisited states lie in the front of list, visited states locate
+					//at the rear end of list 
+					for (STALIST_ITER iCurSta = iPSet->begin(); iCurSta != iPSet->end(); )
+					{
+						if (ableToW[*iCurSta] == 0)
+						{
+							STATEID tmp = *iCurSta;
+							iCurSta = iPSet->erase(iCurSta);
+							iPSet->insert(iPSet->begin(), tmp);
+						}
+						else
+						{
+							++iCurSta;
+						}
+					} 
+
+					//mark the position of two new partition
+					size_t nUnableCnt = 0;
+					STALIST_ITER iCutBeg = iPSet->begin(), iCutEnd = iPSet->end();
+					for (; iCutBeg != iPSet->end(); ++iCutBeg)
+					{
+						if (ableToW[*iCutBeg] == 1)
+						{
+							break;
+						}
+						++nUnableCnt;
+					}
+
+					//record start position of the less partition 
+					if (nUnableCnt <= iPSet->size() / 2)
+					{
+						iCutEnd = iCutBeg;
+						iCutBeg = iPSet->begin();
+					}
+
+					//the less partition insert into pSets, its iterator insert into wSets
+					if (iCutBeg != iCutEnd)
+					{
+						SETLIST_ITER iOldSet = iPSet;
+						iPSet = pSets.insert(++iPSet, STALIST());
+						iPSet->splice(iPSet->begin(), *iOldSet, iCutBeg, iCutEnd);
+						wSets.push_back(iPSet);
+					}
+				}
+
+				//initialize ableToW and bAllZero before read the next char, 
+				ZeroMemory(&ableToW[0], ableToW.size());
+				bAllZero = true;
+			}
+		}
 	}
 }
 
