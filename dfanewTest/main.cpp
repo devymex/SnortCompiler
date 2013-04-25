@@ -22,7 +22,7 @@ void main()
 	std::cout << std::endl;
 
 	dfa.Minimize();
-		for (size_t i = 0; i < dfa.Size(); ++i)
+	for (size_t i = 0; i < dfa.Size(); ++i)
 	{
 		std::cout << i << ":";
 		for (size_t j = 0; j < dfa.GetGroupCount(); ++j)
@@ -37,6 +37,13 @@ void main()
 	CStateSet StaSet;
 	dfa.Process(b, sizeof(b), StaSet);
 	CVectorNumber dfaIds;
-	dfa.GetAcceptedId(2, dfaIds);
+	for (size_t i = 0; i < StaSet.Size(); ++i)
+	{
+		dfa.GetAcceptedId(StaSet[i], dfaIds);
+		for (size_t j = 0; j < dfaIds.Size(); ++j)
+		{
+			std::cout << dfaIds[j] << std::endl;
+		}
+	}
 	system("pause");
 }
