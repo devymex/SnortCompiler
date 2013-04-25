@@ -20,11 +20,6 @@
 //	size_t destState[CHARSETSIZE];
 //};
 
-typedef std::list<STATEID> STALIST;
-typedef std::list<STATEID>::iterator STALIST_ITER;
-typedef std::list<std::list<STATEID>> SETLIST;
-typedef std::list<std::list<STATEID>>::iterator SETLIST_ITER;
-
 struct STATESET_HASH
 {
 	enum {MAX_SIZE = 20000};
@@ -55,8 +50,5 @@ void EClosure(const CNfa &oneNfaTab, const std::vector<size_t> &curNfaVec,
 void RemoveUnreachable(const std::vector<STATEID> *Tab, const STALIST &begs, 
 					   const size_t &col, std::vector<BYTE> &reachable);
 
-void MergeReachable(CDfanew &oneDfaTab, std::vector<BYTE> &reachable);
+void PartitionNonDisState(const size_t &groupnum, const size_t &size, std::vector<STATEID> *pRevTbl, SETLIST &pSets);
 
-void PartitionNonDisState(const size_t &groupnum, std::vector<STATEID> *pRevTbl, SETLIST &pSets);
-
-void MergeNonDisStates(CDfanew &oneDfaTab, SETLIST &Partition);

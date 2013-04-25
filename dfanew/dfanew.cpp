@@ -80,12 +80,6 @@ DFANEWSC void CDfanew::Clear()
 	m_TermSet = new std::vector<TERMSET>;
 }
 
-DFANEWSC void CDfanew::m_pDfaClear()
-{
-	delete m_pDfa;
-	m_pDfa = new std::vector<CDfaRow>;
-}
-
 DFANEWSC size_t CDfanew::FromNFA(CNfa &nfa, NFALOG *nfalog, size_t Count, bool combine)
 {
 	BYTE groups[DFACOLSIZE];
@@ -237,7 +231,7 @@ DFANEWSC size_t CDfanew::Minimize()
 		return size_t(-1);
 	}
 
-	// Extract terminal states from a dfa, initialize partition with terminal states and normal states
+	// FinalStas中保存当前DFA的所有终态，Partition中保存当前DFA的终态和非终态集合，一个终态作为一个集合存入
 	std::list<std::list<STATEID>> Partition(1);
 	std::list<STATEID> FinalStas;
 	for (STATEID i = 0; i < m_pDfa->size(); ++i)
@@ -260,7 +254,7 @@ DFANEWSC size_t CDfanew::Minimize()
 		return size_t(-2);
 	}
 
-	//generate positive traverse table
+	//构建正向访问表，指从起始状态开始正向扫描DFA，记录当前状态通过某一字符可到达的状态集合
 	size_t row = m_pDfa->size();
 	size_t col = GetGroupCount();
 	std::vector<STATEID> *pPosTab = new std::vector<STATEID>[row * col];
@@ -276,6 +270,7 @@ DFANEWSC size_t CDfanew::Minimize()
 		}
 	}
 
+	//初始化可达状态表reachable
 	std::vector<BYTE> reachable(m_pDfa->size(), 0);
 	std::list<STATEID> StartStas;
 	StartStas.push_back(0);
@@ -284,7 +279,7 @@ DFANEWSC size_t CDfanew::Minimize()
 	RemoveUnreachable(pPosTab, StartStas, col, reachable);
 	delete []pPosTab;
 
-	//generate reverse traverse table	
+	//构建逆向访问表，从终态开始逆向扫描DFA，记录哪些状态可以通过某一字符到达当前状态
 	std::vector<STATEID> *pRevTab = new std::vector<STATEID>[row * col];
 	for (STATEID i = 0; i < row; ++i)
 	{
@@ -303,7 +298,7 @@ DFANEWSC size_t CDfanew::Minimize()
 	delete []pRevTab;
 
 	//remove unreachable states, generate new DFA
-	MergeReachable(*this, reachable);
+	MergeReachable(reachable);
 
 	row = m_pDfa->size();
 	pRevTab = new std::vector<STATEID>[row * col];
@@ -320,10 +315,10 @@ DFANEWSC size_t CDfanew::Minimize()
 	}
 
 	//divide nondistinguishable states
-	PartitionNonDisState(GetGroupCount(), pRevTab, Partition);
+	PartitionNonDisState(GetGroupCount(), m_pDfa->size(), pRevTab, Partition);
 
 	//DFA minization
-	MergeNonDisStates(*this, Partition);
+	MergeNonDisStates(Partition);
 
 	delete []pRevTab;
 	return 0;
@@ -347,11 +342,6 @@ DFANEWSC const BYTE* CDfanew::GetGroup() const
 DFANEWSC STATEID CDfanew::GetStartId() const
 {
 	return m_StartId;
-}
-
-DFANEWSC void CDfanew::SetStartId(STATEID id)
-{
-	m_StartId = id;
 }
 
 DFANEWSC void CDfanew::SetId(size_t id)
@@ -433,3 +423,153 @@ DFANEWSC void CDfanew::GetAcceptedId(STATEID id, CVectorNumber &dfaIds)
 	}
 	dfaIds.Unique();
 }
+
+//reachable中保留所有的可达状态，reachable中元素的取值有3个，
+//0 表示该状态为孤立状态，1 表示该状态为不可达状态或者“死”状态，2 表示该状态为可达状态
+void CDfanew::MergeReachable(std::vector<BYTE> &reachable)
+{
+	//统计可达状态的数目
+	size_t nRcbCnt = std::count(reachable.begin(), reachable.end(), 2);
+
+	size_t nColNum = GetGroupCount();
+
+	//标记终态的dfaId，以保证终态编号更改后，其对应的dfaId保持不变
+	std::vector<size_t> termFlag(m_pDfa->size(), size_t(-1));
+	for (size_t i = 0; i < m_TermSet->size(); ++i)
+	{
+		termFlag[(*m_TermSet)[i].dfaSta] = (*m_TermSet)[i].dfaId;
+	}
+	delete m_TermSet;
+	m_TermSet = new std::vector<TERMSET>;
+	
+	//定义一个同成员变量m_pDfa类型相同的变量，用于存储删除多余状态后的DFA跳转表
+	std::vector<CDfaRow> tmpDfa;
+	tmpDfa.resize(nRcbCnt, nColNum);
+
+	STATEID nNewIdx = 0;
+	//将m_pDfa中编号对应为可达状态的复制到tmpDfa中，并修改reachable中可达状态的编号
+	for (std::vector<BYTE>::iterator iter = reachable.begin(); iter != reachable.end(); ++iter)
+	{
+		if (2 == *iter)
+		{
+			STATEID nStaId = STATEID(iter - reachable.begin());
+			tmpDfa[nNewIdx] = (*m_pDfa)[nStaId];
+			*iter = nNewIdx;
+
+			//存入新的终态编号
+			if (((*m_pDfa)[nStaId].GetFlag() & (*m_pDfa)[nStaId].TERMINAL) != 0)
+			{
+				TERMSET tmpSta;
+				tmpSta.dfaSta = nNewIdx;
+				tmpSta.dfaId = termFlag[nStaId];
+				m_TermSet->push_back(tmpSta);
+			}
+			++nNewIdx;
+		}
+		else
+		{
+			*iter = STATEID(-1);
+		}
+	}
+
+	//将tmpDfa中的状态编号修改为相应的新编号
+	for (STATEID i = 0; i < nRcbCnt; ++i)
+	{
+		CDfaRow &curRow = tmpDfa[i];
+		for (STATEID j = 0; j < nColNum; ++j)
+		{
+			if (curRow[j] != STATEID(-1))
+			{
+				curRow[j] = reachable[curRow[j]];
+			}
+		}
+	}
+
+	//替换m_pDfa
+	m_pDfa->clear();
+	m_pDfa->resize(nRcbCnt, nColNum);
+	nNewIdx = 0;
+	for (STATEID idx = 0; idx < nRcbCnt; ++idx)
+	{
+		(*m_pDfa)[nNewIdx] = tmpDfa[idx];
+		++nNewIdx;
+	}
+}
+
+//Partition中的元素为一个状态的集合，集合中元素为多个等价状态，每个集合可以合并为新的DFA中一个状态
+void CDfanew::MergeNonDisStates(SETLIST &Partition)
+{
+	std::vector<STATEID> sta2Part(m_pDfa->size());
+	
+	STATEID nCol = (STATEID)GetGroupCount();
+
+	//标记终态的dfaId，以保证终态编号更改后，其对应的dfaId保持不变
+	std::vector<size_t> termFlag(m_pDfa->size(), size_t(-1));
+	for (size_t i = 0; i < m_TermSet->size(); ++i)
+	{
+		termFlag[(*m_TermSet)[i].dfaSta] = (*m_TermSet)[i].dfaId;
+	}
+	delete m_TermSet;
+	m_TermSet = new std::vector<TERMSET>;
+
+	//定义一个同CDfanew中成员变量m_pDfa类型相同的变量，用于存储删除多余状态后的DFA跳转表
+	std::vector<CDfaRow> tmpDfa;
+	tmpDfa.resize((STATEID)Partition.size(), nCol);
+
+	//等价的状态存于同一个partition中，标记原来的状态存在哪一个新的partition中，并修改新的起始状态编号
+	STATEID nSetIdx = 0;
+	for (SETLIST_ITER iSet = Partition.begin(); iSet != Partition.end(); ++iSet)
+	{
+		for (STALIST_ITER iSta = iSet->begin(); iSta != iSet->end(); ++iSta)
+		{
+			sta2Part[*iSta] = nSetIdx;
+			//修改新的起始状态
+			if (((*m_pDfa)[*iSta].GetFlag() & (*m_pDfa)[*iSta].START) != 0)
+			{
+				m_StartId = nSetIdx;
+			}
+
+			//存入新的终态编号
+			if (((*m_pDfa)[*iSta].GetFlag() & (*m_pDfa)[*iSta].TERMINAL) != 0)
+			{
+				TERMSET tmpSta;
+				tmpSta.dfaSta = nSetIdx;
+				tmpSta.dfaId = termFlag[*iSta];
+				m_TermSet->push_back(tmpSta);
+			}
+
+		}
+		++nSetIdx;
+	}
+
+	//set new DFA and modify new number
+	nSetIdx = 0;
+	for (SETLIST_ITER iSet = Partition.begin(); iSet != Partition.end(); ++iSet)
+	{
+		for (BYTE iCol = 0; iCol != nCol; ++iCol)
+		{
+			CDfaRow &orgRow = (*m_pDfa)[iSet->front()];
+			STATEID nDest = STATEID(-1);
+			if (orgRow[iCol] != STATEID(-1))
+			{
+				nDest = sta2Part[orgRow[iCol]];
+			}
+			tmpDfa[nSetIdx][iCol] = nDest;
+		}
+
+		//set a state attribute
+		tmpDfa[nSetIdx].SetFlag((*m_pDfa)[iSet->front()].GetFlag());
+		++nSetIdx;
+	}
+
+	//替换m_pDfa
+	m_pDfa->clear();
+	m_pDfa->resize(tmpDfa.size(), nCol);
+	nSetIdx = 0;
+	for (STATEID idx = 0; idx < nCol; ++idx)
+	{
+		(*m_pDfa)[nSetIdx] = tmpDfa[idx];
+		++nSetIdx;
+	}
+}
+

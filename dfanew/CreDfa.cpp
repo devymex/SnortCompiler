@@ -189,10 +189,13 @@ void EClosure(const CNfa &oneNfaTab, const std::vector<size_t> &curNfaVec, std::
 	}
 }
 
+//删除不可达状态或者“死”状态，Tab表示传入一个DFA的正向访问表或一个DFA的逆向访问表
+//begs表示读Tab的起始位置
+//reachable表示可达状态集合，初始值为0，输出结果
 void RemoveUnreachable(const std::vector<STATEID> *Tab, const STALIST &begs, const size_t &col, std::vector<BYTE> &reachable)
 {
-	//mark state after traversal, 0 is unreachable and 1 is reachable
 	size_t stas = reachable.size();
+	//mark state after traversal, 0 is unreachable and 1 is reachable
 	std::vector<BYTE> staFlags(stas, 0);
 
 	//reserve current visited states
@@ -225,65 +228,17 @@ void RemoveUnreachable(const std::vector<STATEID> *Tab, const STALIST &begs, con
 	}
 }
 
-void MergeReachable(CDfanew &oneDfaTab, std::vector<BYTE> &reachable)
+//groupnum表示字符集长度，pRevTbl表示逆向访问表
+//pSets表示输入一个状态集的初始划分，输出一个状态集的最终划分结果
+//pSets初始值为终态和非终态集合，其中最后一个为非终态集合
+void PartitionNonDisState(const size_t &groupnum, const size_t &size, std::vector<STATEID> *pRevTbl, SETLIST &pSets)
 {
-	//统计可达状态的数目
-	size_t nRcbCnt = std::count(reachable.begin(), reachable.end(), 2);
-
-	size_t nColNum = oneDfaTab.GetGroupCount();
-
-	//定义一个同CDfanew中成员变量m_pDfa类型相同的变量，用于存储删除多余状态后的DFA跳转表
-	std::vector<CDfaRow> tmpDfa;
-	tmpDfa.resize(nRcbCnt, nColNum);
-
-	STATEID nNewIdx = 0;
-	//将原DFA跳转表中的可达状态复制到tmpDfa中，并修改可达状态的编号
-	for (std::vector<BYTE>::iterator iter = reachable.begin(); iter != reachable.end(); ++iter)
-	{
-		if (2 == *iter)
-		{
-			STATEID nStaId = STATEID(iter - reachable.begin());
-			tmpDfa[nNewIdx] = oneDfaTab[nStaId];
-			*iter = nNewIdx;
-			++nNewIdx;
-		}
-		else
-		{
-			*iter = STATEID(-1);
-		}
-	}
-
-	//将新跳转表中的状态编号修改为新编号
-	for (STATEID i = 0; i < nRcbCnt; ++i)
-	{
-		CDfaRow &curRow = tmpDfa[i];
-		for (STATEID j = 0; j < nColNum; ++j)
-		{
-			if (curRow[j] != STATEID(-1))
-			{
-				curRow[j] = reachable[curRow[j]];
-			}
-		}
-	}
-
-	//复制新的跳转表给原DFA
-	oneDfaTab.m_pDfaClear();
-	nNewIdx = 0;
-	for (STATEID idx = 0; idx < nRcbCnt; ++idx)
-	{
-		oneDfaTab[nNewIdx] = tmpDfa[idx];
-		++nNewIdx;
-	}
-}
-
-void PartitionNonDisState(const size_t &groupnum, std::vector<STATEID> *pRevTbl, SETLIST &pSets)
-{
-	//store the iterator of patition will be visited into wSets
+	//将需要查找的划分的iterator存入wSets，初始化时只保存终态集合
 	std::list<SETLIST_ITER> wSets;
 	SETLIST_ITER iLast = pSets.end();
 	--iLast;
 
-	//initialize wSets with all final states
+	//initialize wSets
 	for (SETLIST_ITER iCurSet = pSets.begin(); iCurSet != iLast; ++iCurSet)
 	{
 		wSets.push_back(iCurSet);
@@ -292,8 +247,7 @@ void PartitionNonDisState(const size_t &groupnum, std::vector<STATEID> *pRevTbl,
 	//each element in ableToW present a property of according state of tmpDfa,
 	//and has two labels, 0 and 1. 1 indicates the according state has the specific
 	//transition to one state of curWSet, 0 otherwise
-	STATEID size = sizeof(pRevTbl) / (STATEID)groupnum;
-	std::vector<BYTE> ableToW(size, 0);
+	std::vector<BYTE> ableToW(size,BYTE(0));
 	bool bAllZero = true;
 	for (; !wSets.empty(); )
 	{
@@ -368,61 +322,6 @@ void PartitionNonDisState(const size_t &groupnum, std::vector<STATEID> *pRevTbl,
 				bAllZero = true;
 			}
 		}
-	}
-}
-
-void MergeNonDisStates(CDfanew &oneDfaTab, SETLIST &Partition)
-{
-	std::vector<STATEID> sta2Part(oneDfaTab.Size());
-	
-	STATEID nCol = (STATEID)oneDfaTab.GetGroupCount();
-
-	//定义一个同CDfanew中成员变量m_pDfa类型相同的变量，用于存储删除多余状态后的DFA跳转表
-	std::vector<CDfaRow> tmpDfa;
-	tmpDfa.resize((STATEID)Partition.size(), nCol);
-
-	//等价的状态存于同一个partition中，标记原来的状态存在哪一个新的partition中，并修改新的起始状态编号
-	STATEID nSetIdx = 0;
-	for (SETLIST_ITER iSet = Partition.begin(); iSet != Partition.end(); ++iSet)
-	{
-		for (STALIST_ITER iSta = iSet->begin(); iSta != iSet->end(); ++iSta)
-		{
-			sta2Part[*iSta] = nSetIdx;
-			if ((oneDfaTab[*iSta].GetFlag() & oneDfaTab[*iSta].START) != 0)
-			{
-				oneDfaTab.SetStartId(nSetIdx);
-			}
-		}
-		++nSetIdx;
-	}
-
-	//set new DFA and modify new number
-	nSetIdx = 0;
-	for (SETLIST_ITER iSet = Partition.begin(); iSet != Partition.end(); ++iSet)
-	{
-		for (BYTE iCol = 0; iCol != nCol; ++iCol)
-		{
-			CDfaRow &orgRow = oneDfaTab[iSet->front()];
-			STATEID nDest = STATEID(-1);
-			if (orgRow[iCol] != STATEID(-1))
-			{
-				nDest = sta2Part[orgRow[iCol]];
-			}
-			tmpDfa[nSetIdx][iCol] = nDest;
-		}
-
-		//set a state attribute
-		tmpDfa[nSetIdx].SetFlag(oneDfaTab[iSet->front()].GetFlag());
-		++nSetIdx;
-	}
-
-	//复制新的跳转表给原DFA
-	oneDfaTab.m_pDfaClear();
-	nSetIdx = 0;
-	for (STATEID idx = 0; idx < nCol; ++idx)
-	{
-		oneDfaTab[nSetIdx] = tmpDfa[idx];
-		++nSetIdx;
 	}
 }
 

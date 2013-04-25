@@ -44,14 +44,12 @@ public:
 	const CDfaRow& operator[](STATEID index) const;
 	void Init(BYTE *pGroup);
 	void Clear();
-	void m_pDfaClear();
 	size_t FromNFA(CNfa &nfa, NFALOG *nfalog, size_t Count, bool combine = false);
 	size_t Minimize();
 	size_t GetGroupCount() const;
 	BYTE Char2Group(BYTE nIdx);
 	const BYTE* GetGroup() const;
 	STATEID GetStartId() const;
-	void SetStartId(STATEID id);
 	void SetId(size_t id);
 	size_t GetId();
 	size_t Process(BYTE *ByteStream, size_t len, CStateSet &StaSet);
@@ -64,4 +62,8 @@ private:
 	std::vector<CDfaRow> *m_pDfa;
 	//pair.first 用来存放dfa的某一终态, pair.second 用来存放该终态对应哪一个dfaid
 	std::vector<TERMSET> *m_TermSet;
+
+	void MergeReachable(std::vector<BYTE> &reachable);
+	void MergeNonDisStates(SETLIST &Partition);
+
 };
