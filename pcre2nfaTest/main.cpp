@@ -17,7 +17,6 @@ void main()
 {
 	const char* a = "/BM/";
 	CNfa nfa;
-	nfa.Resize(1);
 	PcreToNFA(a, nfa);
 	for (size_t i = 0; i < nfa.Size(); ++i)
 	{
