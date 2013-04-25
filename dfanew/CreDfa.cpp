@@ -228,7 +228,7 @@ void RemoveUnreachable(const std::vector<STATEID> *Tab, const STALIST &begs, con
 	}
 }
 
-//groupnum表示字符集长度，pRevTbl表示逆向访问表
+//groupnum表示字符集长度，size表示原DFA的状态数，pRevTbl表示逆向访问表
 //pSets表示输入一个状态集的初始划分，输出一个状态集的最终划分结果
 //pSets初始值为终态和非终态集合，其中最后一个为非终态集合
 void PartitionNonDisState(const size_t &groupnum, const size_t &size, std::vector<STATEID> *pRevTbl, SETLIST &pSets)
