@@ -2,6 +2,7 @@
 //#include "stdafx.h"
 
 #include "../common/common.h"
+#include "dfanew.h"
 
 //以下注释用于测试
 //enum STATEFLAG
@@ -45,3 +46,4 @@ void NextNfaSet(const CNfa &oneNfaTab, const std::vector<size_t> &curNfaVec, siz
 
 void EClosure(const CNfa &oneNfaTab, const std::vector<size_t> &curNfaVec, 
 			  std::vector<size_t> &eNfaVec, char &finFlag);
+

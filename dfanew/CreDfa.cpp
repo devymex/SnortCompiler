@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "CreDfa.h"
-
+#include "dfanew.h"
 
 /* Following codes is a testing for unordered_map */
 /* DONT REMOVE */

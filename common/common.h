@@ -2,6 +2,7 @@
 
 #include <Windows.h>
 #include <vector>
+#include <list>
 
 #define CHARSETSIZE 260
 #define EMPTYEDGE 256
@@ -14,6 +15,10 @@
 #endif
 
 typedef BYTE STATEID;
+typedef std::list<STATEID> STALIST;
+typedef std::list<STATEID>::iterator STALIST_ITER;
+typedef std::list<std::list<STATEID>> SETLIST;
+typedef std::list<std::list<STATEID>>::iterator SETLIST_ITER;
 
 class COMMONSC CVectorNumber
 {
