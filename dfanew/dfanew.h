@@ -54,6 +54,8 @@ public:
 	size_t GetId();
 	size_t Process(BYTE *ByteStream, size_t len, CStateSet &StaSet);
 	void GetAcceptedId(STATEID id, CVectorNumber &dfaIds);
+	size_t Save(BYTE *beg);
+	void Load(BYTE *beg, size_t len);
 private:
 	size_t m_nId;
 	size_t m_nColNum;

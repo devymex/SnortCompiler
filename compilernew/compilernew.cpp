@@ -1,134 +1,134 @@
 #include "stdafx.h"
-#include "compiler.h"
+#include "compilernew.h"
 #include "../common/common.h"
 #include "../rule2nfa/rule2nfa.h"
-#include "../nfa2dfa/nfa2dfa.h"
 #include "../pcre2nfa/pcre2nfa.h"
+#include "../dfanew/dfanew.h"
 
-COMPILER CDfaTbl::CDfaTbl()
+COMPILERNEW CDfaTblNew::CDfaTblNew()
 {
-	m_dfaTbl = new std::vector<CDfa>;	
+	m_pdfaTbl = new std::vector<CDfanew>;	
 }
 
-COMPILER CDfaTbl::CDfaTbl(const CDfaTbl& other)
+COMPILERNEW CDfaTblNew::CDfaTblNew(const CDfaTblNew& other)
 {
-	m_dfaTbl = new std::vector<CDfa>;
+	m_pdfaTbl = new std::vector<CDfanew>;
 	*this = other;
 }
 
-COMPILER const CDfaTbl &CDfaTbl::operator=(const CDfaTbl &other)
+COMPILERNEW const CDfaTblNew &CDfaTblNew::operator=(const CDfaTblNew &other)
 {
-	*m_dfaTbl = *other.m_dfaTbl;
+	*m_pdfaTbl = *other.m_pdfaTbl;
 	return *this;
 }
 
-COMPILER CDfaTbl::~CDfaTbl()
+COMPILERNEW CDfaTblNew::~CDfaTblNew()
 {
-	delete m_dfaTbl;
+	delete m_pdfaTbl;
 }
 
-COMPILER CDfa& CDfaTbl::operator[](size_t index)
+COMPILERNEW CDfanew& CDfaTblNew::operator[](size_t index)
 {
-	return (*m_dfaTbl)[index];
+	return (*m_pdfaTbl)[index];
 }
 
-COMPILER const CDfa& CDfaTbl::operator[](size_t index) const
+COMPILERNEW const CDfanew& CDfaTblNew::operator[](size_t index) const
 {
-	return (*m_dfaTbl)[index];
+	return (*m_pdfaTbl)[index];
 }
 
-COMPILER void CDfaTbl::Reserve(size_t nCount)
+COMPILERNEW void CDfaTblNew::Reserve(size_t nCount)
 {
-	m_dfaTbl->reserve(nCount);
+	m_pdfaTbl->reserve(nCount);
 }
 
-COMPILER void CDfaTbl::Resize(size_t nSize)
+COMPILERNEW void CDfaTblNew::Resize(size_t nSize)
 {
-	m_dfaTbl->resize(nSize);
+	m_pdfaTbl->resize(nSize);
 }
 
-COMPILER const size_t CDfaTbl::Size() const
+COMPILERNEW const size_t CDfaTblNew::Size() const
 {
-	return m_dfaTbl->size();
+	return m_pdfaTbl->size();
 }
 
-COMPILER void CDfaTbl::PushBack(const CDfa &dfa)
+COMPILERNEW void CDfaTblNew::PushBack(const CDfanew &dfa)
 {
-	m_dfaTbl->push_back(dfa);
+	m_pdfaTbl->push_back(dfa);
 }
 
-COMPILER CSidDfaIds::CSidDfaIds()
+COMPILERNEW CSidDfaIdsNew::CSidDfaIdsNew()
 {
-	m_ruleResult = new std::vector<COMPILEDRULE>;
+	m_ruleResult = new std::vector<COMPILEDRULENEW>;
 }
 
-COMPILER CSidDfaIds::CSidDfaIds(const CSidDfaIds& other)
+COMPILERNEW CSidDfaIdsNew::CSidDfaIdsNew(const CSidDfaIdsNew& other)
 {
-	m_ruleResult = new std::vector<COMPILEDRULE>;
+	m_ruleResult = new std::vector<COMPILEDRULENEW>;
 	*this = other;
 }
 
-COMPILER const CSidDfaIds &CSidDfaIds::operator=(const CSidDfaIds &other)
+COMPILERNEW const CSidDfaIdsNew &CSidDfaIdsNew::operator=(const CSidDfaIdsNew &other)
 {
 	*m_ruleResult = *other.m_ruleResult;
 	return *this;
 }
-COMPILER CSidDfaIds::~CSidDfaIds()
+COMPILERNEW CSidDfaIdsNew::~CSidDfaIdsNew()
 {
 	delete m_ruleResult;
 }
 
-COMPILER COMPILEDRULE& CSidDfaIds::operator[](size_t index)
+COMPILERNEW COMPILEDRULENEW& CSidDfaIdsNew::operator[](size_t index)
 {
 	return (*m_ruleResult)[index];
 }
 
-COMPILER const COMPILEDRULE& CSidDfaIds::operator[](size_t index) const
+COMPILERNEW const COMPILEDRULENEW& CSidDfaIdsNew::operator[](size_t index) const
 {
 	return (*m_ruleResult)[index];
 }
 
-COMPILER void CSidDfaIds::Reserve(size_t nCount)
+COMPILERNEW void CSidDfaIdsNew::Reserve(size_t nCount)
 {
 	m_ruleResult->reserve(nCount);
 }
 
-COMPILER void CSidDfaIds::Resize(size_t nSize)
+COMPILERNEW void CSidDfaIdsNew::Resize(size_t nSize)
 {
 	m_ruleResult->resize(nSize);
 }
 
-COMPILER const size_t CSidDfaIds::Size() const
+COMPILERNEW const size_t CSidDfaIdsNew::Size() const
 {
 	return m_ruleResult->size();
 }
 
-COMPILER void CSidDfaIds::PushBack(const COMPILEDRULE &ruleResult)
+COMPILERNEW void CSidDfaIdsNew::PushBack(const COMPILEDRULENEW &ruleResult)
 {
 	m_ruleResult->push_back(ruleResult);
 }
 
-COMPILER COMPILEDRULE& CSidDfaIds::Back()
+COMPILERNEW COMPILEDRULENEW& CSidDfaIdsNew::Back()
 {
 	return m_ruleResult->back();
 }
 
-COMPILER CDfaTbl& CRes::GetDfaTable()
+COMPILERNEW CDfaTblNew& CResNew::GetDfaTable()
 {
 	return m_dfaTbl;
 }
 
-COMPILER CSidDfaIds& CRes::GetSidDfaIds()
+COMPILERNEW CSidDfaIdsNew& CResNew::GetSidDfaIds()
 {
 	return m_sidDfaIds;
 }
 
-COMPILER const CDfaTbl& CRes::GetDfaTable() const
+COMPILERNEW const CDfaTblNew& CResNew::GetDfaTable() const
 {
 	return m_dfaTbl;
 }
 
-COMPILER const CSidDfaIds& CRes::GetSidDfaIds() const
+COMPILERNEW const CSidDfaIdsNew& CResNew::GetSidDfaIds() const
 {
 	return m_sidDfaIds;
 }
@@ -139,7 +139,7 @@ void WriteNum(std::ofstream &fout, _Ty _num, size_t nBytes = sizeof(_Ty))
 	fout.write((char*)&_num, nBytes);
 }
 
-COMPILER size_t CRes::WriteToFile(LPCTSTR filename)
+COMPILERNEW size_t CResNew::WriteToFile(LPCTSTR filename)
 {
 	std::ofstream fout(filename, std::ios::binary);
 	if (!fout)
@@ -175,7 +175,7 @@ COMPILER size_t CRes::WriteToFile(LPCTSTR filename)
 	//开始写规则表
 	for (size_t i = 0; i < m_sidDfaIds.Size(); ++i)
 	{
-		COMPILEDRULE &ruleResult = m_sidDfaIds[i];
+		COMPILEDRULENEW &ruleResult = m_sidDfaIds[i];
 		WriteNum(fout, ruleResult.m_nSid, 4);
 		WriteNum(fout, ruleResult.m_nResult, 4);
 		WriteNum(fout, ruleResult.m_dfaIds.Size(), 4);
@@ -191,27 +191,12 @@ COMPILER size_t CRes::WriteToFile(LPCTSTR filename)
 	//定位文件到末尾
 	fout.seekp(0, std::ios_base::end);
 	//开始写DFAs
+	BYTE dfaDetails[100000];
 	for (size_t i = 0; i < m_dfaTbl.Size(); ++i)
 	{
-		WriteNum(fout, m_dfaTbl[i].Size(), sizeof(STATEID));
-		if (m_dfaTbl[i].Size() == 0)
-		{
-			continue;
-		}
-		//写分组
-		for (size_t j = 0; j < DFACOLSIZE; ++j)
-		{
-			WriteNum(fout, m_dfaTbl[i].GetGroup(j), sizeof(BYTE));
-		}
-		//写DFA跳转表
-		size_t nColNum = m_dfaTbl[i].GetColNum();
-		for (STATEID j = 0; j < m_dfaTbl[i].Size(); ++j)
-		{
-			for (size_t k = 0; k < nColNum; ++k)
-			{
-				WriteNum(fout, m_dfaTbl[i][j][(BYTE)k], sizeof(STATEID));
-			}
-		}
+		size_t len = m_dfaTbl[i].Save(dfaDetails);
+		WriteNum(fout, len);
+		fout.write((char*)dfaDetails, len * sizeof(BYTE));
 	}
 	//填写文件尺寸
 	endPos = fout.tellp();
@@ -224,7 +209,7 @@ COMPILER size_t CRes::WriteToFile(LPCTSTR filename)
 	return 0;
 }
 
-COMPILER size_t CRes::ReadFromFile(LPCTSTR filename)
+COMPILERNEW size_t CResNew::ReadFromFile(LPCTSTR filename)
 {
 	std::ifstream fin(filename, std::ios::binary);
 	if (!fin)
@@ -262,7 +247,7 @@ COMPILER size_t CRes::ReadFromFile(LPCTSTR filename)
 	size_t SidDfaNum;
 	for (size_t i = 0; i < ruleNum; ++i)
 	{
-		COMPILEDRULE &ruleResult = m_sidDfaIds[i];
+		COMPILEDRULENEW &ruleResult = m_sidDfaIds[i];
 		fin.read((char*)&ruleResult.m_nSid, 4);
 		fin.read((char*)&ruleResult.m_nResult, 4);
 		fin.read((char*)&SidDfaNum, 4);
@@ -274,32 +259,14 @@ COMPILER size_t CRes::ReadFromFile(LPCTSTR filename)
 	}
 	//开始读DFAs
 	m_dfaTbl.Resize(dfaNum);
-	STATEID dfaSize;//一个DFA的状态数
+	BYTE dfaDetails[100000];
 	for (size_t i = 0; i < dfaNum; ++i)
 	{
-		CDfa &dfa = m_dfaTbl[i];
-		fin.read((char*)&dfaSize, sizeof(STATEID));
-		if (dfaSize == 0)
-		{
-			continue;
-		}
-		//读分组
-		BYTE pGroup[DFACOLSIZE];
-		for (size_t j = 0; j < DFACOLSIZE; ++j)
-		{
-			fin.read((char*)&pGroup[j], sizeof(BYTE));
-		}
-		dfa.SetGroup(pGroup);
-		dfa.Resize(dfaSize);
-		//读DFA跳转表
-		size_t nColNum = dfa.GetColNum();
-		for (STATEID j = 0; j < dfaSize; ++j)
-		{
-			for (size_t k = 0; k < nColNum; ++k)
-			{
-				fin.read((char*)&dfa[j][(BYTE)k], sizeof(STATEID));
-			}
-		}
+		CDfanew &dfa = m_dfaTbl[i];
+		size_t len;
+		fin.read((char*)&len, 4);
+		fin.read((char*)dfaDetails, len * sizeof(BYTE));
+		dfa.Load(dfaDetails, len);
 	}
 	fin.close();
 	fin.clear();
@@ -307,51 +274,59 @@ COMPILER size_t CRes::ReadFromFile(LPCTSTR filename)
 	return 0;
 }
 
+double dAll;
+double dInterpretRule;
+double dnfatodfa;
+double dmin;
+
 void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 {
-	CRes &result = *(CRes*)lpVoid;
+	CResNew &result = *(CResNew*)lpVoid;
 	size_t nFlag = rule.GetFlag();
 	size_t nNewSize = result.GetSidDfaIds().Size() + 1;
 	result.GetSidDfaIds().Resize(nNewSize);
-	COMPILEDRULE &ruleResult = result.GetSidDfaIds().Back();
+	COMPILEDRULENEW &ruleResult = result.GetSidDfaIds().Back();
 	ruleResult.m_nSid = rule.GetSid();
 	if (rule.Size() == 0)
 	{
-		ruleResult.m_nResult = COMPILEDRULE::RES_EMPTY;
+		ruleResult.m_nResult = COMPILEDRULENEW::RES_EMPTY;
 		return;
 	}
 	else if (nFlag & CSnortRule::RULE_HASNOT)
 	{
-		ruleResult.m_nResult = COMPILEDRULE::RES_HASNOT;
+		ruleResult.m_nResult = COMPILEDRULENEW::RES_HASNOT;
 		return;
 	}
 	else if (nFlag & CSnortRule::RULE_HASBYTE)
 	{
-		ruleResult.m_nResult = COMPILEDRULE::RES_HASBYTE;
+		ruleResult.m_nResult = COMPILEDRULENEW::RES_HASBYTE;
 		return;
 	}
 	else if (nFlag & CSnortRule::RULE_HASNOSIG)
 	{
-		ruleResult.m_nResult = COMPILEDRULE::RES_HASNOSIG;
+		ruleResult.m_nResult = COMPILEDRULENEW::RES_HASNOSIG;
 		return;
 	}
 	else
 	{
 		CNfaTree nfatree;
+		CTimer t;
 		size_t flag = InterpretRule(rule, nfatree);
+		dInterpretRule += t.Reset();
+
 		if (flag == SC_ERROR)
 		{
-			ruleResult.m_nResult = COMPILEDRULE::RES_ERROR;
+			ruleResult.m_nResult = COMPILEDRULENEW::RES_ERROR;
 			return;
 		}
 		else if (flag == SC_EXCEED)
 		{
-			ruleResult.m_nResult = COMPILEDRULE::RES_EXCEED;
+			ruleResult.m_nResult = COMPILEDRULENEW::RES_EXCEED;
 			return;
 		}
 		else
 		{
-			ruleResult.m_nResult = COMPILEDRULE::RES_SUCCESS;
+			ruleResult.m_nResult = COMPILEDRULENEW::RES_SUCCESS;
 			const size_t nCursize = result.GetDfaTable().Size();
 			const size_t nIncrement = nfatree.Size();
 			result.GetDfaTable().Resize(nCursize + nIncrement);
@@ -359,29 +334,34 @@ void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 			for (size_t i = 0; i < nIncrement; ++i)
 			{
 				nId = nCursize + i;
-				CDfa dfa;
-				NfaToDfa(nfatree[i], dfa);
+				CDfanew &dfa = result.GetDfaTable()[nId];
+				t.Reset();
+				dfa.FromNFA(nfatree[i], NULL, 0);
+				dnfatodfa += t.Reset();
 				if (dfa.Size() > SC_STATELIMIT)
 				{
-					ruleResult.m_nResult = COMPILEDRULE::RES_EXCEEDLIMIT;
-					result.GetDfaTable()[nId].SetId(nId);
+					ruleResult.m_nResult = COMPILEDRULENEW::RES_EXCEEDLIMIT;
+					dfa.Clear();
 					//ruleResult.m_dfaIds.Clear();
 					//result.GetDfaTable().Resize(nCursize);
 					//break;
 				}
 				else
 				{
-					CDfa &minDfa = result.GetDfaTable()[nId];
-					DfaMin(dfa, minDfa);
-					minDfa.SetId(nId);
+					t.Reset();
+					dfa.Minimize();
+					dmin += t.Reset();
 				}
+				dfa.SetId(nId);
 				ruleResult.m_dfaIds.PushBack(nId);
 			}
 		}
 	}
 }
 
-COMPILER void compile(LPCTSTR filename, CRes &result)
+COMPILERNEW void compilenew(LPCTSTR filename, CResNew &result)
 {
+	CTimer t;
 	CompileRuleSet(filename, Process, &result);
+	dAll += t.Reset();
 }

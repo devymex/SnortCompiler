@@ -424,6 +424,106 @@ DFANEWSC void CDfanew::GetAcceptedId(STATEID id, CVectorNumber &dfaIds)
 	dfaIds.Unique();
 }
 
+template<typename _Ty>
+void WriteNum(BYTE*& pBuf, _Ty _num, size_t nBytes = sizeof(_Ty))
+{
+	CopyMemory(pBuf, &_num, nBytes);
+	pBuf += nBytes;
+}
+
+DFANEWSC size_t CDfanew::Save(BYTE *beg)
+{
+	BYTE *pOld = beg;
+	//写DFA的Id
+	WriteNum(beg, m_nId);
+	//写DFA的状态个数
+	WriteNum(beg, m_pDfa->size(), sizeof(STATEID));
+	if (m_pDfa->size() == 0)
+	{
+		return beg - pOld;
+	}
+	//写分组
+	for (size_t i = 0; i < DFACOLSIZE; ++i)
+	{
+		WriteNum(beg, m_pGroup[i]);
+	}
+	//写DFA跳转表
+	for (size_t i = 0; i < m_pDfa->size(); ++i)
+	{
+		//写该状态的Flag(NORMAL、START、TERMINAL)
+		WriteNum(beg, (*m_pDfa)[i].GetFlag());
+		for (size_t j = 0; j < m_nColNum; ++j)
+		{
+			WriteNum(beg, (*m_pDfa)[i][j]);
+		}
+	}
+	//写DFA的开始状态编号
+	WriteNum(beg, m_StartId);
+	//写DFA的终态与DFAId的对应关系
+	WriteNum(beg, m_TermSet->size());
+	for (size_t i = 0; i < m_TermSet->size(); ++i)
+	{
+		WriteNum(beg, (*m_TermSet)[i].dfaSta);
+		WriteNum(beg, (*m_TermSet)[i].dfaId);
+	}
+
+	return beg - pOld;
+}
+
+template<typename _Ty>
+void ReadNum(BYTE*& pBuf, _Ty &_num, size_t nBytes = sizeof(_Ty))
+{
+	CopyMemory(&_num, pBuf, nBytes);
+	pBuf += nBytes;
+}
+
+DFANEWSC void CDfanew::Load(BYTE *beg, size_t len)
+{
+	//读DFA的Id
+	size_t dfaId;
+	ReadNum(beg, dfaId);
+	m_nId = dfaId;
+	//读DFA的状态个数
+	STATEID dfaSize;//DFA的状态数
+	ReadNum(beg, dfaSize);
+	if (dfaSize == 0)
+	{
+		return;
+	}
+	//读分组
+	BYTE pGroup[DFACOLSIZE];
+	for (size_t i = 0; i < DFACOLSIZE; ++i)
+	{
+		ReadNum(beg, pGroup[i]);
+	}
+	Init(pGroup);
+	m_nId = dfaId;
+	//读DFA跳转表
+	m_pDfa->resize(dfaSize, m_nColNum);
+	size_t nFlag;
+	for (size_t i = 0; i < m_pDfa->size(); ++i)
+	{
+		//读该状态的Flag(NORMAL、START、TERMINAL)
+		ReadNum(beg, nFlag);
+		(*m_pDfa)[i].SetFlag(nFlag);
+		for (size_t j = 0; j < m_nColNum; ++j)
+		{
+			ReadNum(beg, (*m_pDfa)[i][j]);
+		}
+	}
+	//读DFA的开始状态编号
+	ReadNum(beg, m_StartId);
+	//读DFA的终态与DFAId的对应关系
+	size_t TermSetSize;
+	ReadNum(beg, TermSetSize);
+	m_TermSet->resize(TermSetSize);
+	for (size_t i = 0; i < TermSetSize; ++i)
+	{
+		ReadNum(beg, (*m_TermSet)[i].dfaSta);
+		ReadNum(beg, (*m_TermSet)[i].dfaId);
+	}
+}
+
 //删除不可达状态或者“死”状态，Tab表示传入一个DFA的正向访问表或一个DFA的逆向访问表
 //begs表示读Tab的起始位置
 //reachable表示可达状态集合，初始值为0，输出结果
@@ -702,11 +802,9 @@ void CDfanew::MergeNonDisStates(SETLIST &Partition)
 	//替换m_pDfa
 	m_pDfa->clear();
 	m_pDfa->resize(tmpDfa.size(), nCol);
-	nSetIdx = 0;
-	for (STATEID idx = 0; idx < nCol; ++idx)
+	for (STATEID idx = 0; idx < tmpDfa.size(); ++idx)
 	{
-		(*m_pDfa)[nSetIdx] = tmpDfa[idx];
-		++nSetIdx;
+		(*m_pDfa)[idx] = tmpDfa[idx];
 	}
 }
 
