@@ -45,6 +45,30 @@ private:
 	std::vector<size_t> *m_pSet;
 };
 
+
+class COMMONSC CCString
+{
+public:
+	CCString();
+	CCString(const char *pStr);
+	~CCString();
+	CCString(const CCString &other);
+	CCString& operator = (const CCString &other);
+	char operator[](size_t nIdx) const;
+	void Append(const char* pChar);
+	const char* GetString();
+	const char* C_Str();
+
+	const size_t Size() const;
+	void PushBack(const char nChar);
+	char Back() const;
+	void Clear();
+	bool Empty();
+	
+private:
+	std::string *m_pString;
+};
+
 typedef CVectorNumber CStateSet;
 
 class COMMONSC CNfaRow
@@ -173,6 +197,7 @@ public:
 	size_t GetDfaTermsNum();
 	DFATERMS GetDfaTerms(size_t num);
 	const char* GetPcre() const;
+	void Clear();
 
 	CNfaRow &Back();
 	CNfaRow &operator[](size_t index);
@@ -286,14 +311,14 @@ public:
 	~CRegChain();
 	CRegChain(const CRegChain &other);
 	size_t Size() const;
-	std::string& Back() const;
-	void PushBack(std::string &pcreStr);
-	std::string& operator[](size_t nIdx);
+	CCString& Back() const;
+	void PushBack(CCString &pcreStr);
+	CCString& operator[](size_t nIdx);
 	const CRegChain& operator = (const CRegChain &other);
 	size_t Save(BYTE *beg);
 	void Load(BYTE *beg, size_t len);
 private:
-	std::vector<std::string> *m_pRegList;
+	std::vector<CCString> *m_pRegList;
 };
 
 class COMMONSC CRegRule
