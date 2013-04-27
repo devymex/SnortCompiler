@@ -315,8 +315,7 @@ public:
 	void PushBack(CCString &pcreStr);
 	CCString& operator[](size_t nIdx);
 	const CRegChain& operator = (const CRegChain &other);
-	size_t Save(BYTE *beg);
-	void Load(BYTE *beg, size_t len);
+	void Resize(size_t nSize);
 private:
 	std::vector<CCString> *m_pRegList;
 };
@@ -335,8 +334,6 @@ public:
 	void PushBack(CRegChain &nRegChain);
 	CRegChain& operator[](size_t nIdx);
 	const CRegRule& operator = (const CRegRule &other);
-	size_t Save(BYTE *beg);
-	void Load(BYTE *beg, size_t len);
 private:
 	std::vector<CRegChain> *m_pRegVec;
 };

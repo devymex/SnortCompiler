@@ -688,6 +688,11 @@ COMMONSC const CRegChain& CRegChain::operator = (const CRegChain &other)
 	return *this;
 }
 
+COMMONSC void CRegChain::Resize(size_t nSize)
+{
+	m_pRegList->resize(nSize);
+}
+
 COMMONSC CRegRule::CRegRule()
 {
 	m_pRegVec = new std::vector<CRegChain>;

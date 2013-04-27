@@ -302,7 +302,17 @@ COMPILERNEW size_t CResNew::WriteToFile(LPCTSTR filename)
 	WriteNum(fout, endPos, 4);
 	//定位文件到末尾
 	fout.seekp(0, std::ios_base::end);
-
+	//写RegexTbl
+	for (size_t i = 0; i < m_RegexTbl.Size(); ++i)
+	{
+		WriteNum(fout, m_RegexTbl[i].Size());
+		for (size_t j = 0; j < m_RegexTbl[i].Size(); ++j)
+		{
+			WriteNum(fout, m_RegexTbl[i][j].Size());
+			const char *pString = m_RegexTbl[i][j].C_Str();
+			fout.write(pString, strlen(pString));
+		}
+	}
 	//填写文件尺寸
 	endPos = fout.tellp();
 	fout.seekp(fileSizePos, std::ios_base::beg);
@@ -389,6 +399,21 @@ COMPILERNEW size_t CResNew::ReadFromFile(LPCTSTR filename)
 	{
 		fin.read((char*)&m_DfasInfo[i].dfaId, 4);
 		fin.read((char*)&m_DfasInfo[i].regId, 4);
+	}
+	//写RegexTbl
+	m_RegexTbl.Resize(RegexTblSize);
+	size_t ChainSize;
+	size_t RegSize;
+	for (size_t i = 0; i < RegexTblSize; ++i)
+	{
+		fin.read((char*)&ChainSize, 4);
+		for (size_t j = 0; j < ChainSize; ++j)
+		{
+			fin.read((char*)&RegSize, 4);
+			char *pString = new char[RegSize];
+			fin.read(pString, RegSize);
+			m_RegexTbl[i].PushBack(CCString(pString));
+		}
 	}
 	fin.close();
 	fin.clear();
