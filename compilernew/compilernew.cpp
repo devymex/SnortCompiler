@@ -311,7 +311,9 @@ void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 	{
 		CNfaTree nfatree;
 		CTimer t;
-		size_t flag = InterpretRule(rule, nfatree);
+		//size_t flag = InterpretRule(rule, nfatree);
+		CRegRule regrule;
+		size_t flag = Rule2PcreList(rule, regrule);
 		dInterpretRule += t.Reset();
 
 		if (flag == SC_ERROR)

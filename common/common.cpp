@@ -198,6 +198,13 @@ COMMONSC size_t CNfa::Size() const
 	return m_pNfa->size();
 }
 
+COMMONSC void CNfa::Clear()
+{
+	m_pNfa->clear();
+	m_pPcre->clear();
+	m_DfaTerms->clear();
+}
+
 COMMONSC void CNfa::FromDfa(CDfa &dfa)
 {
 	m_pNfa->clear();
@@ -573,6 +580,164 @@ COMMONSC CDfa::TERMSET CDfa::GetTermSet(STATEID num)
 //	return (*m_pChain)[nIdx];
 //}
 
+COMMONSC CCString::CCString()
+{
+	m_pString = new std::string;
+}
+
+COMMONSC CCString::CCString(const char *pStr)
+{
+	m_pString = new std::string(pStr);
+}
+
+COMMONSC void CCString::Append(const char* pChar)
+{
+	m_pString->append(pChar);;
+}
+
+COMMONSC CCString::~CCString()
+{
+	delete m_pString;
+}
+	
+COMMONSC CCString::CCString(const CCString &other)
+{
+	m_pString = new std::string;
+	*this = other;
+}
+
+COMMONSC CCString& CCString::operator = (const CCString &other)
+{
+	*this->m_pString = *other.m_pString;
+	return *this;
+}
+COMMONSC char CCString::operator[](size_t nIdx) const
+{
+	return (*m_pString)[nIdx];
+}
+	
+COMMONSC const size_t CCString::Size() const
+{
+	return m_pString->size();
+}
+
+COMMONSC void CCString::PushBack(const char nChar)
+{
+	m_pString->push_back(nChar);
+}
+COMMONSC char CCString::Back() const
+{
+	return m_pString->back();
+}
+
+COMMONSC const char* CCString::GetString()
+{
+	return m_pString->c_str();
+}
+
+COMMONSC const char* CCString::C_Str()
+{
+	return m_pString->c_str();
+}
+
+COMMONSC void CCString::Clear()
+{
+	m_pString->clear();
+}
+COMMONSC bool CCString::Empty()
+{
+	return m_pString->empty();
+}
+
+COMMONSC CRegChain::CRegChain()
+{
+	m_pRegList = new std::vector<CCString>;
+}
+
+COMMONSC CRegChain::~CRegChain()
+{
+	delete m_pRegList;
+}
+
+COMMONSC CRegChain::CRegChain(const CRegChain &other)
+{
+	m_pRegList = new std::vector<CCString>;
+	*this = other;
+}
+
+COMMONSC size_t CRegChain::Size() const
+{
+	return m_pRegList->size();
+}
+	
+COMMONSC CCString& CRegChain::Back() const
+{
+	return m_pRegList->back();
+}
+COMMONSC void CRegChain::PushBack(CCString &pcreStr)
+{
+	m_pRegList->push_back(pcreStr);
+}
+COMMONSC CCString& CRegChain::operator[](size_t nIdx)
+{
+	return (*m_pRegList)[nIdx];
+}
+COMMONSC const CRegChain& CRegChain::operator = (const CRegChain &other)
+{
+	*this->m_pRegList = *other.m_pRegList;
+	return *this;
+}
+
+COMMONSC CRegRule::CRegRule()
+{
+	m_pRegVec = new std::vector<CRegChain>;
+}
+
+COMMONSC CRegRule::~CRegRule()
+{
+	delete m_pRegVec;
+}
+
+COMMONSC CRegRule::CRegRule(const CRegRule &other)
+{
+	m_pRegVec = new std::vector<CRegChain>;
+	*this = other;
+}
+
+COMMONSC size_t CRegRule::Size() const
+{
+	return m_pRegVec->size();
+}
+
+COMMONSC CRegChain& CRegRule::Back() const
+{
+	return m_pRegVec->back();
+}
+
+COMMONSC void CRegRule::Reserve(size_t nCount)
+{
+	m_pRegVec->reserve(nCount);
+}
+COMMONSC void CRegRule::Resize(size_t nSize)
+{
+	m_pRegVec->resize(nSize);
+}
+
+COMMONSC void CRegRule::PushBack(CRegChain &nRegChain)
+{
+	m_pRegVec->push_back(nRegChain);
+}
+
+COMMONSC CRegChain& CRegRule::operator[](size_t nIdx)
+{
+	return (*m_pRegVec)[nIdx];
+}
+
+COMMONSC const CRegRule& CRegRule::operator = (const CRegRule &other)
+{
+	*this->m_pRegVec = *other.m_pRegVec;
+	return *this;
+}
 
 COMMONSC CNfaTree::CNfaTree()
 {
