@@ -842,53 +842,53 @@ size_t content2Pcre(OPTIONCONTENT *pContent, std::string &pcreStr)
 }
 
 //convert rule to pcre list
-//CRECHANFA void Rule2PcreList(const CSnortRule &rule, CRegRule &regrule)
-//{
-//	regrule.Reserve(nfaTreeReserve);
-//	size_t regChain_size = 0;
-//	regrule.Resize(++regChain_size);
-//	size_t reg_size = 0;
-//
-//	for(size_t i = 0; i < rule.Size(); ++i)
-//	{
-//		OPTIONCONTENT *pContent = dynamic_cast<OPTIONCONTENT*>(rule[i]);
-//		OPTIONPCRE *pPcre = dynamic_cast<OPTIONPCRE*>(rule[i]);
-//		
-//		if(pContent != NULL)
-//		{
-//			if(!((pContent->nFlags & CF_DISTANCE) || (pContent->nFlags& CF_WITHIN)))
-//			{
-//				if(regrule.Back().Size() != 0)
-//				{
-//					regrule.Resize(++regChain_size);
-//					reg_size = 0;
-//				}
-//			}
-//			std::string conPcreStr = "";
-//			content2Pcre(pContent, conPcreStr);
-//			regrule.Back().PushBack(conPcreStr);
-//		}
-//		else if(pPcre != NULL)
-//		{
-//			if(!(pPcre->nFlags & PF_R))
-//			{
-//				if(regrule.Back().Size() != 0)
-//				{
-//					regrule.Resize(++regChain_size);
-//					reg_size = 0;
-//				}
-//			}
-//			std::string strPattern;
-//			strPattern.resize(pPcre->GetPattern(NULL, 0));
-//			pPcre->GetPattern(&strPattern[0], strPattern.size());
-//			regrule.Back().PushBack(strPattern);
-//
-//			std::cout << "pcre:" << strPattern << "; ";//测试输出
-//		}
-//	}
-//
-//	regrule.Reserve(++regChain_size);
-//}
+CRECHANFA void Rule2PcreList(const CSnortRule &rule, CRegRule &regrule)
+{
+	regrule.Reserve(nfaTreeReserve);
+	size_t regChain_size = 0;
+	regrule.Resize(++regChain_size);
+	size_t reg_size = 0;
+
+	for(size_t i = 0; i < rule.Size(); ++i)
+	{
+		OPTIONCONTENT *pContent = dynamic_cast<OPTIONCONTENT*>(rule[i]);
+		OPTIONPCRE *pPcre = dynamic_cast<OPTIONPCRE*>(rule[i]);
+		
+		if(pContent != NULL)
+		{
+			if(!((pContent->nFlags & CF_DISTANCE) || (pContent->nFlags& CF_WITHIN)))
+			{
+				if(regrule.Back().Size() != 0)
+				{
+					regrule.Resize(++regChain_size);
+					reg_size = 0;
+				}
+			}
+			std::string conPcreStr = "";
+			content2Pcre(pContent, conPcreStr);
+			regrule.Back().PushBack(conPcreStr);
+		}
+		else if(pPcre != NULL)
+		{
+			if(!(pPcre->nFlags & PF_R))
+			{
+				if(regrule.Back().Size() != 0)
+				{
+					regrule.Resize(++regChain_size);
+					reg_size = 0;
+				}
+			}
+			std::string strPattern;
+			strPattern.resize(pPcre->GetPattern(NULL, 0));
+			pPcre->GetPattern(&strPattern[0], strPattern.size());
+			regrule.Back().PushBack(strPattern);
+
+			std::cout << "pcre:" << strPattern << "; ";//测试输出
+		}
+	}
+
+	regrule.Reserve(++regChain_size);
+}
 
 //原始程序
 //CRECHANFA size_t InterpretRule(const CSnortRule &rule, CNfaTree &outTree)
