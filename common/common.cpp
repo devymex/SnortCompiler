@@ -200,9 +200,12 @@ COMMONSC size_t CNfa::Size() const
 
 COMMONSC void CNfa::Clear()
 {
-	m_pNfa->clear();
-	m_pPcre->clear();
-	m_DfaTerms->clear();
+	delete m_pNfa;
+	delete m_pPcre;
+	delete m_DfaTerms;
+	m_pNfa = new std::vector<CNfaRow>;
+	m_pPcre = new std::string;
+	m_DfaTerms = new std::vector<DFATERMS>;
 }
 
 COMMONSC void CNfa::FromDfa(CDfa &dfa)

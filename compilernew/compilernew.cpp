@@ -314,6 +314,15 @@ void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 		//size_t flag = InterpretRule(rule, nfatree);
 		CRegRule regrule;
 		size_t flag = Rule2PcreList(rule, regrule);
+		if(flag == 0)
+		{
+			for(size_t k = 0; k < regrule.Size(); ++k)
+			{
+				CNfa nfa;
+				size_t nFlag = CRegChainToNFA(regrule[k], nfa);
+			}
+		}
+
 		dInterpretRule += t.Reset();
 
 		if (flag == SC_ERROR)
