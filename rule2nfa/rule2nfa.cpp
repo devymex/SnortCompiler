@@ -785,8 +785,7 @@ size_t content2Pcre(OPTIONCONTENT *pContent, CCString &pcreStr)
 		ss.str("");
 		ss << pContent->nOffset;
 		pcreStr.Append(".{");
-		std::string pchar = ss.str();
-		pcreStr.Append(pchar.c_str());
+		pcreStr.Append(ss.str().c_str());
 		pcreStr.Append("}");
 	}
 	if((pContent->nFlags & CF_DISTANCE) && pContent->nDistance > 0)
@@ -794,8 +793,7 @@ size_t content2Pcre(OPTIONCONTENT *pContent, CCString &pcreStr)
 		ss.str("");
 		ss << pContent->nDistance;
 		pcreStr.Append(".{");
-		std::string pchar = ss.str();
-		pcreStr.Append(pchar.c_str());
+		pcreStr.Append(ss.str().c_str());
 		pcreStr.Append("}");
 
 		//pcreStr += ".{" + ss.str() + "}";
@@ -826,8 +824,7 @@ size_t content2Pcre(OPTIONCONTENT *pContent, CCString &pcreStr)
 			ss.str("");
 			ss << n;
 			pcreStr.Append(".{0,");
-			std::string pchar = ss.str();
-			pcreStr.Append(pchar.c_str());
+			pcreStr.Append(ss.str().c_str());
 			pcreStr.Append("}");
 			//pcreStr += ".{0," + ss.str() + "}";
 		}
@@ -900,8 +897,6 @@ CRECHANFA size_t Rule2PcreList(const CSnortRule &rule, CRegRule &regrule)
 			pPcre->GetPattern(&tmpStr[0], tmpStr.size());
 			CCString strPattern(tmpStr.c_str());
 			regrule.Back().PushBack(strPattern);
-
-			std::cout << "pcre:" << tmpStr << "; ";//²âÊÔÊä³ö
 		}
 	}
 

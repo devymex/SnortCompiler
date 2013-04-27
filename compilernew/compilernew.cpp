@@ -410,7 +410,8 @@ COMPILERNEW size_t CResNew::ReadFromFile(LPCTSTR filename)
 		for (size_t j = 0; j < ChainSize; ++j)
 		{
 			fin.read((char*)&RegSize, 4);
-			char *pString = new char[RegSize];
+			char *pString = new char[RegSize + 1];
+			pString[RegSize] = '\0';
 			fin.read(pString, RegSize);
 			m_RegexTbl[i].PushBack(CCString(pString));
 		}
@@ -444,52 +445,68 @@ void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 		ruleResult.m_nResult = COMPILEDRULENEW::RES_HASBYTE;
 		return;
 	}
-	//else if (nFlag & CSnortRule::RULE_HASNOSIG)
-	//{
-	//	ruleResult.m_nResult = COMPILEDRULENEW::RES_HASNOSIG;
-	//	return;
-	//}
 	else
 	{
-		CNfaTree nfatree;
-		size_t flag = InterpretRule(rule, nfatree);
+		CRegRule regrule;
+		size_t flag = Rule2PcreList(rule, regrule);
 
 		if (flag == SC_ERROR)
 		{
 			ruleResult.m_nResult = COMPILEDRULENEW::RES_ERROR;
 			return;
 		}
-		else if (flag == SC_EXCEED)
-		{
-			ruleResult.m_nResult = COMPILEDRULENEW::RES_EXCEED;
-			return;
-		}
 		else
 		{
 			ruleResult.m_nResult = COMPILEDRULENEW::RES_SUCCESS;
-			const size_t nCursize = result.GetDfaTable().Size();
-			const size_t nIncrement = nfatree.Size();
-			result.GetDfaTable().Resize(nCursize + nIncrement);
-			size_t nId;
+			const size_t nDfaTblSize = result.GetDfaTable().Size();
+			const size_t nIncrement = regrule.Size();
+			result.GetDfaTable().Resize(nDfaTblSize + nIncrement);
+			const size_t nDfasInfoSize = result.GetDfasInfo().Size();
+			result.GetDfasInfo().Resize(nDfasInfoSize + nIncrement);
+			const size_t nRegexTblSize = result.GetRegexTbl().Size();
+			result.GetRegexTbl().Resize(nRegexTblSize + nIncrement);
+			size_t nDfaId;
+			size_t nDfasInfoId;
+			size_t nRegId;
 			for (size_t i = 0; i < nIncrement; ++i)
 			{
-				nId = nCursize + i;
-				CDfanew &dfa = result.GetDfaTable()[nId];
-				dfa.FromNFA(nfatree[i], NULL, 0);
-				if (dfa.Size() > SC_STATELIMIT)
+				CNfa nfa;
+				size_t nToNFAFlag = CRegChainToNFA(regrule[i], nfa);
+				nDfaId = nDfaTblSize + i;
+				nDfasInfoId = nDfasInfoSize + i;
+				nRegId = nRegexTblSize + i;
+				CDfanew &dfa = result.GetDfaTable()[nDfaId];
+				if (nToNFAFlag == SC_ERROR)
 				{
-					ruleResult.m_nResult = COMPILEDRULENEW::RES_EXCEEDLIMIT;
-					dfa.Clear();
-					//ruleResult.m_dfaIds.Clear();
-					//result.GetDfaTable().Resize(nCursize);
-					//break;
+					ruleResult.m_nResult = COMPILEDRULENEW::RES_ERROR;
+					ruleResult.m_dfaIds.Clear();
+					result.GetDfaTable().Resize(nDfaTblSize);
+					result.GetDfasInfo().Resize(nDfasInfoSize);
+					result.GetRegexTbl().Resize(nRegexTblSize);
+					return;
+				}
+				else if (nToNFAFlag == SC_EXCEED)
+				{
+					ruleResult.m_nResult = COMPILEDRULENEW::RES_EXCEED;
 				}
 				else
 				{
-					dfa.Minimize();
+					dfa.FromNFA(nfa, NULL, 0);
+					if (dfa.Size() > SC_STATELIMIT)
+					{
+						ruleResult.m_nResult = COMPILEDRULENEW::RES_EXCEEDLIMIT;
+						dfa.Clear();
+					}
+					else
+					{
+						dfa.Minimize();
+					}
 				}
-				dfa.SetId(nId);
-				ruleResult.m_dfaIds.PushBack(nId);
+				dfa.SetId(nDfaId);
+				ruleResult.m_dfaIds.PushBack(nDfaId);
+				result.GetDfasInfo()[nDfasInfoId].dfaId = nDfaId;
+				result.GetDfasInfo()[nDfasInfoId].regId = nRegId;
+				result.GetRegexTbl()[nRegId] = regrule[i];
 			}
 		}
 	}

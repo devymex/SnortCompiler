@@ -12,7 +12,7 @@ void main()
 	//result.ReadFromFile(_T("..\\..\\output\\result.cdt"));
 
 	//CResNew result;
-	compilenew(_T("..\\..\\input\\test.rules"), result);
+	compilenew(_T("..\\..\\input\\allrules.rule"), result);
 	result.WriteToFile(_T("..\\..\\output\\result.cdt"));
 	std::ofstream fout("..\\..\\output\\Statistic.txt");
 	CDfaTblNew &dfaTbl = result.GetDfaTable();
