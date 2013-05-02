@@ -8,7 +8,7 @@
 void main()
 {
 	CRes result;
-	compile(_T("..\\..\\input\\allrules.rule"), result);
+	compile(_T("..\\..\\input\\test.rules"), result);
 	//result.ReadFromFile(_T("..\\..\\output\\result.cdt"));
 	//for (size_t i = 0; i < result.GetDfaTable().Size(); ++i)
 	//{

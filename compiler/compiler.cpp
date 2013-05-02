@@ -338,7 +338,8 @@ void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 	else
 	{
 		CNfaTree nfatree;
-		size_t flag = InterpretRule(rule, nfatree);
+		size_t flag = 0;
+		//size_t flag = InterpretRule(rule, nfatree);
 		if (flag == SC_ERROR)
 		{
 			ruleResult.m_nResult = COMPILEDRULE::RES_ERROR;

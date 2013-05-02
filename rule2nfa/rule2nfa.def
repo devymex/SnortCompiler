@@ -2,4 +2,5 @@ LIBRARY rule2nfa
 EXPORTS
 CompileRuleSet @ 1
 CompileRule @ 2
-InterpretRule @ 3
+Rule2PcreList @ 3
+CRegChainToNFA @ 4
