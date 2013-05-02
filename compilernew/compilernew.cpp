@@ -312,6 +312,11 @@ COMPILERNEW size_t CResNew::WriteToFile(LPCTSTR filename)
 			const char *pString = m_RegexTbl[i][j].C_Str();
 			fout.write(pString, strlen(pString));
 		}
+		WriteNum(fout, m_RegexTbl[i].GetSigCnt());
+		for (size_t j = 0; j < m_RegexTbl[i].GetSigCnt(); ++j)
+		{
+			WriteNum(fout, m_RegexTbl[i].GetSig(j));
+		}
 	}
 	//ÌîÐ´ÎÄ¼þ³ß´ç
 	endPos = fout.tellp();
@@ -404,6 +409,7 @@ COMPILERNEW size_t CResNew::ReadFromFile(LPCTSTR filename)
 	m_RegexTbl.Resize(RegexTblSize);
 	size_t ChainSize;
 	size_t RegSize;
+	size_t SigSize;
 	for (size_t i = 0; i < RegexTblSize; ++i)
 	{
 		fin.read((char*)&ChainSize, 4);
@@ -414,6 +420,13 @@ COMPILERNEW size_t CResNew::ReadFromFile(LPCTSTR filename)
 			pString[RegSize] = '\0';
 			fin.read(pString, RegSize);
 			m_RegexTbl[i].PushBack(CCString(pString));
+		}
+		fin.read((char*)&SigSize, 4);
+		for (size_t j = 0; j < SigSize; ++j)
+		{
+			SIGNATURE Sig;
+			fin.read((char*)&Sig, 4);
+			m_RegexTbl[i].PushBackSig(Sig);
 		}
 	}
 	fin.close();
