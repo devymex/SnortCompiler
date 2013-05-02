@@ -19,6 +19,7 @@ typedef std::list<STATEID> STALIST;
 typedef std::list<STATEID>::iterator STALIST_ITER;
 typedef std::list<std::list<STATEID>> SETLIST;
 typedef std::list<std::list<STATEID>>::iterator SETLIST_ITER;
+typedef DWORD SIGNATURE;
 
 class COMMONSC CVectorNumber
 {
@@ -316,8 +317,13 @@ public:
 	CCString& operator[](size_t nIdx);
 	const CRegChain& operator = (const CRegChain &other);
 	void Resize(size_t nSize);
+	size_t GetSigCnt() const;
+	void PushBackSig(SIGNATURE &signature);
+	SIGNATURE& GetSig(size_t nIdx) const;
+	void Unique();
 private:
 	std::vector<CCString> *m_pRegList;
+	std::vector<SIGNATURE> *m_pSigList;
 };
 
 class COMMONSC CRegRule
