@@ -655,16 +655,19 @@ COMMONSC bool CCString::Empty()
 COMMONSC CRegChain::CRegChain()
 {
 	m_pRegList = new std::vector<CCString>;
+	m_pSigList = new std::vector<SIGNATURE>;
 }
 
 COMMONSC CRegChain::~CRegChain()
 {
 	delete m_pRegList;
+	delete m_pSigList;
 }
 
 COMMONSC CRegChain::CRegChain(const CRegChain &other)
 {
 	m_pRegList = new std::vector<CCString>;
+	m_pSigList = new std::vector<SIGNATURE>;
 	*this = other;
 }
 
@@ -688,12 +691,34 @@ COMMONSC CCString& CRegChain::operator[](size_t nIdx)
 COMMONSC const CRegChain& CRegChain::operator = (const CRegChain &other)
 {
 	*this->m_pRegList = *other.m_pRegList;
+	*this->m_pSigList = *other.m_pSigList;
 	return *this;
 }
 
 COMMONSC void CRegChain::Resize(size_t nSize)
 {
 	m_pRegList->resize(nSize);
+}
+
+COMMONSC size_t CRegChain::GetSigCnt() const
+{
+	return m_pSigList->size();
+}
+
+COMMONSC void CRegChain::PushBackSig(SIGNATURE &signature)
+{
+	m_pSigList->push_back(signature);
+}
+
+COMMONSC SIGNATURE& CRegChain::GetSig(size_t nIdx) const
+{
+	return (*m_pSigList)[nIdx];
+}
+
+COMMONSC void CRegChain::Unique()
+{
+	std::sort(m_pSigList->begin(), m_pSigList->end());
+	m_pSigList->erase(std::unique(m_pSigList->begin(), m_pSigList->end()), m_pSigList->end());
 }
 
 COMMONSC CRegRule::CRegRule()
