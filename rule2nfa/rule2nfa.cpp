@@ -921,7 +921,7 @@ CRECHANFA size_t Rule2PcreList(const CSnortRule &rule, CRegRule &regrule)
 	regrule.Reserve(++regChain_size);
 	for(size_t i = 0; i < regrule.Size(); ++i)
 	{
-		if(regrule[i].GetSigCnt() != 0)
+		if(regrule[i].GetSigCnt() > 1)
 		{
 			regrule[i].Unique();
 		}
