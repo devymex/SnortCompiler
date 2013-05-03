@@ -795,14 +795,19 @@ size_t content2Pcre(OPTIONCONTENT *pContent, CCString &pcreStr)
 		pcreStr.Append(".{");
 		pcreStr.Append(ss.str().c_str());
 		pcreStr.Append("}");
-
-		//pcreStr += ".{" + ss.str() + "}";
 	}
 	if(!((pContent->nFlags & CF_DEPTH) || pContent->nFlags & CF_WITHIN))
 	{
 		//既没有depth也没有within
-		pcreStr.Append(".*");
-		//pcreStr += ".*";
+		if(!((pContent->nFlags & CF_OFFSET) || (pContent->nFlags & CF_DISTANCE)))
+		{
+			//既没有offset约束也没有distance约束
+			pcreStr = "/";
+		}
+		else
+		{
+			pcreStr.Append(".*");
+		}
 	}
 	else
 	{
@@ -826,7 +831,6 @@ size_t content2Pcre(OPTIONCONTENT *pContent, CCString &pcreStr)
 			pcreStr.Append(".{0,");
 			pcreStr.Append(ss.str().c_str());
 			pcreStr.Append("}");
-			//pcreStr += ".{0," + ss.str() + "}";
 		}
 	}
 
@@ -843,12 +847,10 @@ size_t content2Pcre(OPTIONCONTENT *pContent, CCString &pcreStr)
 	if(pContent->nFlags & CF_NOCASE)
 	{
 		pcreStr.Append("/si");
-		//pcreStr += "/si";
 	}
 	else
 	{
 		pcreStr.Append("/s");
-		//pcreStr += "/s";
 	}
 	return 0;
 }
