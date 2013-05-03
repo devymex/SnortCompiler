@@ -9,21 +9,21 @@
 void main()
 {
 	CResNew result;
-	result.ReadFromFile(_T("..\\..\\output\\result(all).cdt"));
+	//result.ReadFromFile(_T("..\\..\\output\\result(all).cdt"));
 
 	//CResNew result;
-	//compilenew(_T("..\\..\\input\\testrules.rule"), result);
-	//result.WriteToFile(_T("..\\..\\output\\result.cdt"));
-	size_t count = 0;
-	for (size_t i = 0; i < result.GetDfaTable().Size(); ++i)
-	{
-		//std::cout << result.GetDfaTable()[i].Size() * result.GetDfaTable()[i].GetGroupCount() << std::endl;
-		if (result.GetDfaTable()[i].Size() != 0 && result.GetDfaTable()[i].Size() * result.GetDfaTable()[i].GetGroupCount() < 1000)
-		{
-			++count;
-		}
-	}
-	std::cout << count << std::endl;
+	compilenew(_T("..\\..\\input\\allrules.rule"), result);
+	result.WriteToFile(_T("..\\..\\output\\result.cdt"));
+	//size_t count = 0;
+	//for (size_t i = 0; i < result.GetDfaTable().Size(); ++i)
+	//{
+	//	//std::cout << result.GetDfaTable()[i].Size() * result.GetDfaTable()[i].GetGroupCount() << std::endl;
+	//	if (result.GetDfaTable()[i].Size() != 0 && result.GetDfaTable()[i].Size() * result.GetDfaTable()[i].GetGroupCount() < 1000)
+	//	{
+	//		++count;
+	//	}
+	//}
+	//std::cout << count << std::endl;
 	//std::ofstream fout("..\\..\\output\\Statistic.txt");
 	//CDfaTblNew &dfaTbl = result.GetDfaTable();
 	//for (size_t i = 0; i < dfaTbl.Size(); ++i)
