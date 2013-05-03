@@ -3,7 +3,7 @@
 
 struct LISTTRAIT
 {
-	enum {TRAIT_LEN = 16};
+	enum {TRAIT_LEN = 32};
 	char szTrait[TRAIT_LEN];
 };
 
@@ -75,7 +75,7 @@ int main(void)
 
 	std::cout << "Loading results from file..." << std::endl;
 	CResNew res;
-	res.ReadFromFile(_T("..\\..\\output\\result.cdt"));
+	res.ReadFromFile(_T("..\\..\\output\\result(all).cdt"));
 	std::cout << "Completed in " << t1.Reset() << " Sec. lists: " << res.GetRegexTbl().Size() << std::endl << std::endl;
 
 	std::vector<RULELIST> listSet;
@@ -126,7 +126,7 @@ int main(void)
 	ZeroMemory(pListMat, nListMatSize * sizeof(size_t));
 	std::cout << "Completed in " << t1.Reset() << " Sec. SML size (bytes): " << nListMatSize * sizeof(size_t) << std::endl << std::endl;
 	
-	// Compute the LCS of every pair of correlative patterns;
+	// Compute the LCS of every pair of correlative lists;
 	std::cout << "Computer similarity of every pair of correlative lists..." << std::endl;
 	size_t nNonzeros = 0;
 	for (std::vector<RULELIST>::iterator i = listSet.begin(); i != listSet.end(); ++i)
@@ -146,8 +146,8 @@ int main(void)
 			{
 				if (std::find_first_of(i->sigs.begin(), i->sigs.end(), listSet[*j].sigs.begin(), listSet[*j].sigs.end()) != i->sigs.end())
 				{
-					pListMat[y * nListMatDem + x] = LongestCommonString(listSet[x].strList, listSet[y].strList);
-					++nNonzeros;
+					pListMat[x * nListMatDem + y] = pListMat[y * nListMatDem + x] = LongestCommonString(listSet[x].strList, listSet[y].strList);
+					nNonzeros += 2;
 				}
 			}
 		}
@@ -159,57 +159,106 @@ int main(void)
 	}
 	std::cout << "Completed in " << t1.Reset() << " Sec. Non-zero members: " << nNonzeros << std::endl << std::endl;
 
-	//const size_t nThreshould = 3;
-	//nNonzeros = 0;
-	//std::cout << "Threshould every elem of SMP to " << nThreshould << std::endl;
-	//for (size_t i = 0; i < nPatMatDem; ++i)
+	//Analyze the data of the similar matrix
+	std::cout << "Analyze the data of the similar matrix..." << std::endl;
+	std::cout << "The number of the list: " << nListMatDem << std::endl;
+	std::cout << "The element of the matrix: " << nListMatSize << std::endl;
+	std::cout << "The matrix sparesity: " << nNonzeros / double(nListMatSize) << std::endl;
+	std::vector<size_t> vecRowNonZeros;
+	size_t nAllZeros = 0;
+	std::vector<std::string> vecNotSimilar;
+	std::vector<size_t> vecdfaSize;
+	std::vector<std::string> vecVerySimiliar;
+	for (size_t i = 0; i < nListMatDem; ++i)
+	{
+		size_t nRowNonZeros = 0;
+		for (size_t j = 0; j < nListMatDem; ++j)
+		{
+			if (pListMat[i * nListMatDem + j] != 0)
+			{
+				++nRowNonZeros;
+			}
+		}
+		if (nRowNonZeros == 0)
+		{
+			vecNotSimilar.push_back(listSet[i].strList);
+			vecdfaSize.push_back(res.GetDfaTable()[i].Size());
+			++nAllZeros;
+		}
+		else
+		{
+			vecVerySimiliar.push_back(listSet[i].strList);
+		}
+		vecRowNonZeros.push_back(nRowNonZeros);
+	}
+	//std::ofstream fout("..\\..\\output\\NotSimilar.txt");
+	//for (size_t i = 0; i < nAllZeros; ++i)
 	//{
-	//	for (size_t j = i + 1; j < nPatMatDem; ++j)
-	//	{
-	//		if (pPatMat[i * nPatMatDem + j] > 0)
-	//		{
-	//			if (pPatMat[i * nPatMatDem + j] <= nThreshould)
-	//			{
-	//				pPatMat[i * nPatMatDem + j] = 0;
-	//			}
-	//			else
-	//			{
-	//				pPatMat[j * nPatMatDem + i] = pPatMat[i * nPatMatDem + j];
-	//				nNonzeros += 2;
-	//			}
-	//		}
-	//	}
+	//	fout << vecNotSimilar[i] << "\t" << vecdfaSize[i] << std::endl;
 	//}
-	//std::cout << "Completed in " << t1.Reset() << " Sec. Non-zero members: " << nNonzeros << std::endl << std::endl;
-
-	//std::ofstream ff("..\\out.tmp");
-	//std::vector<SPARSEELEM> sparseMat;
-	//sparseMat.reserve(nNonzeros / 2);
-	//for (size_t iRule1 = 0; iRule1 < nRuleMatDem; ++iRule1)
+	//fout.close();
+	//fout.clear();
+	//std::ofstream ff("..\\..\\output\\VerySimilar.txt");
+	//for (std::vector<std::string>::iterator i = vecVerySimiliar.begin(); i != vecVerySimiliar.end(); ++i)
 	//{
-	//	for (size_t iRule2 = iRule1 + 1; iRule2 < nRuleMatDem; ++iRule2)
-	//	{
-	//		SPARSEELEM se;
-	//		se.val = pRuleMat[iRule1 * nRuleMatDem + iRule2];
-	//		if (se.val > 0)
-	//		{
-	//			se.row = ruleSids[iRule1];
-	//			se.col = ruleSids[iRule2];
-	//			sparseMat.push_back(se);
-	//			ff << se.row << " " << se.col << " " << se.val << std::endl;
-	//		}
-	//	}
+	//	ff << *i << std::endl;
 	//}
+	//ff.close();
+	//ff.clear();
+	std::cout << "The max of number of element who is nonzero in row: " << *std::max_element(vecRowNonZeros.begin(), vecRowNonZeros.end()) << std::endl;
+	std::cout << "the number of row whose element is all zero: " << nAllZeros << std::endl;
+	std::cout << "the average of number of element who is nonzero in each row: " << std::accumulate(vecRowNonZeros.begin(), vecRowNonZeros.end(), 0) / double(nListMatDem) << std::endl;
+	std::cout << "Completed in " << t1.Reset() << " Sec." << std::endl << std::endl;
 
-	//for (std::vector<SPARSEELEM>::iterator i = sparseMat.begin(); i != sparseMat.end(); ++i)
-	//{
-	//	for (std::vector<SPARSEELEM>::iterator j = i + 1; i != sparseMat.end(); ++i)
-	//	{
+	//Start grouping...
+	std::vector<std::vector<size_t>> vecGroups;
+	std::cout << "Starting grouping..." << std::endl;
+	for (size_t i = 0; i < nListMatDem; ++i)
+	{
+		vecGroups.push_back(std::vector<size_t>());
+		std::vector<size_t> &vecGroup = vecGroups.back();
+		vecGroup.push_back(i);
+		for (size_t j = 0; j < nListMatDem; ++j)
+		{
+			if (pListMat[i * nListMatDem + j] != 0)
+			{
+				vecGroup.push_back(j);
+			}
+		}
+		if (vecGroup.size() == 1)
+		{
+			vecGroups.pop_back();
+		}
+		if (vecGroup.size() > 1)
+		{
+			for (size_t j = 1; j < vecGroup.size(); ++j)
+			{
+				for (size_t k = 0; k < nListMatDem; ++k)
+				{
+					pListMat[vecGroup[j] * nListMatDem + k] = 0;
+					pListMat[k * nListMatDem + vecGroup[j]] = 0;
+				}
+			}
+		}
+	}
+	std::cout << "Completed in " << t1.Reset() << " Sec." << std::endl << std::endl;
 
-	//	}
-	//}
-	//std::cout << "Total time: " << tAll.Reset() << " Sec." << std::endl;
+	//output grouping result...
+	std::cout << "output grouping result..." << std::endl;
+	std::ofstream fout("..\\..\\output\\GroupRes.txt");
+	for (std::vector<std::vector<size_t>>::iterator i = vecGroups.begin(); i != vecGroups.end(); ++i)
+	{
+		for (std::vector<size_t>::iterator j = i->begin(); j != i->end(); ++j)
+		{
+			fout << listSet[*j].strList << std::endl;
+		}
+		fout << std::endl << std::endl;
+	}
+	fout.close();
+	fout.clear();
+	std::cout << "Completed in " << t1.Reset() << " Sec." << std::endl << std::endl;
 
+	std::cout << "Total time: " << tAll.Reset() << " Sec." << std::endl;
 
 	system("pause");
 	return 0;
