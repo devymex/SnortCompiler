@@ -41,30 +41,38 @@ void printNfa(CNfa &nfa)
 
 void main()
 {
-	const char *pcre1 = "/.*AUTH\\s[^\\n]{2}/";
+	const char *pcre1 = "/\\(\\s*(\\x27[^\\x27]{3,}|\\x22[^\\x22]{3,})/si";
 
 	std::vector<CDfa> dfaVec;
-	CDfa dfa1;
+	CDfa dfa1, dfa2,lastdfa;
 
 	dfa1.SetId(1);
-	CNfa nfa1;
+	CNfa nfa1, nfa2;
 	PcreToNFA(pcre1, nfa1);
-	printNfa(nfa1);
+	size_t nfasize = nfa1.Size();
 	NfaToDfa(nfa1, dfa1);
-	//NfaToDfa(nfa3, dfa3);
 
+	NfaToDfa(nfa1, dfa2);
+
+	dfaVec.push_back(dfa1);
+	dfaVec.push_back(dfa2);
+	//NfaToDfa(nfa3, dfa3);
+	OrMerge(dfaVec, lastdfa);
 	//size = dfa3.Size();
 	size_t size 
 		= dfa1.Size();
+
+	size = lastdfa.Size();
+
+	CDfa mindfa;
+	DfaMin(lastdfa, mindfa);
+	size = mindfa.Size();
+
 	//size = dfa2.Size();
 	//size = dfa3.Size();
 
-	printDfa(dfa1);
 
 	std::string str1 = "abcd";
 	std::string str2 = "fghi";
 	size_t match = MatchDfa(dfa1, str1.begin(), str1.end());
-	//match = MatchDfa(lastdfa, str2.begin(), str2.end());
-
-
 }

@@ -72,3 +72,6 @@ private:
 	void MergeNonDisStates(SETLIST &Partition);
 
 };
+
+DFANEWSC void GetDfaSig(CDfanew &dfa);
+

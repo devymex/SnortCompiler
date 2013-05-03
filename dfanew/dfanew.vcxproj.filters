@@ -24,6 +24,9 @@
     <ClInclude Include="CreDfa.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="GetDfaSig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -38,5 +41,8 @@
     <ClCompile Include="GetDfaSig.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="dfanew.def" />
   </ItemGroup>
 </Project>
