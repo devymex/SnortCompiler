@@ -799,7 +799,9 @@ size_t content2Pcre(OPTIONCONTENT *pContent, CCString &pcreStr)
 	if(!((pContent->nFlags & CF_DEPTH) || pContent->nFlags & CF_WITHIN))
 	{
 		//既没有depth也没有within
-		if(!((pContent->nFlags & CF_OFFSET) || (pContent->nFlags & CF_DISTANCE)))
+		if(!((pContent->nFlags & CF_OFFSET) || (pContent->nFlags & CF_DISTANCE))
+			|| ((pContent->nFlags & CF_OFFSET) && pContent->nOffset == 0)
+			|| ((pContent->nFlags & CF_DISTANCE) && pContent->nDistance == 0))
 		{
 			//既没有offset约束也没有distance约束
 			pcreStr = "/";

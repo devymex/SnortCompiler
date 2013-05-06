@@ -1,9 +1,11 @@
 #include "stdafx.h"
 #include "../compilernew/compilernew.h"
 
+#define THRESHOLD 8
+
 struct LISTTRAIT
 {
-	enum {TRAIT_LEN = 32};
+	enum {TRAIT_LEN = 64};
 	char szTrait[TRAIT_LEN];
 };
 
@@ -68,6 +70,12 @@ size_t LongestCommonString(const std::string &str1, const std::string &str2)
 	return count;
 }
 
+struct GROUPRES
+{
+	std::vector<size_t> listIds;
+	std::string comStr;
+};
+
 int main(void)
 {
 	//Load all rules lists from file
@@ -80,14 +88,24 @@ int main(void)
 
 	std::vector<RULELIST> listSet;
 	listSet.reserve(10000);
+	std::string strTmp;
+	size_t nBeg, nEnd;
+	//size_t nPos;
 	for (size_t i = 0; i < res.GetRegexTbl().Size(); ++i)
 	{
 		listSet.push_back(RULELIST());
 		RULELIST &cr = listSet.back();
 		for (size_t j = 0; j < res.GetRegexTbl()[i].Size(); ++j)
 		{
-			cr.strList += res.GetRegexTbl()[i][j].C_Str();
+			strTmp = res.GetRegexTbl()[i][j].C_Str();
+			nBeg = strTmp.find_first_of('/');
+			nEnd = strTmp.find_last_of('/');
+			cr.strList += strTmp.substr(nBeg + 1, nEnd - nBeg - 1);
 		}
+		//while ((nPos = cr.strList.find("\\x", 0)) != std::string::npos)
+		//{
+		//	cr.strList.erase(nPos, 2);
+		//}
 		for (size_t j = 0; j < res.GetRegexTbl()[i].GetSigCnt(); ++j)
 		{
 			cr.sigs.push_back(res.GetRegexTbl()[i].GetSig(j));
@@ -144,7 +162,7 @@ int main(void)
 			size_t y = i - listSet.begin(), x = *j;
 			if (y < x)
 			{
-				if (std::find_first_of(i->sigs.begin(), i->sigs.end(), listSet[*j].sigs.begin(), listSet[*j].sigs.end()) != i->sigs.end())
+				//if (std::find_first_of(i->sigs.begin(), i->sigs.end(), listSet[*j].sigs.begin(), listSet[*j].sigs.end()) != i->sigs.end())
 				{
 					pListMat[x * nListMatDem + y] = pListMat[y * nListMatDem + x] = LongestCommonString(listSet[x].strList, listSet[y].strList);
 					nNonzeros += 2;
@@ -191,54 +209,82 @@ int main(void)
 		}
 		vecRowNonZeros.push_back(nRowNonZeros);
 	}
-	//std::ofstream fout("..\\..\\output\\NotSimilar.txt");
-	//for (size_t i = 0; i < nAllZeros; ++i)
-	//{
-	//	fout << vecNotSimilar[i] << "\t" << vecdfaSize[i] << std::endl;
-	//}
-	//fout.close();
-	//fout.clear();
-	//std::ofstream ff("..\\..\\output\\VerySimilar.txt");
-	//for (std::vector<std::string>::iterator i = vecVerySimiliar.begin(); i != vecVerySimiliar.end(); ++i)
-	//{
-	//	ff << *i << std::endl;
-	//}
-	//ff.close();
-	//ff.clear();
 	std::cout << "The max of number of element who is nonzero in row: " << *std::max_element(vecRowNonZeros.begin(), vecRowNonZeros.end()) << std::endl;
 	std::cout << "the number of row whose element is all zero: " << nAllZeros << std::endl;
 	std::cout << "the average of number of element who is nonzero in each row: " << std::accumulate(vecRowNonZeros.begin(), vecRowNonZeros.end(), 0) / double(nListMatDem) << std::endl;
 	std::cout << "Completed in " << t1.Reset() << " Sec." << std::endl << std::endl;
 
-	//Start grouping...
-	std::vector<std::vector<size_t>> vecGroups;
-	std::cout << "Starting grouping..." << std::endl;
+	//Start preliminary grouping...
+	std::cout << "Starting preliminary grouping..." << std::endl;
+	std::vector<GROUPRES> vecGroups;
+	std::vector<size_t> vecWaitingForGroup;
+	size_t min;
 	for (size_t i = 0; i < nListMatDem; ++i)
 	{
-		vecGroups.push_back(std::vector<size_t>());
-		std::vector<size_t> &vecGroup = vecGroups.back();
-		vecGroup.push_back(i);
+		vecGroups.push_back(GROUPRES());
+		GROUPRES &group = vecGroups.back();
+		group.listIds.push_back(i);
+		min = listSet[i].strList.length();
 		for (size_t j = 0; j < nListMatDem; ++j)
 		{
 			if (pListMat[i * nListMatDem + j] != 0)
 			{
-				vecGroup.push_back(j);
+				group.listIds.push_back(j);
+				if (pListMat[i * nListMatDem + j] < min)
+				{
+					min = pListMat[i * nListMatDem + j];
+				}
 			}
 		}
-		if (vecGroup.size() == 1)
+		if (group.listIds.size() == 1)
 		{
+			vecWaitingForGroup.push_back(i);
 			vecGroups.pop_back();
 		}
-		if (vecGroup.size() > 1)
+		if (group.listIds.size() > 1)
 		{
-			for (size_t j = 1; j < vecGroup.size(); ++j)
+			group.comStr = listSet[i].strList.substr(0, min);
+			for (size_t j = 1; j < group.listIds.size(); ++j)
 			{
 				for (size_t k = 0; k < nListMatDem; ++k)
 				{
-					pListMat[vecGroup[j] * nListMatDem + k] = 0;
-					pListMat[k * nListMatDem + vecGroup[j]] = 0;
+					pListMat[group.listIds[j] * nListMatDem + k] = 0;
+					pListMat[k * nListMatDem + group.listIds[j]] = 0;
 				}
 			}
+		}
+	}
+	std::cout << "Completed in " << t1.Reset() << " Sec." << std::endl << std::endl;
+
+	//Start farther grouping...
+	std::cout << "Starting farther grouping..." << std::endl;
+	size_t max;
+	size_t tmp;
+	size_t index;
+	for (std::vector<size_t>::iterator i = vecWaitingForGroup.begin(); i != vecWaitingForGroup.end(); ++i)
+	{
+		max = 0;
+		index = 0;
+		for (size_t j = 0; j < vecGroups.size(); ++j)
+		{
+			tmp = LongestCommonString(vecGroups[j].comStr, listSet[*i].strList);
+			if (max < tmp || (max == tmp && tmp == vecGroups[j].comStr.length()))
+			{
+				max = tmp;
+				index = j;
+			}
+		}
+		if (max >= THRESHOLD || (max == listSet[*i].strList.length() && max == vecGroups[index].comStr.length()))
+		{
+			vecGroups[index].listIds.push_back(*i);
+			vecGroups[index].comStr.substr(0, max);
+		}
+		else
+		{
+			vecGroups.push_back(GROUPRES());
+			GROUPRES &group = vecGroups.back();
+			group.listIds.push_back(*i);
+			group.comStr = listSet[*i].strList;
 		}
 	}
 	std::cout << "Completed in " << t1.Reset() << " Sec." << std::endl << std::endl;
@@ -246,18 +292,23 @@ int main(void)
 	//output grouping result...
 	std::cout << "output grouping result..." << std::endl;
 	std::ofstream fout("..\\..\\output\\GroupRes.txt");
-	for (std::vector<std::vector<size_t>>::iterator i = vecGroups.begin(); i != vecGroups.end(); ++i)
+	for (std::vector<GROUPRES>::iterator i = vecGroups.begin(); i != vecGroups.end(); ++i)
 	{
-		for (std::vector<size_t>::iterator j = i->begin(); j != i->end(); ++j)
+		if (i->listIds.size() == 1)
 		{
-			fout << listSet[*j].strList << std::endl;
+			fout << listSet[i->listIds[0]].strList << std::endl;
 		}
-		fout << std::endl << std::endl;
+		//for (std::vector<size_t>::iterator j = i->listIds.begin(); j != i->listIds.end(); ++j)
+		//{
+		//	fout << listSet[*j].strList << std::endl;
+		//}
+		//fout << std::endl << std::endl;
 	}
 	fout.close();
 	fout.clear();
 	std::cout << "Completed in " << t1.Reset() << " Sec." << std::endl << std::endl;
 
+	std::cout << vecGroups.size() << std::endl;
 	std::cout << "Total time: " << tAll.Reset() << " Sec." << std::endl;
 
 	system("pause");

@@ -18,7 +18,7 @@ void main()
 	//for (size_t i = 0; i < result.GetDfaTable().Size(); ++i)
 	//{
 	//	//std::cout << result.GetDfaTable()[i].Size() * result.GetDfaTable()[i].GetGroupCount() << std::endl;
-	//	if (result.GetDfaTable()[i].Size() != 0 && result.GetDfaTable()[i].Size() * result.GetDfaTable()[i].GetGroupCount() < 1000)
+	//	if (result.GetDfaTable()[i].Size() > 254 && result.GetDfaTable()[i].Size() <= 510 && result.GetDfaTable()[i].Size() * result.GetDfaTable()[i].GetGroupCount() < 2048)
 	//	{
 	//		++count;
 	//	}

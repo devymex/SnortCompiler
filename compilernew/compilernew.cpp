@@ -504,8 +504,8 @@ void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 				}
 				else
 				{
-					dfa.FromNFA(nfa, NULL, 0);
-					if (dfa.Size() > SC_STATELIMIT)
+					size_t nToDFAFlag = dfa.FromNFA(nfa, NULL, 0);
+					if (nToDFAFlag == -1)
 					{
 						ruleResult.m_nResult = COMPILEDRULENEW::RES_EXCEEDLIMIT;
 						dfa.Clear();
