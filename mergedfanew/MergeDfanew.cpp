@@ -1,43 +1,65 @@
-//#include "stdafx.h"
-//#include "OrDfanew.h"
-//#include "MergeDfanew.h"
-//#include "../nfa2dfa/nfa2dfa.h"
-//#include "../common/common.h"
-//
-//MERDFA bool OrMerge(std::vector<CDfanew> &dfas, CDfanew &lastDfa)
-//{
-//#undef max
-//	for(STATEID i = 0; i < dfas.size(); ++i)
-//	{
-//		if(dfas[i].Size() > std::numeric_limits<STATEID>::max())
-//		{
-//			return false;
-//		}
-//	}
-//	std::vector<CNfa> nfas;
-//	STATEID nTermSta = 0;
-//	CNfa oneNfa;
-//	oneNfa.Resize(1);
-//
-//	for(STATEID i = 0; i < dfas.size(); ++i)
-//	{
-//		nTermSta += dfas[i].Size();
-//	}
-//	nTermSta += 1;
-//
-//	for(STATEID i = 0; i < dfas.size(); ++i)
-//	{
-//		oneNfa[0][EMPTYEDGE].PushBack(oneNfa.Size());
-//		IncreDfaNum(dfas[i], (STATEID)oneNfa.Size());
-//		InsertDfa(dfas[i], oneNfa,nTermSta);
-//	}
-//	CDfa dfalast;
-//	if(NfaToDfa(oneNfa, dfalast, true) == 0)
-//	{
-//		return true;
-//	}
-//	else
-//	{
-//		return false;
-//	}
-//}
+#include "stdafx.h"
+#include "OrDfanew.h"
+#include "MergeDfanew.h"
+
+MERDFANEW bool NOrMerge(std::vector<CDfanew> &dfas, CDfanew &lastDfa)
+{
+#undef max
+	for(STATEID i = 0; i < dfas.size(); ++i)
+	{
+		if(dfas[i].Size() > std::numeric_limits<STATEID>::max())
+		{
+			return false;
+		}
+	}
+		
+	NFALOG nfalog[DFACOLSIZE];
+	size_t count = 0;
+
+	std::vector<CNfa> nfas;
+	STATEID nTermSta = 0;
+	CNfa oneNfa;
+	oneNfa.Resize(1);
+
+	for(STATEID i = 0; i < dfas.size(); ++i)
+	{
+		nTermSta += dfas[i].Size();
+	}
+	nTermSta += (dfas.size() - 1);
+
+	for(STATEID i = 0; i < dfas.size(); ++i)
+	{
+		oneNfa[0][EMPTYEDGE].PushBack(oneNfa.Size());
+		NIncreDfaNum(dfas[i], (STATEID)oneNfa.Size());
+		NInsertDfa(dfas[i], oneNfa,nTermSta, nfalog, count);
+	}
+
+
+	//for(size_t i = 0; i < count; ++i)
+	//{
+	//	nfalog[i].dfaId = oneNfa.GetDfaTerms(i).dfaId;
+	//	nfalog[i].nfaStateId = oneNfa.GetDfaTerms(i).nfaSta;
+	//}
+		for (size_t j = 0; j < oneNfa.Size(); ++j)
+		{
+			std::cout << j << ": ";
+			for (size_t k = 0; k < CHARSETSIZE; ++k)
+			{
+				for (size_t l = 0; l < oneNfa[j][k].Size(); ++l)
+				{
+				
+					std::cout << "(" << k << "," << oneNfa[j][k][l] << ")";
+				}
+			}
+			std::cout << std::endl;
+		}
+
+	if(lastDfa.FromNFA(oneNfa, nfalog, count, true) == 0)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}

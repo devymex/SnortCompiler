@@ -212,7 +212,7 @@ DFANEWSC size_t CDfanew::FromNFA(CNfa &nfa, NFALOG *nfalog, size_t Count, bool c
 							TERMSET term;
 							term.dfaSta = termStasVec[j].second;
 							term.dfaId = nfalog[i].dfaId;
-							m_TermSet->push_back(term);;
+							m_TermSet->push_back(term);
 							break;
 						}
 					}
@@ -338,6 +338,12 @@ DFANEWSC const BYTE* CDfanew::GetGroup() const
 {
 	return m_pGroup;
 }
+
+DFANEWSC const BYTE CDfanew::GetOneGroup(STATEID charNum) const
+{
+	return m_pGroup[charNum];
+}
+
 
 DFANEWSC STATEID CDfanew::GetStartId() const
 {
