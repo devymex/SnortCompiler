@@ -278,11 +278,11 @@ COMMONSC  void CNfa::PushDfaTerms(DFATERMS dfaTerms)
 	m_DfaTerms->push_back(dfaTerms);
 }
 
-COMMONSC	size_t CNfa::GetDfaTermsNum()
+COMMONSC size_t CNfa::GetDfaTermsNum()
 {
 	return m_DfaTerms->size();
 }
-COMMONSC	CNfa::DFATERMS CNfa::GetDfaTerms(size_t num)
+COMMONSC CNfa::DFATERMS CNfa::GetDfaTerms(size_t num)
 {
 	return (*m_DfaTerms)[num];
 }
@@ -320,12 +320,12 @@ COMMONSC CDfaRow& CDfaRow::operator=(const CDfaRow &other)
 	return *this;
 }
 
-COMMONSC STATEID& CDfaRow::operator[](BYTE index)
+COMMONSC STATEID& CDfaRow::operator[](STATEID index)
 {
 	return (*m_pDest)[index];
 }
 
-COMMONSC const STATEID& CDfaRow::operator[](BYTE index) const
+COMMONSC const STATEID& CDfaRow::operator[](STATEID index) const
 {
 	return (*m_pDest)[index];
 }

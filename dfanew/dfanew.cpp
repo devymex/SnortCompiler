@@ -271,7 +271,7 @@ DFANEWSC size_t CDfanew::Minimize()
 	}
 
 	//初始化可达状态表reachable
-	std::vector<BYTE> reachable(m_pDfa->size(), 0);
+	std::vector<STATEID> reachable(m_pDfa->size(), 0);
 	std::list<STATEID> StartStas;
 	StartStas.push_back(0);
 
@@ -533,7 +533,7 @@ DFANEWSC void CDfanew::Load(BYTE *beg, size_t len)
 //删除不可达状态或者“死”状态，Tab表示传入一个DFA的正向访问表或一个DFA的逆向访问表
 //begs表示读Tab的起始位置
 //reachable表示可达状态集合，初始值为0，输出结果
-void CDfanew::RemoveUnreachable(const std::vector<STATEID> *Tab, const STALIST &begs, const size_t &col, std::vector<BYTE> &reachable)
+void CDfanew::RemoveUnreachable(const std::vector<STATEID> *Tab, const STALIST &begs, const size_t &col, std::vector<STATEID> &reachable)
 {
 	size_t stas = reachable.size();
 	//mark state after traversal, 0 is unreachable and 1 is reachable
@@ -571,7 +571,7 @@ void CDfanew::RemoveUnreachable(const std::vector<STATEID> *Tab, const STALIST &
 
 //reachable中保留所有的可达状态，reachable中元素的取值有3个，
 //0 表示该状态为孤立状态，1 表示该状态为不可达状态或者“死”状态，2 表示该状态为可达状态
-void CDfanew::MergeReachable(std::vector<BYTE> &reachable)
+void CDfanew::MergeReachable(std::vector<STATEID> &reachable)
 {
 	//统计可达状态的数目
 	size_t nRcbCnt = std::count(reachable.begin(), reachable.end(), 2);
@@ -593,7 +593,7 @@ void CDfanew::MergeReachable(std::vector<BYTE> &reachable)
 
 	STATEID nNewIdx = 0;
 	//将m_pDfa中编号对应为可达状态的复制到tmpDfa中，并修改reachable中可达状态的编号
-	for (std::vector<BYTE>::iterator iter = reachable.begin(); iter != reachable.end(); ++iter)
+	for (std::vector<STATEID>::iterator iter = reachable.begin(); iter != reachable.end(); ++iter)
 	{
 		if (2 == *iter)
 		{

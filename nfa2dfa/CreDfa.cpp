@@ -41,7 +41,7 @@ bool ColumnEqual(std::vector<CStateSet*> &c1, std::vector<CStateSet*>&c2)
 	return true;
 }
 
-void AvaiEdges(CNfa &oneNfaTab, STATEID *group)
+void AvaiEdges(CNfa &oneNfaTab, BYTE *group)
 {
 	std::vector<std::vector<size_t>> charGroups;
 	std::vector<CStateSet*> column[DFACOLSIZE];

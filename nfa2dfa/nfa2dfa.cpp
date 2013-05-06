@@ -141,7 +141,7 @@ CREDFA size_t NfaToDfa(CNfa &oneNfaTab, CDfa &dfaTab, bool combine)
 	return 0;
 }
 
-void RemoveUnreachable(const std::vector<STATEID> *Tab, const STALIST &begs, const size_t &col, std::vector<BYTE> &reachable)
+void RemoveUnreachable(const std::vector<STATEID> *Tab, const STALIST &begs, const size_t &col, std::vector<STATEID> &reachable)
 {
 	//mark state after traversal, 0 is unreachable and 1 is reachable
 	size_t stas = reachable.size();
@@ -177,7 +177,7 @@ void RemoveUnreachable(const std::vector<STATEID> *Tab, const STALIST &begs, con
 	}
 }
 
-void MergeReachable(const CDfa &oneDfaTab, std::vector<BYTE> &reachable, CDfa &tmpDfa)
+void MergeReachable(const CDfa &oneDfaTab, std::vector<STATEID> &reachable, CDfa &tmpDfa)
 {
 	//count reachable states 
 	size_t nRcbCnt = std::count(reachable.begin(), reachable.end(), 2);
@@ -187,7 +187,7 @@ void MergeReachable(const CDfa &oneDfaTab, std::vector<BYTE> &reachable, CDfa &t
 	STATEID nNewIdx = 0;
 	size_t nColNum = tmpDfa.GetColNum();
 	//reachable states in old DFA copy to new DFA and renumber the new DFA
-	for (std::vector<BYTE>::iterator iter = reachable.begin(); iter != reachable.end(); ++iter)
+	for (std::vector<STATEID>::iterator iter = reachable.begin(); iter != reachable.end(); ++iter)
 	{
 		if (2 == *iter)
 		{
@@ -408,7 +408,7 @@ CREDFA size_t DfaMin(CDfa &oneDfaTab, CDfa &minDfaTab)
 		}
 	}
 
-	std::vector<BYTE> reachable(oneDfaTab.Size(), 0);
+	std::vector<STATEID> reachable(oneDfaTab.Size(), 0);
 	std::list<STATEID> StartStas;
 	StartStas.push_back(0);
 

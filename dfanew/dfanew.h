@@ -8,7 +8,8 @@
 
 #define HASHMODULO 1000000
 
-#define SC_STATELIMIT 254
+#define SC_STATELIMIT 255
+//#define SC_STATELIMIT 510
 
 #define EMPTY 256
 
@@ -67,8 +68,8 @@ private:
 	std::vector<TERMSET> *m_TermSet;
 
 	void RemoveUnreachable(const std::vector<STATEID> *Tab, const STALIST &begs, 
-		const size_t &col, std::vector<BYTE> &reachable);
-	void MergeReachable(std::vector<BYTE> &reachable);
+		const size_t &col, std::vector<STATEID> &reachable);
+	void MergeReachable(std::vector<STATEID> &reachable);
 	void PartitionNonDisState(std::vector<STATEID> *pRevTbl, SETLIST &pSets);
 	void MergeNonDisStates(SETLIST &Partition);
 
