@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "CreDfa.h"
+#include "NCreDfa.h"
 #include "dfanew.h"
 
 /* Following codes is a testing for unordered_map */
@@ -20,7 +20,7 @@
 //STATESETHASH::iterator xx2 = ssh.find(v2);
 //n = xx2->second;
 
-bool ColumnEqual(std::vector<CStateSet*> &c1, std::vector<CStateSet*>&c2)
+bool NColumnEqual(std::vector<CStateSet*> &c1, std::vector<CStateSet*>&c2)
 {
 	if (c1.size() != c2.size())
 	{
@@ -40,7 +40,7 @@ bool ColumnEqual(std::vector<CStateSet*> &c1, std::vector<CStateSet*>&c2)
 	return true;
 }
 
-void AvaiEdges(CNfa &oneNfaTab, STATEID *group)
+void NAvaiEdges(CNfa &oneNfaTab, STATEID *group)
 {
 	std::vector<std::vector<size_t>> charGroups;
 	std::vector<CStateSet*> column[DFACOLSIZE];
@@ -81,7 +81,7 @@ void AvaiEdges(CNfa &oneNfaTab, STATEID *group)
 		fullSet.erase(fullSet.begin());
 		for (std::vector<size_t>::iterator i = fullSet.begin(); i != fullSet.end() && !fullSet.empty();)
 		{
-			if (ColumnEqual(column[curGroup.front()], column[*i]))
+			if (NColumnEqual(column[curGroup.front()], column[*i]))
 			{
 				curGroup.push_back(*i);
 				i = fullSet.erase(i);
@@ -103,7 +103,7 @@ void AvaiEdges(CNfa &oneNfaTab, STATEID *group)
 	}
 }
 
-void NextNfaSet(const CNfa &oneNfaTab, const std::vector<size_t> &curNfaVec, size_t edge, std::vector<size_t> &nextENfaVec, char &finFlag)
+void NNextNfaSet(const CNfa &oneNfaTab, const std::vector<size_t> &curNfaVec, size_t edge, std::vector<size_t> &nextENfaVec, char &finFlag)
 {
 	if (edge >= CHARSETSIZE)
 	{
@@ -128,11 +128,11 @@ void NextNfaSet(const CNfa &oneNfaTab, const std::vector<size_t> &curNfaVec, siz
 	nextNfaVec.erase(std::unique(nextNfaVec.begin(), nextNfaVec.end()), nextNfaVec.end());
 	if(!nextNfaVec.empty())
 	{
-		EClosure(oneNfaTab, nextNfaVec, nextENfaVec, finFlag);
+		NEClosure(oneNfaTab, nextNfaVec, nextENfaVec, finFlag);
 	}
 }
 
-void EClosure(const CNfa &oneNfaTab, const std::vector<size_t> &curNfaVec, std::vector<size_t> &eNfaVec, char &finFlag)
+void NEClosure(const CNfa &oneNfaTab, const std::vector<size_t> &curNfaVec, std::vector<size_t> &eNfaVec, char &finFlag)
 {
 	std::vector<size_t> eStack;
 	char caledStat[20000] = {0};
