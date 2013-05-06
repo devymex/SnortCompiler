@@ -72,7 +72,7 @@ size_t LongestCommonString(const std::string &str1, const std::string &str2)
 
 struct GROUPRES
 {
-	std::vector<size_t> listIds;
+	std::vector<size_t> chainIds;
 	std::string comStr;
 };
 
@@ -223,33 +223,33 @@ int main(void)
 	{
 		vecGroups.push_back(GROUPRES());
 		GROUPRES &group = vecGroups.back();
-		group.listIds.push_back(i);
+		group.chainIds.push_back(i);
 		min = listSet[i].strList.length();
 		for (size_t j = 0; j < nListMatDem; ++j)
 		{
 			if (pListMat[i * nListMatDem + j] != 0)
 			{
-				group.listIds.push_back(j);
+				group.chainIds.push_back(j);
 				if (pListMat[i * nListMatDem + j] < min)
 				{
 					min = pListMat[i * nListMatDem + j];
 				}
 			}
 		}
-		if (group.listIds.size() == 1)
+		if (group.chainIds.size() == 1)
 		{
 			vecWaitingForGroup.push_back(i);
 			vecGroups.pop_back();
 		}
-		if (group.listIds.size() > 1)
+		if (group.chainIds.size() > 1)
 		{
 			group.comStr = listSet[i].strList.substr(0, min);
-			for (size_t j = 1; j < group.listIds.size(); ++j)
+			for (size_t j = 1; j < group.chainIds.size(); ++j)
 			{
 				for (size_t k = 0; k < nListMatDem; ++k)
 				{
-					pListMat[group.listIds[j] * nListMatDem + k] = 0;
-					pListMat[k * nListMatDem + group.listIds[j]] = 0;
+					pListMat[group.chainIds[j] * nListMatDem + k] = 0;
+					pListMat[k * nListMatDem + group.chainIds[j]] = 0;
 				}
 			}
 		}
@@ -276,14 +276,14 @@ int main(void)
 		}
 		if (max >= THRESHOLD || (max == listSet[*i].strList.length() && max == vecGroups[index].comStr.length()))
 		{
-			vecGroups[index].listIds.push_back(*i);
+			vecGroups[index].chainIds.push_back(*i);
 			vecGroups[index].comStr.substr(0, max);
 		}
 		else
 		{
 			vecGroups.push_back(GROUPRES());
 			GROUPRES &group = vecGroups.back();
-			group.listIds.push_back(*i);
+			group.chainIds.push_back(*i);
 			group.comStr = listSet[*i].strList;
 		}
 	}
@@ -294,9 +294,9 @@ int main(void)
 	std::ofstream fout("..\\..\\output\\GroupRes.txt");
 	for (std::vector<GROUPRES>::iterator i = vecGroups.begin(); i != vecGroups.end(); ++i)
 	{
-		if (i->listIds.size() == 1)
+		if (i->chainIds.size() == 1)
 		{
-			fout << listSet[i->listIds[0]].strList << std::endl;
+			fout << listSet[i->chainIds[0]].strList << std::endl;
 		}
 		//for (std::vector<size_t>::iterator j = i->listIds.begin(); j != i->listIds.end(); ++j)
 		//{

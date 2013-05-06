@@ -64,7 +64,7 @@ private:
 struct DFAINFO
 {
 	size_t dfaId;
-	size_t regId;
+	size_t chainId;
 };
 
 class COMPILERNEW CDFASINFO
