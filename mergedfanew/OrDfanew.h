@@ -1,5 +1,5 @@
-//#include "../common/common.h"
-//#include "../dfanew/dfanew.h"
-//void IncreDfaNum(CDfanew &dfa, STATEID num);
-//
-//void InsertDfa(CDfanew &dfa, CNfa &nfa, STATEID nTermSta);
+#include "../common/common.h"
+#include "../dfanew/dfanew.h"
+void NIncreDfaNum(CDfanew &dfa, STATEID num);
+
+void NInsertDfa(CDfanew &dfa, CNfa &nfa, STATEID nTermSta, NFALOG *nfalog, size_t &count);

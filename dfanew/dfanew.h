@@ -50,7 +50,7 @@ public:
 	STATEID GetGroupCount() const;
 	BYTE Char2Group(BYTE nIdx);
 	const BYTE* GetGroup() const;
-	const BYTE GetOneGroup(STATEID chaNum) const;
+	const BYTE GetOneGroup(STATEID charNum) const;
 	STATEID GetStartId() const;
 	void SetId(size_t id);
 	size_t GetId();
