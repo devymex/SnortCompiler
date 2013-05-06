@@ -9,6 +9,9 @@ DFANEWSC void GetDfaSig(CDfanew &dfa)
 {
 	static STATEID serNum = 0;
 
+	std::vector<STATEID> doms;
+	//记录所有的终态
+	std::vector<STATEID> termStas;
 	//深度优先遍历DFA时标记已被访问过的状态
 	size_t visited[DFACOLSIZE];
 	std::memset((char*)visited, 0, sizeof(visited));
@@ -19,7 +22,7 @@ DFANEWSC void GetDfaSig(CDfanew &dfa)
 
 	//支配点矩阵
 	INT64 domMax[4 * 256];
-	std::memset(domMax, 0xFFFFFFFFFFFF, sizeof(domMax));
+	std::memset(domMax, INT64(-1), sizeof(domMax));
 	//UINT8 domMax[DFACOLSIZE][DFACOLSIZE];
 	//std::memset(domMax, 1, sizeof(domMax));
 
@@ -27,15 +30,19 @@ DFANEWSC void GetDfaSig(CDfanew &dfa)
 	STATEID staRow[DFACOLSIZE];
 	std::memset((char*)staRow, (STATEID)-1, sizeof(staRow));
 
-	DeepSearch(dfa.GetStartId(), serNum, dfa, visited, deepSer, staRow);
+	DeepSearch(dfa.GetStartId(), serNum, dfa, termStas, visited, deepSer, staRow);
 
-	Dominates(dfa, domMax, deepSer, staRow);
-
+	Dominates(dfa, termStas, domMax, deepSer, staRow, doms);
+	std::cout << std::endl;
 }
 
 //深度遍历dfa，填写deepser,terRow,staRow
-void DeepSearch(STATEID startSta, STATEID &serNum, CDfanew &dfa, size_t visited[], STATEID deepSer[], STATEID staRow[])
+void DeepSearch(STATEID startSta, STATEID &serNum, CDfanew &dfa, std::vector<STATEID> &termStas, size_t visited[], STATEID deepSer[], STATEID staRow[])
 {
+	if((dfa[startSta].GetFlag() & CDfaRow::TERMINAL) != 0)
+	{
+		termStas.push_back(startSta);
+	}
 	visited[startSta] = 1;
 	std::vector<STATEID> stack;
 
@@ -60,16 +67,16 @@ void DeepSearch(STATEID startSta, STATEID &serNum, CDfanew &dfa, size_t visited[
 	{
 		cursta = stack.front();
 		stack.erase(stack.begin());
-		DeepSearch(cursta, serNum, dfa, visited, deepSer, staRow);
+		DeepSearch(cursta, serNum, dfa, termStas, visited, deepSer, staRow);
 	}
 }
 
-void Dominates(CDfanew &dfa, INT64 domMax[], STATEID deepSer[], STATEID staRow[])
+void Dominates(CDfanew &dfa, std::vector<STATEID> termStas, INT64 domMax[], STATEID deepSer[], STATEID staRow[], std::vector<STATEID> &doms)
 {
 	std::vector<STATEID> inStas[DFACOLSIZE];
 	InStas(dfa, inStas);
 	//initial domMax first row
-	domMax[0] &= (UINT64)1;
+	domMax[0] &= (INT64)1 << 63;
 	for(size_t i = 1; i < 4; ++i)
 	{
 		domMax[i] = 0;
@@ -94,8 +101,16 @@ void Dominates(CDfanew &dfa, INT64 domMax[], STATEID deepSer[], STATEID staRow[]
 				RowAnd(&domMax[i * 4], &domMax[row * 4], &domMax[i * 4]);
 			}
 			//将第i行第i列置1
-			size_t cur = i * 4 + i / 64 + 1;
+			size_t cur = i * 4 + i / 64 - (i % 64 == 0);
+
+			if(i % 64 == 0)
+			{
+				domMax[cur] |= (INT64)1;
+			}
+			else
+			{
 			domMax[cur] |= (INT64)1 << (63 - i % 64);
+			}
 
 			if(!chanFlag)
 			{
@@ -104,8 +119,42 @@ void Dominates(CDfanew &dfa, INT64 domMax[], STATEID deepSer[], STATEID staRow[]
 		}
 	}
 
-	INT64 lastDoms[LENGTH];
-	for()
+	//将多有终态的支配点取交集
+	for(size_t i = 0; i < termStas.size(); ++i)
+	{
+		STATEID cur = staRow[termStas[i]];
+		//只取矩阵中上三角的支配点
+		for(size_t j = 0; j <= cur; ++j)
+		{
+			STATEID t = cur * 4 + j / 64;
+			STATEID s = j % 64;
+			if(j == 0)
+			{
+				if((domMax[t] & (INT64)1 << 63) != 0)
+				{
+					doms.push_back(deepSer[j]);
+				}
+			}
+			else
+			{
+				if(s == 0)
+				{
+					if((domMax[t - 1] & (INT64)1) != 0)
+					{
+						doms.push_back(deepSer[j]);
+					}
+				}
+				else
+				{
+					if((domMax[t] & ((INT64)1 << (63 - s))) != 0)
+					{
+						doms.push_back(deepSer[j]);
+					}
+				}
+			}
+		}
+	}
+
 }
 
 
@@ -153,3 +202,6 @@ bool Change(INT64* before, INT64* after)
 	}
 	return chg;
 }
+
+void SearchDfa()
+{}
