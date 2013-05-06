@@ -5,7 +5,7 @@
 
 void main()
 {
-	const char* a = "/BM/";
+	const char* a = "/^(abcdf|cdf)e/";
 	CNfa nfa;
 	PcreToNFA(a, nfa);
 	CDfanew dfa;
@@ -15,7 +15,10 @@ void main()
 		std::cout << i << ":";
 		for (size_t j = 0; j < dfa.GetGroupCount(); ++j)
 		{
+			if(dfa[i][j] != BYTE(-1))
+			{
 			std::cout << "(" << j << "," << (size_t)dfa[i][j] << ")";
+			}
 		}
 		std::cout << std::endl;
 	}
@@ -27,11 +30,17 @@ void main()
 		std::cout << i << ":";
 		for (size_t j = 0; j < dfa.GetGroupCount(); ++j)
 		{
+			if(dfa[i][j] != BYTE(-1))
+			{
 			std::cout << "(" << j << "," << (size_t)dfa[i][j] << ")";
+			}
 		}
 		std::cout << std::endl;
 	}
 	std::cout << std::endl;
+
+	GetDfaSig(dfa);
+
 
 	BYTE b[] = "fsdfsdkfBMdf";
 	CStateSet StaSet;

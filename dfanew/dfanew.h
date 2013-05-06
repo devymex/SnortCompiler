@@ -47,9 +47,10 @@ public:
 	void Clear();
 	size_t FromNFA(CNfa &nfa, NFALOG *nfalog, size_t Count, bool combine = false);
 	size_t Minimize();
-	size_t GetGroupCount() const;
+	STATEID GetGroupCount() const;
 	BYTE Char2Group(BYTE nIdx);
 	const BYTE* GetGroup() const;
+	const BYTE GetOneGroup(STATEID chaNum) const;
 	STATEID GetStartId() const;
 	void SetId(size_t id);
 	size_t GetId();
@@ -59,7 +60,7 @@ public:
 	void Load(BYTE *beg, size_t len);
 private:
 	size_t m_nId;
-	size_t m_nColNum;
+	STATEID m_nColNum;
 	STATEID m_StartId;
 	BYTE m_pGroup[DFACOLSIZE];
 	std::vector<CDfaRow> *m_pDfa;
@@ -73,3 +74,6 @@ private:
 	void MergeNonDisStates(SETLIST &Partition);
 
 };
+
+DFANEWSC void GetDfaSig(CDfanew &dfa);
+

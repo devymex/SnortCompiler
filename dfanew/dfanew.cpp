@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "dfanew.h"
-#include "CreDfa.h"
+#include "NCreDfa.h"
 
 DFANEWSC CDfanew::CDfanew()
 	: m_nId(size_t(-1)), m_nColNum(size_t(0)), m_StartId(STATEID(0))
@@ -83,15 +83,15 @@ DFANEWSC void CDfanew::Clear()
 DFANEWSC size_t CDfanew::FromNFA(CNfa &nfa, NFALOG *nfalog, size_t Count, bool combine)
 {
 	BYTE groups[DFACOLSIZE];
-	AvaiEdges(nfa, groups);
+	NAvaiEdges(nfa, groups);
 	Init(groups);
 
 	std::vector<std::pair<std::vector<size_t>, STATEID>> termStasVec;
 
-	typedef std::unordered_map<std::vector<size_t>, STATEID, STATESET_HASH> STATESETHASH;
+	typedef std::unordered_map<std::vector<size_t>, STATEID, NSTATESET_HASH> STATESETHASH;
 
 	STATESETHASH ssh;
-	ssh.rehash(STATESET_HASH::MAX_SIZE);
+	ssh.rehash(NSTATESET_HASH::MAX_SIZE);
 
 	std::stack<std::vector<size_t>> nfaStasStack;
 	std::vector<size_t> startEVec;
@@ -99,7 +99,7 @@ DFANEWSC size_t CDfanew::FromNFA(CNfa &nfa, NFALOG *nfalog, size_t Count, bool c
 
 	char finFlag = 0;
 	startVec.push_back(0);
-	EClosure(nfa, startVec, startEVec, finFlag);
+	NEClosure(nfa, startVec, startEVec, finFlag);
 
 
 	nfaStasStack.push(startEVec);
@@ -150,7 +150,7 @@ DFANEWSC size_t CDfanew::FromNFA(CNfa &nfa, NFALOG *nfalog, size_t Count, bool c
 
 			std::vector<size_t> nextNfaVec;
 
-			NextNfaSet(nfa, curNfaVec, nCurChar, nextNfaVec, finFlag);
+			NNextNfaSet(nfa, curNfaVec, nCurChar, nextNfaVec, finFlag);
 
 			if(!nextNfaVec.empty())
 			{
@@ -324,7 +324,7 @@ DFANEWSC size_t CDfanew::Minimize()
 	return 0;
 }
 
-DFANEWSC size_t CDfanew::GetGroupCount() const
+DFANEWSC STATEID CDfanew::GetGroupCount() const
 {
 	return m_nColNum;
 }

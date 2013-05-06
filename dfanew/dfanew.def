@@ -1,0 +1,3 @@
+LIBRARY dfanew
+EXPORTS
+GetDfaSig @1
