@@ -34,26 +34,6 @@ MERDFANEW bool NOrMerge(std::vector<CDfanew> &dfas, CDfanew &lastDfa)
 		NInsertDfa(dfas[i], oneNfa,nTermSta, nfalog, count);
 	}
 
-
-	//for(size_t i = 0; i < count; ++i)
-	//{
-	//	nfalog[i].dfaId = oneNfa.GetDfaTerms(i).dfaId;
-	//	nfalog[i].nfaStateId = oneNfa.GetDfaTerms(i).nfaSta;
-	//}
-		for (size_t j = 0; j < oneNfa.Size(); ++j)
-		{
-			std::cout << j << ": ";
-			for (size_t k = 0; k < CHARSETSIZE; ++k)
-			{
-				for (size_t l = 0; l < oneNfa[j][k].Size(); ++l)
-				{
-				
-					std::cout << "(" << k << "," << oneNfa[j][k][l] << ")";
-				}
-			}
-			std::cout << std::endl;
-		}
-
 	if(lastDfa.FromNFA(oneNfa, nfalog, count, true) == 0)
 	{
 		return true;

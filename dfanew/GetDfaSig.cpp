@@ -33,6 +33,8 @@ DFANEWSC void GetDfaSig(CDfanew &dfa)
 	DeepSearch(dfa.GetStartId(), serNum, dfa, termStas, visited, deepSer, staRow);
 
 	Dominates(dfa, termStas, domMax, deepSer, staRow, doms);
+
+	WFSDfa(dfa, doms, staRow);
 	std::cout << std::endl;
 }
 
@@ -203,5 +205,78 @@ bool Change(INT64* before, INT64* after)
 	return chg;
 }
 
-void SearchDfa()
-{}
+void WFSDfa(CDfanew &dfa, std::vector<STATEID> doms, STATEID *staRow)
+{
+	//入度
+	size_t in[DFACOLSIZE - 1];
+	//出度
+	size_t out[DFACOLSIZE - 1];
+	//记录所有入边
+	size_t inEdges[DFACOLSIZE - 1][DFACOLSIZE];
+	//深度
+	STATEID deeps[DFACOLSIZE - 1];
+	STATEID visited[DFACOLSIZE];
+	std::memset(in, 0, sizeof(in));
+	std::memset(out, 0, sizeof(out));
+	std::memset(deeps, BYTE(-1), sizeof(deeps));
+	std::memset(visited, 0, sizeof(visited));
+	std::memset(inEdges, 0, sizeof(inEdges));
+
+	std::vector<STATEID> stack;
+	stack.push_back(dfa.GetStartId());
+	deeps[dfa.GetStartId()] = 0;
+	while (!stack.empty())
+	{
+		STATEID cur = stack.front();
+		stack.erase(stack.begin());
+		if (visited[cur] == 0)
+		{
+			STATEID tempVisit[DFACOLSIZE - 1];
+			std::memset(tempVisit, 0, sizeof(tempVisit));
+			visited[cur] = 1;
+			for(size_t i = 0; i < DFACOLSIZE; ++i)
+			{
+				size_t group = dfa.GetOneGroup(i);
+				STATEID next = dfa[cur][group];
+				if (next != BYTE(-1))
+				{
+					++out[cur];
+					++in[next];
+					if(staRow[cur] != STATEID(-1) && inEdges[next][i] == 0)
+					{
+						inEdges[next][i] = 1;
+					}
+					if((tempVisit[next] == 0) && (visited[next] == 0))
+					{
+						tempVisit[next] = 1;
+						deeps[next] = deeps[cur] + 1;
+						stack.resize(stack.size() + 1);
+						stack.back() = next;
+					}
+				}
+			}
+		}
+	}
+	//judge if all the in edges are the same
+	STATEID sameIn[DFACOLSIZE - 1];
+	std::memset(sameIn, 0, sizeof(sameIn));
+	for(std::vector<STATEID>::iterator iter = doms.begin(); iter != doms.end(); ++iter)
+	{
+		size_t count = 0;
+		for(size_t i = 0; i < DFACOLSIZE; ++i)
+		{
+			if(inEdges[*iter][i] == 1) 
+			{
+				++count;
+			}
+
+		}
+
+		sameIn[*iter] = count;
+
+	}
+
+
+
+	std::cout << std::endl;
+}
