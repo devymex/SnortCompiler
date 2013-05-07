@@ -6,7 +6,7 @@
 
 void main()
 {
-	CNfa nfa1,nfa2;
+	/*CNfa nfa1,nfa2;
 	std::vector<CDfanew> dfas;
 	CDfanew dfa1, dfa2, lastdfa;
 	const char* a1 = "/^abcd/";
@@ -32,52 +32,56 @@ void main()
 		std::cout << std::endl;
 	}
 
+	system("pause");*/
+
+	const char* a = "/^(abcd|cd)fe/";
+	CNfa nfa;
+	PcreToNFA(a, nfa);
+	CDfanew dfa;
+	dfa.FromNFA(nfa, NULL, 0);
+	for (size_t i = 0; i < dfa.Size(); ++i)
+	{
+		std::cout << i << ":";
+		for (size_t j = 0; j < dfa.GetGroupCount(); ++j)
+		{
+			if(dfa[i][j] != BYTE(-1))
+			{
+			std::cout << "(" << j << "," << (size_t)dfa[i][j] << ")";
+			}
+		}
+		std::cout << std::endl;
+	}
+	std::cout << std::endl;
+
+	dfa.Minimize();
+	for (size_t i = 0; i < dfa.Size(); ++i)
+	{
+		std::cout << i << ":";
+		for (size_t j = 0; j < dfa.GetGroupCount(); ++j)
+		{
+			if(dfa[i][j] != BYTE(-1))
+			{
+			std::cout << "(" << j << "," << (size_t)dfa[i][j] << ")";
+			}
+		}
+		std::cout << std::endl;
+	}
+	std::cout << std::endl;
+
+	GetDfaSig(dfa);
+
+
+	BYTE b[] = "fsdfsdkfBMdf";
+	CStateSet StaSet;
+	dfa.Process(b, sizeof(b), StaSet);
+	CVectorNumber dfaIds;
+	for (size_t i = 0; i < StaSet.Size(); ++i)
+	{
+		dfa.GetAcceptedId(StaSet[i], dfaIds);
+		for (size_t j = 0; j < dfaIds.Size(); ++j)
+		{
+			std::cout << dfaIds[j] << std::endl;
+		}
+	}
 	system("pause");
-	//CDfanew dfa;
-	//dfa.FromNFA(nfa, NULL, 0);
-	//for (size_t i = 0; i < dfa.Size(); ++i)
-	//{
-	//	std::cout << i << ":";
-	//	for (size_t j = 0; j < dfa.GetGroupCount(); ++j)
-	//	{
-	//		if(dfa[i][j] != BYTE(-1))
-	//		{
-	//		std::cout << "(" << j << "," << (size_t)dfa[i][j] << ")";
-	//		}
-	//	}
-	//	std::cout << std::endl;
-	//}
-	//std::cout << std::endl;
-
-	//dfa.Minimize();
-	//for (size_t i = 0; i < dfa.Size(); ++i)
-	//{
-	//	std::cout << i << ":";
-	//	for (size_t j = 0; j < dfa.GetGroupCount(); ++j)
-	//	{
-	//		if(dfa[i][j] != BYTE(-1))
-	//		{
-	//		std::cout << "(" << j << "," << (size_t)dfa[i][j] << ")";
-	//		}
-	//	}
-	//	std::cout << std::endl;
-	//}
-	//std::cout << std::endl;
-
-	//GetDfaSig(dfa);
-
-
-	//BYTE b[] = "fsdfsdkfBMdf";
-	//CStateSet StaSet;
-	//dfa.Process(b, sizeof(b), StaSet);
-	//CVectorNumber dfaIds;
-	//for (size_t i = 0; i < StaSet.Size(); ++i)
-	//{
-	//	dfa.GetAcceptedId(StaSet[i], dfaIds);
-	//	for (size_t j = 0; j < dfaIds.Size(); ++j)
-	//	{
-	//		std::cout << dfaIds[j] << std::endl;
-	//	}
-	//}
-	//system("pause");
 }
