@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "../compilernew/compilernew.h"
+#include "../mergedfanew/MergeDfanew.h"
 
 #define THRESHOLD 8
 
@@ -74,6 +75,12 @@ struct GROUPRES
 {
 	std::vector<size_t> chainIds;
 	std::string comStr;
+};
+
+struct DFASIZE
+{
+	std::size_t dfaId;
+	std::size_t dfaSize;
 };
 
 int main(void)
@@ -289,26 +296,150 @@ int main(void)
 	}
 	std::cout << "Completed in " << t1.Reset() << " Sec." << std::endl << std::endl;
 
-	//output grouping result...
-	std::cout << "output grouping result..." << std::endl;
-	std::ofstream fout("..\\..\\output\\GroupRes.txt");
+	////output grouping result...
+	//std::cout << "output grouping result..." << std::endl;
+	//std::ofstream fout("..\\..\\output\\GroupRes.txt");
+	//for (std::vector<GROUPRES>::iterator i = vecGroups.begin(); i != vecGroups.end(); ++i)
+	//{
+	//	if (i->chainIds.size() == 1)
+	//	{
+	//		fout << listSet[i->chainIds[0]].strList << std::endl;
+	//	}
+	//	//for (std::vector<size_t>::iterator j = i->listIds.begin(); j != i->listIds.end(); ++j)
+	//	//{
+	//	//	fout << listSet[*j].strList << std::endl;
+	//	//}
+	//	//fout << std::endl << std::endl;
+	//}
+	//fout.close();
+	//fout.clear();
+	//std::cout << "Completed in " << t1.Reset() << " Sec." << std::endl << std::endl;
+
+	//Change chainid to dfaid...
+	std::cout << "Change chainid to dfaid..." << std::endl;
+	std::vector<std::vector<DFASIZE>> vecDfaSize(vecGroups.size());
 	for (std::vector<GROUPRES>::iterator i = vecGroups.begin(); i != vecGroups.end(); ++i)
 	{
-		if (i->chainIds.size() == 1)
+		std::vector<DFASIZE> &dfaIds = vecDfaSize[i - vecGroups.begin()];
+		for (std::vector<size_t>::iterator j = i->chainIds.begin(); j != i->chainIds.end(); ++j)
 		{
-			fout << listSet[i->chainIds[0]].strList << std::endl;
+			for (size_t k = 0; k < res.GetDfasInfo().Size(); ++k)
+			{
+				if (res.GetDfasInfo()[k].chainId == *j)
+				{
+					dfaIds.push_back(DFASIZE());
+					dfaIds.back().dfaId = res.GetDfasInfo()[k].dfaId;
+					dfaIds.back().dfaSize = res.GetDfaTable()[dfaIds.back().dfaId].Size() * res.GetDfaTable()[dfaIds.back().dfaId].GetGroupCount();
+				}
+			}
 		}
-		//for (std::vector<size_t>::iterator j = i->listIds.begin(); j != i->listIds.end(); ++j)
-		//{
-		//	fout << listSet[*j].strList << std::endl;
-		//}
-		//fout << std::endl << std::endl;
 	}
-	fout.close();
-	fout.clear();
 	std::cout << "Completed in " << t1.Reset() << " Sec." << std::endl << std::endl;
 
-	std::cout << vecGroups.size() << std::endl;
+	//Sort dfaid by dfa size...
+	std::cout << "Sort dfaid by dfa size..." << std::endl;
+	struct COMP
+	{
+		bool operator()(const DFASIZE &id1, const DFASIZE &id2)
+		{
+			return id1.dfaSize < id2.dfaSize;
+		}
+	};
+	for (size_t i = 0; i < vecDfaSize.size(); ++i)
+	{
+		std::sort(vecDfaSize[i].begin(), vecDfaSize[i].end(), COMP());
+	}
+	std::cout << "Completed in " << t1.Reset() << " Sec." << std::endl << std::endl;
+
+	//Extract explosion, one and more chains in a group...
+	std::cout << "Extract explosion, one and more chains in a group..." << std::endl;
+	std::vector<size_t> vecExplosion;
+	std::vector<size_t> vecOne;
+	std::vector<std::vector<size_t>> vecMore;
+	for (std::vector<std::vector<DFASIZE>>::iterator i = vecDfaSize.begin(); i != vecDfaSize.end(); ++i)
+	{
+		for (std::vector<DFASIZE>::iterator j = i->begin(); j != i->end(); ++j)
+		{
+			if (j->dfaSize == 0)
+			{
+				vecExplosion.push_back(j->dfaId);
+			}
+			else if (i->end() - j == 1)
+			{
+				vecOne.push_back(j->dfaId);
+			}
+			else
+			{
+				vecMore.push_back(std::vector<size_t>());
+				while (j != i->end())
+				{
+					vecMore.back().push_back(j->dfaId);
+					++j;
+				}
+				break;
+			}
+		}
+	}
+	std::cout << "Completed in " << t1.Reset() << " Sec." << std::endl << std::endl;
+
+	//Merge dfa in a group...
+	std::cout << "Merge dfa in a group..." << std::endl;
+	for (size_t i = 0; i < vecMore.size(); ++i)
+	{
+		std::vector<CDfanew> vecDfas(2);
+		vecDfas[0] = res.GetDfaTable()[vecMore[i][0]];
+		vecDfas[1] = res.GetDfaTable()[vecMore[i][1]];
+		CDfanew MergeDfa;
+		if (!NOrMerge(vecDfas, MergeDfa))
+		{
+			for (size_t j = 0; j < vecMore[i].size(); ++j)
+			{
+				vecOne.push_back(vecMore[i][j]);
+			}
+			vecMore.erase(vecMore.begin() + i);
+			continue;
+		}
+		CDfanew NewMergeDfa;
+		size_t mergeFlag = true;
+		for (size_t j = 2; j < vecMore[i].size(); ++j)
+		{
+			vecDfas[0] = MergeDfa;
+			vecDfas[1] = res.GetDfaTable()[vecMore[i][j]];
+			if (!NOrMerge(vecDfas, NewMergeDfa))
+			{
+				mergeFlag = false;
+				res.GetDfaTable().PushBack(MergeDfa);
+				if (vecMore[i].size() - j == 1)
+				{
+					vecOne.push_back(vecMore[i][j]);
+					vecMore[i].erase(vecMore[i].begin() + j);
+				}
+				else
+				{
+					vecMore.push_back(std::vector<size_t>());
+					size_t nId = j;
+					while (j < vecMore[i].size())
+					{
+						vecMore.back().push_back(vecMore[i][j]);
+						++j;
+					}
+					vecMore[i].erase(vecMore[i].begin() + nId, vecMore[i].end());
+				}
+				break;
+			}
+			else
+			{
+				MergeDfa = NewMergeDfa;
+			}
+		}
+		if (mergeFlag)
+		{
+			res.GetDfaTable().PushBack(MergeDfa);
+		}
+	}
+	std::cout << "Completed in " << t1.Reset() << " Sec." << std::endl << std::endl;
+
+	//std::cout << vecGroups.size() << std::endl;
 	std::cout << "Total time: " << tAll.Reset() << " Sec." << std::endl;
 
 	system("pause");
