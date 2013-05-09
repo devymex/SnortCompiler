@@ -33,8 +33,8 @@ DFANEWSC void GetDfaSig(CDfanew &dfa)
 	DeepSearch(dfa.GetStartId(), serNum, dfa, termStas, visited, deepSer, staRow);
 
 	Dominates(dfa, termStas, domMax, deepSer, staRow, doms);
-
-	WFSDfa(dfa, doms, staRow);
+	std::vector<CCString> allStr;
+	WFSDfa(dfa, doms, staRow, allStr);
 	std::cout << std::endl;
 }
 
@@ -103,16 +103,10 @@ void Dominates(CDfanew &dfa, std::vector<STATEID> termStas, INT64 domMax[], STAT
 				RowAnd(&domMax[i * 4], &domMax[row * 4], &domMax[i * 4]);
 			}
 			//将第i行第i列置1
-			size_t cur = i * 4 + i / 64 - (i % 64 == 0);
+			size_t cur = i * 4 + i / 64;
 
-			if(i % 64 == 0)
-			{
-				domMax[cur] |= (INT64)1;
-			}
-			else
-			{
 			domMax[cur] |= (INT64)1 << (63 - i % 64);
-			}
+	
 
 			if(!chanFlag)
 			{
@@ -122,41 +116,63 @@ void Dominates(CDfanew &dfa, std::vector<STATEID> termStas, INT64 domMax[], STAT
 	}
 
 	//将多有终态的支配点取交集
+	//for(size_t i = 0; i < termStas.size(); ++i)
+	//{
+	//	STATEID cur = staRow[termStas[i]];
+	//	//只取矩阵中上三角的支配点
+	//	for(size_t j = 0; j <= cur; ++j)
+	//	{
+	//		STATEID t = cur * 4 + j / 64;
+	//		STATEID s = j % 64;
+	//		if(j == 0)
+	//		{
+	//			if((domMax[t] & (INT64)1 << 63) != 0)
+	//			{
+	//				doms.push_back(deepSer[j]);
+	//			}
+	//		}
+	//		else
+	//		{
+	//			if(s == 0)
+	//			{
+	//				if((domMax[t - 1] & (INT64)1) != 0)
+	//				{
+	//					doms.push_back(deepSer[j]);
+	//				}
+	//			}
+	//			else
+	//			{
+	//				if((domMax[t] & ((INT64)1 << (63 - s))) != 0)
+	//				{
+	//					doms.push_back(deepSer[j]);
+	//				}
+	//			}
+	//		}
+	//	}
+	//}
+	size_t minDeep = DFACOLSIZE;
+	INT64 termAnd[LENGTH];
+	std::memset(termAnd, INT64(-1), sizeof(termAnd));
 	for(size_t i = 0; i < termStas.size(); ++i)
 	{
-		STATEID cur = staRow[termStas[i]];
-		//只取矩阵中上三角的支配点
-		for(size_t j = 0; j <= cur; ++j)
+		STATEID row = staRow[termStas[i]];
+		if(row < minDeep)
 		{
-			STATEID t = cur * 4 + j / 64;
-			STATEID s = j % 64;
-			if(j == 0)
-			{
-				if((domMax[t] & (INT64)1 << 63) != 0)
-				{
-					doms.push_back(deepSer[j]);
-				}
-			}
-			else
-			{
-				if(s == 0)
-				{
-					if((domMax[t - 1] & (INT64)1) != 0)
-					{
-						doms.push_back(deepSer[j]);
-					}
-				}
-				else
-				{
-					if((domMax[t] & ((INT64)1 << (63 - s))) != 0)
-					{
-						doms.push_back(deepSer[j]);
-					}
-				}
-			}
+			minDeep = row;
 		}
+		RowAnd(termAnd, &domMax[row * 4], termAnd);
 	}
 
+		for(size_t j = 0; j <= minDeep; ++j)
+		{
+
+			STATEID t = j / 64 ; 
+			STATEID s = j % 64;
+			if((termAnd[t] & (INT64)1 << (63 - s)) != (INT64)0)
+			{
+				doms.push_back(deepSer[j]);
+			}
+		}
 }
 
 
@@ -205,14 +221,15 @@ bool Change(INT64* before, INT64* after)
 	return chg;
 }
 
-void WFSDfa(CDfanew &dfa, std::vector<STATEID> doms, STATEID *staRow)
+void WFSDfa(CDfanew &dfa, std::vector<STATEID> doms, STATEID *staRow, std::vector<CCString> &allStr)
 {
 	//入度
 	size_t in[DFACOLSIZE - 1];
 	//出度
 	size_t out[DFACOLSIZE - 1];
 	//记录所有入边
-	size_t inEdges[DFACOLSIZE - 1][DFACOLSIZE];
+	std::vector<STATEID> inEdges[DFACOLSIZE - 1];
+	STATEID inEdgeVis[DFACOLSIZE - 1][DFACOLSIZE];
 	//深度
 	STATEID deeps[DFACOLSIZE - 1];
 	STATEID visited[DFACOLSIZE];
@@ -221,6 +238,7 @@ void WFSDfa(CDfanew &dfa, std::vector<STATEID> doms, STATEID *staRow)
 	std::memset(deeps, BYTE(-1), sizeof(deeps));
 	std::memset(visited, 0, sizeof(visited));
 	std::memset(inEdges, 0, sizeof(inEdges));
+	std::memset(inEdgeVis, 0, sizeof(inEdgeVis));
 
 	std::vector<STATEID> stack;
 	stack.push_back(dfa.GetStartId());
@@ -242,9 +260,13 @@ void WFSDfa(CDfanew &dfa, std::vector<STATEID> doms, STATEID *staRow)
 				{
 					++out[cur];
 					++in[next];
-					if(staRow[cur] != STATEID(-1) && inEdges[next][i] == 0)
+					if(staRow[next] != STATEID(-1))
 					{
-						inEdges[next][i] = 1;
+						inEdges[next].push_back(i);
+						if(inEdgeVis[next][i] == 0)
+						{
+							inEdgeVis[next][i] = 1;
+						}
 					}
 					if((tempVisit[next] == 0) && (visited[next] == 0))
 					{
@@ -265,7 +287,7 @@ void WFSDfa(CDfanew &dfa, std::vector<STATEID> doms, STATEID *staRow)
 		size_t count = 0;
 		for(size_t i = 0; i < DFACOLSIZE; ++i)
 		{
-			if(inEdges[*iter][i] == 1) 
+			if(inEdgeVis[*iter][i] == 1) 
 			{
 				++count;
 			}
@@ -276,7 +298,32 @@ void WFSDfa(CDfanew &dfa, std::vector<STATEID> doms, STATEID *staRow)
 
 	}
 
+	CCString str;
 
+	for(std::vector<STATEID>::iterator iter = doms.begin(); iter != doms.end(); ++iter)
+	{
+		if(sameIn[*iter] != 1)
+		{
+			continue;
+		}
+		else
+		{
+			//const char a = inEdges[*iter][0];
+			std::string str1;
+			str1 = inEdges[*iter][0];
+			str.Append(str1.c_str());
+		}
+		if(out[*iter] > 1 | iter== (doms.end() - 1))
+		{
+			if(str.Size() != 0)
+			{
+				allStr.resize(allStr.size() + 1);
+				allStr.back() = str;
+				str.Clear();
+			}
+			continue;
+		}
+	}
 
 	std::cout << std::endl;
 }

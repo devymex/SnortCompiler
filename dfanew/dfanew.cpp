@@ -150,6 +150,7 @@ DFANEWSC size_t CDfanew::FromNFA(CNfa &nfa, NFALOG *nfalog, size_t Count, bool c
 
 			std::vector<size_t> nextNfaVec;
 
+			finFlag = 0;
 			NNextNfaSet(nfa, curNfaVec, nCurChar, nextNfaVec, finFlag);
 
 			if(!nextNfaVec.empty())
@@ -221,6 +222,13 @@ DFANEWSC size_t CDfanew::FromNFA(CNfa &nfa, NFALOG *nfalog, size_t Count, bool c
 		}
 	}
 	return 0;
+}
+DFANEWSC  void CDfanew:: printTerms()
+{
+	for(std::vector<TERMSET>::iterator iter = m_TermSet->begin(); iter != m_TermSet->end(); ++iter)
+	{
+		std::cout << (size_t)iter->dfaSta <<"  :  " << iter->dfaId << std::endl;
+	}
 }
 
 DFANEWSC size_t CDfanew::Minimize()

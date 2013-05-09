@@ -8,4 +8,4 @@ void Dominates(CDfanew &dfa, std::vector<STATEID> termStas, INT64 domMax[], STAT
 void InStas(CDfanew &dfa, std::vector<STATEID> *inStas);
 void RowAnd(INT64* firRow, INT64* secRow, INT64* lastRow);
 bool Change(INT64* before, INT64* after);
-void WFSDfa(CDfanew &dfa, std::vector<STATEID> doms, STATEID *staRow);
+void WFSDfa(CDfanew &dfa, std::vector<STATEID> doms, STATEID *staRow, std::vector<CCString> &allStr);
