@@ -12,7 +12,7 @@ void main()
 	//result.ReadFromFile(_T("..\\..\\output\\result(all).cdt"));
 
 	//CResNew result;
-	compilenew(_T("..\\..\\input\\allrules.rule"), result);
+	compilenew(_T("..\\..\\input\\testrules.rule"), result);
 	result.WriteToFile(_T("..\\..\\output\\result.cdt"));
 	//size_t count = 0;
 	//for (size_t i = 0; i < result.GetDfaTable().Size(); ++i)
