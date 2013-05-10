@@ -67,9 +67,9 @@ void main()
 	//		continue;
 	//	}
 	//}
-	//CTimer t;
+	CTimer t;
 	compilenew(_T("..\\..\\input\\allrules.rule"), result);
 	result.WriteToFile(_T("..\\..\\output\\result.cdt"));
-	//std::cout << t.Reset() << std::endl;
+	std::cout << t.Reset() << std::endl;
 	system("pause");
 }
