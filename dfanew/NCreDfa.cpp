@@ -42,66 +42,115 @@ bool NColumnEqual(std::vector<CStateSet*> &c1, std::vector<CStateSet*>&c2)
 
 void NAvaiEdges(CNfa &oneNfaTab, STATEID *group)
 {
-	std::vector<std::vector<size_t>> charGroups;
-	std::vector<CStateSet*> column[DFACOLSIZE];
-	for(size_t charNum = 0; charNum < DFACOLSIZE; ++charNum)
+	//std::unordered_map<std::vector<CStateSet*>, STATEID, GROUPSET_HASH> GROUPHASH;
+	typedef std::unordered_map<std::string, STATEID> GROUPHASH;//将每一列表示成string形式，size=0的用'n'代表，每行之间用'u'间隔,元素与元素之间用','间隔
+	GROUPHASH ghash;
+	STATEID curId = 0;
+	std::stringstream ss;
+	for(size_t c = 0; c < DFACOLSIZE; ++c)
 	{
-		column[charNum].reserve(20000);
+		std::string str;
 		for(size_t i = 0; i < oneNfaTab.Size(); ++i)
 		{
-			CStateSet &elem = oneNfaTab[i][charNum];
-			elem.Sort();
-			column[charNum].push_back(&elem);
-			for (size_t j = 0; j < elem.Size(); ++j)
+			CStateSet &elems = oneNfaTab[i][c];
+			if(elems.Size() == 0)
 			{
-				if(elem[j] > oneNfaTab.Size())
-				{
-					std::cout << "overflow" << std::endl;
-					return;
-				}
-			}
-		}
-	}
-
-	charGroups.clear();
-	std::vector<size_t> fullSet;
-
-	//std::cout << "columns complete" << std::endl;
-
-	for (size_t i = 0; i < DFACOLSIZE; ++i)
-	{
-		fullSet.push_back(i);
-	}
-
-	for (; !fullSet.empty();)
-	{
-		charGroups.push_back(std::vector<size_t>());
-		std::vector<size_t> &curGroup = charGroups.back();
-		curGroup.push_back(fullSet.front());
-		fullSet.erase(fullSet.begin());
-		for (std::vector<size_t>::iterator i = fullSet.begin(); i != fullSet.end() && !fullSet.empty();)
-		{
-			if (NColumnEqual(column[curGroup.front()], column[*i]))
-			{
-				curGroup.push_back(*i);
-				i = fullSet.erase(i);
+				str += 'n';
 			}
 			else
 			{
-				++i;
+				elems.Sort();
+				for(size_t j = 0; j < elems.Size(); ++j)
+				{
+					if(elems[j] > oneNfaTab.Size())
+					{
+						std::cout << "overflow" << std::endl;
+						return;
+					}
+					ss.str("");
+					ss << elems[j];
+					str += ss.str();
+					str += ',';
+				}
 			}
+			str += 'u';
 		}
-	}
-	//std::cout << "grouping complete" << std::endl;
-
-	for(STATEID i = 0; i < charGroups.size(); ++i)
-	{
-		for(STATEID j = 0; j < charGroups[i].size(); ++j)
+		GROUPHASH::iterator it = ghash.find(str);
+		if(it == ghash.end())
 		{
-			group[charGroups[i][j]] = i;
+			ghash[str] = curId;
+			group[c] = curId;
+			++curId;
+		}
+		else
+		{
+			group[c] = it->second;
 		}
 	}
 }
+
+//void NAvaiEdges(CNfa &oneNfaTab, STATEID *group)
+//{
+//	std::vector<std::vector<size_t>> charGroups;
+//	std::vector<CStateSet*> column[DFACOLSIZE];
+//	for(size_t charNum = 0; charNum < DFACOLSIZE; ++charNum)
+//	{
+//		column[charNum].reserve(20000);
+//		for(size_t i = 0; i < oneNfaTab.Size(); ++i)
+//		{
+//			CStateSet &elem = oneNfaTab[i][charNum];
+//			elem.Sort();
+//			column[charNum].push_back(&elem);
+//			for (size_t j = 0; j < elem.Size(); ++j)
+//			{
+//				if(elem[j] > oneNfaTab.Size())
+//				{
+//					std::cout << "overflow" << std::endl;
+//					return;
+//				}
+//			}
+//		}
+//	}
+//
+//	charGroups.clear();
+//	std::vector<size_t> fullSet;
+//
+//	//std::cout << "columns complete" << std::endl;
+//
+//	for (size_t i = 0; i < DFACOLSIZE; ++i)
+//	{
+//		fullSet.push_back(i);
+//	}
+//
+//	for (; !fullSet.empty();)
+//	{
+//		charGroups.push_back(std::vector<size_t>());
+//		std::vector<size_t> &curGroup = charGroups.back();
+//		curGroup.push_back(fullSet.front());
+//		fullSet.erase(fullSet.begin());
+//		for (std::vector<size_t>::iterator i = fullSet.begin(); i != fullSet.end() && !fullSet.empty();)
+//		{
+//			if (NColumnEqual(column[curGroup.front()], column[*i]))
+//			{
+//				curGroup.push_back(*i);
+//				i = fullSet.erase(i);
+//			}
+//			else
+//			{
+//				++i;
+//			}
+//		}
+//	}
+//	//std::cout << "grouping complete" << std::endl;
+//
+//	for(STATEID i = 0; i < charGroups.size(); ++i)
+//	{
+//		for(STATEID j = 0; j < charGroups[i].size(); ++j)
+//		{
+//			group[charGroups[i][j]] = i;
+//		}
+//	}
+//}
 
 void NNextNfaSet(const CNfa &oneNfaTab, const std::vector<size_t> &curNfaVec, size_t edge, std::vector<size_t> &nextENfaVec, char &finFlag)
 {
