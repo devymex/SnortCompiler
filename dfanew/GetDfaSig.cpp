@@ -313,7 +313,7 @@ void WFSDfa(CDfanew &dfa, std::vector<STATEID> doms, STATEID *staRow, std::vecto
 			str1 = inEdges[*iter][0];
 			str.Append(str1.c_str());
 		}
-		if(out[*iter] > 1 | iter== (doms.end() - 1))
+		if(out[*iter] > 1 || iter == (doms.end() - 1))
 		{
 			if(str.Size() != 0)
 			{
