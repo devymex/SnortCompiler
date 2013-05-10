@@ -56,9 +56,9 @@ void printNfa(CNfa oneNfaTab);
 
 void printDfa(CDfa dfaTab);
 
-void RemoveUnreachable(const std::vector<STATEID> *Tab, const STALIST &begs, const size_t &col, std::vector<BYTE> &reachable);
+void RemoveUnreachable(const std::vector<STATEID> *Tab, const STALIST &begs, const size_t &col, std::vector<STATEID> &reachable);
 
-void MergeReachable(const CDfa &oneDfaTab, std::vector<BYTE> &reachable, CDfa &tmpDfa);
+void MergeReachable(const CDfa &oneDfaTab, std::vector<STATEID> &reachable, CDfa &tmpDfa);
 
 void PartitionNonDisState(CDfa &tmpDfa, std::vector<STATEID> *pRevTbl, SETLIST &pSets);
 

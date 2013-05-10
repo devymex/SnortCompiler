@@ -6,48 +6,70 @@
 #include "../dfanew/dfanew.h"
 #include "../compilernew/compilernew.h"
 
+class CTimer
+{
+public:
+	__forceinline CTimer()
+	{
+		QueryPerformanceFrequency((PLARGE_INTEGER)&m_nFreq);
+		QueryPerformanceCounter((PLARGE_INTEGER)&m_nStart);
+	}
+	__forceinline double Cur()
+	{
+		__int64 nCur;
+		double dCur;
+
+		QueryPerformanceCounter((PLARGE_INTEGER)&nCur);
+		dCur = double(nCur - m_nStart) / double(m_nFreq);
+
+		return dCur;
+	}
+	__forceinline double Reset()
+	{
+		__int64 nCur;
+		double dCur;
+
+		QueryPerformanceCounter((PLARGE_INTEGER)&nCur);
+		dCur = double(nCur - m_nStart) / double(m_nFreq);
+		m_nStart = nCur;
+
+		return dCur;
+	}
+private:
+	__int64 m_nFreq;
+	__int64 m_nStart;
+};
+
 void main()
 {
 	CResNew result;
-	//result.ReadFromFile(_T("..\\..\\output\\result.cdt"));
-
-	//CResNew result;
-	compilenew(_T("..\\..\\input\\a.rules"), result);
-	result.WriteToFile(_T("..\\..\\output\\result.cdt"));
-	//std::ofstream fout("..\\..\\output\\Statistic.txt");
-	//CDfaTblNew &dfaTbl = result.GetDfaTable();
-	//for (size_t i = 0; i < dfaTbl.Size(); ++i)
+	//result.ReadFromFile(_T("..\\..\\output\\result(back_up).cdt"));
+	//CResNew resultnew;
+	//resultnew.ReadFromFile(_T("..\\..\\output\\result.cdt"));
+	//for (size_t i = 0; i < result.GetSidDfaIds().Size(); ++i)
 	//{
-	//	if (dfaTbl[i].Size() == 0)
+	//	for (size_t j = 0; j < result.GetSidDfaIds()[i].m_dfaIds.Size(); ++j)
 	//	{
-	//		fout << 255 << " " << 0 << " " << 0 << " " << size_t(-1) << " " << 0 << " " << 0 << std::endl;
-	//	}
-	//	else
-	//	{
-	//		fout << (size_t)dfaTbl[i].Size() << " " << dfaTbl[i].GetGroupCount() << " ";
-	//		BYTE tmp[256] = {0};
-	//		for (size_t j = 0; j < dfaTbl[i].Size(); ++j)
+	//		if (result.GetSidDfaIds()[i].m_dfaIds[j] == 227)
 	//		{
-	//			for (size_t k = 0; k < dfaTbl[i].GetGroupCount(); ++k)
-	//			{
-	//				++tmp[dfaTbl[i][j][k]];
-	//			}
+	//			std::cout << result.GetSidDfaIds()[i].m_nSid << std::endl;
 	//		}
-	//		size_t max = 0;
-	//		size_t maxId = -1;
-	//		for (size_t j = 0; j < 256; ++j)
-	//		{
-	//			if (tmp[j] > max)
-	//			{
-	//				max = tmp[j];
-	//				maxId = j;
-	//			}
-	//		}
-	//		size_t total = dfaTbl[i].Size() * dfaTbl[i].GetGroupCount();
-	//		fout << total << " " << maxId << " " << max << " " << max / double(total) << std::endl;
 	//	}
 	//}
-	//fout.close();
-	//fout.clear();
+	//for (size_t i = 0; i < result.GetDfaTable().Size(); ++i)
+	//{
+	//	if (result.GetDfaTable()[i].Size() != resultnew.GetDfaTable()[i].Size() || result.GetDfaTable()[i].GetGroupCount() != resultnew.GetDfaTable()[i].GetGroupCount())
+	//	{
+	//		std::cout << (size_t)result.GetDfaTable()[i].Size() << std::endl;
+	//		std::cout << (size_t)resultnew.GetDfaTable()[i].Size() << std::endl;
+	//		std::cout << (size_t)result.GetDfaTable()[i].GetGroupCount() << std::endl;
+	//		std::cout << (size_t)resultnew.GetDfaTable()[i].GetGroupCount() << std::endl;
+	//		continue;
+	//	}
+	//}
+	CTimer t;
+	compilenew(_T("..\\..\\input\\allrules.rule"), result);
+	result.WriteToFile(_T("..\\..\\output\\result.cdt"));
+	std::cout << t.Reset() << std::endl;
 	system("pause");
 }

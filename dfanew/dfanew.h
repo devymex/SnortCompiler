@@ -8,7 +8,8 @@
 
 #define HASHMODULO 1000000
 
-#define SC_STATELIMIT 254
+#define SC_STATELIMIT 255
+//#define SC_STATELIMIT 510
 
 #define EMPTY 256
 
@@ -46,9 +47,10 @@ public:
 	void Clear();
 	size_t FromNFA(CNfa &nfa, NFALOG *nfalog, size_t Count, bool combine = false);
 	size_t Minimize();
-	size_t GetGroupCount() const;
+	STATEID GetGroupCount() const;
 	BYTE Char2Group(BYTE nIdx);
 	const BYTE* GetGroup() const;
+	const BYTE GetOneGroup(STATEID charNum) const;
 	STATEID GetStartId() const;
 	void SetId(size_t id);
 	size_t GetId();
@@ -56,9 +58,10 @@ public:
 	void GetAcceptedId(STATEID id, CVectorNumber &dfaIds);
 	size_t Save(BYTE *beg);
 	void Load(BYTE *beg, size_t len);
+	void printTerms();
 private:
 	size_t m_nId;
-	size_t m_nColNum;
+	STATEID m_nColNum;
 	STATEID m_StartId;
 	BYTE m_pGroup[DFACOLSIZE];
 	std::vector<CDfaRow> *m_pDfa;
@@ -66,9 +69,12 @@ private:
 	std::vector<TERMSET> *m_TermSet;
 
 	void RemoveUnreachable(const std::vector<STATEID> *Tab, const STALIST &begs, 
-		const size_t &col, std::vector<BYTE> &reachable);
-	void MergeReachable(std::vector<BYTE> &reachable);
+		const size_t &col, std::vector<STATEID> &reachable);
+	void MergeReachable(std::vector<STATEID> &reachable);
 	void PartitionNonDisState(std::vector<STATEID> *pRevTbl, SETLIST &pSets);
 	void MergeNonDisStates(SETLIST &Partition);
 
 };
+
+DFANEWSC void GetDfaSig(CDfanew &dfa);
+

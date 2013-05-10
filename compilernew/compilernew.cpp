@@ -294,7 +294,7 @@ COMPILERNEW size_t CResNew::WriteToFile(LPCTSTR filename)
 	for (size_t i = 0; i < m_DfasInfo.Size(); ++i)
 	{
 		WriteNum(fout, m_DfasInfo[i].dfaId);
-		WriteNum(fout, m_DfasInfo[i].regId);
+		WriteNum(fout, m_DfasInfo[i].chainId);
 	}
 	//ÌîÐ´RegexTblÆ«ÒÆ
 	endPos = fout.tellp();
@@ -403,7 +403,7 @@ COMPILERNEW size_t CResNew::ReadFromFile(LPCTSTR filename)
 	for (size_t i = 0; i < dfasInfoSize; ++i)
 	{
 		fin.read((char*)&m_DfasInfo[i].dfaId, 4);
-		fin.read((char*)&m_DfasInfo[i].regId, 4);
+		fin.read((char*)&m_DfasInfo[i].chainId, 4);
 	}
 	//Ð´RegexTbl
 	m_RegexTbl.Resize(RegexTblSize);
@@ -480,14 +480,14 @@ void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 			result.GetRegexTbl().Resize(nRegexTblSize + nIncrement);
 			size_t nDfaId;
 			size_t nDfasInfoId;
-			size_t nRegId;
+			size_t nChainId;
 			for (size_t i = 0; i < nIncrement; ++i)
 			{
 				CNfa nfa;
 				size_t nToNFAFlag = CRegChainToNFA(regrule[i], nfa);
 				nDfaId = nDfaTblSize + i;
 				nDfasInfoId = nDfasInfoSize + i;
-				nRegId = nRegexTblSize + i;
+				nChainId = nRegexTblSize + i;
 				CDfanew &dfa = result.GetDfaTable()[nDfaId];
 				if (nToNFAFlag == SC_ERROR)
 				{
@@ -504,8 +504,8 @@ void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 				}
 				else
 				{
-					dfa.FromNFA(nfa, NULL, 0);
-					if (dfa.Size() > SC_STATELIMIT)
+					size_t nToDFAFlag = dfa.FromNFA(nfa, NULL, 0);
+					if (nToDFAFlag == -1)
 					{
 						ruleResult.m_nResult = COMPILEDRULENEW::RES_EXCEEDLIMIT;
 						dfa.Clear();
@@ -518,8 +518,8 @@ void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 				dfa.SetId(nDfaId);
 				ruleResult.m_dfaIds.PushBack(nDfaId);
 				result.GetDfasInfo()[nDfasInfoId].dfaId = nDfaId;
-				result.GetDfasInfo()[nDfasInfoId].regId = nRegId;
-				result.GetRegexTbl()[nRegId] = regrule[i];
+				result.GetDfasInfo()[nDfasInfoId].chainId = nChainId;
+				result.GetRegexTbl()[nChainId] = regrule[i];
 			}
 		}
 	}

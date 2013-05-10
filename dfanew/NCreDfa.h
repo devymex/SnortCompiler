@@ -20,7 +20,7 @@
 //	size_t destState[CHARSETSIZE];
 //};
 
-struct STATESET_HASH
+struct NSTATESET_HASH
 {
 	enum {MAX_SIZE = 20000};
 	size_t operator()(const std::vector<size_t> &set)
@@ -39,11 +39,11 @@ struct STATESET_HASH
 	}
 };
 
-void AvaiEdges(CNfa &oneNfaTab, BYTE *group);
+void NAvaiEdges(CNfa &oneNfaTab, BYTE *group);
 
-void NextNfaSet(const CNfa &oneNfaTab, const std::vector<size_t> &curNfaVec, size_t edge,
+void NNextNfaSet(const CNfa &oneNfaTab, const std::vector<size_t> &curNfaVec, size_t edge,
 				std::vector<size_t> &nextENfaVec, char &finFlag);
 
-void EClosure(const CNfa &oneNfaTab, const std::vector<size_t> &curNfaVec, 
+void NEClosure(const CNfa &oneNfaTab, const std::vector<size_t> &curNfaVec, 
 			  std::vector<size_t> &eNfaVec, char &finFlag);
 

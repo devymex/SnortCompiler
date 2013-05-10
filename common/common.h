@@ -15,6 +15,7 @@
 #endif
 
 typedef BYTE STATEID;
+//typedef WORD STATEID;
 typedef std::list<STATEID> STALIST;
 typedef std::list<STATEID>::iterator STALIST_ITER;
 typedef std::list<std::list<STATEID>> SETLIST;
@@ -122,8 +123,8 @@ public:
 	~CDfaRow();
 	CDfaRow(const CDfaRow &other);
 	CDfaRow& operator=(const CDfaRow &other);
-	STATEID& operator[](BYTE index);
-	const STATEID& operator[](BYTE index) const;
+	STATEID& operator[](STATEID index);
+	const STATEID& operator[](STATEID index) const;
 	void SetFlag(size_t nFlag);
 	size_t GetFlag() const;
 	size_t GetColNum() const;

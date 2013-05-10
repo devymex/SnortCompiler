@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "dfanew.h"
-#include "CreDfa.h"
+#include "NCreDfa.h"
 
 DFANEWSC CDfanew::CDfanew()
 	: m_nId(size_t(-1)), m_nColNum(size_t(0)), m_StartId(STATEID(0))
@@ -83,15 +83,15 @@ DFANEWSC void CDfanew::Clear()
 DFANEWSC size_t CDfanew::FromNFA(CNfa &nfa, NFALOG *nfalog, size_t Count, bool combine)
 {
 	BYTE groups[DFACOLSIZE];
-	AvaiEdges(nfa, groups);
+	NAvaiEdges(nfa, groups);
 	Init(groups);
 
 	std::vector<std::pair<std::vector<size_t>, STATEID>> termStasVec;
 
-	typedef std::unordered_map<std::vector<size_t>, STATEID, STATESET_HASH> STATESETHASH;
+	typedef std::unordered_map<std::vector<size_t>, STATEID, NSTATESET_HASH> STATESETHASH;
 
 	STATESETHASH ssh;
-	ssh.rehash(STATESET_HASH::MAX_SIZE);
+	ssh.rehash(NSTATESET_HASH::MAX_SIZE);
 
 	std::stack<std::vector<size_t>> nfaStasStack;
 	std::vector<size_t> startEVec;
@@ -99,7 +99,7 @@ DFANEWSC size_t CDfanew::FromNFA(CNfa &nfa, NFALOG *nfalog, size_t Count, bool c
 
 	char finFlag = 0;
 	startVec.push_back(0);
-	EClosure(nfa, startVec, startEVec, finFlag);
+	NEClosure(nfa, startVec, startEVec, finFlag);
 
 
 	nfaStasStack.push(startEVec);
@@ -150,7 +150,9 @@ DFANEWSC size_t CDfanew::FromNFA(CNfa &nfa, NFALOG *nfalog, size_t Count, bool c
 
 			std::vector<size_t> nextNfaVec;
 
-			NextNfaSet(nfa, curNfaVec, nCurChar, nextNfaVec, finFlag);
+			//
+			finFlag = 0;
+			NNextNfaSet(nfa, curNfaVec, nCurChar, nextNfaVec, finFlag);
 
 			if(!nextNfaVec.empty())
 			{
@@ -212,7 +214,7 @@ DFANEWSC size_t CDfanew::FromNFA(CNfa &nfa, NFALOG *nfalog, size_t Count, bool c
 							TERMSET term;
 							term.dfaSta = termStasVec[j].second;
 							term.dfaId = nfalog[i].dfaId;
-							m_TermSet->push_back(term);;
+							m_TermSet->push_back(term);
 							break;
 						}
 					}
@@ -221,6 +223,13 @@ DFANEWSC size_t CDfanew::FromNFA(CNfa &nfa, NFALOG *nfalog, size_t Count, bool c
 		}
 	}
 	return 0;
+}
+DFANEWSC  void CDfanew:: printTerms()
+{
+	for(std::vector<TERMSET>::iterator iter = m_TermSet->begin(); iter != m_TermSet->end(); ++iter)
+	{
+		std::cout << (size_t)iter->dfaSta <<"  :  " << iter->dfaId << std::endl;
+	}
 }
 
 DFANEWSC size_t CDfanew::Minimize()
@@ -271,7 +280,7 @@ DFANEWSC size_t CDfanew::Minimize()
 	}
 
 	//初始化可达状态表reachable
-	std::vector<BYTE> reachable(m_pDfa->size(), 0);
+	std::vector<STATEID> reachable(m_pDfa->size(), 0);
 	std::list<STATEID> StartStas;
 	StartStas.push_back(0);
 
@@ -324,7 +333,7 @@ DFANEWSC size_t CDfanew::Minimize()
 	return 0;
 }
 
-DFANEWSC size_t CDfanew::GetGroupCount() const
+DFANEWSC STATEID CDfanew::GetGroupCount() const
 {
 	return m_nColNum;
 }
@@ -338,6 +347,12 @@ DFANEWSC const BYTE* CDfanew::GetGroup() const
 {
 	return m_pGroup;
 }
+
+DFANEWSC const BYTE CDfanew::GetOneGroup(STATEID charNum) const
+{
+	return m_pGroup[charNum];
+}
+
 
 DFANEWSC STATEID CDfanew::GetStartId() const
 {
@@ -527,7 +542,7 @@ DFANEWSC void CDfanew::Load(BYTE *beg, size_t len)
 //删除不可达状态或者“死”状态，Tab表示传入一个DFA的正向访问表或一个DFA的逆向访问表
 //begs表示读Tab的起始位置
 //reachable表示可达状态集合，初始值为0，输出结果
-void CDfanew::RemoveUnreachable(const std::vector<STATEID> *Tab, const STALIST &begs, const size_t &col, std::vector<BYTE> &reachable)
+void CDfanew::RemoveUnreachable(const std::vector<STATEID> *Tab, const STALIST &begs, const size_t &col, std::vector<STATEID> &reachable)
 {
 	size_t stas = reachable.size();
 	//mark state after traversal, 0 is unreachable and 1 is reachable
@@ -565,7 +580,7 @@ void CDfanew::RemoveUnreachable(const std::vector<STATEID> *Tab, const STALIST &
 
 //reachable中保留所有的可达状态，reachable中元素的取值有3个，
 //0 表示该状态为孤立状态，1 表示该状态为不可达状态或者“死”状态，2 表示该状态为可达状态
-void CDfanew::MergeReachable(std::vector<BYTE> &reachable)
+void CDfanew::MergeReachable(std::vector<STATEID> &reachable)
 {
 	//统计可达状态的数目
 	size_t nRcbCnt = std::count(reachable.begin(), reachable.end(), 2);
@@ -587,7 +602,7 @@ void CDfanew::MergeReachable(std::vector<BYTE> &reachable)
 
 	STATEID nNewIdx = 0;
 	//将m_pDfa中编号对应为可达状态的复制到tmpDfa中，并修改reachable中可达状态的编号
-	for (std::vector<BYTE>::iterator iter = reachable.begin(); iter != reachable.end(); ++iter)
+	for (std::vector<STATEID>::iterator iter = reachable.begin(); iter != reachable.end(); ++iter)
 	{
 		if (2 == *iter)
 		{
@@ -807,4 +822,3 @@ void CDfanew::MergeNonDisStates(SETLIST &Partition)
 		(*m_pDfa)[idx] = tmpDfa[idx];
 	}
 }
-
