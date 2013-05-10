@@ -19,6 +19,7 @@ MERDFANEW bool NOrMerge(std::vector<CDfanew> &dfas, CDfanew &lastDfa)
 	std::vector<CNfa> nfas;
 	STATEID nTermSta = 0;
 	CNfa oneNfa;
+	oneNfa.Reserve(1000);
 	oneNfa.Resize(1);
 
 	for(STATEID i = 0; i < dfas.size(); ++i)
