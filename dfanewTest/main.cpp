@@ -4,6 +4,23 @@
 #include "../pcre2nfa/pcre2nfa.h"
 #include "../mergedfanew/MergeDfanew.h"
 
+
+	void printNfa(CNfa &nfa)
+{
+	for (size_t j = 0; j < nfa.Size(); ++j)
+	{
+		std::cout << j << ": ";
+		for (size_t k = 0; k < CHARSETSIZE; ++k)
+		{
+			for (size_t l = 0; l < nfa[j][k].Size(); ++l)
+			{
+				std::cout << "(" << k << "," << nfa[j][k][l] << ")";
+			}
+		}
+		std::cout << std::endl;
+	}
+}
+
 void main()
 {
 	/*CNfa nfa1,nfa2;
@@ -34,19 +51,24 @@ void main()
 
 	system("pause");*/
 
-	const char* a = "/^(abcd|cd)fe/";
+
+	const char* a = "/^(ab|bc)def(ab|cd)/";
 	CNfa nfa;
+
 	PcreToNFA(a, nfa);
+	printNfa(nfa);
 	CDfanew dfa;
 	dfa.FromNFA(nfa, NULL, 0);
+	dfa.printTerms();
 	for (size_t i = 0; i < dfa.Size(); ++i)
 	{
 		std::cout << i << ":";
-		for (size_t j = 0; j < dfa.GetGroupCount(); ++j)
+		for (size_t charNum = 0; charNum < 256; ++charNum)
 		{
+			size_t j = dfa.GetOneGroup(charNum);
 			if(dfa[i][j] != BYTE(-1))
 			{
-			std::cout << "(" << j << "," << (size_t)dfa[i][j] << ")";
+			std::cout << "(" << charNum << "," << (size_t)dfa[i][j] << ")";
 			}
 		}
 		std::cout << std::endl;
@@ -57,11 +79,12 @@ void main()
 	for (size_t i = 0; i < dfa.Size(); ++i)
 	{
 		std::cout << i << ":";
-		for (size_t j = 0; j < dfa.GetGroupCount(); ++j)
+		for (size_t charNum = 0; charNum < 256; ++charNum)
 		{
+			size_t j = dfa.GetOneGroup(charNum);
 			if(dfa[i][j] != BYTE(-1))
 			{
-			std::cout << "(" << j << "," << (size_t)dfa[i][j] << ")";
+			std::cout << "(" << charNum << "," << (size_t)dfa[i][j] << ")";
 			}
 		}
 		std::cout << std::endl;

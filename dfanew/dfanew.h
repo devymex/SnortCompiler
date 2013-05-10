@@ -58,6 +58,7 @@ public:
 	void GetAcceptedId(STATEID id, CVectorNumber &dfaIds);
 	size_t Save(BYTE *beg);
 	void Load(BYTE *beg, size_t len);
+	void printTerms();
 private:
 	size_t m_nId;
 	STATEID m_nColNum;
