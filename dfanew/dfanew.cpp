@@ -821,4 +821,3 @@ void CDfanew::MergeNonDisStates(SETLIST &Partition)
 		(*m_pDfa)[idx] = tmpDfa[idx];
 	}
 }
-
