@@ -434,7 +434,6 @@ COMPILERNEW size_t CResNew::ReadFromFile(LPCTSTR filename)
 
 	return 0;
 }
-
 void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 {
 	CResNew &result = *(CResNew*)lpVoid;
@@ -484,7 +483,9 @@ void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 			for (size_t i = 0; i < nIncrement; ++i)
 			{
 				CNfa nfa;
+
 				size_t nToNFAFlag = CRegChainToNFA(regrule[i], nfa);
+
 				nDfaId = nDfaTblSize + i;
 				nDfasInfoId = nDfasInfoSize + i;
 				nChainId = nRegexTblSize + i;
@@ -505,6 +506,7 @@ void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 				else
 				{
 					size_t nToDFAFlag = dfa.FromNFA(nfa, NULL, 0);
+
 					if (nToDFAFlag == -1)
 					{
 						ruleResult.m_nResult = COMPILEDRULENEW::RES_EXCEEDLIMIT;
