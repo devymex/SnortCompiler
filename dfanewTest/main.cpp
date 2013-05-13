@@ -1,5 +1,4 @@
 #include <iostream>
-#include <fstream>
 #include "../common/common.h"
 #include "../dfanew/dfanew.h"
 #include "../pcre2nfa/pcre2nfa.h"
@@ -21,44 +20,6 @@
 		std::cout << std::endl;
 	}
 }
-
- void outPutDfa(CDfanew &dfa, const char* filename)
-	{
-		std::ofstream fout(filename);
-		if(!fout)
-		{
-			std::cout << "file open error!" << std::endl;
-		}
-
-		fout << "字符和组对应关系：" << std::endl;
-		for(BYTE i = 0; i < DFACOLSIZE - 1; ++i)
-		{
-			fout << (size_t)i << "\t" << (size_t)dfa.Char2Group(i) << std::endl;
-		}
-
-		fout << 255 << "\t" << (size_t)dfa.Char2Group(255) << std::endl;
-		fout << "\t";
-		//for(size_t k = 0; k != dfa.GetGroupCount(); ++k)
-		//{
-		//	fout << dfa.GetGroup[k] << "\t";
-		//}
-		for(BYTE j = 0; j != dfa.GetGroupCount(); ++j)
-		{
-			fout << (size_t)j << "\t";
-		}
-		fout << std::endl;
-		for(size_t i = 0; i != dfa.Size(); ++i)
-		{
-			fout << i << "\t";
-			for(BYTE j = 0; j != dfa.GetGroupCount(); ++j)
-			{
-				fout << (size_t)dfa[i][j] << "\t";
-			}
-			fout << std::endl;
-		}
-		fout.close();
-	}
-
 
 void main()
 {
@@ -91,15 +52,17 @@ void main()
 	system("pause");*/
 
 
-	const char* a =  "/<tel[^\x3A]{6}/smi";
+	const char* a ="/^abcdefg/"
+;
 	CNfa nfa;
 
 	PcreToNFA(a, nfa);
-	printNfa(nfa);
+	//printNfa(nfa);
 	CDfanew dfa;
 	dfa.FromNFA(nfa, NULL, 0);
-	outPutDfa(dfa,"d:\\dfatext.txt");
-	dfa.printTerms();
+	//outPutDfa(dfa, "F:\\cppProject\\huawei\\PreciseMatch\\input\\dfa3_after.txt"
+
+	//dfa.printTerms();
 	for (size_t i = 0; i < dfa.Size(); ++i)
 	{
 		std::cout << i << ":";
@@ -116,22 +79,22 @@ void main()
 	std::cout << std::endl;
 
 	dfa.Minimize();
-	for (size_t i = 0; i < dfa.Size(); ++i)
-	{
-		std::cout << i << ":";
-		for (size_t charNum = 0; charNum < 256; ++charNum)
-		{
-			size_t j = dfa.GetOneGroup(charNum);
-			if(dfa[i][j] != BYTE(-1))
-			{
-			std::cout << "(" << charNum << "," << (size_t)dfa[i][j] << ")";
-			}
-		}
-		std::cout << std::endl;
-	}
-	std::cout << std::endl;
-
-	GetDfaSig(dfa);
+	//for (size_t i = 0; i < dfa.Size(); ++i)
+	//{
+	//	std::cout << i << ":";
+	//	for (size_t charNum = 0; charNum < 256; ++charNum)
+	//	{
+	//		size_t j = dfa.GetOneGroup(charNum);
+	//		if(dfa[i][j] != BYTE(-1))
+	//		{
+	//		std::cout << "(" << charNum << "," << (size_t)dfa[i][j] << ")";
+	//		}
+	//	}
+	//	std::cout << std::endl;
+	//}
+	//std::cout << std::endl;
+	std::vector<std::vector<BYTE>> allStr;
+	GetDfaSig(dfa, allStr);
 
 
 	BYTE b[] = "fsdfsdkfBMdf";

@@ -434,6 +434,11 @@ COMPILERNEW size_t CResNew::ReadFromFile(LPCTSTR filename)
 
 	return 0;
 }
+
+double rule2pcretime = 0.0;
+double pcre2nfatime = 0.0;
+double nfa2dfatime = 0.0;
+double dfamintimetime = 0.0;
 void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 {
 	CResNew &result = *(CResNew*)lpVoid;
@@ -460,7 +465,11 @@ void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 	else
 	{
 		CRegRule regrule;
+
+		CTimer ctime;//用于测试
+		ctime.Reset();//用于测试
 		size_t flag = Rule2PcreList(rule, regrule);
+		rule2pcretime += ctime.Reset();//用于测试
 
 		if (flag == SC_ERROR)
 		{
@@ -484,7 +493,9 @@ void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 			{
 				CNfa nfa;
 
+				ctime.Reset();//用于测试
 				size_t nToNFAFlag = CRegChainToNFA(regrule[i], nfa);
+				pcre2nfatime += ctime.Reset();//用于测试
 
 				nDfaId = nDfaTblSize + i;
 				nDfasInfoId = nDfasInfoSize + i;
@@ -505,7 +516,9 @@ void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 				}
 				else
 				{
+					ctime.Reset();//用于测试
 					size_t nToDFAFlag = dfa.FromNFA(nfa, NULL, 0);
+					nfa2dfatime += ctime.Reset();//用于测试
 
 					if (nToDFAFlag == -1)
 					{
@@ -514,7 +527,9 @@ void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 					}
 					else
 					{
+						ctime.Reset();//用于测试
 						dfa.Minimize();
+						dfamintimetime += ctime.Reset();//用于测试
 					}
 				}
 				dfa.SetId(nDfaId);
