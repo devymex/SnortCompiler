@@ -42,7 +42,7 @@ bool NColumnEqual(std::vector<CStateSet*> &c1, std::vector<CStateSet*>&c2)
 
 void NAvaiEdges(CNfa &oneNfaTab, STATEID *group)
 {
-	//std::unordered_map<std::vector<CStateSet*>, STATEID, GROUPSET_HASH> GROUPHASH;
+	//typedef std::unordered_map<std::vector<CStateSet*>, STATEID, GROUPSET_HASH> GROUPHASH;
 	typedef std::unordered_map<std::string, STATEID> GROUPHASH;//将每一列表示成string形式，size=0的用'n'代表，每行之间用'u'间隔,元素与元素之间用','间隔
 	GROUPHASH ghash;
 	STATEID curId = 0;
@@ -152,6 +152,43 @@ void NAvaiEdges(CNfa &oneNfaTab, STATEID *group)
 //	}
 //}
 
+//void NNextNfaSet(const CNfa &oneNfaTab, const std::vector<size_t> &curNfaVec, size_t edge, std::vector<size_t> &nextENfaVec, char &finFlag)
+//{
+//	if (edge >= CHARSETSIZE)
+//	{
+//		std::cout << "Fatal Error!" << std::endl;
+//		return;
+//	}
+//	std::vector<size_t> nextNfaVec;
+//	std::vector<size_t> hasChecked(oneNfaTab.Size() + 1);
+//	//std::fill(hasChecked.begin(), hasChecked.end(), 0);
+//
+//	for(std::vector<size_t>::const_iterator vecIter = curNfaVec.begin(); vecIter != curNfaVec.end(); ++vecIter)
+//	{
+//		if(*vecIter == oneNfaTab.Size())
+//		{
+//			continue;
+//		}
+//		const CStateSet &nextEdges = oneNfaTab[*vecIter][edge];
+//		for (size_t i = 0; i < nextEdges.Size(); ++i)
+//		{
+//			//nextNfaVec.push_back(nextEdges[i]);
+//			if(hasChecked[nextEdges[i]] == 0)
+//			{
+//				hasChecked[nextEdges[i]] = 1;
+//				nextNfaVec.push_back(nextEdges[i]);
+//			}
+//		}
+//	}
+//	//std::sort(nextNfaVec.begin(), nextNfaVec.end());
+//	//nextNfaVec.erase(std::unique(nextNfaVec.begin(), nextNfaVec.end()), nextNfaVec.end());
+//
+//	if(!nextNfaVec.empty())
+//	{
+//		NEClosure(oneNfaTab, nextNfaVec, nextENfaVec, finFlag);
+//	}
+//}
+
 void NNextNfaSet(const CNfa &oneNfaTab, const std::vector<size_t> &curNfaVec, size_t edge, std::vector<size_t> &nextENfaVec, char &finFlag)
 {
 	if (edge >= CHARSETSIZE)
@@ -184,57 +221,110 @@ void NNextNfaSet(const CNfa &oneNfaTab, const std::vector<size_t> &curNfaVec, si
 void NEClosure(const CNfa &oneNfaTab, const std::vector<size_t> &curNfaVec, std::vector<size_t> &eNfaVec, char &finFlag)
 {
 	std::vector<size_t> eStack;
-	char caledStat[20000] = {0};
 	const size_t cEmptyEdge = 256;
+	size_t finalId = oneNfaTab.Size();//终态id
+	const size_t flagSize = finalId + 1;
+	std::vector<size_t> caledStat(flagSize, 0);
+	std::vector<size_t> hasInsert(flagSize, 0);//表示是否已经添加到eNfaVec中
 
-	if (eNfaVec.capacity() < 1000)
+	if (eNfaVec.capacity() < flagSize)
 	{
-		eNfaVec.reserve(1000);
+		eNfaVec.reserve(flagSize);
 	}
-
-	for(std::vector<size_t>::const_iterator vecIter = curNfaVec.begin(); vecIter != curNfaVec.end(); ++vecIter)
+	for(std::vector<size_t>::const_iterator vecIter = curNfaVec.begin();
+		vecIter != curNfaVec.end(); ++vecIter)
 	{
-		eStack.push_back(*vecIter);
-		eNfaVec.push_back(*vecIter);
-		if(*vecIter == oneNfaTab.Size())
+		if(caledStat[*vecIter] == 0)
 		{
+			caledStat[*vecIter] = 1;
+			eStack.push_back(*vecIter);
+		}
+	}
+	while(!eStack.empty())
+	{
+		size_t curState = eStack.back();
+		eStack.pop_back();
+		if(caledStat[curState] == 1 && hasInsert[curState] == 0)
+		{
+			hasInsert[curState] = 1;
+			eNfaVec.push_back(curState);
+		}
+		if(curState == finalId)
+		{
+			finFlag = 1;
 			continue;
 		}
-
-		while(!eStack.empty())
+		//curState的E转移
+		const CStateSet &eTempVec = oneNfaTab[curState][cEmptyEdge];
+		if(eTempVec.Size() != 0)
 		{
-			size_t curSta;
-			curSta = eStack.back();
-			eStack.pop_back();
-			if(caledStat[curSta] == 0)
+			for(size_t i = 0; i != eTempVec.Size(); ++i)
 			{
-				caledStat[curSta] = 1;
-				if(curSta < oneNfaTab.Size())
+				if(caledStat[eTempVec[i]] == 0)
 				{
-					const CStateSet &eTempVec = oneNfaTab[curSta][cEmptyEdge];
-					if(eTempVec.Size() != 0)
-					{
-						for (size_t i = 0; i < eTempVec.Size(); ++i)
-						{
-							eNfaVec.push_back(eTempVec[i]);
-							eStack.push_back(eTempVec[i]);
-						}
-					}
+					caledStat[eTempVec[i]] = 1;
+					eStack.push_back(eTempVec[i]);
 				}
 			}
 		}
 	}
 
-	std::sort(eNfaVec.begin(), eNfaVec.end());
-	eNfaVec.erase(std::unique(eNfaVec.begin(), eNfaVec.end()), eNfaVec.end());
-
-	for(std::vector<size_t>::iterator iter = eNfaVec.begin(); iter != eNfaVec.end(); ++iter)
-	{
-		if(*iter == oneNfaTab.Size())
-		{
-			finFlag = 1;
-			break;
-		}
-	}
 }
+
+//void NEClosure(const CNfa &oneNfaTab, const std::vector<size_t> &curNfaVec, std::vector<size_t> &eNfaVec, char &finFlag)
+//{
+//	std::vector<size_t> eStack;
+//	char caledStat[20000] = {0};
+//	const size_t cEmptyEdge = 256;
+//
+//	if (eNfaVec.capacity() < 1000)
+//	{
+//		eNfaVec.reserve(1000);
+//	}
+//
+//	for(std::vector<size_t>::const_iterator vecIter = curNfaVec.begin(); vecIter != curNfaVec.end(); ++vecIter)
+//	{
+//		eStack.push_back(*vecIter);
+//		eNfaVec.push_back(*vecIter);
+//		if(*vecIter == oneNfaTab.Size())
+//		{
+//			continue;
+//		}
+//
+//		while(!eStack.empty())
+//		{
+//			size_t curSta;
+//			curSta = eStack.back();
+//			eStack.pop_back();
+//			if(caledStat[curSta] == 0)
+//			{
+//				caledStat[curSta] = 1;
+//				if(curSta < oneNfaTab.Size())
+//				{
+//					const CStateSet &eTempVec = oneNfaTab[curSta][cEmptyEdge];
+//					if(eTempVec.Size() != 0)
+//					{
+//						for (size_t i = 0; i < eTempVec.Size(); ++i)
+//						{
+//							eNfaVec.push_back(eTempVec[i]);
+//							eStack.push_back(eTempVec[i]);
+//						}
+//					}
+//				}
+//			}
+//		}
+//	}
+//
+//	std::sort(eNfaVec.begin(), eNfaVec.end());
+//	eNfaVec.erase(std::unique(eNfaVec.begin(), eNfaVec.end()), eNfaVec.end());
+//
+//	for(std::vector<size_t>::iterator iter = eNfaVec.begin(); iter != eNfaVec.end(); ++iter)
+//	{
+//		if(*iter == oneNfaTab.Size())
+//		{
+//			finFlag = 1;
+//			break;
+//		}
+//	}
+//}
 

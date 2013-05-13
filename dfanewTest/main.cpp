@@ -56,10 +56,12 @@ void main()
 	CNfa nfa;
 
 	PcreToNFA(a, nfa);
-	printNfa(nfa);
+	//printNfa(nfa);
 	CDfanew dfa;
 	dfa.FromNFA(nfa, NULL, 0);
-	dfa.printTerms();
+	//outPutDfa(dfa, "F:\\cppProject\\huawei\\PreciseMatch\\input\\dfa3_after.txt"
+
+	//dfa.printTerms();
 	for (size_t i = 0; i < dfa.Size(); ++i)
 	{
 		std::cout << i << ":";

@@ -1,3 +1,5 @@
 LIBRARY
 EXPORTS
-GetDfaSig @1
+GetDfaSig @ 1
+outPut @ 2
+outPutDfa @ 3
