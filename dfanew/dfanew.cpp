@@ -2,6 +2,112 @@
 #include "dfanew.h"
 #include "NCreDfa.h"
 
+class CTimer
+{
+public:
+	__forceinline CTimer()
+	{
+		QueryPerformanceFrequency((PLARGE_INTEGER)&m_nFreq);
+		QueryPerformanceCounter((PLARGE_INTEGER)&m_nStart);
+	}
+	__forceinline double Cur()
+	{
+		__int64 nCur;
+		double dCur;
+
+		QueryPerformanceCounter((PLARGE_INTEGER)&nCur);
+		dCur = double(nCur - m_nStart) / double(m_nFreq);
+
+		return dCur;
+	}
+	__forceinline double Reset()
+	{
+		__int64 nCur;
+		double dCur;
+
+		QueryPerformanceCounter((PLARGE_INTEGER)&nCur);
+		dCur = double(nCur - m_nStart) / double(m_nFreq);
+		m_nStart = nCur;
+
+		return dCur;
+	}
+private:
+	__int64 m_nFreq;
+	__int64 m_nStart;
+};
+
+//测试函数:输出一个nfa
+DFANEWSC void outPut(CNfa &nfa, const char* fileName)
+{
+	size_t stateNum = nfa.Size();
+	std::ofstream fout(fileName);
+	fout << "\t";
+	for(size_t t = 0; t < 257; ++t)
+	{
+		fout << t << "\t";
+	}
+	fout << std::endl;
+	for(size_t i = 0; i < stateNum; ++i)
+	{
+		fout << i << "\t";
+		for(size_t j = 0; j < 257; ++j)
+		{
+			if(nfa[i][j].Size() == 0)
+			{
+				fout << -1 << "\t";
+			}
+			else
+			{
+				for(size_t k = 0; k < nfa[i][j].Size(); ++k)
+				{
+					fout << nfa[i][j][k] << ", ";
+				}
+				fout << "\t";
+			}
+		}
+		fout << std::endl;
+	}
+	fout.close();
+}
+
+//测试输出一个dfa
+DFANEWSC void outPutDfa(CDfanew &dfa, const char* filename)
+{
+	std::ofstream fout(filename);
+	if(!fout)
+	{
+		std::cout << "file open error!" << std::endl;
+	}
+
+	fout << "字符和组对应关系：" << std::endl;
+	for(BYTE i = 0; i < DFACOLSIZE - 1; ++i)
+	{
+		fout << (size_t)i << "\t" << (size_t)dfa.Char2Group(i) << std::endl;
+	}
+
+	fout << 255 << "\t" << (size_t)dfa.Char2Group(255) << std::endl;
+	fout << "\t";
+	//for(size_t k = 0; k != dfa.GetGroupCount(); ++k)
+	//{
+	//	fout << dfa.GetGroup[k] << "\t";
+	//}
+	for(BYTE j = 0; j != dfa.GetGroupCount(); ++j)
+	{
+		fout << (size_t)j << "\t";
+	}
+	fout << std::endl;
+	for(size_t i = 0; i != dfa.Size(); ++i)
+	{
+		fout << i << "\t";
+		for(BYTE j = 0; j != dfa.GetGroupCount(); ++j)
+		{
+			fout << (size_t)dfa[i][j] << "\t";
+		}
+		fout << std::endl;
+	}
+	fout.close();
+}
+
 DFANEWSC CDfanew::CDfanew()
 	: m_nId(size_t(-1)), m_nColNum(size_t(0)), m_StartId(STATEID(0))
 {
@@ -117,10 +223,11 @@ DFANEWSC size_t CDfanew::FromNFA(CNfa &nfa, NFALOG *nfalog, size_t Count, bool c
 		finFlag = 0;
 	}
 	std::vector<size_t> curNfaVec;
-	std::vector<size_t> compuFlag;
+	//std::vector<size_t> compuFlag;
 	while(nfaStasStack.size() > 0)
 	{
-		compuFlag.clear();
+		std::vector<size_t> compuFlag(m_nColNum, 0);
+		//compuFlag.clear();
 		STATEID curStaNum;
 		curNfaVec = nfaStasStack.top();
 		nfaStasStack.pop();
@@ -133,12 +240,18 @@ DFANEWSC size_t CDfanew::FromNFA(CNfa &nfa, NFALOG *nfalog, size_t Count, bool c
 			}
 
 			STATEID curGroup = m_pGroup[nCurChar];
-			if(std::find(compuFlag.begin(), compuFlag.end(), curGroup) != compuFlag.end())
+			if(compuFlag[curGroup] == 1)
 			{
 				continue;
 			}
+			compuFlag[curGroup] = 1;
 
-			compuFlag.push_back(curGroup);
+			//if(std::find(compuFlag.begin(), compuFlag.end(), curGroup) != compuFlag.end())
+			//{
+			//	continue;
+			//}
+
+			//compuFlag.push_back(curGroup);
 
 			STATESETHASH::iterator ir = ssh.find(curNfaVec);
 			if (ir == ssh.end())
@@ -150,7 +263,6 @@ DFANEWSC size_t CDfanew::FromNFA(CNfa &nfa, NFALOG *nfalog, size_t Count, bool c
 
 			std::vector<size_t> nextNfaVec;
 
-			//
 			finFlag = 0;
 			NNextNfaSet(nfa, curNfaVec, nCurChar, nextNfaVec, finFlag);
 
