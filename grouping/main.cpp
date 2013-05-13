@@ -83,6 +83,14 @@ struct DFASIZE
 	std::size_t dfaSize;
 };
 
+struct COMP
+{
+	bool operator()(const DFASIZE &id1, const DFASIZE &id2)
+	{
+		return id1.dfaSize < id2.dfaSize;
+	}
+};
+
 struct DFAGROUP
 {
 	std::vector<size_t> dfaIds;
@@ -260,18 +268,12 @@ void ChainIdTODfaId(const std::vector<CHAINGROUP> &vecChainGroups, const CResNew
 				{
 					dfaIds.push_back(DFASIZE());
 					dfaIds.back().dfaId = res.GetDfasInfo()[k].dfaId;
-					dfaIds.back().dfaSize = res.GetDfaTable()[dfaIds.back().dfaId].Size() * res.GetDfaTable()[dfaIds.back().dfaId].GetGroupCount();
+					dfaIds.back().dfaSize = res.GetDfaTable()[dfaIds.back().dfaId].Size();
+					//dfaIds.back().dfaSize = res.GetDfaTable()[dfaIds.back().dfaId].Size() * res.GetDfaTable()[dfaIds.back().dfaId].GetGroupCount();
 				}
 			}
 		}
 	}
-	struct COMP
-	{
-		bool operator()(const DFASIZE &id1, const DFASIZE &id2)
-		{
-			return id1.dfaSize < id2.dfaSize;
-		}
-	};
 	for (size_t i = 0; i < vecDfaSize.size(); ++i)
 	{
 		std::sort(vecDfaSize[i].begin(), vecDfaSize[i].end(), COMP());
@@ -306,7 +308,7 @@ void Extract(const std::vector<std::vector<DFASIZE>> &vecDfaSize, std::vector<si
 	}
 }
 
-void Merge(std::vector<DFAGROUP> &vecGroupRes, CResNew &res, std::vector<size_t> &vecOne, std::vector<std::vector<size_t>> &vecMore)
+void MergeMore(std::vector<DFAGROUP> &vecGroupRes, CResNew &res, std::vector<size_t> &vecOne, std::vector<std::vector<size_t>> &vecMore)
 {
 	vecGroupRes.reserve(10000);
 	bool mergeFlag;
@@ -314,6 +316,7 @@ void Merge(std::vector<DFAGROUP> &vecGroupRes, CResNew &res, std::vector<size_t>
 	CDfanew MergeDfa;
 	for (size_t i = 0; i < vecMore.size(); ++i)
 	{
+		std::cout << "More" << std::endl;
 		std::cout << "NO: " << i << std::endl;
 		std::cout << "Total: " << vecMore.size() << std::endl << std::endl;
 		std::vector<CDfanew> vecDfas(2);
@@ -376,8 +379,34 @@ void Merge(std::vector<DFAGROUP> &vecGroupRes, CResNew &res, std::vector<size_t>
 			oneGroup.mergeDfaId = res.GetDfaTable().Size() - 1;
 		}
 	}
+}
+
+void SortOne(CResNew &res, std::vector<size_t> &vecOne)
+{
+	std::vector<DFASIZE> vecDfaSize(vecOne.size());
+	for (size_t i = 0; i < vecOne.size(); ++i)
+	{
+		vecDfaSize[i].dfaId = vecOne[i];
+		vecDfaSize[i].dfaSize = res.GetDfaTable()[vecOne[i]].Size();
+		//vecDfaSize[i].dfaSize = res.GetDfaTable()[vecOne[i]].Size() * res.GetDfaTable()[vecOne[i]].GetGroupCount();
+	}
+	std::sort(vecDfaSize.begin(), vecDfaSize.end(), COMP());
+	for (size_t i = 0; i < vecDfaSize.size(); ++i)
+	{
+		vecOne[i] = vecDfaSize[i].dfaId;
+	}
+}
+
+void MergeOne(std::vector<DFAGROUP> &vecGroupRes, CResNew &res, std::vector<size_t> &vecOne)
+{
+	bool mergeFlag;
+	std::vector<CDfanew> vecDfas(2);
+	CDfanew MergeDfa;
 	for (size_t i = 0; i < vecOne.size();)
 	{
+		std::cout << "One" << std::endl;
+		std::cout << "NO: " << i << std::endl;
+		std::cout << "Total: " << vecOne.size() << std::endl << std::endl;
 		vecDfas[0] = res.GetDfaTable()[vecOne[i]];
 		mergeFlag = true;
 		for (size_t j = i + 1; j < vecOne.size(); ++j)
@@ -409,6 +438,9 @@ void Merge(std::vector<DFAGROUP> &vecGroupRes, CResNew &res, std::vector<size_t>
 			}
 			else
 			{
+				std::cout << "One" << std::endl;
+				std::cout << "NO: " << j << std::endl;
+				std::cout << "Total: " << vecOne.size() << std::endl << std::endl;
 				vecDfas[0] = MergeDfa;
 			}
 		}
@@ -432,6 +464,7 @@ void Merge(std::vector<DFAGROUP> &vecGroupRes, CResNew &res, std::vector<size_t>
 				}
 				oneGroup.mergeDfaId = res.GetDfaTable().Size() - 1;
 			}
+			break;
 		}
 	}
 }
@@ -499,7 +532,10 @@ int main(void)
 	//Merge dfa in a group...
 	std::cout << "Merge dfa in a group..." << std::endl;
 	std::vector<DFAGROUP> vecGroupRes;
-	Merge(vecGroupRes, res, vecOne, vecMore);
+	MergeMore(vecGroupRes, res, vecOne, vecMore);
+	SortOne(res, vecOne);
+	MergeOne(vecGroupRes, res, vecOne);
+	std::cout << "Number of groups: " << vecGroupRes.size() << std::endl;
 	std::cout << "Completed in " << t1.Reset() << " Sec." << std::endl << std::endl;
 
 	std::cout << "Total time: " << tAll.Reset() << " Sec." << std::endl;

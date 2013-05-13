@@ -150,6 +150,7 @@ DFANEWSC size_t CDfanew::FromNFA(CNfa &nfa, NFALOG *nfalog, size_t Count, bool c
 
 			std::vector<size_t> nextNfaVec;
 
+			//
 			finFlag = 0;
 			NNextNfaSet(nfa, curNfaVec, nCurChar, nextNfaVec, finFlag);
 
@@ -821,4 +822,3 @@ void CDfanew::MergeNonDisStates(SETLIST &Partition)
 		(*m_pDfa)[idx] = tmpDfa[idx];
 	}
 }
-
