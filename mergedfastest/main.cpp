@@ -41,26 +41,33 @@ void printNfa(CNfa &nfa)
 
 void main()
 {
-	const char *pcre1 = "/\\(\\s*(\\x27[^\\x27]{3,}|\\x22[^\\x22]{3,})/si";
+	const char *pcre1 = "/^ab.*c/";
+	const char *pcre2 = "/^de.*f/";
 
 	std::vector<CDfa> dfaVec;
 	CDfa dfa1, dfa2,lastdfa;
 
 	dfa1.SetId(1);
+	dfa2.SetId(2);
+
 	CNfa nfa1, nfa2;
 	PcreToNFA(pcre1, nfa1);
-	size_t nfasize = nfa1.Size();
+	//size_t nfasize = nfa1.Size();
 	NfaToDfa(nfa1, dfa1);
-
-	NfaToDfa(nfa1, dfa2);
+		
+	PcreToNFA(pcre2, nfa2);
+	NfaToDfa(nfa2, dfa2);
 
 	dfaVec.push_back(dfa1);
 	dfaVec.push_back(dfa2);
 	//NfaToDfa(nfa3, dfa3);
 	OrMerge(dfaVec, lastdfa);
+	printDfa(lastdfa);
+
+	std::cout << lastdfa.Size() << std::endl;
+
 	//size = dfa3.Size();
-	size_t size 
-		= dfa1.Size();
+	size_t size = dfa1.Size();
 
 	size = lastdfa.Size();
 
