@@ -59,7 +59,7 @@ void main()
 	//printNfa(nfa);
 	CDfanew dfa;
 	dfa.FromNFA(nfa, NULL, 0);
-	//outPutDfa(dfa, "F:\\cppProject\\huawei\\PreciseMatch\\input\\dfa3_after.txt"
+	outPutDfa(dfa, "F:\\cppProject\\huawei\\PreciseMatch\\input\\dfa3_after.txt");
 
 	//dfa.printTerms();
 	for (size_t i = 0; i < dfa.Size(); ++i)

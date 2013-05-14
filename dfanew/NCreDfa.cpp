@@ -1,6 +1,12 @@
 #include "stdafx.h"
 #include "NCreDfa.h"
 #include "dfanew.h"
+#include "md5.h"
+
+struct MD5VAL
+{
+	size_t val[4];
+};
 
 /* Following codes is a testing for unordered_map */
 /* DONT REMOVE */
@@ -40,26 +46,56 @@ bool NColumnEqual(std::vector<CStateSet*> &c1, std::vector<CStateSet*>&c2)
 	return true;
 }
 
+
+struct NFACOL_HASH
+{
+	size_t operator()(const MD5VAL &md5val)
+	{
+		const size_t _FNV_offset_basis = 2166136261U;
+		const size_t _FNV_prime = 16777619U;
+
+		size_t _Val = _FNV_offset_basis;
+		for (size_t _Next = 0; _Next < 4; ++_Next)
+			{	
+				_Val ^= (size_t)md5val.val[_Next];
+				_Val *= _FNV_prime;
+			}
+
+		return (_Val);
+	}
+};
+
+bool operator == (const MD5VAL &md5val1, const MD5VAL &md5val2)
+{
+	for(size_t i = 0; i < 4; ++i)
+	{
+		if(md5val1.val[i] != md5val2.val[i])
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+//对每一列求md5值，然后将此值进行hash
 void NAvaiEdges(CNfa &oneNfaTab, STATEID *group)
 {
-	//typedef std::unordered_map<std::vector<CStateSet*>, STATEID, GROUPSET_HASH> GROUPHASH;
-	typedef std::unordered_map<std::string, STATEID> GROUPHASH;//将每一列表示成string形式，size=0的用'n'代表，每行之间用'u'间隔,元素与元素之间用','间隔
-	GROUPHASH ghash;
-	STATEID curId = 0;
-	std::stringstream ss;
-	for(size_t c = 0; c < DFACOLSIZE; ++c)
+	typedef std::unordered_map<MD5VAL, STATEID, NFACOL_HASH> GROUPHASH;//使用md5值进行hash
+	GROUPHASH md5Hash;
+
+	//std::vector<MD5VAL> colMd5Vec(DFACOLSIZE);
+	std::vector<MD5VAL> colMd5Vec;
+	typedef std::vector<std::vector<size_t> > COLUMN;
+	COLUMN nfaCol(DFACOLSIZE);
+
+	//将列取出，使用-1间隔
+	for(size_t i = 0; i < oneNfaTab.Size(); ++i)
 	{
-		std::string str;
-		for(size_t i = 0; i < oneNfaTab.Size(); ++i)
+		for(size_t c = 0; c < DFACOLSIZE; ++c)
 		{
 			CStateSet &elems = oneNfaTab[i][c];
-			if(elems.Size() == 0)
+			if(elems.Size() != 0)
 			{
-				str += 'n';
-			}
-			else
-			{
-				elems.Sort();
 				for(size_t j = 0; j < elems.Size(); ++j)
 				{
 					if(elems[j] > oneNfaTab.Size())
@@ -67,28 +103,90 @@ void NAvaiEdges(CNfa &oneNfaTab, STATEID *group)
 						std::cout << "overflow" << std::endl;
 						return;
 					}
-					ss.str("");
-					ss << elems[j];
-					str += ss.str();
-					str += ',';
+					nfaCol[c].push_back(elems[j]);
 				}
 			}
-			str += 'u';
+			nfaCol[c].push_back(-1);
 		}
-		GROUPHASH::iterator it = ghash.find(str);
-		if(it == ghash.end())
+	}
+
+	//求每列的md5值
+	MD5 md5;
+	for(size_t c = 0; c < DFACOLSIZE; ++c)
+	{
+		MD5VAL md5val;
+		md5.reset();
+		md5.update((const void*)&nfaCol[c][0], nfaCol[c].size() * sizeof(size_t));
+		memcpy(md5val.val, md5.digest(), 16);
+		colMd5Vec.push_back(md5val);
+	}
+
+
+	STATEID curId = 0;
+	for(size_t c = 0; c < DFACOLSIZE; ++c)
+	{
+		GROUPHASH::iterator it = md5Hash.find(colMd5Vec[c]);
+		if(it == md5Hash.end())
 		{
-			ghash[str] = curId;
+			md5Hash[colMd5Vec[c]] = curId;
 			group[c] = curId;
 			++curId;
 		}
 		else
 		{
-			group[c] = it->second;
+			group[c] = md5Hash[colMd5Vec[c]];
 		}
 	}
 }
 
+
+//使用string进行hash，正确，快
+//void NAvaiEdges(CNfa &oneNfaTab, STATEID *group)
+//{
+//	//typedef std::unordered_map<std::vector<CStateSet*>, STATEID, GROUPSET_HASH> GROUPHASH;
+//	typedef std::unordered_map<std::string, STATEID> GROUPHASH;//将每一列表示成string形式，size=0的用'n'代表，每行之间用'u'间隔,元素与元素之间用','间隔
+//	GROUPHASH ghash;
+//	STATEID curId = 0;
+//	std::stringstream ss;
+//	for(size_t c = 0; c < DFACOLSIZE; ++c)
+//	{
+//		std::string str;
+//		for(size_t i = 0; i < oneNfaTab.Size(); ++i)
+//		{
+//			CStateSet &elems = oneNfaTab[i][c];
+//			if(elems.Size() != 0)
+//			{
+//				elems.Sort();
+//				for(size_t j = 0; j < elems.Size(); ++j)
+//				{
+//					if(elems[j] > oneNfaTab.Size())
+//					{
+//						std::cout << "overflow" << std::endl;
+//						return;
+//					}
+//					ss.str("");
+//					ss << elems[j];
+//					str += ss.str();
+//					str += ',';
+//				}
+//			}
+//			str += 'u';
+//		}
+//		GROUPHASH::iterator it = ghash.find(str);
+//		if(it == ghash.end())
+//		{
+//			ghash[str] = curId;
+//			group[c] = curId;
+//			++curId;
+//		}
+//		else
+//		{
+//			group[c] = it->second;
+//		}
+//	}
+//}
+
+//原始代码，正确，慢
 //void NAvaiEdges(CNfa &oneNfaTab, STATEID *group)
 //{
 //	std::vector<std::vector<size_t>> charGroups;
