@@ -5,7 +5,7 @@
 
 
 
-DFANEWSC void GetDfaSig(CDfanew &dfa)
+DFANEWSC void GetDfaSig(CDfanew &dfa, std::vector<std::vector<BYTE>> &allStr)
 {
 	static STATEID serNum = 0;
 
@@ -33,7 +33,6 @@ DFANEWSC void GetDfaSig(CDfanew &dfa)
 	DeepSearch(dfa.GetStartId(), serNum, dfa, termStas, visited, deepSer, staRow);
 
 	Dominates(dfa, termStas, domMax, deepSer, staRow, doms);
-	std::vector<CCString> allStr;
 	WFSDfa(dfa, doms, staRow, allStr);
 	std::cout << std::endl;
 }
@@ -221,14 +220,14 @@ bool Change(INT64* before, INT64* after)
 	return chg;
 }
 
-void WFSDfa(CDfanew &dfa, std::vector<STATEID> doms, STATEID *staRow, std::vector<CCString> &allStr)
+void WFSDfa(CDfanew &dfa, std::vector<STATEID> doms, STATEID *staRow, std::vector<std::vector<BYTE>> &allStr)
 {
 	//入度
 	size_t in[DFACOLSIZE - 1];
 	//出度
 	size_t out[DFACOLSIZE - 1];
 	//记录所有入边
-	std::vector<STATEID> inEdges[DFACOLSIZE - 1];
+	std::vector<BYTE> inEdges[DFACOLSIZE - 1];
 	STATEID inEdgeVis[DFACOLSIZE - 1][DFACOLSIZE];
 	//深度
 	STATEID deeps[DFACOLSIZE - 1];
@@ -298,7 +297,7 @@ void WFSDfa(CDfanew &dfa, std::vector<STATEID> doms, STATEID *staRow, std::vecto
 
 	}
 
-	CCString str;
+	std::vector<BYTE> str;
 
 	for(std::vector<STATEID>::iterator iter = doms.begin(); iter != doms.end(); ++iter)
 	{
@@ -309,17 +308,16 @@ void WFSDfa(CDfanew &dfa, std::vector<STATEID> doms, STATEID *staRow, std::vecto
 		else
 		{
 			//const char a = inEdges[*iter][0];
-			std::string str1;
-			str1 = inEdges[*iter][0];
-			str.Append(str1.c_str());
+			str.push_back((BYTE)inEdges[*iter][0]);
 		}
 		if(out[*iter] > 1 || iter == (doms.end() - 1))
 		{
-			if(str.Size() != 0)
+			if(str.size() != 0)
 			{
 				allStr.resize(allStr.size() + 1);
 				allStr.back() = str;
-				str.Clear();
+				size_t size = str.size();
+				str.clear();
 			}
 			continue;
 		}

@@ -52,7 +52,8 @@ void main()
 	system("pause");*/
 
 
-	const char* a = "/^(ab|bc)def(ab|cd)/";
+	const char* a ="/^abcdefg/"
+;
 	CNfa nfa;
 
 	PcreToNFA(a, nfa);
@@ -78,22 +79,22 @@ void main()
 	std::cout << std::endl;
 
 	dfa.Minimize();
-	for (size_t i = 0; i < dfa.Size(); ++i)
-	{
-		std::cout << i << ":";
-		for (size_t charNum = 0; charNum < 256; ++charNum)
-		{
-			size_t j = dfa.GetOneGroup(charNum);
-			if(dfa[i][j] != BYTE(-1))
-			{
-			std::cout << "(" << charNum << "," << (size_t)dfa[i][j] << ")";
-			}
-		}
-		std::cout << std::endl;
-	}
-	std::cout << std::endl;
-
-	GetDfaSig(dfa);
+	//for (size_t i = 0; i < dfa.Size(); ++i)
+	//{
+	//	std::cout << i << ":";
+	//	for (size_t charNum = 0; charNum < 256; ++charNum)
+	//	{
+	//		size_t j = dfa.GetOneGroup(charNum);
+	//		if(dfa[i][j] != BYTE(-1))
+	//		{
+	//		std::cout << "(" << charNum << "," << (size_t)dfa[i][j] << ")";
+	//		}
+	//	}
+	//	std::cout << std::endl;
+	//}
+	//std::cout << std::endl;
+	std::vector<std::vector<BYTE>> allStr;
+	GetDfaSig(dfa, allStr);
 
 
 	BYTE b[] = "fsdfsdkfBMdf";
