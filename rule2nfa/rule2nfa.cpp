@@ -206,7 +206,7 @@ template<typename _Iter>
 size_t FormatPcre (_Iter pBeg, _Iter pEnd, OPTIONPCRE &pcre)
 {
 	pcre.nFlags = 0;
-	//If rule includes '!',we should delete this rule
+
 	if (*std::find_if_not(pBeg, pEnd, ISSPACE()) == '!')
 	{
 		return size_t(-2);
@@ -427,9 +427,12 @@ size_t ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
 				{
 					nFlag |= CSnortRule::RULE_HASNOT;
 				}
-				nResult = size_t(-1);
-				delete pPcre;
-				break;
+				else
+				{
+					nResult = size_t(-1);
+					delete pPcre;
+					break;
+				}
 			}
 			snortRule.PushBack(pPcre);
 		}
