@@ -14,6 +14,8 @@
 #define COMMONSC __declspec(dllexport)
 #endif
 
+double COMMONSC g_dTimer;
+
 typedef BYTE STATEID;
 //typedef WORD STATEID;
 typedef std::list<STATEID> STALIST;

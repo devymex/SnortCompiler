@@ -87,10 +87,12 @@ void main()
 
 	//const char* a = "/^(ab|bc)def(ab|cd)/";
 	const char* a = "/^.{2}.*ab/si";
+	//const char* a = "/^(a|b)abb/";
 	CNfa nfa;
 
 	PcreToNFA(a, nfa);
 	//printNfa(nfa);
+	outPut(nfa, "F:\\cppProject\\huawei\\PreciseMatch\\input\\nfa3_after.txt");
 	CDfanew dfa;
 	
 	CTimer nfa2dfatime;//”√”⁄≤‚ ‘

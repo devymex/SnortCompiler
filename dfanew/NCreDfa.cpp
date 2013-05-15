@@ -230,46 +230,46 @@ bool operator == (const std::vector<CStateSet*> &set1, const std::vector<CStateS
 
 
 //使用std::vector<size_t>*进行hash, 正确，较快
-void NAvaiEdges(CNfa &oneNfaTab, STATEID *group)
-{
-	typedef std::unordered_map<std::vector<CStateSet*>, STATEID, GROUPSET_HASH> GROUPHASH;
-	GROUPHASH ghash;
-	STATEID curId = 0;
-
-	typedef std::vector<std::vector<CStateSet*> > COLUMN;
-	COLUMN nfaCol(DFACOLSIZE);
-
-	for(size_t c = 0; c < DFACOLSIZE; ++c)
-	{
-		nfaCol[c].resize(oneNfaTab.Size());
-		for(size_t i = 0; i < oneNfaTab.Size(); ++i)
-		{
-			CStateSet &elems = oneNfaTab[i][c];
-			if(elems.Size() != 0)
-			{
-				elems.Sort();
-				nfaCol[c][i] = &oneNfaTab[i][c];
-			}
-			else
-			{
-				nfaCol[c][i] = &oneNfaTab[i][c];
-			}
-		}
-
-		GROUPHASH::iterator colIt = ghash.find(nfaCol[c]);
-		if(colIt == ghash.end())
-		{
-			ghash[nfaCol[c]] = curId;
-			group[c] = curId;
-			++curId;
-		}
-		else
-		{
-			group[c] = colIt->second;
-		}
-	}
-
-}
+//void NAvaiEdges(CNfa &oneNfaTab, STATEID *group)
+//{
+//	typedef std::unordered_map<std::vector<CStateSet*>, STATEID, GROUPSET_HASH> GROUPHASH;
+//	GROUPHASH ghash;
+//	STATEID curId = 0;
+//
+//	typedef std::vector<std::vector<CStateSet*> > COLUMN;
+//	COLUMN nfaCol(DFACOLSIZE);
+//
+//	for(size_t c = 0; c < DFACOLSIZE; ++c)
+//	{
+//		nfaCol[c].resize(oneNfaTab.Size());
+//		for(size_t i = 0; i < oneNfaTab.Size(); ++i)
+//		{
+//			CStateSet &elems = oneNfaTab[i][c];
+//			if(elems.Size() != 0)
+//			{
+//				elems.Sort();
+//				nfaCol[c][i] = &oneNfaTab[i][c];
+//			}
+//			else
+//			{
+//				nfaCol[c][i] = &oneNfaTab[i][c];
+//			}
+//		}
+//
+//		GROUPHASH::iterator colIt = ghash.find(nfaCol[c]);
+//		if(colIt == ghash.end())
+//		{
+//			ghash[nfaCol[c]] = curId;
+//			group[c] = curId;
+//			++curId;
+//		}
+//		else
+//		{
+//			group[c] = colIt->second;
+//		}
+//	}
+//
+//}
 
 //string 正确 快，先取出列
 //void NAvaiEdges(CNfa &oneNfaTab, STATEID *group)
@@ -316,51 +316,51 @@ void NAvaiEdges(CNfa &oneNfaTab, STATEID *group)
 //}
 
 //使用string进行hash，正确，非常快
-//void NAvaiEdges(CNfa &oneNfaTab, STATEID *group)
-//{
-//	//typedef std::unordered_map<std::vector<CStateSet*>, STATEID, GROUPSET_HASH> GROUPHASH;
-//	typedef std::unordered_map<std::string, STATEID> GROUPHASH;//将每一列表示成string形式，size=0的用'n'代表，每行之间用'u'间隔,元素与元素之间用','间隔
-//	GROUPHASH ghash;
-//	STATEID curId = 0;
-//	//std::stringstream ss;
-//	for(size_t c = 0; c < DFACOLSIZE; ++c)
-//	{
-//		std::string str;
-//		for(size_t i = 0; i < oneNfaTab.Size(); ++i)
-//		{
-//			CStateSet &elems = oneNfaTab[i][c];
-//			if(elems.Size() != 0)
-//			{
-//				elems.Sort();
-//				for(size_t j = 0; j < elems.Size(); ++j)
-//				{
-//					if(elems[j] > oneNfaTab.Size())
-//					{
-//						std::cout << "overflow" << std::endl;
-//						return;
-//					}
-//					//ss.str("");
-//					//ss << elems[j];
-//					//str += ss.str();
-//					str += elems[j];
-//					str += ',';
-//				}
-//			}
-//			str += 'u';
-//		}
-//		GROUPHASH::iterator it = ghash.find(str);
-//		if(it == ghash.end())
-//		{
-//			ghash[str] = curId;
-//			group[c] = curId;
-//			++curId;
-//		}
-//		else
-//		{
-//			group[c] = it->second;
-//		}
-//	}
-//}
+void NAvaiEdges(CNfa &oneNfaTab, STATEID *group)
+{
+	//typedef std::unordered_map<std::vector<CStateSet*>, STATEID, GROUPSET_HASH> GROUPHASH;
+	typedef std::unordered_map<std::string, STATEID> GROUPHASH;//将每一列表示成string形式，size=0的用'n'代表，每行之间用'u'间隔,元素与元素之间用','间隔
+	GROUPHASH ghash;
+	STATEID curId = 0;
+	//std::stringstream ss;
+	for(size_t c = 0; c < DFACOLSIZE; ++c)
+	{
+		std::string str;
+		for(size_t i = 0; i < oneNfaTab.Size(); ++i)
+		{
+			CStateSet &elems = oneNfaTab[i][c];
+			if(elems.Size() != 0)
+			{
+				elems.Sort();
+				for(size_t j = 0; j < elems.Size(); ++j)
+				{
+					if(elems[j] > oneNfaTab.Size())
+					{
+						std::cout << "overflow" << std::endl;
+						return;
+					}
+					//ss.str("");
+					//ss << elems[j];
+					//str += ss.str();
+					str += elems[j];
+					str += ',';
+				}
+			}
+			str += 'u';
+		}
+		GROUPHASH::iterator it = ghash.find(str);
+		if(it == ghash.end())
+		{
+			ghash[str] = curId;
+			group[c] = curId;
+			++curId;
+		}
+		else
+		{
+			group[c] = it->second;
+		}
+	}
+}
 //
 //原始代码，正确，慢
 //void NAvaiEdges(CNfa &oneNfaTab, STATEID *group)
