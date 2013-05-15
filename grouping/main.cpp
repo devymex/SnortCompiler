@@ -366,7 +366,7 @@ void MergeMore(std::vector<DFAGROUP> &vecGroupRes, CResNew &res, std::vector<siz
 				DFAGROUP &oneGroup = vecGroupRes.back();
 				for (size_t k = 0; k < j; ++k)
 				{
-					oneGroup.dfaIds.push_back(k);
+					oneGroup.dfaIds.push_back(vecMore[i][k]);
 				}
 				oneGroup.mergeDfaId = res.GetDfaTable().Size() - 1;
 				if (vecMore[i].size() - j == 1)
@@ -435,187 +435,93 @@ void PutInGroup(std::map<size_t, size_t> &dfaIdToSidMap, std::map<size_t, std::v
 	}
 }
 
-void ProcessRemain(std::map<size_t, size_t> &dfaIdToSidMap, std::vector<DFAGROUP> &vecGroupRes, CResNew &res, std::vector<size_t> &vecOne)
+void SortOne(CResNew &res, std::vector<size_t> &vecOne)
 {
-	std::map<size_t, std::vector<size_t>> sidToGroupMap;
-	for (std::vector<size_t>::iterator i = vecOne.begin(); i != vecOne.end(); ++i)
+	std::vector<DFASIZE> vecDfaSize(vecOne.size());
+	for (size_t i = 0; i < vecOne.size(); ++i)
 	{
-		sidToGroupMap[dfaIdToSidMap[*i]].push_back(*i);
+		vecDfaSize[i].dfaId = vecOne[i];
+		vecDfaSize[i].dfaSize = res.GetDfaTable()[vecOne[i]].Size();
+		//vecDfaSize[i].dfaSize = res.GetDfaTable()[vecOne[i]].Size() * res.GetDfaTable()[vecOne[i]].GetGroupCount();
 	}
-	std::vector<std::vector<DFASIZE>> vecDfaSizetmp;
-	for (std::map<size_t, std::vector<size_t>>::iterator i = sidToGroupMap.begin(); i != sidToGroupMap.end(); ++i)
+	std::sort(vecDfaSize.begin(), vecDfaSize.end(), COMP());
+	for (size_t i = 0; i < vecDfaSize.size(); ++i)
 	{
-		vecDfaSizetmp.push_back(std::vector<DFASIZE>());
-		std::vector<DFASIZE> &dfaIds = vecDfaSizetmp.back();
-		for (std::vector<size_t>::iterator j = i->second.begin(); j != i->second.end(); ++j)
-		{
-			dfaIds.push_back(DFASIZE());
-			dfaIds.back().dfaId = *j;
-			dfaIds.back().dfaSize = res.GetDfaTable()[*j].Size();
-		}
+		vecOne[i] = vecDfaSize[i].dfaId;
 	}
-	for (std::vector<std::vector<DFASIZE>>::iterator i = vecDfaSizetmp.begin(); i != vecDfaSizetmp.end(); ++i)
-	{
-		std::sort(i->begin(), i->end(), COMP());
-	}
-	std::vector<std::vector<size_t>> vecGroups;
-	for (std::vector<std::vector<DFASIZE>>::iterator i = vecDfaSizetmp.begin(); i != vecDfaSizetmp.end(); ++i)
-	{
-		vecGroups.push_back(std::vector<size_t>());
-		for (std::vector<DFASIZE>::iterator j = i->begin(); j != i->end(); ++j)
-		{
-			vecGroups.back().push_back(j->dfaId);
-		}
-	}
+}
+
+void MergeOne(std::vector<DFAGROUP> &vecGroupRes, CResNew &res, std::vector<size_t> &vecOne)
+{
 	bool mergeFlag;
 	std::vector<CDfanew> vecDfas(2);
 	CDfanew MergeDfa;
-	for (size_t i = 0; i < vecGroups.size(); ++i)
+	for (size_t i = 0; i < vecOne.size();)
 	{
-		std::cout << "Remain" << std::endl;
+		std::cout << "One" << std::endl;
 		std::cout << "NO: " << i << std::endl;
-		std::cout << "Total: " << vecGroups.size() << std::endl << std::endl;
-		if (vecGroups[i].size() == 1)
-		{
-			vecGroupRes.resize(vecGroupRes.size() + 1);
-			vecGroupRes.back().dfaIds.push_back(vecGroups[i][0]);
-			vecGroupRes.back().mergeDfaId = vecGroups[i][0];
-			continue;
-		}
-		vecDfas[0] = res.GetDfaTable()[vecGroups[i][0]];
-		vecDfas[1] = res.GetDfaTable()[vecGroups[i][1]];
-		if (!NOrMerge(vecDfas, MergeDfa))
-		{
-			for (size_t j = 0; j < vecGroups[i].size(); ++j)
-			{
-				vecGroupRes.resize(vecGroupRes.size() + 1);
-				vecGroupRes.back().dfaIds.push_back(vecGroups[i][j]);
-				vecGroupRes.back().mergeDfaId = vecGroups[i][j];
-			}
-			continue;
-		}
+		std::cout << "Total: " << vecOne.size() << std::endl << std::endl;
+		vecDfas[0] = res.GetDfaTable()[vecOne[i]];
 		mergeFlag = true;
-		vecDfas[0] = MergeDfa;
-		for (size_t j = 2; j < vecGroups[i].size(); ++j)
+		for (size_t j = i + 1; j < vecOne.size(); ++j)
 		{
-			vecDfas[1] = res.GetDfaTable()[vecGroups[i][j]];
+			vecDfas[1] = res.GetDfaTable()[vecOne[j]];
 			if (!NOrMerge(vecDfas, MergeDfa))
 			{
 				mergeFlag = false;
-				res.GetDfaTable().PushBack(vecDfas[0]);
-				vecGroupRes.resize(vecGroupRes.size() + 1);
-				DFAGROUP &oneGroup = vecGroupRes.back();
-				for (size_t k = 0; k < j; ++k)
+				if (j - i == 1)
 				{
-					oneGroup.dfaIds.push_back(k);
+					vecGroupRes.resize(vecGroupRes.size() + 1);
+					DFAGROUP &oneGroup = vecGroupRes.back();
+					oneGroup.dfaIds.push_back(vecOne[i]);
+					oneGroup.mergeDfaId = vecOne[i];
 				}
-				oneGroup.mergeDfaId = res.GetDfaTable().Size() - 1;
-				vecGroups.push_back(std::vector<size_t>(vecGroups[i].begin() + j, vecGroups[i].end()));
+				else
+				{
+					res.GetDfaTable().PushBack(vecDfas[0]);
+					vecGroupRes.resize(vecGroupRes.size() + 1);
+					DFAGROUP &oneGroup = vecGroupRes.back();
+					for (size_t k = i; k < j; ++k)
+					{
+						oneGroup.dfaIds.push_back(vecOne[k]);
+					}
+					oneGroup.mergeDfaId = res.GetDfaTable().Size() - 1;
+				}
+				i = j;
 				break;
 			}
 			else
 			{
+				std::cout << "One" << std::endl;
+				std::cout << "NO: " << j << std::endl;
+				std::cout << "Total: " << vecOne.size() << std::endl << std::endl;
 				vecDfas[0] = MergeDfa;
 			}
 		}
 		if (mergeFlag)
 		{
-			res.GetDfaTable().PushBack(vecDfas[0]);
-			vecGroupRes.resize(vecGroupRes.size() + 1);
-			DFAGROUP &oneGroup = vecGroupRes.back();
-			oneGroup.dfaIds.insert(oneGroup.dfaIds.begin(), vecGroups[i].begin(), vecGroups[i].end());
-			oneGroup.mergeDfaId = res.GetDfaTable().Size() - 1;
+			if (i == vecOne.size() - 1)
+			{
+				vecGroupRes.resize(vecGroupRes.size() + 1);
+				DFAGROUP &oneGroup = vecGroupRes.back();
+				oneGroup.dfaIds.push_back(vecOne[i]);
+				oneGroup.mergeDfaId = vecOne[i];
+			}
+			else
+			{
+				res.GetDfaTable().PushBack(vecDfas[0]);
+				vecGroupRes.resize(vecGroupRes.size() + 1);
+				DFAGROUP &oneGroup = vecGroupRes.back();
+				for (size_t k = i; k < vecOne.size(); ++k)
+				{
+					oneGroup.dfaIds.push_back(vecOne[k]);
+				}
+				oneGroup.mergeDfaId = res.GetDfaTable().Size() - 1;
+			}
+			break;
 		}
 	}
 }
-
-//void SortOne(CResNew &res, std::vector<size_t> &vecOne)
-//{
-//	std::vector<DFASIZE> vecDfaSize(vecOne.size());
-//	for (size_t i = 0; i < vecOne.size(); ++i)
-//	{
-//		vecDfaSize[i].dfaId = vecOne[i];
-//		vecDfaSize[i].dfaSize = res.GetDfaTable()[vecOne[i]].Size();
-//		//vecDfaSize[i].dfaSize = res.GetDfaTable()[vecOne[i]].Size() * res.GetDfaTable()[vecOne[i]].GetGroupCount();
-//	}
-//	std::sort(vecDfaSize.begin(), vecDfaSize.end(), COMP());
-//	for (size_t i = 0; i < vecDfaSize.size(); ++i)
-//	{
-//		vecOne[i] = vecDfaSize[i].dfaId;
-//	}
-//}
-//
-//void MergeOne(std::vector<DFAGROUP> &vecGroupRes, CResNew &res, std::vector<size_t> &vecOne)
-//{
-//	bool mergeFlag;
-//	std::vector<CDfanew> vecDfas(2);
-//	CDfanew MergeDfa;
-//	for (size_t i = 0; i < vecOne.size();)
-//	{
-//		std::cout << "One" << std::endl;
-//		std::cout << "NO: " << i << std::endl;
-//		std::cout << "Total: " << vecOne.size() << std::endl << std::endl;
-//		vecDfas[0] = res.GetDfaTable()[vecOne[i]];
-//		mergeFlag = true;
-//		for (size_t j = i + 1; j < vecOne.size(); ++j)
-//		{
-//			vecDfas[1] = res.GetDfaTable()[vecOne[j]];
-//			if (!NOrMerge(vecDfas, MergeDfa))
-//			{
-//				mergeFlag = false;
-//				if (j - i == 1)
-//				{
-//					vecGroupRes.resize(vecGroupRes.size() + 1);
-//					DFAGROUP &oneGroup = vecGroupRes.back();
-//					oneGroup.dfaIds.push_back(i);
-//					oneGroup.mergeDfaId = vecOne[i];
-//				}
-//				else
-//				{
-//					res.GetDfaTable().PushBack(vecDfas[0]);
-//					vecGroupRes.resize(vecGroupRes.size() + 1);
-//					DFAGROUP &oneGroup = vecGroupRes.back();
-//					for (size_t k = i; k < j; ++k)
-//					{
-//						oneGroup.dfaIds.push_back(k);
-//					}
-//					oneGroup.mergeDfaId = res.GetDfaTable().Size() - 1;
-//				}
-//				i = j;
-//				break;
-//			}
-//			else
-//			{
-//				std::cout << "One" << std::endl;
-//				std::cout << "NO: " << j << std::endl;
-//				std::cout << "Total: " << vecOne.size() << std::endl << std::endl;
-//				vecDfas[0] = MergeDfa;
-//			}
-//		}
-//		if (mergeFlag)
-//		{
-//			if (i == vecOne.size() - 1)
-//			{
-//				vecGroupRes.resize(vecGroupRes.size() + 1);
-//				DFAGROUP &oneGroup = vecGroupRes.back();
-//				oneGroup.dfaIds.push_back(i);
-//				oneGroup.mergeDfaId = vecOne[i];
-//			}
-//			else
-//			{
-//				res.GetDfaTable().PushBack(vecDfas[0]);
-//				vecGroupRes.resize(vecGroupRes.size() + 1);
-//				DFAGROUP &oneGroup = vecGroupRes.back();
-//				for (size_t k = i; k < vecOne.size(); ++k)
-//				{
-//					oneGroup.dfaIds.push_back(k);
-//				}
-//				oneGroup.mergeDfaId = res.GetDfaTable().Size() - 1;
-//			}
-//			break;
-//		}
-//	}
-//}
 
 int main(void)
 {
@@ -624,7 +530,7 @@ int main(void)
 
 	std::cout << "Loading results from file..." << std::endl;
 	CResNew res;
-	res.ReadFromFile(_T("..\\..\\output\\result(back_up).cdt"));
+	res.ReadFromFile(_T("..\\..\\output\\result.cdt"));
 	std::cout << "Completed in " << t1.Reset() << " Sec. chains: " << res.GetRegexTbl().Size() << std::endl << std::endl;
 
 	std::cout << "Build sidToDfaIdsMap from result..." << std::endl;
@@ -692,10 +598,12 @@ int main(void)
 	std::vector<DFAGROUP> vecGroupRes;
 	vecGroupRes.reserve(10000);
 	MergeMore(vecGroupRes, res, vecOne, vecMore);
+	std::cout << "Completed in " << t1.Reset() << " Sec." << std::endl << std::endl;
+	
+	std::cout << "Put in group..." << std::endl;
 	PutInGroup(dfaIdToSidMap, sidToDfaIdsMap, vecGroupRes, res, vecOne);
-	ProcessRemain(dfaIdToSidMap, vecGroupRes, res, vecOne);
-	//SortOne(res, vecOne);
-	//MergeOne(vecGroupRes, res, vecOne);
+	SortOne(res, vecOne);
+	MergeOne(vecGroupRes, res, vecOne);
 	std::cout << "Number of groups: " << vecGroupRes.size() << std::endl;
 	std::cout << "Completed in " << t1.Reset() << " Sec." << std::endl << std::endl;
 
