@@ -3,6 +3,40 @@
 #include "dfanew.h"
 #include "md5.h"
 
+class CTimer
+{
+public:
+	__forceinline CTimer()
+	{
+		QueryPerformanceFrequency((PLARGE_INTEGER)&m_nFreq);
+		QueryPerformanceCounter((PLARGE_INTEGER)&m_nStart);
+	}
+	__forceinline double Cur()
+	{
+		__int64 nCur;
+		double dCur;
+
+		QueryPerformanceCounter((PLARGE_INTEGER)&nCur);
+		dCur = double(nCur - m_nStart) / double(m_nFreq);
+
+		return dCur;
+	}
+	__forceinline double Reset()
+	{
+		__int64 nCur;
+		double dCur;
+
+		QueryPerformanceCounter((PLARGE_INTEGER)&nCur);
+		dCur = double(nCur - m_nStart) / double(m_nFreq);
+		m_nStart = nCur;
+
+		return dCur;
+	}
+private:
+	__int64 m_nFreq;
+	__int64 m_nStart;
+};
+
 struct MD5VAL
 {
 	size_t val[4];
@@ -77,77 +111,218 @@ bool operator == (const MD5VAL &md5val1, const MD5VAL &md5val2)
 	return true;
 }
 
-//对每一列求md5值，然后将此值进行hash
+//对每一列求md5值，然后将此值进行hash,正确，与用string速度一样
+//void NAvaiEdges(CNfa &oneNfaTab, STATEID *group)
+//{
+//	typedef std::unordered_map<MD5VAL, STATEID, NFACOL_HASH> GROUPHASH;//使用md5值进行hash
+//	GROUPHASH md5Hash;
+//
+//	//std::vector<MD5VAL> colMd5Vec(DFACOLSIZE);
+//	std::vector<MD5VAL> colMd5Vec;
+//	typedef std::vector<std::vector<size_t> > COLUMN;
+//	COLUMN nfaCol(DFACOLSIZE);
+//
+//	//将列取出，使用-1间隔
+//	for(size_t i = 0; i < oneNfaTab.Size(); ++i)
+//	{
+//		for(size_t c = 0; c < DFACOLSIZE; ++c)
+//		{
+//			CStateSet &elems = oneNfaTab[i][c];
+//			if(elems.Size() != 0)
+//			{
+//				for(size_t j = 0; j < elems.Size(); ++j)
+//				{
+//					if(elems[j] > oneNfaTab.Size())
+//					{
+//						std::cout << "overflow" << std::endl;
+//						return;
+//					}
+//					nfaCol[c].push_back(elems[j]);
+//				}
+//			}
+//			nfaCol[c].push_back(-1);
+//		}
+//	}
+//
+//	//求每列的md5值
+//	MD5 md5;
+//	for(size_t c = 0; c < DFACOLSIZE; ++c)
+//	{
+//		MD5VAL md5val;
+//		md5.reset();
+//		md5.update((const void*)&nfaCol[c][0], nfaCol[c].size() * sizeof(size_t));
+//		memcpy(md5val.val, md5.digest(), 16);
+//		colMd5Vec.push_back(md5val);
+//	}
+//
+//	STATEID curId = 0;
+//	for(size_t c = 0; c < DFACOLSIZE; ++c)
+//	{
+//		GROUPHASH::iterator it = md5Hash.find(colMd5Vec[c]);
+//		if(it == md5Hash.end())
+//		{
+//			md5Hash[colMd5Vec[c]] = curId;
+//			group[c] = curId;
+//			++curId;
+//		}
+//		else
+//		{
+//			group[c] = it->second;
+//		}
+//	}
+//}
+
+struct KEY
+{
+	std::vector<size_t>* m_pKey;
+};
+
+struct GROUPSET_HASH
+{
+	size_t operator()(const std::vector<CStateSet*> &set)
+	{
+		const size_t _FNV_offset_basis = 2166136261U;
+		const size_t _FNV_prime = 16777619U;
+
+		size_t _Val = _FNV_offset_basis;
+		for (size_t _Next = 0; _Next < set.size(); ++_Next)
+			{	
+				for(size_t j = 0; j < set[_Next]->Size(); ++j)
+				{
+					_Val ^= (*set[_Next])[j];
+					_Val *= _FNV_prime;
+
+				}
+				_Val ^= (size_t)-1;
+				_Val *= _FNV_prime;
+			}
+
+		return (_Val);
+	}
+};
+
+bool operator == (const std::vector<CStateSet*> &set1, const std::vector<CStateSet*> &set2)
+{
+	size_t nSize = set1.size();
+	if(nSize != set2.size())
+	{
+		return false;
+	}
+	for(size_t i = 0; i < nSize; ++i)
+	{
+		size_t iSize1 = set1[i]->Size();
+		size_t iSize2 = set2[i]->Size();
+
+		if(iSize1 != iSize2)
+		{
+			return false;
+		}
+		if(iSize1 != 0 && iSize2 != 0)
+		{
+			if(memcmp(&(*set1[i])[0], &(*set2[i])[0], iSize1 * sizeof(size_t) != 0))
+			{
+				return false;
+			}
+		}
+	}
+	return true;
+}
+
+
+//使用std::vector<size_t>*进行hash, 正确，较快
 void NAvaiEdges(CNfa &oneNfaTab, STATEID *group)
 {
-	typedef std::unordered_map<MD5VAL, STATEID, NFACOL_HASH> GROUPHASH;//使用md5值进行hash
-	GROUPHASH md5Hash;
+	typedef std::unordered_map<std::vector<CStateSet*>, STATEID, GROUPSET_HASH> GROUPHASH;
+	GROUPHASH ghash;
+	STATEID curId = 0;
 
-	//std::vector<MD5VAL> colMd5Vec(DFACOLSIZE);
-	std::vector<MD5VAL> colMd5Vec;
-	typedef std::vector<std::vector<size_t> > COLUMN;
+	typedef std::vector<std::vector<CStateSet*> > COLUMN;
 	COLUMN nfaCol(DFACOLSIZE);
 
-	//将列取出，使用-1间隔
-	for(size_t i = 0; i < oneNfaTab.Size(); ++i)
+	for(size_t c = 0; c < DFACOLSIZE; ++c)
 	{
-		for(size_t c = 0; c < DFACOLSIZE; ++c)
+		nfaCol[c].resize(oneNfaTab.Size());
+		for(size_t i = 0; i < oneNfaTab.Size(); ++i)
 		{
 			CStateSet &elems = oneNfaTab[i][c];
 			if(elems.Size() != 0)
 			{
-				for(size_t j = 0; j < elems.Size(); ++j)
-				{
-					if(elems[j] > oneNfaTab.Size())
-					{
-						std::cout << "overflow" << std::endl;
-						return;
-					}
-					nfaCol[c].push_back(elems[j]);
-				}
+				elems.Sort();
+				nfaCol[c][i] = &oneNfaTab[i][c];
 			}
-			nfaCol[c].push_back(-1);
+			else
+			{
+				nfaCol[c][i] = &oneNfaTab[i][c];
+			}
 		}
-	}
 
-	//求每列的md5值
-	MD5 md5;
-	for(size_t c = 0; c < DFACOLSIZE; ++c)
-	{
-		MD5VAL md5val;
-		md5.reset();
-		md5.update((const void*)&nfaCol[c][0], nfaCol[c].size() * sizeof(size_t));
-		memcpy(md5val.val, md5.digest(), 16);
-		colMd5Vec.push_back(md5val);
-	}
-
-
-	STATEID curId = 0;
-	for(size_t c = 0; c < DFACOLSIZE; ++c)
-	{
-		GROUPHASH::iterator it = md5Hash.find(colMd5Vec[c]);
-		if(it == md5Hash.end())
+		GROUPHASH::iterator colIt = ghash.find(nfaCol[c]);
+		if(colIt == ghash.end())
 		{
-			md5Hash[colMd5Vec[c]] = curId;
+			ghash[nfaCol[c]] = curId;
 			group[c] = curId;
 			++curId;
 		}
 		else
 		{
-			group[c] = md5Hash[colMd5Vec[c]];
+			group[c] = colIt->second;
 		}
 	}
+
 }
 
+//string 正确 快，先取出列
+//void NAvaiEdges(CNfa &oneNfaTab, STATEID *group)
+//{
+//	typedef std::unordered_map<std::string, STATEID> GROUPHASH;//将每一列表示成string形式，每行之间用'u'间隔,元素与元素之间用','间隔
+//	GROUPHASH ghash;
+//	STATEID curId = 0;
+//	std::vector<std::string> colVec(DFACOLSIZE);
+//	for(size_t i = 0; i < oneNfaTab.Size(); ++i)
+//	{
+//		for(size_t c = 0; c < DFACOLSIZE; ++c)
+//		{
+//			CStateSet &elems = oneNfaTab[i][c];
+//			if(elems.Size() != 0)
+//			{
+//				elems.Sort();
+//				for(size_t j = 0; j < elems.Size(); ++j)
+//				{
+//					if(elems[j] > oneNfaTab.Size())
+//					{
+//						std::cout << "overflow" << std::endl;
+//						return;
+//					}
+//					colVec[c].push_back(elems[j]);
+//				}
+//			}
+//			colVec[c].push_back('u');
+//		}
+//	}
+//	for(size_t c = 0; c < DFACOLSIZE; ++c)
+//	{
+//		GROUPHASH::iterator colIt = ghash.find(colVec[c]);
+//		if(colIt == ghash.end())
+//		{
+//			ghash[colVec[c]] = curId;
+//			group[c] = curId;
+//			++curId;
+//		}
+//		else
+//		{
+//			group[c] = colIt->second;
+//		}
+//	}
+//}
 
-//使用string进行hash，正确，快
+//使用string进行hash，正确，非常快
 //void NAvaiEdges(CNfa &oneNfaTab, STATEID *group)
 //{
 //	//typedef std::unordered_map<std::vector<CStateSet*>, STATEID, GROUPSET_HASH> GROUPHASH;
 //	typedef std::unordered_map<std::string, STATEID> GROUPHASH;//将每一列表示成string形式，size=0的用'n'代表，每行之间用'u'间隔,元素与元素之间用','间隔
 //	GROUPHASH ghash;
 //	STATEID curId = 0;
-//	std::stringstream ss;
+//	//std::stringstream ss;
 //	for(size_t c = 0; c < DFACOLSIZE; ++c)
 //	{
 //		std::string str;
@@ -164,9 +339,10 @@ void NAvaiEdges(CNfa &oneNfaTab, STATEID *group)
 //						std::cout << "overflow" << std::endl;
 //						return;
 //					}
-//					ss.str("");
-//					ss << elems[j];
-//					str += ss.str();
+//					//ss.str("");
+//					//ss << elems[j];
+//					//str += ss.str();
+//					str += elems[j];
 //					str += ',';
 //				}
 //			}
@@ -185,7 +361,7 @@ void NAvaiEdges(CNfa &oneNfaTab, STATEID *group)
 //		}
 //	}
 //}
-
+//
 //原始代码，正确，慢
 //void NAvaiEdges(CNfa &oneNfaTab, STATEID *group)
 //{
