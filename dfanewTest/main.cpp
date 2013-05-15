@@ -4,8 +4,41 @@
 #include "../pcre2nfa/pcre2nfa.h"
 #include "../mergedfanew/MergeDfanew.h"
 
+class CTimer
+{
+public:
+	__forceinline CTimer()
+	{
+		QueryPerformanceFrequency((PLARGE_INTEGER)&m_nFreq);
+		QueryPerformanceCounter((PLARGE_INTEGER)&m_nStart);
+	}
+	__forceinline double Cur()
+	{
+		__int64 nCur;
+		double dCur;
 
-	void printNfa(CNfa &nfa)
+		QueryPerformanceCounter((PLARGE_INTEGER)&nCur);
+		dCur = double(nCur - m_nStart) / double(m_nFreq);
+
+		return dCur;
+	}
+	__forceinline double Reset()
+	{
+		__int64 nCur;
+		double dCur;
+
+		QueryPerformanceCounter((PLARGE_INTEGER)&nCur);
+		dCur = double(nCur - m_nStart) / double(m_nFreq);
+		m_nStart = nCur;
+
+		return dCur;
+	}
+private:
+	__int64 m_nFreq;
+	__int64 m_nStart;
+};
+
+void printNfa(CNfa &nfa)
 {
 	for (size_t j = 0; j < nfa.Size(); ++j)
 	{
@@ -52,15 +85,20 @@ void main()
 	system("pause");*/
 
 
-	const char* a ="/^abcdefg/"
-;
+	//const char* a = "/^(ab|bc)def(ab|cd)/";
+	const char* a = "/^.{2}.*ab/si";
 	CNfa nfa;
 
 	PcreToNFA(a, nfa);
 	//printNfa(nfa);
 	CDfanew dfa;
+	
+	CTimer nfa2dfatime;//用于测试
+	nfa2dfatime.Reset();//用于测试
 	dfa.FromNFA(nfa, NULL, 0);
-	//outPutDfa(dfa, "F:\\cppProject\\huawei\\PreciseMatch\\input\\dfa3_after.txt"
+	std::cout << "nfa2dfatime: " << nfa2dfatime.Reset() << std::endl;//用于测试
+
+	outPutDfa(dfa, "F:\\cppProject\\huawei\\PreciseMatch\\input\\dfa3_after.txt");
 
 	//dfa.printTerms();
 	for (size_t i = 0; i < dfa.Size(); ++i)

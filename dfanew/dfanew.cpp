@@ -190,6 +190,7 @@ DFANEWSC size_t CDfanew::FromNFA(CNfa &nfa, NFALOG *nfalog, size_t Count, bool c
 {
 	BYTE groups[DFACOLSIZE];
 	NAvaiEdges(nfa, groups);
+
 	Init(groups);
 
 	std::vector<std::pair<std::vector<size_t>, STATEID>> termStasVec;
