@@ -1,6 +1,41 @@
 #include "stdafx.h"
 #include "common.h"
 
+
+class CTimer
+{
+public:
+	__forceinline CTimer()
+	{
+		QueryPerformanceFrequency((PLARGE_INTEGER)&m_nFreq);
+		QueryPerformanceCounter((PLARGE_INTEGER)&m_nStart);
+	}
+	__forceinline double Cur()
+	{
+		__int64 nCur;
+		double dCur;
+
+		QueryPerformanceCounter((PLARGE_INTEGER)&nCur);
+		dCur = double(nCur - m_nStart) / double(m_nFreq);
+
+		return dCur;
+	}
+	__forceinline double Reset()
+	{
+		__int64 nCur;
+		double dCur;
+
+		QueryPerformanceCounter((PLARGE_INTEGER)&nCur);
+		dCur = double(nCur - m_nStart) / double(m_nFreq);
+		m_nStart = nCur;
+
+		return dCur;
+	}
+private:
+	__int64 m_nFreq;
+	__int64 m_nStart;
+};
+
 RULEOPTION::RULEOPTION()
 {
 	m_pPattern = new std::string;
@@ -190,12 +225,24 @@ COMMONSC void CNfa::Reserve(size_t _Count)
 
 COMMONSC void CNfa::Resize(size_t _Newsize)
 {
+	//CTimer t;
 	m_pNfa->resize(_Newsize);
+	//g_dTimer += t.Reset();
 }
 
 COMMONSC size_t CNfa::Size() const
 {
 	return m_pNfa->size();
+}
+
+COMMONSC void CNfa::Clear()
+{
+	delete m_pNfa;
+	delete m_pPcre;
+	delete m_DfaTerms;
+	m_pNfa = new std::vector<CNfaRow>;
+	m_pPcre = new std::string;
+	m_DfaTerms = new std::vector<DFATERMS>;
 }
 
 COMMONSC void CNfa::FromDfa(CDfa &dfa)
@@ -268,11 +315,11 @@ COMMONSC  void CNfa::PushDfaTerms(DFATERMS dfaTerms)
 	m_DfaTerms->push_back(dfaTerms);
 }
 
-COMMONSC	size_t CNfa::GetDfaTermsNum()
+COMMONSC size_t CNfa::GetDfaTermsNum()
 {
 	return m_DfaTerms->size();
 }
-COMMONSC	CNfa::DFATERMS CNfa::GetDfaTerms(size_t num)
+COMMONSC CNfa::DFATERMS CNfa::GetDfaTerms(size_t num)
 {
 	return (*m_DfaTerms)[num];
 }
@@ -310,12 +357,12 @@ COMMONSC CDfaRow& CDfaRow::operator=(const CDfaRow &other)
 	return *this;
 }
 
-COMMONSC STATEID& CDfaRow::operator[](BYTE index)
+COMMONSC STATEID& CDfaRow::operator[](STATEID index)
 {
 	return (*m_pDest)[index];
 }
 
-COMMONSC const STATEID& CDfaRow::operator[](BYTE index) const
+COMMONSC const STATEID& CDfaRow::operator[](STATEID index) const
 {
 	return (*m_pDest)[index];
 }
@@ -473,11 +520,11 @@ COMMONSC void CDfa::PushTermSet(TERMSET oneTerm)
 	m_TermSet->push_back(oneTerm);
 }
 
-COMMONSC	STATEID CDfa::GetTermSetNum()
+COMMONSC STATEID CDfa::GetTermSetNum()
 {
-	return m_TermSet->size();
+	return (STATEID)m_TermSet->size();
 }
-COMMONSC	CDfa::TERMSET CDfa::GetTermSet(STATEID num)
+COMMONSC CDfa::TERMSET CDfa::GetTermSet(STATEID num)
 {
 	return (*m_TermSet)[num];
 }
@@ -573,6 +620,194 @@ COMMONSC	CDfa::TERMSET CDfa::GetTermSet(STATEID num)
 //	return (*m_pChain)[nIdx];
 //}
 
+COMMONSC CCString::CCString()
+{
+	m_pString = new std::string;
+}
+
+COMMONSC CCString::CCString(const char *pStr)
+{
+	m_pString = new std::string(pStr);
+}
+
+COMMONSC void CCString::Append(const char* pChar)
+{
+	m_pString->append(pChar);;
+}
+
+COMMONSC CCString::~CCString()
+{
+	delete m_pString;
+}
+	
+COMMONSC CCString::CCString(const CCString &other)
+{
+	m_pString = new std::string;
+	*this = other;
+}
+
+COMMONSC CCString& CCString::operator = (const CCString &other)
+{
+	*this->m_pString = *other.m_pString;
+	return *this;
+}
+COMMONSC char CCString::operator[](size_t nIdx) const
+{
+	return (*m_pString)[nIdx];
+}
+	
+COMMONSC const size_t CCString::Size() const
+{
+	return m_pString->size();
+}
+
+COMMONSC void CCString::PushBack(const char nChar)
+{
+	m_pString->push_back(nChar);
+}
+COMMONSC char CCString::Back() const
+{
+	return m_pString->back();
+}
+
+COMMONSC const char* CCString::GetString()
+{
+	return m_pString->c_str();
+}
+
+COMMONSC const char* CCString::C_Str()
+{
+	return m_pString->c_str();
+}
+
+COMMONSC void CCString::Clear()
+{
+	m_pString->clear();
+}
+COMMONSC bool CCString::Empty()
+{
+	return m_pString->empty();
+}
+
+COMMONSC CRegChain::CRegChain()
+{
+	m_pRegList = new std::vector<CCString>;
+	m_pSigList = new std::vector<SIGNATURE>;
+}
+
+COMMONSC CRegChain::~CRegChain()
+{
+	delete m_pRegList;
+	delete m_pSigList;
+}
+
+COMMONSC CRegChain::CRegChain(const CRegChain &other)
+{
+	m_pRegList = new std::vector<CCString>;
+	m_pSigList = new std::vector<SIGNATURE>;
+	*this = other;
+}
+
+COMMONSC size_t CRegChain::Size() const
+{
+	return m_pRegList->size();
+}
+	
+COMMONSC CCString& CRegChain::Back() const
+{
+	return m_pRegList->back();
+}
+COMMONSC void CRegChain::PushBack(CCString &pcreStr)
+{
+	m_pRegList->push_back(pcreStr);
+}
+COMMONSC CCString& CRegChain::operator[](size_t nIdx)
+{
+	return (*m_pRegList)[nIdx];
+}
+COMMONSC const CRegChain& CRegChain::operator = (const CRegChain &other)
+{
+	*this->m_pRegList = *other.m_pRegList;
+	*this->m_pSigList = *other.m_pSigList;
+	return *this;
+}
+
+COMMONSC void CRegChain::Resize(size_t nSize)
+{
+	m_pRegList->resize(nSize);
+}
+
+COMMONSC size_t CRegChain::GetSigCnt() const
+{
+	return m_pSigList->size();
+}
+
+COMMONSC void CRegChain::PushBackSig(SIGNATURE &signature)
+{
+	m_pSigList->push_back(signature);
+}
+
+COMMONSC SIGNATURE& CRegChain::GetSig(size_t nIdx) const
+{
+	return (*m_pSigList)[nIdx];
+}
+
+COMMONSC void CRegChain::Unique()
+{
+	std::sort(m_pSigList->begin(), m_pSigList->end());
+	m_pSigList->erase(std::unique(m_pSigList->begin(), m_pSigList->end()), m_pSigList->end());
+}
+
+COMMONSC CRegRule::CRegRule()
+{
+	m_pRegVec = new std::vector<CRegChain>;
+}
+
+COMMONSC CRegRule::~CRegRule()
+{
+	delete m_pRegVec;
+}
+
+COMMONSC CRegRule::CRegRule(const CRegRule &other)
+{
+	m_pRegVec = new std::vector<CRegChain>;
+	*this = other;
+}
+
+COMMONSC size_t CRegRule::Size() const
+{
+	return m_pRegVec->size();
+}
+
+COMMONSC CRegChain& CRegRule::Back() const
+{
+	return m_pRegVec->back();
+}
+
+COMMONSC void CRegRule::Reserve(size_t nCount)
+{
+	m_pRegVec->reserve(nCount);
+}
+COMMONSC void CRegRule::Resize(size_t nSize)
+{
+	m_pRegVec->resize(nSize);
+}
+
+COMMONSC void CRegRule::PushBack(CRegChain &nRegChain)
+{
+	m_pRegVec->push_back(nRegChain);
+}
+
+COMMONSC CRegChain& CRegRule::operator[](size_t nIdx)
+{
+	return (*m_pRegVec)[nIdx];
+}
+
+COMMONSC const CRegRule& CRegRule::operator = (const CRegRule &other)
+{
+	*this->m_pRegVec = *other.m_pRegVec;
+	return *this;
+}
 
 COMMONSC CNfaTree::CNfaTree()
 {

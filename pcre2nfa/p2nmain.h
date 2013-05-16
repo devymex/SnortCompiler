@@ -4,7 +4,7 @@
 #include "pcre2nfa.h"
 #include "../common/common.h"
 
-#define SC_LIMIT 100
+#define SC_LIMIT 200
 
 #define IMM2_SIZE 2
 #define LINK_SIZE 2

@@ -194,6 +194,10 @@ COMPILER size_t CRes::WriteToFile(LPCTSTR filename)
 	for (size_t i = 0; i < m_dfaTbl.Size(); ++i)
 	{
 		WriteNum(fout, m_dfaTbl[i].Size(), sizeof(STATEID));
+		if (m_dfaTbl[i].Size() == 0)
+		{
+			continue;
+		}
 		//写分组
 		for (size_t j = 0; j < DFACOLSIZE; ++j)
 		{
@@ -275,6 +279,10 @@ COMPILER size_t CRes::ReadFromFile(LPCTSTR filename)
 	{
 		CDfa &dfa = m_dfaTbl[i];
 		fin.read((char*)&dfaSize, sizeof(STATEID));
+		if (dfaSize == 0)
+		{
+			continue;
+		}
 		//读分组
 		BYTE pGroup[DFACOLSIZE];
 		for (size_t j = 0; j < DFACOLSIZE; ++j)
@@ -330,7 +338,8 @@ void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 	else
 	{
 		CNfaTree nfatree;
-		size_t flag = InterpretRule(rule, nfatree);
+		size_t flag = 0;
+		//size_t flag = InterpretRule(rule, nfatree);
 		if (flag == SC_ERROR)
 		{
 			ruleResult.m_nResult = COMPILEDRULE::RES_ERROR;
@@ -351,15 +360,21 @@ void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 			for (size_t i = 0; i < nIncrement; ++i)
 			{
 				nId = nCursize + i;
-				CDfa &dfa = result.GetDfaTable()[nId];
-				dfa.SetId(nId);
+				CDfa dfa;
 				NfaToDfa(nfatree[i], dfa);
 				if (dfa.Size() > SC_STATELIMIT)
 				{
 					ruleResult.m_nResult = COMPILEDRULE::RES_EXCEEDLIMIT;
-					ruleResult.m_dfaIds.Clear();
-					result.GetDfaTable().Resize(nCursize);
-					break;
+					result.GetDfaTable()[nId].SetId(nId);
+					//ruleResult.m_dfaIds.Clear();
+					//result.GetDfaTable().Resize(nCursize);
+					//break;
+				}
+				else
+				{
+					CDfa &minDfa = result.GetDfaTable()[nId];
+					DfaMin(dfa, minDfa);
+					minDfa.SetId(nId);
 				}
 				ruleResult.m_dfaIds.PushBack(nId);
 			}

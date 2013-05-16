@@ -15,9 +15,8 @@ void ReadPcres(std::vector<std::string> &vecPcres)
 
 void main()
 {
-	const char* a = "/BM/";
+	const char* a = "/.*AUTH\\s[^\\n]{2}/";
 	CNfa nfa;
-	nfa.Resize(1);
 	PcreToNFA(a, nfa);
 	for (size_t i = 0; i < nfa.Size(); ++i)
 	{

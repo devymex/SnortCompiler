@@ -2,11 +2,6 @@
 #include "CreDfa.h"
 #include "nfa2dfa.h"
 
-typedef std::list<STATEID> STALIST;
-typedef std::list<STATEID>::iterator STALIST_ITER;
-typedef std::list<std::list<STATEID>> SETLIST;
-typedef std::list<std::list<STATEID>>::iterator SETLIST_ITER;
-
 CREDFA size_t NfaToDfa(CNfa &oneNfaTab, CDfa &dfaTab, bool combine)
 {
 	BYTE groups[DFACOLSIZE];
@@ -146,15 +141,18 @@ CREDFA size_t NfaToDfa(CNfa &oneNfaTab, CDfa &dfaTab, bool combine)
 	return 0;
 }
 
-void RemoveUnreachable(const std::vector<STATEID> *Tab, const STALIST &begs, const size_t &col, std::vector<BYTE> &reachable)
+void RemoveUnreachable(const std::vector<STATEID> *Tab, const STALIST &begs, const size_t &col, std::vector<STATEID> &reachable)
 {
+	//mark state after traversal, 0 is unreachable and 1 is reachable
 	size_t stas = reachable.size();
 	std::vector<BYTE> staFlags(stas, 0);
 
+	//reserve current visited states
 	std::vector<size_t> staStack;
 	staStack.reserve(stas);
 
 	staStack.assign(begs.begin(), begs.end());
+	//extract each state in staStack until all states have visited
 	for (; !staStack.empty(); )
 	{
 		size_t nSta = staStack.back();
@@ -162,6 +160,7 @@ void RemoveUnreachable(const std::vector<STATEID> *Tab, const STALIST &begs, con
 		if (staFlags[nSta] == 0)
 		{
 			staFlags[nSta] = 1;
+			//according to each of transitions add states to staStack 
 			for (size_t i = 0; i < col; ++i)
 			{
 				for (size_t j = 0; j < Tab[nSta * col + i].size(); ++j)
@@ -178,15 +177,17 @@ void RemoveUnreachable(const std::vector<STATEID> *Tab, const STALIST &begs, con
 	}
 }
 
-void MergeReachable(const CDfa &oneDfaTab, std::vector<BYTE> &reachable, CDfa &tmpDfa)
+void MergeReachable(const CDfa &oneDfaTab, std::vector<STATEID> &reachable, CDfa &tmpDfa)
 {
+	//count reachable states 
 	size_t nRcbCnt = std::count(reachable.begin(), reachable.end(), 2);
-	tmpDfa.Resize(nRcbCnt);
+	tmpDfa.Resize((STATEID)nRcbCnt);
 	tmpDfa.SetGroup(oneDfaTab.GetGroup());
 
 	STATEID nNewIdx = 0;
 	size_t nColNum = tmpDfa.GetColNum();
-	for (std::vector<BYTE>::iterator iter = reachable.begin(); iter != reachable.end(); ++iter)
+	//reachable states in old DFA copy to new DFA and renumber the new DFA
+	for (std::vector<STATEID>::iterator iter = reachable.begin(); iter != reachable.end(); ++iter)
 	{
 		if (2 == *iter)
 		{
@@ -201,10 +202,11 @@ void MergeReachable(const CDfa &oneDfaTab, std::vector<BYTE> &reachable, CDfa &t
 		}
 	}
 
-	for (size_t i = 0; i < nRcbCnt; ++i)
+	//the new number replace the old in new DFA
+	for (STATEID i = 0; i < nRcbCnt; ++i)
 	{
 		CDfaRow &curRow = tmpDfa[i];
-		for (size_t j = 0; j < nColNum; ++j)
+		for (STATEID j = 0; j < nColNum; ++j)
 		{
 			if (curRow[j] != STATEID(-1))
 			{
@@ -216,18 +218,26 @@ void MergeReachable(const CDfa &oneDfaTab, std::vector<BYTE> &reachable, CDfa &t
 
 void PartitionNonDisState(CDfa &tmpDfa, std::vector<STATEID> *pRevTbl, SETLIST &pSets)
 {
+	//every two states in the same partition are equivalent 
+	//if they have the same behavior for all the input sequences,
+	//and the partitions are reserved in pSets.
 
 	size_t nColNum = tmpDfa.GetColNum();
 
+	//store the iterator of patition will be visited into wSets
 	std::list<SETLIST_ITER> wSets;
 	SETLIST_ITER iLast = pSets.end();
 	--iLast;
-	
+
+	//initialize wSets with all final states
 	for (SETLIST_ITER iCurSet = pSets.begin(); iCurSet != iLast; ++iCurSet)
 	{
 		wSets.push_back(iCurSet);
 	}
 
+	//each element in ableToW present a property of according state of tmpDfa,
+	//and has two labels, 0 and 1. 1 indicates the according state has the specific
+	//transition to one state of curWSet, 0 otherwise
 	std::vector<BYTE> ableToW(tmpDfa.Size(), 0);
 	bool bAllZero = true;
 	for (; !wSets.empty(); )
@@ -236,6 +246,9 @@ void PartitionNonDisState(CDfa &tmpDfa, std::vector<STATEID> *pRevTbl, SETLIST &
 		wSets.pop_front();
 		for (BYTE byChar = 0; byChar < nColNum; ++byChar)
 		{
+			//initialize the ableToW
+			//for each state in curWSet find source states of it in pRecTbl
+			//if exist at last one source state to curWSet, the bAllZero is set to false
 			for (STALIST_ITER iSta = curWSet.begin(); iSta != curWSet.end(); ++iSta)
 			{
 				std::vector<STATEID> &ableToI = pRevTbl[*iSta * nColNum + byChar];
@@ -249,6 +262,9 @@ void PartitionNonDisState(CDfa &tmpDfa, std::vector<STATEID> *pRevTbl, SETLIST &
 			{
 				for (SETLIST_ITER iPSet = pSets.begin(); iPSet != pSets.end(); ++iPSet)
 				{
+					//each partition in pSets,according to the label of a state in partition adjust position 
+					//all unvisited states lie in the front of list, visited states locate
+					//at the rear end of list 
 					for (STALIST_ITER iCurSta = iPSet->begin(); iCurSta != iPSet->end(); )
 					{
 						if (ableToW[*iCurSta] == 0)
@@ -262,6 +278,8 @@ void PartitionNonDisState(CDfa &tmpDfa, std::vector<STATEID> *pRevTbl, SETLIST &
 							++iCurSta;
 						}
 					} 
+
+					//mark the position of two new partition
 					size_t nUnableCnt = 0;
 					STALIST_ITER iCutBeg = iPSet->begin(), iCutEnd = iPSet->end();
 					for (; iCutBeg != iPSet->end(); ++iCutBeg)
@@ -272,11 +290,15 @@ void PartitionNonDisState(CDfa &tmpDfa, std::vector<STATEID> *pRevTbl, SETLIST &
 						}
 						++nUnableCnt;
 					}
+
+					//record start position of the less partition 
 					if (nUnableCnt <= iPSet->size() / 2)
 					{
 						iCutEnd = iCutBeg;
 						iCutBeg = iPSet->begin();
 					}
+
+					//the less partition insert into pSets, its iterator insert into wSets
 					if (iCutBeg != iCutEnd)
 					{
 						SETLIST_ITER iOldSet = iPSet;
@@ -285,6 +307,8 @@ void PartitionNonDisState(CDfa &tmpDfa, std::vector<STATEID> *pRevTbl, SETLIST &
 						wSets.push_back(iPSet);
 					}
 				}
+
+				//initialize ableToW and bAllZero before read the next char, 
 				ZeroMemory(&ableToW[0], ableToW.size());
 				bAllZero = true;
 			}
@@ -296,10 +320,12 @@ void MergeNonDisStates(CDfa &tmpDfa, SETLIST &Partition, CDfa &minDfaTab)
 {
 	std::vector<STATEID> sta2Part(tmpDfa.Size());
 
+	//set group of new DFA 
 	minDfaTab.SetGroup(tmpDfa.GetGroup());
-	minDfaTab.Resize(Partition.size());
+	minDfaTab.Resize((STATEID)Partition.size());
 
-	size_t nSetIdx = 0;
+	//an old state which belongs to a new partition and set start state
+	STATEID nSetIdx = 0;
 	for (SETLIST_ITER iSet = Partition.begin(); iSet != Partition.end(); ++iSet)
 	{
 		for (STALIST_ITER iSta = iSet->begin(); iSta != iSet->end(); ++iSta)
@@ -313,19 +339,22 @@ void MergeNonDisStates(CDfa &tmpDfa, SETLIST &Partition, CDfa &minDfaTab)
 		++nSetIdx;
 	}
 
+	//set new DFA and modify new number
 	nSetIdx = 0;
 	for (SETLIST_ITER iSet = Partition.begin(); iSet != Partition.end(); ++iSet)
 	{
 		for (BYTE iCol = 0; iCol != minDfaTab.GetColNum(); ++iCol)
 		{
 			CDfaRow &orgRow = tmpDfa[iSet->front()];
-			STATEID nDest = -1;
+			STATEID nDest = STATEID(-1);
 			if (orgRow[iCol] != STATEID(-1))
 			{
 				nDest = sta2Part[orgRow[iCol]];
 			}
 			minDfaTab[nSetIdx][iCol] = nDest;
 		}
+
+		//set a state attribute
 		minDfaTab[nSetIdx].SetFlag(tmpDfa[iSet->front()].GetFlag());
 		++nSetIdx;
 	}
@@ -334,12 +363,13 @@ void MergeNonDisStates(CDfa &tmpDfa, SETLIST &Partition, CDfa &minDfaTab)
 
 CREDFA size_t DfaMin(CDfa &oneDfaTab, CDfa &minDfaTab)
 {
+	//error: DFA is empty 
 	if (oneDfaTab.Size() == 0)
 	{
 		return size_t(-1);
 	}
 
-	// Extract final states from a dfa;
+	// Extract terminal states from a dfa, initialize partition with terminal states and normal states
 	std::list<std::list<STATEID>> Partition(1);
 	std::list<STATEID> FinalStas;
 	for (STATEID i = 0; i < oneDfaTab.Size(); ++i)
@@ -356,19 +386,21 @@ CREDFA size_t DfaMin(CDfa &oneDfaTab, CDfa &minDfaTab)
 		}
 	}
 
+	//error: terminal states or normal states are empty
 	if (Partition.size() == 1 || Partition.back().empty())
 	{
 		return size_t(-2);
 	}
 
+	//generate positive traverse table
 	size_t row = oneDfaTab.Size();
 	size_t col = oneDfaTab.GetColNum();
 	std::vector<STATEID> *pPosTab = new std::vector<STATEID>[row * col];
-	for (size_t i = 0; i < row; ++i)
+	for (STATEID i = 0; i < row; ++i)
 	{
-		for (size_t j = 0; j < col; ++j)
+		for (STATEID j = 0; j < col; ++j)
 		{
-			STATEID nDest = oneDfaTab[i][j];
+			STATEID nDest = (STATEID)oneDfaTab[i][j];
 			if (nDest != STATEID(-1))
 			{
 				pPosTab[i * col + j].push_back(nDest);
@@ -376,19 +408,21 @@ CREDFA size_t DfaMin(CDfa &oneDfaTab, CDfa &minDfaTab)
 		}
 	}
 
-	std::vector<BYTE> reachable(oneDfaTab.Size(), 0);
+	std::vector<STATEID> reachable(oneDfaTab.Size(), 0);
 	std::list<STATEID> StartStas;
 	StartStas.push_back(0);
 
+	//record states that will be visited from positive traverse table
 	RemoveUnreachable(pPosTab, StartStas, col, reachable);
 	delete []pPosTab;
 
+	//generate reverse traverse table	
 	std::vector<STATEID> *pRevTab = new std::vector<STATEID>[row * col];
-	for (size_t i = 0; i < row; ++i)
+	for (STATEID i = 0; i < row; ++i)
 	{
-		for (size_t j = 0; j < col; ++j)
+		for (STATEID j = 0; j < col; ++j)
 		{
-			STATEID nDest = oneDfaTab[i][j];
+			STATEID nDest = (STATEID)oneDfaTab[i][j];
 			if (nDest != STATEID(-1))
 			{
 				pRevTab[nDest * col + j].push_back(STATEID(i));
@@ -396,12 +430,17 @@ CREDFA size_t DfaMin(CDfa &oneDfaTab, CDfa &minDfaTab)
 		}
 	}
 
+	//record states that will be visited from reverse traverse table
 	RemoveUnreachable(pRevTab, FinalStas, col, reachable);
 
+	//remove unreachable states, generate new DFA
 	CDfa tmpDfa;
 	MergeReachable(oneDfaTab, reachable, tmpDfa);
 
+	//divide nondistinguishable states
 	PartitionNonDisState(tmpDfa, pRevTab, Partition);
+
+	//DFA minization
 	MergeNonDisStates(tmpDfa, Partition, minDfaTab);
 
 	minDfaTab.SetId(oneDfaTab.GetId());

@@ -206,7 +206,7 @@ template<typename _Iter>
 size_t FormatPcre (_Iter pBeg, _Iter pEnd, OPTIONPCRE &pcre)
 {
 	pcre.nFlags = 0;
-	//If rule includes '!',we should delete this rule
+
 	if (*std::find_if_not(pBeg, pEnd, ISSPACE()) == '!')
 	{
 		return size_t(-2);
@@ -427,9 +427,12 @@ size_t ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
 				{
 					nFlag |= CSnortRule::RULE_HASNOT;
 				}
-				nResult = size_t(-1);
-				delete pPcre;
-				break;
+				else
+				{
+					nResult = size_t(-1);
+					delete pPcre;
+					break;
+				}
 			}
 			snortRule.PushBack(pPcre);
 		}
@@ -591,6 +594,7 @@ CRECHANFA size_t CompileRuleSet(LPCTSTR fileName, RECIEVER recv, LPVOID lpUser)
 				rIt != rules.end(); ++rIt)
 			{
 				std::cout << rIt - rules.begin() + 1 << std::endl;
+				//std::cout << ": " << g_dTimer << std::endl;
 				CompileRule(rIt->c_str(), recv, lpUser);
 			}
 		}
@@ -776,26 +780,40 @@ void outPut(CNfa &nfa, std::string &fileName)
 	fout.close();
 }
 
-size_t content2Pcre(OPTIONCONTENT *pContent, std::string &pcreStr)
+size_t content2Pcre(OPTIONCONTENT *pContent, CCString &pcreStr)
 {
 	std::stringstream ss;
-	pcreStr = "/^";
+	pcreStr = ("/^");
 	if((pContent->nFlags & CF_OFFSET) && pContent->nOffset > 0)
 	{
 		ss.str("");
 		ss << pContent->nOffset;
-		pcreStr += ".{" + ss.str() + "}";
+		pcreStr.Append(".{");
+		pcreStr.Append(ss.str().c_str());
+		pcreStr.Append("}");
 	}
 	if((pContent->nFlags & CF_DISTANCE) && pContent->nDistance > 0)
 	{
 		ss.str("");
 		ss << pContent->nDistance;
-		pcreStr += ".{" + ss.str() + "}";
+		pcreStr.Append(".{");
+		pcreStr.Append(ss.str().c_str());
+		pcreStr.Append("}");
 	}
 	if(!((pContent->nFlags & CF_DEPTH) || pContent->nFlags & CF_WITHIN))
 	{
 		//既没有depth也没有within
-		pcreStr += ".*";
+		if(!((pContent->nFlags & CF_OFFSET) || (pContent->nFlags & CF_DISTANCE))
+			|| ((pContent->nFlags & CF_OFFSET) && pContent->nOffset == 0)
+			|| ((pContent->nFlags & CF_DISTANCE) && pContent->nDistance == 0))
+		{
+			//既没有offset约束也没有distance约束
+			pcreStr = "/";
+		}
+		else
+		{
+			pcreStr.Append(".*");
+		}
 	}
 	else
 	{
@@ -816,7 +834,9 @@ size_t content2Pcre(OPTIONCONTENT *pContent, std::string &pcreStr)
 		{
 			ss.str("");
 			ss << n;
-			pcreStr += ".{0," + ss.str() + "}";
+			pcreStr.Append(".{0,");
+			pcreStr.Append(ss.str().c_str());
+			pcreStr.Append("}");
 		}
 	}
 
@@ -827,68 +847,112 @@ size_t content2Pcre(OPTIONCONTENT *pContent, std::string &pcreStr)
 	std::string::iterator  opValueBeg= con.begin(), opValueEnd = con.end();
 	std::vector<BYTE> conVec;
 	FormatOptionContent(opValueBeg, opValueEnd, conVec, CONPCRE);
-	char* str = (char*)&conVec[0];
-	pcreStr.append(str);
+	const char* str = (char*)&conVec[0];
+	pcreStr.Append(str);
 
 	if(pContent->nFlags & CF_NOCASE)
 	{
-		pcreStr += "/si";
+		pcreStr.Append("/si");
 	}
 	else
 	{
-		pcreStr += "/s";
+		pcreStr.Append("/s");
 	}
 	return 0;
 }
 
 //convert rule to pcre list
-//CRECHANFA void Rule2PcreList(const CSnortRule &rule, CRegRule &regrule)
-//{
-//	regrule.Reserve(nfaTreeReserve);
-//	size_t regChain_size = 0;
-//	regrule.Resize(++regChain_size);
-//	size_t reg_size = 0;
-//
-//	for(size_t i = 0; i < rule.Size(); ++i)
-//	{
-//		OPTIONCONTENT *pContent = dynamic_cast<OPTIONCONTENT*>(rule[i]);
-//		OPTIONPCRE *pPcre = dynamic_cast<OPTIONPCRE*>(rule[i]);
-//		
-//		if(pContent != NULL)
-//		{
-//			if(!((pContent->nFlags & CF_DISTANCE) || (pContent->nFlags& CF_WITHIN)))
-//			{
-//				if(regrule.Back().Size() != 0)
-//				{
-//					regrule.Resize(++regChain_size);
-//					reg_size = 0;
-//				}
-//			}
-//			std::string conPcreStr = "";
-//			content2Pcre(pContent, conPcreStr);
-//			regrule.Back().PushBack(conPcreStr);
-//		}
-//		else if(pPcre != NULL)
-//		{
-//			if(!(pPcre->nFlags & PF_R))
-//			{
-//				if(regrule.Back().Size() != 0)
-//				{
-//					regrule.Resize(++regChain_size);
-//					reg_size = 0;
-//				}
-//			}
-//			std::string strPattern;
-//			strPattern.resize(pPcre->GetPattern(NULL, 0));
-//			pPcre->GetPattern(&strPattern[0], strPattern.size());
-//			regrule.Back().PushBack(strPattern);
-//
-//			std::cout << "pcre:" << strPattern << "; ";//测试输出
-//		}
-//	}
-//
-//	regrule.Reserve(++regChain_size);
-//}
+CRECHANFA size_t Rule2PcreList(const CSnortRule &rule, CRegRule &regrule)
+{
+	regrule.Reserve(nfaTreeReserve);
+	size_t regChain_size = 0;
+	regrule.Resize(++regChain_size);
+	int cFlag = 0;
+
+	for(size_t i = 0; i < rule.Size(); ++i)
+	{
+		OPTIONCONTENT *pContent = dynamic_cast<OPTIONCONTENT*>(rule[i]);
+		OPTIONPCRE *pPcre = dynamic_cast<OPTIONPCRE*>(rule[i]);
+		
+		if(pContent != NULL)
+		{
+			if(!((pContent->nFlags & CF_DISTANCE) || (pContent->nFlags& CF_WITHIN)))
+			{
+				if(regrule.Back().Size() != 0)
+				{
+					regrule.Resize(++regChain_size);
+				}
+			}
+			CCString conPcreStr;
+			cFlag = content2Pcre(pContent, conPcreStr);
+			if(cFlag != 0)
+			{
+				return cFlag;
+			}
+			//提取content中的signature
+			if(pContent->vecconts.size() >= 4)
+			{
+				for(std::vector<BYTE>::iterator sigIt = pContent->vecconts.begin();
+					sigIt + 3 != pContent->vecconts.end(); ++sigIt)
+				{
+					SIGNATURE sig = *(SIGNATURE*)&(*sigIt);
+					//BYTE *p = (BYTE*)&sig;
+					//std::cout << p << "  ";
+					//for(size_t j = 0; j < 4; ++j)
+					//{
+					//	BYTE c = *(p + j);
+					//	std::cout << (size_t)c << " ";
+					//}
+					//std::cout << std::endl;
+					regrule.Back().PushBackSig(sig);
+				}
+			}
+			regrule.Back().PushBack(conPcreStr);
+		}
+		else if(pPcre != NULL)
+		{
+			if(!(pPcre->nFlags & PF_R))
+			{
+				if(regrule.Back().Size() != 0)
+				{
+					regrule.Resize(++regChain_size);
+				}
+			}
+			std::string tmpStr;
+			tmpStr.resize(pPcre->GetPattern(NULL, 0));
+			pPcre->GetPattern(&tmpStr[0], tmpStr.size());
+			CCString strPattern(tmpStr.c_str());
+			regrule.Back().PushBack(strPattern);
+		}
+	}
+
+	regrule.Reserve(++regChain_size);
+	for(size_t i = 0; i < regrule.Size(); ++i)
+	{
+		if(regrule[i].GetSigCnt() > 1)
+		{
+			regrule[i].Unique();
+		}
+	}
+	return 0;
+}
+
+CRECHANFA size_t CRegChainToNFA(CRegChain &regchain, CNfa &nfa)
+{
+	nfa.Reserve(nfaReserve);
+	int flag = 0;
+	for(size_t i = 0; i < regchain.Size(); ++i)
+	{
+		flag = PcreToNFA(regchain[i].C_Str(), nfa);
+		if(flag != 0)
+		{
+			nfa.Clear();
+			return flag;
+		}
+	}
+	nfa.Reserve(nfa.Size() + 1);
+	return 0;
+}
 
 //原始程序
 //CRECHANFA size_t InterpretRule(const CSnortRule &rule, CNfaTree &outTree)
@@ -954,87 +1018,89 @@ size_t content2Pcre(OPTIONCONTENT *pContent, std::string &pcreStr)
 //}
 
 
-CRECHANFA size_t InterpretRule(const CSnortRule &rule, CNfaTree &outTree)
-{
-	outTree.Reserve(nfaTreeReserve);
-
-	size_t flag = 0;
-	size_t cFlag = 0;
-	size_t nfaChain_size = 0;
-	outTree.Resize(++nfaChain_size);
-	outTree.Back().Reserve(nfaReserve);
-	std::string str = "";
-
-	for(size_t i = 0; i < rule.Size(); ++i)
-	{
-		OPTIONCONTENT *pContent = dynamic_cast<OPTIONCONTENT*>(rule[i]);
-		OPTIONPCRE *pPcre = dynamic_cast<OPTIONPCRE*>(rule[i]);
-		std::string pcreStr = "";
-		if(pContent != NULL)
-		{
-			if(!((pContent->nFlags & CF_DISTANCE) || (pContent->nFlags& CF_WITHIN)))
-			{
-				if(outTree.Back().Size() != 0)
-				{
-					outTree.Back().Reserve(outTree.Back().Size() + 1);
-					outTree.Back().SetPcre(str.c_str());
-					str = "";
-					outTree.Resize(++nfaChain_size);
-					outTree.Back().Reserve(nfaReserve);
-				}
-			}
-			cFlag = content2Pcre(pContent, pcreStr);
-			if(cFlag != 0)
-			{
-				return cFlag;
-			}
-		}
-		else if(pPcre != NULL)
-		{
-
-			if(!(pPcre->nFlags & PF_R))
-			{
-				if(outTree.Back().Size() != 0)
-				{
-					outTree.Back().Reserve(outTree.Back().Size() + 1);
-					outTree.Back().SetPcre(str.c_str());
-					str = "";
-					outTree.Resize(++nfaChain_size);
-					outTree.Back().Reserve(nfaReserve);
-				}
-			}
-			pcreStr.resize(pPcre->GetPattern(NULL, 0));
-			pPcre->GetPattern(&pcreStr[0], pcreStr.size());
-		}
-		flag = PcreToNFA(pcreStr.c_str(), outTree.Back());
-		if(flag != 0)
-		{
-			return flag;
-		}
-
-		//std::string str = outTree.Back().GetPcre();
-
-		//erase header and tail of a pcre 
-		std::string::iterator it1 = std::find(pcreStr.begin(), pcreStr.end(), '/');
-		if(*(++it1) == '^')
-		{
-			pcreStr.erase(pcreStr.begin(), ++it1);
-		}
-		else
-		{
-			pcreStr.erase(pcreStr.begin(), it1);
-			std::string tmp = ".*";
-			pcreStr.insert(pcreStr.begin(), tmp.begin(), tmp.end());
-		}
-		pcreStr.erase(std::find(pcreStr.rbegin(), pcreStr.rend(), '/').base() - 1, pcreStr.end());
-
-		str += pcreStr;
-	}
-
-	outTree.Reserve(++nfaChain_size);
-	outTree.Back().SetPcre(str.c_str());
-	return 0;
-}
+//CRECHANFA size_t InterpretRule(const CSnortRule &rule, CNfaTree &outTree)
+//{
+//	outTree.Reserve(nfaTreeReserve);
+//
+//	size_t flag = 0;
+//	size_t cFlag = 0;
+//	size_t nfaChain_size = 0;
+//	outTree.Resize(++nfaChain_size);
+//	outTree.Back().Reserve(nfaReserve);
+//	std::string str = "";
+//
+//	for(size_t i = 0; i < rule.Size(); ++i)
+//	{
+//		OPTIONCONTENT *pContent = dynamic_cast<OPTIONCONTENT*>(rule[i]);
+//		OPTIONPCRE *pPcre = dynamic_cast<OPTIONPCRE*>(rule[i]);
+//		std::string pcreStr = "";
+//		if(pContent != NULL)
+//		{
+//			if(!((pContent->nFlags & CF_DISTANCE) || (pContent->nFlags& CF_WITHIN)))
+//			{
+//				if(outTree.Back().Size() != 0)
+//				{
+//					outTree.Back().Reserve(outTree.Back().Size() + 1);
+//					outTree.Back().SetPcre(str.c_str());
+//					str = "";
+//					outTree.Resize(++nfaChain_size);
+//					outTree.Back().Reserve(nfaReserve);
+//				}
+//			}
+//
+//			cFlag = content2Pcre(pContent, pcreStr);
+//			if(cFlag != 0)
+//			{
+//				return cFlag;
+//			}
+//		}
+//		else if(pPcre != NULL)
+//		{
+//
+//			if(!(pPcre->nFlags & PF_R))
+//			{
+//				if(outTree.Back().Size() != 0)
+//				{
+//					outTree.Back().Reserve(outTree.Back().Size() + 1);
+//					outTree.Back().SetPcre(str.c_str());
+//					str = "";
+//					outTree.Resize(++nfaChain_size);
+//					outTree.Back().Reserve(nfaReserve);
+//				}
+//			}
+//			pcreStr.resize(pPcre->GetPattern(NULL, 0));
+//			pPcre->GetPattern(&pcreStr[0], pcreStr.size());
+//		}
+//		flag = PcreToNFA(pcreStr.c_str(), outTree.Back());
+//		if(flag != 0)
+//		{
+//			return flag;
+//		}
+//
+//		//std::string str = outTree.Back().GetPcre();
+//
+//		//erase header and tail of a pcre 
+//		std::string::iterator it1 = std::find(pcreStr.begin(), pcreStr.end(), '/');
+//		if(*(++it1) == '^')
+//		{
+//			pcreStr.erase(pcreStr.begin(), ++it1);
+//		}
+//		else
+//		{
+//			pcreStr.erase(pcreStr.begin(), it1);
+//			std::string tmp = ".*";
+//			pcreStr.insert(pcreStr.begin(), tmp.begin(), tmp.end());
+//		}
+//		pcreStr.erase(std::find(pcreStr.rbegin(), pcreStr.rend(), '/').base() - 1, pcreStr.end());
+//
+//		str += pcreStr;
+//	}
+//
+//	outTree.Reserve(++nfaChain_size);
+//	outTree.Back().SetPcre(str.c_str());
+//
+//	return 0;
+//}
 
 
 //CRECHANFA void SerializeNfa(CNfaChain &nfaChain, CNfa &seriaNfa)

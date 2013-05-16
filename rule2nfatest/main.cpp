@@ -58,7 +58,8 @@ void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 	else
 	{
 		CNfaTree nfatree;
-		size_t flag = InterpretRule(rule, nfatree);
+		size_t flag = 0;
+		//size_t flag = InterpretRule(rule, nfatree);
 		if (flag == SC_ERROR)
 		{
 			result.m_errorIds.push_back(nSid);

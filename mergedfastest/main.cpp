@@ -4,55 +4,22 @@
 #include "../nfa2dfa/nfa2dfa.h"
 #include "../mergedfas/mergedfas.h"
 
-template <class _t>
-void printDfa(_t dfaTab)
+void printDfa(CDfa dfaTab)
 {
-	int tabSize = dfaTab.Size();
-	std::vector<std::vector<std::vector<size_t>>> matrix;
-	std::vector<std::vector<size_t>> matRow;
-	std::vector<size_t> matRowRow;
-	for(int i = 0; i < tabSize; ++i)
-	{
-		matrix.push_back(matRow);
-		for(int j = 0; j < tabSize; ++j)
+	for (size_t j = 0; j < dfaTab.Size(); ++j)
 		{
-			matrix[i].push_back(matRowRow);
-		}
-	}
-
-		for(size_t s = 0; s < dfaTab.Size(); ++s)
-	{
-		for(int i = 0 ; i < CHARSETSIZE - 4; ++i)
-		{
-			if(dfaTab[s][i] != size_t(-1))
+			std::cout << j << ": ";
+			for (size_t k = 0; k < CHARSETSIZE - 4; ++k)
 			{
-				size_t suf = dfaTab[s][i];
-				matrix[s][suf].push_back(i);
-			}
-		}
-
-	}
-
-
-	for(std::vector<std::vector<std::vector<size_t>>>::iterator iter = matrix.begin(); iter != matrix.end(); ++iter)
-	{
-		std::cout << iter - matrix.begin() << "  :  ";
-		for(std::vector<std::vector<size_t>>::iterator curIter = iter->begin(); curIter != iter->end(); ++curIter)
-		{
-			if(curIter->size() > 0)
-			{
-				std::cout << curIter - iter->begin() << " (";
-				for(std::vector<size_t>::iterator curcurIter = curIter->begin(); curcurIter != curIter->end(); ++curcurIter)
+				size_t temp = dfaTab.GetGroup(k);
+				if(dfaTab[j][temp] != (BYTE (-1)))
 				{
-					std::cout << *curcurIter << ",";
+					std::cout << "(" << k << "," << dfaTab[j][temp] << ")";
 				}
-				std::cout << ")  ";
+
 			}
+			std::cout << std::endl;
 		}
-		std::cout << std::endl;
-
-	}
-
 }
 
 void printNfa(CNfa &nfa)
@@ -64,6 +31,7 @@ void printNfa(CNfa &nfa)
 			{
 				for (size_t l = 0; l < nfa[j][k].Size(); ++l)
 				{
+				
 					std::cout << "(" << k << "," << nfa[j][k][l] << ")";
 				}
 			}
@@ -73,46 +41,38 @@ void printNfa(CNfa &nfa)
 
 void main()
 {
-	const char *pcre1 = "/^abcd/";
-	const char *pcre2 = "/^fghi/";
+	const char *pcre1 = "/\\(\\s*(\\x27[^\\x27]{3,}|\\x22[^\\x22]{3,})/si";
 
 	std::vector<CDfa> dfaVec;
 	CDfa dfa1, dfa2,lastdfa;
 
 	dfa1.SetId(1);
-	dfa2.SetId(2);
-	CNfa nfa1, nfa2, nfa3;
+	CNfa nfa1, nfa2;
 	PcreToNFA(pcre1, nfa1);
-	PcreToNFA(pcre2, nfa2);
-	printNfa(nfa1);
-	printNfa(nfa2);
+	size_t nfasize = nfa1.Size();
 	NfaToDfa(nfa1, dfa1);
-	NfaToDfa(nfa2, dfa2);
-	//NfaToDfa(nfa3, dfa3);
 
+	NfaToDfa(nfa1, dfa2);
+
+	dfaVec.push_back(dfa1);
+	dfaVec.push_back(dfa2);
+	//NfaToDfa(nfa3, dfa3);
+	OrMerge(dfaVec, lastdfa);
 	//size = dfa3.Size();
 	size_t size 
 		= dfa1.Size();
+
+	size = lastdfa.Size();
+
+	CDfa mindfa;
+	DfaMin(lastdfa, mindfa);
+	size = mindfa.Size();
+
 	//size = dfa2.Size();
 	//size = dfa3.Size();
-	dfaVec.push_back(dfa1);
-	dfaVec.push_back(dfa2);
-	OrMerge(dfaVec, lastdfa);
-	size = lastdfa.Size();
-	size = lastdfa.GetTermSetNum();
 
-	for(int i = 0; i < size; ++i)
-	{
-		CDfa::TERMSET termset = lastdfa.GetTermSet(i);
-		std::cout << std::endl;
-	}
 
 	std::string str1 = "abcd";
 	std::string str2 = "fghi";
 	size_t match = MatchDfa(dfa1, str1.begin(), str1.end());
-	match = MatchDfa(lastdfa, str1.begin(), str1.end());
-	match = MatchDfa(lastdfa, str2.begin(), str2.end());
-
-	size = lastdfa.Size();
-
 }

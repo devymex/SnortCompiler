@@ -2,6 +2,7 @@
 
 #include <Windows.h>
 #include <vector>
+#include <list>
 
 #define CHARSETSIZE 260
 #define EMPTYEDGE 256
@@ -13,7 +14,15 @@
 #define COMMONSC __declspec(dllexport)
 #endif
 
+double COMMONSC g_dTimer;
+
 typedef BYTE STATEID;
+//typedef WORD STATEID;
+typedef std::list<STATEID> STALIST;
+typedef std::list<STATEID>::iterator STALIST_ITER;
+typedef std::list<std::list<STATEID>> SETLIST;
+typedef std::list<std::list<STATEID>>::iterator SETLIST_ITER;
+typedef DWORD SIGNATURE;
 
 class COMMONSC CVectorNumber
 {
@@ -38,6 +47,30 @@ public:
 	void Clear();
 private:
 	std::vector<size_t> *m_pSet;
+};
+
+
+class COMMONSC CCString
+{
+public:
+	CCString();
+	CCString(const char *pStr);
+	~CCString();
+	CCString(const CCString &other);
+	CCString& operator = (const CCString &other);
+	char operator[](size_t nIdx) const;
+	void Append(const char* pChar);
+	const char* GetString();
+	const char* C_Str();
+
+	const size_t Size() const;
+	void PushBack(const char nChar);
+	char Back() const;
+	void Clear();
+	bool Empty();
+	
+private:
+	std::string *m_pString;
 };
 
 typedef CVectorNumber CStateSet;
@@ -92,8 +125,8 @@ public:
 	~CDfaRow();
 	CDfaRow(const CDfaRow &other);
 	CDfaRow& operator=(const CDfaRow &other);
-	STATEID& operator[](BYTE index);
-	const STATEID& operator[](BYTE index) const;
+	STATEID& operator[](STATEID index);
+	const STATEID& operator[](STATEID index) const;
 	void SetFlag(size_t nFlag);
 	size_t GetFlag() const;
 	size_t GetColNum() const;
@@ -168,6 +201,7 @@ public:
 	size_t GetDfaTermsNum();
 	DFATERMS GetDfaTerms(size_t num);
 	const char* GetPcre() const;
+	void Clear();
 
 	CNfaRow &Back();
 	CNfaRow &operator[](size_t index);
@@ -281,12 +315,18 @@ public:
 	~CRegChain();
 	CRegChain(const CRegChain &other);
 	size_t Size() const;
-	std::string& Back() const;
-	void PushBack(std::string &pcreStr);
-	std::string& operator[](size_t nIdx);
+	CCString& Back() const;
+	void PushBack(CCString &pcreStr);
+	CCString& operator[](size_t nIdx);
 	const CRegChain& operator = (const CRegChain &other);
+	void Resize(size_t nSize);
+	size_t GetSigCnt() const;
+	void PushBackSig(SIGNATURE &signature);
+	SIGNATURE& GetSig(size_t nIdx) const;
+	void Unique();
 private:
-	std::vector<std::string> *m_pRegList;
+	std::vector<CCString> *m_pRegList;
+	std::vector<SIGNATURE> *m_pSigList;
 };
 
 class COMMONSC CRegRule
