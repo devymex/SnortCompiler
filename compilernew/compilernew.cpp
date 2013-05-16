@@ -545,4 +545,9 @@ void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 COMPILERNEW void compilenew(LPCTSTR filename, CResNew &result)
 {
 	CompileRuleSet(filename, Process, &result);
+
+std::cout << "rule2pcretime:" << rule2pcretime << std::endl;
+std::cout << "pcre2nfatime:" << pcre2nfatime << std::endl;
+std::cout << "nfa2dfatime:" << nfa2dfatime << std::endl;
+std::cout << "dfamintimetime:" << dfamintimetime << std::endl;
 }

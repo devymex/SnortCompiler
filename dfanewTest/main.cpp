@@ -4,8 +4,7 @@
 #include "../pcre2nfa/pcre2nfa.h"
 #include "../mergedfanew/MergeDfanew.h"
 
-
-	void printNfa(CNfa &nfa)
+void printNfa(CNfa &nfa)
 {
 	for (size_t j = 0; j < nfa.Size(); ++j)
 	{
@@ -55,14 +54,20 @@ void main()
 
 
 
-	//const char* a ="/^ab.{2}c/";
-	//CNfa nfa;
+	const char* a = "/^(ab|bc)d(ef|g)/si";
+	//const char* a = "/^.{2}.*ab/si";
+	//const char* a = "/^(a|b)abb/";
 
 	//PcreToNFA(a, nfa);
 	//printNfa(nfa);
-	//CDfanew dfa;
+	outPut(nfa, "F:\\cppProject\\huawei\\PreciseMatch\\input\\nfa3_after.txt");
 	//dfa.FromNFA(nfa, NULL, 0);
-	//outPutDfa(dfa, "F:\\cppProject\\huawei\\PreciseMatch\\input\\dfa3_after.txt"
+	
+	CTimer nfa2dfatime;//用于测试
+	nfa2dfatime.Reset();//用于测试
+	std::cout << "nfa2dfatime: " << nfa2dfatime.Reset() << std::endl;//用于测试
+
+	outPutDfa(dfa, "F:\\cppProject\\huawei\\PreciseMatch\\input\\dfa3_after.txt");
 
 	//dfa.printTerms();
 	/*for (size_t i = 0; i < dfa.Size(); ++i)

@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "common.h"
 
+
 RULEOPTION::RULEOPTION()
 {
 	m_pPattern = new std::string;
@@ -190,7 +191,9 @@ COMMONSC void CNfa::Reserve(size_t _Count)
 
 COMMONSC void CNfa::Resize(size_t _Newsize)
 {
+	//CTimer t;
 	m_pNfa->resize(_Newsize);
+	//g_dTimer += t.Reset();
 }
 
 COMMONSC size_t CNfa::Size() const
@@ -200,12 +203,9 @@ COMMONSC size_t CNfa::Size() const
 
 COMMONSC void CNfa::Clear()
 {
-	delete m_pNfa;
-	delete m_pPcre;
-	delete m_DfaTerms;
-	m_pNfa = new std::vector<CNfaRow>;
-	m_pPcre = new std::string;
-	m_DfaTerms = new std::vector<DFATERMS>;
+	m_pNfa->clear();
+	m_pPcre->clear();
+	m_DfaTerms->clear();
 }
 
 COMMONSC void CNfa::FromDfa(CDfa &dfa)
