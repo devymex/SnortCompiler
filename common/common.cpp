@@ -2,40 +2,6 @@
 #include "common.h"
 
 
-class CTimer
-{
-public:
-	__forceinline CTimer()
-	{
-		QueryPerformanceFrequency((PLARGE_INTEGER)&m_nFreq);
-		QueryPerformanceCounter((PLARGE_INTEGER)&m_nStart);
-	}
-	__forceinline double Cur()
-	{
-		__int64 nCur;
-		double dCur;
-
-		QueryPerformanceCounter((PLARGE_INTEGER)&nCur);
-		dCur = double(nCur - m_nStart) / double(m_nFreq);
-
-		return dCur;
-	}
-	__forceinline double Reset()
-	{
-		__int64 nCur;
-		double dCur;
-
-		QueryPerformanceCounter((PLARGE_INTEGER)&nCur);
-		dCur = double(nCur - m_nStart) / double(m_nFreq);
-		m_nStart = nCur;
-
-		return dCur;
-	}
-private:
-	__int64 m_nFreq;
-	__int64 m_nStart;
-};
-
 RULEOPTION::RULEOPTION()
 {
 	m_pPattern = new std::string;
@@ -237,12 +203,9 @@ COMMONSC size_t CNfa::Size() const
 
 COMMONSC void CNfa::Clear()
 {
-	delete m_pNfa;
-	delete m_pPcre;
-	delete m_DfaTerms;
-	m_pNfa = new std::vector<CNfaRow>;
-	m_pPcre = new std::string;
-	m_DfaTerms = new std::vector<DFATERMS>;
+	m_pNfa->clear();
+	m_pPcre->clear();
+	m_DfaTerms->clear();
 }
 
 COMMONSC void CNfa::FromDfa(CDfa &dfa)
