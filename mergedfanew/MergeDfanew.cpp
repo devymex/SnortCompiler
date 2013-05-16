@@ -8,7 +8,7 @@ MERDFANEW bool NOrMerge(std::vector<CDfanew> &dfas, CDfanew &lastDfa)
 #undef max
 
 	size_t nTermSta = 0;//合并后nfa总状态数
-	for(STATEID i = 0; i < dfas.size(); ++i)
+	for(size_t i = 0; i < dfas.size(); ++i)
 	{
 		if(dfas[i].Size() > std::numeric_limits<STATEID>::max())
 		{
@@ -34,10 +34,11 @@ MERDFANEW bool NOrMerge(std::vector<CDfanew> &dfas, CDfanew &lastDfa)
 	//}
 	//nTermSta += (dfas.size() - 1);
 
-	for(STATEID i = 0; i < dfas.size(); ++i)
+	for(size_t i = 0; i < dfas.size(); ++i)
 	{
 		oneNfa[0][EMPTYEDGE].PushBack(oneNfa.Size());
-		NIncreDfaNum(dfas[i], (STATEID)oneNfa.Size());
+		//NIncreDfaNum(dfas[i], (STATEID)oneNfa.Size());
+		NIncreDfaNum(dfas[i], (size_t)oneNfa.Size());
 		NInsertDfa(dfas[i], oneNfa,nTermSta, nfalog, count);
 	}
 
