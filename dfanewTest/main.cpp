@@ -26,8 +26,8 @@ void main()
 	CNfa nfa1,nfa2;
 	std::vector<CDfanew> dfas;
 	CDfanew dfa1, dfa2, lastdfa;
-	const char* a1 = "/ab.*c/";
-	const char* a2 = "/de.*f/";
+	const char* a1 = "/^ab.{2}c/";
+	const char* a2 = "/^abcd/";
 	PcreToNFA(a1, nfa1);
 	PcreToNFA(a2, nfa2);
 	dfa1.FromNFA(nfa1, NULL, 0, false);
@@ -36,21 +36,9 @@ void main()
 	dfas.push_back(dfa2);
 	NOrMerge(dfas,lastdfa);
 
-	std::cout << size_t(lastdfa.Size()) << std::endl;
-
 	lastdfa.Minimize();
 	std::cout << size_t(lastdfa.GetStartId()) << std::endl;
-
-	//CVectorNumber dfaIds;
-	//for (size_t i = 0; i < lastdfa.Size(); ++i)
-	//{
-	//	lastdfa.GetAcceptedId(i, dfaIds);
-	//	for (size_t j = 0; j < dfaIds.Size(); ++j)
-	//	{
-	//		std::cout << dfaIds[j] << std::endl;
-	//	}
-	//}
-
+	std::cout << size_t(lastdfa.Size()) << std::endl;
 	for (size_t i = 0; i < lastdfa.Size(); ++i)
 	{
 		std::cout << i << ":";
@@ -65,37 +53,36 @@ void main()
 		std::cout << std::endl;
 	}
 
-	std::cout << size_t(lastdfa.Size()) << std::endl;
-
-	system("pause");
 
 
-	//const char* a ="/^ab.*c/";
+	//const char* a ="/^ab.{2}c/";
 	//CNfa nfa;
 
 	//PcreToNFA(a, nfa);
-	////printNfa(nfa);
+	//printNfa(nfa);
 	//CDfanew dfa;
 	//dfa.FromNFA(nfa, NULL, 0);
-	////outPutDfa(dfa, "F:\\cppProject\\huawei\\PreciseMatch\\input\\dfa3_after.txt"
+	//outPutDfa(dfa, "F:\\cppProject\\huawei\\PreciseMatch\\input\\dfa3_after.txt"
 
-	////dfa.printTerms();
-	//for (size_t i = 0; i < dfa.Size(); ++i)
-	//{
-	//	std::cout << i << ":";
-	//	for (size_t charNum = 0; charNum < 256; ++charNum)
-	//	{
-	//		size_t j = dfa.GetOneGroup(charNum);
-	//		if(dfa[i][j] != BYTE(-1))
-	//		{
-	//			std::cout << "(" << charNum << "," << (size_t)dfa[i][j] << ")";
-	//		}
-	//	}
-	//	std::cout << std::endl;
-	//}
-	//std::cout << std::endl;
+	//dfa.printTerms();
+	/*for (size_t i = 0; i < dfa.Size(); ++i)
+	{
+		std::cout << i << ":";
+		for (size_t charNum = 0; charNum < 256; ++charNum)
+		{
+			size_t j = dfa.GetOneGroup(charNum);
+			if(dfa[i][j] != BYTE(-1))
+			{
+				std::cout << "(" << charNum << "," << (size_t)dfa[i][j] << ")";
+			}
+		}
+		std::cout << std::endl;
+	}
+	std::cout << std::endl;*/
 
 	//dfa.Minimize();
+	//std::cout << size_t(dfa.GetStartId()) << std::endl;
+
 	//for (size_t i = 0; i < dfa.Size(); ++i)
 	//{
 	//	std::cout << i << ":";
@@ -126,5 +113,5 @@ void main()
 	//		std::cout << dfaIds[j] << std::endl;
 	//	}
 	//}
-	//system("pause");
+	system("pause");
 }
