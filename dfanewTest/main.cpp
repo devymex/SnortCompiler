@@ -60,14 +60,14 @@ void main()
 
 	//PcreToNFA(a, nfa);
 	//printNfa(nfa);
-	outPut(nfa, "F:\\cppProject\\huawei\\PreciseMatch\\input\\nfa3_after.txt");
+	//outPut(nfa, "F:\\cppProject\\huawei\\PreciseMatch\\input\\nfa3_after.txt");
 	//dfa.FromNFA(nfa, NULL, 0);
 	
 	CTimer nfa2dfatime;//用于测试
 	nfa2dfatime.Reset();//用于测试
 	std::cout << "nfa2dfatime: " << nfa2dfatime.Reset() << std::endl;//用于测试
 
-	outPutDfa(dfa, "F:\\cppProject\\huawei\\PreciseMatch\\input\\dfa3_after.txt");
+	//outPutDfa(dfa, "F:\\cppProject\\huawei\\PreciseMatch\\input\\dfa3_after.txt");
 
 	//dfa.printTerms();
 	/*for (size_t i = 0; i < dfa.Size(); ++i)
