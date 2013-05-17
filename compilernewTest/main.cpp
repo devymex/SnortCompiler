@@ -6,44 +6,10 @@
 #include "../dfanew/dfanew.h"
 #include "../compilernew/compilernew.h"
 
-class CTimer
-{
-public:
-	__forceinline CTimer()
-	{
-		QueryPerformanceFrequency((PLARGE_INTEGER)&m_nFreq);
-		QueryPerformanceCounter((PLARGE_INTEGER)&m_nStart);
-	}
-	__forceinline double Cur()
-	{
-		__int64 nCur;
-		double dCur;
-
-		QueryPerformanceCounter((PLARGE_INTEGER)&nCur);
-		dCur = double(nCur - m_nStart) / double(m_nFreq);
-
-		return dCur;
-	}
-	__forceinline double Reset()
-	{
-		__int64 nCur;
-		double dCur;
-
-		QueryPerformanceCounter((PLARGE_INTEGER)&nCur);
-		dCur = double(nCur - m_nStart) / double(m_nFreq);
-		m_nStart = nCur;
-
-		return dCur;
-	}
-private:
-	__int64 m_nFreq;
-	__int64 m_nStart;
-};
-
 void main()
 {
 	CResNew result;
-	//result.ReadFromFile(_T("..\\..\\output\\result_test.cdt"));
+	//result.ReadFromFile(_T("..\\..\\output\\result.cdt"));
 	//for (size_t i = 0; i < result.GetRegexTbl().Size(); ++i)
 	//{
 	//	if (result.GetRegexTbl()[i].GetSigCnt() == 0)
@@ -111,7 +77,7 @@ void main()
 
 	CTimer t;
 	compilenew(_T("..\\..\\input\\allrules.rule"), result);
-	result.WriteToFile(_T("..\\..\\output\\result_test.cdt"));
+	result.WriteToFile(_T("..\\..\\output\\result.cdt"));
 	std::cout << t.Reset() << std::endl;
 	system("pause");
 }

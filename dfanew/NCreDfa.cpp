@@ -3,40 +3,6 @@
 #include "dfanew.h"
 #include "md5.h"
 
-class CTimer
-{
-public:
-	__forceinline CTimer()
-	{
-		QueryPerformanceFrequency((PLARGE_INTEGER)&m_nFreq);
-		QueryPerformanceCounter((PLARGE_INTEGER)&m_nStart);
-	}
-	__forceinline double Cur()
-	{
-		__int64 nCur;
-		double dCur;
-
-		QueryPerformanceCounter((PLARGE_INTEGER)&nCur);
-		dCur = double(nCur - m_nStart) / double(m_nFreq);
-
-		return dCur;
-	}
-	__forceinline double Reset()
-	{
-		__int64 nCur;
-		double dCur;
-
-		QueryPerformanceCounter((PLARGE_INTEGER)&nCur);
-		dCur = double(nCur - m_nStart) / double(m_nFreq);
-		m_nStart = nCur;
-
-		return dCur;
-	}
-private:
-	__int64 m_nFreq;
-	__int64 m_nStart;
-};
-
 struct MD5VAL
 {
 	size_t val[4];
@@ -217,7 +183,7 @@ bool operator == (const std::vector<CStateSet*> &set1, const std::vector<CStateS
 		{
 			return false;
 		}
-		if(iSize1 != 0 && iSize2 != 0)
+		if(iSize1 != 0)
 		{
 			if(memcmp(&(*set1[i])[0], &(*set2[i])[0], iSize1 * sizeof(size_t) != 0))
 			{
@@ -323,30 +289,36 @@ void NAvaiEdges(CNfa &oneNfaTab, STATEID *group)
 	GROUPHASH ghash;
 	STATEID curId = 0;
 	//std::stringstream ss;
+	size_t nSize = oneNfaTab.Size();
+	for (size_t i = 0; i < nSize; ++i)
+	{
+		oneNfaTab[i].SortAllDest();
+	}
+	std::string str;
+	str.reserve(10000);
 	for(size_t c = 0; c < DFACOLSIZE; ++c)
 	{
-		std::string str;
-		for(size_t i = 0; i < oneNfaTab.Size(); ++i)
+		str.clear();
+		for(size_t i = 0; i < nSize; ++i)
 		{
-			CStateSet &elems = oneNfaTab[i][c];
-			if(elems.Size() != 0)
+			CNfaRow &row = oneNfaTab[i];
+			//CStateSet &elems = oneNfaTab[i][c];
+			size_t nCnt = row.DestCnt(c);
+			for(size_t j = 0; j < nCnt; ++j)
 			{
-				elems.Sort();
-				for(size_t j = 0; j < elems.Size(); ++j)
+				size_t nSta = row.GetDest(c, j);
+				if(nSta > nSize)
 				{
-					if(elems[j] > oneNfaTab.Size())
-					{
-						std::cout << "overflow" << std::endl;
-						return;
-					}
-					//ss.str("");
-					//ss << elems[j];
-					//str += ss.str();
-					str += elems[j];
-					str += ',';
+					std::cout << "overflow" << std::endl;
+					return;
 				}
+				//ss.str("");
+				//ss << elems[j];
+				//str += ss.str();
+				str += nSta;
+				str.push_back(',');
 			}
-			str += 'u';
+			str.push_back('u');
 		}
 		GROUPHASH::iterator it = ghash.find(str);
 		if(it == ghash.end())
@@ -470,18 +442,26 @@ void NNextNfaSet(const CNfa &oneNfaTab, const std::vector<size_t> &curNfaVec, si
 		std::cout << "Fatal Error!" << std::endl;
 		return;
 	}
-	std::vector<size_t> nextNfaVec;
-
+	static std::vector<size_t> nextNfaVec;
+	if (nextNfaVec.capacity() < 100)
+	{
+		nextNfaVec.reserve(10000);
+	}
+	nextNfaVec.clear();
+	size_t nSize = oneNfaTab.Size();
 	for(std::vector<size_t>::const_iterator vecIter = curNfaVec.begin(); vecIter != curNfaVec.end(); ++vecIter)
 	{
-		if(*vecIter == oneNfaTab.Size())
+		if(*vecIter == nSize)
 		{
 			continue;
 		}
-		const CStateSet &nextEdges = oneNfaTab[*vecIter][edge];
-		for (size_t i = 0; i < nextEdges.Size(); ++i)
+		const CNfaRow &row = oneNfaTab[*vecIter];
+		size_t nCurCnt = nextNfaVec.size();
+		size_t nAddCnt = row.DestCnt(edge);
+		if (nAddCnt != 0)
 		{
-			nextNfaVec.push_back(nextEdges[i]);
+			nextNfaVec.resize(nCurCnt + nAddCnt);
+			row.CopyCol(edge, &nextNfaVec[nCurCnt]);
 		}
 	}
 	std::sort(nextNfaVec.begin(), nextNfaVec.end());
@@ -494,17 +474,22 @@ void NNextNfaSet(const CNfa &oneNfaTab, const std::vector<size_t> &curNfaVec, si
 
 void NEClosure(const CNfa &oneNfaTab, const std::vector<size_t> &curNfaVec, std::vector<size_t> &eNfaVec, char &finFlag)
 {
-	std::vector<size_t> eStack;
+	static std::vector<size_t> eStack;
+
+	if (eStack.capacity() < 100)
+	{
+		eStack.reserve(10000);
+	}
+	eStack.clear();
 	const size_t cEmptyEdge = 256;
 	size_t finalId = oneNfaTab.Size();//终态id
 	const size_t flagSize = finalId + 1;
-	std::vector<size_t> caledStat(flagSize, 0);
-	std::vector<size_t> hasInsert(flagSize, 0);//表示是否已经添加到eNfaVec中
+	size_t *caledStat = (size_t*)VirtualAlloc(NULL, flagSize * sizeof(size_t) * 2,
+		MEM_COMMIT, PAGE_READWRITE);
+	//std::vector<size_t> caledStat(flagSize, 0);
+	size_t *hasInsert = caledStat + flagSize;
+	//std::vector<size_t> hasInsert(flagSize, 0);//表示是否已经添加到eNfaVec中
 
-	if (eNfaVec.capacity() < flagSize)
-	{
-		eNfaVec.reserve(flagSize);
-	}
 	for(std::vector<size_t>::const_iterator vecIter = curNfaVec.begin();
 		vecIter != curNfaVec.end(); ++vecIter)
 	{
@@ -529,20 +514,19 @@ void NEClosure(const CNfa &oneNfaTab, const std::vector<size_t> &curNfaVec, std:
 			continue;
 		}
 		//curState的E转移
-		const CStateSet &eTempVec = oneNfaTab[curState][cEmptyEdge];
-		if(eTempVec.Size() != 0)
+		const CNfaRow &row = oneNfaTab[curState];
+		size_t nCnt = row.DestCnt(cEmptyEdge);
+		for(size_t i = 0; i != nCnt; ++i)
 		{
-			for(size_t i = 0; i != eTempVec.Size(); ++i)
+			size_t nSta = row.GetDest(cEmptyEdge, i);
+			if(caledStat[nSta] == 0)
 			{
-				if(caledStat[eTempVec[i]] == 0)
-				{
-					caledStat[eTempVec[i]] = 1;
-					eStack.push_back(eTempVec[i]);
-				}
+				caledStat[nSta] = 1;
+				eStack.push_back(nSta);
 			}
 		}
 	}
-
+	VirtualFree(caledStat, 0, MEM_RELEASE);
 }
 
 //void NEClosure(const CNfa &oneNfaTab, const std::vector<size_t> &curNfaVec, std::vector<size_t> &eNfaVec, char &finFlag)

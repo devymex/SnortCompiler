@@ -4,56 +4,6 @@
 #include "../pcre2nfa/pcre2nfa.h"
 #include "../mergedfanew/MergeDfanew.h"
 
-class CTimer
-{
-public:
-	__forceinline CTimer()
-	{
-		QueryPerformanceFrequency((PLARGE_INTEGER)&m_nFreq);
-		QueryPerformanceCounter((PLARGE_INTEGER)&m_nStart);
-	}
-	__forceinline double Cur()
-	{
-		__int64 nCur;
-		double dCur;
-
-		QueryPerformanceCounter((PLARGE_INTEGER)&nCur);
-		dCur = double(nCur - m_nStart) / double(m_nFreq);
-
-		return dCur;
-	}
-	__forceinline double Reset()
-	{
-		__int64 nCur;
-		double dCur;
-
-		QueryPerformanceCounter((PLARGE_INTEGER)&nCur);
-		dCur = double(nCur - m_nStart) / double(m_nFreq);
-		m_nStart = nCur;
-
-		return dCur;
-	}
-private:
-	__int64 m_nFreq;
-	__int64 m_nStart;
-};
-
-void printNfa(CNfa &nfa)
-{
-	for (size_t j = 0; j < nfa.Size(); ++j)
-	{
-		std::cout << j << ": ";
-		for (size_t k = 0; k < CHARSETSIZE; ++k)
-		{
-			for (size_t l = 0; l < nfa[j][k].Size(); ++l)
-			{
-				std::cout << "(" << k << "," << nfa[j][k][l] << ")";
-			}
-		}
-		std::cout << std::endl;
-	}
-}
-
 void main()
 {
 	/*CNfa nfa1,nfa2;
@@ -85,12 +35,14 @@ void main()
 	system("pause");*/
 
 
-	//const char* a = "/^(ab|bc)def(ab|cd)/";
-	const char* a = "/^.{2}.*ab/si";
+	const char* a = "/^(ab|bc)d(ef|g)/si";
+	//const char* a = "/^.{2}.*ab/si";
+	//const char* a = "/^(a|b)abb/";
 	CNfa nfa;
 
 	PcreToNFA(a, nfa);
 	//printNfa(nfa);
+	outPut(nfa, "F:\\cppProject\\huawei\\PreciseMatch\\input\\nfa3_after.txt");
 	CDfanew dfa;
 	
 	CTimer nfa2dfatime;//ÓÃÓÚ²âÊÔ

@@ -21,23 +21,6 @@ struct RES
 	std::vector<size_t> m_emptyIds;
 };
 
-
-void printNfa(CNfa &nfa)
-{
-	for (size_t j = 0; j < nfa.Size(); ++j)
-		{
-			std::cout << j << ": ";
-			for (size_t k = 0; k < CHARSETSIZE; ++k)
-			{
-				for (size_t l = 0; l < nfa[j][k].Size(); ++l)
-				{
-					std::cout << "(" << k << "," << nfa[j][k][l] << ")";
-				}
-			}
-			std::cout << std::endl;
-		}
-}
-
 void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 {
 	RES &result = *(RES*)lpVoid;

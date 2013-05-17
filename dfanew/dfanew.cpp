@@ -2,40 +2,6 @@
 #include "dfanew.h"
 #include "NCreDfa.h"
 
-class CTimer
-{
-public:
-	__forceinline CTimer()
-	{
-		QueryPerformanceFrequency((PLARGE_INTEGER)&m_nFreq);
-		QueryPerformanceCounter((PLARGE_INTEGER)&m_nStart);
-	}
-	__forceinline double Cur()
-	{
-		__int64 nCur;
-		double dCur;
-
-		QueryPerformanceCounter((PLARGE_INTEGER)&nCur);
-		dCur = double(nCur - m_nStart) / double(m_nFreq);
-
-		return dCur;
-	}
-	__forceinline double Reset()
-	{
-		__int64 nCur;
-		double dCur;
-
-		QueryPerformanceCounter((PLARGE_INTEGER)&nCur);
-		dCur = double(nCur - m_nStart) / double(m_nFreq);
-		m_nStart = nCur;
-
-		return dCur;
-	}
-private:
-	__int64 m_nFreq;
-	__int64 m_nStart;
-};
-
 //测试函数:输出一个nfa
 DFANEWSC void outPut(CNfa &nfa, const char* fileName)
 {
@@ -50,17 +16,19 @@ DFANEWSC void outPut(CNfa &nfa, const char* fileName)
 	for(size_t i = 0; i < stateNum; ++i)
 	{
 		fout << i << "\t";
+		const CNfaRow &row = nfa[i];
 		for(size_t j = 0; j < 257; ++j)
 		{
-			if(nfa[i][j].Size() == 0)
+			size_t nCnt = row.DestCnt(j);
+			if(nCnt == 0)
 			{
 				fout << -1 << "\t";
 			}
 			else
 			{
-				for(size_t k = 0; k < nfa[i][j].Size(); ++k)
+				for(size_t k = 0; k < nCnt; ++k)
 				{
-					fout << nfa[i][j][k] << ", ";
+					fout << row.GetDest(j, k) << ", ";
 				}
 				fout << "\t";
 			}
@@ -225,6 +193,8 @@ DFANEWSC size_t CDfanew::FromNFA(CNfa &nfa, NFALOG *nfalog, size_t Count, bool c
 	}
 	std::vector<size_t> curNfaVec;
 	//std::vector<size_t> compuFlag;
+	std::vector<size_t> nextNfaVec;
+	nextNfaVec.reserve(10000);
 	while(nfaStasStack.size() > 0)
 	{
 		std::vector<size_t> compuFlag(m_nColNum, 0);
@@ -262,7 +232,7 @@ DFANEWSC size_t CDfanew::FromNFA(CNfa &nfa, NFALOG *nfalog, size_t Count, bool c
 			}
 			curStaNum = ir->second;
 
-			std::vector<size_t> nextNfaVec;
+			nextNfaVec.clear();
 
 			finFlag = 0;
 			NNextNfaSet(nfa, curNfaVec, nCurChar, nextNfaVec, finFlag);
@@ -352,30 +322,6 @@ DFANEWSC size_t CDfanew::Minimize()
 	{
 		return size_t(-1);
 	}
-
-	// FinalStas中保存当前DFA的所有终态，Partition中保存当前DFA的终态和非终态集合，一个终态作为一个集合存入
-	std::list<std::list<STATEID>> Partition(1);
-	std::list<STATEID> FinalStas;
-	for (STATEID i = 0; i < m_pDfa->size(); ++i)
-	{
-		if (((*m_pDfa)[i].GetFlag() & (*m_pDfa)[i].TERMINAL) != 0)
-		{
-			FinalStas.push_back(i);
-			Partition.push_front(std::list<STATEID>());
-			Partition.front().push_back(i);
-		}
-		else
-		{
-			Partition.back().push_back(i);
-		}
-	}
-
-	//error: terminal states or normal states are empty
-	if (Partition.size() == 1 || Partition.back().empty())
-	{
-		return size_t(-2);
-	}
-
 	//构建正向访问表，指从起始状态开始正向扫描DFA，记录当前状态通过某一字符可到达的状态集合
 	size_t row = m_pDfa->size();
 	size_t col = GetGroupCount();
@@ -415,12 +361,42 @@ DFANEWSC size_t CDfanew::Minimize()
 		}
 	}
 
+	std::list<STATEID> FinalStas;
+	for (STATEID i = 0; i < m_pDfa->size(); ++i)
+	{
+		if (((*m_pDfa)[i].GetFlag() & (*m_pDfa)[i].TERMINAL) != 0)
+		{
+			FinalStas.push_back(i);
+		}
+	}
+
 	//record states that will be visited from reverse traverse table
 	RemoveUnreachable(pRevTab, FinalStas, col, reachable);
 	delete []pRevTab;
 
 	//remove unreachable states, generate new DFA
 	MergeReachable(reachable);
+
+	// FinalStas中保存当前DFA的所有终态，Partition中保存当前DFA的终态和非终态集合，一个终态作为一个集合存入
+	std::list<std::list<STATEID>> Partition(1);
+	for (STATEID i = 0; i < m_pDfa->size(); ++i)
+	{
+		if (((*m_pDfa)[i].GetFlag() & (*m_pDfa)[i].TERMINAL) != 0)
+		{
+			Partition.push_front(std::list<STATEID>());
+			Partition.front().push_back(i);
+		}
+		else
+		{
+			Partition.back().push_back(i);
+		}
+	}
+
+	//error: terminal states or normal states are empty
+	if (Partition.size() == 1 || Partition.back().empty())
+	{
+		return size_t(-2);
+	}
 
 	row = m_pDfa->size();
 	pRevTab = new std::vector<STATEID>[row * col];
@@ -755,11 +731,9 @@ void CDfanew::MergeReachable(std::vector<STATEID> &reachable)
 	//替换m_pDfa
 	m_pDfa->clear();
 	m_pDfa->resize(nRcbCnt, nColNum);
-	nNewIdx = 0;
 	for (STATEID idx = 0; idx < nRcbCnt; ++idx)
 	{
-		(*m_pDfa)[nNewIdx] = tmpDfa[idx];
-		++nNewIdx;
+		(*m_pDfa)[idx] = tmpDfa[idx];
 	}
 }
 
@@ -799,6 +773,7 @@ void CDfanew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, SETLIST &pSets
 				std::vector<STATEID> &ableToI = pRevTbl[*iSta * groupnum + byChar];
 				for (std::vector<STATEID>::iterator i = ableToI.begin(); i != ableToI.end(); ++i)
 				{
+					STATEID x = *i;
 					ableToW[*i] = 1;
 					bAllZero = false;
 				}
