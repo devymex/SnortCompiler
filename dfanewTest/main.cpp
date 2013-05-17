@@ -34,70 +34,73 @@ void main()
 
 	system("pause");*/
 
+	//const char* a1 = "/^(ab|bc)def(ab|cd)/";
+	const char* a1 = "/^(ab|bc)d(ef|g)/i";
+	const char* a2 = "/^.{2}.*ab/si";
+	const char* a3 = "/^(a|b)abb/";
+	CNfa nfa1;
+	CNfa nfa2;
+	CNfa nfa3;
 
-	const char* a = "/^(ab|bc)d(ef|g)/si";
-	//const char* a = "/^.{2}.*ab/si";
-	//const char* a = "/^(a|b)abb/";
-	CNfa nfa;
+	PcreToNFA(a1, nfa1);
+	PcreToNFA(a2, nfa2);
+	PcreToNFA(a3, nfa3);
 
-	PcreToNFA(a, nfa);
-	//printNfa(nfa);
-	outPut(nfa, "F:\\cppProject\\huawei\\PreciseMatch\\input\\nfa3_after.txt");
-	CDfanew dfa;
+	outPut(nfa1, "F:\\cppProject\\huawei\\PreciseMatch\\output\\nfa1_opt.txt");
+	outPut(nfa2, "F:\\cppProject\\huawei\\PreciseMatch\\output\\nfa2_opt.txt");
+	outPut(nfa3, "F:\\cppProject\\huawei\\PreciseMatch\\output\\nfa3_opt.txt");
+
+
+	CDfanew dfa1;
+	CDfanew dfa2;
+	CDfanew dfa3;
 	
 	CTimer nfa2dfatime;//用于测试
 	nfa2dfatime.Reset();//用于测试
-	dfa.FromNFA(nfa, NULL, 0);
-	std::cout << "nfa2dfatime: " << nfa2dfatime.Reset() << std::endl;//用于测试
+	dfa1.FromNFA(nfa1, NULL, 0);
+	dfa2.FromNFA(nfa2, NULL, 0);
+	dfa3.FromNFA(nfa3, NULL, 0);
+	std::cout << "nfa2dfastime: " << nfa2dfatime.Reset() << std::endl;//用于测试
+	//outPutDfa(dfa1, "F:\\cppProject\\huawei\\PreciseMatch\\output\\dfa1_after.txt");
 
-	outPutDfa(dfa, "F:\\cppProject\\huawei\\PreciseMatch\\input\\dfa3_after.txt");
+	dfa1.Minimize();
+	dfa2.Minimize();
+	dfa3.Minimize();
+	std::cout << "dfasMin: " << nfa2dfatime.Reset() << std::endl;//用于测试
 
-	//dfa.printTerms();
-	for (size_t i = 0; i < dfa.Size(); ++i)
-	{
-		std::cout << i << ":";
-		for (size_t charNum = 0; charNum < 256; ++charNum)
-		{
-			size_t j = dfa.GetOneGroup(charNum);
-			if(dfa[i][j] != BYTE(-1))
-			{
-			std::cout << "(" << charNum << "," << (size_t)dfa[i][j] << ")";
-			}
-		}
-		std::cout << std::endl;
-	}
-	std::cout << std::endl;
+	outPutDfa(dfa1, "F:\\cppProject\\huawei\\PreciseMatch\\output\\dfa1_opt.txt");
+	outPutDfa(dfa2, "F:\\cppProject\\huawei\\PreciseMatch\\output\\dfa2_opt.txt");
+	outPutDfa(dfa3, "F:\\cppProject\\huawei\\PreciseMatch\\output\\dfa3_opt.txt");
 
-	dfa.Minimize();
-	//for (size_t i = 0; i < dfa.Size(); ++i)
+	std::vector<CDfanew> dfas;
+	dfas.push_back(dfa1);
+	dfas.push_back(dfa2);
+	dfas.push_back(dfa3);
+	CDfanew lastdfa;
+
+	nfa2dfatime.Reset();//用于测试
+	NOrMerge(dfas, lastdfa);
+	std::cout << "merge dfas time: " << nfa2dfatime.Reset() << std::endl;//用于测试
+
+	lastdfa.Minimize();
+	outPutDfa(lastdfa, "F:\\cppProject\\huawei\\PreciseMatch\\output\\lastdfa_opt.txt");
+
+
+	//std::vector<std::vector<BYTE>> allStr;
+	//GetDfaSig(dfa, allStr);
+
+
+	//BYTE b[] = "fsdfsdkfBMdf";
+	//CStateSet StaSet;
+	//dfa.Process(b, sizeof(b), StaSet);
+	//CVectorNumber dfaIds;
+	//for (size_t i = 0; i < StaSet.Size(); ++i)
 	//{
-	//	std::cout << i << ":";
-	//	for (size_t charNum = 0; charNum < 256; ++charNum)
+	//	dfa.GetAcceptedId(StaSet[i], dfaIds);
+	//	for (size_t j = 0; j < dfaIds.Size(); ++j)
 	//	{
-	//		size_t j = dfa.GetOneGroup(charNum);
-	//		if(dfa[i][j] != BYTE(-1))
-	//		{
-	//		std::cout << "(" << charNum << "," << (size_t)dfa[i][j] << ")";
-	//		}
+	//		std::cout << dfaIds[j] << std::endl;
 	//	}
-	//	std::cout << std::endl;
 	//}
-	//std::cout << std::endl;
-	std::vector<std::vector<BYTE>> allStr;
-	GetDfaSig(dfa, allStr);
-
-
-	BYTE b[] = "fsdfsdkfBMdf";
-	CStateSet StaSet;
-	dfa.Process(b, sizeof(b), StaSet);
-	CVectorNumber dfaIds;
-	for (size_t i = 0; i < StaSet.Size(); ++i)
-	{
-		dfa.GetAcceptedId(StaSet[i], dfaIds);
-		for (size_t j = 0; j < dfaIds.Size(); ++j)
-		{
-			std::cout << dfaIds[j] << std::endl;
-		}
-	}
 	system("pause");
 }

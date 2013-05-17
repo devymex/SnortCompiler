@@ -142,7 +142,7 @@ public:
 	size_t GetFlag() const;
 	size_t GetColNum() const;
 private:
-	size_t m_nFlag;
+	size_t m_nFlag;//标记该状态/行的属性：NORMAL、START、TERMINAL
 	size_t m_nColNum;
 	std::vector<STATEID> *m_pDest;
 };

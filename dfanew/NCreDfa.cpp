@@ -205,6 +205,12 @@ bool operator == (const std::vector<CStateSet*> &set1, const std::vector<CStateS
 //	typedef std::vector<std::vector<CStateSet*> > COLUMN;
 //	COLUMN nfaCol(DFACOLSIZE);
 //
+//	//size_t nSize = oneNfaTab.Size();
+//	//for (size_t i = 0; i < nSize; ++i)
+//	//{
+//	//	oneNfaTab[i].SortAllDest();
+//	//}
+//
 //	for(size_t c = 0; c < DFACOLSIZE; ++c)
 //	{
 //		nfaCol[c].resize(oneNfaTab.Size());
@@ -288,7 +294,7 @@ void NAvaiEdges(CNfa &oneNfaTab, STATEID *group)
 	typedef std::unordered_map<std::string, STATEID> GROUPHASH;//将每一列表示成string形式，size=0的用'n'代表，每行之间用'u'间隔,元素与元素之间用','间隔
 	GROUPHASH ghash;
 	STATEID curId = 0;
-	//std::stringstream ss;
+	std::stringstream ss;
 	size_t nSize = oneNfaTab.Size();
 	for (size_t i = 0; i < nSize; ++i)
 	{
@@ -312,10 +318,10 @@ void NAvaiEdges(CNfa &oneNfaTab, STATEID *group)
 					std::cout << "overflow" << std::endl;
 					return;
 				}
-				//ss.str("");
-				//ss << elems[j];
-				//str += ss.str();
-				str += nSta;
+				ss.str("");
+				ss << nSta;
+				str += ss.str();
+				//str += nSta;
 				str.push_back(',');
 			}
 			str.push_back('u');
