@@ -20,11 +20,13 @@ void main()
 	PcreToNFA(a, nfa);
 	for (size_t i = 0; i < nfa.Size(); ++i)
 	{
+		const CNfaRow &row = nfa[i];
 		for (size_t j = 0; j < CHARSETSIZE; ++j)
 		{
-			for (size_t k = 0; k < nfa[i][j].Size(); ++k)
+			size_t nCnt = row.DestCnt(j);
+			for (size_t k = 0; k < nCnt; ++k)
 			{
-				std::cout << "(" << i << "," << j << "," << nfa[i][j][k] << ")" << std::endl;
+				std::cout << "(" << i << "," << j << "," << row.GetDest(j, k) << ")" << std::endl;
 			}
 		}
 	}

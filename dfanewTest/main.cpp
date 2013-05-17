@@ -4,29 +4,13 @@
 #include "../pcre2nfa/pcre2nfa.h"
 #include "../mergedfanew/MergeDfanew.h"
 
-void printNfa(CNfa &nfa)
-{
-	for (size_t j = 0; j < nfa.Size(); ++j)
-	{
-		std::cout << j << ": ";
-		for (size_t k = 0; k < CHARSETSIZE; ++k)
-		{
-			for (size_t l = 0; l < nfa[j][k].Size(); ++l)
-			{
-				std::cout << "(" << k << "," << nfa[j][k][l] << ")";
-			}
-		}
-		std::cout << std::endl;
-	}
-}
-
 void main()
 {
-	CNfa nfa1,nfa2;
+	/*CNfa nfa1,nfa2;
 	std::vector<CDfanew> dfas;
 	CDfanew dfa1, dfa2, lastdfa;
-	const char* a1 = "/^ab.{2}c/";
-	const char* a2 = "/^abcd/";
+	const char* a1 = "/^abcd/";
+	const char* a2 = "/^efgh/";
 	PcreToNFA(a1, nfa1);
 	PcreToNFA(a2, nfa2);
 	dfa1.FromNFA(nfa1, NULL, 0, false);
@@ -35,42 +19,41 @@ void main()
 	dfas.push_back(dfa2);
 	NOrMerge(dfas,lastdfa);
 
-	lastdfa.Minimize();
-	std::cout << size_t(lastdfa.GetStartId()) << std::endl;
-	std::cout << size_t(lastdfa.Size()) << std::endl;
 	for (size_t i = 0; i < lastdfa.Size(); ++i)
 	{
 		std::cout << i << ":";
-		for (size_t j = 0; j < DFACOLSIZE; ++j)
+		for (size_t j = 0; j < lastdfa.GetGroupCount(); ++j)
 		{
-			size_t group = lastdfa.GetOneGroup(j);
-			if(lastdfa[i][group] != BYTE(-1))
+			if(lastdfa[i][j] != BYTE(-1))
 			{
-				std::cout << "(" << j << "," << (size_t)lastdfa[i][group] << ")";
+				std::cout << "(" << j << "," << (size_t)lastdfa[i][j] << ")";
 			}
 		}
 		std::cout << std::endl;
 	}
 
+	system("pause");*/
 
 
 	const char* a = "/^(ab|bc)d(ef|g)/si";
 	//const char* a = "/^.{2}.*ab/si";
 	//const char* a = "/^(a|b)abb/";
+	CNfa nfa;
 
-	//PcreToNFA(a, nfa);
+	PcreToNFA(a, nfa);
 	//printNfa(nfa);
-	//outPut(nfa, "F:\\cppProject\\huawei\\PreciseMatch\\input\\nfa3_after.txt");
-	//dfa.FromNFA(nfa, NULL, 0);
+	outPut(nfa, "F:\\cppProject\\huawei\\PreciseMatch\\input\\nfa3_after.txt");
+	CDfanew dfa;
 	
 	CTimer nfa2dfatime;//用于测试
 	nfa2dfatime.Reset();//用于测试
+	dfa.FromNFA(nfa, NULL, 0);
 	std::cout << "nfa2dfatime: " << nfa2dfatime.Reset() << std::endl;//用于测试
 
-	//outPutDfa(dfa, "F:\\cppProject\\huawei\\PreciseMatch\\input\\dfa3_after.txt");
+	outPutDfa(dfa, "F:\\cppProject\\huawei\\PreciseMatch\\input\\dfa3_after.txt");
 
 	//dfa.printTerms();
-	/*for (size_t i = 0; i < dfa.Size(); ++i)
+	for (size_t i = 0; i < dfa.Size(); ++i)
 	{
 		std::cout << i << ":";
 		for (size_t charNum = 0; charNum < 256; ++charNum)
@@ -78,16 +61,14 @@ void main()
 			size_t j = dfa.GetOneGroup(charNum);
 			if(dfa[i][j] != BYTE(-1))
 			{
-				std::cout << "(" << charNum << "," << (size_t)dfa[i][j] << ")";
+			std::cout << "(" << charNum << "," << (size_t)dfa[i][j] << ")";
 			}
 		}
 		std::cout << std::endl;
 	}
-	std::cout << std::endl;*/
+	std::cout << std::endl;
 
-	//dfa.Minimize();
-	//std::cout << size_t(dfa.GetStartId()) << std::endl;
-
+	dfa.Minimize();
 	//for (size_t i = 0; i < dfa.Size(); ++i)
 	//{
 	//	std::cout << i << ":";
@@ -102,21 +83,21 @@ void main()
 	//	std::cout << std::endl;
 	//}
 	//std::cout << std::endl;
-	//std::vector<std::vector<BYTE>> allStr;
-	//GetDfaSig(dfa, allStr);
+	std::vector<std::vector<BYTE>> allStr;
+	GetDfaSig(dfa, allStr);
 
 
-	//BYTE b[] = "fsdfsdkfBMdf";
-	//CStateSet StaSet;
-	//dfa.Process(b, sizeof(b), StaSet);
-	//CVectorNumber dfaIds;
-	//for (size_t i = 0; i < StaSet.Size(); ++i)
-	//{
-	//	dfa.GetAcceptedId(StaSet[i], dfaIds);
-	//	for (size_t j = 0; j < dfaIds.Size(); ++j)
-	//	{
-	//		std::cout << dfaIds[j] << std::endl;
-	//	}
-	//}
+	BYTE b[] = "fsdfsdkfBMdf";
+	CStateSet StaSet;
+	dfa.Process(b, sizeof(b), StaSet);
+	CVectorNumber dfaIds;
+	for (size_t i = 0; i < StaSet.Size(); ++i)
+	{
+		dfa.GetAcceptedId(StaSet[i], dfaIds);
+		for (size_t j = 0; j < dfaIds.Size(); ++j)
+		{
+			std::cout << dfaIds[j] << std::endl;
+		}
+	}
 	system("pause");
 }
