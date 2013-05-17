@@ -124,6 +124,11 @@ DFANEWSC const CDfaRow& CDfanew::operator[](STATEID index) const
 	return (*m_pDfa)[index];
 }
 
+DFANEWSC void CDfanew::PushBackTermSet(TERMSET &term)
+{
+	m_TermSet->push_back(term);
+}
+
 DFANEWSC void CDfanew::Init(BYTE *pGroup)
 {
 	Clear();
