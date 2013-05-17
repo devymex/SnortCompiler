@@ -198,6 +198,8 @@ DFANEWSC size_t CDfanew::FromNFA(CNfa &nfa, NFALOG *nfalog, size_t Count, bool c
 	}
 	std::vector<size_t> curNfaVec;
 	//std::vector<size_t> compuFlag;
+	std::vector<size_t> nextNfaVec;
+	nextNfaVec.reserve(10000);
 	while(nfaStasStack.size() > 0)
 	{
 		std::vector<size_t> compuFlag(m_nColNum, 0);
@@ -235,7 +237,7 @@ DFANEWSC size_t CDfanew::FromNFA(CNfa &nfa, NFALOG *nfalog, size_t Count, bool c
 			}
 			curStaNum = ir->second;
 
-			std::vector<size_t> nextNfaVec;
+			nextNfaVec.clear();
 
 			finFlag = 0;
 			NNextNfaSet(nfa, curNfaVec, nCurChar, nextNfaVec, finFlag);

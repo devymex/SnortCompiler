@@ -174,17 +174,17 @@ COMMONSC const size_t& CNfaRow::GetDest(size_t nCol, size_t nIdx) const
 
 COMMONSC size_t* CNfaRow::GetCol(size_t nCol)
 {
-	return &m_pDestSet[nCol][0];
+	return m_pDestSet[nCol].data();
 }
 
 COMMONSC const size_t* CNfaRow::GetCol(size_t nCol) const
 {
-	return &m_pDestSet[nCol][0];
+	return m_pDestSet[nCol].data();
 }
 
 COMMONSC void CNfaRow::CopyCol(size_t nCol, size_t *pOut) const
 {
-	memcpy(pOut, &m_pDestSet[nCol][0], m_pDestSet[nCol].size() * sizeof(size_t));
+	memcpy(pOut, m_pDestSet[nCol].data(), m_pDestSet[nCol].size() * sizeof(size_t));
 }
 
 COMMONSC void CNfaRow::AddDest(size_t nCol, size_t nDest)
