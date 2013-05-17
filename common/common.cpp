@@ -206,6 +206,7 @@ COMMONSC void CNfaRow::SortAllDest()
 }
 
 COMMONSC CNfaRow::CNfaRow(const CNfaRow &other)
+	: m_nSize(0), m_pDestSet(0)
 {
 	*this = other;
 }
