@@ -294,23 +294,23 @@ void NAvaiEdges(CNfa &oneNfaTab, STATEID *group)
 		std::string str;
 		for(size_t i = 0; i < oneNfaTab.Size(); ++i)
 		{
-			CStateSet &elems = oneNfaTab[i][c];
-			if(elems.Size() != 0)
+			CNfaRow &row = oneNfaTab[i];
+			//CStateSet &elems = oneNfaTab[i][c];
+			row.SortDest(c);
+			size_t nCnt = row.DestCnt(c);
+			for(size_t j = 0; j < nCnt; ++j)
 			{
-				elems.Sort();
-				for(size_t j = 0; j < elems.Size(); ++j)
+				size_t nSta = row.GetDest(c, j);
+				if(nSta > oneNfaTab.Size())
 				{
-					if(elems[j] > oneNfaTab.Size())
-					{
-						std::cout << "overflow" << std::endl;
-						return;
-					}
-					//ss.str("");
-					//ss << elems[j];
-					//str += ss.str();
-					str += elems[j];
-					str += ',';
+					std::cout << "overflow" << std::endl;
+					return;
 				}
+				//ss.str("");
+				//ss << elems[j];
+				//str += ss.str();
+				str += nSta;
+				str += ',';
 			}
 			str += 'u';
 		}
@@ -444,10 +444,13 @@ void NNextNfaSet(const CNfa &oneNfaTab, const std::vector<size_t> &curNfaVec, si
 		{
 			continue;
 		}
-		const CStateSet &nextEdges = oneNfaTab[*vecIter][edge];
-		for (size_t i = 0; i < nextEdges.Size(); ++i)
+		const CNfaRow &row = oneNfaTab[*vecIter];
+		size_t nCurCnt = nextNfaVec.size();
+		size_t nAddCnt = row.DestCnt(edge);
+		if (nAddCnt != 0)
 		{
-			nextNfaVec.push_back(nextEdges[i]);
+			nextNfaVec.resize(nCurCnt + row.DestCnt(edge));
+			row.CopyCol(edge, &nextNfaVec[nCurCnt]);
 		}
 	}
 	std::sort(nextNfaVec.begin(), nextNfaVec.end());
@@ -495,16 +498,15 @@ void NEClosure(const CNfa &oneNfaTab, const std::vector<size_t> &curNfaVec, std:
 			continue;
 		}
 		//curStateµÄE×ªÒÆ
-		const CStateSet &eTempVec = oneNfaTab[curState][cEmptyEdge];
-		if(eTempVec.Size() != 0)
+		const CNfaRow &row = oneNfaTab[curState];
+		size_t nCnt = row.DestCnt(cEmptyEdge);
+		for(size_t i = 0; i != nCnt; ++i)
 		{
-			for(size_t i = 0; i != eTempVec.Size(); ++i)
+			size_t nSta = row.GetDest(cEmptyEdge, i);
+			if(caledStat[nSta] == 0)
 			{
-				if(caledStat[eTempVec[i]] == 0)
-				{
-					caledStat[eTempVec[i]] = 1;
-					eStack.push_back(eTempVec[i]);
-				}
+				caledStat[nSta] = 1;
+				eStack.push_back(nSta);
 			}
 		}
 	}

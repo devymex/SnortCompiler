@@ -34,8 +34,8 @@ void main()
 	//	}
 	//}
 	CTimer t;
-	compilenew(_T("..\\..\\input\\allrules.rule"), result);
+	compilenew(_T("..\\allrules.rule"), result);
 	std::cout << t.Reset() << std::endl;
-	result.WriteToFile(_T("..\\..\\output\\result_after.cdt"));
+	result.WriteToFile(_T("..\\result_after.cdt"));
 	system("pause");
 }

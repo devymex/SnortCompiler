@@ -13,11 +13,13 @@ void IncreNfaStaNum(int increNum, CNfa &curNfa)
 
 	for (size_t i = 0; i < curNfa.Size(); ++i)
 	{
-		for(size_t charNum = 0; charNum < CHARSETSIZE -3; ++charNum)
+		CNfaRow &row = curNfa[i];
+		for(size_t charNum = 0; charNum < CHARSETSIZE - 3; ++charNum)
 		{
-			for (size_t j = 0; j < curNfa[i][charNum].Size(); ++j)
+			size_t nCnt = row.DestCnt(charNum);
+			for (size_t j = 0; j < nCnt; ++j)
 			{
-				curNfa[i][charNum][j] += increNum;
+				row.GetDest(charNum, j) += increNum;
 			}
 		}
 	}

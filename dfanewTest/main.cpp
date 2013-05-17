@@ -4,22 +4,6 @@
 #include "../pcre2nfa/pcre2nfa.h"
 #include "../mergedfanew/MergeDfanew.h"
 
-void printNfa(CNfa &nfa)
-{
-	for (size_t j = 0; j < nfa.Size(); ++j)
-	{
-		std::cout << j << ": ";
-		for (size_t k = 0; k < CHARSETSIZE; ++k)
-		{
-			for (size_t l = 0; l < nfa[j][k].Size(); ++l)
-			{
-				std::cout << "(" << k << "," << nfa[j][k][l] << ")";
-			}
-		}
-		std::cout << std::endl;
-	}
-}
-
 void main()
 {
 	/*CNfa nfa1,nfa2;
