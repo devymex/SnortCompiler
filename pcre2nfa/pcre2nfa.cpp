@@ -147,13 +147,14 @@ PCRETONFA size_t PcreToNFA(const char *pPcre, CNfa &nfa)
 	}
 	if (nFromBeg == size_t(-1))
 	{
-		size_t nCursize = nfa.Size();
-		nfa.Resize(nCursize + 1);
+		size_t nCurSize = nfa.Size();
+		nfa.Resize(nCurSize + 1);
 		for (size_t i = 0; i < EMPTY; ++i)
 		{
-			nfa.Back()[i].PushBack(nCursize);
+			nfa.Back().AddDest(i, nCurSize);
 		}
-		nfa.Back()[EMPTY].PushBack(nCursize + 1);
+		nfa.Back().AddDest(EMPTY, nCurSize + 1);
 	}
-	return ProcessPcre(Beg, End, nfa);
+	size_t nr = ProcessPcre(Beg, End, nfa);
+	return nr;
 }

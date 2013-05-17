@@ -36,9 +36,9 @@ MERDFANEW bool NOrMerge(std::vector<CDfanew> &dfas, CDfanew &lastDfa)
 
 	for(STATEID i = 0; i < dfas.size(); ++i)
 	{
-		oneNfa[0][EMPTYEDGE].PushBack(oneNfa.Size());
+		oneNfa[0].AddDest(EMPTYEDGE, oneNfa.Size());
 		NIncreDfaNum(dfas[i], (STATEID)oneNfa.Size());
-		NInsertDfa(dfas[i], oneNfa,nTermSta, nfalog, count);
+		NInsertDfa(dfas[i], oneNfa, nTermSta, nfalog, count);
 	}
 
 	if(lastDfa.FromNFA(oneNfa, nfalog, count, true) == 0)

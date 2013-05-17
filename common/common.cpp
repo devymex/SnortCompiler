@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "common.h"
 
-
 RULEOPTION::RULEOPTION()
 {
 	m_pPattern = new std::string;
@@ -132,22 +131,78 @@ COMMONSC void CVectorNumber::Clear()
 	m_pSet->clear();
 }
 
-COMMONSC CNfaRow::CNfaRow()
+COMMONSC CNfaRow::CNfaRow(size_t nSize)
+	: m_nSize(nSize)
 {
+	m_pDestSet = new std::vector<size_t>[m_nSize];
 }
 
 COMMONSC CNfaRow::~CNfaRow()
 {
+	delete []m_pDestSet;
 }
 
-COMMONSC CStateSet& CNfaRow::operator[](size_t nChar)
+COMMONSC size_t CNfaRow::Size() const
 {
-	return m_pDestSet[nChar];
+	return m_nSize;
 }
 
-COMMONSC const CStateSet& CNfaRow::operator[](size_t nChar) const
+COMMONSC void CNfaRow::Resize(size_t nSize)
 {
-	return m_pDestSet[nChar];
+	if (m_nSize != nSize)
+	{
+		delete []m_pDestSet;
+		m_pDestSet = new std::vector<size_t>[nSize];
+		m_nSize = nSize;
+	}
+}
+
+COMMONSC size_t CNfaRow::DestCnt(size_t nCol) const
+{
+	return m_pDestSet[nCol].size();
+}
+
+COMMONSC size_t& CNfaRow::GetDest(size_t nCol, size_t nIdx)
+{
+	return m_pDestSet[nCol][nIdx];
+}
+
+COMMONSC const size_t& CNfaRow::GetDest(size_t nCol, size_t nIdx) const
+{
+	return m_pDestSet[nCol][nIdx];
+}
+
+COMMONSC size_t* CNfaRow::GetCol(size_t nCol)
+{
+	return m_pDestSet[nCol].data();
+}
+
+COMMONSC const size_t* CNfaRow::GetCol(size_t nCol) const
+{
+	return m_pDestSet[nCol].data();
+}
+
+COMMONSC void CNfaRow::CopyCol(size_t nCol, size_t *pOut) const
+{
+	memcpy(pOut, m_pDestSet[nCol].data(), m_pDestSet[nCol].size() * sizeof(size_t));
+}
+
+COMMONSC void CNfaRow::AddDest(size_t nCol, size_t nDest)
+{
+	m_pDestSet[nCol].push_back(nDest);
+}
+
+COMMONSC void CNfaRow::SortDest(size_t nCol)
+{
+	std::sort(m_pDestSet[nCol].begin(), m_pDestSet[nCol].end());
+}
+
+COMMONSC void CNfaRow::SortAllDest()
+{
+	for (size_t i = 0; i < m_nSize; ++i)
+	{
+		std::sort(m_pDestSet[i].begin(), m_pDestSet[i].end());
+	}
 }
 
 COMMONSC CNfaRow::CNfaRow(const CNfaRow &other)
@@ -157,7 +212,8 @@ COMMONSC CNfaRow::CNfaRow(const CNfaRow &other)
 
 COMMONSC CNfaRow& CNfaRow::operator=(const CNfaRow &other)
 {
-	for (size_t i = 0; i < CHARSETSIZE; ++i)
+	Resize(other.m_nSize);
+	for (size_t i = 0; i < m_nSize; ++i)
 	{
 		m_pDestSet[i] = other.m_pDestSet[i];
 	}
@@ -193,6 +249,10 @@ COMMONSC void CNfa::Resize(size_t _Newsize)
 {
 	//CTimer t;
 	m_pNfa->resize(_Newsize);
+	for (std::vector<CNfaRow>::iterator i = m_pNfa->begin(); i != m_pNfa->end(); ++i)
+	{
+		i->Resize(CHARSETSIZE);
+	}
 	//g_dTimer += t.Reset();
 }
 
@@ -219,7 +279,7 @@ COMMONSC void CNfa::FromDfa(CDfa &dfa)
 		{
 			if(dfa[i][charNum] != STATEID(-1))
 			{
-				(*m_pNfa)[i][charNum].PushBack(dfa[i][charNum]);
+				(*m_pNfa)[i].AddDest(charNum, dfa[i][charNum]);
 			}
 		}
 	}
@@ -899,3 +959,22 @@ COMMONSC RULEOPTION* CSnortRule::operator[](size_t nIdx) const
 {
 	return (*m_pOptions)[nIdx];
 }
+
+COMMONSC void printNfa(CNfa &nfa)
+{
+	for (size_t i = 0; i < nfa.Size(); ++i)
+	{
+		const CNfaRow &row = nfa[i];
+		std::cout << i << ": ";
+		for (size_t j = 0; j < CHARSETSIZE; ++j)
+		{
+			size_t nCnt = row.DestCnt(j);
+			for (size_t k = 0; k < nCnt; ++k)
+			{
+				std::cout << "(" << j << "," << row.GetDest(j, k) << ")";
+			}
+		}
+		std::cout << std::endl;
+	}
+}
+

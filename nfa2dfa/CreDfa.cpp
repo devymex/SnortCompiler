@@ -29,7 +29,7 @@ bool ColumnEqual(std::vector<CStateSet*> &c1, std::vector<CStateSet*>&c2)
 	}
 	for (size_t i = 0; i < c1.size(); ++i)
 	{
-		if (c1[i]->Size() != c2[i]->Size())
+		if (c1[i]->size() != c2[i]->size())
 		{
 			return false;
 		}
@@ -119,10 +119,11 @@ void NextNfaSet(const CNfa &oneNfaTab, const std::vector<size_t> &curNfaVec, siz
 		{
 			continue;
 		}
-		const CStateSet &nextEdges = oneNfaTab[*vecIter][edge];
-		for (size_t i = 0; i < nextEdges.Size(); ++i)
+		const CNfaRow &row = oneNfaTab[*vecIter];
+		size_t nSize = row.DestCnt(edge);
+		for (size_t i = 0; i < nSize; ++i)
 		{
-			nextNfaVec.push_back(nextEdges[i]);
+			nextNfaVec.push_back(row.GetDest(edge, i));
 		}
 	}
 	std::sort(nextNfaVec.begin(), nextNfaVec.end());
@@ -163,14 +164,13 @@ void EClosure(const CNfa &oneNfaTab, const std::vector<size_t> &curNfaVec, std::
 				caledStat[curSta] = 1;
 				if(curSta < oneNfaTab.Size())
 				{
-					const CStateSet &eTempVec = oneNfaTab[curSta][cEmptyEdge];
-					if(eTempVec.Size() != 0)
+					const CNfaRow &row = oneNfaTab[curSta];
+					size_t nCnt = row.DestCnt(cEmptyEdge);
+					//const CStateSet &eTempVec = [cEmptyEdge];
+					for (size_t i = 0; i < nCnt; ++i)
 					{
-						for (size_t i = 0; i < eTempVec.Size(); ++i)
-						{
-							eNfaVec.push_back(eTempVec[i]);
-							eStack.push_back(eTempVec[i]);
-						}
+						eNfaVec.push_back(row.GetDest(cEmptyEdge, i));
+						eStack.push_back(row.GetDest(cEmptyEdge, i));
 					}
 				}
 			}

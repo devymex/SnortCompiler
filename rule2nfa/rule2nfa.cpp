@@ -636,11 +636,11 @@ void contentToLinearNFA(OPTIONCONTENT *content, CNfa &nfa)
 		size_t id = i + 1;
 		for(int j = 0; j < 256; ++j)
 		{
-			row[j].PushBack(id);
+			row.AddDest(j, id);
 		}
 		if(i >= mustCnt)
 		{
-			row[EMPTYEDGE].PushBack(stateID);
+			row.AddDest(EMPTYEDGE, stateID);
 		}
 	}
 
@@ -654,12 +654,12 @@ void contentToLinearNFA(OPTIONCONTENT *content, CNfa &nfa)
 
 		if((content->nFlags & CF_NOCASE) && isalpha(*iter))
 		{
-			row[toupper(*iter)].PushBack(stateID);
-			row[tolower(*iter)].PushBack(stateID);
+			row.AddDest(toupper(*iter), stateID);
+			row.AddDest(tolower(*iter), stateID);
 		}
 		else
 		{
-			row[*iter].PushBack(stateID);
+			row.AddDest(*iter, stateID);
 		}
 
 		++stateID;
@@ -694,7 +694,7 @@ void contentToDefaultNFA(OPTIONCONTENT *content, CNfa &nfa)
 		size_t id = i + 1;
 		for(size_t j = 0; j < 256; ++j)
 		{
-			row[j].PushBack(id);
+			row.AddDest(j, id);
 		}
 	}
 
@@ -719,12 +719,12 @@ void contentToDefaultNFA(OPTIONCONTENT *content, CNfa &nfa)
 		{
 			if(i == 0)
 			{
-				row[c].PushBack(stateID);
+				row.AddDest(c, stateID);
 			}
 			BYTE character = BYTE((content->nFlags & CF_NOCASE) ? tolower(c) : c);
 			if(character == pattern[i])
 			{
-				row[c].PushBack(id);
+				row.AddDest(c, id);
 			}
 		}
 	}
@@ -759,18 +759,20 @@ void outPut(CNfa &nfa, std::string &fileName)
 	fout << std::endl;
 	for(size_t i = 0; i < stateNum; ++i)
 	{
+		const CNfaRow &row = nfa[i];
 		fout << i << "\t";
 		for(size_t j = 0; j < 257; ++j)
 		{
-			if(nfa[i][j].Size() == 0)
+			size_t nCnt = row.DestCnt(j);
+			if(nCnt == 0)
 			{
 				fout << -1 << "\t";
 			}
 			else
 			{
-				for(size_t k = 0; k < nfa[i][j].Size(); ++k)
+				for(size_t k = 0; k < nCnt; ++k)
 				{
-					fout << nfa[i][j][k] << ", ";
+					fout << row.GetDest(j, k) << ", ";
 				}
 				fout << "\t";
 			}
