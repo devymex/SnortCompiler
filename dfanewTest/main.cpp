@@ -35,20 +35,20 @@ void main()
 	system("pause");*/
 
 	//const char* a1 = "/^(ab|bc)def(ab|cd)/";
-	const char* a1 = "/^(ab|bc)d(ef|g)/i";
-	const char* a2 = "/^.{2}.*ab/si";
-	const char* a3 = "/^(a|b)abb/";
+	//const char* a1 = "/^(ab|bc)d(ef|g)/";
+	const char* a1 = "/^.{2}.*ab/si";
+	//const char* a3 = "/^(a|b)abb/";
 	CNfa nfa1;
 	CNfa nfa2;
 	CNfa nfa3;
 
 	PcreToNFA(a1, nfa1);
-	PcreToNFA(a2, nfa2);
-	PcreToNFA(a3, nfa3);
+	//PcreToNFA(a2, nfa2);
+	//PcreToNFA(a3, nfa3);
 
-	outPut(nfa1, "F:\\cppProject\\huawei\\PreciseMatch\\output\\nfa1_opt.txt");
-	outPut(nfa2, "F:\\cppProject\\huawei\\PreciseMatch\\output\\nfa2_opt.txt");
-	outPut(nfa3, "F:\\cppProject\\huawei\\PreciseMatch\\output\\nfa3_opt.txt");
+	outPut(nfa1, "F:\\cppProject\\huawei\\PreciseMatch\\output\\nfa1_test.txt");
+	//outPut(nfa2, "F:\\cppProject\\huawei\\PreciseMatch\\output\\nfa2_opt.txt");
+	//outPut(nfa3, "F:\\cppProject\\huawei\\PreciseMatch\\output\\nfa3_opt.txt");
 
 
 	CDfanew dfa1;
@@ -58,10 +58,10 @@ void main()
 	CTimer nfa2dfatime;//用于测试
 	nfa2dfatime.Reset();//用于测试
 	dfa1.FromNFA(nfa1, NULL, 0);
-	dfa2.FromNFA(nfa2, NULL, 0);
-	dfa3.FromNFA(nfa3, NULL, 0);
+	//dfa2.FromNFA(nfa2, NULL, 0);
+	//dfa3.FromNFA(nfa3, NULL, 0);
 	std::cout << "nfa2dfastime: " << nfa2dfatime.Reset() << std::endl;//用于测试
-	//outPutDfa(dfa1, "F:\\cppProject\\huawei\\PreciseMatch\\output\\dfa1_after.txt");
+	outPutDfa(dfa1, "F:\\cppProject\\huawei\\PreciseMatch\\output\\dfa1_test.txt");
 
 	dfa1.Minimize();
 	dfa2.Minimize();

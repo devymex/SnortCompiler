@@ -894,18 +894,18 @@ CRECHANFA size_t Rule2PcreList(const CSnortRule &rule, CRegRule &regrule)
 			//提取content中的signature
 			if(pContent->vecconts.size() >= 4)
 			{
-				for(std::vector<BYTE>::iterator sigIt = pContent->vecconts.begin();
-					sigIt + 3 != pContent->vecconts.end(); ++sigIt)
+				std::vector<BYTE> contentTmp;
+				contentTmp.reserve(pContent->vecconts.size());
+				for(std::vector<BYTE>::iterator itTmp = pContent->vecconts.begin();
+					itTmp != pContent->vecconts.end(); ++itTmp)
+				{
+					contentTmp.push_back(tolower(*itTmp));
+				}
+
+				for(std::vector<BYTE>::iterator sigIt = contentTmp.begin();
+					sigIt + 3 != contentTmp.end(); ++sigIt)
 				{
 					SIGNATURE sig = *(SIGNATURE*)&(*sigIt);
-					//BYTE *p = (BYTE*)&sig;
-					//std::cout << p << "  ";
-					//for(size_t j = 0; j < 4; ++j)
-					//{
-					//	BYTE c = *(p + j);
-					//	std::cout << (size_t)c << " ";
-					//}
-					//std::cout << std::endl;
 					regrule.Back().PushBackSig(sig);
 				}
 			}

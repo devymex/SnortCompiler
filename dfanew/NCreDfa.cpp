@@ -140,12 +140,13 @@ bool operator == (const MD5VAL &md5val1, const MD5VAL &md5val2)
 
 struct KEY
 {
-	std::vector<size_t>* m_pKey;
+	size_t* pAddr;
+	size_t nSize;
 };
 
 struct GROUPSET_HASH
 {
-	size_t operator()(const std::vector<CStateSet*> &set)
+	size_t operator()(const std::vector<KEY> &set)
 	{
 		const size_t _FNV_offset_basis = 2166136261U;
 		const size_t _FNV_prime = 16777619U;
@@ -153,11 +154,15 @@ struct GROUPSET_HASH
 		size_t _Val = _FNV_offset_basis;
 		for (size_t _Next = 0; _Next < set.size(); ++_Next)
 			{	
-				for(size_t j = 0; j < set[_Next]->Size(); ++j)
+				if(set[_Next].pAddr != NULL)
 				{
-					_Val ^= (*set[_Next])[j];
-					_Val *= _FNV_prime;
+					for(size_t j = 0; j < set[_Next].nSize; ++j)
+					{
+						size_t elemt = set[_Next].pAddr[j];
+						_Val ^= elemt;
+						_Val *= _FNV_prime;
 
+					}
 				}
 				_Val ^= (size_t)-1;
 				_Val *= _FNV_prime;
@@ -167,7 +172,7 @@ struct GROUPSET_HASH
 	}
 };
 
-bool operator == (const std::vector<CStateSet*> &set1, const std::vector<CStateSet*> &set2)
+bool operator == (const std::vector<KEY> &set1, const std::vector<KEY> &set2)
 {
 	size_t nSize = set1.size();
 	if(nSize != set2.size())
@@ -176,72 +181,86 @@ bool operator == (const std::vector<CStateSet*> &set1, const std::vector<CStateS
 	}
 	for(size_t i = 0; i < nSize; ++i)
 	{
-		size_t iSize1 = set1[i]->Size();
-		size_t iSize2 = set2[i]->Size();
-
-		if(iSize1 != iSize2)
+		if((set1[i].pAddr == NULL && set2[i].pAddr != NULL) || (set1[i].pAddr != NULL && set2[i].pAddr == NULL))
 		{
 			return false;
 		}
-		if(iSize1 != 0)
+		if(set1[i].pAddr != NULL && set2[i].pAddr != NULL)
 		{
-			if(memcmp(&(*set1[i])[0], &(*set2[i])[0], iSize1 * sizeof(size_t) != 0))
+			size_t iSize1 = set1[i].nSize;
+			size_t iSize2 = set2[i].nSize;
+			if(iSize1 != iSize2)
+			{
+				return false;
+			}
+			if(memcmp(set1[i].pAddr, set2[i].pAddr, iSize1 * sizeof(size_t)) != 0)
 			{
 				return false;
 			}
 		}
+
 	}
 	return true;
 }
 
 
-//使用std::vector<size_t>*进行hash, 正确，较快
-//void NAvaiEdges(CNfa &oneNfaTab, STATEID *group)
-//{
-//	typedef std::unordered_map<std::vector<CStateSet*>, STATEID, GROUPSET_HASH> GROUPHASH;
-//	GROUPHASH ghash;
-//	STATEID curId = 0;
-//
-//	typedef std::vector<std::vector<CStateSet*> > COLUMN;
-//	COLUMN nfaCol(DFACOLSIZE);
-//
-//	//size_t nSize = oneNfaTab.Size();
-//	//for (size_t i = 0; i < nSize; ++i)
-//	//{
-//	//	oneNfaTab[i].SortAllDest();
-//	//}
-//
-//	for(size_t c = 0; c < DFACOLSIZE; ++c)
-//	{
-//		nfaCol[c].resize(oneNfaTab.Size());
-//		for(size_t i = 0; i < oneNfaTab.Size(); ++i)
-//		{
-//			CStateSet &elems = oneNfaTab[i][c];
-//			if(elems.Size() != 0)
-//			{
-//				elems.Sort();
-//				nfaCol[c][i] = &oneNfaTab[i][c];
-//			}
-//			else
-//			{
-//				nfaCol[c][i] = &oneNfaTab[i][c];
-//			}
-//		}
-//
-//		GROUPHASH::iterator colIt = ghash.find(nfaCol[c]);
-//		if(colIt == ghash.end())
-//		{
-//			ghash[nfaCol[c]] = curId;
-//			group[c] = curId;
-//			++curId;
-//		}
-//		else
-//		{
-//			group[c] = colIt->second;
-//		}
-//	}
-//
-//}
+//使用std::vector<size_t*>进行hash, 正确，较快
+void NAvaiEdges(CNfa &oneNfaTab, STATEID *group)
+{
+	typedef std::unordered_map<std::vector<KEY>, STATEID, GROUPSET_HASH> GROUPHASH;
+	GROUPHASH ghash;
+	STATEID curId = 0;
+
+	typedef std::vector<std::vector<KEY> > COLUMN;
+	COLUMN nfaCol(DFACOLSIZE);
+
+	size_t nSize = oneNfaTab.Size();
+	for (size_t i = 0; i < nSize; ++i)
+	{
+		oneNfaTab[i].SortAllDest();
+	}
+
+	for(size_t c = 0; c < DFACOLSIZE; ++c)
+	{
+		nfaCol[c].resize(oneNfaTab.Size());
+		for(size_t i = 0; i < oneNfaTab.Size(); ++i)
+		{
+			//CNfaRow &row = oneNfaTab[i];
+			//size_t* pElems = row.GetElem(c);
+			nfaCol[c][i].pAddr = oneNfaTab[i].GetCol(c);
+			nfaCol[c][i].nSize = oneNfaTab[i].DestCnt(c);
+			//if(nfaCol[c][i] != NULL)
+			//{
+			//	std::cout << "not NULL" << std::endl;
+			//}
+			//CNfaRow &row = oneNfaTab[i];
+			//size_t* elems = row.GetCol(c);
+			//if(elems.size() != 0)
+			//{
+			//	std::sort(elems.begin(), elems.end());
+			//	//elems.Sort();
+			//	nfaCol[c][i] = oneNfaTab[i].GetCol[c];
+			//}
+			//else
+			//{
+			//	nfaCol[c][i] = oneNfaTab[i].GetCol[c];
+			//}
+		}
+
+		GROUPHASH::iterator colIt = ghash.find(nfaCol[c]);
+		if(colIt == ghash.end())
+		{
+			ghash[nfaCol[c]] = curId;
+			group[c] = curId;
+			++curId;
+		}
+		else
+		{
+			group[c] = colIt->second;
+		}
+	}
+
+}
 
 //string 正确 快，先取出列
 //void NAvaiEdges(CNfa &oneNfaTab, STATEID *group)
@@ -288,57 +307,57 @@ bool operator == (const std::vector<CStateSet*> &set1, const std::vector<CStateS
 //}
 
 //使用string进行hash，正确，非常快
-void NAvaiEdges(CNfa &oneNfaTab, STATEID *group)
-{
-	//typedef std::unordered_map<std::vector<CStateSet*>, STATEID, GROUPSET_HASH> GROUPHASH;
-	typedef std::unordered_map<std::string, STATEID> GROUPHASH;//将每一列表示成string形式，size=0的用'n'代表，每行之间用'u'间隔,元素与元素之间用','间隔
-	GROUPHASH ghash;
-	STATEID curId = 0;
-	std::stringstream ss;
-	size_t nSize = oneNfaTab.Size();
-	for (size_t i = 0; i < nSize; ++i)
-	{
-		oneNfaTab[i].SortAllDest();
-	}
-	std::string str;
-	str.reserve(10000);
-	for(size_t c = 0; c < DFACOLSIZE; ++c)
-	{
-		str.clear();
-		for(size_t i = 0; i < nSize; ++i)
-		{
-			CNfaRow &row = oneNfaTab[i];
-			//CStateSet &elems = oneNfaTab[i][c];
-			size_t nCnt = row.DestCnt(c);
-			for(size_t j = 0; j < nCnt; ++j)
-			{
-				size_t nSta = row.GetDest(c, j);
-				if(nSta > nSize)
-				{
-					std::cout << "overflow" << std::endl;
-					return;
-				}
-				ss.str("");
-				ss << nSta;
-				str += ss.str();
-				//str += nSta;
-				str.push_back(',');
-			}
-			str.push_back('u');
-		}
-		GROUPHASH::iterator it = ghash.find(str);
-		if(it == ghash.end())
-		{
-			ghash[str] = curId;
-			group[c] = curId;
-			++curId;
-		}
-		else
-		{
-			group[c] = it->second;
-		}
-	}
-}
+//void NAvaiEdges(CNfa &oneNfaTab, STATEID *group)
+//{
+//	//typedef std::unordered_map<std::vector<CStateSet*>, STATEID, GROUPSET_HASH> GROUPHASH;
+//	typedef std::unordered_map<std::string, STATEID> GROUPHASH;//将每一列表示成string形式，size=0的用'n'代表，每行之间用'u'间隔,元素与元素之间用','间隔
+//	GROUPHASH ghash;
+//	STATEID curId = 0;
+//	std::stringstream ss;
+//	size_t nSize = oneNfaTab.Size();
+//	for (size_t i = 0; i < nSize; ++i)
+//	{
+//		oneNfaTab[i].SortAllDest();
+//	}
+//	std::string str;
+//	str.reserve(10000);
+//	for(size_t c = 0; c < DFACOLSIZE; ++c)
+//	{
+//		str.clear();
+//		for(size_t i = 0; i < nSize; ++i)
+//		{
+//			CNfaRow &row = oneNfaTab[i];
+//			//CStateSet &elems = oneNfaTab[i][c];
+//			size_t nCnt = row.DestCnt(c);
+//			for(size_t j = 0; j < nCnt; ++j)
+//			{
+//				size_t nSta = row.GetDest(c, j);
+//				if(nSta > nSize)
+//				{
+//					std::cout << "overflow" << std::endl;
+//					return;
+//				}
+//				ss.str("");
+//				ss << nSta;
+//				str += ss.str();
+//				//str += nSta;
+//				str.push_back(',');
+//			}
+//			str.push_back('u');
+//		}
+//		GROUPHASH::iterator it = ghash.find(str);
+//		if(it == ghash.end())
+//		{
+//			ghash[str] = curId;
+//			group[c] = curId;
+//			++curId;
+//		}
+//		else
+//		{
+//			group[c] = it->second;
+//		}
+//	}
+//}
 //
 //原始代码，正确，慢
 //void NAvaiEdges(CNfa &oneNfaTab, STATEID *group)
