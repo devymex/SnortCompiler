@@ -89,6 +89,7 @@ public:
 	size_t& GetDest(size_t nCol, size_t nIdx);
 	const size_t& GetDest(size_t nCol, size_t nIdx) const;
 	size_t* GetCol(size_t nCol);
+	//size_t* GetElem(size_t nCol);
 	const size_t* GetCol(size_t nCol) const;
 	void CopyCol(size_t nCol, size_t *pOut) const;
 	void AddDest(size_t nCol, size_t nDest);

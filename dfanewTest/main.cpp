@@ -35,7 +35,7 @@ void main()
 	system("pause");*/
 
 	//const char* a1 = "/^(ab|bc)def(ab|cd)/";
-	const char* a1 = "/^(ab|bc)d(ef|g)/i";
+	const char* a1 = "/^(ab|bc)d(ef|g)/";
 	const char* a2 = "/^.{2}.*ab/si";
 	const char* a3 = "/^(a|b)abb/";
 	CNfa nfa1;
@@ -46,9 +46,9 @@ void main()
 	PcreToNFA(a2, nfa2);
 	PcreToNFA(a3, nfa3);
 
-	outPut(nfa1, "F:\\cppProject\\huawei\\PreciseMatch\\output\\nfa1_opt.txt");
-	outPut(nfa2, "F:\\cppProject\\huawei\\PreciseMatch\\output\\nfa2_opt.txt");
-	outPut(nfa3, "F:\\cppProject\\huawei\\PreciseMatch\\output\\nfa3_opt.txt");
+	outPut(nfa1, "F:\\cppProject\\huawei\\PreciseMatch\\output\\nfa1_origin.txt");
+	outPut(nfa2, "F:\\cppProject\\huawei\\PreciseMatch\\output\\nfa2_origin.txt");
+	outPut(nfa3, "F:\\cppProject\\huawei\\PreciseMatch\\output\\nfa3_origin.txt");
 
 
 	CDfanew dfa1;
@@ -61,16 +61,16 @@ void main()
 	dfa2.FromNFA(nfa2, NULL, 0);
 	dfa3.FromNFA(nfa3, NULL, 0);
 	std::cout << "nfa2dfastime: " << nfa2dfatime.Reset() << std::endl;//用于测试
-	//outPutDfa(dfa1, "F:\\cppProject\\huawei\\PreciseMatch\\output\\dfa1_after.txt");
+	//outPutDfa(dfa1, "F:\\cppProject\\huawei\\PreciseMatch\\output\\dfa1_test.txt");
 
 	dfa1.Minimize();
 	dfa2.Minimize();
 	dfa3.Minimize();
 	std::cout << "dfasMin: " << nfa2dfatime.Reset() << std::endl;//用于测试
 
-	outPutDfa(dfa1, "F:\\cppProject\\huawei\\PreciseMatch\\output\\dfa1_opt.txt");
-	outPutDfa(dfa2, "F:\\cppProject\\huawei\\PreciseMatch\\output\\dfa2_opt.txt");
-	outPutDfa(dfa3, "F:\\cppProject\\huawei\\PreciseMatch\\output\\dfa3_opt.txt");
+	outPutDfa(dfa1, "F:\\cppProject\\huawei\\PreciseMatch\\output\\dfa1_origin.txt");
+	outPutDfa(dfa2, "F:\\cppProject\\huawei\\PreciseMatch\\output\\dfa2_origin.txt");
+	outPutDfa(dfa3, "F:\\cppProject\\huawei\\PreciseMatch\\output\\dfa3_origin.txt");
 
 	std::vector<CDfanew> dfas;
 	dfas.push_back(dfa1);
@@ -83,7 +83,7 @@ void main()
 	std::cout << "merge dfas time: " << nfa2dfatime.Reset() << std::endl;//用于测试
 
 	lastdfa.Minimize();
-	outPutDfa(lastdfa, "F:\\cppProject\\huawei\\PreciseMatch\\output\\lastdfa_opt.txt");
+	outPutDfa(lastdfa, "F:\\cppProject\\huawei\\PreciseMatch\\output\\lastdfa_origin.txt");
 
 
 	//std::vector<std::vector<BYTE>> allStr;

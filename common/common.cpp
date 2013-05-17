@@ -172,6 +172,16 @@ COMMONSC const size_t& CNfaRow::GetDest(size_t nCol, size_t nIdx) const
 	return m_pDestSet[nCol][nIdx];
 }
 
+//COMMONSC size_t* CNfaRow::GetElem(size_t nCol)
+//{
+//	if(!m_pDestSet[nCol].empty())
+//	{
+//		return &m_pDestSet[nCol][0];
+//	}
+//	else 
+//		return NULL;
+//}
+
 COMMONSC size_t* CNfaRow::GetCol(size_t nCol)
 {
 	return m_pDestSet[nCol].data();
