@@ -77,7 +77,7 @@ void main()
 
 	CTimer t;
 	compilenew(_T("..\\..\\input\\allrules.rule"), result);
-	result.WriteToFile(_T("..\\..\\output\\result.cdt"));
+	result.WriteToFile(_T("..\\..\\output\\result_size_t.cdt"));
 	std::cout << t.Reset() << std::endl;
 	system("pause");
 }

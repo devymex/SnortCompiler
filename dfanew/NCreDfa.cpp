@@ -204,7 +204,7 @@ bool operator == (const std::vector<KEY> &set1, const std::vector<KEY> &set2)
 }
 
 
-//使用std::vector<size_t*>进行hash, 正确，较快
+//使用std::vector<size_t*>进行hash, 正确，快
 void NAvaiEdges(CNfa &oneNfaTab, STATEID *group)
 {
 	typedef std::unordered_map<std::vector<KEY>, STATEID, GROUPSET_HASH> GROUPHASH;
@@ -225,26 +225,8 @@ void NAvaiEdges(CNfa &oneNfaTab, STATEID *group)
 		nfaCol[c].resize(oneNfaTab.Size());
 		for(size_t i = 0; i < oneNfaTab.Size(); ++i)
 		{
-			//CNfaRow &row = oneNfaTab[i];
-			//size_t* pElems = row.GetElem(c);
 			nfaCol[c][i].pAddr = oneNfaTab[i].GetCol(c);
 			nfaCol[c][i].nSize = oneNfaTab[i].DestCnt(c);
-			//if(nfaCol[c][i] != NULL)
-			//{
-			//	std::cout << "not NULL" << std::endl;
-			//}
-			//CNfaRow &row = oneNfaTab[i];
-			//size_t* elems = row.GetCol(c);
-			//if(elems.size() != 0)
-			//{
-			//	std::sort(elems.begin(), elems.end());
-			//	//elems.Sort();
-			//	nfaCol[c][i] = oneNfaTab[i].GetCol[c];
-			//}
-			//else
-			//{
-			//	nfaCol[c][i] = oneNfaTab[i].GetCol[c];
-			//}
 		}
 
 		GROUPHASH::iterator colIt = ghash.find(nfaCol[c]);
@@ -306,7 +288,7 @@ void NAvaiEdges(CNfa &oneNfaTab, STATEID *group)
 //	}
 //}
 
-//使用string进行hash，正确，非常快
+//使用string进行hash，正确，快
 //void NAvaiEdges(CNfa &oneNfaTab, STATEID *group)
 //{
 //	//typedef std::unordered_map<std::vector<CStateSet*>, STATEID, GROUPSET_HASH> GROUPHASH;
