@@ -900,7 +900,14 @@ CRECHANFA size_t Rule2PcreList(const CSnortRule &rule, CRegRule &regrule)
 					itTmp != pContent->vecconts.end(); ++itTmp)
 				{
 					BYTE c = *itTmp;
-					contentTmp.push_back(tolower(c));
+					if (c >= 'A' && c <= 'Z')
+					{
+						contentTmp.push_back(c - 'A' + 'a');
+					}
+					else
+					{
+						contentTmp.push_back(c);
+					}
 				}
 
 				for(std::vector<BYTE>::iterator sigIt = contentTmp.begin();
