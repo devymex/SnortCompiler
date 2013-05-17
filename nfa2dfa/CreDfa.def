@@ -1,3 +1,0 @@
-LIBRARY nfa2dfa
-EXPORTS
-NfaToDfa @ 1
