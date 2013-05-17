@@ -894,19 +894,22 @@ CRECHANFA size_t Rule2PcreList(const CSnortRule &rule, CRegRule &regrule)
 			//提取content中的signature
 			if(pContent->vecconts.size() >= 4)
 			{
-				//std::vector<BYTE> contentTmp;
-				//contentTmp.reserve(pContent->vecconts.size());
-				//for(std::vector<BYTE>::iterator itTmp = pContent->vecconts.begin();
-				//	itTmp != pContent->vecconts.end(); ++itTmp)
-				//{
-				//	BYTE c = *itTmp;
-				//	contentTmp.push_back(tolower(c));
-				//}
+				std::vector<BYTE> contentTmp;
+				contentTmp.reserve(pContent->vecconts.size());
+				for(std::vector<BYTE>::iterator itTmp = pContent->vecconts.begin();
+					itTmp != pContent->vecconts.end(); ++itTmp)
+				{
+					BYTE c = *itTmp;
+					contentTmp.push_back(tolower(c));
+				}
 
-				for(std::vector<BYTE>::iterator sigIt = pContent->vecconts.begin();
-					sigIt + 3 != pContent->vecconts.end(); ++sigIt)
+				for(std::vector<BYTE>::iterator sigIt = contentTmp.begin();
+					sigIt + 3 != contentTmp.end(); ++sigIt)
 				{
 					SIGNATURE sig = *(SIGNATURE*)&(*sigIt);
+
+					//BYTE *p = (BYTE*)&sig;
+					//std::cout << *p << *(p + 1) << *(p + 2) << *(p + 3) << std::endl;
 					regrule.Back().PushBackSig(sig);
 				}
 			}
@@ -937,6 +940,15 @@ CRECHANFA size_t Rule2PcreList(const CSnortRule &rule, CRegRule &regrule)
 			regrule[i].Unique();
 		}
 	}
+	//for(size_t i = 0; i < regrule.Size(); ++i)
+	//{
+	//	for(size_t j = 0; j < regrule[i].GetSigCnt(); ++j)
+	//	{
+	//		BYTE *p  = (BYTE*)&regrule[i].GetSig(j);
+	//		std::cout << *p << *(p + 1) << *(p + 2) << *(p + 3) << "  ";
+	//	}
+	//	std::cout << std::endl;
+	//}
 	return 0;
 }
 
