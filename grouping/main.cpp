@@ -386,6 +386,7 @@ void ExtractSigs(const std::vector<RULECHAIN> &chainSet, std::vector<CHAINGROUP>
 			};
 		}
 
+		i->comSigs.clear();
 		for (std::map<SIGNATURE, size_t>::iterator j = SigMap.begin(); j != SigMap.end(); ++j)
 		{
 			if (j->second == i->chainIds.size())
@@ -396,7 +397,7 @@ void ExtractSigs(const std::vector<RULECHAIN> &chainSet, std::vector<CHAINGROUP>
 	}
 }
 
-void PutChainInGroup(std::map<size_t, size_t> &dfaIdToSidMap, std::map<size_t, std::vector<size_t>> &sidToDfaIdsMap, std::vector<CHAINGROUP> &vecChainGroups, CResNew &res, std::vector<size_t> &vecWaitForGroup)
+void PutInByRule(std::map<size_t, size_t> &dfaIdToSidMap, std::map<size_t, std::vector<size_t>> &sidToDfaIdsMap, std::vector<CHAINGROUP> &vecChainGroups, CResNew &res, std::vector<size_t> &vecWaitForGroup)
 {
 	std::map<size_t, size_t> dfaIdToGroupId;
 	for (std::vector<CHAINGROUP>::iterator i = vecChainGroups.begin(); i != vecChainGroups.end(); ++i)
@@ -410,6 +411,7 @@ void PutChainInGroup(std::map<size_t, size_t> &dfaIdToSidMap, std::map<size_t, s
 	vecWaitForGroup.clear();
 	for (std::vector<size_t>::iterator i = vecWaitForGroupCopy.begin(); i != vecWaitForGroupCopy.end(); ++i)
 	{
+		std::cout << "PutInByRule" << std::endl;
 		std::cout << "One" << std::endl;
 		std::cout << "NO: " << i - vecWaitForGroupCopy.begin() << std::endl;
 		std::cout << "Total: " << vecWaitForGroupCopy.size() << std::endl << std::endl;
@@ -433,6 +435,115 @@ void PutChainInGroup(std::map<size_t, size_t> &dfaIdToSidMap, std::map<size_t, s
 				}
 			}
 		}
+	}
+}
+
+void UpdateComSigs(std::vector<SIGNATURE> &oldSigs, const std::vector<SIGNATURE> &newSigs)
+{
+	std::map<SIGNATURE, size_t> sigToCountMap;
+	for (std::vector<SIGNATURE>::iterator i = oldSigs.begin(); i != oldSigs.end(); ++i)
+	{
+		++sigToCountMap[*i];
+	}
+	oldSigs.clear();
+	for (std::vector<SIGNATURE>::const_iterator i = newSigs.begin(); i != newSigs.end(); ++i)
+	{
+		++sigToCountMap[*i];
+	}
+	for (std::map<SIGNATURE, size_t>::iterator i = sigToCountMap.begin(); i != sigToCountMap.end(); ++i)
+	{
+		if (i->second == 2)
+		{
+			oldSigs.push_back(i->first);
+		}
+	}
+}
+
+void PutInBySig(const std::vector<RULECHAIN> &chainSet, std::vector<CHAINGROUP> &vecChainGroups, CResNew &res, std::vector<size_t> &vecWaitForGroup)
+{
+	std::vector<size_t> vecWaitForGroupCopy(vecWaitForGroup.begin(), vecWaitForGroup.end());
+	vecWaitForGroup.clear();
+	for (std::vector<size_t>::iterator i = vecWaitForGroupCopy.begin(); i != vecWaitForGroupCopy.end(); ++i)
+	{
+		std::cout << "PutInBySig" << std::endl;
+		std::cout << "One" << std::endl;
+		std::cout << "NO: " << i - vecWaitForGroupCopy.begin() << std::endl;
+		std::cout << "Total: " << vecWaitForGroupCopy.size() << std::endl << std::endl;
+		vecWaitForGroup.push_back(*i);
+		for (std::vector<CHAINGROUP>::iterator j = vecChainGroups.begin(); j != vecChainGroups.end(); ++j)
+		{
+			std::vector<SIGNATURE>::iterator k = std::find_first_of(j->comSigs.begin(), j->comSigs.end(), chainSet[*i].sigs.begin(), chainSet[*i].sigs.end());
+			if (k != j->comSigs.end())
+			{
+				std::vector<CDfanew> vecDfas;
+				vecDfas.push_back(res.GetDfaTable()[j->mergeDfaId]);
+				vecDfas.push_back(res.GetDfaTable()[*i]);
+				CDfanew MergeDfa;
+				if (NOrMerge(vecDfas, MergeDfa))
+				{
+					j->chainIds.push_back(*i);
+					res.GetDfaTable().PushBack(MergeDfa);
+					j->mergeDfaId = res.GetDfaTable().Size() - 1;
+					vecWaitForGroup.pop_back();
+					UpdateComSigs(j->comSigs, chainSet[*i].sigs);
+					break;
+				}
+			}
+		}
+	}
+}
+
+void BuildGroupBySig(const std::vector<RULECHAIN> &chainSet, std::vector<CHAINGROUP> &vecChainGroups, CResNew &res, std::vector<size_t> &vecWaitForGroup)
+{
+	std::vector<CHAINGROUP> newGroups;
+	std::vector<size_t> visited(vecWaitForGroup.size(), 0);
+	size_t idx = 0;
+	for (std::vector<size_t>::iterator i = vecWaitForGroup.begin(); i != vecWaitForGroup.end(); ++i, ++idx)
+	{
+		if (visited[idx])
+		{
+			continue;
+		}
+		visited[idx] = 1;
+		newGroups.push_back(CHAINGROUP());
+		CHAINGROUP &oneGroup = newGroups.back();
+		oneGroup.chainIds.push_back(*i);
+		oneGroup.comSigs = chainSet[*i].sigs;
+		for (std::vector<size_t>::iterator j = i + 1; j != vecWaitForGroup.end(); ++j)
+		{
+			std::vector<SIGNATURE>::iterator k = std::find_first_of(oneGroup.comSigs.begin(), oneGroup.comSigs.end(), chainSet[*j].sigs.begin(), chainSet[*j].sigs.end());
+			if (k != oneGroup.comSigs.end())
+			{
+				visited[j - vecWaitForGroup.begin()] = 1;
+				oneGroup.chainIds.push_back(*j);
+				UpdateComSigs(oneGroup.comSigs, chainSet[*j].sigs);
+			}
+		}
+	}
+
+	vecWaitForGroup.clear();
+	for (std::vector<CHAINGROUP>::iterator i = newGroups.begin(); i != newGroups.end(); )
+	{
+		if (i->chainIds.size() == 1)
+		{
+			vecWaitForGroup.push_back(i->chainIds[0]);
+			i = newGroups.erase(i);
+		}
+		else
+		{
+			++i;
+		}
+	}
+	MergeMore(newGroups, res, vecWaitForGroup);
+	ExtractSigs(chainSet, newGroups);
+	vecChainGroups.insert(vecChainGroups.end(), newGroups.begin(), newGroups.end());
+	for (std::vector<size_t>::iterator i = vecWaitForGroup.begin(); i != vecWaitForGroup.end(); ++i)
+	{
+		vecChainGroups.push_back(CHAINGROUP());
+		CHAINGROUP &oneGroup = vecChainGroups.back();
+		oneGroup.chainIds.push_back(*i);
+		oneGroup.comSigs = chainSet[*i].sigs;
+		oneGroup.mergeDfaId = *i;
 	}
 }
 
@@ -500,12 +611,22 @@ int main(void)
 	ExtractSigs(chainSet, vecChainGroups);
 	std::cout << "Completed in " << t1.Reset() << " Sec." << std::endl << std::endl;
 
+	//Put chain in group which belong to a same rule...
 	std::cout << "Put chain in group which belong to a same rule..." << std::endl;
-	PutChainInGroup(dfaIdToSidMap, sidToDfaIdsMap, vecChainGroups, res, vecWaitForGroup);
+	PutInByRule(dfaIdToSidMap, sidToDfaIdsMap, vecChainGroups, res, vecWaitForGroup);
+	std::cout << "Completed in " << t1.Reset() << " Sec." << std::endl << std::endl;
+
+	//Put chain in group which have the same signature...
+	std::cout << "Put chain in group which have the same signature..." << std::endl;
+	PutInBySig(chainSet, vecChainGroups, res, vecWaitForGroup);
+	std::cout << "Completed in " << t1.Reset() << " Sec." << std::endl << std::endl;
+
+	//New group which have the same signature...
+	std::cout << "Put chain in group which have the same signature..." << std::endl;
+	BuildGroupBySig(chainSet, vecChainGroups, res, vecWaitForGroup);
 	std::cout << "Completed in " << t1.Reset() << " Sec." << std::endl << std::endl;
 
 	std::cout << vecChainGroups.size() << std::endl;
-	std::cout << vecWaitForGroup.size() << std::endl;
 	std::cout << "Total time: " << tAll.Reset() << " Sec." << std::endl;
 
 	system("pause");

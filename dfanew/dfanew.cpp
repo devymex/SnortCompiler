@@ -132,19 +132,51 @@ DFANEWSC void CDfanew::PushBackTermSet(TERMSET &term)
 DFANEWSC void CDfanew::Init(BYTE *pGroup)
 {
 	Clear();
-	std::vector<BYTE> tmpGroup;
-	std::copy(pGroup, pGroup + DFACOLSIZE, std::back_inserter(tmpGroup));
-	std::sort(tmpGroup.begin(), tmpGroup.end());
-	tmpGroup.erase(std::unique(tmpGroup.begin(), tmpGroup.end()), tmpGroup.end());
-	if (tmpGroup.back() == tmpGroup.size() - 1)
+	BYTE occurred[DFACOLSIZE] = {0};
+	for (size_t i = 0; i < DFACOLSIZE; ++i)
 	{
-		m_nColNum = tmpGroup.size();
+		occurred[pGroup[i]] = 1;
+	}
+	bool flag = true;
+	size_t ZeroBegPos = 0;
+	for (; ZeroBegPos < DFACOLSIZE; ++ZeroBegPos)
+	{
+		if (occurred[ZeroBegPos] == 0)
+		{
+			break;
+		}
+	}
+	for (size_t i = ZeroBegPos + 1; i < DFACOLSIZE; ++i)
+	{
+		if (occurred[i] == 1)
+		{
+			flag = false;
+			break;
+		}
+	}
+	if (flag)
+	{
+
+		m_nColNum = ZeroBegPos;
 		CopyMemory(m_pGroup, pGroup, DFACOLSIZE * sizeof(BYTE));
 	}
 	else
 	{
 		std::cerr << "Group error!" << std::endl;
 	}
+	//std::vector<BYTE> tmpGroup;
+	//std::copy(pGroup, pGroup + DFACOLSIZE, std::back_inserter(tmpGroup));
+	//std::sort(tmpGroup.begin(), tmpGroup.end());
+	//tmpGroup.erase(std::unique(tmpGroup.begin(), tmpGroup.end()), tmpGroup.end());
+	//if (tmpGroup.back() == tmpGroup.size() - 1)
+	//{
+	//	m_nColNum = tmpGroup.size();
+	//	CopyMemory(m_pGroup, pGroup, DFACOLSIZE * sizeof(BYTE));
+	//}
+	//else
+	//{
+	//	std::cerr << "Group error!" << std::endl;
+	//}
 }
 
 DFANEWSC void CDfanew::Clear()
