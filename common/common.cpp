@@ -172,6 +172,16 @@ COMMONSC const size_t& CNfaRow::GetDest(size_t nCol, size_t nIdx) const
 	return m_pDestSet[nCol][nIdx];
 }
 
+//COMMONSC size_t* CNfaRow::GetElem(size_t nCol)
+//{
+//	if(!m_pDestSet[nCol].empty())
+//	{
+//		return &m_pDestSet[nCol][0];
+//	}
+//	else 
+//		return NULL;
+//}
+
 COMMONSC size_t* CNfaRow::GetCol(size_t nCol)
 {
 	return m_pDestSet[nCol].data();
@@ -249,7 +259,7 @@ COMMONSC void CNfa::Reserve(size_t _Count)
 COMMONSC void CNfa::Resize(size_t _Newsize)
 {
 	//CTimer t;
-	m_pNfa->resize(_Newsize);
+ 	m_pNfa->resize(_Newsize);
 	for (std::vector<CNfaRow>::iterator i = m_pNfa->begin(); i != m_pNfa->end(); ++i)
 	{
 		i->Resize(CHARSETSIZE);

@@ -89,6 +89,7 @@ public:
 	size_t& GetDest(size_t nCol, size_t nIdx);
 	const size_t& GetDest(size_t nCol, size_t nIdx) const;
 	size_t* GetCol(size_t nCol);
+	//size_t* GetElem(size_t nCol);
 	const size_t* GetCol(size_t nCol) const;
 	void CopyCol(size_t nCol, size_t *pOut) const;
 	void AddDest(size_t nCol, size_t nDest);
@@ -142,7 +143,7 @@ public:
 	size_t GetFlag() const;
 	size_t GetColNum() const;
 private:
-	size_t m_nFlag;
+	size_t m_nFlag;//标记该状态/行的属性：NORMAL、START、TERMINAL
 	size_t m_nColNum;
 	std::vector<STATEID> *m_pDest;
 };
