@@ -14,6 +14,8 @@
 #define COMMONSC __declspec(dllexport)
 #endif
 
+double COMMONSC g_dTimer;
+
 typedef BYTE STATEID;
 //typedef WORD STATEID;
 typedef std::list<STATEID> STALIST;
@@ -47,6 +49,8 @@ private:
 	std::vector<size_t> *m_pSet;
 };
 
+typedef CVectorNumber CStateSet;
+
 
 class COMMONSC CCString
 {
@@ -71,20 +75,30 @@ private:
 	std::string *m_pString;
 };
 
-typedef CVectorNumber CStateSet;
-
 class COMMONSC CNfaRow
 {
 public:
-	CNfaRow();
+	CNfaRow(size_t nSize = CHARSETSIZE);
 	~CNfaRow();
 	CNfaRow(const CNfaRow &other);
 	CNfaRow& operator=(const CNfaRow &other);
 
-	CStateSet& operator[](size_t nChar);
-	const CStateSet& operator[](size_t nChar) const;
+	void Resize(size_t nSize);
+	size_t Size() const;
+	size_t DestCnt(size_t nCol) const;
+	size_t& GetDest(size_t nCol, size_t nIdx);
+	const size_t& GetDest(size_t nCol, size_t nIdx) const;
+	size_t* GetCol(size_t nCol);
+	//size_t* GetElem(size_t nCol);
+	const size_t* GetCol(size_t nCol) const;
+	void CopyCol(size_t nCol, size_t *pOut) const;
+	void AddDest(size_t nCol, size_t nDest);
+	void SortDest(size_t nCol);
+	void SortAllDest();
+
 private:
-	CStateSet m_pDestSet[CHARSETSIZE];
+	size_t m_nSize;
+	std::vector<size_t> *m_pDestSet;
 };
 
 //class COMMONSC CDfaRow
@@ -129,7 +143,7 @@ public:
 	size_t GetFlag() const;
 	size_t GetColNum() const;
 private:
-	size_t m_nFlag;
+	size_t m_nFlag;//标记该状态/行的属性：NORMAL、START、TERMINAL
 	size_t m_nColNum;
 	std::vector<STATEID> *m_pDest;
 };
@@ -382,3 +396,39 @@ private:
 	size_t m_nFlag;
 	std::vector<RULEOPTION*> *m_pOptions;
 };
+
+class CTimer
+{
+public:
+	__forceinline CTimer()
+	{
+		QueryPerformanceFrequency((PLARGE_INTEGER)&m_nFreq);
+		QueryPerformanceCounter((PLARGE_INTEGER)&m_nStart);
+	}
+	__forceinline double Cur()
+	{
+		__int64 nCur;
+		double dCur;
+
+		QueryPerformanceCounter((PLARGE_INTEGER)&nCur);
+		dCur = double(nCur - m_nStart) / double(m_nFreq);
+
+		return dCur;
+	}
+	__forceinline double Reset()
+	{
+		__int64 nCur;
+		double dCur;
+
+		QueryPerformanceCounter((PLARGE_INTEGER)&nCur);
+		dCur = double(nCur - m_nStart) / double(m_nFreq);
+		m_nStart = nCur;
+
+		return dCur;
+	}
+private:
+	__int64 m_nFreq;
+	__int64 m_nStart;
+};
+
+COMMONSC void printNfa(CNfa &nfa);

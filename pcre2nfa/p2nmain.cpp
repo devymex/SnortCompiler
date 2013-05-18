@@ -340,6 +340,16 @@ Fn FUNC[156] =
 	some in the past. */
 };
 
+enum PCRESIGN
+{
+	ALT,
+	BRA,
+	CBRA,
+	SCBRA,
+	BRAZERO,
+	ONCE,
+};
+
 //void GenerateNFA(std::vector<PCRE> &vecPcres)
 //{
 //	size_t count = 0;
@@ -503,13 +513,13 @@ size_t ProcessPcre(std::vector<unsigned char>::iterator &Beg, const std::vector<
 {
 	size_t CurState = nfa.Size();
 	bool ALTBeg = false;
-	std::vector<std::string> vecPath;
+	std::vector<PCRESIGN> vecPath;
 	std::vector<size_t> PreStates;
 	size_t ALTPreBeg = CurState;
 	return Process(Beg, End, nfa, CurState, PreStates, ALTPreBeg, ALTBeg, size_t(-1), false, false, false, vecPath);
 }
 
-size_t Process(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, std::vector<size_t> &PreStates, size_t ALTPreBeg, bool &ALTBeg, size_t ALTBeginState, bool CBRA, bool ALT, bool BRAZERO, std::vector<std::string> &vecPath)
+size_t Process(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, std::vector<size_t> &PreStates, size_t ALTPreBeg, bool &ALTBeg, size_t ALTBeginState, bool bCBRA, bool bALT, bool bBRAZERO, std::vector<PCRESIGN> &vecPath)
 {
 	std::vector<unsigned char>::iterator start, end;
 	size_t CurPreState;
@@ -522,9 +532,9 @@ size_t Process(std::vector<unsigned char>::iterator &Beg, const std::vector<unsi
 		CurPreState = size_t(-1);
 	}
 	size_t ALTPreState = ALTPreBeg;
-	bool IsCBRA = CBRA;
-	bool IsALT = ALT;
-	bool IsBRAZERO = BRAZERO;
+	bool IsCBRA = bCBRA;
+	bool IsALT = bALT;
+	bool IsBRAZERO = bBRAZERO;
 	size_t ALTBegState = ALTBeginState;
 	size_t flag = SC_SUCCESS;
 	for (;Beg != End;)
@@ -556,9 +566,9 @@ size_t Process(std::vector<unsigned char>::iterator &Beg, const std::vector<unsi
 			case OP_ALT:
 				ALTBeg = true;
 				ALTBegState = CurState;
-				if (vecPath.back() != "ALT")
+				if (vecPath.back() != ALT)
 				{
-					vecPath.push_back("ALT");
+					vecPath.push_back(ALT);
 				}
 				end = Beg + GET(Beg + 1);
 				start = Beg + Steps[OP_ALT];
@@ -572,11 +582,11 @@ size_t Process(std::vector<unsigned char>::iterator &Beg, const std::vector<unsi
 					std::cout << "ERROR!" << std::endl;
 					break;
 				}
-				if (vecPath.back() == "CBRA")
+				if (vecPath.back() == CBRA)
 				{
 					vecPath.pop_back();
 					PreStates.pop_back();
-					if (vecPath.size() > 0 && vecPath.back() == "BRAZERO")
+					if (vecPath.size() > 0 && vecPath.back() == BRAZERO)
 					{
 						vecPath.pop_back();
 						CurPreState = PreStates.back();
@@ -590,11 +600,11 @@ size_t Process(std::vector<unsigned char>::iterator &Beg, const std::vector<unsi
 					}
 					IsALT = false;
 				}
-				else if (vecPath.back() == "SCBRA")
+				else if (vecPath.back() == SCBRA)
 				{
 					vecPath.pop_back();
 					PreStates.pop_back();
-					if (vecPath.size() > 0 && vecPath.back() == "BRAZERO")
+					if (vecPath.size() > 0 && vecPath.back() == BRAZERO)
 					{
 						vecPath.pop_back();
 						CurPreState = PreStates.back();
@@ -608,15 +618,15 @@ size_t Process(std::vector<unsigned char>::iterator &Beg, const std::vector<unsi
 					}
 					IsALT = false;
 				}
-				else if (vecPath.back() == "ALT")
+				else if (vecPath.back() == ALT)
 				{
 					ALTBeg = false;
 					IsALT = true;
 					IsBRAZERO = false;
 					vecPath.pop_back();
 					CurPreState = PreStates.back();
-					if (vecPath.size() >= 2 && ((vecPath[vecPath.size() - 1] == "CBRA" && vecPath[vecPath.size() - 2] == "BRAZERO") || 
-						(vecPath[vecPath.size() - 1] == "SCBRA" && vecPath[vecPath.size() - 2] == "BRAZERO")))
+					if (vecPath.size() >= 2 && ((vecPath[vecPath.size() - 1] == CBRA && vecPath[vecPath.size() - 2] == BRAZERO) || 
+						(vecPath[vecPath.size() - 1] == SCBRA && vecPath[vecPath.size() - 2] == BRAZERO)))
 					{
 						IsBRAZERO = true;
 						CurPreState = PreStates.back();
@@ -626,7 +636,7 @@ size_t Process(std::vector<unsigned char>::iterator &Beg, const std::vector<unsi
 						CurPreState = PreStates.back();
 						PreStates.pop_back();
 					}
-					else if (vecPath.size() >= 1 && vecPath[vecPath.size() - 1] == "CBRA")
+					else if (vecPath.size() >= 1 && vecPath[vecPath.size() - 1] == CBRA)
 					{
 						CurPreState = PreStates.back();
 						PreStates.pop_back();
@@ -637,14 +647,14 @@ size_t Process(std::vector<unsigned char>::iterator &Beg, const std::vector<unsi
 
 					}
 				}
-				else if (vecPath.back() == "ONCE")
+				else if (vecPath.back() == ONCE)
 				{
 					vecPath.pop_back();
 					PreStates.pop_back();
 					IsALT = false;
 					IsBRAZERO = false;
 				}
-				else if (vecPath.back() == "BRA")
+				else if (vecPath.back() == BRA)
 				{
 					vecPath.pop_back();
 					PreStates.pop_back();
@@ -667,11 +677,11 @@ size_t Process(std::vector<unsigned char>::iterator &Beg, const std::vector<unsi
 				}
 				IsALT = false;
 				IsBRAZERO = false;
-				if (vecPath.back() == "ALT")
+				if (vecPath.back() == ALT)
 				{
 					IsALT = true;
 					vecPath.pop_back();
-					if (vecPath.size() >= 2 && (vecPath.back() == "CBRA" && vecPath[vecPath.size() - 2] == "BRAZERO") || vecPath.back() == "SCBRA" && vecPath[vecPath.size() - 2] == "BRAZERO")
+					if (vecPath.size() >= 2 && (vecPath.back() == CBRA && vecPath[vecPath.size() - 2] == BRAZERO) || vecPath.back() == SCBRA && vecPath[vecPath.size() - 2] == BRAZERO)
 					{
 						vecPath.pop_back();
 						vecPath.pop_back();
@@ -680,7 +690,7 @@ size_t Process(std::vector<unsigned char>::iterator &Beg, const std::vector<unsi
 						IsBRAZERO = true;
 					}
 				}
-				else if (vecPath.size() >= 2 && (vecPath.back() == "CBRA" && vecPath[vecPath.size() - 2] == "BRAZERO") || vecPath.back() == "SCBRA" && vecPath[vecPath.size() - 2] == "BRAZERO")
+				else if (vecPath.size() >= 2 && (vecPath.back() == CBRA && vecPath[vecPath.size() - 2] == BRAZERO) || vecPath.back() == SCBRA && vecPath[vecPath.size() - 2] == BRAZERO)
 				{
 					vecPath.pop_back();
 					vecPath.pop_back();
@@ -688,7 +698,7 @@ size_t Process(std::vector<unsigned char>::iterator &Beg, const std::vector<unsi
 					PreStates.pop_back();
 					IsBRAZERO = true;
 				}
-				else if (vecPath.back() == "CBRA")
+				else if (vecPath.back() == CBRA)
 				{
 					vecPath.pop_back();
 					PreStates.pop_back();
@@ -703,14 +713,14 @@ size_t Process(std::vector<unsigned char>::iterator &Beg, const std::vector<unsi
 			case OP_ONCE:
 				end = Beg + GET(Beg + 1);
 				start = Beg + Steps[OP_ONCE];
-				vecPath.push_back("ONCE");
+				vecPath.push_back(ONCE);
 				PreStates.push_back(CurState);
 				AddEMPTY(nfa, CurState);
 				flag = Process(start, end, nfa, CurState, PreStates, ALTPreState, ALTBeg, ALTBegState, IsCBRA, IsALT, IsBRAZERO, vecPath);
 				Beg = end;
 				break;
 			case OP_BRA:
-				vecPath.push_back("BRA");
+				vecPath.push_back(BRA);
 				end = Beg + GET(Beg + 1);
 				start = Beg + Steps[OP_BRA];
 				if (*start == OP_CIRCM)
@@ -726,7 +736,7 @@ size_t Process(std::vector<unsigned char>::iterator &Beg, const std::vector<unsi
 				Beg = end;
 				break;
 			case OP_CBRA:
-				vecPath.push_back("CBRA");
+				vecPath.push_back(CBRA);
 				end = Beg + GET(Beg + 1);
 				start = Beg + Steps[OP_CBRA];
 				if (!ALTBeg)
@@ -740,7 +750,7 @@ size_t Process(std::vector<unsigned char>::iterator &Beg, const std::vector<unsi
 				Beg = end;
 				break;
 			case OP_SCBRA:
-				vecPath.push_back("SCBRA");
+				vecPath.push_back(SCBRA);
 				end = Beg + GET(Beg + 1);
 				start = Beg + Steps[OP_SCBRA];
 				OP_SCBRA_FUNC(start, end, nfa, CurState);
@@ -754,7 +764,7 @@ size_t Process(std::vector<unsigned char>::iterator &Beg, const std::vector<unsi
 				Beg = end;
 				break;
 			case OP_BRAZERO:
-				vecPath.push_back("BRAZERO");
+				vecPath.push_back(BRAZERO);
 				end = Beg + 1 + GET(Beg + 2);
 				start = Beg + Steps[OP_BRAZERO];
 				if (!ALTBeg)
@@ -781,7 +791,7 @@ void ProcessALT(CNfa &nfa, size_t PreState, bool &ALTBegin, size_t ALTBegState)
 {
 	if (ALTBegin)
 	{
-		nfa[PreState][EMPTY].PushBack(ALTBegState);
+		nfa[PreState].AddDest(EMPTY, ALTBegState);
 		ALTBegin = false;
 	}
 }
@@ -797,7 +807,7 @@ size_t OP_COMMON_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vect
 	//std::cout << size_t(*Beg) << " " << NUMS[*Beg] << std::endl;
 	for (size_t i = 0; i < NUMS[*Beg]; ++i)
 	{
-		nfa.Back()[tmp[i]].PushBack(CurState);
+		nfa.Back().AddDest(tmp[i], CurState);
 	}
 
 	return SC_SUCCESS;
@@ -807,25 +817,26 @@ void OP_CIRCM_FUNC(CNfa &nfa, size_t &CurState)
 {
 	size_t nCursize = nfa.Size();
 	nfa.Resize(nCursize + 3);
-	nfa[nCursize][EMPTY].PushBack(CurState + 1);
-	nfa[nCursize][EMPTY].PushBack(CurState + 3);
+	nfa[nCursize].AddDest(EMPTY, CurState + 1);
+	nfa[nCursize].AddDest(EMPTY, CurState + 3);
 	++CurState;
+
+	++nCursize;
 	for (size_t i = 0; i < 10; ++i)
 	{
-		nfa[nCursize + 1][i].PushBack(CurState);
+		nfa[nCursize].AddDest(i, CurState);
 	}
-	nfa[nCursize + 1]['\n'].PushBack(CurState + 1);
-	nfa[nCursize + 1]['\n'].PushBack(CurState + 2);
-	nfa[nCursize + 1]['\r'].PushBack(CurState + 2);
-	nfa[nCursize + 1][11].PushBack(CurState);
-	nfa[nCursize + 1][12].PushBack(CurState);
+	nfa[nCursize].AddDest('\n', CurState + 1);
+	nfa[nCursize].AddDest('\n', CurState + 2);
+	nfa[nCursize].AddDest('\r', CurState + 2);
+	nfa[nCursize].AddDest(11, CurState);
+	nfa[nCursize].AddDest(12, CurState);
 	for (size_t i = 14; i < 256; ++i)
 	{
-		nfa[nCursize + 1][i].PushBack(CurState);
+		nfa[nCursize].AddDest(i, CurState);
 	}
-	++CurState;
-	++CurState;
-	nfa[nCursize + 2]['\r'].PushBack(CurState);
+	CurState += 2;
+	nfa[nCursize + 1].AddDest('\r', CurState);
 }
 
 size_t OP_CHAR_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, size_t PreState, bool &ALTBegin, size_t ALTBegState)
@@ -834,7 +845,7 @@ size_t OP_CHAR_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector
 	++CurState;
 	size_t nCursize = nfa.Size();
 	nfa.Resize(nCursize + 1);
-	nfa.Back()[*(Beg + 1)].PushBack(CurState);
+	nfa.Back().AddDest(*(Beg + 1), CurState);
 
 	return SC_SUCCESS;
 }
@@ -848,12 +859,12 @@ size_t OP_CHARI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vecto
 	unsigned char c = *(Beg + 1);
 	if (isalpha(c))
 	{
-		nfa.Back()[tolower(c)].PushBack(CurState);
-		nfa.Back()[toupper(c)].PushBack(CurState);
+		nfa.Back().AddDest(tolower(c), CurState);
+		nfa.Back().AddDest(toupper(c), CurState);
 	}
 	else
 	{
-		nfa.Back()[c].PushBack(CurState);
+		nfa.Back().AddDest(c, CurState);
 	}
 	
 	return SC_SUCCESS;
@@ -870,7 +881,7 @@ size_t OP_NOT_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<
 	{
 		if (j != c)
 		{
-			nfa.Back()[j].PushBack(CurState);
+			nfa.Back().AddDest(j, CurState);
 		}
 	}
 	
@@ -888,7 +899,7 @@ size_t OP_NOTI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector
 	{
 		if (j != (size_t)tolower(c) && j != (size_t)toupper(c))
 		{
-			nfa.Back()[j].PushBack(CurState);
+			nfa.Back().AddDest(j, CurState);
 		}
 	}
 	
@@ -900,9 +911,9 @@ size_t OP_STAR_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
 	size_t nCursize = nfa.Size();
 	nfa.Resize(nCursize + 1);
-	nfa.Back()[*(Beg + 1)].PushBack(CurState);
+	nfa.Back().AddDest(*(Beg + 1), CurState);
 	++CurState;
-	nfa.Back()[EMPTY].PushBack(CurState);
+	nfa.Back().AddDest(EMPTY, CurState);
 	
 	return SC_SUCCESS;
 }
@@ -913,10 +924,10 @@ size_t OP_PLUS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector
 	size_t nCursize = nfa.Size();
 	nfa.Resize(nCursize + 2);
 	++CurState;
-	nfa[nCursize][*(Beg + 1)].PushBack(CurState);
-	nfa.Back()[*(Beg + 1)].PushBack(CurState);
+	nfa[nCursize].AddDest(*(Beg + 1), CurState);
+	nfa.Back().AddDest(*(Beg + 1), CurState);
 	++CurState;
-	nfa.Back()[EMPTY].PushBack(CurState);
+	nfa.Back().AddDest(EMPTY, CurState);
 	
 	return SC_SUCCESS;
 }
@@ -927,8 +938,8 @@ size_t OP_QUERY_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vecto
 	size_t nCursize = nfa.Size();
 	nfa.Resize(nCursize + 1);
 	++CurState;
-	nfa.Back()[*(Beg + 1)].PushBack(CurState);
-	nfa.Back()[EMPTY].PushBack(CurState);
+	nfa.Back().AddDest(*(Beg + 1), CurState);
+	nfa.Back().AddDest(EMPTY, CurState);
 	
 	return SC_SUCCESS;
 }
@@ -947,9 +958,9 @@ size_t OP_UPTO_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector
 	unsigned char c = *(Beg + 3);
 	for (size_t i = 0; i < count; ++i)
 	{
-		nfa[nCursize + i][EMPTY].PushBack(CurState - i + count);
+		nfa[nCursize + i].AddDest(EMPTY, CurState - i + count);
 		++CurState;
-		nfa[nCursize + i][c].PushBack(CurState);
+		nfa[nCursize + i].AddDest(c, CurState);
 	}
 	
 	return SC_SUCCESS;
@@ -969,7 +980,7 @@ size_t OP_EXACT_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vecto
 	for (size_t i = 0; i < count; ++i)
 	{
 		++CurState;
-		nfa[nCursize + i][c].PushBack(CurState);
+		nfa[nCursize + i].AddDest(c, CurState);
 	}
 	
 	return SC_SUCCESS;
@@ -983,15 +994,15 @@ size_t OP_STARI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vecto
 	unsigned char c = *(Beg + 1);
 	if (isalpha(c))
 	{
-		nfa.Back()[tolower(c)].PushBack(CurState);
-		nfa.Back()[toupper(c)].PushBack(CurState);
+		nfa.Back().AddDest(tolower(c), CurState);
+		nfa.Back().AddDest(toupper(c), CurState);
 	}
 	else
 	{
-		nfa.Back()[c].PushBack(CurState);
+		nfa.Back().AddDest(c, CurState);
 	}
 	++CurState;
-	nfa.Back()[EMPTY].PushBack(CurState);
+	nfa.Back().AddDest(EMPTY, CurState);
 	
 	return SC_SUCCESS;
 }
@@ -1005,24 +1016,24 @@ size_t OP_PLUSI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vecto
 	++CurState;
 	if (isalpha(c))
 	{
-		nfa[nCursize][tolower(c)].PushBack(CurState);
-		nfa[nCursize][toupper(c)].PushBack(CurState);
+		nfa[nCursize].AddDest(tolower(c), CurState);
+		nfa[nCursize].AddDest(toupper(c), CurState);
 	}
 	else
 	{
-		nfa[nCursize][c].PushBack(CurState);
+		nfa[nCursize].AddDest(c, CurState);
 	}
 	if (isalpha(c))
 	{
-		nfa.Back()[tolower(c)].PushBack(CurState);
-		nfa.Back()[toupper(c)].PushBack(CurState);
+		nfa.Back().AddDest(tolower(c), CurState);
+		nfa.Back().AddDest(toupper(c), CurState);
 	}
 	else
 	{
-		nfa.Back()[c].PushBack(CurState);
+		nfa.Back().AddDest(c, CurState);
 	}
 	++CurState;
-	nfa.Back()[EMPTY].PushBack(CurState);
+	nfa.Back().AddDest(EMPTY, CurState);
 	
 	return SC_SUCCESS;
 }
@@ -1036,14 +1047,14 @@ size_t OP_QUERYI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vect
 	++CurState;
 	if (isalpha(c))
 	{
-		nfa.Back()[tolower(c)].PushBack(CurState);
-		nfa.Back()[toupper(c)].PushBack(CurState);
+		nfa.Back().AddDest(tolower(c), CurState);
+		nfa.Back().AddDest(toupper(c), CurState);
 	}
 	else
 	{
-		nfa.Back()[c].PushBack(CurState);
+		nfa.Back().AddDest(c, CurState);
 	}
-	nfa.Back()[EMPTY].PushBack(CurState);
+	nfa.Back().AddDest(EMPTY, CurState);
 	
 	return SC_SUCCESS;
 }
@@ -1062,16 +1073,16 @@ size_t OP_UPTOI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vecto
 	unsigned char c = *(Beg + 3);
 	for (size_t i = 0; i < count; ++i)
 	{
-		nfa[nCursize + i][EMPTY].PushBack(CurState - i + count);
+		nfa[nCursize + i].AddDest(EMPTY, CurState - i + count);
 		++CurState;
 		if (isalpha(c))
 		{
-			nfa[nCursize + i][tolower(c)].PushBack(CurState);
-			nfa[nCursize + i][toupper(c)].PushBack(CurState);
+			nfa[nCursize + i].AddDest(tolower(c), CurState);
+			nfa[nCursize + i].AddDest(toupper(c), CurState);
 		}
 		else
 		{
-			nfa[nCursize + i][c].PushBack(CurState);
+			nfa[nCursize + i].AddDest(c, CurState);
 		}
 	}
 	
@@ -1094,12 +1105,12 @@ size_t OP_EXACTI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vect
 		++CurState;
 		if (isalpha(c))
 		{
-			nfa[nCursize + i][tolower(c)].PushBack(CurState);
-			nfa[nCursize + i][toupper(c)].PushBack(CurState);
+			nfa[nCursize + i].AddDest(tolower(c), CurState);
+			nfa[nCursize + i].AddDest(toupper(c), CurState);
 		}
 		else
 		{
-			nfa[nCursize + i][c].PushBack(CurState);
+			nfa[nCursize + i].AddDest(c, CurState);
 		}
 	}
 	
@@ -1116,11 +1127,11 @@ size_t OP_NOTSTAR_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vec
 	{
 		if (i != c)
 		{
-			nfa.Back()[i].PushBack(CurState);
+			nfa.Back().AddDest(i, CurState);
 		}
 	}
 	++CurState;
-	nfa.Back()[EMPTY].PushBack(CurState);
+	nfa.Back().AddDest(EMPTY, CurState);
 	
 	return SC_SUCCESS;
 }
@@ -1136,12 +1147,12 @@ size_t OP_NOTPLUS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vec
 	{
 		if (i != c)
 		{
-			nfa[nCursize][i].PushBack(CurState);
-			nfa.Back()[i].PushBack(CurState);
+			nfa[nCursize].AddDest(i, CurState);
+			nfa.Back().AddDest(i, CurState);
 		}
 	}
 	++CurState;
-	nfa.Back()[EMPTY].PushBack(CurState);
+	nfa.Back().AddDest(EMPTY, CurState);
 	
 	return SC_SUCCESS;
 }
@@ -1157,10 +1168,10 @@ size_t OP_NOTQUERY_FUNC(std::vector<unsigned char>::iterator &Beg, const std::ve
 	{
 		if (i != c)
 		{
-			nfa.Back()[i].PushBack(CurState);
+			nfa.Back().AddDest(i, CurState);
 		}
 	}
-	nfa.Back()[EMPTY].PushBack(CurState);
+	nfa.Back().AddDest(EMPTY, CurState);
 	
 	return SC_SUCCESS;
 }
@@ -1178,13 +1189,13 @@ size_t OP_NOTUPTO_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vec
 	unsigned char c = *(Beg + 3);
 	for (size_t i = 0; i < count; ++i)
 	{
-		nfa[nCursize + i][EMPTY].PushBack(CurState - i + count);
+		nfa[nCursize + i].AddDest(EMPTY, CurState - i + count);
 		++CurState;
 		for (size_t j = 0; j < 256; ++j)
 		{
 			if (j != c)
 			{
-				nfa[nCursize + i][j].PushBack(CurState);
+				nfa[nCursize + i].AddDest(j, CurState);
 			}
 		}
 	}
@@ -1210,7 +1221,7 @@ size_t OP_NOTEXACT_FUNC(std::vector<unsigned char>::iterator &Beg, const std::ve
 		{
 			if (j != c)
 			{
-				nfa[nCursize + i][j].PushBack(CurState);
+				nfa[nCursize + i].AddDest(j, CurState);
 			}
 		}
 	}
@@ -1228,11 +1239,11 @@ size_t OP_NOTSTARI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::ve
 	{
 		if (i != (size_t)tolower(c) && i != (size_t)toupper(c))
 		{
-			nfa.Back()[i].PushBack(CurState);
+			nfa.Back().AddDest(i, CurState);
 		}
 	}
 	++CurState;
-	nfa.Back()[EMPTY].PushBack(CurState);
+	nfa.Back().AddDest(EMPTY, CurState);
 	
 	return SC_SUCCESS;
 }
@@ -1248,12 +1259,12 @@ size_t OP_NOTPLUSI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::ve
 	{
 		if (i != (size_t)tolower(c) && i != (size_t)toupper(c))
 		{
-			nfa[nCursize][i].PushBack(CurState);
-			nfa.Back()[i].PushBack(CurState);
+			nfa[nCursize].AddDest(i, CurState);
+			nfa.Back().AddDest(i, CurState);
 		}
 	}
 	++CurState;
-	nfa.Back()[EMPTY].PushBack(CurState);
+	nfa.Back().AddDest(EMPTY, CurState);
 	
 	return SC_SUCCESS;
 }
@@ -1269,10 +1280,10 @@ size_t OP_NOTQUERYI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::v
 	{
 		if (i != (size_t)tolower(c) && i != (size_t)toupper(c))
 		{
-			nfa.Back()[i].PushBack(CurState);
+			nfa.Back().AddDest(i, CurState);
 		}
 	}
-	nfa.Back()[EMPTY].PushBack(CurState);
+	nfa.Back().AddDest(EMPTY, CurState);
 	
 	return SC_SUCCESS;
 }
@@ -1290,13 +1301,13 @@ size_t OP_NOTUPTOI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::ve
 	unsigned char c = *(Beg + 3);
 	for (size_t i = 0; i < count; ++i)
 	{
-		nfa[nCursize + i][EMPTY].PushBack(CurState - i + count);
+		nfa[nCursize + i].AddDest(EMPTY, CurState - i + count);
 		++CurState;
 		for (size_t j = 0; j < 256; ++j)
 		{
 			if (j != (size_t)tolower(c) && j != (size_t)toupper(c))
 			{
-				nfa[nCursize + i][j].PushBack(CurState);
+				nfa[nCursize + i].AddDest(j, CurState);
 			}
 		}
 	}
@@ -1322,7 +1333,7 @@ size_t OP_NOTEXACTI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::v
 		{
 			if (j != (size_t)tolower(c) && j != (size_t)toupper(c))
 			{
-				nfa[nCursize + i][j].PushBack(CurState);
+				nfa[nCursize + i].AddDest(j, CurState);
 			}
 		}
 	}
@@ -1342,10 +1353,10 @@ size_t OP_TYPESTAR_FUNC(std::vector<unsigned char>::iterator &Beg, const std::ve
 		size_t* tmp = ptr[c];
 		for (size_t i = 0; i < Cnt; ++i)
 		{
-			nfa.Back()[*(tmp + i)].PushBack(CurState);
+			nfa.Back().AddDest(*(tmp + i), CurState);
 		}
 		++CurState;
-		nfa.Back()[EMPTY].PushBack(CurState);
+		nfa.Back().AddDest(EMPTY, CurState);
 	}
 	
 	return SC_SUCCESS;
@@ -1364,11 +1375,11 @@ size_t OP_TYPEPLUS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::ve
 		size_t* tmp = ptr[c];
 		for (size_t i = 0; i < Cnt; ++i)
 		{
-			nfa[nCursize][*(tmp + i)].PushBack(CurState);
-			nfa.Back()[*(tmp + i)].PushBack(CurState);
+			nfa[nCursize].AddDest(*(tmp + i), CurState);
+			nfa.Back().AddDest(*(tmp + i), CurState);
 		}
 		++CurState;
-		nfa.Back()[EMPTY].PushBack(CurState);
+		nfa.Back().AddDest(EMPTY, CurState);
 	}
 	
 	return SC_SUCCESS;
@@ -1387,9 +1398,9 @@ size_t OP_TYPEQUERY_FUNC(std::vector<unsigned char>::iterator &Beg, const std::v
 		size_t* tmp = ptr[c];
 		for (size_t i = 0; i < Cnt; ++i)
 		{
-			nfa.Back()[*(tmp + i)].PushBack(CurState);
+			nfa.Back().AddDest(*(tmp + i), CurState);
 		}
-		nfa.Back()[EMPTY].PushBack(CurState);
+		nfa.Back().AddDest(EMPTY, CurState);
 	}
 	
 	return SC_SUCCESS;
@@ -1411,7 +1422,7 @@ size_t OP_TYPEUPTO_FUNC(std::vector<unsigned char>::iterator &Beg, const std::ve
 		for (size_t i = 0; i < count; ++i)
 		{
 			FUNC[c](tmpBeg, End, nfa, CurState, PreState, ALTBeg, ALTBegState);
-			nfa.Back()[EMPTY].PushBack(CurState - 1 + count - i);
+			nfa.Back().AddDest(EMPTY, CurState - 1 + count - i);
 		}
 	}
 	
@@ -1454,8 +1465,8 @@ size_t OP_CLASS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vecto
 		{
 			if (*(Beg + i + 1) & 1 << j)
 			{
-				nfa.Back()[i * 8 + j].PushBack(tmp);
-				Row[i * 8 + j].PushBack(tmp);
+				nfa.Back().AddDest(i * 8 + j, tmp);
+				Row.AddDest(i * 8 + j, tmp);
 			}
 		}
 	}
@@ -1467,31 +1478,31 @@ size_t OP_CLASS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vecto
 	case OP_CRSTAR:
 		for (size_t i = 0; i < CHARSETSIZE; ++i)
 		{
-			for (size_t j = 0; j < nfa.Back()[i].Size(); ++j)
+			for (size_t j = 0; j < nfa.Back().DestCnt(i); ++j)
 			{
-				if (nfa.Back()[i][j] == CurState + 1)
+				if (nfa.Back().GetDest(i, j) == CurState + 1)
 				{
-					nfa.Back()[i][j] = CurState;
+					nfa.Back().GetDest(i, j) = CurState;
 				}
 			}
 		}
 		++CurState;
-		nfa.Back()[EMPTY].PushBack(CurState);
+		nfa.Back().AddDest(EMPTY, CurState);
 		Beg += Steps[OP_CRSTAR];
 		break;
 	case OP_CRMINSTAR:
 		for (size_t i = 0; i < CHARSETSIZE; ++i)
 		{
-			for (size_t j = 0; j < nfa.Back()[i].Size(); ++j)
+			for (size_t j = 0; j < nfa.Back().DestCnt(i); ++j)
 			{
-				if (nfa.Back()[i][j] == CurState + 1)
+				if (nfa.Back().GetDest(i, j) == CurState + 1)
 				{
-					nfa.Back()[i][j] = CurState;
+					nfa.Back().GetDest(i, j) = CurState;
 				}
 			}
 		}
 		++CurState;
-		nfa.Back()[EMPTY].PushBack(CurState);
+		nfa.Back().AddDest(EMPTY, CurState);
 		Beg += Steps[OP_CRMINSTAR];
 		break;
 	case OP_CRPLUS:
@@ -1499,7 +1510,7 @@ size_t OP_CLASS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vecto
 		Copy(nfa.Back(), Row, 0);
 		++CurState;
 		++CurState;
-		nfa.Back()[EMPTY].PushBack(CurState);
+		nfa.Back().AddDest(EMPTY, CurState);
 		Beg += Steps[OP_CRPLUS];
 		break;
 	case OP_CRMINPLUS:
@@ -1507,12 +1518,12 @@ size_t OP_CLASS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vecto
 		Copy(nfa.Back(), Row, 0);
 		++CurState;
 		++CurState;
-		nfa.Back()[EMPTY].PushBack(CurState);
+		nfa.Back().AddDest(EMPTY, CurState);
 		Beg += Steps[OP_CRMINPLUS];
 		break;
 	case OP_CRQUERY:
 		++CurState;
-		nfa.Back()[EMPTY].PushBack(CurState);
+		nfa.Back().AddDest(EMPTY, CurState);
 		Beg += Steps[OP_CRQUERY];
 		break;
 	case OP_CRRANGE:
@@ -1534,21 +1545,22 @@ size_t OP_CLASS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vecto
 			nfa.Resize(nCursize + min + 1);
 			for (size_t i = 0; i < CHARSETSIZE; ++i)
 			{
-				if (Row[i].Size() == 1)
+				if (Row.DestCnt(i) == 1)
 				{
-					nfa.Back()[i].PushBack(CurState);
+					nfa.Back().AddDest(i, CurState);
 				}
 			}
 			++CurState;
-			nfa.Back()[EMPTY].PushBack(CurState);
+			nfa.Back().AddDest(EMPTY, CurState);
 		}
 		else
 		{
 			nfa.Resize(nCursize + max);
-			for (size_t i = 0; i < max - min; ++i)
+			size_t nDiff = max - min, nBeg = nCursize + min;
+			for (size_t i = 0; i < nDiff; ++i)
 			{
-				Copy(nfa[nCursize + min + i], Row, min + i);
-				nfa[nCursize + min + i][EMPTY].PushBack(CurState - i + max - min);
+				Copy(nfa[nBeg + i], Row, min + i);
+				nfa[nBeg + i].AddDest(EMPTY, CurState - i + nDiff);
 				++CurState;
 			}
 		}
@@ -1575,44 +1587,47 @@ size_t OP_NCLASS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vect
 		{
 			if (*(Beg + i + 1) & 1 << j)
 			{
-				nfa.Back()[i * 8 + j].PushBack(tmp);
-				Row[i * 8 + j].PushBack(tmp);
+				nfa.Back().AddDest(i * 8 + j, tmp);
+				Row.AddDest(i * 8 + j, tmp);
 			}
 		}
 	}
 	Beg += Steps[OP_CLASS];
 	size_t min, max;
-
 	switch (*Beg)
 	{
 	case OP_CRSTAR:
 		for (size_t i = 0; i < CHARSETSIZE; ++i)
 		{
-			for (size_t j = 0; j < nfa.Back()[i].Size(); ++j)
+			size_t nCnt = nfa.Back().DestCnt(i);
+			for (size_t j = 0; j < nCnt; ++j)
 			{
-				if (nfa.Back()[i][j] == CurState + 1)
+				size_t &nSta = nfa.Back().GetDest(i, j);
+				if (nSta == CurState + 1)
 				{
-					nfa.Back()[i][j] = CurState;
+					nSta = CurState;
 				}
 			}
 		}
 		++CurState;
-		nfa.Back()[EMPTY].PushBack(CurState);
+		nfa.Back().AddDest(EMPTY, CurState);
 		Beg += Steps[OP_CRSTAR];
 		break;
 	case OP_CRMINSTAR:
 		for (size_t i = 0; i < CHARSETSIZE; ++i)
 		{
-			for (size_t j = 0; j < nfa.Back()[i].Size(); ++j)
+			size_t nCnt = nfa.Back().DestCnt(i);
+			for (size_t j = 0; j < nCnt; ++j)
 			{
-				if (nfa.Back()[i][j] == CurState + 1)
+				size_t &nSta = nfa.Back().GetDest(i, j);
+				if (nSta == CurState + 1)
 				{
-					nfa.Back()[i][j] = CurState;
+					nSta = CurState;
 				}
 			}
 		}
 		++CurState;
-		nfa.Back()[EMPTY].PushBack(CurState);
+		nfa.Back().AddDest(EMPTY, CurState);
 		Beg += Steps[OP_CRMINSTAR];
 		break;
 	case OP_CRPLUS:
@@ -1620,7 +1635,7 @@ size_t OP_NCLASS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vect
 		Copy(nfa.Back(), Row, 0);
 		++CurState;
 		++CurState;
-		nfa.Back()[EMPTY].PushBack(CurState);
+		nfa.Back().AddDest(EMPTY, CurState);
 		Beg += Steps[OP_CRPLUS];
 		break;
 	case OP_CRMINPLUS:
@@ -1628,12 +1643,12 @@ size_t OP_NCLASS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vect
 		Copy(nfa.Back(), Row, 0);
 		++CurState;
 		++CurState;
-		nfa.Back()[EMPTY].PushBack(CurState);
+		nfa.Back().AddDest(EMPTY, CurState);
 		Beg += Steps[OP_CRMINPLUS];
 		break;
 	case OP_CRQUERY:
 		++CurState;
-		nfa.Back()[EMPTY].PushBack(CurState);
+		nfa.Back().AddDest(EMPTY, CurState);
 		Beg += Steps[OP_CRQUERY];
 		break;
 	case OP_CRRANGE:
@@ -1655,13 +1670,13 @@ size_t OP_NCLASS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vect
 			nfa.Resize(nCursize + min + 1);
 			for (size_t i = 0; i < CHARSETSIZE; ++i)
 			{
-				if (Row[i].Size() == 1)
+				if (Row.DestCnt(i) == 1)
 				{
-					nfa.Back()[i].PushBack(CurState);
+					nfa.Back().AddDest(i, CurState);
 				}
 			}
 			++CurState;
-			nfa.Back()[EMPTY].PushBack(CurState);
+			nfa.Back().AddDest(EMPTY, CurState);
 		}
 		else
 		{
@@ -1669,7 +1684,7 @@ size_t OP_NCLASS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vect
 			for (size_t i = 0; i < max - min; ++i)
 			{
 				Copy(nfa[nCursize + min + i], Row, min + i);
-				nfa[nCursize + min + i][EMPTY].PushBack(CurState - i + max - min);
+				nfa[nCursize + min + i].AddDest(EMPTY, CurState - i + max - min);
 				++CurState;
 			}
 		}
@@ -1687,20 +1702,23 @@ void OP_ALT_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<un
 {
 	for (size_t i = PreState; i < nfa.Size(); ++i)
 	{
+		CNfaRow &row = nfa[i];
 		for (size_t j = 0; j < CHARSETSIZE; ++j)
 		{
-			for (size_t k = 0; k < nfa[i][j].Size(); ++k)
+			size_t nCnt = row.DestCnt(j);
+			for (size_t k = 0; k < nCnt; ++k)
 			{
-				if (nfa[i][j][k] == CurState)
+				size_t &nSta = row.GetDest(j, k);
+				if (nSta == CurState)
 				{
-					nfa[i][j][k] = MAX;
+					nSta = MAX;
 				}
 			}
 		}
 	}
 	if (Beg == End)
 	{
-		nfa[PreState][EMPTY].PushBack(MAX);
+		nfa[PreState].AddDest(EMPTY, MAX);
 	}
 }
 
@@ -1708,19 +1726,22 @@ void OP_KET_FUNC(CNfa &nfa, size_t PreState, size_t &CurState, bool IsALT, bool 
 {
 	if (IsBRAZERO)
 	{
-		nfa[PreState][EMPTY].PushBack(CurState);
+		nfa[PreState].AddDest(EMPTY, CurState);
 	}
 	if (IsALT)
 	{
 		for (size_t i = PreState; i < nfa.Size(); ++i)
 		{
+			CNfaRow &row = nfa[i];
 			for (size_t j = 0; j < CHARSETSIZE; ++j)
 			{
-				for (size_t k = 0; k < nfa[i][j].Size(); ++k)
+				size_t nCnt = row.DestCnt(j);
+				for (size_t k = 0; k < nCnt; ++k)
 				{
-					if (nfa[i][j][k] == MAX)
+					size_t &nSta = row.GetDest(j, k);
+					if (nSta == MAX)
 					{
-						nfa[i][j][k] = CurState;
+						nSta = CurState;
 					}
 				}
 			}
@@ -1734,13 +1755,16 @@ void OP_KETRMAX_FUNC(CNfa &nfa, size_t PreState, size_t &CurState, bool IsBRAZER
 	{
 		for (size_t i = PreState; i < nfa.Size(); ++i)
 		{
+			CNfaRow &row = nfa[i];
 			for (size_t j = 0; j < CHARSETSIZE; ++j)
 			{
-				for (size_t k = 0; k < nfa[i][j].Size(); ++k)
+				size_t nCnt = row.DestCnt(j);
+				for (size_t k = 0; k < nCnt; ++k)
 				{
-					if (nfa[i][j][k] == MAX)
+					size_t &nSta = row.GetDest(j, k);
+					if (nSta == MAX)
 					{
-						nfa[i][j][k] = CurState;
+						nSta = CurState;
 					}
 				}
 			}
@@ -1750,19 +1774,22 @@ void OP_KETRMAX_FUNC(CNfa &nfa, size_t PreState, size_t &CurState, bool IsBRAZER
 	{
 		for (size_t i = PreState; i < nfa.Size(); ++i)
 		{
+			CNfaRow &row = nfa[i];
 			for (size_t j = 0; j < CHARSETSIZE; ++j)
 			{
-				for (size_t k = 0; k < nfa[i][j].Size(); ++k)
+				size_t nCnt = row.DestCnt(j);
+				for (size_t k = 0; k < nCnt; ++k)
 				{
-					if (nfa[i][j][k] == CurState)
+					size_t &nSta = row.GetDest(j, k);
+					if (nSta == CurState)
 					{
-						nfa[i][j][k] = PreState;
+						nSta = PreState;
 					}
 				}
 			}
 			
 		}
-		nfa[PreState][EMPTY].PushBack(CurState);
+		nfa[PreState].AddDest(EMPTY, CurState);
 	}
 	else
 	{
@@ -1771,29 +1798,34 @@ void OP_KETRMAX_FUNC(CNfa &nfa, size_t PreState, size_t &CurState, bool IsBRAZER
 		size_t StartState = CurState;
 		for (size_t i = PreState; i < nCursize; ++i)
 		{
+			CNfaRow &row = nfa[i];
 			for (size_t j = 0; j < CHARSETSIZE; ++j)
 			{
-				for (size_t k = 0; k < nfa[i][j].Size(); ++k)
+				size_t nCnt = row.DestCnt(j);
+				for (size_t k = 0; k < nCnt; ++k)
 				{
-					nfa[nCursize + i - PreState][j].PushBack(CurState + (nfa[i][j][k]) - i);
+					nfa[nCursize + i - PreState].AddDest(j, CurState + row.GetDest(j, k) - i);
 				}
 			}
 			++CurState;
 		}
 		for (size_t i = StartState; i < nfa.Size(); ++i)
 		{
+			CNfaRow &row = nfa[i];
 			for (size_t j = 0; j < CHARSETSIZE; ++j)
 			{
-				for (size_t k = 0; k < nfa[i][j].Size(); ++k)
+				size_t nCnt = row.DestCnt(j);
+				for (size_t k = 0; k < nCnt; ++k)
 				{
-					if (nfa[i][j][k] == CurState)
+					size_t &nSta = row.GetDest(j, k);
+					if (nSta == CurState)
 					{
-						nfa[i][j][k] = StartState;
+						nSta = StartState;
 					}
 				}
 			}
 		}
-		nfa[StartState][EMPTY].PushBack(CurState);
+		nfa[StartState].AddDest(EMPTY, CurState);
 	}
 }
 
@@ -1803,7 +1835,7 @@ size_t OP_BRA_CBRA_SCBRA_FUNC(std::vector<unsigned char>::iterator &Beg, const s
 	{
 		size_t nCursize = nfa.Size();
 		nfa.Resize(nCursize + 1);
-		nfa.Back()[EMPTY].PushBack(MAX);
+		nfa.Back().AddDest(EMPTY, MAX);
 		++CurState;
 	}
 	
@@ -1829,9 +1861,10 @@ void Copy(CNfaRow &NewRow, CNfaRow &Row, size_t increment)
 {
 	for (size_t i = 0; i < CHARSETSIZE; ++i)
 	{
-		for (size_t j = 0; j < Row[i].Size(); ++j)
+		size_t nDestCnt = Row.DestCnt(i);
+		for (size_t j = 0; j < nDestCnt; ++j)
 		{
-			NewRow[i].PushBack(Row[i][j] + increment);
+			NewRow.AddDest(i, Row.GetDest(i, j) + increment);
 		}
 	}
 }
@@ -1841,7 +1874,7 @@ void AddEMPTY(CNfa &nfa, size_t &CurState)
 	size_t nCursize = nfa.Size();
 	nfa.Resize(nCursize + 1);
 	++CurState;
-	nfa.Back()[EMPTY].PushBack(CurState);
+	nfa.Back().AddDest(EMPTY, CurState);
 }
 
 void OutPut(std::vector<PCRE>::iterator &Pcre, CNfa &nfa, size_t count)
@@ -1870,11 +1903,11 @@ void OutPut(std::vector<PCRE>::iterator &Pcre, CNfa &nfa, size_t count)
 	{
 		for (size_t j = 0; j < CHARSETSIZE; ++j)
 		{
-			num = nfa[i][j].Size();
+			num = nfa[i].DestCnt(j);
 			fout.write((char*)&num, 4);
-			for (size_t k = 0; k < nfa[i][j].Size(); ++k)
+			for (size_t k = 0; k < num; ++k)
 			{
-				fout.write((char*)&(nfa[i][j][k]), 4);
+				fout.write((char*)&(nfa[i].GetDest(j, k)), 4);
 			}
 		}
 	}

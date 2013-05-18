@@ -45,6 +45,7 @@ public:
 	const CDfaRow& operator[](STATEID index) const;
 	void Init(BYTE *pGroup);
 	void Clear();
+	void PushBackTermSet(TERMSET &term);
 	size_t FromNFA(CNfa &nfa, NFALOG *nfalog, size_t Count, bool combine = false);
 	size_t Minimize();
 	STATEID GetGroupCount() const;

@@ -206,7 +206,7 @@ template<typename _Iter>
 size_t FormatPcre (_Iter pBeg, _Iter pEnd, OPTIONPCRE &pcre)
 {
 	pcre.nFlags = 0;
-	//If rule includes '!',we should delete this rule
+
 	if (*std::find_if_not(pBeg, pEnd, ISSPACE()) == '!')
 	{
 		return size_t(-2);
@@ -427,9 +427,12 @@ size_t ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
 				{
 					nFlag |= CSnortRule::RULE_HASNOT;
 				}
-				nResult = size_t(-1);
-				delete pPcre;
-				break;
+				else
+				{
+					nResult = size_t(-1);
+					delete pPcre;
+					break;
+				}
 			}
 			snortRule.PushBack(pPcre);
 		}
@@ -591,6 +594,7 @@ CRECHANFA size_t CompileRuleSet(LPCTSTR fileName, RECIEVER recv, LPVOID lpUser)
 				rIt != rules.end(); ++rIt)
 			{
 				std::cout << rIt - rules.begin() + 1 << std::endl;
+				//std::cout << ": " << g_dTimer << std::endl;
 				CompileRule(rIt->c_str(), recv, lpUser);
 			}
 		}
@@ -632,11 +636,11 @@ void contentToLinearNFA(OPTIONCONTENT *content, CNfa &nfa)
 		size_t id = i + 1;
 		for(int j = 0; j < 256; ++j)
 		{
-			row[j].PushBack(id);
+			row.AddDest(j, id);
 		}
 		if(i >= mustCnt)
 		{
-			row[EMPTYEDGE].PushBack(stateID);
+			row.AddDest(EMPTYEDGE, stateID);
 		}
 	}
 
@@ -650,12 +654,12 @@ void contentToLinearNFA(OPTIONCONTENT *content, CNfa &nfa)
 
 		if((content->nFlags & CF_NOCASE) && isalpha(*iter))
 		{
-			row[toupper(*iter)].PushBack(stateID);
-			row[tolower(*iter)].PushBack(stateID);
+			row.AddDest(toupper(*iter), stateID);
+			row.AddDest(tolower(*iter), stateID);
 		}
 		else
 		{
-			row[*iter].PushBack(stateID);
+			row.AddDest(*iter, stateID);
 		}
 
 		++stateID;
@@ -690,7 +694,7 @@ void contentToDefaultNFA(OPTIONCONTENT *content, CNfa &nfa)
 		size_t id = i + 1;
 		for(size_t j = 0; j < 256; ++j)
 		{
-			row[j].PushBack(id);
+			row.AddDest(j, id);
 		}
 	}
 
@@ -715,12 +719,12 @@ void contentToDefaultNFA(OPTIONCONTENT *content, CNfa &nfa)
 		{
 			if(i == 0)
 			{
-				row[c].PushBack(stateID);
+				row.AddDest(c, stateID);
 			}
 			BYTE character = BYTE((content->nFlags & CF_NOCASE) ? tolower(c) : c);
 			if(character == pattern[i])
 			{
-				row[c].PushBack(id);
+				row.AddDest(c, id);
 			}
 		}
 	}
@@ -755,18 +759,20 @@ void outPut(CNfa &nfa, std::string &fileName)
 	fout << std::endl;
 	for(size_t i = 0; i < stateNum; ++i)
 	{
+		const CNfaRow &row = nfa[i];
 		fout << i << "\t";
 		for(size_t j = 0; j < 257; ++j)
 		{
-			if(nfa[i][j].Size() == 0)
+			size_t nCnt = row.DestCnt(j);
+			if(nCnt == 0)
 			{
 				fout << -1 << "\t";
 			}
 			else
 			{
-				for(size_t k = 0; k < nfa[i][j].Size(); ++k)
+				for(size_t k = 0; k < nCnt; ++k)
 				{
-					fout << nfa[i][j][k] << ", ";
+					fout << row.GetDest(j, k) << ", ";
 				}
 				fout << "\t";
 			}
@@ -888,18 +894,29 @@ CRECHANFA size_t Rule2PcreList(const CSnortRule &rule, CRegRule &regrule)
 			//提取content中的signature
 			if(pContent->vecconts.size() >= 4)
 			{
-				for(std::vector<BYTE>::iterator sigIt = pContent->vecconts.begin();
-					sigIt + 3 != pContent->vecconts.end(); ++sigIt)
+				std::vector<BYTE> contentTmp;
+				contentTmp.reserve(pContent->vecconts.size());
+				for(std::vector<BYTE>::iterator itTmp = pContent->vecconts.begin();
+					itTmp != pContent->vecconts.end(); ++itTmp)
+				{
+					BYTE c = *itTmp;
+					if (c >= 'A' && c <= 'Z')
+					{
+						contentTmp.push_back(c - 'A' + 'a');
+					}
+					else
+					{
+						contentTmp.push_back(c);
+					}
+				}
+
+				for(std::vector<BYTE>::iterator sigIt = contentTmp.begin();
+					sigIt + 3 != contentTmp.end(); ++sigIt)
 				{
 					SIGNATURE sig = *(SIGNATURE*)&(*sigIt);
+
 					//BYTE *p = (BYTE*)&sig;
-					//std::cout << p << "  ";
-					//for(size_t j = 0; j < 4; ++j)
-					//{
-					//	BYTE c = *(p + j);
-					//	std::cout << (size_t)c << " ";
-					//}
-					//std::cout << std::endl;
+					//std::cout << *p << *(p + 1) << *(p + 2) << *(p + 3) << std::endl;
 					regrule.Back().PushBackSig(sig);
 				}
 			}
@@ -930,6 +947,15 @@ CRECHANFA size_t Rule2PcreList(const CSnortRule &rule, CRegRule &regrule)
 			regrule[i].Unique();
 		}
 	}
+	//for(size_t i = 0; i < regrule.Size(); ++i)
+	//{
+	//	for(size_t j = 0; j < regrule[i].GetSigCnt(); ++j)
+	//	{
+	//		BYTE *p  = (BYTE*)&regrule[i].GetSig(j);
+	//		std::cout << *p << *(p + 1) << *(p + 2) << *(p + 3) << "  ";
+	//	}
+	//	std::cout << std::endl;
+	//}
 	return 0;
 }
 
