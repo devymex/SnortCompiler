@@ -925,7 +925,6 @@ void CDfanew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, SETLIST &pSets
 				std::vector<STATEID> &ableToI = pRevTbl[*iSta * groupnum + byChar];
 				for (std::vector<STATEID>::iterator i = ableToI.begin(); i != ableToI.end(); ++i)
 				{
-					STATEID x = *i;
 					ableToW[*i] = 1;
 					bAllZero = false;
 				}
