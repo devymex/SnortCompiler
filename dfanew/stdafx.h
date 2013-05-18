@@ -13,3 +13,4 @@
 #include <windows.h>
 
 #define DFANEW_H_
+#undef max

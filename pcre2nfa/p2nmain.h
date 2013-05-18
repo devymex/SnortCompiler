@@ -332,6 +332,8 @@ enum {
 
 extern const unsigned char Steps[];
 
+extern enum PCRESIGN;
+
 struct PCRE
 {
 	std::string PcreStr;//pcre×Ö·û´®
@@ -346,7 +348,7 @@ void NextForCLASS(std::vector<unsigned char>::iterator &Beg);
 
 size_t ProcessPcre(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa);
 
-size_t Process(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, std::vector<size_t> &PreStates, size_t ALTPreBeg, bool &ALTBeg, size_t ALTBeginState, bool CBRA, bool ALT, bool BRAZERO, std::vector<std::string> &vecPath);
+size_t Process(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, std::vector<size_t> &PreStates, size_t ALTPreBeg, bool &ALTBeg, size_t ALTBeginState, bool bCBRA, bool bALT, bool bBRAZERO, std::vector<PCRESIGN> &vecPath);
 
 void ProcessALT(CNfa &nfa, size_t PreState, bool &ALTBegin, size_t ALTBegState);
 

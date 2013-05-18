@@ -56,7 +56,7 @@ class COMMONSC CCString
 {
 public:
 	CCString();
-	CCString(const char *pStr);
+	explicit CCString(const char *pStr);
 	~CCString();
 	CCString(const CCString &other);
 	CCString& operator = (const CCString &other);
@@ -78,7 +78,7 @@ private:
 class COMMONSC CNfaRow
 {
 public:
-	CNfaRow(size_t nSize = CHARSETSIZE);
+	explicit CNfaRow(size_t nSize = CHARSETSIZE);
 	~CNfaRow();
 	CNfaRow(const CNfaRow &other);
 	CNfaRow& operator=(const CNfaRow &other);
@@ -89,6 +89,7 @@ public:
 	size_t& GetDest(size_t nCol, size_t nIdx);
 	const size_t& GetDest(size_t nCol, size_t nIdx) const;
 	size_t* GetCol(size_t nCol);
+	//size_t* GetElem(size_t nCol);
 	const size_t* GetCol(size_t nCol) const;
 	void CopyCol(size_t nCol, size_t *pOut) const;
 	void AddDest(size_t nCol, size_t nDest);
@@ -131,7 +132,7 @@ public:
 		START    = 1 << 1,
 		TERMINAL = 1 << 2
 	};
-	CDfaRow(size_t col);
+	explicit CDfaRow(size_t col);
 	void Fill(STATEID _Val);
 	~CDfaRow();
 	CDfaRow(const CDfaRow &other);
@@ -142,7 +143,7 @@ public:
 	size_t GetFlag() const;
 	size_t GetColNum() const;
 private:
-	size_t m_nFlag;
+	size_t m_nFlag;//标记该状态/行的属性：NORMAL、START、TERMINAL
 	size_t m_nColNum;
 	std::vector<STATEID> *m_pDest;
 };
@@ -430,4 +431,4 @@ private:
 	__int64 m_nStart;
 };
 
-COMMONSC void printNfa(CNfa &nfa);
+COMMONSC void printNfa(const CNfa &nfa);

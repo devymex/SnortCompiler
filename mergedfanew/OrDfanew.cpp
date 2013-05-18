@@ -21,9 +21,11 @@ void NInsertDfa(CDfanew &dfa, CNfa &nfa, STATEID nTermSta, NFALOG *nfalog, size_
 	nfa.Resize(nfa.Size() + dfa.Size());
 	for(STATEID i = 0; i < dfa.Size(); ++i)
 	{
-		if((dfa[i].GetFlag() & CDfaRow::TERMINAL) != 0)
+		CNfaRow &nfaRow = nfa[temp + i];
+		CDfaRow &dfaRow = dfa[i];
+		if((dfaRow.GetFlag() & CDfaRow::TERMINAL) != 0)
 		{
-			nfa[temp + i].AddDest(EMPTYEDGE, nTermSta);
+			nfaRow.AddDest(EMPTYEDGE, nTermSta);
 
 			nfalog[count].dfaId = dfa.GetId();
 			nfalog[count].nfaStateId = temp + i;
@@ -32,10 +34,10 @@ void NInsertDfa(CDfanew &dfa, CNfa &nfa, STATEID nTermSta, NFALOG *nfalog, size_
 		for(size_t charNum = 0; charNum < DFACOLSIZE; ++charNum)
 		{
 			STATEID group = dfa.GetOneGroup(charNum);
-			STATEID add = dfa[i][group];
+			STATEID add = dfaRow[group];
 			if (add != STATEID(-1))
 			{
-				nfa[i + temp].AddDest(charNum, add);
+				nfaRow.AddDest(charNum, add);
 			}
 		}
 	}
