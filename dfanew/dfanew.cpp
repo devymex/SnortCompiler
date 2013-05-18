@@ -297,7 +297,7 @@ void GetNextEClosureSet(const CNfa &nfa, const std::vector<STATESET> &eClosure,
 			if (nAddCnt != 0)
 			{
 				nextSet.resize(nCurCnt + nAddCnt);
-				memcpy(nextSet.data() + nCurCnt, pStates, nAddCnt);
+				memcpy(nextSet.data() + nCurCnt, pStates, nAddCnt * sizeof(size_t));
 			}
 		}
 	}
