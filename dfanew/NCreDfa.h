@@ -47,3 +47,4 @@ void NNextNfaSet(const CNfa &oneNfaTab, const std::vector<size_t> &curNfaVec, si
 void NEClosure(const CNfa &oneNfaTab, const std::vector<size_t> &curNfaVec, 
 			  std::vector<size_t> &eNfaVec, char &finFlag);
 
+void NEClosure1(const CNfa &oneNfaTab, const std::vector<size_t> &curNfaVec, std::vector<size_t> &eNfaVec, char &finFlag);

@@ -476,7 +476,7 @@ int main(void)
 
 	std::cout << "Loading results from file..." << std::endl;
 	CResNew res;
-	res.ReadFromFile(_T("..\\..\\output\\result(back_up).cdt"));
+	res.ReadFromFile(_T("..\\..\\result.cdt"));
 	std::cout << "Completed in " << t1.Reset() << " Sec. chains: " << res.GetRegexTbl().Size() << std::endl << std::endl;
 
 	std::cout << "Build chainSet from result..." << std::endl;

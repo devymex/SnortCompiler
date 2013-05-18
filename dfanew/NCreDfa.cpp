@@ -214,11 +214,68 @@ void NNextNfaSet(const CNfa &oneNfaTab, const std::vector<size_t> &curNfaVec, si
 	nextNfaVec.erase(std::unique(nextNfaVec.begin(), nextNfaVec.end()), nextNfaVec.end());
 	if(!nextNfaVec.empty())
 	{
-		NEClosure(oneNfaTab, nextNfaVec, nextENfaVec, finFlag);
+		NEClosure1(oneNfaTab, nextNfaVec, nextENfaVec, finFlag);
 	}
 }
 
 void NEClosure(const CNfa &oneNfaTab, const std::vector<size_t> &curNfaVec, std::vector<size_t> &eNfaVec, char &finFlag)
+{
+	std::vector<size_t> eStack;
+	char caledStat[20000] = {0};
+	const size_t cEmptyEdge = 256;
+
+	if (eNfaVec.capacity() < 1000)
+	{
+		eNfaVec.reserve(1000);
+	}
+
+	for(std::vector<size_t>::const_iterator vecIter = curNfaVec.begin(); vecIter != curNfaVec.end(); ++vecIter)
+	{
+		eStack.push_back(*vecIter);
+		eNfaVec.push_back(*vecIter);
+		if(*vecIter == oneNfaTab.Size())
+		{
+			continue;
+		}
+
+		while(!eStack.empty())
+		{
+			size_t curSta;
+			curSta = eStack.back();
+			eStack.pop_back();
+			if(caledStat[curSta] == 0)
+			{
+				caledStat[curSta] = 1;
+				if(curSta < oneNfaTab.Size())
+				{
+					const CStateSet &eTempVec = oneNfaTab[curSta][cEmptyEdge];
+					if(eTempVec.Size() != 0)
+					{
+						for (size_t i = 0; i < eTempVec.Size(); ++i)
+						{
+							eNfaVec.push_back(eTempVec[i]);
+							eStack.push_back(eTempVec[i]);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	std::sort(eNfaVec.begin(), eNfaVec.end());
+	eNfaVec.erase(std::unique(eNfaVec.begin(), eNfaVec.end()), eNfaVec.end());
+
+	for(std::vector<size_t>::iterator iter = eNfaVec.begin(); iter != eNfaVec.end(); ++iter)
+	{
+		if(*iter == oneNfaTab.Size())
+		{
+			finFlag = 1;
+			break;
+		}
+	}
+}
+
+void NEClosure1(const CNfa &oneNfaTab, const std::vector<size_t> &curNfaVec, std::vector<size_t> &eNfaVec, char &finFlag)
 {
 	std::vector<size_t> eStack;
 	const size_t cEmptyEdge = 256;
