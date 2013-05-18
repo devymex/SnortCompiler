@@ -217,10 +217,6 @@ void Warshall(BYTE *pMat, size_t nSize)
 				{
 					((BYTE*)pBeg1)[j] |= ((BYTE*)pBeg2)[j];
 				}
-				//for (size_t j = 0; j < nSize; ++j)
-				//{
-				//	pMat[row + j] |= pMat[k * nSize + j];
-				//}
 			}
 		}
 	}
@@ -285,11 +281,12 @@ void GetNextStateSet(const CNfa &nfa, size_t edge, const STATESET &curSet, STATE
 	}
 
 	size_t nSize = nfa.Size();
-	for(STATESET::const_iterator vecIter = curSet.begin(); vecIter != curSet.end(); ++vecIter)
+	for(STATESET::const_iterator i = curSet.begin(); i != curSet.end(); ++i)
 	{
-		if(*vecIter != nSize)
+		size_t nCurSta = *i;
+		if(nCurSta != nSize)
 		{
-			const CNfaRow &row = nfa[*vecIter];
+			const CNfaRow &row = nfa[nCurSta];
 			size_t nCurCnt = nextSet.size();
 			size_t nAddCnt = row.DestCnt(edge);
 			if (nAddCnt != 0)
@@ -329,7 +326,7 @@ void GetNextEClosureSet(const CNfa &nfa, const std::vector<STATESET> &eClosure,
 	GetEClosureSet(eClosure, nextStaSet, eClosureSet);
 }
 
-DFANEWSC size_t CDfanew::FromNFA(CNfa &nfa, NFALOG *nfalog, size_t Count, bool combine)
+DFANEWSC size_t CDfanew::FromNFA(const CNfa &nfa, NFALOG *nfalog, size_t Count, bool combine)
 {
 	typedef std::unordered_map<std::vector<size_t>, STATEID, NSTATESET_HASH> STATESETHASH;
 	std::vector<std::pair<std::vector<size_t>, STATEID>> termStasVec;
@@ -892,7 +889,7 @@ void CDfanew::MergeReachable(std::vector<STATEID> &reachable)
 //groupnum表示字符集长度，size表示原DFA的状态数，pRevTbl表示逆向访问表
 //pSets表示输入一个状态集的初始划分，输出一个状态集的最终划分结果
 //pSets初始值为终态和非终态集合，其中最后一个为非终态集合
-void CDfanew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, SETLIST &pSets)
+void CDfanew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, SETLIST &pSets) const
 {
 	//将需要查找的划分的iterator存入wSets，初始化时只保存终态集合
 	std::list<SETLIST_ITER> wSets;
@@ -908,7 +905,7 @@ void CDfanew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, SETLIST &pSets
 	//each element in ableToW present a property of according state of tmpDfa,
 	//and has two labels, 0 and 1. 1 indicates the according state has the specific
 	//transition to one state of curWSet, 0 otherwise
-	std::vector<BYTE> ableToW(m_pDfa->size(),BYTE(0));
+	std::vector<BYTE> ableToW(m_pDfa->size(), 0);
 	bool bAllZero = true;
 	BYTE groupnum = (BYTE)GetGroupCount();
 	for (; !wSets.empty(); )
@@ -925,29 +922,31 @@ void CDfanew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, SETLIST &pSets
 				std::vector<STATEID> &ableToI = pRevTbl[*iSta * groupnum + byChar];
 				for (std::vector<STATEID>::iterator i = ableToI.begin(); i != ableToI.end(); ++i)
 				{
-					STATEID x = *i;
 					ableToW[*i] = 1;
 					bAllZero = false;
 				}
 			}
 			if (!bAllZero)
 			{
+				bAllZero = true;
 				for (SETLIST_ITER iPSet = pSets.begin(); iPSet != pSets.end(); ++iPSet)
 				{
 					//each partition in pSets,according to the label of a state in partition adjust position 
 					//all unvisited states lie in the front of list, visited states locate
-					//at the rear end of list 
-					for (STALIST_ITER iCurSta = iPSet->begin(); iCurSta != iPSet->end(); )
+					//at the rear end of list
+					STALIST_ITER iCur = iPSet->begin();
+					for (; ableToW[*iCur++] == 1 && iCur != iPSet->end(); );
+					for (; iCur != iPSet->end();)
 					{
-						if (ableToW[*iCurSta] == 0)
+						if (ableToW[*iCur] == 1)
 						{
-							STATEID tmp = *iCurSta;
-							iCurSta = iPSet->erase(iCurSta);
+							STATEID tmp = *iCur;
+							iCur = iPSet->erase(iCur);
 							iPSet->insert(iPSet->begin(), tmp);
 						}
 						else
 						{
-							++iCurSta;
+							++iCur;
 						}
 					} 
 
@@ -956,7 +955,7 @@ void CDfanew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, SETLIST &pSets
 					STALIST_ITER iCutBeg = iPSet->begin(), iCutEnd = iPSet->end();
 					for (; iCutBeg != iPSet->end(); ++iCutBeg)
 					{
-						if (ableToW[*iCutBeg] == 1)
+						if (ableToW[*iCutBeg] == 0)
 						{
 							break;
 						}
@@ -981,8 +980,7 @@ void CDfanew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, SETLIST &pSets
 				}
 
 				//initialize ableToW and bAllZero before read the next char, 
-				ZeroMemory(&ableToW[0], ableToW.size());
-				bAllZero = true;
+				memset(ableToW.data(), 0, ableToW.size());
 			}
 		}
 	}

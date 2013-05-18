@@ -68,14 +68,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="md5.h" />
     <ClInclude Include="NCreDfa.h" />
     <ClInclude Include="dfanew.h" />
     <ClInclude Include="GetDfaSig.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="md5.cpp" />
     <ClCompile Include="NCreDfa.cpp" />
     <ClCompile Include="dfanew.cpp" />
     <ClCompile Include="GetDfaSig.cpp" />
