@@ -785,7 +785,7 @@ void outPut(CNfa &nfa, std::string &fileName)
 size_t content2Pcre(OPTIONCONTENT *pContent, CCString &pcreStr)
 {
 	std::stringstream ss;
-	pcreStr = ("/^");
+	pcreStr = CCString("/^");
 	if((pContent->nFlags & CF_OFFSET) && pContent->nOffset > 0)
 	{
 		ss.str("");
@@ -810,7 +810,7 @@ size_t content2Pcre(OPTIONCONTENT *pContent, CCString &pcreStr)
 			|| ((pContent->nFlags & CF_DISTANCE) && pContent->nDistance == 0))
 		{
 			//既没有offset约束也没有distance约束
-			pcreStr = "/";
+			pcreStr = CCString("/");
 		}
 		else
 		{

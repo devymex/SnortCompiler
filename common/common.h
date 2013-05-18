@@ -56,7 +56,7 @@ class COMMONSC CCString
 {
 public:
 	CCString();
-	CCString(const char *pStr);
+	explicit CCString(const char *pStr);
 	~CCString();
 	CCString(const CCString &other);
 	CCString& operator = (const CCString &other);
@@ -78,7 +78,7 @@ private:
 class COMMONSC CNfaRow
 {
 public:
-	CNfaRow(size_t nSize = CHARSETSIZE);
+	explicit CNfaRow(size_t nSize = CHARSETSIZE);
 	~CNfaRow();
 	CNfaRow(const CNfaRow &other);
 	CNfaRow& operator=(const CNfaRow &other);
@@ -131,7 +131,7 @@ public:
 		START    = 1 << 1,
 		TERMINAL = 1 << 2
 	};
-	CDfaRow(size_t col);
+	explicit CDfaRow(size_t col);
 	void Fill(STATEID _Val);
 	~CDfaRow();
 	CDfaRow(const CDfaRow &other);
@@ -430,4 +430,4 @@ private:
 	__int64 m_nStart;
 };
 
-COMMONSC void printNfa(CNfa &nfa);
+COMMONSC void printNfa(const CNfa &nfa);

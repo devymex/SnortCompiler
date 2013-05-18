@@ -1577,8 +1577,9 @@ size_t OP_NCLASS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vect
 		{
 			if (*(Beg + i + 1) & 1 << j)
 			{
-				nfa.Back().AddDest(i * 8 + j, tmp);
-				Row.AddDest(i * 8 + j, tmp);
+				size_t nCol = i * 8 + j;
+				nfa.Back().AddDest(nCol, tmp);
+				Row.AddDest(nCol, tmp);
 			}
 		}
 	}
@@ -1673,8 +1674,9 @@ size_t OP_NCLASS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vect
 			nfa.Resize(nCursize + max);
 			for (size_t i = 0; i < max - min; ++i)
 			{
-				Copy(nfa[nCursize + min + i], Row, min + i);
-				nfa[nCursize + min + i].AddDest(EMPTY, CurState - i + max - min);
+				size_t nCnt = min + i;
+				Copy(nfa[nCursize + nCnt], Row, nCnt);
+				nfa[nCursize + nCnt].AddDest(EMPTY, CurState + max - nCnt);
 				++CurState;
 			}
 		}
@@ -1891,13 +1893,14 @@ void OutPut(std::vector<PCRE>::iterator &Pcre, CNfa &nfa, size_t count)
 	size_t num;
 	for (size_t i = 0; i < Cnt; ++i)
 	{
+		CNfaRow &row = nfa[i];
 		for (size_t j = 0; j < CHARSETSIZE; ++j)
 		{
-			num = nfa[i].DestCnt(j);
+			num = row.DestCnt(j);
 			fout.write((char*)&num, 4);
 			for (size_t k = 0; k < num; ++k)
 			{
-				fout.write((char*)&(nfa[i].GetDest(j, k)), 4);
+				fout.write((char*)&(row.GetDest(j, k)), 4);
 			}
 		}
 	}
