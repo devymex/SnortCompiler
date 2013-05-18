@@ -343,10 +343,7 @@ DFANEWSC size_t CDfanew::FromNFA(CNfa &nfa, NFALOG *nfalog, size_t Count, bool c
 	Init(groups);
 
 	std::stack<std::vector<size_t>> nfaStasStack;
-	std::vector<size_t> startEVec;
-	std::vector<size_t> startVec;
-
-	startEVec = eClosure[0];
+	std::vector<size_t> &startEVec = eClosure.front();
 	nfaStasStack.push(startEVec);
 
 	STATESETHASH ssh;
@@ -357,8 +354,7 @@ DFANEWSC size_t CDfanew::FromNFA(CNfa &nfa, NFALOG *nfalog, size_t Count, bool c
 	CDfaRow &firstRow = m_pDfa->back();
 	firstRow.SetFlag(firstRow.GetFlag() | firstRow.START);
 
-	startVec.push_back(0);
-	if (!startEVec.empty() && startEVec.back() == nfa.Size())
+	if (startEVec.back() == nfa.Size())
 	{
 		firstRow.SetFlag(firstRow.GetFlag() | firstRow.TERMINAL);
 	}
