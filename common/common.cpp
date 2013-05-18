@@ -202,12 +202,7 @@ COMMONSC void CNfaRow::AddDest(size_t nCol, size_t nDest)
 	m_pDestSet[nCol].push_back(nDest);
 }
 
-COMMONSC void CNfaRow::SortDest(size_t nCol)
-{
-	std::sort(m_pDestSet[nCol].begin(), m_pDestSet[nCol].end());
-}
-
-COMMONSC void CNfaRow::SortAllDest()
+COMMONSC void CNfaRow::SortAll()
 {
 	for (size_t i = 0; i < m_nSize; ++i)
 	{
@@ -254,6 +249,11 @@ COMMONSC CNfa::~CNfa()
 COMMONSC void CNfa::Reserve(size_t _Count)
 {
 	m_pNfa->reserve(_Count);
+}
+
+COMMONSC void CNfa::Shrink()
+{
+//	m_pNfa->shrink_to_fit();
 }
 
 COMMONSC void CNfa::Resize(size_t _Newsize)
@@ -353,9 +353,18 @@ COMMONSC size_t CNfa::GetDfaTermsNum()
 {
 	return m_DfaTerms->size();
 }
+
 COMMONSC CNfa::DFATERMS CNfa::GetDfaTerms(size_t num)
 {
 	return (*m_DfaTerms)[num];
+}
+
+COMMONSC void CNfa::SortAll()
+{
+	for(std::vector<CNfaRow>::iterator i = m_pNfa->begin(); i != m_pNfa->end(); ++i)
+	{
+		i->SortAll();
+	}
 }
 
 

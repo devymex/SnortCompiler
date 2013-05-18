@@ -46,7 +46,7 @@ public:
 	void Init(BYTE *pGroup);
 	void Clear();
 	void PushBackTermSet(TERMSET &term);
-	size_t FromNFA(CNfa &nfa, NFALOG *nfalog, size_t Count, bool combine = false);
+	size_t FromNFA(const CNfa &nfa, NFALOG *nfalog, size_t Count, bool combine = false);
 	size_t Minimize();
 	STATEID GetGroupCount() const;
 	BYTE Char2Group(BYTE nIdx);
@@ -72,7 +72,7 @@ private:
 	void RemoveUnreachable(const std::vector<STATEID> *Tab, const STALIST &begs, 
 		const size_t &col, std::vector<STATEID> &reachable);
 	void MergeReachable(std::vector<STATEID> &reachable);
-	void PartitionNonDisState(std::vector<STATEID> *pRevTbl, SETLIST &pSets);
+	void PartitionNonDisState(std::vector<STATEID> *pRevTbl, SETLIST &pSets) const;
 	void MergeNonDisStates(SETLIST &Partition);
 
 };

@@ -25,18 +25,20 @@ struct NSTATESET_HASH
 	enum {MAX_SIZE = 20000};
 	size_t operator()(const std::vector<size_t> &set)
 	{
-		size_t nr = set.size() + 1;
-		if (set.size() > 0)
+		const size_t _FNV_offset_basis = 2166136261U;
+		const size_t _FNV_prime = 16777619U;
+
+		const size_t *pData = set.data();
+		const size_t *pEnd = pData + set.size();
+
+		size_t nr = 2166136261U;
+		for (; pData != pEnd; ++pData)
 		{
-			std::vector<size_t>::const_reverse_iterator rbeg = set.crbegin();
-			nr *= (*rbeg++) + 1;
-			if (set.size() > 1)
-			{
-				nr *= (*rbeg++) + 1;
-			}
+			nr ^= *pData;
+			nr *= _FNV_prime;
 		}
-		return nr % MAX_SIZE;
+		return nr;
 	}
 };
 
-void NAvaiEdges(CNfa &oneNfaTab, BYTE *group);
+void NAvaiEdges(const CNfa &oneNfaTab, BYTE *group);

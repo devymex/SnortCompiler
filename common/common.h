@@ -93,8 +93,7 @@ public:
 	const size_t* GetCol(size_t nCol) const;
 	void CopyCol(size_t nCol, size_t *pOut) const;
 	void AddDest(size_t nCol, size_t nDest);
-	void SortDest(size_t nCol);
-	void SortAllDest();
+	void SortAll();
 
 private:
 	size_t m_nSize;
@@ -204,6 +203,7 @@ public:
 	//size_t GetRowNum(void);
 	void Reserve(size_t _Count);
 	void Resize(size_t _Newsize);
+	void Shrink();
 	size_t Size() const;
 	void FromDfa(CDfa &dfa);
 	void PushBack(const CNfaRow &row);
@@ -214,6 +214,7 @@ public:
 	DFATERMS GetDfaTerms(size_t num);
 	const char* GetPcre() const;
 	void Clear();
+	void SortAll();
 
 	CNfaRow &Back();
 	CNfaRow &operator[](size_t index);
