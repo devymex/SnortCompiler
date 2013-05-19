@@ -2,104 +2,108 @@
 #include "NCreDfa.h"
 #include "dfanew.h"
 
-struct NFAELEM
+struct COLUMNKEY
 {
-	size_t* pBuf;
-	size_t nSize;
-	__forceinline bool operator ==(const NFAELEM &other) const
+	std::vector<size_t> key;
+	size_t hash;
+	__forceinline bool operator == (const COLUMNKEY &other) const
 	{
-		if (nSize != other.nSize)
+		size_t nSize = key.size();
+		if (nSize != other.key.size())
 		{
 			return false;
 		}
-		if (nSize > 0)
+		if (nSize == 0)
 		{
-			return (0 == memcmp(pBuf, other.pBuf, nSize));
+			return true;
 		}
-		return true;
+		return (0 == memcmp(key.data(), other.key.data(), nSize * sizeof(size_t)));
 	}
 };
 
-struct NFACOLUMN
+struct COLUMNKEYHASH
 {
-	std::vector<NFAELEM> elems;
-	size_t nTotal;
-	size_t nHash;
-	bool operator==(const NFACOLUMN &other) const
+	__forceinline size_t operator ()(const COLUMNKEY &column)
 	{
-		if (nTotal != other.nTotal)
-		{
-			return false;
-		}
-		return (elems == other.elems);	
+		return column.hash;
 	}
 };
 
-struct NFACOLUMNHASH
-{
-	size_t operator()(const NFACOLUMN &column)
-	{
-		return column.nHash;
-	}
-};
-
-void CalcKeyHash(NFACOLUMN &column)
-{
-	const size_t _FNV_offset_basis = 2166136261U;
-	const size_t _FNV_prime = 16777619U;
-	column.nHash = _FNV_offset_basis;
-	column.nTotal = 0;
-	for (std::vector<NFAELEM>::const_iterator i = column.elems.cbegin();
-		i != column.elems.cend(); ++i)
-	{
-		size_t nSize = i->nSize;
-		column.nTotal += nSize;
-		column.nHash ^= nSize;
-		column.nHash *= _FNV_prime;
-		for (size_t j = 0; j < nSize; ++j)
-		{	
-			column.nHash ^= i->pBuf[j];
-			column.nHash *= _FNV_prime;
-		}
-	}
-}
-
-typedef std::unordered_map<NFACOLUMN, STATEID, NFACOLUMNHASH> GROUPHASH;
+typedef std::unordered_map<COLUMNKEY, STATEID, COLUMNKEYHASH> COLUMNHASHMAP;
 
 void NAvaiEdges(const CNfa &nfa, STATEID *group)
 {
-	static NFACOLUMN keys[CHARSETSIZE];
+	const size_t _FNV_offset_basis = 2166136261U;
+	const size_t _FNV_prime = 16777619U;
+
+	static COLUMNKEY columns[CHARSETSIZE];
+	size_t zeroCnts[CHARSETSIZE] = {0};
 
 	size_t nSize = nfa.Size();
-	for (size_t col = 0; col < CHARSETSIZE; ++col)
+	for (size_t i = 0; i < CHARSETSIZE; ++i)
 	{
-		NFACOLUMN &curCol = keys[col];
-		curCol.elems.resize(nSize);
-		for (size_t i = 0; i < nSize; ++i)
+		columns[i].key.clear();
+		//columns[i].key.reserve(1000);
+		columns[i].hash = _FNV_offset_basis;
+	}
+	for (size_t i = 0; i < nSize; ++i)
+	{
+		const CNfaRow &curRow = nfa[i];
+		for (size_t j = 0; j < CHARSETSIZE; ++j)
 		{
-			const CNfaRow &curRow = nfa[i];
-			NFAELEM &curElem = curCol.elems[i];
-			curElem.pBuf = (size_t*)curRow.GetCol(col);
-			curElem.nSize = curRow.DestCnt(col);
+			std::vector<size_t> &curCol = columns[j].key;
+			const size_t *pData = curRow.GetCol(j);
+			size_t nCurSize = curCol.size();
+			size_t nAddSize = curRow.DestCnt(j);
+			if (nAddSize != 0)
+			{
+				if (zeroCnts[j] > 0)
+				{
+					curCol.resize(curCol.size() + zeroCnts[j], 0);
+					zeroCnts[j] = 0;
+				}
+				curCol.push_back(nAddSize);
+			}
+			else
+			{
+				++zeroCnts[j];
+			}
+
+			size_t &hash = columns[j].hash;
+			hash ^= nAddSize;
+			hash *= _FNV_prime;
+			for (size_t k = 0; k < nAddSize; ++k)
+			{
+				curCol.push_back(pData[k]);
+				hash ^= pData[k];
+				hash *= _FNV_prime;
+			}
 		}
-		CalcKeyHash(curCol);
+	}
+	for (size_t i = 0; i < CHARSETSIZE; ++i)
+	{
+		std::vector<size_t> &curCol = columns[i].key;
+		size_t nCurSize = curCol.size();
+
+		curCol.resize(nCurSize + zeroCnts[i]);
+		memset(curCol.data() + nCurSize, 0, zeroCnts[i] * sizeof(size_t));
 	}
 
-	GROUPHASH gpHash;
-	gpHash.rehash(991);
-	for(size_t c = 0; c < DFACOLSIZE; ++c)
+	static COLUMNHASHMAP colHash;
+	colHash.clear();
+	for(size_t i = 0; i < DFACOLSIZE; ++i)
 	{
-		NFACOLUMN &curCol = keys[c];
-		GROUPHASH::iterator colIt = gpHash.find(curCol);
-		if(colIt == gpHash.end())
+		COLUMNKEY &curCol = columns[i];
+		COLUMNHASHMAP::iterator same = colHash.find(curCol);
+		if(same == colHash.end())
 		{
-			STATEID curId = gpHash.size();
-			gpHash[curCol] = curId;
-			group[c] = curId;
+			STATEID curId = colHash.size();
+			colHash[curCol] = curId;
+			group[i] = curId;
 		}
 		else
 		{
-			group[c] = colIt->second;
+			group[i] = same->second;
 		}
 	}
 }

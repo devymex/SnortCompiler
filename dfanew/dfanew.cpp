@@ -195,7 +195,6 @@ DFANEWSC void CDfanew::Clear()
 }
 
 typedef std::vector<size_t> STATESET;
-#include <xmmintrin.h>
 
 void Warshall(BYTE *pMat, size_t nWidth, size_t nHeight)
 {
@@ -208,7 +207,7 @@ void Warshall(BYTE *pMat, size_t nWidth, size_t nHeight)
 			{
 				__m128i *pBeg1 = (__m128i*)(pMat + row);
 				__m128i *pBeg2 = (__m128i*)(pMat + k * nWidth);
-				size_t nInts = nWidth / sizeof(__m128i);
+				size_t nInts = nWidth >> 4;
 				for (size_t j = 0; j < nInts; ++j)
 				{
 					*pBeg1 = _mm_or_si128(*pBeg1, *pBeg2);
