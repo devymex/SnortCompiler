@@ -195,52 +195,43 @@ DFANEWSC void CDfanew::Clear()
 }
 
 typedef std::vector<size_t> STATESET;
+#include <xmmintrin.h>
 
-void Warshall(BYTE *pMat, size_t nSize)
+void Warshall(BYTE *pMat, size_t nWidth, size_t nHeight)
 {
-	for (size_t k = 0; k < nSize; ++k)
+	for (size_t k = 0; k < nHeight; ++k)
 	{
-		for (size_t i = 0; i < nSize; ++i)
+		for (size_t i = 0; i < nHeight; ++i)
 		{
-			size_t row = i * nSize;
+			size_t row = i * nWidth;
 			if (pMat[row + k])
 			{
-				size_t nInts = nSize / sizeof(__int64);
-				size_t nBytes = nSize % sizeof(__int64);
-				__int64 *pBeg1 = (__int64*)(pMat + row);
-				__int64 *pBeg2 = (__int64*)(pMat + k * nSize);
+				__m128i *pBeg1 = (__m128i*)(pMat + row);
+				__m128i *pBeg2 = (__m128i*)(pMat + k * nWidth);
+				size_t nInts = nWidth / sizeof(__m128i);
 				for (size_t j = 0; j < nInts; ++j)
 				{
-					*pBeg1++ |= *pBeg2++;
-				}
-				for (size_t j = 0; j < nBytes; ++j)
-				{
-					((BYTE*)pBeg1)[j] |= ((BYTE*)pBeg2)[j];
+					*pBeg1 = _mm_or_si128(*pBeg1, *pBeg2);
+					++pBeg1;
+					++pBeg2;
 				}
 			}
 		}
 	}
 }
 
-void PrintMat(BYTE *pMat, size_t nSize)
-{
-	for (size_t i = 0; i < nSize; ++i)
-	{
-		for (size_t j = 0; j < nSize; ++j)
-		{
-			std::cout << int(pMat[i * nSize + j]) << " ";
-		}
-		std::cout << std::endl;
-	}
-	std::cout << std::endl;
-}
-
 void NfaEClosure(const CNfa &nfa, std::vector<STATESET> &eClosure)
 {
 	//printNfa(nfa);
 	size_t nNfaSize = nfa.Size();
-	size_t nMatSize = nNfaSize + 1;
-	BYTE *pMat = (BYTE*)VirtualAlloc(NULL, nMatSize * nMatSize, MEM_COMMIT, PAGE_READWRITE);
+	size_t nMatHeight = nNfaSize + 1;
+	size_t nMatWidth = nMatHeight;
+	if (nMatWidth % 16 != 0)
+	{
+		nMatWidth = (nMatWidth / 16) * 16 + 16;
+	}
+	BYTE *pMat = (BYTE*)_aligned_malloc(nMatWidth * nMatHeight, 128);
+	memset(pMat, 0, nMatWidth * nMatHeight);
 
 	for (size_t i = 0; i < nNfaSize; ++i)
 	{
@@ -249,27 +240,26 @@ void NfaEClosure(const CNfa &nfa, std::vector<STATESET> &eClosure)
 		const size_t *pDest = row.GetCol(EMPTY);
 		for (size_t k = 0; k < nCnt; ++k)
 		{
-			pMat[i * nMatSize + pDest[k]] = 1;
+			pMat[i * nMatWidth + pDest[k]] = 1;
 		}
-		pMat[i * nMatSize + i] = 1;
+		pMat[i * nMatWidth + i] = 1;
 	}
 
-	Warshall(pMat, nMatSize);
-	//PrintMat(pMat, nMatSize);
+	Warshall(pMat, nMatWidth, nMatHeight);
 
 	eClosure.resize(nNfaSize + 1);
 	for (size_t i = 0; i < nNfaSize; ++i)
 	{
-		for (size_t j = 0; j < nMatSize; ++j)
+		for (size_t j = 0; j < nMatWidth; ++j)
 		{
-			if (pMat[i * nMatSize + j])
+			if (pMat[i * nMatWidth + j])
 			{
 				eClosure[i].push_back(j);
 			}
 		}
 	}
 	eClosure[nNfaSize].push_back(nNfaSize);
-	VirtualFree(pMat, 0, MEM_RELEASE);
+	_aligned_free(pMat);
 }
 
 void GetNextEClosureSet(const CNfa &nfa, const std::vector<STATESET> &eClosure,
@@ -462,9 +452,16 @@ DFANEWSC size_t CDfanew::Minimize()
 		return size_t(-1);
 	}
 
-	size_t nMatSize = nSize + 1;
-	BYTE *pMat = (BYTE*)VirtualAlloc(NULL, nMatSize * nMatSize,
-		MEM_COMMIT, PAGE_READWRITE);
+	size_t nMatHeight = nSize + 1;
+	size_t nMatWidth = nMatHeight;
+
+	if (nMatWidth % 16 != 0)
+	{
+		nMatWidth = (nMatWidth / 16) * 16 + 16;
+	}
+	BYTE *pMat = (BYTE*)_aligned_malloc(nMatWidth * nMatHeight, 128);
+	memset(pMat, 0, nMatWidth * nMatHeight);
+
 	pMat[0] = 1;
 	for (size_t i = 0; i < nSize; ++i)
 	{
@@ -473,27 +470,27 @@ DFANEWSC size_t CDfanew::Minimize()
 			STATEID nextSta = (STATEID)(*m_pDfa)[i][j];
 			if (nextSta != STATEID(-1))
 			{
-				pMat[i * nMatSize + nextSta] = 1;
+				pMat[i * nMatWidth + nextSta] = 1;
 			}
 		}
 	}
-	for (STATEID i = 0; i < m_pDfa->size(); ++i)
+	for (STATEID i = 0; i < nSize; ++i)
 	{
 		if ((*m_pDfa)[i].GetFlag() & CDfaRow::TERMINAL)
 		{
-			pMat[i * nMatSize + nSize] = 1;
+			pMat[i * nMatWidth + nSize] = 1;
 		}
 	}
-	Warshall(pMat, nMatSize);
-	std::vector<STATEID> reachable(nSize, 0);
+	Warshall(pMat, nMatWidth, nMatHeight);
+	std::vector<STATEID> reachable;
 	for (size_t i = 0; i < nSize; ++i)
 	{
-		if (pMat[i] && pMat[i * nMatSize + nSize])
+		if (pMat[i] && pMat[i * nMatWidth + nSize])
 		{
-			reachable[i] = 2;
+			reachable.push_back(i);
 		}
 	}
-	VirtualFree(pMat, 0, MEM_RELEASE);
+	_aligned_free(pMat);
 
 	std::vector<STATEID> *pRevTab;
 
@@ -755,46 +752,43 @@ DFANEWSC void CDfanew::Load(BYTE *beg, size_t len)
 //0 表示该状态为孤立状态，1 表示该状态为不可达状态或者“死”状态，2 表示该状态为可达状态
 void CDfanew::MergeReachable(std::vector<STATEID> &reachable)
 {
-	//统计可达状态的数目
-	size_t nRcbCnt = std::count(reachable.begin(), reachable.end(), 2);
-
-	size_t nColNum = GetGroupCount();
-
+	size_t nDfaSize = m_pDfa->size();
 	//标记终态的dfaId，以保证终态编号更改后，其对应的dfaId保持不变
-	std::vector<size_t> termFlag(m_pDfa->size(), size_t(-1));
+	std::vector<size_t> termFlag(nDfaSize, size_t(-1));
 	for (size_t i = 0; i < m_TermSet->size(); ++i)
 	{
-		termFlag[(*m_TermSet)[i].dfaSta] = (*m_TermSet)[i].dfaId;
+		TERMSET &curSet = (*m_TermSet)[i];
+		termFlag[curSet.dfaSta] = curSet.dfaId;
 	}
 	m_TermSet->clear();
 	
+	//统计可达状态的数目
+	size_t nRcbCnt = reachable.size();
+	size_t nColNum = GetGroupCount();
+
 	//定义一个同成员变量m_pDfa类型相同的变量，用于存储删除多余状态后的DFA跳转表
 	std::vector<CDfaRow> *pNewDfa = new std::vector<CDfaRow>(nRcbCnt, CDfaRow(nColNum));
 	std::vector<CDfaRow> &tmpDfa = *pNewDfa;
 
-	STATEID nNewIdx = 0;
+	size_t nMemSize = nDfaSize * sizeof(STATEID);
+	STATEID *pOldToNew = (STATEID*)VirtualAlloc(NULL, nMemSize, MEM_COMMIT, PAGE_READWRITE);
+	memset(pOldToNew, 0xFF, nMemSize);
+
 	//将m_pDfa中编号对应为可达状态的复制到tmpDfa中，并修改reachable中可达状态的编号
 	for (std::vector<STATEID>::iterator iter = reachable.begin(); iter != reachable.end(); ++iter)
 	{
-		if (2 == *iter)
-		{
-			STATEID nStaId = STATEID(iter - reachable.begin());
-			tmpDfa[nNewIdx] = (*m_pDfa)[nStaId];
-			*iter = nNewIdx;
+		STATEID nOldId = *iter, nNewId = iter - reachable.begin();
+		CDfaRow &oldRow = (*m_pDfa)[nOldId];
+		tmpDfa[nNewId] = oldRow;
+		pOldToNew[nOldId] = nNewId;
 
-			//存入新的终态编号
-			if (((*m_pDfa)[nStaId].GetFlag() & (*m_pDfa)[nStaId].TERMINAL) != 0)
-			{
-				TERMSET tmpSta;
-				tmpSta.dfaSta = nNewIdx;
-				tmpSta.dfaId = termFlag[nStaId];
-				m_TermSet->push_back(tmpSta);
-			}
-			++nNewIdx;
-		}
-		else
+		//存入新的终态编号
+		if (oldRow.GetFlag() & oldRow.TERMINAL)
 		{
-			*iter = STATEID(-1);
+			TERMSET tmpSta;
+			tmpSta.dfaSta = nNewId;
+			tmpSta.dfaId = termFlag[nOldId];
+			m_TermSet->push_back(tmpSta);
 		}
 	}
 
@@ -807,10 +801,11 @@ void CDfanew::MergeReachable(std::vector<STATEID> &reachable)
 			STATEID &cur = curRow[j];
 			if (cur != STATEID(-1))
 			{
-				cur = reachable[cur];
+				cur = pOldToNew[cur];
 			}
 		}
 	}
+	VirtualFree(pOldToNew, 0, MEM_RELEASE);
 
 	//替换m_pDfa
 	delete m_pDfa;
