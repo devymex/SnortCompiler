@@ -172,16 +172,6 @@ COMMONSC const size_t& CNfaRow::GetDest(size_t nCol, size_t nIdx) const
 	return m_pDestSet[nCol][nIdx];
 }
 
-//COMMONSC size_t* CNfaRow::GetElem(size_t nCol)
-//{
-//	if(!m_pDestSet[nCol].empty())
-//	{
-//		return &m_pDestSet[nCol][0];
-//	}
-//	else 
-//		return NULL;
-//}
-
 COMMONSC size_t* CNfaRow::GetCol(size_t nCol)
 {
 	return m_pDestSet[nCol].data();
@@ -194,7 +184,8 @@ COMMONSC const size_t* CNfaRow::GetCol(size_t nCol) const
 
 COMMONSC void CNfaRow::CopyCol(size_t nCol, size_t *pOut) const
 {
-	memcpy(pOut, m_pDestSet[nCol].data(), m_pDestSet[nCol].size() * sizeof(size_t));
+	std::vector<size_t> &col = m_pDestSet[nCol];
+	memcpy(pOut, col.data(), col.size() * sizeof(size_t));
 }
 
 COMMONSC void CNfaRow::AddDest(size_t nCol, size_t nDest)
@@ -366,8 +357,6 @@ COMMONSC void CNfa::SortAll()
 		i->SortAll();
 	}
 }
-
-
 
 COMMONSC CDfaRow::CDfaRow(size_t col)
 	: m_nFlag(NORMAL), m_nColNum(col)
