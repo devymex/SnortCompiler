@@ -285,8 +285,15 @@ void GetNextEClosureSet(const CNfa &nfa, const std::vector<STATESET> &eClosure,
 			const size_t *pStates = row.GetCol(edge);
 			if (nAddCnt != 0)
 			{
-				nextSet.resize(nCurCnt + nAddCnt);
-				memcpy(nextSet.data() + nCurCnt, pStates, nAddCnt * sizeof(size_t));
+				if (nAddCnt == 1)
+				{
+					nextSet.push_back(*pStates);
+				}
+				else
+				{
+					nextSet.resize(nCurCnt + nAddCnt);
+					memcpy(nextSet.data() + nCurCnt, pStates, nAddCnt * sizeof(size_t));
+				}
 			}
 		}
 	}
