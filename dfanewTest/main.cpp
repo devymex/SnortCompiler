@@ -41,11 +41,9 @@ void main()
 	CNfa nfa1;
 	CNfa nfa2;
 	CNfa nfa3;
-
 	CRegChain regchain1;
 	CRegChain regchain2;
 	CRegChain regchain3;
-
 	PcreToNFA(a1, nfa1, regchain1);
 	PcreToNFA(a2, nfa2, regchain2);
 	PcreToNFA(a3, nfa3, regchain3);
