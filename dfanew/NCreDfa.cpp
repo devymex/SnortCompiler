@@ -21,18 +21,16 @@ struct COLUMNKEY
 	}
 };
 
-struct COLUMNKEYHASH
-{
-	__forceinline size_t operator ()(const COLUMNKEY &column)
-	{
-		return column.hash;
-	}
-};
-
-typedef std::unordered_map<COLUMNKEY, STATEID, COLUMNKEYHASH> COLUMNHASHMAP;
-
 void NAvaiEdges(const CNfa &nfa, STATEID *group)
 {
+	struct COLUMNKEYHASH
+	{
+		__forceinline size_t operator ()(const COLUMNKEY &column)
+		{
+			return column.hash;
+		}
+	};
+	typedef std::unordered_map<COLUMNKEY, STATEID, COLUMNKEYHASH> COLUMNHASHMAP;
 	const size_t _FNV_offset_basis = 2166136261U;
 	const size_t _FNV_prime = 16777619U;
 
@@ -43,7 +41,6 @@ void NAvaiEdges(const CNfa &nfa, STATEID *group)
 	for (size_t i = 0; i < CHARSETSIZE; ++i)
 	{
 		columns[i].key.clear();
-		//columns[i].key.reserve(1000);
 		columns[i].hash = _FNV_offset_basis;
 	}
 	for (size_t i = 0; i < nSize; ++i)
@@ -84,7 +81,6 @@ void NAvaiEdges(const CNfa &nfa, STATEID *group)
 	{
 		std::vector<size_t> &curCol = columns[i].key;
 		size_t nCurSize = curCol.size();
-
 		curCol.resize(nCurSize + zeroCnts[i]);
 		memset(curCol.data() + nCurSize, 0, zeroCnts[i] * sizeof(size_t));
 	}
