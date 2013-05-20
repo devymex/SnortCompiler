@@ -56,7 +56,7 @@ class COMMONSC CCString
 {
 public:
 	CCString();
-	CCString(const char *pStr);
+	explicit CCString(const char *pStr);
 	~CCString();
 	CCString(const CCString &other);
 	CCString& operator = (const CCString &other);
@@ -78,7 +78,7 @@ private:
 class COMMONSC CNfaRow
 {
 public:
-	CNfaRow(size_t nSize = CHARSETSIZE);
+	explicit CNfaRow(size_t nSize = CHARSETSIZE);
 	~CNfaRow();
 	CNfaRow(const CNfaRow &other);
 	CNfaRow& operator=(const CNfaRow &other);
@@ -89,12 +89,10 @@ public:
 	size_t& GetDest(size_t nCol, size_t nIdx);
 	const size_t& GetDest(size_t nCol, size_t nIdx) const;
 	size_t* GetCol(size_t nCol);
-	//size_t* GetElem(size_t nCol);
 	const size_t* GetCol(size_t nCol) const;
 	void CopyCol(size_t nCol, size_t *pOut) const;
 	void AddDest(size_t nCol, size_t nDest);
-	void SortDest(size_t nCol);
-	void SortAllDest();
+	void SortAll();
 
 private:
 	size_t m_nSize;
@@ -132,7 +130,7 @@ public:
 		START    = 1 << 1,
 		TERMINAL = 1 << 2
 	};
-	CDfaRow(size_t col);
+	explicit CDfaRow(size_t col);
 	void Fill(STATEID _Val);
 	~CDfaRow();
 	CDfaRow(const CDfaRow &other);
@@ -204,6 +202,7 @@ public:
 	//size_t GetRowNum(void);
 	void Reserve(size_t _Count);
 	void Resize(size_t _Newsize);
+	void Shrink();
 	size_t Size() const;
 	void FromDfa(CDfa &dfa);
 	void PushBack(const CNfaRow &row);
@@ -214,6 +213,7 @@ public:
 	DFATERMS GetDfaTerms(size_t num);
 	const char* GetPcre() const;
 	void Clear();
+	void SortAll();
 
 	CNfaRow &Back();
 	CNfaRow &operator[](size_t index);
@@ -431,4 +431,4 @@ private:
 	__int64 m_nStart;
 };
 
-COMMONSC void printNfa(CNfa &nfa);
+COMMONSC void printNfa(const CNfa &nfa);

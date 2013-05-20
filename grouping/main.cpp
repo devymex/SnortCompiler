@@ -120,7 +120,7 @@ bool ExtractTraits(const RULECHAIN &rulechain, CHAINTRAIT &trait)
 
 void BuildChainTraitMap(const std::vector<RULECHAIN> &chainSet, TRAITMAP &traitMap)
 {
-	traitMap.rehash(CHAINTRAITHASH::HASH_SIZE);
+	//traitMap.rehash(CHAINTRAITHASH::HASH_SIZE);
 	for (std::vector<RULECHAIN>::const_iterator i = chainSet.begin(); i != chainSet.end(); ++i)
 	{
 		CHAINTRAIT trait;

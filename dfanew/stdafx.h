@@ -11,5 +11,7 @@
 #include <stack>
 #include <limits>
 #include <windows.h>
+#include <xmmintrin.h>
 
 #define DFANEW_H_
+#undef max
