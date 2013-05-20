@@ -504,11 +504,10 @@ DFANEWSC size_t CDfanew::Minimize()
 		}
 	}
 	Warshall(pMat, nMatWidth, nMatHeight);
-
 	std::vector<STATEID> reachable;
-	reachable.push_back(m_StartId);
 
 	size_t nStartRow = m_StartId * nMatWidth;
+	pMat[nStartRow + m_StartId] = 1;
 	for (size_t i = 0; i < nSize; ++i)
 	{
 		if (pMat[nStartRow + i] && pMat[i * nMatWidth + nSize])
@@ -968,22 +967,23 @@ void CDfanew::MergeNonDisStates(SETLIST &Partition)
 	{
 		for (STALIST_ITER iSta = iSet->begin(); iSta != iSet->end(); ++iSta)
 		{
-			sta2Part[*iSta] = nSetIdx;
+			STATEID CurSta = *iSta;
+			CDfaRow &curRow = (*m_pDfa)[CurSta];
+			sta2Part[CurSta] = nSetIdx;
 			//修改新的起始状态
-			if (((*m_pDfa)[*iSta].GetFlag() & (*m_pDfa)[*iSta].START) != 0)
+			if (curRow.GetFlag() & curRow.START)
 			{
 				m_StartId = nSetIdx;
 			}
 
 			//存入新的终态编号
-			if (((*m_pDfa)[*iSta].GetFlag() & (*m_pDfa)[*iSta].TERMINAL) != 0)
+			if (curRow.GetFlag() & curRow.TERMINAL)
 			{
 				TERMSET tmpSta;
 				tmpSta.dfaSta = nSetIdx;
-				tmpSta.dfaId = termFlag[*iSta];
+				tmpSta.dfaId = termFlag[CurSta];
 				m_TermSet->push_back(tmpSta);
 			}
-
 		}
 		++nSetIdx;
 	}
