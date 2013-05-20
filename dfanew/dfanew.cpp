@@ -399,7 +399,7 @@ DFANEWSC size_t CDfanew::FromNFA(const CNfa &nfa, NFALOG *nfalog, size_t Count, 
 							nTotalSize += sizeof(TERMSET);
 						}
 					}
-					if (m_pDfa->size() >= SC_STATELIMIT || nTotalSize >= 2048)
+					if (m_pDfa->size() >= SC_STATELIMIT)// || nTotalSize >= 2048
 					{
 						return (size_t)-1;
 					}
@@ -437,7 +437,7 @@ DFANEWSC size_t CDfanew::FromNFA(const CNfa &nfa, NFALOG *nfalog, size_t Count, 
 		}
 		if (nTotalSize >= 2048)
 		{
-			return (size_t)-1;
+			//return (size_t)-1;
 		}
 	}
 	m_pDfa->shrink_to_fit();
@@ -527,7 +527,7 @@ DFANEWSC size_t CDfanew::Minimize()
 	std::list<std::list<STATEID>> Partition(1);
 	for (STATEID i = 0; i < m_pDfa->size(); ++i)
 	{
-		if (((*m_pDfa)[i].GetFlag() & (*m_pDfa)[i].TERMINAL) != 0)
+		if ((*m_pDfa)[i].GetFlag() & (*m_pDfa)[i].TERMINAL)
 		{
 			Partition.push_front(std::list<STATEID>());
 			Partition.front().push_back(i);
