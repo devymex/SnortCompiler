@@ -452,6 +452,18 @@ DFANEWSC  void CDfanew:: printTerms()
 	}
 }
 
+void PrintMatrix(BYTE *pMat, size_t nWidth, size_t nHeight)
+{
+	for (size_t i = 0; i < nHeight; ++i)
+	{
+		for (size_t j = 0; j < nHeight; ++j)
+		{
+			std::cout << (size_t)pMat[i * nWidth + j] << " ";
+		}
+		std::cout << std::endl;
+	}
+}
+
 DFANEWSC size_t CDfanew::Minimize()
 {
 	//error: DFA is empty
@@ -472,7 +484,7 @@ DFANEWSC size_t CDfanew::Minimize()
 	BYTE *pMat = (BYTE*)_aligned_malloc(nMatWidth * nMatHeight, 128);
 	memset(pMat, 0, nMatWidth * nMatHeight);
 
-	pMat[0] = 1;
+	//pMat[0] = 1;
 	for (size_t i = 0; i < nSize; ++i)
 	{
 		for (size_t j = 0; j < nCols; ++j)
@@ -492,20 +504,25 @@ DFANEWSC size_t CDfanew::Minimize()
 		}
 	}
 	Warshall(pMat, nMatWidth, nMatHeight);
+
 	std::vector<STATEID> reachable;
+	reachable.push_back(m_StartId);
+
+	size_t nStartRow = m_StartId * nMatWidth;
 	for (size_t i = 0; i < nSize; ++i)
 	{
-		if (pMat[i] && pMat[i * nMatWidth + nSize])
+		if (pMat[nStartRow + i] && pMat[i * nMatWidth + nSize])
 		{
 			reachable.push_back(i);
 		}
 	}
 	_aligned_free(pMat);
 
-	std::vector<STATEID> *pRevTab;
-
-	//remove unreachable states, generate new DFA
-	MergeReachable(reachable);
+	if (reachable.size() < nSize)
+	{
+		//remove unreachable states, generate new DFA
+		MergeReachable(reachable);
+	}
 
 	// FinalStas中保存当前DFA的所有终态，Partition中保存当前DFA的终态和非终态集合，一个终态作为一个集合存入
 	std::list<std::list<STATEID>> Partition(1);
@@ -529,7 +546,7 @@ DFANEWSC size_t CDfanew::Minimize()
 	}
 
 	nSize = m_pDfa->size();
-	pRevTab = new std::vector<STATEID>[nSize * nCols];
+	std::vector<STATEID> *pRevTab = new std::vector<STATEID>[nSize * nCols];
 	for (STATEID i = 0; i < nSize; ++i)
 	{
 		for (STATEID j = 0; j < nCols; ++j)
@@ -545,8 +562,11 @@ DFANEWSC size_t CDfanew::Minimize()
 	//divide nondistinguishable states
 	PartitionNonDisState(pRevTab, Partition);
 
-	//DFA minization
-	MergeNonDisStates(Partition);
+	if (Partition.size() < nSize)
+	{
+		//DFA minization
+		MergeNonDisStates(Partition);
+	}
 
 	delete []pRevTab;
 	return 0;
@@ -984,7 +1004,6 @@ void CDfanew::MergeNonDisStates(SETLIST &Partition)
 			}
 			curRow[iCol] = nDest;
 		}
-
 		//set a state attribute
 		curRow.SetFlag(orgRow.GetFlag());
 		++nSetIdx;
