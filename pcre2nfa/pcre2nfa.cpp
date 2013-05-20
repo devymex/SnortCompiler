@@ -8,7 +8,7 @@
 #define BUFLEN 1024
 
 //使用Pcre8.32库解析单个pcre
-size_t PcreToCode(const std::string &OnePcre, std::vector<unsigned char> &code)
+size_t PcreToCode(const std::string &OnePcre, std::vector<unsigned char> &code, CRegChain &regchain)
 {
 	size_t nFromBeg = 0;
 	std::string Pcre;//pcre的具体内容
@@ -27,7 +27,6 @@ size_t PcreToCode(const std::string &OnePcre, std::vector<unsigned char> &code)
 		std::cout << "Input Pcre Error!" << std::endl;
 		return size_t(-2);
 	}
-
 	if (!Pcre.empty() && Pcre[0] != '^')
 	{
 		nFromBeg = size_t(-1);
@@ -127,11 +126,11 @@ bool ExceedLimit(const std::string &OnePcre)
 }
 
 //把单个pcre转化为NFA
-PCRETONFA size_t PcreToNFA(const char *pPcre, CNfa &nfa)
+PCRETONFA size_t PcreToNFA(const char *pPcre, CNfa &nfa, CRegChain &regchain)
 {
 	std::vector<unsigned char> code;
 	std::string strPcre(pPcre);
-	size_t nFromBeg = PcreToCode(strPcre, code);
+	size_t nFromBeg = PcreToCode(strPcre, code, regchain);
 	std::vector<unsigned char>::iterator Beg, End;
 	Beg = code.begin();
 	End = code.end();
@@ -145,6 +144,37 @@ PCRETONFA size_t PcreToNFA(const char *pPcre, CNfa &nfa)
 	{
 		return SC_EXCEED;
 	}
+
+	if (code.size() > 0)
+	{
+		std::vector<std::vector<unsigned char>> strs;
+		GetSignature(code, strs);
+
+		if (strs.size() > 0)
+		{
+			for (size_t i = 0; i < strs.size(); ++i)
+			{
+				for(std::vector<unsigned char>::iterator iter = strs[i].begin(); iter != strs[i].end(); ++iter)
+				{
+					if ((*iter >= 65) && (*iter <= 90))
+					{
+						*iter = tolower(*iter);
+					}
+				}
+			}
+
+			for (size_t i = 0; i < strs.size(); ++i)
+			{
+				for (std::vector<unsigned char>::iterator iter = strs[i].begin(); iter + 3 != strs[i].end(); ++iter)
+				{
+					SIGNATURE sig = *(SIGNATURE*)&(*iter);
+					regchain.PushBackSig(sig);
+				}
+			}
+			regchain.Unique();
+		}
+	}
+
 	if (nFromBeg == size_t(-1))
 	{
 		size_t nCurSize = nfa.Size();
@@ -156,6 +186,7 @@ PCRETONFA size_t PcreToNFA(const char *pPcre, CNfa &nfa)
 		}
 		row.AddDest(EMPTY, nCurSize + 1);
 	}
-	size_t nr = ProcessPcre(Beg, End, nfa);
-	return nr;
+//	size_t nr = ProcessPcre(Beg, End, nfa);
+//	return nr;
+	return 1;
 }

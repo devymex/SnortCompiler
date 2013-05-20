@@ -125,6 +125,9 @@
     <ClCompile Include="pcre2nfa.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="GetSignature.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="pcre2nfa.def" />
