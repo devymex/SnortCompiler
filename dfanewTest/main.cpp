@@ -41,10 +41,12 @@ void main()
 	CNfa nfa1;
 	CNfa nfa2;
 	CNfa nfa3;
-
-	PcreToNFA(a1, nfa1);
-	PcreToNFA(a2, nfa2);
-	PcreToNFA(a3, nfa3);
+	CRegChain regchain1;
+	CRegChain regchain2;
+	CRegChain regchain3;
+	PcreToNFA(a1, nfa1, regchain1);
+	PcreToNFA(a2, nfa2, regchain2);
+	PcreToNFA(a3, nfa3, regchain3);
 
 	outPut(nfa1, "F:\\cppProject\\huawei\\PreciseMatch\\output\\nfa1_origin.txt");
 	outPut(nfa2, "F:\\cppProject\\huawei\\PreciseMatch\\output\\nfa2_origin.txt");
