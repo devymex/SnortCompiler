@@ -583,7 +583,7 @@ int main(void)
 
 	std::cout << "Loading results from file..." << std::endl;
 	CResNew res;
-	res.ReadFromFile(_T("..\\..\\output\\result_test.cdt"));
+	res.ReadFromFile(_T("..\\..\\output\\result.cdt"));
 	std::cout << "Completed in " << t1.Reset() << " Sec. chains: " << res.GetRegexTbl().Size() << std::endl << std::endl;
 
 	std::cout << "Build sidToDfaIdsMap from result..." << std::endl;

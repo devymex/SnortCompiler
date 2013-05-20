@@ -965,7 +965,7 @@ CRECHANFA size_t CRegChainToNFA(CRegChain &regchain, CNfa &nfa)
 	int flag = 0;
 	for(size_t i = 0; i < regchain.Size(); ++i)
 	{
-		std::cout << regchain[i].C_Str() << std::endl;
+		//std::cout << regchain[i].C_Str() << std::endl;
 		flag = PcreToNFA(regchain[i].C_Str(), nfa);
 		if(flag != 0)
 		{
@@ -973,7 +973,7 @@ CRECHANFA size_t CRegChainToNFA(CRegChain &regchain, CNfa &nfa)
 			return flag;
 		}
 	}
-	std::cout << std::endl;
+	//std::cout << std::endl;
 	nfa.Shrink();
 	nfa.SortAll();
 	return 0;

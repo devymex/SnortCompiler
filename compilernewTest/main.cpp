@@ -9,9 +9,7 @@
 
 void main()
 {
-
 	CTimer t;
-
 	CResNew result;
 	//result.ReadFromFile(_T("..\\..\\output\\result.cdt"));
 	//for (size_t i = 0; i < result.GetRegexTbl().Size(); ++i)
@@ -79,8 +77,8 @@ void main()
 	//std::cout << success_cNt + error_cNt + exceed_cNt + hasbyte_cNt + hasnot_cNt + empty_cNt + hasnosig_cNt + exceedlimit_cNt << std::endl;
 	//std::cout << result.GetSidDfaIds().Size() << std::endl;
 
-	compilenew(_T("..\\..\\input\\testrules.rule"), result);
-	result.WriteToFile(_T("..\\..\\output\\result_test.cdt"));
+	compilenew(_T("..\\..\\input\\allrules.rule"), result);
+	result.WriteToFile(_T("..\\..\\output\\result.cdt"));
 	std::cout << t.Reset() << std::endl;
 	system("pause");
 }
