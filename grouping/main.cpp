@@ -336,6 +336,29 @@ void MergeMore(std::vector<CHAINGROUP> &vecChainGroups, CResNew &res, std::vecto
 			i = vecChainGroups.erase(i);
 			continue;
 		}
+		//std::cout << ((size_t)vecDfas[0].Size()) * ((size_t)vecDfas[0].GetGroupCount()) << std::endl;
+		//std::cout << ((size_t)vecDfas[1].Size()) * ((size_t)vecDfas[1].GetGroupCount()) << std::endl;
+		//std::cout << ((size_t)MergeDfa.Size()) * ((size_t)MergeDfa.GetGroupCount()) << std::endl;
+		//std::cout << (size_t)MergeDfa.Size() << std::endl;
+		//std::cout << vecDfas[0].GetId() << std::endl;
+		//std::cout << (size_t)vecDfas[0].GetStartId() << std::endl;
+		//std::cout << (size_t)vecDfas[0].GetGroupCount() << std::endl;
+		//for (size_t j = 0; j < DFACOLSIZE; ++j)
+		//{
+		//	std::cout << (size_t)vecDfas[0].GetOneGroup(j) << " ";
+		//}
+		//std::cout << std::endl;
+		//vecDfas[0].printTerms();
+		//std::cout << vecDfas[1].GetId() << std::endl;
+		//std::cout << (size_t)vecDfas[1].GetStartId() << std::endl;
+		//std::cout << (size_t)vecDfas[1].GetGroupCount() << std::endl;
+		//for (size_t j = 0; j < DFACOLSIZE; ++j)
+		//{
+		//	std::cout << (size_t)vecDfas[1].GetOneGroup(j) << " ";
+		//}
+		//std::cout << std::endl;
+		//vecDfas[1].printTerms();
+
 		mergeFlag = true;
 		vecDfas[0] = MergeDfa;
 		for (size_t j = 2; j < i->chainIds.size(); ++j)
@@ -511,6 +534,10 @@ void BuildGroupBySig(const std::vector<RULECHAIN> &chainSet, std::vector<CHAINGR
 		oneGroup.comSigs = chainSet[*i].sigs;
 		for (std::vector<size_t>::iterator j = i + 1; j != vecWaitForGroup.end(); ++j)
 		{
+			if (visited[idx])
+			{
+				continue;
+			}
 			std::vector<SIGNATURE>::iterator k = std::find_first_of(oneGroup.comSigs.begin(), oneGroup.comSigs.end(), chainSet[*j].sigs.begin(), chainSet[*j].sigs.end());
 			if (k != oneGroup.comSigs.end())
 			{
@@ -534,6 +561,7 @@ void BuildGroupBySig(const std::vector<RULECHAIN> &chainSet, std::vector<CHAINGR
 			++i;
 		}
 	}
+	SortChainId(newGroups, chainSet);
 	MergeMore(newGroups, res, vecWaitForGroup);
 	ExtractSigs(chainSet, newGroups);
 	vecChainGroups.insert(vecChainGroups.end(), newGroups.begin(), newGroups.end());
@@ -545,6 +573,7 @@ void BuildGroupBySig(const std::vector<RULECHAIN> &chainSet, std::vector<CHAINGR
 		oneGroup.comSigs = chainSet[*i].sigs;
 		oneGroup.mergeDfaId = *i;
 	}
+	vecWaitForGroup.clear();
 }
 
 int main(void)
@@ -604,6 +633,9 @@ int main(void)
 	//Merge dfa in a group...
 	std::cout << "Merge dfa in a group..." << std::endl;
 	MergeMore(vecChainGroups, res, vecWaitForGroup);
+	//std::cout << ((size_t)res.GetDfaTable()[3].Size()) * ((size_t)res.GetDfaTable()[3].GetGroupCount()) << std::endl;
+	//std::cout << ((size_t)res.GetDfaTable()[1].Size()) * ((size_t)res.GetDfaTable()[1].GetGroupCount()) << std::endl;
+	//std::cout << ((size_t)res.GetDfaTable()[4].Size()) << std::endl;
 	std::cout << "Completed in " << t1.Reset() << " Sec." << std::endl << std::endl;
 
 	//Extract common Signatures in each group...
@@ -622,11 +654,56 @@ int main(void)
 	std::cout << "Completed in " << t1.Reset() << " Sec." << std::endl << std::endl;
 
 	//New group which have the same signature...
-	std::cout << "Put chain in group which have the same signature..." << std::endl;
+	std::cout << "New group which have the same signature..." << std::endl;
 	BuildGroupBySig(chainSet, vecChainGroups, res, vecWaitForGroup);
 	std::cout << "Completed in " << t1.Reset() << " Sec." << std::endl << std::endl;
+	
+	std::ofstream fout("..\\..\\output\\group.txt");
+	for (std::vector<CHAINGROUP>::iterator i = vecChainGroups.begin(); i != vecChainGroups.end(); ++i)
+	{
+		size_t nSpaceSize = 0;
+		for(std::vector<size_t>::iterator j = i->chainIds.begin(); j != i->chainIds.end(); ++j)
+		{
+			nSpaceSize += ((size_t)res.GetDfaTable()[*j].Size()) * ((size_t)res.GetDfaTable()[*j].GetGroupCount());
+		}
+
+		size_t tmp = ((size_t)res.GetDfaTable()[i->mergeDfaId].Size()) * ((size_t)res.GetDfaTable()[i->mergeDfaId].GetGroupCount());
+		if (nSpaceSize < ((size_t)res.GetDfaTable()[i->mergeDfaId].Size()) * ((size_t)res.GetDfaTable()[i->mergeDfaId].GetGroupCount()))
+		{
+			for(std::vector<size_t>::iterator j = i->chainIds.begin(); j != i->chainIds.end(); ++j)
+			{
+				fout << chainSet[*j].strChain << std::endl;
+			}
+			fout << std::endl;
+		}
+	}
+	fout.clear();
+	fout.close();
+
+	size_t Num = 0;
+	for (std::vector<CHAINGROUP>::iterator i = vecChainGroups.begin(); i != vecChainGroups.end(); ++i)
+	{
+		Num += i->chainIds.size();
+	}
+	std::cout << Num + vecExplosion.size() << std::endl;
 
 	std::cout << vecChainGroups.size() << std::endl;
+
+	std::vector<size_t> occurred(res.GetDfaTable().Size(), 0);
+	for (std::vector<CHAINGROUP>::iterator i = vecChainGroups.begin(); i != vecChainGroups.end(); ++i)
+	{
+		occurred[i->mergeDfaId] = 1;
+	}
+	for (std::vector<size_t>::iterator i = occurred.begin(); i != occurred.end(); ++i)
+	{
+		if (*i == 0)
+		{
+			res.GetDfaTable()[i - occurred.begin()].Clear();
+		}
+	}
+
+	res.WriteToFile(_T("..\\..\\output\\FinalResult.cdt"));
+
 	std::cout << "Total time: " << tAll.Reset() << " Sec." << std::endl;
 
 	system("pause");

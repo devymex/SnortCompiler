@@ -8,7 +8,7 @@
 #define BUFLEN 1024
 
 //使用Pcre8.32库解析单个pcre
-size_t PcreToCode(const std::string &OnePcre, std::vector<unsigned char> &code, CRegChain &regchain)
+size_t PcreToCode(const std::string &OnePcre, std::vector<unsigned char> &code)
 {
 	size_t nFromBeg = 0;
 	std::string Pcre;//pcre的具体内容
@@ -130,7 +130,7 @@ PCRETONFA size_t PcreToNFA(const char *pPcre, CNfa &nfa, CRegChain &regchain)
 {
 	std::vector<unsigned char> code;
 	std::string strPcre(pPcre);
-	size_t nFromBeg = PcreToCode(strPcre, code, regchain);
+	size_t nFromBeg = PcreToCode(strPcre, code);
 	std::vector<unsigned char>::iterator Beg, End;
 	Beg = code.begin();
 	End = code.end();
@@ -158,7 +158,7 @@ PCRETONFA size_t PcreToNFA(const char *pPcre, CNfa &nfa, CRegChain &regchain)
 				{
 					if ((*iter >= 65) && (*iter <= 90))
 					{
-						*iter = tolower(*iter);
+						*iter = (unsigned char)tolower(*iter);
 					}
 				}
 			}
