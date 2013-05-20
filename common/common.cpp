@@ -469,7 +469,7 @@ COMMONSC void CDfa::Reserve(size_t _Count)
 
 COMMONSC void CDfa::Resize(STATEID _Newsize)
 {
-	m_pDfa->resize(_Newsize, m_nColNum);
+	m_pDfa->resize(_Newsize, CDfaRow(m_nColNum));
 }
 
 COMMONSC STATEID CDfa::Size() const
@@ -971,7 +971,7 @@ COMMONSC RULEOPTION* CSnortRule::operator[](size_t nIdx) const
 	return (*m_pOptions)[nIdx];
 }
 
-COMMONSC void printNfa(CNfa &nfa)
+COMMONSC void printNfa(const CNfa &nfa)
 {
 	for (size_t i = 0; i < nfa.Size(); ++i)
 	{

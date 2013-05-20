@@ -40,6 +40,7 @@ struct NSTATESET_HASH
 };
 
 void NAvaiEdges(CNfa &oneNfaTab, BYTE *group);
+<<<<<<< HEAD
 
 void NNextNfaSet(const CNfa &oneNfaTab, const std::vector<size_t> &curNfaVec, size_t edge,
 				std::vector<size_t> &nextENfaVec, char &finFlag);
@@ -48,3 +49,5 @@ void NEClosure(const CNfa &oneNfaTab, const std::vector<size_t> &curNfaVec,
 			  std::vector<size_t> &eNfaVec, char &finFlag);
 
 void NEClosure1(const CNfa &oneNfaTab, const std::vector<size_t> &curNfaVec, std::vector<size_t> &eNfaVec, char &finFlag);
+=======
+>>>>>>> 03a9c4816b65b0a0a8df1896bb3e058c8351bdc6
