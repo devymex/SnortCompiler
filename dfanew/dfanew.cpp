@@ -344,6 +344,11 @@ DFANEWSC size_t CDfanew::FromNFA(const CNfa &nfa, NFALOG *nfalog, size_t Count, 
 	static std::vector<size_t> nextNfaVec;
 	nextNfaVec.clear();
 	BYTE compuFlag[CHARSETSIZE];
+
+	size_t nTotalSize = m_TermSet->size() * sizeof(TERMSET) +
+				sizeof(m_pGroup) + sizeof(m_StartId) + sizeof(m_nId) +
+				m_pDfa->size() * m_nColNum;
+
 	for (; nfaStasStack.size() > 0; )
 	{
 		curNfaVec = nfaStasStack.top();
@@ -352,24 +357,12 @@ DFANEWSC size_t CDfanew::FromNFA(const CNfa &nfa, NFALOG *nfalog, size_t Count, 
 		memset(compuFlag, 0, sizeof(compuFlag));
 		for (size_t nCurChar = 0; nCurChar < DFACOLSIZE; ++nCurChar)
 		{
-			if( m_pDfa->size() > SC_STATELIMIT)
-			{
-				return (size_t)-1;
-			}
-
 			STATEID curGroup = m_pGroup[nCurChar];
 			if(compuFlag[curGroup] == 1)
 			{
 				continue;
 			}
 			compuFlag[curGroup] = 1;
-
-			STATESETHASH::iterator ir = ssh.find(curNfaVec);
-			if (ir == ssh.end())
-			{
-				std::cout << "Fatal Error!" << std::endl;
-				break;
-			}
 
 			nextNfaVec.clear();
 			GetNextEClosureSet(nfa, eClosure, curNfaVec, nCurChar, nextNfaVec);
@@ -386,7 +379,8 @@ DFANEWSC size_t CDfanew::FromNFA(const CNfa &nfa, NFALOG *nfalog, size_t Count, 
 					ssh[nextNfaVec] = nextSta;
 
 					m_pDfa->push_back(CDfaRow(m_nColNum));
-					(*m_pDfa)[ir->second][curGroup] = nextSta;
+					nTotalSize += m_nColNum;
+					(*m_pDfa)[ssh[curNfaVec]][curGroup] = nextSta;
 
 					// is final state
 					if (nextNfaVec.back() == nfa.Size())
@@ -402,13 +396,18 @@ DFANEWSC size_t CDfanew::FromNFA(const CNfa &nfa, NFALOG *nfalog, size_t Count, 
 							m_TermSet->push_back(TERMSET());
 							m_TermSet->back().dfaSta = nextSta;
 							m_TermSet->back().dfaId = m_nId;
+							nTotalSize += sizeof(TERMSET);
 						}
+					}
+					if (m_pDfa->size() >= SC_STATELIMIT || nTotalSize >= 2048)
+					{
+						return (size_t)-1;
 					}
 					nfaStasStack.push(nextNfaVec);
 				}
 				else
 				{
-					(*m_pDfa)[ir->second][curGroup] = ssh[nextNfaVec];
+					(*m_pDfa)[ssh[curNfaVec]][curGroup] = ssh[nextNfaVec];
 				}
 			}
 		}
@@ -429,11 +428,16 @@ DFANEWSC size_t CDfanew::FromNFA(const CNfa &nfa, NFALOG *nfalog, size_t Count, 
 							m_TermSet->push_back(TERMSET());
 							m_TermSet->back().dfaSta = termStasVec[j].second;
 							m_TermSet->back().dfaId = nfalog[i].dfaId;
+							nTotalSize += sizeof(TERMSET);
 							break;
 						}
 					}
 				}
 			}
+		}
+		if (nTotalSize >= 2048)
+		{
+			return (size_t)-1;
 		}
 	}
 	m_pDfa->shrink_to_fit();
