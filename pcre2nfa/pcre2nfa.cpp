@@ -186,7 +186,6 @@ PCRETONFA size_t PcreToNFA(const char *pPcre, CNfa &nfa, CRegChain &regchain)
 		}
 		row.AddDest(EMPTY, nCurSize + 1);
 	}
-//	size_t nr = ProcessPcre(Beg, End, nfa);
-//	return nr;
-	return 1;
+	size_t nr = ProcessPcre(Beg, End, nfa);
+	return nr;
 }
