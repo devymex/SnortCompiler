@@ -12,16 +12,17 @@ void main()
 	//PcreToNFA("/^POSTxml version<methodCall><methodName></methodName><params><param><value><string></string></value></param><param><value><string>/", nfa1);
 	//PcreToNFA("/^POSTxml version<methodCall><methodName></methodName><params><param><value><name>'\\,''\\x29\\x29\\x3Becho '_begin_\\x0A'\\x3Becho/", nfa2);
 	
-	PcreToNFA("/^POST/s", nfa1);
-	PcreToNFA("/xml version/s", nfa1);
-	PcreToNFA("/<methodCall><methodName>/s", nfa1);
-	PcreToNFA("/</methodName><params><param><value><string></string></value></param><param><value><string>/s", nfa1);
+	CRegChain regChain;
+	PcreToNFA("/^POST/s", nfa1, regChain);
+	PcreToNFA("/xml version/s", nfa1, regChain);
+	PcreToNFA("/<methodCall><methodName>/s", nfa1, regChain);
+	PcreToNFA("/</methodName><params><param><value><string></string></value></param><param><value><string>/s", nfa1, regChain);
 
-	PcreToNFA("/^POST/s", nfa2);
-	PcreToNFA("/xml version/s", nfa2);
-	PcreToNFA("/<methodCall><methodName>/s", nfa2);
-	PcreToNFA("/</methodName><params><param><value><name>/s", nfa2);
-	PcreToNFA("/'\\,''\\x29\\x29\\x3Becho '_begin_\\x0A'\\x3Becho/s", nfa2);
+	PcreToNFA("/^POST/s", nfa2, regChain);
+	PcreToNFA("/xml version/s", nfa2, regChain);
+	PcreToNFA("/<methodCall><methodName>/s", nfa2, regChain);
+	PcreToNFA("/</methodName><params><param><value><name>/s", nfa2, regChain);
+	PcreToNFA("/'\\,''\\x29\\x29\\x3Becho '_begin_\\x0A'\\x3Becho/s", nfa2, regChain);
 
 	CDfanew dfa1;
 	CDfanew dfa2;
