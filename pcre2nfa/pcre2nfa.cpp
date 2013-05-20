@@ -149,11 +149,12 @@ PCRETONFA size_t PcreToNFA(const char *pPcre, CNfa &nfa)
 	{
 		size_t nCurSize = nfa.Size();
 		nfa.Resize(nCurSize + 1);
+		CNfaRow &row = nfa.Back();
 		for (size_t i = 0; i < EMPTY; ++i)
 		{
-			nfa.Back().AddDest(i, nCurSize);
+			row.AddDest(i, nCurSize);
 		}
-		nfa.Back().AddDest(EMPTY, nCurSize + 1);
+		row.AddDest(EMPTY, nCurSize + 1);
 	}
 	size_t nr = ProcessPcre(Beg, End, nfa);
 	return nr;
