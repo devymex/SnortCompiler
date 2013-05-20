@@ -14,4 +14,5 @@
 #define SC_EXCEED size_t(-2)
 
 //把单个pcre转化为NFA
-PCRETONFA size_t PcreToNFA(const char *pPcre, CNfa &nfa);
+PCRETONFA size_t PcreToNFA(const char *pPcre, CNfa &nfa, CRegChain &regchain);
+PCRETONFA void GetSignature(std::vector<unsigned char> &code, std::vector<std::vector<unsigned char>> &strs);

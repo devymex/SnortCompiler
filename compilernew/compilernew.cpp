@@ -450,12 +450,17 @@ void AssignSig(CResNew &result, size_t BegIdx, size_t EndIdx)
 	}
 	for (size_t i = BegIdx; i < EndIdx; ++i)
 	{
-		if (result.GetRegexTbl()[i].GetSigCnt() == 0)
+		//if (result.GetRegexTbl()[i].GetSigCnt() == 0)
+		//{
+		//	for (size_t j = 0; j < vecRuleSigs.size(); ++j)
+		//	{
+		//		result.GetRegexTbl()[i].PushBackSig(vecRuleSigs[j]);
+		//	}
+		//}
+		result.GetRegexTbl()[i].ClearSigList();
+		for (size_t j = 0; j < vecRuleSigs.size(); ++j)
 		{
-			for (size_t j = 0; j < vecRuleSigs.size(); ++j)
-			{
-				result.GetRegexTbl()[i].PushBackSig(vecRuleSigs[j]);
-			}
+			result.GetRegexTbl()[i].PushBackSig(vecRuleSigs[j]);
 		}
 	}
 }
