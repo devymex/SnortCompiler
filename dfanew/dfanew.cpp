@@ -448,6 +448,18 @@ DFANEWSC  void CDfanew:: printTerms()
 	}
 }
 
+void PrintMatrix(BYTE *pMat, size_t nWidth, size_t nHeight)
+{
+	for (size_t i = 0; i < nHeight; ++i)
+	{
+		for (size_t j = 0; j < nWidth; ++j)
+		{
+			std::cout << (size_t)pMat[i * nWidth + j] << " ";
+		}
+		std::cout << std::endl;
+	}
+}
+
 DFANEWSC size_t CDfanew::Minimize()
 {
 	//error: DFA is empty
@@ -487,11 +499,15 @@ DFANEWSC size_t CDfanew::Minimize()
 			pMat[i * nMatWidth + nSize] = 1;
 		}
 	}
+	//PrintMatrix(pMat, nMatWidth, nMatHeight);
+	//std::cout << std::endl;
 	Warshall(pMat, nMatWidth, nMatHeight);
+	//PrintMatrix(pMat, nMatWidth, nMatHeight);
 	std::vector<STATEID> reachable;
+	size_t nStartRow = m_StartId * nMatWidth;
 	for (size_t i = 0; i < nSize; ++i)
 	{
-		if (pMat[i] && pMat[i * nMatWidth + nSize])
+		if (pMat[nStartRow + i] && pMat[i * nMatWidth + nSize])
 		{
 			reachable.push_back(i);
 		}

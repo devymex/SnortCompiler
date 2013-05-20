@@ -71,6 +71,9 @@
     <Report>
       <Path>grouping130518.vsp</Path>
     </Report>
+    <Report>
+      <Path>grouping130520.vsp</Path>
+    </Report>
   </Reports>
   <Launches>
     <ProjBinary>
