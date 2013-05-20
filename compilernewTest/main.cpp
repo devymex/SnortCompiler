@@ -5,9 +5,11 @@
 #include "../common/common.h"
 #include "../dfanew/dfanew.h"
 #include "../compilernew/compilernew.h"
+#include "../pcre2nfa/pcre2nfa.h"
 
 void main()
 {
+
 	CTimer t;
 
 	CResNew result;
