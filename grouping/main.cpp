@@ -365,6 +365,8 @@ void SplitByComSig(const std::vector<RULECHAIN> &chainSet, std::vector<CHAINGROU
 			}
 		}
 	}
+
+	SortChainId(vecChainGroups, chainSet);
 }
 
 void MergeMore(std::vector<CHAINGROUP> &vecChainGroups, CResNew &res, std::vector<size_t> &vecWaitForGroup)
