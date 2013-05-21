@@ -156,7 +156,6 @@ DFANEWSC void CDfanew::Init(BYTE *pGroup)
 	}
 	if (flag)
 	{
-
 		m_nColNum = ZeroBegPos;
 		CopyMemory(m_pGroup, pGroup, DFACOLSIZE * sizeof(BYTE));
 	}
@@ -571,7 +570,7 @@ DFANEWSC size_t CDfanew::Minimize()
 	return 0;
 }
 
-DFANEWSC STATEID CDfanew::GetGroupCount() const
+DFANEWSC WORD CDfanew::GetGroupCount() const
 {
 	return m_nColNum;
 }

@@ -37,7 +37,7 @@ MERDFANEW bool NOrMerge(std::vector<CDfanew> &dfas, CDfanew &lastDfa)
 
 	if(lastDfa.FromNFA(oneNfa, nfalog, count, true) == 0)
 	{
-		lastDfa.Minimize();
+		//lastDfa.Minimize();
 		//size_t nSpaceSize = 0;
 		//for(size_t i = 0; i < dfas.size(); ++i)
 		//{

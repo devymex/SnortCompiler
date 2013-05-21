@@ -1,53 +1,259 @@
 #include "stdafx.h"
+#include "grouping.h"
 #include "../compilernew/compilernew.h"
 #include "../mergedfanew/MergeDfanew.h"
 
-#define THRESHOLD 8
-
-struct CHAINTRAIT
+GROUPINGSC CGROUPS::CGROUPS()
 {
-	enum {TRAIT_LEN = 64};
-	char szTrait[TRAIT_LEN];
-};
-
-bool operator == (const CHAINTRAIT &r1, const CHAINTRAIT &r2)
-{
-	__int64 *p1 = (__int64*)r1.szTrait;
-	__int64 *p2 = (__int64*)r2.szTrait;
-	for (size_t i = 0; i < CHAINTRAIT::TRAIT_LEN / sizeof(__int64); ++i)
-	{
-		if (p1[i] != p2[i])
-		{
-			return false;
-		}
-	}
-	return true;
+	m_pGroups = new std::vector<GROUP>;
 }
 
-struct CHAINTRAITHASH
+GROUPINGSC CGROUPS::CGROUPS(const CGROUPS& other)
 {
-	enum {HASH_SIZE = 1000000};
-	size_t operator()(const CHAINTRAIT &rt)
+	m_pGroups = new std::vector<GROUP>;
+	*this = other;
+}
+
+GROUPINGSC const CGROUPS &CGROUPS::operator=(const CGROUPS &other)
+{
+	*m_pGroups = *other.m_pGroups;
+	return *this;
+}
+
+GROUPINGSC CGROUPS::~CGROUPS()
+{
+	delete m_pGroups;
+}
+
+GROUPINGSC GROUP &CGROUPS::operator[](size_t index)
+{
+	return (*m_pGroups)[index];
+}
+
+GROUPINGSC const GROUP& CGROUPS::operator[](size_t index) const
+{
+	return (*m_pGroups)[index];
+}
+
+GROUPINGSC void CGROUPS::Reserve(size_t nCount)
+{
+	m_pGroups->reserve(nCount);
+}
+
+GROUPINGSC void CGROUPS::Resize(size_t nSize)
+{
+	m_pGroups->resize(nSize);
+}
+
+GROUPINGSC const size_t CGROUPS::Size() const
+{
+	return m_pGroups->size();
+}
+
+GROUPINGSC void CGROUPS::PushBack(const GROUP &oneGroup)
+{
+	m_pGroups->push_back(oneGroup);
+}
+
+GROUPINGSC GROUP &CGROUPS::Back()
+{
+	return m_pGroups->back();
+}
+
+GROUPINGSC CDfaTblNew &CGROUPRes::GetDfaTable()
+{
+	return m_dfaTbl;
+}
+
+GROUPINGSC CSidDfaIdsNew &CGROUPRes::GetSidDfaIds()
+{
+	return m_sidDfaIds;
+}
+
+GROUPINGSC CGROUPS &CGROUPRes::GetGroups()
+{
+	return m_groups;
+}
+
+GROUPINGSC const CDfaTblNew &CGROUPRes::GetDfaTable() const
+{
+	return m_dfaTbl;
+}
+
+GROUPINGSC const CSidDfaIdsNew &CGROUPRes::GetSidDfaIds() const
+{
+	return m_sidDfaIds;
+}
+
+GROUPINGSC const CGROUPS &CGROUPRes::GetGroups() const
+{
+	return m_groups;
+}
+
+template<typename _Ty>
+void WriteNum(std::ofstream &fout, _Ty _num, size_t nBytes = sizeof(_Ty))
+{
+	fout.write((char*)&_num, nBytes);
+}
+
+GROUPINGSC size_t CGROUPRes::WriteToFile(LPCTSTR filename)
+{
+	std::ofstream fout(filename, std::ios::binary);
+	if (!fout)
 	{
-		const size_t *p = (size_t*)rt.szTrait;
-		size_t n = 1;
-		for (size_t i = 0; i < CHAINTRAIT::TRAIT_LEN / sizeof(size_t); ++i)
-		{
-			n *= p[i];
-		}
-
-		return n % HASH_SIZE;
+		std::cerr << "Open file Failed!" << std::endl;
+		return (size_t)-1;
 	}
-};
+	//记录文件尺寸填写位置
+	std::streamoff fileSizePos = fout.tellp();
+	fout.seekp(4, std::ios_base::cur);
+	//规则数量
+	WriteNum(fout, m_sidDfaIds.Size());
+	//记录规则偏移填写位置
+	std::streamoff ruleOffsetPos = fout.tellp();
+	fout.seekp(4, std::ios_base::cur);
+	//DFAs数量
+	WriteNum(fout, m_dfaTbl.Size());
+	//记录DFAs偏移填写位置
+	std::streamoff dfaOffsetPos = fout.tellp();
+	fout.seekp(4, std::ios_base::cur);
+	//group数量
+	WriteNum(fout, m_groups.Size());
+	//记录groups偏移填写位置
+	std::streamoff groupOffsetPos = fout.tellp();
+	fout.seekp(4, std::ios_base::cur);
+	//填写规则偏移
+	std::streamoff endPos = fout.tellp();
+	fout.seekp(ruleOffsetPos, std::ios_base::beg);
+	WriteNum(fout, endPos, 4);
+	//定位文件到末尾
+	fout.seekp(endPos, std::ios_base::beg);
+	//开始写规则表
+	for (size_t i = 0; i < m_sidDfaIds.Size(); ++i)
+	{
+		COMPILEDRULENEW &ruleResult = m_sidDfaIds[i];
+		WriteNum(fout, ruleResult.m_nSid, 4);
+		WriteNum(fout, ruleResult.m_nResult, 4);
+		WriteNum(fout, ruleResult.m_dfaIds.Size(), 4);
+		for (size_t j = 0; j < ruleResult.m_dfaIds.Size(); ++j)
+		{
+			WriteNum(fout, ruleResult.m_dfaIds[j], 4);
+		}
+	}
+	//填写DFAs偏移
+	endPos = fout.tellp();
+	fout.seekp(dfaOffsetPos, std::ios_base::beg);
+	WriteNum(fout, endPos, 4);
+	//定位文件到末尾
+	fout.seekp(0, std::ios_base::end);
+	//开始写DFAs
+	BYTE dfaDetails[100000];
+	for (size_t i = 0; i < m_dfaTbl.Size(); ++i)
+	{
+		size_t len = m_dfaTbl[i].Save(dfaDetails);
+		WriteNum(fout, len);
+		fout.write((char*)dfaDetails, len * sizeof(BYTE));
+	}
+	//填写分组偏移
+	endPos = fout.tellp();
+	fout.seekp(groupOffsetPos, std::ios_base::beg);
+	WriteNum(fout, endPos, 4);
+	//定位文件到末尾
+	fout.seekp(0, std::ios_base::end);
+	//开始写groups
+	for (size_t i = 0; i < m_groups.Size(); ++i)
+	{
+		WriteNum(fout, m_groups[i].dfaId);
+		WriteNum(fout, m_groups[i].vecSigs.size());
+		for (size_t j = 0; j < m_groups[i].vecSigs.size(); ++j)
+		{
+			WriteNum(fout, m_groups[i].vecSigs[j]);
+		}
+	}
+	//填写文件尺寸
+	endPos = fout.tellp();
+	fout.seekp(fileSizePos, std::ios_base::beg);
+	WriteNum(fout, endPos, 4);
+	fout.seekp(0, std::ios_base::end);
+	fout.close();
+	fout.clear();
 
-typedef std::unordered_map<CHAINTRAIT, std::vector<size_t>, CHAINTRAITHASH> TRAITMAP;
+	return 0;
+}
 
-struct RULECHAIN
+GROUPINGSC size_t CGROUPRes::ReadFromFile(LPCTSTR filename)
 {
-	CDfanew dfa;
-	std::string strChain;
-	std::vector<SIGNATURE> sigs;
-};
+	std::ifstream fin(filename, std::ios::binary);
+	if (!fin)
+	{
+		std::cerr << "Open file Failed!" << std::endl;
+		return (size_t)-1;
+	}
+	//读取文件尺寸
+	size_t fileSize;
+	fin.read((char*)&fileSize, 4);
+	//读取规则数量
+	size_t ruleNum;
+	fin.read((char*)&ruleNum, 4);
+	//跳过规则偏移
+	fin.seekg(4, std::ios_base::cur);
+	//DFAs数量
+	size_t dfaNum;
+	fin.read((char*)&dfaNum, 4);
+	//跳过DFAs偏移
+	fin.seekg(4, std::ios_base::cur);
+	//group数量
+	size_t groupNum;
+	fin.read((char*)&groupNum, 4);
+	//跳过分组偏移
+	fin.seekg(4, std::ios_base::cur);
+	//开始读规则表
+	m_sidDfaIds.Resize(ruleNum);
+	size_t SidDfaNum;
+	for (size_t i = 0; i < ruleNum; ++i)
+	{
+		COMPILEDRULENEW &ruleResult = m_sidDfaIds[i];
+		fin.read((char*)&ruleResult.m_nSid, 4);
+		fin.read((char*)&ruleResult.m_nResult, 4);
+		fin.read((char*)&SidDfaNum, 4);
+		ruleResult.m_dfaIds.Resize(SidDfaNum);
+		for (size_t j = 0; j < SidDfaNum; ++j)
+		{
+			fin.read((char*)&(ruleResult.m_dfaIds[j]), 4);
+		}
+	}
+	//开始读DFAs
+	m_dfaTbl.Resize(dfaNum);
+	BYTE dfaDetails[100000];
+	for (size_t i = 0; i < dfaNum; ++i)
+	{
+		CDfanew &dfa = m_dfaTbl[i];
+		size_t len;
+		fin.read((char*)&len, 4);
+		fin.read((char*)dfaDetails, len * sizeof(BYTE));
+		dfa.Load(dfaDetails, len);
+	}
+	//读分组
+	m_groups.Resize(groupNum);
+	size_t nSigNum;
+	for (size_t i = 0; i < groupNum; ++i)
+	{
+		GROUP &oneGroup = m_groups[i];
+		fin.read((char*)&oneGroup.dfaId, 4);
+		fin.read((char*)&nSigNum, 4);
+		oneGroup.vecSigs.resize(nSigNum);
+		for (size_t j = 0; j < nSigNum; ++j)
+		{
+			SIGNATURE &oneSig = oneGroup.vecSigs[j];
+			fin.read((char*)&oneSig, sizeof(SIGNATURE));
+		}
+	}
+	fin.close();
+	fin.clear();
+
+	return 0;
+}
+
 
 void BuildSidToDfaIdsMap(CResNew &res, std::map<size_t, std::vector<size_t>> &sidToDfaIdsMap)
 {
@@ -140,14 +346,6 @@ void BuildChainTraitMap(const std::vector<RULECHAIN> &chainSet, TRAITMAP &traitM
 		}
 	}
 }
-
-struct CHAINGROUP
-{
-	std::vector<size_t> chainIds;
-	std::string comStr;
-	std::vector<SIGNATURE> comSigs;
-	std::size_t mergeDfaId;
-};
 
 //计算两个字符串的最长公共前缀
 std::string LongestCommonPrefix(const std::string &str1, const std::string &str2)
@@ -622,19 +820,31 @@ void ClearUselessDfa(const std::vector<CHAINGROUP> &vecChainGroups, CResNew &res
 			res.GetDfaTable()[i - occurred.begin()].Clear();
 		}
 	}
-
-	res.WriteToFile(_T("..\\..\\output\\FinalResult.cdt"));
 }
 
-int main(void)
+void BuildGroupRes(const std::vector<CHAINGROUP> &vecChainGroups, const CResNew &res, CGROUPRes &groupRes)
+{
+	groupRes.GetGroups().Resize(vecChainGroups.size());
+	groupRes.GetDfaTable().Resize(vecChainGroups.size());
+	size_t idx = 0;
+	for (std::vector<CHAINGROUP>::const_iterator i = vecChainGroups.begin(); i != vecChainGroups.end(); ++i, ++idx)
+	{
+		groupRes.GetGroups()[idx].dfaId = idx;
+		groupRes.GetGroups()[idx].vecSigs = i->comSigs;
+		groupRes.GetDfaTable()[idx] = res.GetDfaTable()[i->mergeDfaId];
+	}
+	groupRes.GetSidDfaIds() = res.GetSidDfaIds();
+}
+
+GROUPINGSC void grouping(CResNew &res, CGROUPRes &groupRes)
 {
 	//Load all rules chains from file
 	CTimer t1, tAll;
 
-	std::cout << "Loading results from file..." << std::endl;
-	CResNew res;
-	res.ReadFromFile(_T("..\\..\\output\\result.cdt"));
-	std::cout << "Completed in " << t1.Reset() << " Sec. chains: " << res.GetRegexTbl().Size() << std::endl << std::endl;
+	//std::cout << "Loading results from file..." << std::endl;
+	//CResNew res;
+	//res.ReadFromFile(filename);
+	//std::cout << "Completed in " << t1.Reset() << " Sec. chains: " << res.GetRegexTbl().Size() << std::endl << std::endl;
 
 	std::cout << "Build sidToDfaIdsMap from result..." << std::endl;
 	std::map<size_t, std::vector<size_t>> sidToDfaIdsMap;
@@ -717,8 +927,10 @@ int main(void)
 	ClearUselessDfa(vecChainGroups, res);
 	std::cout << "Completed in " << t1.Reset() << " Sec." << std::endl << std::endl;
 
-	std::cout << "Total time: " << tAll.Reset() << " Sec." << std::endl;
+	//Build group result...
+	std::cout << "Build group result..." << std::endl;
+	BuildGroupRes(vecChainGroups, res, groupRes);
+	std::cout << "Completed in " << t1.Reset() << " Sec." << std::endl << std::endl;
 
-	system("pause");
-	return 0;
+	std::cout << "Total time: " << tAll.Reset() << " Sec." << std::endl;
 }
