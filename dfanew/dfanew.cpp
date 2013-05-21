@@ -124,6 +124,16 @@ DFANEWSC const CDfaRow& CDfanew::operator[](STATEID index) const
 	return (*m_pDfa)[index];
 }
 
+DFANEWSC void CDfanew::reserve(STATEID Maxnum)
+{
+	m_pDfa->reserve(Maxnum);
+}
+
+DFANEWSC void CDfanew::PushBackDfa(CDfaRow &sta)
+{
+	m_pDfa->push_back(sta);
+}
+
 DFANEWSC void CDfanew::PushBackTermSet(TERMSET &term)
 {
 	m_TermSet->push_back(term);

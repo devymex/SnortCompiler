@@ -24,12 +24,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "rule2nfatest", "rule2nfates
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "common", "common\common.vcxproj", "{0C639590-DE81-4AB4-AA71-6CE6CAB424E4}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{26C91374-F23D-4A57-A710-0F3AC1EF99FE}"
-	ProjectSection(SolutionItems) = preProject
-		allrules.rule = allrules.rule
-		smallrules.rule = smallrules.rule
-	EndProjectSection
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "grouping", "grouping\grouping.vcxproj", "{E6C145F2-A57F-48D4-8B34-EA8166B984F8}"
 	ProjectSection(ProjectDependencies) = postProject
 		{F6606B01-EE46-44B3-B199-A8A58B004BD9} = {F6606B01-EE46-44B3-B199-A8A58B004BD9}
@@ -75,6 +69,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hashmapping", "hashmapping\hashmapping.vcxproj", "{73BEAFF1-05F6-42DB-B221-24CD0501505B}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hashmappingTest", "hashmappingTest\hashmappingTest.vcxproj", "{1E122C12-FA1E-40DB-95AA-0A56C9F7D7B2}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "becchi_pro", "becchi_pro\becchi_pro.vcxproj", "{92DFD284-88F5-4E8C-A3E1-D5D88F022E9D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -138,6 +134,10 @@ Global
 		{1E122C12-FA1E-40DB-95AA-0A56C9F7D7B2}.Debug|Win32.Build.0 = Debug|Win32
 		{1E122C12-FA1E-40DB-95AA-0A56C9F7D7B2}.Release|Win32.ActiveCfg = Release|Win32
 		{1E122C12-FA1E-40DB-95AA-0A56C9F7D7B2}.Release|Win32.Build.0 = Release|Win32
+		{92DFD284-88F5-4E8C-A3E1-D5D88F022E9D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{92DFD284-88F5-4E8C-A3E1-D5D88F022E9D}.Debug|Win32.Build.0 = Debug|Win32
+		{92DFD284-88F5-4E8C-A3E1-D5D88F022E9D}.Release|Win32.ActiveCfg = Release|Win32
+		{92DFD284-88F5-4E8C-A3E1-D5D88F022E9D}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
