@@ -66,6 +66,16 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mergedfanew", "mergedfanew\
 		{0C639590-DE81-4AB4-AA71-6CE6CAB424E4} = {0C639590-DE81-4AB4-AA71-6CE6CAB424E4}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "groupingTest", "groupingTest\groupingTest.vcxproj", "{4C67E265-13A7-4F96-BBBC-B885E0DE6576}"
+	ProjectSection(ProjectDependencies) = postProject
+		{F6606B01-EE46-44B3-B199-A8A58B004BD9} = {F6606B01-EE46-44B3-B199-A8A58B004BD9}
+		{E6C145F2-A57F-48D4-8B34-EA8166B984F8} = {E6C145F2-A57F-48D4-8B34-EA8166B984F8}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hashmapping", "hashmapping\hashmapping.vcxproj", "{73BEAFF1-05F6-42DB-B221-24CD0501505B}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hashmappingTest", "hashmappingTest\hashmappingTest.vcxproj", "{1E122C12-FA1E-40DB-95AA-0A56C9F7D7B2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -116,6 +126,18 @@ Global
 		{F0E71E24-2091-4670-883B-B3CC085AF034}.Debug|Win32.Build.0 = Debug|Win32
 		{F0E71E24-2091-4670-883B-B3CC085AF034}.Release|Win32.ActiveCfg = Release|Win32
 		{F0E71E24-2091-4670-883B-B3CC085AF034}.Release|Win32.Build.0 = Release|Win32
+		{4C67E265-13A7-4F96-BBBC-B885E0DE6576}.Debug|Win32.ActiveCfg = Debug|Win32
+		{4C67E265-13A7-4F96-BBBC-B885E0DE6576}.Debug|Win32.Build.0 = Debug|Win32
+		{4C67E265-13A7-4F96-BBBC-B885E0DE6576}.Release|Win32.ActiveCfg = Release|Win32
+		{4C67E265-13A7-4F96-BBBC-B885E0DE6576}.Release|Win32.Build.0 = Release|Win32
+		{73BEAFF1-05F6-42DB-B221-24CD0501505B}.Debug|Win32.ActiveCfg = Debug|Win32
+		{73BEAFF1-05F6-42DB-B221-24CD0501505B}.Debug|Win32.Build.0 = Debug|Win32
+		{73BEAFF1-05F6-42DB-B221-24CD0501505B}.Release|Win32.ActiveCfg = Release|Win32
+		{73BEAFF1-05F6-42DB-B221-24CD0501505B}.Release|Win32.Build.0 = Release|Win32
+		{1E122C12-FA1E-40DB-95AA-0A56C9F7D7B2}.Debug|Win32.ActiveCfg = Debug|Win32
+		{1E122C12-FA1E-40DB-95AA-0A56C9F7D7B2}.Debug|Win32.Build.0 = Debug|Win32
+		{1E122C12-FA1E-40DB-95AA-0A56C9F7D7B2}.Release|Win32.ActiveCfg = Release|Win32
+		{1E122C12-FA1E-40DB-95AA-0A56C9F7D7B2}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
