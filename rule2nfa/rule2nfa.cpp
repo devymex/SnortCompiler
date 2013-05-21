@@ -965,7 +965,7 @@ CRECHANFA size_t CRegChainToNFA(CRegChain &regchain, CNfa &nfa)
 	int flag = 0;
 	for(size_t i = 0; i < regchain.Size(); ++i)
 	{
-		flag = PcreToNFA(regchain[i].C_Str(), nfa);
+		flag = PcreToNFA(regchain[i].C_Str(), nfa, regchain);
 		if(flag != 0)
 		{
 			nfa.Clear();

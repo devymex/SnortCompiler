@@ -195,7 +195,6 @@ DFANEWSC void CDfanew::Clear()
 }
 
 typedef std::vector<size_t> STATESET;
-#include <xmmintrin.h>
 
 void Warshall(BYTE *pMat, size_t nWidth, size_t nHeight)
 {
@@ -208,7 +207,7 @@ void Warshall(BYTE *pMat, size_t nWidth, size_t nHeight)
 			{
 				__m128i *pBeg1 = (__m128i*)(pMat + row);
 				__m128i *pBeg2 = (__m128i*)(pMat + k * nWidth);
-				size_t nInts = nWidth / sizeof(__m128i);
+				size_t nInts = nWidth >> 4;
 				for (size_t j = 0; j < nInts; ++j)
 				{
 					*pBeg1 = _mm_or_si128(*pBeg1, *pBeg2);
@@ -286,8 +285,15 @@ void GetNextEClosureSet(const CNfa &nfa, const std::vector<STATESET> &eClosure,
 			const size_t *pStates = row.GetCol(edge);
 			if (nAddCnt != 0)
 			{
-				nextSet.resize(nCurCnt + nAddCnt);
-				memcpy(nextSet.data() + nCurCnt, pStates, nAddCnt * sizeof(size_t));
+				if (nAddCnt == 1)
+				{
+					nextSet.push_back(*pStates);
+				}
+				else
+				{
+					nextSet.resize(nCurCnt + nAddCnt);
+					memcpy(nextSet.data() + nCurCnt, pStates, nAddCnt * sizeof(size_t));
+				}
 			}
 		}
 	}
@@ -338,6 +344,11 @@ DFANEWSC size_t CDfanew::FromNFA(const CNfa &nfa, NFALOG *nfalog, size_t Count, 
 	static std::vector<size_t> nextNfaVec;
 	nextNfaVec.clear();
 	BYTE compuFlag[CHARSETSIZE];
+
+	size_t nTotalSize = m_TermSet->size() * sizeof(TERMSET) +
+				sizeof(m_pGroup) + sizeof(m_StartId) + sizeof(m_nId) +
+				m_pDfa->size() * m_nColNum;
+
 	for (; nfaStasStack.size() > 0; )
 	{
 		curNfaVec = nfaStasStack.top();
@@ -346,24 +357,12 @@ DFANEWSC size_t CDfanew::FromNFA(const CNfa &nfa, NFALOG *nfalog, size_t Count, 
 		memset(compuFlag, 0, sizeof(compuFlag));
 		for (size_t nCurChar = 0; nCurChar < DFACOLSIZE; ++nCurChar)
 		{
-			if( m_pDfa->size() > SC_STATELIMIT)
-			{
-				return (size_t)-1;
-			}
-
 			STATEID curGroup = m_pGroup[nCurChar];
 			if(compuFlag[curGroup] == 1)
 			{
 				continue;
 			}
 			compuFlag[curGroup] = 1;
-
-			STATESETHASH::iterator ir = ssh.find(curNfaVec);
-			if (ir == ssh.end())
-			{
-				std::cout << "Fatal Error!" << std::endl;
-				break;
-			}
 
 			nextNfaVec.clear();
 			GetNextEClosureSet(nfa, eClosure, curNfaVec, nCurChar, nextNfaVec);
@@ -380,7 +379,8 @@ DFANEWSC size_t CDfanew::FromNFA(const CNfa &nfa, NFALOG *nfalog, size_t Count, 
 					ssh[nextNfaVec] = nextSta;
 
 					m_pDfa->push_back(CDfaRow(m_nColNum));
-					(*m_pDfa)[ir->second][curGroup] = nextSta;
+					nTotalSize += m_nColNum;
+					(*m_pDfa)[ssh[curNfaVec]][curGroup] = nextSta;
 
 					// is final state
 					if (nextNfaVec.back() == nfa.Size())
@@ -396,13 +396,18 @@ DFANEWSC size_t CDfanew::FromNFA(const CNfa &nfa, NFALOG *nfalog, size_t Count, 
 							m_TermSet->push_back(TERMSET());
 							m_TermSet->back().dfaSta = nextSta;
 							m_TermSet->back().dfaId = m_nId;
+							nTotalSize += sizeof(TERMSET);
 						}
+					}
+					if (m_pDfa->size() >= SC_STATELIMIT)// || nTotalSize >= 2048
+					{
+						return (size_t)-1;
 					}
 					nfaStasStack.push(nextNfaVec);
 				}
 				else
 				{
-					(*m_pDfa)[ir->second][curGroup] = ssh[nextNfaVec];
+					(*m_pDfa)[ssh[curNfaVec]][curGroup] = ssh[nextNfaVec];
 				}
 			}
 		}
@@ -423,11 +428,16 @@ DFANEWSC size_t CDfanew::FromNFA(const CNfa &nfa, NFALOG *nfalog, size_t Count, 
 							m_TermSet->push_back(TERMSET());
 							m_TermSet->back().dfaSta = termStasVec[j].second;
 							m_TermSet->back().dfaId = nfalog[i].dfaId;
+							nTotalSize += sizeof(TERMSET);
 							break;
 						}
 					}
 				}
 			}
+		}
+		if (nTotalSize >= 2048)
+		{
+			//return (size_t)-1;
 		}
 	}
 	m_pDfa->shrink_to_fit();
@@ -439,6 +449,18 @@ DFANEWSC  void CDfanew:: printTerms()
 	for(std::vector<TERMSET>::iterator iter = m_TermSet->begin(); iter != m_TermSet->end(); ++iter)
 	{
 		std::cout << (size_t)iter->dfaSta <<"  :  " << iter->dfaId << std::endl;
+	}
+}
+
+void PrintMatrix(BYTE *pMat, size_t nWidth, size_t nHeight)
+{
+	for (size_t i = 0; i < nHeight; ++i)
+	{
+		for (size_t j = 0; j < nHeight; ++j)
+		{
+			std::cout << (size_t)pMat[i * nWidth + j] << " ";
+		}
+		std::cout << std::endl;
 	}
 }
 
@@ -462,7 +484,7 @@ DFANEWSC size_t CDfanew::Minimize()
 	BYTE *pMat = (BYTE*)_aligned_malloc(nMatWidth * nMatHeight, 128);
 	memset(pMat, 0, nMatWidth * nMatHeight);
 
-	pMat[0] = 1;
+	//pMat[0] = 1;
 	for (size_t i = 0; i < nSize; ++i)
 	{
 		for (size_t j = 0; j < nCols; ++j)
@@ -483,25 +505,29 @@ DFANEWSC size_t CDfanew::Minimize()
 	}
 	Warshall(pMat, nMatWidth, nMatHeight);
 	std::vector<STATEID> reachable;
+
+	size_t nStartRow = m_StartId * nMatWidth;
+	pMat[nStartRow + m_StartId] = 1;
 	for (size_t i = 0; i < nSize; ++i)
 	{
-		if (pMat[i] && pMat[i * nMatWidth + nSize])
+		if (pMat[nStartRow + i] && pMat[i * nMatWidth + nSize])
 		{
 			reachable.push_back(i);
 		}
 	}
 	_aligned_free(pMat);
 
-	std::vector<STATEID> *pRevTab;
-
-	//remove unreachable states, generate new DFA
-	MergeReachable(reachable);
+	if (reachable.size() < nSize)
+	{
+		//remove unreachable states, generate new DFA
+		MergeReachable(reachable);
+	}
 
 	// FinalStas中保存当前DFA的所有终态，Partition中保存当前DFA的终态和非终态集合，一个终态作为一个集合存入
 	std::list<std::list<STATEID>> Partition(1);
 	for (STATEID i = 0; i < m_pDfa->size(); ++i)
 	{
-		if (((*m_pDfa)[i].GetFlag() & (*m_pDfa)[i].TERMINAL) != 0)
+		if ((*m_pDfa)[i].GetFlag() & (*m_pDfa)[i].TERMINAL)
 		{
 			Partition.push_front(std::list<STATEID>());
 			Partition.front().push_back(i);
@@ -519,7 +545,7 @@ DFANEWSC size_t CDfanew::Minimize()
 	}
 
 	nSize = m_pDfa->size();
-	pRevTab = new std::vector<STATEID>[nSize * nCols];
+	std::vector<STATEID> *pRevTab = new std::vector<STATEID>[nSize * nCols];
 	for (STATEID i = 0; i < nSize; ++i)
 	{
 		for (STATEID j = 0; j < nCols; ++j)
@@ -535,8 +561,11 @@ DFANEWSC size_t CDfanew::Minimize()
 	//divide nondistinguishable states
 	PartitionNonDisState(pRevTab, Partition);
 
-	//DFA minization
-	MergeNonDisStates(Partition);
+	if (Partition.size() < nSize)
+	{
+		//DFA minization
+		MergeNonDisStates(Partition);
+	}
 
 	delete []pRevTab;
 	return 0;
@@ -938,22 +967,23 @@ void CDfanew::MergeNonDisStates(SETLIST &Partition)
 	{
 		for (STALIST_ITER iSta = iSet->begin(); iSta != iSet->end(); ++iSta)
 		{
-			sta2Part[*iSta] = nSetIdx;
+			STATEID CurSta = *iSta;
+			CDfaRow &curRow = (*m_pDfa)[CurSta];
+			sta2Part[CurSta] = nSetIdx;
 			//修改新的起始状态
-			if (((*m_pDfa)[*iSta].GetFlag() & (*m_pDfa)[*iSta].START) != 0)
+			if (curRow.GetFlag() & curRow.START)
 			{
 				m_StartId = nSetIdx;
 			}
 
 			//存入新的终态编号
-			if (((*m_pDfa)[*iSta].GetFlag() & (*m_pDfa)[*iSta].TERMINAL) != 0)
+			if (curRow.GetFlag() & curRow.TERMINAL)
 			{
 				TERMSET tmpSta;
 				tmpSta.dfaSta = nSetIdx;
-				tmpSta.dfaId = termFlag[*iSta];
+				tmpSta.dfaId = termFlag[CurSta];
 				m_TermSet->push_back(tmpSta);
 			}
-
 		}
 		++nSetIdx;
 	}
@@ -974,7 +1004,6 @@ void CDfanew::MergeNonDisStates(SETLIST &Partition)
 			}
 			curRow[iCol] = nDest;
 		}
-
 		//set a state attribute
 		curRow.SetFlag(orgRow.GetFlag());
 		++nSetIdx;

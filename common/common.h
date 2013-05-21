@@ -336,6 +336,7 @@ public:
 	void PushBackSig(SIGNATURE &signature);
 	SIGNATURE& GetSig(size_t nIdx) const;
 	void Unique();
+	void ClearSigList();
 private:
 	std::vector<CCString> *m_pRegList;
 	std::vector<SIGNATURE> *m_pSigList;

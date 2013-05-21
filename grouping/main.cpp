@@ -314,6 +314,61 @@ void ExtractExplosion(const std::vector<RULECHAIN> &chainSet, std::vector<CHAING
 	}
 }
 
+void SplitByComSig(const std::vector<RULECHAIN> &chainSet, std::vector<CHAINGROUP> &vecChainGroups, std::vector<size_t> &vecWaitForGroup)
+{
+	std::vector<CHAINGROUP> vecOldGroup(vecChainGroups.begin(), vecChainGroups.end());
+	vecChainGroups.clear();
+	for (std::vector<CHAINGROUP>::iterator i = vecOldGroup.begin(); i != vecOldGroup.end(); ++i)
+	{
+		std::vector<size_t> &chainIds = i->chainIds;
+		while (!chainIds.empty())
+		{
+			std::map<SIGNATURE, std::vector<size_t>> SigToIdsMap;
+			for (std::vector<size_t>::iterator j = chainIds.begin(); j != chainIds.end(); ++j)
+			{
+				for (std::vector<SIGNATURE>::const_iterator k = chainSet[*j].sigs.begin(); k != chainSet[*j].sigs.end(); ++k)
+				{
+					SigToIdsMap[*k].push_back(*j);
+				}
+			}
+			size_t max = 0;
+			std::map<SIGNATURE, std::vector<size_t>>::iterator iter;
+			for (std::map<SIGNATURE, std::vector<size_t>>::iterator j = SigToIdsMap.begin(); j != SigToIdsMap.end(); ++j)
+			{
+				if (max < j->second.size())
+				{
+					max = j->second.size();
+					iter = j;
+				}
+			}
+			if (max > 1)
+			{
+				vecChainGroups.push_back(CHAINGROUP());
+				CHAINGROUP &oneGroup = vecChainGroups.back();
+				oneGroup.chainIds.insert(oneGroup.chainIds.begin(), iter->second.begin(), iter->second.end());
+				for (std::vector<size_t>::iterator j = chainIds.begin(); j != chainIds.end();)
+				{
+					if (std::find(iter->second.begin(), iter->second.end(), *j) != iter->second.end())
+					{
+						j = chainIds.erase(j);
+					}
+					else
+					{
+						++j;
+					}
+				}
+			}
+			else
+			{
+				vecWaitForGroup.insert(vecWaitForGroup.begin(), chainIds.begin(), chainIds.end());
+				chainIds.clear();
+			}
+		}
+	}
+
+	SortChainId(vecChainGroups, chainSet);
+}
+
 void MergeMore(std::vector<CHAINGROUP> &vecChainGroups, CResNew &res, std::vector<size_t> &vecWaitForGroup)
 {
 	bool mergeFlag;
@@ -511,6 +566,10 @@ void BuildGroupBySig(const std::vector<RULECHAIN> &chainSet, std::vector<CHAINGR
 		oneGroup.comSigs = chainSet[*i].sigs;
 		for (std::vector<size_t>::iterator j = i + 1; j != vecWaitForGroup.end(); ++j)
 		{
+			if (visited[idx])
+			{
+				continue;
+			}
 			std::vector<SIGNATURE>::iterator k = std::find_first_of(oneGroup.comSigs.begin(), oneGroup.comSigs.end(), chainSet[*j].sigs.begin(), chainSet[*j].sigs.end());
 			if (k != oneGroup.comSigs.end())
 			{
@@ -534,6 +593,7 @@ void BuildGroupBySig(const std::vector<RULECHAIN> &chainSet, std::vector<CHAINGR
 			++i;
 		}
 	}
+	SortChainId(newGroups, chainSet);
 	MergeMore(newGroups, res, vecWaitForGroup);
 	ExtractSigs(chainSet, newGroups);
 	vecChainGroups.insert(vecChainGroups.end(), newGroups.begin(), newGroups.end());
@@ -545,6 +605,25 @@ void BuildGroupBySig(const std::vector<RULECHAIN> &chainSet, std::vector<CHAINGR
 		oneGroup.comSigs = chainSet[*i].sigs;
 		oneGroup.mergeDfaId = *i;
 	}
+	vecWaitForGroup.clear();
+}
+
+void ClearUselessDfa(const std::vector<CHAINGROUP> &vecChainGroups, CResNew &res)
+{
+	std::vector<size_t> occurred(res.GetDfaTable().Size(), 0);
+	for (std::vector<CHAINGROUP>::const_iterator i = vecChainGroups.begin(); i != vecChainGroups.end(); ++i)
+	{
+		occurred[i->mergeDfaId] = 1;
+	}
+	for (std::vector<size_t>::iterator i = occurred.begin(); i != occurred.end(); ++i)
+	{
+		if (*i == 0)
+		{
+			res.GetDfaTable()[i - occurred.begin()].Clear();
+		}
+	}
+
+	res.WriteToFile(_T("..\\..\\output\\FinalResult.cdt"));
 }
 
 int main(void)
@@ -601,6 +680,11 @@ int main(void)
 	ExtractExplosion(chainSet, vecChainGroups, vecWaitForGroup, vecExplosion);
 	std::cout << "Completed in " << t1.Reset() << " Sec." << std::endl << std::endl;
 
+	//Split by common Sig...
+	std::cout << "Split by common Sig..." << std::endl;
+	SplitByComSig(chainSet, vecChainGroups, vecWaitForGroup);
+	std::cout << "Completed in " << t1.Reset() << " Sec." << std::endl << std::endl;
+
 	//Merge dfa in a group...
 	std::cout << "Merge dfa in a group..." << std::endl;
 	MergeMore(vecChainGroups, res, vecWaitForGroup);
@@ -622,11 +706,17 @@ int main(void)
 	std::cout << "Completed in " << t1.Reset() << " Sec." << std::endl << std::endl;
 
 	//New group which have the same signature...
-	std::cout << "Put chain in group which have the same signature..." << std::endl;
+	std::cout << "New group which have the same signature..." << std::endl;
 	BuildGroupBySig(chainSet, vecChainGroups, res, vecWaitForGroup);
 	std::cout << "Completed in " << t1.Reset() << " Sec." << std::endl << std::endl;
 
 	std::cout << vecChainGroups.size() << std::endl;
+
+	//Clear useless dfa...
+	std::cout << "Clear useless dfa..." << std::endl;
+	ClearUselessDfa(vecChainGroups, res);
+	std::cout << "Completed in " << t1.Reset() << " Sec." << std::endl << std::endl;
+
 	std::cout << "Total time: " << tAll.Reset() << " Sec." << std::endl;
 
 	system("pause");

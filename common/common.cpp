@@ -790,6 +790,11 @@ COMMONSC void CRegChain::Unique()
 	m_pSigList->erase(std::unique(m_pSigList->begin(), m_pSigList->end()), m_pSigList->end());
 }
 
+COMMONSC void CRegChain::ClearSigList()
+{
+	m_pSigList->clear();
+}
+
 COMMONSC CRegRule::CRegRule()
 {
 	m_pRegVec = new std::vector<CRegChain>;
