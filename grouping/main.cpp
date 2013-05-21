@@ -314,6 +314,59 @@ void ExtractExplosion(const std::vector<RULECHAIN> &chainSet, std::vector<CHAING
 	}
 }
 
+void SplitByComSig(const std::vector<RULECHAIN> &chainSet, std::vector<CHAINGROUP> &vecChainGroups, std::vector<size_t> &vecWaitForGroup)
+{
+	std::vector<CHAINGROUP> vecOldGroup(vecChainGroups.begin(), vecChainGroups.end());
+	vecChainGroups.clear();
+	for (std::vector<CHAINGROUP>::iterator i = vecOldGroup.begin(); i != vecOldGroup.end(); ++i)
+	{
+		std::vector<size_t> &chainIds = i->chainIds;
+		while (!chainIds.empty())
+		{
+			std::map<SIGNATURE, std::vector<size_t>> SigToIdsMap;
+			for (std::vector<size_t>::iterator j = chainIds.begin(); j != chainIds.end(); ++j)
+			{
+				for (std::vector<SIGNATURE>::const_iterator k = chainSet[*j].sigs.begin(); k != chainSet[*j].sigs.end(); ++k)
+				{
+					SigToIdsMap[*k].push_back(*j);
+				}
+			}
+			size_t max = 0;
+			std::map<SIGNATURE, std::vector<size_t>>::iterator iter;
+			for (std::map<SIGNATURE, std::vector<size_t>>::iterator j = SigToIdsMap.begin(); j != SigToIdsMap.end(); ++j)
+			{
+				if (max < j->second.size())
+				{
+					max = j->second.size();
+					iter = j;
+				}
+			}
+			if (max > 1)
+			{
+				vecChainGroups.push_back(CHAINGROUP());
+				CHAINGROUP &oneGroup = vecChainGroups.back();
+				oneGroup.chainIds.insert(oneGroup.chainIds.begin(), iter->second.begin(), iter->second.end());
+				for (std::vector<size_t>::iterator j = chainIds.begin(); j != chainIds.end();)
+				{
+					if (std::find(iter->second.begin(), iter->second.end(), *j) != iter->second.end())
+					{
+						j = chainIds.erase(j);
+					}
+					else
+					{
+						++j;
+					}
+				}
+			}
+			else
+			{
+				vecWaitForGroup.insert(vecWaitForGroup.begin(), chainIds.begin(), chainIds.end());
+				chainIds.clear();
+			}
+		}
+	}
+}
+
 void MergeMore(std::vector<CHAINGROUP> &vecChainGroups, CResNew &res, std::vector<size_t> &vecWaitForGroup)
 {
 	bool mergeFlag;
@@ -623,6 +676,11 @@ int main(void)
 	std::cout << "Extract explosion chains..." << std::endl;
 	std::vector<size_t> vecExplosion;
 	ExtractExplosion(chainSet, vecChainGroups, vecWaitForGroup, vecExplosion);
+	std::cout << "Completed in " << t1.Reset() << " Sec." << std::endl << std::endl;
+
+	//Split by common Sig...
+	std::cout << "Split by common Sig..." << std::endl;
+	SplitByComSig(chainSet, vecChainGroups, vecWaitForGroup);
 	std::cout << "Completed in " << t1.Reset() << " Sec." << std::endl << std::endl;
 
 	//Merge dfa in a group...

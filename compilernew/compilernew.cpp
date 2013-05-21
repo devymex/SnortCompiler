@@ -486,6 +486,20 @@ void Rule2Dfas(const CSnortRule &rule, CResNew &result, COMPILEDRULENEW &ruleRes
 	}
 	else
 	{
+		bool bHasSigs = false;
+		for (size_t i = 0; i < regrule.Size(); ++i)
+		{
+			if (regrule[i].GetSigCnt() > 0)
+			{
+				bHasSigs = true;
+				break;
+			}
+		}
+		if (!bHasSigs)
+		{
+			ruleResult.m_nResult = COMPILEDRULENEW::RES_HASNOSIG;
+			return;
+		}
 		ruleResult.m_nResult = COMPILEDRULENEW::RES_SUCCESS;
 		const size_t nDfaTblSize = result.GetDfaTable().Size();
 		const size_t nIncrement = regrule.Size();
@@ -577,11 +591,11 @@ void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 		ruleResult.m_nResult = COMPILEDRULENEW::RES_HASBYTE;
 		return;
 	}
-	else if (nFlag & CSnortRule::RULE_HASNOSIG)
-	{
-		ruleResult.m_nResult = COMPILEDRULENEW::RES_HASNOSIG;
-		return;
-	}
+	//else if (nFlag & CSnortRule::RULE_HASNOSIG)
+	//{
+	//	ruleResult.m_nResult = COMPILEDRULENEW::RES_HASNOSIG;
+	//	return;
+	//}
 	else
 	{
 		Rule2Dfas(rule, result, ruleResult);
