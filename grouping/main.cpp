@@ -314,6 +314,61 @@ void ExtractExplosion(const std::vector<RULECHAIN> &chainSet, std::vector<CHAING
 	}
 }
 
+void SplitByComSig(const std::vector<RULECHAIN> &chainSet, std::vector<CHAINGROUP> &vecChainGroups, std::vector<size_t> &vecWaitForGroup)
+{
+	std::vector<CHAINGROUP> vecOldGroup(vecChainGroups.begin(), vecChainGroups.end());
+	vecChainGroups.clear();
+	for (std::vector<CHAINGROUP>::iterator i = vecOldGroup.begin(); i != vecOldGroup.end(); ++i)
+	{
+		std::vector<size_t> &chainIds = i->chainIds;
+		while (!chainIds.empty())
+		{
+			std::map<SIGNATURE, std::vector<size_t>> SigToIdsMap;
+			for (std::vector<size_t>::iterator j = chainIds.begin(); j != chainIds.end(); ++j)
+			{
+				for (std::vector<SIGNATURE>::const_iterator k = chainSet[*j].sigs.begin(); k != chainSet[*j].sigs.end(); ++k)
+				{
+					SigToIdsMap[*k].push_back(*j);
+				}
+			}
+			size_t max = 0;
+			std::map<SIGNATURE, std::vector<size_t>>::iterator iter;
+			for (std::map<SIGNATURE, std::vector<size_t>>::iterator j = SigToIdsMap.begin(); j != SigToIdsMap.end(); ++j)
+			{
+				if (max < j->second.size())
+				{
+					max = j->second.size();
+					iter = j;
+				}
+			}
+			if (max > 1)
+			{
+				vecChainGroups.push_back(CHAINGROUP());
+				CHAINGROUP &oneGroup = vecChainGroups.back();
+				oneGroup.chainIds.insert(oneGroup.chainIds.begin(), iter->second.begin(), iter->second.end());
+				for (std::vector<size_t>::iterator j = chainIds.begin(); j != chainIds.end();)
+				{
+					if (std::find(iter->second.begin(), iter->second.end(), *j) != iter->second.end())
+					{
+						j = chainIds.erase(j);
+					}
+					else
+					{
+						++j;
+					}
+				}
+			}
+			else
+			{
+				vecWaitForGroup.insert(vecWaitForGroup.begin(), chainIds.begin(), chainIds.end());
+				chainIds.clear();
+			}
+		}
+	}
+
+	SortChainId(vecChainGroups, chainSet);
+}
+
 void MergeMore(std::vector<CHAINGROUP> &vecChainGroups, CResNew &res, std::vector<size_t> &vecWaitForGroup)
 {
 	bool mergeFlag;
@@ -336,29 +391,6 @@ void MergeMore(std::vector<CHAINGROUP> &vecChainGroups, CResNew &res, std::vecto
 			i = vecChainGroups.erase(i);
 			continue;
 		}
-		//std::cout << ((size_t)vecDfas[0].Size()) * ((size_t)vecDfas[0].GetGroupCount()) << std::endl;
-		//std::cout << ((size_t)vecDfas[1].Size()) * ((size_t)vecDfas[1].GetGroupCount()) << std::endl;
-		//std::cout << ((size_t)MergeDfa.Size()) * ((size_t)MergeDfa.GetGroupCount()) << std::endl;
-		//std::cout << (size_t)MergeDfa.Size() << std::endl;
-		//std::cout << vecDfas[0].GetId() << std::endl;
-		//std::cout << (size_t)vecDfas[0].GetStartId() << std::endl;
-		//std::cout << (size_t)vecDfas[0].GetGroupCount() << std::endl;
-		//for (size_t j = 0; j < DFACOLSIZE; ++j)
-		//{
-		//	std::cout << (size_t)vecDfas[0].GetOneGroup(j) << " ";
-		//}
-		//std::cout << std::endl;
-		//vecDfas[0].printTerms();
-		//std::cout << vecDfas[1].GetId() << std::endl;
-		//std::cout << (size_t)vecDfas[1].GetStartId() << std::endl;
-		//std::cout << (size_t)vecDfas[1].GetGroupCount() << std::endl;
-		//for (size_t j = 0; j < DFACOLSIZE; ++j)
-		//{
-		//	std::cout << (size_t)vecDfas[1].GetOneGroup(j) << " ";
-		//}
-		//std::cout << std::endl;
-		//vecDfas[1].printTerms();
-
 		mergeFlag = true;
 		vecDfas[0] = MergeDfa;
 		for (size_t j = 2; j < i->chainIds.size(); ++j)
@@ -576,6 +608,24 @@ void BuildGroupBySig(const std::vector<RULECHAIN> &chainSet, std::vector<CHAINGR
 	vecWaitForGroup.clear();
 }
 
+void ClearUselessDfa(const std::vector<CHAINGROUP> &vecChainGroups, CResNew &res)
+{
+	std::vector<size_t> occurred(res.GetDfaTable().Size(), 0);
+	for (std::vector<CHAINGROUP>::const_iterator i = vecChainGroups.begin(); i != vecChainGroups.end(); ++i)
+	{
+		occurred[i->mergeDfaId] = 1;
+	}
+	for (std::vector<size_t>::iterator i = occurred.begin(); i != occurred.end(); ++i)
+	{
+		if (*i == 0)
+		{
+			res.GetDfaTable()[i - occurred.begin()].Clear();
+		}
+	}
+
+	res.WriteToFile(_T("..\\..\\output\\FinalResult.cdt"));
+}
+
 int main(void)
 {
 	//Load all rules chains from file
@@ -630,12 +680,14 @@ int main(void)
 	ExtractExplosion(chainSet, vecChainGroups, vecWaitForGroup, vecExplosion);
 	std::cout << "Completed in " << t1.Reset() << " Sec." << std::endl << std::endl;
 
+	//Split by common Sig...
+	std::cout << "Split by common Sig..." << std::endl;
+	SplitByComSig(chainSet, vecChainGroups, vecWaitForGroup);
+	std::cout << "Completed in " << t1.Reset() << " Sec." << std::endl << std::endl;
+
 	//Merge dfa in a group...
 	std::cout << "Merge dfa in a group..." << std::endl;
 	MergeMore(vecChainGroups, res, vecWaitForGroup);
-	//std::cout << ((size_t)res.GetDfaTable()[3].Size()) * ((size_t)res.GetDfaTable()[3].GetGroupCount()) << std::endl;
-	//std::cout << ((size_t)res.GetDfaTable()[1].Size()) * ((size_t)res.GetDfaTable()[1].GetGroupCount()) << std::endl;
-	//std::cout << ((size_t)res.GetDfaTable()[4].Size()) << std::endl;
 	std::cout << "Completed in " << t1.Reset() << " Sec." << std::endl << std::endl;
 
 	//Extract common Signatures in each group...
@@ -657,52 +709,13 @@ int main(void)
 	std::cout << "New group which have the same signature..." << std::endl;
 	BuildGroupBySig(chainSet, vecChainGroups, res, vecWaitForGroup);
 	std::cout << "Completed in " << t1.Reset() << " Sec." << std::endl << std::endl;
-	
-	std::ofstream fout("..\\..\\output\\group.txt");
-	for (std::vector<CHAINGROUP>::iterator i = vecChainGroups.begin(); i != vecChainGroups.end(); ++i)
-	{
-		size_t nSpaceSize = 0;
-		for(std::vector<size_t>::iterator j = i->chainIds.begin(); j != i->chainIds.end(); ++j)
-		{
-			nSpaceSize += ((size_t)res.GetDfaTable()[*j].Size()) * ((size_t)res.GetDfaTable()[*j].GetGroupCount());
-		}
-
-		size_t tmp = ((size_t)res.GetDfaTable()[i->mergeDfaId].Size()) * ((size_t)res.GetDfaTable()[i->mergeDfaId].GetGroupCount());
-		if (nSpaceSize < ((size_t)res.GetDfaTable()[i->mergeDfaId].Size()) * ((size_t)res.GetDfaTable()[i->mergeDfaId].GetGroupCount()))
-		{
-			for(std::vector<size_t>::iterator j = i->chainIds.begin(); j != i->chainIds.end(); ++j)
-			{
-				fout << chainSet[*j].strChain << std::endl;
-			}
-			fout << std::endl;
-		}
-	}
-	fout.clear();
-	fout.close();
-
-	size_t Num = 0;
-	for (std::vector<CHAINGROUP>::iterator i = vecChainGroups.begin(); i != vecChainGroups.end(); ++i)
-	{
-		Num += i->chainIds.size();
-	}
-	std::cout << Num + vecExplosion.size() << std::endl;
 
 	std::cout << vecChainGroups.size() << std::endl;
 
-	std::vector<size_t> occurred(res.GetDfaTable().Size(), 0);
-	for (std::vector<CHAINGROUP>::iterator i = vecChainGroups.begin(); i != vecChainGroups.end(); ++i)
-	{
-		occurred[i->mergeDfaId] = 1;
-	}
-	for (std::vector<size_t>::iterator i = occurred.begin(); i != occurred.end(); ++i)
-	{
-		if (*i == 0)
-		{
-			res.GetDfaTable()[i - occurred.begin()].Clear();
-		}
-	}
-
-	res.WriteToFile(_T("..\\..\\output\\FinalResult.cdt"));
+	//Clear useless dfa...
+	std::cout << "Clear useless dfa..." << std::endl;
+	ClearUselessDfa(vecChainGroups, res);
+	std::cout << "Completed in " << t1.Reset() << " Sec." << std::endl << std::endl;
 
 	std::cout << "Total time: " << tAll.Reset() << " Sec." << std::endl;
 
