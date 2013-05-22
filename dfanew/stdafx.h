@@ -12,6 +12,7 @@
 #include <limits>
 #include <windows.h>
 #include <xmmintrin.h>
+#include <deque>
 
 #define DFANEW_H_
 #undef max

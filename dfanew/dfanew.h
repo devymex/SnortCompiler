@@ -43,9 +43,13 @@ public:
 	STATEID Size() const;
 	CDfaRow& operator[](STATEID index);
 	const CDfaRow& operator[](STATEID index) const;
+	CDfaRow& BackRow();
+	void ReservRow(size_t nCount);
+	void ResizeRow(size_t nSize, size_t nCol);
 	void Init(BYTE *pGroup);
 	void Clear();
 	void PushBackTermSet(TERMSET &term);
+	TERMSET& BackTermSet();
 	size_t FromNFA(const CNfa &nfa, NFALOG *nfalog, size_t Count, bool combine = false);
 	size_t Minimize();
 	STATEID GetGroupCount() const;

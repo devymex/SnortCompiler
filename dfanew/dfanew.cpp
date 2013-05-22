@@ -114,6 +114,19 @@ DFANEWSC STATEID CDfanew::Size() const
 	return (STATEID)m_pDfa->size();
 }
 
+DFANEWSC CDfaRow& CDfanew::BackRow()
+{
+	return m_pDfa->back();
+}
+DFANEWSC void CDfanew::ReservRow(size_t nCount)
+{
+	m_pDfa->reserve(nCount);
+}
+DFANEWSC void CDfanew::ResizeRow(size_t nSize, size_t nCol)
+{
+	m_pDfa->resize(nSize, CDfaRow(nCol));
+}
+
 DFANEWSC CDfaRow& CDfanew::operator[](STATEID index)
 {
 	return (*m_pDfa)[index];
@@ -129,11 +142,16 @@ DFANEWSC void CDfanew::PushBackTermSet(TERMSET &term)
 	m_TermSet->push_back(term);
 }
 
+DFANEWSC TERMSET& CDfanew::BackTermSet()
+{
+	return m_TermSet->back();
+}
+
 DFANEWSC void CDfanew::Init(BYTE *pGroup)
 {
-	Clear();
+	//Clear();
 	BYTE occurred[DFACOLSIZE] = {0};
-	for (size_t i = 0; i < DFACOLSIZE; ++i)
+	for (size_t i = 0; i < DFACOLSIZE; ++i) 
 	{
 		occurred[pGroup[i]] = 1;
 	}
@@ -448,7 +466,7 @@ DFANEWSC  void CDfanew:: printTerms()
 {
 	for(std::vector<TERMSET>::iterator iter = m_TermSet->begin(); iter != m_TermSet->end(); ++iter)
 	{
-		std::cout << (size_t)iter->dfaSta <<"  :  " << iter->dfaId << std::endl;
+		std::cout << (size_t)iter->dfaSta <<"  :  " << "dfa " << iter->dfaId << std::endl;
 	}
 }
 
@@ -467,6 +485,9 @@ void PrintMatrix(BYTE *pMat, size_t nWidth, size_t nHeight)
 DFANEWSC size_t CDfanew::Minimize()
 {
 	//error: DFA is empty
+
+	CTimer time1;//用于测试
+
 	size_t nSize = m_pDfa->size();
 	size_t nCols = GetGroupCount();
 	if (nSize == 0)
@@ -517,11 +538,15 @@ DFANEWSC size_t CDfanew::Minimize()
 	}
 	_aligned_free(pMat);
 
+	std::cout << "准备工作： " << time1.Reset() << std::endl;//测试
+
 	if (reachable.size() < nSize)
 	{
 		//remove unreachable states, generate new DFA
 		MergeReachable(reachable);
 	}
+
+	std::cout << "合并等价状态： " << time1.Reset() << std::endl;//测试
 
 	// FinalStas中保存当前DFA的所有终态，Partition中保存当前DFA的终态和非终态集合，一个终态作为一个集合存入
 	std::list<std::list<STATEID>> Partition(1);
@@ -566,6 +591,8 @@ DFANEWSC size_t CDfanew::Minimize()
 		//DFA minization
 		MergeNonDisStates(Partition);
 	}
+
+	std::cout << "状态划分： " << time1.Reset() << std::endl;//合并
 
 	delete []pRevTab;
 	return 0;
