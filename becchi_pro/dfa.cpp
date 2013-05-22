@@ -3408,13 +3408,13 @@ unsigned DFA::CD2FA(){
 
 void DFA::Dfa2CDfanew(CDfanew &curDFA)
 {
-	//BYTE group[CSIZE];
-	//for (int i = 0; i < CSIZE; ++i)
-	//{
-	//	group[i] = (BYTE)i;
-	//}
-	//
-	//curDFA.Init(group);
+	BYTE group[CSIZE];
+	for (int i = 0; i < CSIZE; ++i)
+	{
+		group[i] = (BYTE)i;
+	}
+	
+	curDFA.Init(group);
 	curDFA.reserve(300);
 	STATEID newIdx = 0;
 	STATEID *old2new = new STATEID[_size];
@@ -3437,9 +3437,9 @@ void DFA::Dfa2CDfanew(CDfanew &curDFA)
 			}
 			if (state_table[s] != NULL)
 			{	
-				//size_t ColNum = curDFA.GetGroupCount();
-				curDFA.PushBackDfa(CDfaRow(CSIZE));	
-				for (size_t c = 0; c < CSIZE; ++c)
+				size_t ColNum = curDFA.GetGroupCount();
+				curDFA.PushBackDfa(CDfaRow(ColNum));	
+				for (size_t c = 0; c < ColNum; ++c)
 				{
 					curDFA[newIdx][c] = (STATEID)state_table[s][c];
 				}					
@@ -3450,18 +3450,21 @@ void DFA::Dfa2CDfanew(CDfanew &curDFA)
 		}
 	}
 
-	for (size_t s = 0; s < curDFA.Size(); ++s)
+	if (this->dead_state != -1)
 	{
-		CDfaRow &curRow = curDFA[s];
-		for (size_t c = 0; c < CSIZE; ++c)
+		for (size_t s = 0; s < curDFA.Size(); ++s)
 		{
-			STATEID nDest = STATEID(-1);
-			STATEID nCur = curRow[c];
-			if (nCur != this->dead_state)
+			CDfaRow &curRow = curDFA[s];
+			for (size_t c = 0; c < curDFA.GetGroupCount(); ++c)
 			{
-				nDest = old2new[nCur];
+				STATEID nDest = STATEID(-1);
+				STATEID nCur = curRow[c];
+				if (nCur != this->dead_state)
+				{
+					nDest = old2new[nCur];
+				}
+				curRow[c] = nDest;
 			}
-			curRow[c] = nDest;
 		}
 	}
 }

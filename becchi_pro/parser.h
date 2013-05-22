@@ -74,12 +74,10 @@
 #define MINUS_RANGE '-'  
  
 class regex_parser{
-
+public:
 	bool i_modifier; //the parsed regular expressions must be in ignore case mode (see PCRE specs)	
 
 	bool m_modifier; // the m modifier must be applied (see PCRE specs)
-
-public:
 
 	//instantiates the parser
 	regex_parser(bool i_mod, bool m_mod);
@@ -98,8 +96,6 @@ public:
 	NFA *group_regex(FILE *file, int group[]);
 
 	unsigned long parse_regex_group(FILE *file, int group[]);
-
-private:
 
 	//parses a regular expressions into the given NFA
 	void parse_re(NFA* nfa, const char *re);
