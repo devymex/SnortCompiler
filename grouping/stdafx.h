@@ -8,3 +8,5 @@
 #include <numeric>
 #include <string>
 #include <sstream>
+
+#define GROUPING_H_

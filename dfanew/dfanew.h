@@ -48,7 +48,7 @@ public:
 	void PushBackTermSet(TERMSET &term);
 	size_t FromNFA(const CNfa &nfa, NFALOG *nfalog, size_t Count, bool combine = false);
 	size_t Minimize();
-	STATEID GetGroupCount() const;
+	WORD GetGroupCount() const;
 	BYTE Char2Group(BYTE nIdx);
 	const BYTE* GetGroup() const;
 	const BYTE GetOneGroup(STATEID charNum) const;
@@ -60,10 +60,9 @@ public:
 	size_t Save(BYTE *beg);
 	void Load(BYTE *beg, size_t len);
 	void printTerms();
-	size_t LinkSize();
 private:
 	size_t m_nId;
-	STATEID m_nColNum;
+	WORD m_nColNum;
 	STATEID m_StartId;
 	BYTE m_pGroup[DFACOLSIZE];
 	std::vector<CDfaRow> *m_pDfa;

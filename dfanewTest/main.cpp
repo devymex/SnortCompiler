@@ -6,112 +6,63 @@
 
 void main()
 {
-	/*CNfa nfa1,nfa2;
-	std::vector<CDfanew> dfas;
-	CDfanew dfa1, dfa2, lastdfa;
-	const char* a1 = "/^abcd/";
-	const char* a2 = "/^efgh/";
-	PcreToNFA(a1, nfa1);
-	PcreToNFA(a2, nfa2);
-	dfa1.FromNFA(nfa1, NULL, 0, false);
-	dfa2.FromNFA(nfa2, NULL, 0, false);
-	dfas.push_back(dfa1);
-	dfas.push_back(dfa2);
-	NOrMerge(dfas,lastdfa);
+	CNfa nfa1;
+	CNfa nfa2;
 
-	for (size_t i = 0; i < lastdfa.Size(); ++i)
-	{
-		std::cout << i << ":";
-		for (size_t j = 0; j < lastdfa.GetGroupCount(); ++j)
-		{
-			if(lastdfa[i][j] != BYTE(-1))
-			{
-				std::cout << "(" << j << "," << (size_t)lastdfa[i][j] << ")";
-			}
-		}
-		std::cout << std::endl;
-	}
+	CRegChain regChain;
+	//PcreToNFA("/^POST/s", nfa1, regChain);
+	//PcreToNFA("/xml version/s", nfa1, regChain);
+	//PcreToNFA("/<methodCall><methodName>/s", nfa1, regChain);
+	//PcreToNFA("/</methodName><params><param><value><string></string></value></param><param><value><string>/s", nfa1, regChain);
 
-	system("pause");*/
+	//PcreToNFA("/^POST/s", nfa2, regChain);
+	//PcreToNFA("/xml version/s", nfa2, regChain);
+	//PcreToNFA("/<methodCall><methodName>/s", nfa2, regChain);
+	//PcreToNFA("/</methodName><params><param><value><name>/s", nfa2, regChain);
+	//PcreToNFA("/'\\,''\\x29\\x29\\x3Becho '_begin_\\x0A'\\x3Becho/s", nfa2, regChain);
 
-	//const char* a1 = "/^(ab|bc)def(ab|cd)/";
-	//const char* a1 = "/^(ab|bc)d(ef|g)/";
-	//const char* a2 = "/^.{2}.*ab/si";
-	//const char* a3 = "/^(a|b)abb/";
-	//CNfa nfa1;
-	//CNfa nfa2;
-	//CNfa nfa3;
-	//CRegChain regchain1;
-	//CRegChain regchain2;
-	//CRegChain regchain3;
-	//PcreToNFA(a1, nfa1, regchain1);
-	//PcreToNFA(a2, nfa2, regchain2);
-	//PcreToNFA(a3, nfa3, regchain3);
+	PcreToNFA("/^abcd/", nfa1, regChain);
+	PcreToNFA("/^xbcd/", nfa2, regChain);
 
-	//outPut(nfa1, "F:\\cppProject\\huawei\\PreciseMatch\\output\\nfa1_origin.txt");
-	//outPut(nfa2, "F:\\cppProject\\huawei\\PreciseMatch\\output\\nfa2_origin.txt");
-	//outPut(nfa3, "F:\\cppProject\\huawei\\PreciseMatch\\output\\nfa3_origin.txt");
+	CDfanew dfa1;
+	CDfanew dfa2;
 
-
-	//CDfanew dfa1;
-	//CDfanew dfa2;
-	//CDfanew dfa3;
-	//
-	//CTimer nfa2dfatime;//用于测试
-	//nfa2dfatime.Reset();//用于测试
-	//dfa1.FromNFA(nfa1, NULL, 0);
-	//dfa2.FromNFA(nfa2, NULL, 0);
-	//dfa3.FromNFA(nfa3, NULL, 0);
-	//std::cout << "nfa2dfastime: " << nfa2dfatime.Reset() << std::endl;//用于测试
-	////outPutDfa(dfa1, "F:\\cppProject\\huawei\\PreciseMatch\\output\\dfa1_test.txt");
-
-	//dfa1.Minimize();
-	//dfa2.Minimize();
-	//dfa3.Minimize();
-	//std::cout << "dfasMin: " << nfa2dfatime.Reset() << std::endl;//用于测试
-
-	//outPutDfa(dfa1, "F:\\cppProject\\huawei\\PreciseMatch\\output\\dfa1_origin.txt");
-	//outPutDfa(dfa2, "F:\\cppProject\\huawei\\PreciseMatch\\output\\dfa2_origin.txt");
-	//outPutDfa(dfa3, "F:\\cppProject\\huawei\\PreciseMatch\\output\\dfa3_origin.txt");
-
-	//std::vector<CDfanew> dfas;
-	//dfas.push_back(dfa1);
-	//dfas.push_back(dfa2);
-	//dfas.push_back(dfa3);
-	//CDfanew lastdfa;
-
-	//nfa2dfatime.Reset();//用于测试
-	//NOrMerge(dfas, lastdfa);
-	//std::cout << "merge dfas time: " << nfa2dfatime.Reset() << std::endl;//用于测试
-
-	//lastdfa.Minimize();
-	//outPutDfa(lastdfa, "F:\\cppProject\\huawei\\PreciseMatch\\output\\lastdfa_origin.txt");
-	const char* a1= "/^a(uf|de)bfg/";
-	const char* a2 = "/^a(me|fe)bfg/";
-	CNfa nfa1, nfa2;
-	CDfanew dfa1, dfa2;
-	CRegChain chain1, chain2;
-	PcreToNFA(a1, nfa1, chain1);
-	PcreToNFA(a2, nfa2, chain2);
 	dfa1.FromNFA(nfa1, NULL, 0);
 	dfa2.FromNFA(nfa2, NULL, 0);
-	std::vector<CDfanew> dfas;
-	dfas.push_back(dfa1);
-	dfas.push_back(dfa2);
+
+	dfa1.Minimize();
+	dfa2.Minimize();
+
+	std::vector<CDfanew> dfas(2);
+	dfas[0] = dfa1;
+	dfas[1] = dfa2;
+
 	CDfanew lastdfa;
+
 	NOrMerge(dfas, lastdfa);
-	for (size_t i = 0; i < lastdfa.Size(); ++i)
+	lastdfa.Minimize();
+
+	CNfa nfa3;
+	PcreToNFA("/^ybcd/", nfa3, regChain);
+	CDfanew dfa3;
+	dfa3.FromNFA(nfa3, NULL, 0);
+	dfa3.Minimize();
+
+	dfas[0] = lastdfa;
+	dfas[1] = dfa3;
+	CDfanew finaldfa;
+	NOrMerge(dfas, finaldfa);
+	finaldfa.Minimize();
+
+	std::cout << (size_t)finaldfa.GetStartId() << std::endl;
+	for (size_t i = 0; i < finaldfa.Size(); ++i)
 	{
-		std::cout << i << ":";
-		for (size_t j = 0; j < CHARSETSIZE; ++j)
+		if (finaldfa[i].GetFlag() & CDfaRow::TERMINAL)
 		{
-			size_t group = lastdfa.GetOneGroup(j);
-			if(lastdfa[i][group] != BYTE(-1))
-			{
-				std::cout << "(" << j << "," << (size_t)lastdfa[i][group] << ")";
-			}
+			std::cout << i << std::endl;
 		}
-		std::cout << std::endl;
 	}
+	outPutDfa(finaldfa, "..\\..\\output\\test.txt");
+
 	system("pause");
 }
