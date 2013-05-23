@@ -2,10 +2,17 @@
 #include "../becchi_pro/parser.h"
 #include "../becchi_pro/nfa.h"
 #include "../becchi_pro/dfa.h"
+#include "../common/common.h"
+#include "../dfanew/dfanew.h"
+#include "../compilernew/compilernew.h"
+#include "../rule2nfa/rule2nfa.h"
+#include "../pcre2nfa/pcre2nfa.h"
 #include <fstream>
 #include <iostream>
 #include <string>
 #include <algorithm>
+#include <tchar.h>
+#include <Windows.h>
 
 int VERBOSE = 1;
 int DEBUG = 0;
@@ -14,6 +21,8 @@ regex_parser *parser;
 int REGEXNUM;
 int THRESHOLD;
 int groupcnt = 0;
+
+typedef void (CALLBACK *RECIEVER)(const CSnortRule &rule, LPVOID lpParam);
 
 //unsigned long **DFAdata;
 
@@ -192,73 +201,90 @@ NFA* CreatNFA(const char* re)
 //	}
 //}
 
-struct ROWKEY
-{
-	std::vector<BYTE> charset;
-	STATEID state;
-};
+//struct COMPARECHARGROUP
+//{
+//	bool operator()(std::vector<BYTE> &x, std::vector<BYTE> &y)
+//	{
+//		return (x.front() < y.front());
+//	}
+//};
+//
+//struct COMPARESTATOGROUP
+//{
+//	bool operator()(std::vector<BYTE> &x, std::vector<BYTE> &y)
+//	{
+//		return (x == y);
+//	}
+//};
 
-struct COMPARECHARSET
+bool operator<(const std::vector<BYTE> &x, std::vector<BYTE> &y)
 {
-	bool operator()(ROWKEY &x, ROWKEY &y)
-	{
-		std::sort(x.charset.begin(), x.charset.end());
-		std::sort(y.charset.begin(), y.charset.end());
-		return (x.charset.front() < y.charset.front());
-	}
-};
+	return (x.front() < y.front());
+}
 
-struct COMPAREROWKEY
+bool operator==(const std::vector<BYTE> &x, std::vector<BYTE> &y)
 {
-	bool operator()(ROWKEY &x, ROWKEY &y)
+	return (x == y);
+}
+
+void GetChargroup(CDfanew &dfa, STATEID &sta, std::vector<std::vector<BYTE>> &chargroup)
+{
+	CDfaRow &cur = dfa[sta];
+
+	std::map<STATEID, std::vector<BYTE>> sta2charset;
+	for (size_t col = 0; col < dfa.GetGroupCount(); ++col)
 	{
-		return (x.charset == y.charset);
+		sta2charset[cur[col]].push_back(col);
 	}
-};
+
+	for (std::map<STATEID, std::vector<BYTE>>::iterator iMap = sta2charset.begin(); iMap != sta2charset.end(); ++iMap)
+	{
+		chargroup.push_back(iMap->second);
+	}
+}
 
 size_t EqualDFA(CDfanew &dfa1, std::vector<BYTE> &visited1, STATEID sta1, CDfanew &dfa2, std::vector<BYTE> &visited2, STATEID sta2)
 {
 	visited1[sta1] = 1;
 	visited2[sta2] = 1;
 
-	std::vector<ROWKEY> row1;
-	std::vector<ROWKEY> row2;
+	std::vector<std::vector<BYTE>> sta2chargroup1;
+	std::vector<std::vector<BYTE>> sta2chargroup2;
 
-	row1.resize(dfa1.Size());
-	for (STATEID i = 0; i < (STATEID)dfa1.Size(); ++i)
-	{
-		row1[i].state = i;
-	}
-	row2.resize(dfa2.Size());
-	for (STATEID i = 0; i < (STATEID)dfa1.Size(); ++i)
-	{
-		row1[i].state = i;
-	}
+	GetChargroup(dfa1, sta1, sta2chargroup1);
+	GetChargroup(dfa2, sta2, sta2chargroup2);
 
-	CDfaRow &cur1 = dfa1[sta1];
-	CDfaRow &cur2 = dfa2[sta2];
+	if (sta2chargroup1.size() == sta2chargroup2.size())
+	{
+		//std::sort(sta2chargroup1.begin(), sta2chargroup1.end(), COMPARECHARGROUP());
+		//std::sort(sta2chargroup2.begin(), sta2chargroup2.end(), COMPARECHARGROUP());
+		//bool flag = std::equal(sta2chargroup1.begin(), sta2chargroup1.end(),
+		//	sta2chargroup2.begin(), COMPARESTATOGROUP());
+		std::sort(sta2chargroup1.begin(), sta2chargroup1.end());
+		std::sort(sta2chargroup2.begin(), sta2chargroup2.end());
+		bool flag = std::equal(sta2chargroup1.begin(), sta2chargroup1.end(),
+			sta2chargroup2.begin());
 
-	for (size_t col = 0; col < dfa1.GetGroupCount(); ++col)
-	{
-		row1[cur1[col]].charset.push_back(col);
-	}
-	for (size_t col = 0; col < dfa2.GetGroupCount(); ++col)
-	{
-		row2[cur1[col]].charset.push_back(col);
-	}
-
-	std::sort(row1.begin(), row1.end(), COMPARECHARSET());
-	std::sort(row2.begin(), row2.end(), COMPARECHARSET());
-	bool flag = std::equal(row1.begin(), row1.end(), row2.begin(), COMPAREROWKEY());
-	if (flag)
-	{
-		for (size_t i = 0, j = 0; i < row1.size() && j < row2.size(); ++i)
+		if (flag)
 		{
-			if ((visited1[row1[i].state] == 0 && !row1[i].charset.empty()) 
-				&& (visited1[row2[i].state] == 0 && !row2[i].charset.empty()))
+			for (size_t i = 0, j = 0; i < sta2chargroup1.size() 
+				&& j < sta2chargroup2.size(); ++i, ++j)
 			{
-				EqualDFA(dfa1, visited1, row1[i].state, dfa2, visited2, row2[i].state);
+				BYTE char1 = sta2chargroup1[i].front();
+				BYTE char2 = sta2chargroup2[j].front();	
+				STATEID cur1 = dfa1[sta1][char1];
+				STATEID cur2 = dfa2[sta2][char2];
+				if ((cur1 != (STATEID)-1 && visited1[cur1] == 0) 
+					&& (cur2 != (STATEID)-1 && visited2[cur2] == 0)
+					&& !EqualDFA(dfa1, visited1, cur1, dfa2, visited2, cur2))
+				{
+					return 0;
+				}
 			}
+		}
+		else
+		{
+			return 0;
 		}
 	}
 	else
@@ -269,11 +295,102 @@ size_t EqualDFA(CDfanew &dfa1, std::vector<BYTE> &visited1, STATEID sta1, CDfane
 	return 1;
 }
 
+void FoldDFA(CDfanew &curDfa)
+{
+	CDfanew foldDfa;
+	BYTE group[CSIZE];
+	for (int i = 0; i < CSIZE; ++i)
+	{
+		group[i] = (BYTE)i;
+	}
+
+	foldDfa.Init(group);
+	foldDfa.reserve(300);
+	for (size_t i = 0; i < curDfa.Size(); ++i)
+	{
+		foldDfa.PushBackDfa(CDfaRow(CSIZE));
+		for (BYTE j = 0; j < CSIZE; ++j)
+		{
+			BYTE z = curDfa.Char2Group(j);
+			foldDfa[i][j] = curDfa[i][z];
+		}
+	}
+
+	curDfa = foldDfa;
+}
+
+size_t CompDfa(CDfanew &OwnDfa, CDfanew &BeDfa)
+{
+	size_t Result = 0;
+	std::vector<BYTE> visited1(OwnDfa.Size());
+	std::fill(visited1.begin(), visited1.end(), 0);
+	std::vector<BYTE> visited2(BeDfa.Size());
+	std::fill(visited2.begin(), visited2.end(), 0);
+	if (OwnDfa.Size() == BeDfa.Size())
+	{
+		if(EqualDFA(OwnDfa, visited1, BeDfa.GetStartId(), BeDfa, visited2, BeDfa.GetStartId()))
+		{
+			Result = 1;
+		}
+	}
+	return Result;
+}
+
+void CompareWithPcre(const char *pPcre)
+{
+	CNfa nfa1;
+	CRegChain regChain;
+	PcreToNFA(pPcre, nfa1, regChain);
+	CDfanew OwnDfa;
+	OwnDfa.FromNFA(nfa1, NULL, 0);
+	OwnDfa.Minimize();
+
+	NFA* nfa2 = CreatNFA(pPcre);
+	nfa2->remove_epsilon();
+	nfa2->reduce();
+	//nfa->output();
+	DFA* BeDfa = nfa2->nfa2dfa();
+	delete nfa2;
+	if (BeDfa != NULL)
+	{
+		BeDfa->minimize();
+	}
+	CDfanew newBeDfa;
+	BeDfa->Dfa2CDfanew(newBeDfa);
+
+	if (CompDfa(OwnDfa, newBeDfa))
+	{
+		std::cout << "the two DFAs are equal!" << std::endl;
+	}
+	else
+	{
+		std::cout << "the two DFAs are not equal!" << std::endl;
+	}
+}
+
+void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
+{
+	CResNew &result = *(CResNew*)lpVoid;
+	CRegRule rr;
+	Rule2PcreList(rule, rr);
+	for (size_t i = 0; i < rr.Size(); ++i)
+	{
+		for (size_t j = 0; j < rr[i].Size(); ++j)
+		{
+			CompareWithPcre(rr[i][j].C_Str());
+		}
+	}
+}
+
 /*
  *  MAIN - entry point
  */
-int main(int argc, char **argv){
-	
+int main(int argc, char **argv)
+{
+
+	CResNew result;
+	CompileRuleSet("..\\allrules.rule", Process, &result);
+
 	init_conf();
 
 	while(!parse_arguments(argc,argv)) usage();
@@ -297,6 +414,7 @@ int main(int argc, char **argv){
 	std::vector<std::string> regset;
 	ReadRegexs(argv[3], regset);
 	
+
 	std::vector<CDfanew> dfaset;
 	for (std::vector<std::string>::iterator iReg = regset.begin(); iReg != regset.end(); ++iReg)
 	{
@@ -304,7 +422,7 @@ int main(int argc, char **argv){
 		NFA* nfa = CreatNFA(re);
 		nfa->remove_epsilon();
 		nfa->reduce();
-		nfa->output();
+		//nfa->output();
 		DFA* dfa = nfa->nfa2dfa();
 		delete nfa;
 
@@ -317,26 +435,20 @@ int main(int argc, char **argv){
 		//dfa->dump();
 		CDfanew newdfa;
 		dfa->Dfa2CDfanew(newdfa);
-		display(newdfa);
+		//display(newdfa);
 		dfaset.push_back(newdfa);
 		delete dfa;
 	}
 
-	//CDfanew foldDfa;
-	//for (BYTE i = 0; i < CSIZE; ++i)
-	//{
-
-	//}
-
-	for (std::vector<CDfanew>::iterator iDfa = dfaset.begin(); iDfa != dfaset.end(); ++iDfa)
+	for (std::vector<CDfanew>::iterator iDfa = dfaset.begin() + 1; iDfa != dfaset.end(); ++iDfa)
 	{
-		std::vector<BYTE> visited1(iDfa->Size());
+		std::vector<BYTE> visited1((iDfa - 1)->Size());
 		std::fill(visited1.begin(), visited1.end(), 0);
 		std::vector<BYTE> visited2(iDfa->Size());
 		std::fill(visited2.begin(), visited2.end(), 0);
-		if (iDfa->Size() == (iDfa + 1)->Size())
+		if ((iDfa - 1)->Size() == iDfa->Size())
 		{
-			if(EqualDFA(*iDfa, visited1, iDfa->GetStartId(), *(iDfa + 1), visited2, (iDfa + 1)->GetStartId()))
+			if(EqualDFA(*(iDfa - 1), visited1, (iDfa - 1)->GetStartId(), *iDfa, visited2, iDfa->GetStartId()))
 			{
 				std::cout << "the two DFAs are equal!" << std::endl;
 			}
