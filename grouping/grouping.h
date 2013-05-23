@@ -9,7 +9,7 @@
 #endif
 
 #define THRESHOLD 8
-#define NUMOFCOMSIGS 1
+#define NUMOFCOMSIGS 2
 
 struct CHAINTRAIT
 {
