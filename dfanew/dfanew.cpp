@@ -174,7 +174,6 @@ DFANEWSC void CDfanew::Init(BYTE *pGroup)
 	}
 	if (flag)
 	{
-
 		m_nColNum = ZeroBegPos;
 		CopyMemory(m_pGroup, pGroup, DFACOLSIZE * sizeof(BYTE));
 	}
@@ -486,7 +485,7 @@ DFANEWSC size_t CDfanew::Minimize()
 {
 	//error: DFA is empty
 
-	CTimer time1;//用于测试
+	//CTimer time1;//用于测试
 
 	size_t nSize = m_pDfa->size();
 	size_t nCols = GetGroupCount();
@@ -538,7 +537,7 @@ DFANEWSC size_t CDfanew::Minimize()
 	}
 	_aligned_free(pMat);
 
-	std::cout << "准备工作： " << time1.Reset() << std::endl;//测试
+	//std::cout << "准备工作： " << time1.Reset() << std::endl;//测试
 
 	if (reachable.size() < nSize)
 	{
@@ -546,7 +545,7 @@ DFANEWSC size_t CDfanew::Minimize()
 		MergeReachable(reachable);
 	}
 
-	std::cout << "合并等价状态： " << time1.Reset() << std::endl;//测试
+	//std::cout << "合并等价状态： " << time1.Reset() << std::endl;//测试
 
 	// FinalStas中保存当前DFA的所有终态，Partition中保存当前DFA的终态和非终态集合，一个终态作为一个集合存入
 	std::list<std::list<STATEID>> Partition(1);
@@ -592,13 +591,13 @@ DFANEWSC size_t CDfanew::Minimize()
 		MergeNonDisStates(Partition);
 	}
 
-	std::cout << "状态划分： " << time1.Reset() << std::endl;//合并
+	//std::cout << "状态划分： " << time1.Reset() << std::endl;//合并
 
 	delete []pRevTab;
 	return 0;
 }
 
-DFANEWSC STATEID CDfanew::GetGroupCount() const
+DFANEWSC WORD CDfanew::GetGroupCount() const
 {
 	return m_nColNum;
 }
