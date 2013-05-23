@@ -6,7 +6,8 @@
 int main()
 {
 	CResNew result;
-	compilenew(_T("..\\..\\input\\allrules.rule"), result);
+	//compilenew(_T("..\\..\\input\\allrules.rule"), result);
+	result.ReadFromFile(_T("..\\..\\output\\result.cdt"));
 	CGROUPRes groupRes;
 	grouping(result, groupRes);
 	groupRes.WriteToFile(_T("..\\..\\output\\GroupResut.cdt"));

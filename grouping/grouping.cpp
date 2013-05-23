@@ -60,6 +60,19 @@ GROUPINGSC GROUP &CGROUPS::Back()
 	return m_pGroups->back();
 }
 
+struct COMP
+{
+	bool operator()(const GROUP &group1, const GROUP &group2)
+	{
+		return group1.vecSigs.size() < group2.vecSigs.size();
+	}
+};
+
+GROUPINGSC void CGROUPS::Sort()
+{
+	std::sort(m_pGroups->begin(), m_pGroups->end(), COMP());
+}
+
 GROUPINGSC CDfaTblNew &CGROUPRes::GetDfaTable()
 {
 	return m_dfaTbl;
@@ -521,32 +534,45 @@ void SplitByComSig(const std::vector<RULECHAIN> &chainSet, std::vector<CHAINGROU
 		std::vector<size_t> &chainIds = i->chainIds;
 		while (!chainIds.empty())
 		{
-			std::map<SIGNATURE, std::vector<size_t>> SigToIdsMap;
-			for (std::vector<size_t>::iterator j = chainIds.begin(); j != chainIds.end(); ++j)
+			std::vector<size_t> haveComSigIds(chainIds.begin(), chainIds.end());
+			size_t count = 0;
+			std::vector<SIGNATURE> vecComSigs;
+			while (!haveComSigIds.empty() && count < NUMOFCOMSIGS)
 			{
-				for (std::vector<SIGNATURE>::const_iterator k = chainSet[*j].sigs.begin(); k != chainSet[*j].sigs.end(); ++k)
+				std::map<SIGNATURE, std::vector<size_t>> SigToIdsMap;
+				for (std::vector<size_t>::iterator j = haveComSigIds.begin(); j != haveComSigIds.end(); ++j)
 				{
-					SigToIdsMap[*k].push_back(*j);
+					for (std::vector<SIGNATURE>::const_iterator k = chainSet[*j].sigs.begin(); k != chainSet[*j].sigs.end(); ++k)
+					{
+						SigToIdsMap[*k].push_back(*j);
+					}
 				}
-			}
-			size_t max = 0;
-			std::map<SIGNATURE, std::vector<size_t>>::iterator iter;
-			for (std::map<SIGNATURE, std::vector<size_t>>::iterator j = SigToIdsMap.begin(); j != SigToIdsMap.end(); ++j)
-			{
-				if (max < j->second.size())
+				size_t max = 0;
+				std::map<SIGNATURE, std::vector<size_t>>::iterator iter;
+				for (std::map<SIGNATURE, std::vector<size_t>>::iterator j = SigToIdsMap.begin(); j != SigToIdsMap.end(); ++j)
 				{
-					max = j->second.size();
-					iter = j;
+					if (max < j->second.size() && std::find(vecComSigs.begin(), vecComSigs.end(), j->first) == vecComSigs.end())
+					{
+						max = j->second.size();
+						iter = j;
+					}
 				}
+				if (max <= 1)
+				{
+					break;
+				}
+				vecComSigs.push_back(iter->first);
+				haveComSigIds = iter->second;
+				++count;
 			}
-			if (max > 1)
+			if (count >= NUMOFCOMSIGS)
 			{
 				vecChainGroups.push_back(CHAINGROUP());
 				CHAINGROUP &oneGroup = vecChainGroups.back();
-				oneGroup.chainIds.insert(oneGroup.chainIds.begin(), iter->second.begin(), iter->second.end());
+				oneGroup.chainIds.insert(oneGroup.chainIds.begin(), haveComSigIds.begin(), haveComSigIds.end());
 				for (std::vector<size_t>::iterator j = chainIds.begin(); j != chainIds.end();)
 				{
-					if (std::find(iter->second.begin(), iter->second.end(), *j) != iter->second.end())
+					if (std::find(haveComSigIds.begin(), haveComSigIds.end(), *j) != haveComSigIds.end())
 					{
 						j = chainIds.erase(j);
 					}
@@ -725,8 +751,19 @@ void PutInBySig(const std::vector<RULECHAIN> &chainSet, std::vector<CHAINGROUP> 
 		vecWaitForGroup.push_back(*i);
 		for (std::vector<CHAINGROUP>::iterator j = vecChainGroups.begin(); j != vecChainGroups.end(); ++j)
 		{
-			std::vector<SIGNATURE>::iterator k = std::find_first_of(j->comSigs.begin(), j->comSigs.end(), chainSet[*i].sigs.begin(), chainSet[*i].sigs.end());
-			if (k != j->comSigs.end())
+			std::vector<SIGNATURE> vecSigs(chainSet[*i].sigs.begin(), chainSet[*i].sigs.end());
+			size_t count = 0;
+			while (count < NUMOFCOMSIGS)
+			{
+				std::vector<SIGNATURE>::iterator k = std::find_first_of(vecSigs.begin(), vecSigs.end(), j->comSigs.begin(), j->comSigs.end());
+				if (k == vecSigs.end())
+				{
+					break;
+				}
+				vecSigs.erase(k);
+				++count;
+			}
+			if (count >= NUMOFCOMSIGS)
 			{
 				std::vector<CDfanew> vecDfas;
 				vecDfas.push_back(res.GetDfaTable()[j->mergeDfaId]);
@@ -764,12 +801,23 @@ void BuildGroupBySig(const std::vector<RULECHAIN> &chainSet, std::vector<CHAINGR
 		oneGroup.comSigs = chainSet[*i].sigs;
 		for (std::vector<size_t>::iterator j = i + 1; j != vecWaitForGroup.end(); ++j)
 		{
-			if (visited[idx])
+			if (visited[j - vecWaitForGroup.begin()])
 			{
 				continue;
 			}
-			std::vector<SIGNATURE>::iterator k = std::find_first_of(oneGroup.comSigs.begin(), oneGroup.comSigs.end(), chainSet[*j].sigs.begin(), chainSet[*j].sigs.end());
-			if (k != oneGroup.comSigs.end())
+			std::vector<SIGNATURE> vecSigs(oneGroup.comSigs.begin(), oneGroup.comSigs.end());
+			size_t count = 0;
+			while (count < NUMOFCOMSIGS)
+			{
+				std::vector<SIGNATURE>::iterator k = std::find_first_of(vecSigs.begin(), vecSigs.end(), chainSet[*j].sigs.begin(), chainSet[*j].sigs.end());
+				if (k == vecSigs.end())
+				{
+					break;
+				}
+				vecSigs.erase(k);
+				++count;
+			}
+			if (count >= NUMOFCOMSIGS)
 			{
 				visited[j - vecWaitForGroup.begin()] = 1;
 				oneGroup.chainIds.push_back(*j);
@@ -791,6 +839,39 @@ void BuildGroupBySig(const std::vector<RULECHAIN> &chainSet, std::vector<CHAINGR
 			++i;
 		}
 	}
+
+	std::map<SIGNATURE, std::vector<size_t>> SigToIdsMap;
+	for (std::vector<size_t>::iterator i = vecWaitForGroup.begin(); i != vecWaitForGroup.end(); )
+	{
+		if (chainSet[*i].sigs.size() == 1)
+		{
+			SigToIdsMap[chainSet[*i].sigs[0]].push_back(*i);
+			i = vecWaitForGroup.erase(i);
+		}
+		else
+		{
+			++i;
+		}
+	}
+	for (std::map<SIGNATURE, std::vector<size_t>>::iterator i = SigToIdsMap.begin(); i != SigToIdsMap.end(); ++i)
+	{
+		if (i->second.size() > 1)
+		{
+			newGroups.push_back(CHAINGROUP());
+			CHAINGROUP &oneGroup = newGroups.back();
+			oneGroup.chainIds = i->second;
+			oneGroup.comSigs.push_back(i->first);
+		}
+		else if (i->second.size() == 1)
+		{
+			vecWaitForGroup.push_back(i->second[0]);
+		}
+		else
+		{
+			continue;
+		}
+	}
+
 	SortChainId(newGroups, chainSet);
 	MergeMore(newGroups, res, vecWaitForGroup);
 	ExtractSigs(chainSet, newGroups);
@@ -920,8 +1001,6 @@ GROUPINGSC void grouping(CResNew &res, CGROUPRes &groupRes)
 	BuildGroupBySig(chainSet, vecChainGroups, res, vecWaitForGroup);
 	std::cout << "Completed in " << t1.Reset() << " Sec." << std::endl << std::endl;
 
-	std::cout << vecChainGroups.size() << std::endl;
-
 	//Clear useless dfa...
 	std::cout << "Clear useless dfa..." << std::endl;
 	ClearUselessDfa(vecChainGroups, res);
@@ -931,6 +1010,8 @@ GROUPINGSC void grouping(CResNew &res, CGROUPRes &groupRes)
 	std::cout << "Build group result..." << std::endl;
 	BuildGroupRes(vecChainGroups, res, groupRes);
 	std::cout << "Completed in " << t1.Reset() << " Sec." << std::endl << std::endl;
+
+	std::cout << vecChainGroups.size() << std::endl;
 
 	std::cout << "Total time: " << tAll.Reset() << " Sec." << std::endl;
 }
