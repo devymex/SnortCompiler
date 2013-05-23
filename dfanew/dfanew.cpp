@@ -399,7 +399,7 @@ DFANEWSC size_t CDfanew::FromNFA(const CNfa &nfa, NFALOG *nfalog, size_t Count, 
 							nTotalSize += sizeof(TERMSET);
 						}
 					}
-					if (m_pDfa->size() >= SC_STATELIMIT || nTotalSize >= 2048)
+					if (m_pDfa->size() >= SC_STATELIMIT) // || nTotalSize >= 2048
 					{
 						return (size_t)-1;
 					}
@@ -437,7 +437,7 @@ DFANEWSC size_t CDfanew::FromNFA(const CNfa &nfa, NFALOG *nfalog, size_t Count, 
 		}
 		if (nTotalSize >= 2048)
 		{
-			return (size_t)-1;
+			//return (size_t)-1;
 		}
 	}
 	m_pDfa->shrink_to_fit();
@@ -635,6 +635,36 @@ DFANEWSC size_t CDfanew::Process(BYTE *ByteStream, size_t len, CStateSet &StaSet
 
 	return nPos;
 }
+
+DFANEWSC size_t CDfanew::LinkSize()
+{
+	size_t nextstaNums[CHARSETSIZE];
+	memset(nextstaNums, 0, sizeof(nextstaNums));
+	size_t maxNextsta = 0;
+	size_t linksize = 0;
+	for (size_t i = 0; i < m_pDfa->size(); ++i)
+	{
+		for (size_t j = 0; j < DFACOLSIZE; ++j)
+		{
+			BYTE group = m_pGroup[j];
+			size_t nextsta = (*m_pDfa)[i][group];
+
+			++nextstaNums[nextsta];
+
+
+			if(maxNextsta < nextstaNums[nextsta])
+			{
+				maxNextsta = nextstaNums[nextsta];
+			}
+		}
+		linksize += 2 * (256 - maxNextsta) + 6;
+		maxNextsta = 0;
+		memset(nextstaNums, 0, sizeof(nextstaNums));
+	}
+
+	return linksize;
+}
+
 
 struct COMPFORSORT
 {

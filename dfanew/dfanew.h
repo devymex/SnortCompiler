@@ -60,6 +60,7 @@ public:
 	size_t Save(BYTE *beg);
 	void Load(BYTE *beg, size_t len);
 	void printTerms();
+	size_t LinkSize();
 private:
 	size_t m_nId;
 	STATEID m_nColNum;
