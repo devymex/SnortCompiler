@@ -532,7 +532,7 @@ COMMONSC BYTE CDfa::GetGroup(size_t nIdx)
 	return m_pGroup[nIdx];
 }
 
-COMMONSC const BYTE* CDfa::GetGroup() const
+COMMONSC const BYTE* CDfa::GetGroup()
 {
 	return m_pGroup;
 }

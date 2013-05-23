@@ -972,19 +972,6 @@ void DFA::put_testbed(unsigned flag)
 
 }
 
-void DFA::output()
-{
-	for (state_t s = 0; s < _size; ++s)
-	{
-		std::cout << s << ":";
-		for (size_t c = 0; c < CSIZE; ++c)
-		{
-			std::cout << state_table[s][c] << " ";
-		}
-		std::cout << std::endl;
-	}
-	std::cout << std::endl;
-}
 /*
 void DFA::state_reassembly(unsigned flag)
 {
@@ -3404,6 +3391,22 @@ unsigned DFA::CD2FA(){
 	delete P;
 	
 	return trees;
+}
+
+//add my code
+
+void DFA::output()
+{
+	for (state_t s = 0; s < _size; ++s)
+	{
+		std::cout << s << ":";
+		for (size_t c = 0; c < CSIZE; ++c)
+		{
+			std::cout << state_table[s][c] << " ";
+		}
+		std::cout << std::endl;
+	}
+	std::cout << std::endl;
 }
 
 void DFA::Dfa2CDfanew(CDfanew &curDFA)
