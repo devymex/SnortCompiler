@@ -1,3 +1,4 @@
+#pragma once
 #include "../common/common.h"
 #include "../dfanew/dfanew.h"
 #include <windows.h>
