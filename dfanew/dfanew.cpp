@@ -600,10 +600,14 @@ DFANEWSC const BYTE CDfanew::GetOneGroup(STATEID charNum) const
 	return m_pGroup[charNum];
 }
 
-
 DFANEWSC STATEID CDfanew::GetStartId() const
 {
 	return m_StartId;
+}
+
+DFANEWSC void CDfanew::SetStartId(size_t id)
+{
+	m_StartId = id;
 }
 
 DFANEWSC void CDfanew::SetId(size_t id)

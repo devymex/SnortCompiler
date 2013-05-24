@@ -14,7 +14,7 @@
 #include <tchar.h>
 #include <Windows.h>
 
-int VERBOSE = 1;
+int VERBOSE = 0;
 int DEBUG = 0;
 FILE *ruleset;
 regex_parser *parser;
@@ -81,7 +81,7 @@ static int parse_arguments(int argc, char **argv)
 				return 0;
 			}
 			THRESHOLD = atoi(argv[i]); 
-			printf(">> DFA limit is %d\n",THRESHOLD);
+			//printf(">> DFA limit is %d\n",THRESHOLD);
 		}
 		else {
 			fprintf(stderr,"Ignoring invalid option %s\n",argv[i]);
@@ -140,14 +140,50 @@ void display(CDfanew &newdfa)
 {
 	for(size_t i = 0; i != newdfa.Size(); ++i)
 	{
-		std::cout << i << ":  ";
+		std::cout << "state # "<< i << ":  ";
 		for(size_t j = 0; j != newdfa.GetGroupCount(); ++j)
 		{
-			std::cout << (size_t)newdfa[i][j] << " ";
+			if (newdfa[i][j] != (STATEID)-1)
+			{
+				std::cout << "< " << j << "," <<  (size_t)newdfa[i][j] << " >" ;
+			}
 		}
 		std::cout << std::endl;
 	}
 }
+
+void fdisplay(CDfanew &newdfa, const char* fileName)
+{
+	std::ofstream fout(fileName);
+	fout << (size_t)newdfa.GetStartId() << std::endl;
+	for(size_t i = 0; i != newdfa.Size(); ++i)
+	{
+		std::map<STATEID, size_t> rowStateCnt;
+		for(size_t j = 0; j != newdfa.GetGroupCount(); ++j)
+		{
+			rowStateCnt[newdfa[i][j]]++;
+		}
+		STATEID maxId = 0;
+		for (std::map<STATEID, size_t>::iterator j = rowStateCnt.begin(); j != rowStateCnt.end(); ++j)
+		{
+			if (j->second > rowStateCnt[maxId])
+			{
+				maxId = j->first;
+			}
+		}
+		fout << "s"<< i << ", maxId: " << (size_t)maxId << ", ";
+		for(size_t j = 0; j != newdfa.GetGroupCount(); ++j)
+		{
+			if (newdfa[i][j] != maxId)
+			{
+				fout << "<" << j << "," <<  (size_t)newdfa[i][j] << "> " ;
+			}
+		}
+		fout << std::endl;
+	}
+	fout.close();
+}
+
 
 NFA* CreatNFA(const char* re)
 {
@@ -305,12 +341,13 @@ void FoldDFA(CDfanew &curDfa)
 
 	foldDfa.Init(group);
 	foldDfa.reserve((STATEID)300);
+	foldDfa.SetStartId(curDfa.GetStartId());
 	for (size_t i = 0; i < curDfa.Size(); ++i)
 	{
 		foldDfa.PushBackDfa(CDfaRow(CSIZE));
-		for (BYTE j = 0; j < CSIZE; ++j)
+		for (size_t j = 0; j < CSIZE; ++j)
 		{
-			BYTE z = curDfa.Char2Group(j);
+			BYTE z = curDfa.Char2Group((BYTE)j);
 			foldDfa[i][j] = curDfa[i][z];
 		}
 	}
@@ -327,28 +364,76 @@ size_t CompDfa(CDfanew &OwnDfa, CDfanew &BeDfa)
 	std::fill(visited2.begin(), visited2.end(), 0);
 	if (OwnDfa.Size() == BeDfa.Size())
 	{
-		if(EqualDFA(OwnDfa, visited1, BeDfa.GetStartId(), BeDfa, visited2, BeDfa.GetStartId()))
+		if(EqualDFA(OwnDfa, visited1, OwnDfa.GetStartId(), BeDfa, visited2, BeDfa.GetStartId()))
 		{
 			Result = 1;
 		}
 	}
+	else
+	{
+		std::cout << (size_t)OwnDfa.Size() << ", " << (size_t)BeDfa.Size() << std::endl;
+	}
 	return Result;
+}
+
+template<typename _Iter>
+void FormatPcre (_Iter pBeg, _Iter pEnd, std::string &bPcre, std::string &oPcre)
+{
+	_Iter iPcreBeg = std::find(pBeg, pEnd, '/');
+	_Iter iPcreEnd = pEnd;
+	for(; *iPcreEnd != '/'; --iPcreEnd);
+
+	bPcre = std::string(iPcreBeg + 1, iPcreEnd);
+	if (bPcre.back() == '$')
+	{
+		bPcre.pop_back();
+		oPcre = std::string(iPcreBeg, iPcreEnd - 1);
+		oPcre.push_back('/');
+	}
+	else
+	{
+		oPcre = std::string(iPcreBeg, iPcreEnd + 1);
+	}
+	oPcre.push_back('s');
+
+	std::cout << bPcre << std::endl;
+	std::cout << oPcre << std::endl;
+
 }
 
 size_t CompareWithPcre(const char *pPcre)
 {
+	std::string Pcre1;
+	std::string Pcre2;
+	FormatPcre(pPcre, pPcre + strlen(pPcre), Pcre1, Pcre2);
+	
+	const char* bPcre = Pcre1.c_str();
+	const char* oPcre = Pcre2.c_str();
+
 	size_t Result = 0;
+
+
 	CNfa nfa1;
 	CRegChain regChain;
-	PcreToNFA(pPcre, nfa1, regChain);
+	if (SC_SUCCESS != PcreToNFA(oPcre, nfa1, regChain))
+	{
+		return 1;
+	}
+	//outPut(nfa1, "..//result1.txt");
 	CDfanew OwnDfa;
 	OwnDfa.FromNFA(nfa1, NULL, 0);
 	OwnDfa.Minimize();
+	CStateSet tmp;
+	OwnDfa.Process((BYTE*)" taa", 4, tmp);
+	FoldDFA(OwnDfa);
+	fdisplay(OwnDfa,"..//result1.txt");
+	//std::cout << std::endl;
+	//display(OwnDfa);
 
-	NFA* nfa2 = CreatNFA(pPcre);
+	NFA* nfa2 = CreatNFA(bPcre);
 	nfa2->remove_epsilon();
 	nfa2->reduce();
-	//nfa->output();
+	//nfa2->output();
 	DFA* BeDfa = nfa2->nfa2dfa();
 	delete nfa2;
 	if (BeDfa != NULL)
@@ -357,6 +442,9 @@ size_t CompareWithPcre(const char *pPcre)
 	}
 	CDfanew newBeDfa;
 	BeDfa->Dfa2CDfanew(newBeDfa);
+	std::cout << std::endl;
+	//display(newBeDfa);
+	fdisplay(newBeDfa, "..//result2.txt");
 
 	if (CompDfa(OwnDfa, newBeDfa))
 	{
@@ -371,6 +459,8 @@ void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 	CResNew &result = *(CResNew*)lpVoid;
 	CRegRule rr;
 	Rule2PcreList(rule, rr);
+	static size_t num = 0;
+	std::cout << ++num << std::endl;
 	for (size_t i = 0; i < rr.Size(); ++i)
 	{
 		for (size_t j = 0; j < rr[i].Size(); ++j)
@@ -378,6 +468,7 @@ void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 			if (!CompareWithPcre(rr[i][j].C_Str()))
 			{
 				std::cout << rule.GetSid() << std::endl;
+				system("pause");
 			}
 		}
 	}
@@ -391,7 +482,7 @@ int main(int argc, char **argv)
 	init_conf();
 
 	while(!parse_arguments(argc,argv)) usage();
-	printf(">> file: %s\n",config.regex_file);
+	//printf(">> file: %s\n",config.regex_file);
 
 	DEBUG=config.debug;
 	

@@ -55,6 +55,7 @@ public:
 	const BYTE* GetGroup() const;
 	const BYTE GetOneGroup(STATEID charNum) const;
 	STATEID GetStartId() const;
+	void SetStartId(size_t id);
 	void SetId(size_t id);
 	size_t GetId();
 	size_t Process(BYTE *ByteStream, size_t len, CStateSet &StaSet);
