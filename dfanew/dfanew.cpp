@@ -109,9 +109,9 @@ DFANEWSC CDfanew& CDfanew::operator=(const CDfanew &other)
 	return *this;
 }
 
-DFANEWSC STATEID CDfanew::Size() const
+DFANEWSC size_t CDfanew::Size() const
 {
-	return (STATEID)m_pDfa->size();
+	return m_pDfa->size();
 }
 
 DFANEWSC CDfaRow& CDfanew::BackRow()
@@ -332,7 +332,10 @@ DFANEWSC size_t CDfanew::FromNFA(const CNfa &nfa, NFALOG *nfalog, size_t Count, 
 	typedef std::unordered_map<std::vector<size_t>, STATEID, NSTATESET_HASH> STATESETHASH;
 	std::vector<std::pair<std::vector<size_t>, STATEID>> termStasVec;
 
+	size_t dfaId = m_nId;
 	Clear();
+	m_nId = dfaId;
+	
 	size_t nNfaSize = nfa.Size();
 	std::vector<std::vector<size_t>> eClosure;
 	NfaEClosure(nfa, eClosure);
@@ -388,15 +391,21 @@ DFANEWSC size_t CDfanew::FromNFA(const CNfa &nfa, NFALOG *nfalog, size_t Count, 
 			{
 				if(ssh.count(nextNfaVec) == 0)
 				{
-					if (ssh.size() > std::numeric_limits<STATEID>::max())
+					//if (ssh.size() > std::numeric_limits<STATEID>::max())
+					//{
+					//	std::cerr << "Fatal Error!" << std::endl;
+					//	return (size_t)-1;
+					//}
+					m_pDfa->push_back(CDfaRow(m_nColNum));
+					//std::cout << m_pDfa->size() << std::endl;//ÓÃÓÚ²âÊÔ
+					if (m_pDfa->size() > SC_STATELIMIT)// || nTotalSize >= 2048
 					{
-						std::cerr << "Fatal Error!" << std::endl;
+						std::cout << "SC_STATELIMIT!" << std::endl;
 						return (size_t)-1;
 					}
 					STATEID nextSta = (STATEID)ssh.size();
 					ssh[nextNfaVec] = nextSta;
 
-					m_pDfa->push_back(CDfaRow(m_nColNum));
 					nTotalSize += m_nColNum;
 					(*m_pDfa)[ssh[curNfaVec]][curGroup] = nextSta;
 
@@ -416,10 +425,6 @@ DFANEWSC size_t CDfanew::FromNFA(const CNfa &nfa, NFALOG *nfalog, size_t Count, 
 							m_TermSet->back().dfaId = m_nId;
 							nTotalSize += sizeof(TERMSET);
 						}
-					}
-					if (m_pDfa->size() >= SC_STATELIMIT)// || nTotalSize >= 2048
-					{
-						return (size_t)-1;
 					}
 					nfaStasStack.push(nextNfaVec);
 				}

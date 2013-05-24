@@ -40,7 +40,7 @@ public:
 	~CDfanew();
 	CDfanew(const CDfanew &other);
 	CDfanew& operator=(const CDfanew &other);
-	STATEID Size() const;
+	size_t Size() const;
 	CDfaRow& operator[](STATEID index);
 	const CDfaRow& operator[](STATEID index) const;
 	CDfaRow& BackRow();

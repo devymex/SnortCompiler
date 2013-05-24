@@ -78,7 +78,7 @@ void main()
 	//std::cout << result.GetSidDfaIds().Size() << std::endl;
 
 	compilenew(_T("..\\..\\input\\allrules.rule"), result);
-	result.WriteToFile(_T("..\\..\\output\\result.cdt"));
+	result.WriteToFile(_T("..\\..\\output\\result_2.cdt"));
 	std::cout << t.Reset() << std::endl;
 	system("pause");
 }
