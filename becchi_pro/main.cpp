@@ -2,9 +2,9 @@
 #include "../becchi_pro/parser.h"
 #include "../becchi_pro/nfa.h"
 #include "../becchi_pro/dfa.h"
+#include "../compilernew/compilernew.h"
 #include "../common/common.h"
 #include "../dfanew/dfanew.h"
-#include "../compilernew/compilernew.h"
 #include "../rule2nfa/rule2nfa.h"
 #include "../pcre2nfa/pcre2nfa.h"
 #include <fstream>
@@ -22,7 +22,6 @@ int REGEXNUM;
 int THRESHOLD;
 int groupcnt = 0;
 
-typedef void (CALLBACK *RECIEVER)(const CSnortRule &rule, LPVOID lpParam);
 
 //unsigned long **DFAdata;
 
@@ -201,31 +200,31 @@ NFA* CreatNFA(const char* re)
 //	}
 //}
 
-//struct COMPARECHARGROUP
+struct COMPARECHARGROUP
+{
+	bool operator()(std::vector<BYTE> &x, std::vector<BYTE> &y)
+	{
+		return (x.front() < y.front());
+	}
+};
+
+struct COMPARESTATOGROUP
+{
+	bool operator()(std::vector<BYTE> &x, std::vector<BYTE> &y)
+	{
+		return (x == y);
+	}
+};
+
+//bool operator<(const std::vector<BYTE> &x, std::vector<BYTE> &y)
 //{
-//	bool operator()(std::vector<BYTE> &x, std::vector<BYTE> &y)
-//	{
-//		return (x.front() < y.front());
-//	}
-//};
+//	return (x.front() < y.front());
+//}
 //
-//struct COMPARESTATOGROUP
+//bool operator==(const std::vector<BYTE> &x, std::vector<BYTE> &y)
 //{
-//	bool operator()(std::vector<BYTE> &x, std::vector<BYTE> &y)
-//	{
-//		return (x == y);
-//	}
-//};
-
-bool operator<(const std::vector<BYTE> &x, std::vector<BYTE> &y)
-{
-	return (x.front() < y.front());
-}
-
-bool operator==(const std::vector<BYTE> &x, std::vector<BYTE> &y)
-{
-	return (x == y);
-}
+//	return (x == y);
+//}
 
 void GetChargroup(CDfanew &dfa, STATEID &sta, std::vector<std::vector<BYTE>> &chargroup)
 {
@@ -256,14 +255,14 @@ size_t EqualDFA(CDfanew &dfa1, std::vector<BYTE> &visited1, STATEID sta1, CDfane
 
 	if (sta2chargroup1.size() == sta2chargroup2.size())
 	{
-		//std::sort(sta2chargroup1.begin(), sta2chargroup1.end(), COMPARECHARGROUP());
-		//std::sort(sta2chargroup2.begin(), sta2chargroup2.end(), COMPARECHARGROUP());
-		//bool flag = std::equal(sta2chargroup1.begin(), sta2chargroup1.end(),
-		//	sta2chargroup2.begin(), COMPARESTATOGROUP());
-		std::sort(sta2chargroup1.begin(), sta2chargroup1.end());
-		std::sort(sta2chargroup2.begin(), sta2chargroup2.end());
+		std::sort(sta2chargroup1.begin(), sta2chargroup1.end(), COMPARECHARGROUP());
+		std::sort(sta2chargroup2.begin(), sta2chargroup2.end(), COMPARECHARGROUP());
 		bool flag = std::equal(sta2chargroup1.begin(), sta2chargroup1.end(),
-			sta2chargroup2.begin());
+			sta2chargroup2.begin(), COMPARESTATOGROUP());
+		//std::sort(sta2chargroup1.begin(), sta2chargroup1.end());
+		//std::sort(sta2chargroup2.begin(), sta2chargroup2.end());
+		//bool flag = std::equal(sta2chargroup1.begin(), sta2chargroup1.end(),
+		//	sta2chargroup2.begin());
 
 		if (flag)
 		{
@@ -305,7 +304,7 @@ void FoldDFA(CDfanew &curDfa)
 	}
 
 	foldDfa.Init(group);
-	foldDfa.reserve(300);
+	foldDfa.reserve((STATEID)300);
 	for (size_t i = 0; i < curDfa.Size(); ++i)
 	{
 		foldDfa.PushBackDfa(CDfaRow(CSIZE));
@@ -336,8 +335,9 @@ size_t CompDfa(CDfanew &OwnDfa, CDfanew &BeDfa)
 	return Result;
 }
 
-void CompareWithPcre(const char *pPcre)
+size_t CompareWithPcre(const char *pPcre)
 {
+	size_t Result = 0;
 	CNfa nfa1;
 	CRegChain regChain;
 	PcreToNFA(pPcre, nfa1, regChain);
@@ -360,12 +360,10 @@ void CompareWithPcre(const char *pPcre)
 
 	if (CompDfa(OwnDfa, newBeDfa))
 	{
-		std::cout << "the two DFAs are equal!" << std::endl;
+		Result = 1;
 	}
-	else
-	{
-		std::cout << "the two DFAs are not equal!" << std::endl;
-	}
+
+	return Result;
 }
 
 void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
@@ -377,7 +375,10 @@ void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 	{
 		for (size_t j = 0; j < rr[i].Size(); ++j)
 		{
-			CompareWithPcre(rr[i][j].C_Str());
+			if (!CompareWithPcre(rr[i][j].C_Str()))
+			{
+				std::cout << rule.GetSid() << std::endl;
+			}
 		}
 	}
 }
@@ -387,10 +388,6 @@ void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
  */
 int main(int argc, char **argv)
 {
-
-	CResNew result;
-	CompileRuleSet("..\\allrules.rule", Process, &result);
-
 	init_conf();
 
 	while(!parse_arguments(argc,argv)) usage();
@@ -411,57 +408,62 @@ int main(int argc, char **argv)
 	ruleset=fopen(config.regex_file,"r");
 	parser=new regex_parser(false,false);
 
-	std::vector<std::string> regset;
-	ReadRegexs(argv[3], regset);
-	
+	CResNew result;
+	CompileRuleSet(_T("..\\allrules.rule"), Process, &result);
 
-	std::vector<CDfanew> dfaset;
-	for (std::vector<std::string>::iterator iReg = regset.begin(); iReg != regset.end(); ++iReg)
-	{
-		const char* re = iReg->c_str();
-		NFA* nfa = CreatNFA(re);
-		nfa->remove_epsilon();
-		nfa->reduce();
-		//nfa->output();
-		DFA* dfa = nfa->nfa2dfa();
-		delete nfa;
 
-		if (dfa != NULL)
-		{
-			dfa->minimize();
-		}
-		//dfa->output();
-		//std::cout << std::endl;
-		//dfa->dump();
-		CDfanew newdfa;
-		dfa->Dfa2CDfanew(newdfa);
-		//display(newdfa);
-		dfaset.push_back(newdfa);
-		delete dfa;
-	}
+	//std::vector<std::string> regset;
+	//ReadRegexs(argv[3], regset);
 
-	for (std::vector<CDfanew>::iterator iDfa = dfaset.begin() + 1; iDfa != dfaset.end(); ++iDfa)
-	{
-		std::vector<BYTE> visited1((iDfa - 1)->Size());
-		std::fill(visited1.begin(), visited1.end(), 0);
-		std::vector<BYTE> visited2(iDfa->Size());
-		std::fill(visited2.begin(), visited2.end(), 0);
-		if ((iDfa - 1)->Size() == iDfa->Size())
-		{
-			if(EqualDFA(*(iDfa - 1), visited1, (iDfa - 1)->GetStartId(), *iDfa, visited2, iDfa->GetStartId()))
-			{
-				std::cout << "the two DFAs are equal!" << std::endl;
-			}
-			else
-			{
-				std::cout << "the two DFAs are not equal!" << std::endl;
-			}
-		}
-		else
-		{
-			std::cout << "the two DFAs are not equal!" << std::endl;
-		}
-	}
+
+	//std::vector<CDfanew> dfaset;
+	//for (std::vector<std::string>::iterator iReg = regset.begin(); iReg != regset.end(); ++iReg)
+	//{
+	//	const char* re = iReg->c_str();
+	//	NFA* nfa = CreatNFA(re);
+	//	nfa->remove_epsilon();
+	//	nfa->reduce();
+	//	//nfa->output();
+	//	DFA* dfa = nfa->nfa2dfa();
+	//	delete nfa;
+
+	//	if (dfa != NULL)
+	//	{
+	//		dfa->minimize();
+	//	}
+	//	//dfa->output();
+	//	//std::cout << std::endl;
+	//	//dfa->dump();
+	//	CDfanew newdfa;
+	//	dfa->Dfa2CDfanew(newdfa);
+	//	//display(newdfa);
+	//	dfaset.push_back(newdfa);
+	//	delete dfa;
+	//}
+
+	//for (std::vector<CDfanew>::iterator iDfa = dfaset.begin() + 1; iDfa != dfaset.end(); ++iDfa)
+	//{
+	//	std::vector<BYTE> visited1((iDfa - 1)->Size());
+	//	std::fill(visited1.begin(), visited1.end(), 0);
+	//	std::vector<BYTE> visited2(iDfa->Size());
+	//	std::fill(visited2.begin(), visited2.end(), 0);
+	//	if ((iDfa - 1)->Size() == iDfa->Size())
+	//	{
+	//		if(EqualDFA(*(iDfa - 1), visited1, (iDfa - 1)->GetStartId(), *iDfa, visited2, iDfa->GetStartId()))
+	//		{
+	//			std::cout << "the two DFAs are equal!" << std::endl;
+	//		}
+	//		else
+	//		{
+	//			std::cout << "the two DFAs are not equal!" << std::endl;
+	//		}
+	//	}
+	//	else
+	//	{
+	//		std::cout << "the two DFAs are not equal!" << std::endl;
+	//	}
+	//}
+
 	//REGEXNUM = parser->get_regex_num(ruleset);
 
 	//int i;
