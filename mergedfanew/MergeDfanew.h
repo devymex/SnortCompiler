@@ -9,4 +9,5 @@
 #endif
 
 MERDFANEW bool NOrMerge(std::vector<CDfanew> &dfas, CDfanew &lastDfa);
+//MERDFANEW size_t NOrMerge(std::vector<CDfanew> &dfas, CDfanew &lastDfa);
 

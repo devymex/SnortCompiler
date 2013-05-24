@@ -10,6 +10,9 @@
       <Platform>Win32</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{3C8C83EE-9D02-43F5-905A-E7601AC87A53}</ProjectGuid>
     <RootNamespace>dfanewTest</RootNamespace>
@@ -65,9 +68,6 @@
       <AdditionalDependencies>$(SolutionDir)$(Configuration)\dfanew.lib;$(SolutionDir)$(Configuration)\common.lib;$(SolutionDir)$(Configuration)\pcre2nfa.lib;$(SolutionDir)$(Configuration)\mergedfanew.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="main.cpp" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

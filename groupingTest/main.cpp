@@ -6,8 +6,9 @@
 int main()
 {
 	CResNew result;
-	compilenew(_T("..\\..\\input\\allrules.rule"), result);
-	//result.ReadFromFile(_T("..\\..\\output\\result.cdt"));
+	//compilenew(_T("..\\..\\input\\allrules.rule"), result);
+	//result.WriteToFile(_T("..\\..\\output\\result.cdt"));
+	result.ReadFromFile(_T("..\\..\\output\\result.cdt"));
 	CGROUPRes groupRes;
 
 	CTimer ctime;

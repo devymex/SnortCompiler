@@ -3,4 +3,3 @@ EXPORTS
 GetDfaSig @ 1
 outPut @ 2
 outPutDfa @ 3
-NAvaiEdges @ 4
