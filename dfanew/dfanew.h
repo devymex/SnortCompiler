@@ -2,6 +2,7 @@
 
 #include <windows.h>
 #include <vector>
+#include <map>
 #include "../common/common.h"
 
 #define DFACOLSIZE 256

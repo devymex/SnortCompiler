@@ -369,10 +369,10 @@ size_t CompDfa(CDfanew &OwnDfa, CDfanew &BeDfa)
 			Result = 1;
 		}
 	}
-	else
-	{
-		std::cout << (size_t)OwnDfa.Size() << ", " << (size_t)BeDfa.Size() << std::endl;
-	}
+	//else
+	//{
+	//	std::cout << (size_t)OwnDfa.Size() << ", " << (size_t)BeDfa.Size() << std::endl;
+	//}
 	return Result;
 }
 
@@ -411,6 +411,8 @@ size_t CompareWithPcre(const char *pPcre)
 	const char* oPcre = Pcre2.c_str();
 
 	size_t Result = 0;
+	CStateSet tmp;
+	char* str = ":IP ConaaX-Mailer:EBT ReporterbbbSubjecwq:Vic";
 
 
 	CNfa nfa1;
@@ -419,14 +421,15 @@ size_t CompareWithPcre(const char *pPcre)
 	{
 		return 1;
 	}
-	//outPut(nfa1, "..//result1.txt");
+	//outPut(nfa1, "..//nfaresult1.txt");
 	CDfanew OwnDfa;
 	OwnDfa.FromNFA(nfa1, NULL, 0);
+	std::cout << (size_t)OwnDfa.Size() << std::endl;
 	OwnDfa.Minimize();
-	CStateSet tmp;
-	OwnDfa.Process((BYTE*)" taa", 4, tmp);
 	FoldDFA(OwnDfa);
-	fdisplay(OwnDfa,"..//result1.txt");
+	//fdisplay(OwnDfa,"..//result1.txt");
+	//OwnDfa.Process((BYTE*)str, strlen(str), tmp);
+	//std::cout << tmp.Size() << std::endl;
 	//std::cout << std::endl;
 	//display(OwnDfa);
 
@@ -442,9 +445,12 @@ size_t CompareWithPcre(const char *pPcre)
 	}
 	CDfanew newBeDfa;
 	BeDfa->Dfa2CDfanew(newBeDfa);
-	std::cout << std::endl;
+	std::cout << (size_t)newBeDfa.Size() << std::endl;
+	//newBeDfa.Process((BYTE* )str, strlen(str), tmp);
+	//std::cout << tmp.Size() << std::endl;
+	//std::cout << std::endl;
 	//display(newBeDfa);
-	fdisplay(newBeDfa, "..//result2.txt");
+	//fdisplay(newBeDfa, "..//result2.txt");
 
 	if (CompDfa(OwnDfa, newBeDfa))
 	{

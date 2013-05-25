@@ -532,21 +532,42 @@ DFANEWSC size_t CDfanew::Minimize()
 		MergeReachable(reachable);
 	}
 
-	// FinalStas中保存当前DFA的所有终态，Partition中保存当前DFA的终态和非终态集合，一个终态作为一个集合存入
+	// Partition中保存当前DFA的终态和非终态集合，一个终态作为一个集合存入
+	std::map<size_t, std::vector<STATEID>> diffTerms;
+	for (STATEID i = 0; i < m_TermSet->size(); ++i)
+	{
+		diffTerms[(*m_TermSet)[i].dfaId].push_back((*m_TermSet)[i].dfaSta);
+	}		
+
 	std::list<std::list<STATEID>> Partition(1);
+	for (std::map<size_t, std::vector<STATEID>>::iterator iMap = diffTerms.begin(); iMap != diffTerms.end(); ++iMap)
+	{
+		Partition.push_front(std::list<STATEID>());
+		for (std::vector<STATEID>::iterator iVec = iMap->second.begin(); iVec != iMap->second.end(); ++iVec)
+		{
+			Partition.front().push_back(*iVec);
+		}
+	}
 	for (STATEID i = 0; i < m_pDfa->size(); ++i)
 	{
-		if ((*m_pDfa)[i].GetFlag() & (*m_pDfa)[i].TERMINAL)
-		{
-			Partition.push_front(std::list<STATEID>());
-			Partition.front().push_back(i);
-		}
-		else
+		if (!((*m_pDfa)[i].GetFlag() & (*m_pDfa)[i].TERMINAL))
 		{
 			Partition.back().push_back(i);
 		}
 	}
-
+	//std::list<std::list<STATEID>> Partition(1);
+	//for (STATEID i = 0; i < m_pDfa->size(); ++i)
+	//{
+	//	if ((*m_pDfa)[i].GetFlag() & (*m_pDfa)[i].TERMINAL)
+	//	{
+	//		Partition.push_front(std::list<STATEID>());
+	//		Partition.front().push_back(i);
+	//	}
+	//	else
+	//	{
+	//		Partition.back().push_back(i);
+	//	}
+	//}
 	//error: terminal states or normal states are empty
 	if (Partition.size() == 1 || Partition.back().empty())
 	{
@@ -625,7 +646,7 @@ DFANEWSC size_t CDfanew::Process(BYTE *ByteStream, size_t len, CStateSet &StaSet
 	std::vector<bool> res(m_pDfa->size(), false);
 	STATEID ActiveState = m_StartId;
 	size_t nPos = 0;
-	for (size_t nPos = 0; nPos < len; ++nPos)
+	for (nPos = 0; nPos < len; ++nPos)
 	{
 		if ((*this)[ActiveState].GetFlag() & CDfaRow::TERMINAL)
 		{
@@ -865,10 +886,23 @@ void CDfanew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, SETLIST &pSets
 	--iLast;
 
 	//initialize wSets
+	size_t TermCnt = 0; 
 	for (SETLIST_ITER iCurSet = pSets.begin(); iCurSet != iLast; ++iCurSet)
 	{
-		wSets.push_back(iCurSet);
+		TermCnt += iCurSet->size();
 	}
+	if (TermCnt < pSets.back().size())
+	{
+		for (SETLIST_ITER iCurSet = pSets.begin(); iCurSet != iLast; ++iCurSet)
+		{
+			wSets.push_back(iCurSet);
+		}
+	}
+	else
+	{
+		wSets.push_back(iLast);
+	}
+
 
 	//each element in ableToW present a property of according state of tmpDfa,
 	//and has two labels, 0 and 1. 1 indicates the according state has the specific
