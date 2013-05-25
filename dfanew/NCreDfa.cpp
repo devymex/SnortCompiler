@@ -21,7 +21,7 @@ struct COLUMNKEY
 	}
 };
 
-void NAvaiEdges(const CNfa &nfa, STATEID *group)
+DFANEWSC void NAvaiEdges(const CNfa &nfa, STATEID *group)
 {
 	struct COLUMNKEYHASH
 	{

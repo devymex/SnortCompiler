@@ -540,6 +540,7 @@ void Rule2Dfas(const CSnortRule &rule, CResNew &result, COMPILEDRULENEW &ruleRes
 			{
 				ctime.Reset();//用于测试
 				size_t nToDFAFlag = dfa.FromNFA(nfa, NULL, 0);
+//				std::cout << "  "<< dfa.LinkSize() << ", " << dfa.GetGroupCount() * dfa.Size() << std::endl;
 				nfa2dfatime += ctime.Reset();//用于测试
 
 				if (nToDFAFlag == -1)

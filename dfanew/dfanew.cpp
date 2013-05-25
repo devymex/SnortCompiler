@@ -109,9 +109,22 @@ DFANEWSC CDfanew& CDfanew::operator=(const CDfanew &other)
 	return *this;
 }
 
-DFANEWSC STATEID CDfanew::Size() const
+DFANEWSC size_t CDfanew::Size() const
 {
-	return (STATEID)m_pDfa->size();
+	return m_pDfa->size();
+}
+
+DFANEWSC CDfaRow& CDfanew::BackRow()
+{
+	return m_pDfa->back();
+}
+DFANEWSC void CDfanew::ReservRow(size_t nCount)
+{
+	m_pDfa->reserve(nCount);
+}
+DFANEWSC void CDfanew::ResizeRow(size_t nSize, size_t nCol)
+{
+	m_pDfa->resize(nSize, CDfaRow(nCol));
 }
 
 DFANEWSC CDfaRow& CDfanew::operator[](STATEID index)
@@ -139,11 +152,16 @@ DFANEWSC void CDfanew::PushBackTermSet(TERMSET &term)
 	m_TermSet->push_back(term);
 }
 
+DFANEWSC TERMSET& CDfanew::BackTermSet()
+{
+	return m_TermSet->back();
+}
+
 DFANEWSC void CDfanew::Init(BYTE *pGroup)
 {
-	Clear();
+	//Clear();
 	BYTE occurred[DFACOLSIZE] = {0};
-	for (size_t i = 0; i < DFACOLSIZE; ++i)
+	for (size_t i = 0; i < DFACOLSIZE; ++i) 
 	{
 		occurred[pGroup[i]] = 1;
 	}
@@ -324,6 +342,10 @@ DFANEWSC size_t CDfanew::FromNFA(const CNfa &nfa, NFALOG *nfalog, size_t Count, 
 	typedef std::unordered_map<std::vector<size_t>, STATEID, NSTATESET_HASH> STATESETHASH;
 	std::vector<std::pair<std::vector<size_t>, STATEID>> termStasVec;
 
+	size_t dfaId = m_nId;
+	Clear();
+	m_nId = dfaId;
+	
 	size_t nNfaSize = nfa.Size();
 	std::vector<std::vector<size_t>> eClosure;
 	NfaEClosure(nfa, eClosure);
@@ -379,15 +401,21 @@ DFANEWSC size_t CDfanew::FromNFA(const CNfa &nfa, NFALOG *nfalog, size_t Count, 
 			{
 				if(ssh.count(nextNfaVec) == 0)
 				{
-					if (ssh.size() > std::numeric_limits<STATEID>::max())
+					//if (ssh.size() > std::numeric_limits<STATEID>::max())
+					//{
+					//	std::cerr << "Fatal Error!" << std::endl;
+					//	return (size_t)-1;
+					//}
+					m_pDfa->push_back(CDfaRow(m_nColNum));
+					//std::cout << m_pDfa->size() << std::endl;//用于测试
+					if (m_pDfa->size() > SC_STATELIMIT)// || nTotalSize >= 2048
 					{
-						std::cerr << "Fatal Error!" << std::endl;
+						std::cout << "SC_STATELIMIT!" << std::endl;
 						return (size_t)-1;
 					}
 					STATEID nextSta = (STATEID)ssh.size();
 					ssh[nextNfaVec] = nextSta;
 
-					m_pDfa->push_back(CDfaRow(m_nColNum));
 					nTotalSize += m_nColNum;
 					(*m_pDfa)[ssh[curNfaVec]][curGroup] = nextSta;
 
@@ -407,10 +435,6 @@ DFANEWSC size_t CDfanew::FromNFA(const CNfa &nfa, NFALOG *nfalog, size_t Count, 
 							m_TermSet->back().dfaId = m_nId;
 							nTotalSize += sizeof(TERMSET);
 						}
-					}
-					if (m_pDfa->size() >= SC_STATELIMIT)// || nTotalSize >= 2048
-					{
-						return (size_t)-1;
 					}
 					nfaStasStack.push(nextNfaVec);
 				}
@@ -457,7 +481,7 @@ DFANEWSC  void CDfanew:: printTerms()
 {
 	for(std::vector<TERMSET>::iterator iter = m_TermSet->begin(); iter != m_TermSet->end(); ++iter)
 	{
-		std::cout << (size_t)iter->dfaSta <<"  :  " << iter->dfaId << std::endl;
+		std::cout << (size_t)iter->dfaSta <<"  :  " << "dfa " << iter->dfaId << std::endl;
 	}
 }
 
@@ -476,6 +500,9 @@ void PrintMatrix(BYTE *pMat, size_t nWidth, size_t nHeight)
 DFANEWSC size_t CDfanew::Minimize()
 {
 	//error: DFA is empty
+
+	//CTimer time1;//用于测试
+
 	size_t nSize = m_pDfa->size();
 	size_t nCols = GetGroupCount();
 	if (nSize == 0)
@@ -525,6 +552,8 @@ DFANEWSC size_t CDfanew::Minimize()
 		}
 	}
 	_aligned_free(pMat);
+
+	//std::cout << "准备工作： " << time1.Reset() << std::endl;//测试
 
 	if (reachable.size() < nSize)
 	{

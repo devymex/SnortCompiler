@@ -9,6 +9,7 @@
 #endif
 
 #define THRESHOLD 8
+#define NUMOFCOMSIGS 2
 
 struct CHAINTRAIT
 {
@@ -83,6 +84,7 @@ public:
 	const size_t Size() const;
 	void PushBack(const GROUP &oneGroup);
 	GROUP &Back();
+	void Sort();
 private:
 	std::vector<GROUP> *m_pGroups;
 };

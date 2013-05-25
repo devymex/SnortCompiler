@@ -27,6 +27,7 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "grouping", "grouping\grouping.vcxproj", "{E6C145F2-A57F-48D4-8B34-EA8166B984F8}"
 	ProjectSection(ProjectDependencies) = postProject
 		{F6606B01-EE46-44B3-B199-A8A58B004BD9} = {F6606B01-EE46-44B3-B199-A8A58B004BD9}
+		{F0E71E24-2091-4670-883B-B3CC085AF034} = {F0E71E24-2091-4670-883B-B3CC085AF034}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dfanew", "dfanew\dfanew.vcxproj", "{673B9C32-B6AA-4451-80DE-93DF369B64DC}"
@@ -67,8 +68,21 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "groupingTest", "groupingTes
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hashmapping", "hashmapping\hashmapping.vcxproj", "{73BEAFF1-05F6-42DB-B221-24CD0501505B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E6C145F2-A57F-48D4-8B34-EA8166B984F8} = {E6C145F2-A57F-48D4-8B34-EA8166B984F8}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hashmappingTest", "hashmappingTest\hashmappingTest.vcxproj", "{1E122C12-FA1E-40DB-95AA-0A56C9F7D7B2}"
+	ProjectSection(ProjectDependencies) = postProject
+		{73BEAFF1-05F6-42DB-B221-24CD0501505B} = {73BEAFF1-05F6-42DB-B221-24CD0501505B}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MatchPacket", "MatchPacket\MatchPacket.vcxproj", "{F9E57E55-B880-46AA-AB2F-9AA68DC71214}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "matchpkttest", "matchpkttest\matchpkttest.vcxproj", "{EACE9D83-7444-4E9D-A9DE-3D089E02B3A4}"
+	ProjectSection(ProjectDependencies) = postProject
+		{F9E57E55-B880-46AA-AB2F-9AA68DC71214} = {F9E57E55-B880-46AA-AB2F-9AA68DC71214}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "becchi_pro", "becchi_pro\becchi_pro.vcxproj", "{92DFD284-88F5-4E8C-A3E1-D5D88F022E9D}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -141,6 +155,14 @@ Global
 		{1E122C12-FA1E-40DB-95AA-0A56C9F7D7B2}.Debug|Win32.Build.0 = Debug|Win32
 		{1E122C12-FA1E-40DB-95AA-0A56C9F7D7B2}.Release|Win32.ActiveCfg = Release|Win32
 		{1E122C12-FA1E-40DB-95AA-0A56C9F7D7B2}.Release|Win32.Build.0 = Release|Win32
+		{F9E57E55-B880-46AA-AB2F-9AA68DC71214}.Debug|Win32.ActiveCfg = Debug|Win32
+		{F9E57E55-B880-46AA-AB2F-9AA68DC71214}.Debug|Win32.Build.0 = Debug|Win32
+		{F9E57E55-B880-46AA-AB2F-9AA68DC71214}.Release|Win32.ActiveCfg = Release|Win32
+		{F9E57E55-B880-46AA-AB2F-9AA68DC71214}.Release|Win32.Build.0 = Release|Win32
+		{EACE9D83-7444-4E9D-A9DE-3D089E02B3A4}.Debug|Win32.ActiveCfg = Debug|Win32
+		{EACE9D83-7444-4E9D-A9DE-3D089E02B3A4}.Debug|Win32.Build.0 = Debug|Win32
+		{EACE9D83-7444-4E9D-A9DE-3D089E02B3A4}.Release|Win32.ActiveCfg = Release|Win32
+		{EACE9D83-7444-4E9D-A9DE-3D089E02B3A4}.Release|Win32.Build.0 = Release|Win32
 		{92DFD284-88F5-4E8C-A3E1-D5D88F022E9D}.Debug|Win32.ActiveCfg = Debug|Win32
 		{92DFD284-88F5-4E8C-A3E1-D5D88F022E9D}.Debug|Win32.Build.0 = Debug|Win32
 		{92DFD284-88F5-4E8C-A3E1-D5D88F022E9D}.Release|Win32.ActiveCfg = Release|Win32
