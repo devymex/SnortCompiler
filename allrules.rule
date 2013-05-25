@@ -1,1 +1,1 @@
-alert tcp $HOME_NET any -> $EXTERNAL_NET 25 (msg:"BACKDOOR hatredfriend email notification detection"; flow:to_server,established; pcre:"/^[^\n]*\s+t.*/smi"; metadata:policy security-ips drop; reference:url,www.spywareguide.com/product_show.php?id=832; reference:url,www3.ca.com/securityadvisor/pest/pest.aspx?id=453077215; classtype:trojan-activity; sid:6339; rev:2;)
+alert tcp $HOME_NET any -> $EXTERNAL_NET 25 (pcre:"/^\x3A[^\r\n]*IP\s+Con.*X-Mailer\x3A[^\r\n]*EBT\s+Reporter.*Subjecwq\x3A[^\r\n]*Vic/smi"; sid:6339; )
