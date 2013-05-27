@@ -42,6 +42,7 @@
 #include "nfa.h"
 #include <algorithm>
 #include <iostream>
+#include <fstream>
 #include <iterator>
 
 #include "subset.h"
@@ -160,15 +161,71 @@ void NFA::output()
 {
 	nfa_list *queue=new nfa_list();
 	traverse(queue);
+	struct COMP
+	{
+		bool operator()(pair<symbol_t,NFA*>* &p1, pair<symbol_t,NFA*>* &p2)
+		{
+			return p1->first < p2->first;
+		}
+	};
+	std::ofstream fout("..//nfa.txt");
+	size_t idx = 0;
+	for (nfa_list::iterator iState = queue->begin(); iState != queue->end(); ++iState, ++idx)
+	{
+		pair_set *curState = (*iState)->transitions;
+		std::vector<pair<symbol_t,NFA*>*> tmp(curState->begin(), curState->end());
+		std::sort(tmp.begin(), tmp.end(), COMP());
+		for (std::vector<pair<symbol_t,NFA*>*>::iterator i = tmp.begin(); i != tmp.end(); ++i)
+		{
+			fout <<  "nfa1[" << idx << "].AddDest(" << (*i)->first << ", " << (*i)->second->id << ");" << std::endl;  
+		}
+		//std::cout << std::endl;
+	}
+
+	//nfa_list *queue=new nfa_list();
+	//traverse(queue);
+	//struct COMP
+	//{
+	//	bool operator()(pair<symbol_t,NFA*>* &p1, pair<symbol_t,NFA*>* &p2)
+	//	{
+	//		return p1->first < p2->first;
+	//	}
+	//};
+	//for (nfa_list::iterator iState = queue->begin(); iState != queue->end(); ++iState)
+	//{
+	//	std::cout << (*iState)->id << ":";
+	//	pair_set *curState = (*iState)->transitions;
+	//	std::vector<pair<symbol_t,NFA*>*> tmp(curState->begin(), curState->end());
+	//	std::sort(tmp.begin(), tmp.end(), COMP());
+	//	for (std::vector<pair<symbol_t,NFA*>*>::iterator i = tmp.begin(); i != tmp.end(); ++i)
+	//	{
+	//		std::cout <<  "<" << (*i)->first << "," << (*i)->second->id << ">";  
+	//	}
+	//	std::cout << std::endl;
+	//}
+}
+
+void NFA::nfa2CNfa(CNfa & cnfa)
+{
+	nfa_list *queue=new nfa_list();
+	traverse(queue);
+	struct COMP
+	{
+		bool operator()(pair<symbol_t,NFA*>* &p1, pair<symbol_t,NFA*>* &p2)
+		{
+			return p1->first < p2->first;
+		}
+	};
 	for (nfa_list::iterator iState = queue->begin(); iState != queue->end(); ++iState)
 	{
-		std::cout << (*iState)->id << ":";
 		pair_set *curState = (*iState)->transitions;
-		for (pair_set::iterator ipair = curState->begin(); ipair  != curState->end(); ++ipair)
+		std::vector<pair<symbol_t,NFA*>*> tmp(curState->begin(), curState->end());
+		std::sort(tmp.begin(), tmp.end(), COMP());
+		cnfa.PushBack(CNfaRow());
+		for (std::vector<pair<symbol_t,NFA*>*>::iterator i = tmp.begin(); i != tmp.end(); ++i)
 		{
-			std::cout <<  "<" << (*ipair)->first << "," << (*ipair)->second->id << ">";  
+			cnfa.Back().AddDest((*i)->first, (*i)->second->id);
 		}
-		std::cout << std::endl;
 	}
 }
 

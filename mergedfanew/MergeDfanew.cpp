@@ -44,17 +44,17 @@ MERDFANEW bool NOrMerge(std::vector<CDfanew> &dfas, CDfanew &lastDfa)
 	//std::cout << "方法一合并dfa用时：" << c.Reset() << std::endl;
 
 	//if(lastDfa.FromNFA(oneNfa, nfalog, count, true) == 0)
-	if(tmp == 0)
-	{
-		lastDfa.Minimize();
-		//std::cout << "方法一lastDfa最小化用时: " << c.Reset() << std::endl;
+	//if(tmp == 0)
+	//{
+	//	lastDfa.Minimize();
+	//	//std::cout << "方法一lastDfa最小化用时: " << c.Reset() << std::endl;
 
-		return true;
-	}
-	else
-	{
-		return false;
-	}
+	//	return true;
+	//}
+	//else
+	//{
+	//	return false;
+	//}
 }
 
 struct TODFA_HASH

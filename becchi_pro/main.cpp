@@ -415,18 +415,22 @@ size_t CompareWithPcre(const char *pPcre)
 	char* str = ":IP ConaaX-Mailer:EBT ReporterbbbSubjecwq:Vic";
 
 
-	CNfa nfa1;
-	CRegChain regChain;
-	if (SC_SUCCESS != PcreToNFA(oPcre, nfa1, regChain))
-	{
-		return 1;
-	}
+	//CNfa nfa1;
+	//CRegChain regChain;
+	//if (SC_SUCCESS != PcreToNFA(oPcre, nfa1, regChain))
+	//{
+	//	return 1;
+	//}
+	//std::cout << nfa1.Size() << std::endl;
 	//outPut(nfa1, "..//nfaresult1.txt");
 	CDfanew OwnDfa;
-	OwnDfa.FromNFA(nfa1, NULL, 0);
-	std::cout << (size_t)OwnDfa.Size() << std::endl;
-	OwnDfa.Minimize();
-	FoldDFA(OwnDfa);
+	//if (-1 == OwnDfa.FromNFA(nfa1, NULL, 0))
+	//{
+	//	return 1;
+	//}
+	//std::cout << (size_t)OwnDfa.Size() << std::endl;
+	//OwnDfa.Minimize();
+	//FoldDFA(OwnDfa);
 	//fdisplay(OwnDfa,"..//result1.txt");
 	//OwnDfa.Process((BYTE*)str, strlen(str), tmp);
 	//std::cout << tmp.Size() << std::endl;
@@ -438,11 +442,13 @@ size_t CompareWithPcre(const char *pPcre)
 	nfa2->reduce();
 	//nfa2->output();
 	DFA* BeDfa = nfa2->nfa2dfa();
+	std::cout << BeDfa->size() << std::endl;
 	delete nfa2;
 	if (BeDfa != NULL)
 	{
 		BeDfa->minimize();
 	}
+	std::cout << BeDfa->size() << std::endl;
 	CDfanew newBeDfa;
 	BeDfa->Dfa2CDfanew(newBeDfa);
 	std::cout << (size_t)newBeDfa.Size() << std::endl;
