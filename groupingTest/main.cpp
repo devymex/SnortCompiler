@@ -7,10 +7,15 @@ int main()
 {
 	CResNew result;
 	//compilenew(_T("..\\..\\input\\allrules.rule"), result);
+	//result.WriteToFile(_T("..\\..\\output\\result.cdt"));
 	result.ReadFromFile(_T("..\\..\\output\\result.cdt"));
 	CGROUPRes groupRes;
+
+	CTimer ctime;
 	grouping(result, groupRes);
-	groupRes.WriteToFile(_T("..\\..\\output\\GroupResut.cdt"));
+	std::cout << "分组时间： " << ctime.Reset() << std::endl;
+
+	groupRes.WriteToFile(_T("..\\..\\output\\GroupResut_2.cdt"));
 
 	//groupRes.ReadFromFile(_T("..\\..\\output\\GroupResut.cdt"));
 	//groupRes.WriteToFile(_T("..\\..\\output\\GroupResut1.cdt"));

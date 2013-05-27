@@ -6,6 +6,7 @@
 #include <list>
 #include <set>
 #include <string>
+#include <tchar.h>
 #include <windows.h>
 #include <sstream>
 #include <fstream>
@@ -15,3 +16,4 @@
 #include <stack>
 
 #define CRECHANFA_H_
+//Œ“

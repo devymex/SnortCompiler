@@ -109,9 +109,22 @@ DFANEWSC CDfanew& CDfanew::operator=(const CDfanew &other)
 	return *this;
 }
 
-DFANEWSC STATEID CDfanew::Size() const
+DFANEWSC size_t CDfanew::Size() const
 {
-	return (STATEID)m_pDfa->size();
+	return m_pDfa->size();
+}
+
+DFANEWSC CDfaRow& CDfanew::BackRow()
+{
+	return m_pDfa->back();
+}
+DFANEWSC void CDfanew::ReservRow(size_t nCount)
+{
+	m_pDfa->reserve(nCount);
+}
+DFANEWSC void CDfanew::ResizeRow(size_t nSize, size_t nCol)
+{
+	m_pDfa->resize(nSize, CDfaRow(nCol));
 }
 
 DFANEWSC CDfaRow& CDfanew::operator[](STATEID index)
@@ -124,16 +137,31 @@ DFANEWSC const CDfaRow& CDfanew::operator[](STATEID index) const
 	return (*m_pDfa)[index];
 }
 
+DFANEWSC void CDfanew::reserve(STATEID Maxnum)
+{
+	m_pDfa->reserve(Maxnum);
+}
+
+DFANEWSC void CDfanew::PushBackDfa(CDfaRow &sta)
+{
+	m_pDfa->push_back(sta);
+}
+
 DFANEWSC void CDfanew::PushBackTermSet(TERMSET &term)
 {
 	m_TermSet->push_back(term);
+}
+
+DFANEWSC TERMSET& CDfanew::BackTermSet()
+{
+	return m_TermSet->back();
 }
 
 DFANEWSC void CDfanew::Init(BYTE *pGroup)
 {
 	//Clear();
 	BYTE occurred[DFACOLSIZE] = {0};
-	for (size_t i = 0; i < DFACOLSIZE; ++i)
+	for (size_t i = 0; i < DFACOLSIZE; ++i) 
 	{
 		occurred[pGroup[i]] = 1;
 	}
@@ -314,7 +342,10 @@ DFANEWSC size_t CDfanew::FromNFA(const CNfa &nfa, NFALOG *nfalog, size_t Count, 
 	typedef std::unordered_map<std::vector<size_t>, STATEID, NSTATESET_HASH> STATESETHASH;
 	std::vector<std::pair<std::vector<size_t>, STATEID>> termStasVec;
 
+	size_t dfaId = m_nId;
 	Clear();
+	m_nId = dfaId;
+	
 	size_t nNfaSize = nfa.Size();
 	std::vector<std::vector<size_t>> eClosure;
 	NfaEClosure(nfa, eClosure);
@@ -370,15 +401,21 @@ DFANEWSC size_t CDfanew::FromNFA(const CNfa &nfa, NFALOG *nfalog, size_t Count, 
 			{
 				if(ssh.count(nextNfaVec) == 0)
 				{
-					if (ssh.size() > std::numeric_limits<STATEID>::max())
+					//if (ssh.size() > std::numeric_limits<STATEID>::max())
+					//{
+					//	std::cerr << "Fatal Error!" << std::endl;
+					//	return (size_t)-1;
+					//}
+					m_pDfa->push_back(CDfaRow(m_nColNum));
+					//std::cout << m_pDfa->size() << std::endl;//用于测试
+					if (m_pDfa->size() > SC_STATELIMIT)// || nTotalSize >= 2048
 					{
-						std::cerr << "Fatal Error!" << std::endl;
+						std::cout << "SC_STATELIMIT!" << std::endl;
 						return (size_t)-1;
 					}
 					STATEID nextSta = (STATEID)ssh.size();
 					ssh[nextNfaVec] = nextSta;
 
-					m_pDfa->push_back(CDfaRow(m_nColNum));
 					nTotalSize += m_nColNum;
 					(*m_pDfa)[ssh[curNfaVec]][curGroup] = nextSta;
 
@@ -398,10 +435,6 @@ DFANEWSC size_t CDfanew::FromNFA(const CNfa &nfa, NFALOG *nfalog, size_t Count, 
 							m_TermSet->back().dfaId = m_nId;
 							nTotalSize += sizeof(TERMSET);
 						}
-					}
-					if (m_pDfa->size() >= SC_STATELIMIT)// || nTotalSize >= 2048
-					{
-						return (size_t)-1;
 					}
 					nfaStasStack.push(nextNfaVec);
 				}
@@ -448,7 +481,7 @@ DFANEWSC  void CDfanew:: printTerms()
 {
 	for(std::vector<TERMSET>::iterator iter = m_TermSet->begin(); iter != m_TermSet->end(); ++iter)
 	{
-		std::cout << (size_t)iter->dfaSta <<"  :  " << iter->dfaId << std::endl;
+		std::cout << (size_t)iter->dfaSta <<"  :  " << "dfa " << iter->dfaId << std::endl;
 	}
 }
 
@@ -467,6 +500,9 @@ void PrintMatrix(BYTE *pMat, size_t nWidth, size_t nHeight)
 DFANEWSC size_t CDfanew::Minimize()
 {
 	//error: DFA is empty
+
+	//CTimer time1;//用于测试
+
 	size_t nSize = m_pDfa->size();
 	size_t nCols = GetGroupCount();
 	if (nSize == 0)
@@ -517,27 +553,50 @@ DFANEWSC size_t CDfanew::Minimize()
 	}
 	_aligned_free(pMat);
 
+	//std::cout << "准备工作： " << time1.Reset() << std::endl;//测试
+
 	if (reachable.size() < nSize)
 	{
 		//remove unreachable states, generate new DFA
 		MergeReachable(reachable);
 	}
 
-	// FinalStas中保存当前DFA的所有终态，Partition中保存当前DFA的终态和非终态集合，一个终态作为一个集合存入
+	// Partition中保存当前DFA的终态和非终态集合，一个终态作为一个集合存入
+	std::map<size_t, std::vector<STATEID>> diffTerms;
+	for (STATEID i = 0; i < m_TermSet->size(); ++i)
+	{
+		diffTerms[(*m_TermSet)[i].dfaId].push_back((*m_TermSet)[i].dfaSta);
+	}		
+
 	std::list<std::list<STATEID>> Partition(1);
+	for (std::map<size_t, std::vector<STATEID>>::iterator iMap = diffTerms.begin(); iMap != diffTerms.end(); ++iMap)
+	{
+		Partition.push_front(std::list<STATEID>());
+		for (std::vector<STATEID>::iterator iVec = iMap->second.begin(); iVec != iMap->second.end(); ++iVec)
+		{
+			Partition.front().push_back(*iVec);
+		}
+	}
 	for (STATEID i = 0; i < m_pDfa->size(); ++i)
 	{
-		if ((*m_pDfa)[i].GetFlag() & (*m_pDfa)[i].TERMINAL)
-		{
-			Partition.push_front(std::list<STATEID>());
-			Partition.front().push_back(i);
-		}
-		else
+		if (!((*m_pDfa)[i].GetFlag() & (*m_pDfa)[i].TERMINAL))
 		{
 			Partition.back().push_back(i);
 		}
 	}
-
+	//std::list<std::list<STATEID>> Partition(1);
+	//for (STATEID i = 0; i < m_pDfa->size(); ++i)
+	//{
+	//	if ((*m_pDfa)[i].GetFlag() & (*m_pDfa)[i].TERMINAL)
+	//	{
+	//		Partition.push_front(std::list<STATEID>());
+	//		Partition.front().push_back(i);
+	//	}
+	//	else
+	//	{
+	//		Partition.back().push_back(i);
+	//	}
+	//}
 	//error: terminal states or normal states are empty
 	if (Partition.size() == 1 || Partition.back().empty())
 	{
@@ -591,10 +650,14 @@ DFANEWSC const BYTE CDfanew::GetOneGroup(STATEID charNum) const
 	return m_pGroup[charNum];
 }
 
-
 DFANEWSC STATEID CDfanew::GetStartId() const
 {
 	return m_StartId;
+}
+
+DFANEWSC void CDfanew::SetStartId(size_t id)
+{
+	m_StartId = id;
 }
 
 DFANEWSC void CDfanew::SetId(size_t id)
@@ -612,7 +675,7 @@ DFANEWSC size_t CDfanew::Process(BYTE *ByteStream, size_t len, CStateSet &StaSet
 	std::vector<bool> res(m_pDfa->size(), false);
 	STATEID ActiveState = m_StartId;
 	size_t nPos = 0;
-	for (size_t nPos = 0; nPos < len; ++nPos)
+	for (nPos = 0; nPos < len; ++nPos)
 	{
 		if ((*this)[ActiveState].GetFlag() & CDfaRow::TERMINAL)
 		{
@@ -852,10 +915,23 @@ void CDfanew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, SETLIST &pSets
 	--iLast;
 
 	//initialize wSets
+	size_t TermCnt = 0; 
 	for (SETLIST_ITER iCurSet = pSets.begin(); iCurSet != iLast; ++iCurSet)
 	{
-		wSets.push_back(iCurSet);
+		TermCnt += iCurSet->size();
 	}
+	if (TermCnt < pSets.back().size())
+	{
+		for (SETLIST_ITER iCurSet = pSets.begin(); iCurSet != iLast; ++iCurSet)
+		{
+			wSets.push_back(iCurSet);
+		}
+	}
+	else
+	{
+		wSets.push_back(iLast);
+	}
+
 
 	//each element in ableToW present a property of according state of tmpDfa,
 	//and has two labels, 0 and 1. 1 indicates the according state has the specific
