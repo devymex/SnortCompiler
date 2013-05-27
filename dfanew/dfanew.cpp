@@ -223,7 +223,7 @@ DFANEWSC void CDfanew::Clear()
 
 typedef std::vector<size_t> STATESET;
 
-void Warshall(STATEID *pMat, size_t nWidth, size_t nHeight)
+void Warshall(BYTE *pMat, size_t nWidth, size_t nHeight)
 {
 	for (size_t k = 0; k < nHeight; ++k)
 	{
@@ -256,8 +256,8 @@ void NfaEClosure(const CNfa &nfa, std::vector<STATESET> &eClosure)
 	{
 		nMatWidth = (nMatWidth / 16) * 16 + 16;
 	}
-	STATEID *pMat = (STATEID*)_aligned_malloc(nMatWidth * nMatHeight * sizeof(STATEID), 128);
-	memset(pMat, 0, nMatWidth * nMatHeight * sizeof(STATEID));
+	BYTE *pMat = (BYTE*)_aligned_malloc(nMatWidth * nMatHeight, 128);
+	memset(pMat, 0, nMatWidth * nMatHeight);
 
 	for (size_t i = 0; i < nNfaSize; ++i)
 	{
@@ -517,8 +517,8 @@ DFANEWSC size_t CDfanew::Minimize()
 	{
 		nMatWidth = (nMatWidth / 16) * 16 + 16;
 	}
-	STATEID *pMat = (STATEID*)_aligned_malloc(nMatWidth * nMatHeight * sizeof(STATEID), 128);
-	memset(pMat, 0, nMatWidth * nMatHeight * sizeof(STATEID));
+	BYTE *pMat = (BYTE*)_aligned_malloc(nMatWidth * nMatHeight, 128);
+	memset(pMat, 0, nMatWidth * nMatHeight);
 
 	//pMat[0] = 1;
 	for (size_t i = 0; i < nSize; ++i)

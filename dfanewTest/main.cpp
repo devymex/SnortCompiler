@@ -22,19 +22,7 @@ void main()
 
 	//PcreToNFA("/^\\x3A[^\\r\\n]*IP\\s+Con.*X-Mailer\\x3A[^\\r\\n]*EBT\\s+Reporter.*Subjecwq\\x3A[^\\r\\n]*Vic/smi", nfa1, regChain);
 
-	//PcreToNFA("/^\\x3A[^\\r\\n]*IP\\s+Con.*X-Mailer\\x3A[^\\r\\n]*EBT\\s+Reporter.*Subjecwq\\x3A[^\\r\\n]*Vic/s", nfa1, regChain);\
-
-	nfa1.Resize(40);
-
-	nfa1[0].AddDest(58, 1);
-	for (size_t i = 0; i < 256; ++i)
-	{
-		nfa1[1].AddDest(i, 1);
-	}
-	nfa1[1].AddDest(73, 2);
-	nfa1[2].AddDest(83, 3);
-
-	outPut(nfa1, "..\\..\\output\\nfa.txt");
+	PcreToNFA("/^\\x3A[^\\r\\n]*IP\\s+Con.*X-Mailer\\x3A[^\\r\\n]*EBT\\s+Reporter.*Subjecwq\\x3A[^\\r\\n]*Vic/s", nfa1, regChain);
 
 	std::cout << nfa1.Size() << std::endl;
 
@@ -42,11 +30,13 @@ void main()
 
 	dfa1.FromNFA(nfa1, NULL, 0);
 
+	outPutDfa(dfa1, "..\\..\\output\\dfa.txt");
+
 	dfa1.Minimize();
 
 	std::cout << (size_t)dfa1.Size() << std::endl;
 
-	outPutDfa(dfa1, "..\\..\\output\\dfa.txt");
+	outPutDfa(dfa1, "..\\..\\output\\dfa_after.txt");
 
 	std::cout << (size_t)dfa1.GetStartId() << std::endl;
 	for (size_t i = 0; i < dfa1.Size(); ++i)
