@@ -131,7 +131,7 @@ DFANEWSC void CDfanew::PushBackTermSet(TERMSET &term)
 
 DFANEWSC void CDfanew::Init(BYTE *pGroup)
 {
-	Clear();
+	//Clear();
 	BYTE occurred[DFACOLSIZE] = {0};
 	for (size_t i = 0; i < DFACOLSIZE; ++i)
 	{
@@ -314,6 +314,7 @@ DFANEWSC size_t CDfanew::FromNFA(const CNfa &nfa, NFALOG *nfalog, size_t Count, 
 	typedef std::unordered_map<std::vector<size_t>, STATEID, NSTATESET_HASH> STATESETHASH;
 	std::vector<std::pair<std::vector<size_t>, STATEID>> termStasVec;
 
+	Clear();
 	size_t nNfaSize = nfa.Size();
 	std::vector<std::vector<size_t>> eClosure;
 	NfaEClosure(nfa, eClosure);
