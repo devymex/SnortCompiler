@@ -822,19 +822,23 @@ void OP_CIRCM_FUNC(CNfa &nfa, size_t &CurState)
 	++CurState;
 
 	++nCursize;
-	for (size_t i = 0; i < 10; ++i)
+	for (size_t i = 0; i < 256; ++i)
 	{
 		nfa[nCursize].AddDest(i, CurState);
 	}
+	//for (size_t i = 0; i < 10; ++i)
+	//{
+	//	nfa[nCursize].AddDest(i, CurState);
+	//}
 	nfa[nCursize].AddDest('\n', CurState + 1);
 	nfa[nCursize].AddDest('\n', CurState + 2);
 	nfa[nCursize].AddDest('\r', CurState + 2);
-	nfa[nCursize].AddDest(11, CurState);
-	nfa[nCursize].AddDest(12, CurState);
-	for (size_t i = 14; i < 256; ++i)
-	{
-		nfa[nCursize].AddDest(i, CurState);
-	}
+	//nfa[nCursize].AddDest(11, CurState);
+	//nfa[nCursize].AddDest(12, CurState);
+	//for (size_t i = 14; i < 256; ++i)
+	//{
+	//	nfa[nCursize].AddDest(i, CurState);
+	//}
 	CurState += 2;
 	nfa[nCursize + 1].AddDest('\r', CurState);
 }

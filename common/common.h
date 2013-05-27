@@ -16,8 +16,8 @@
 
 double COMMONSC g_dTimer;
 
-typedef BYTE STATEID;
-//typedef WORD STATEID;
+//typedef BYTE STATEID;
+typedef WORD STATEID;
 typedef std::list<STATEID> STALIST;
 typedef std::list<STATEID>::iterator STALIST_ITER;
 typedef std::list<std::list<STATEID>> SETLIST;

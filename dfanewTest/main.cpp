@@ -6,80 +6,47 @@
 
 void main()
 {
-	CTimer time;
+	CNfa nfa1;
 
-	//const char* a1 = "/^(ab|bc)d(ef|g)/";
-	//const char* a2 = "/^.{2}.*ab/si";
-	//const char* a3 = "/^(a|b)abb/";
-	const char* a1 = "/^User-Agent\x3A[^\r\n]*URLBlaze/smi";
-	const char* a2 = "/^User-Agent\x3A[^\r\n]*iMeshBar/smi";
-	const char* a3 = "/^User-Agent\x3a[^\r\n]*AlertSpy/smi";
-	const char* a4 = "/^User-Agent\x3a[^\r\n]*EzReward/smi";
-	const char* a5 = "/^User-Agent\x3a[^\r\n].*USDR\d+/smi";
 	CRegChain regChain;
-	CNfa nfa1, nfa2, nfa3, nfa4, nfa5;
+	//PcreToNFA("/^POST/s", nfa1, regChain);
+	//PcreToNFA("/xml version/s", nfa1, regChain);
+	//PcreToNFA("/<methodCall><methodName>/s", nfa1, regChain);
+	//PcreToNFA("/</methodName><params><param><value><string></string></value></param><param><value><string>/s", nfa1, regChain);
 
-	time.Reset();
-	PcreToNFA(a1, nfa1, regChain);
-	PcreToNFA(a2, nfa2, regChain);
-	PcreToNFA(a3, nfa3, regChain);
-	PcreToNFA(a4, nfa4, regChain);
-	PcreToNFA(a5, nfa5, regChain);
-	//std::cout << "pcre to nfa: " << time.Reset() << std::endl;
+	//PcreToNFA("/^POST/s", nfa2, regChain);
+	//PcreToNFA("/xml version/s", nfa2, regChain);
+	//PcreToNFA("/<methodCall><methodName>/s", nfa2, regChain);
+	//PcreToNFA("/</methodName><params><param><value><name>/s", nfa2, regChain);
+	//PcreToNFA("/'\\,''\\x29\\x29\\x3Becho '_begin_\\x0A'\\x3Becho/s", nfa2, regChain);
 
-	//outPut(nfa1, "F:\\cppProject\\huawei\\PreciseMatch\\output\\nfa1_opt.txt");
-	//outPut(nfa2, "F:\\cppProject\\huawei\\PreciseMatch\\output\\nfa2_opt.txt");
-	//outPut(nfa3, "F:\\cppProject\\huawei\\PreciseMatch\\output\\nfa3_opt.txt");
+	//PcreToNFA("/^\\x3A[^\\r\\n]*IP\\s+Con.*X-Mailer\\x3A[^\\r\\n]*EBT\\s+Reporter.*Subjecwq\\x3A[^\\r\\n]*Vic/smi", nfa1, regChain);
 
-	CDfanew dfa1, dfa2, dfa3, dfa4, dfa5;
-	dfa1.SetId(1);
-	dfa2.SetId(2);
-	dfa3.SetId(3);
-	dfa4.SetId(4);
-	dfa5.SetId(5);
+	PcreToNFA("/^\\x3A[^\\r\\n]*IP\\s+Con.*X-Mailer\\x3A[^\\r\\n]*EBT\\s+Reporter.*Subjecwq\\x3A[^\\r\\n]*Vic/s", nfa1, regChain);
 
-	time.Reset();
+	std::cout << nfa1.Size() << std::endl;
+
+	CDfanew dfa1;
+
 	dfa1.FromNFA(nfa1, NULL, 0);
-	dfa2.FromNFA(nfa2, NULL, 0);
-	dfa3.FromNFA(nfa3, NULL, 0);
-	dfa4.FromNFA(nfa4, NULL, 0);
-	dfa5.FromNFA(nfa5, NULL, 0);
-	//std::cout << "nfa to dfa: " << time.Reset() << std::endl;
+
+	outPutDfa(dfa1, "..\\..\\output\\dfa.txt");
 
 	dfa1.Minimize();
-	dfa2.Minimize();
-	dfa3.Minimize();
-	dfa4.Minimize();
-	dfa5.Minimize();
-	//std::cout << "dfa min: " << time.Reset() << std::endl;
 
-	//outPutDfa(dfa1, "F:\\cppProject\\huawei\\PreciseMatch\\output\\dfa1_opt.txt");
-	//outPutDfa(dfa2, "F:\\cppProject\\huawei\\PreciseMatch\\output\\dfa2_opt.txt");
-	//outPutDfa(dfa3, "F:\\cppProject\\huawei\\PreciseMatch\\output\\dfa3_opt.txt");
-	//dfa1.printTerms();
-	//dfa2.printTerms();
-	//dfa3.printTerms();
+	std::cout << (size_t)dfa1.Size() << std::endl;
 
-	std::vector<CDfanew> dfas;
-	dfas.push_back(dfa1);
-	dfas.push_back(dfa2);
-	dfas.push_back(dfa3);
-	dfas.push_back(dfa4);
-	dfas.push_back(dfa5);
-	CDfanew lastdfa;
+	outPutDfa(dfa1, "..\\..\\output\\dfa_after.txt");
 
-	time.Reset();
-	NOrMerge(dfas, lastdfa);//已经进行了最小化操作
-	std::cout << "merge dfa: " << time.Reset() << std::endl;
-
-	outPutDfa(lastdfa, "F:\\cppProject\\huawei\\PreciseMatch\\output\\lastdfa_opt_1.txt");
-	std::cout << "合并后终态：" << std::endl;
-	lastdfa.printTerms();
-
-	std::cout << ((size_t)dfa1.Size()) * ((size_t)dfa1.GetGroupCount()) << std::endl;
-	std::cout << ((size_t)dfa2.Size()) * ((size_t)dfa2.GetGroupCount()) << std::endl;
-	std::cout << ((size_t)lastdfa.Size()) * ((size_t)lastdfa.GetGroupCount()) << std::endl;
-	std::cout << ((size_t)lastdfa.Size()) << std::endl;
+	std::cout << (size_t)dfa1.GetStartId() << std::endl;
+	for (size_t i = 0; i < dfa1.Size(); ++i)
+	{
+		if (dfa1[i].GetFlag() & CDfaRow::TERMINAL)
+		{
+			std::cout << i << std::endl;
+		}
+	}
+	outPutDfa(dfa1, "..\\..\\output\\test.txt");
 
 	system("pause");
 }

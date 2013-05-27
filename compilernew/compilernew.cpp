@@ -57,6 +57,11 @@ COMPILERNEW void CDfaTblNew::PushBack(const CDfanew &dfa)
 	m_pdfaTbl->push_back(dfa);
 }
 
+COMPILERNEW void CDfaTblNew::Clear()
+{
+	m_pdfaTbl->clear();
+}
+
 COMPILERNEW CSidDfaIdsNew::CSidDfaIdsNew()
 {
 	m_ruleResult = new std::vector<COMPILEDRULENEW>;
