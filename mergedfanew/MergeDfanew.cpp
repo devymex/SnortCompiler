@@ -292,7 +292,7 @@ MERDFANEW bool NOrMerge(std::vector<CDfanew> &dfas, CDfanew &lastDfa)
 				STATESETHASH::iterator nextIt = statehash.find(NextVec);
 				if(nextIt == statehash.end())
 				{
-#undef max
+#undef max 
 					//if (statehash.size() >= std::numeric_limits<STATEID>::max())
 					//{
 					//	std::cerr << "Size limit!" << std::endl;
