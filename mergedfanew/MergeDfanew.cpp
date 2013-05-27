@@ -149,7 +149,9 @@ void DfaColGroup(std::vector<CDfanew> &dfas, BYTE* groups)
 //可以先根据每个dfa的分组情况，通过hash将最终的lastDfa进行分组
 MERDFANEW bool NOrMerge(std::vector<CDfanew> &dfas, CDfanew &lastDfa)
 {
+	size_t dfaId = lastDfa.GetId();
 	lastDfa.Clear();
+	lastDfa.SetId(dfaId);
 	//CTimer mergtime;//用于测试
 #undef max
 
