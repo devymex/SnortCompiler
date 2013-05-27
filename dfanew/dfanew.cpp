@@ -770,16 +770,16 @@ DFANEWSC size_t CDfanew::Save(BYTE *beg)
 		WriteNum(beg, (*m_pDfa)[i].GetFlag());
 		for (size_t j = 0; j < m_nColNum; ++j)
 		{
-			WriteNum(beg, (*m_pDfa)[i][j]);
+			WriteNum(beg, (*m_pDfa)[i][j], sizeof(BYTE));
 		}
 	}
 	//写DFA的开始状态编号
-	WriteNum(beg, m_StartId);
+	WriteNum(beg, m_StartId, sizeof(BYTE));
 	//写DFA的终态与DFAId的对应关系
 	WriteNum(beg, m_TermSet->size());
 	for (size_t i = 0; i < m_TermSet->size(); ++i)
 	{
-		WriteNum(beg, (*m_TermSet)[i].dfaSta);
+		WriteNum(beg, (*m_TermSet)[i].dfaSta, sizeof(BYTE));
 		WriteNum(beg, (*m_TermSet)[i].dfaId);
 	}
 
@@ -801,7 +801,7 @@ DFANEWSC void CDfanew::Load(BYTE *beg, size_t len)
 	m_nId = dfaId;
 	//读DFA的状态个数
 	STATEID dfaSize;//DFA的状态数
-	ReadNum(beg, dfaSize);
+	ReadNum(beg, dfaSize, sizeof(STATEID));
 	if (dfaSize == 0)
 	{
 		return;
@@ -824,18 +824,18 @@ DFANEWSC void CDfanew::Load(BYTE *beg, size_t len)
 		(*m_pDfa)[i].SetFlag(nFlag);
 		for (size_t j = 0; j < m_nColNum; ++j)
 		{
-			ReadNum(beg, (*m_pDfa)[i][j]);
+			ReadNum(beg, (*m_pDfa)[i][j], sizeof(BYTE));
 		}
 	}
 	//读DFA的开始状态编号
-	ReadNum(beg, m_StartId);
+	ReadNum(beg, m_StartId, sizeof(BYTE));
 	//读DFA的终态与DFAId的对应关系
 	size_t TermSetSize;
 	ReadNum(beg, TermSetSize);
 	m_TermSet->resize(TermSetSize);
 	for (size_t i = 0; i < TermSetSize; ++i)
 	{
-		ReadNum(beg, (*m_TermSet)[i].dfaSta);
+		ReadNum(beg, (*m_TermSet)[i].dfaSta, sizeof(BYTE));
 		ReadNum(beg, (*m_TermSet)[i].dfaId);
 	}
 }

@@ -22,15 +22,24 @@ void main()
 
 	//PcreToNFA("/^\\x3A[^\\r\\n]*IP\\s+Con.*X-Mailer\\x3A[^\\r\\n]*EBT\\s+Reporter.*Subjecwq\\x3A[^\\r\\n]*Vic/smi", nfa1, regChain);
 
-	PcreToNFA("/^\\x3A[^\\r\\n]*IP\\s+Con.*X-Mailer\\x3A[^\\r\\n]*EBT\\s+Reporter.*Subjecwq\\x3A[^\\r\\n]*Vic/s", nfa1, regChain);
-
+	PcreToNFA("/a((.*b)?c)+/s", nfa1, regChain);
+	
 	std::cout << nfa1.Size() << std::endl;
+
+	outPut(nfa1, "..\\..\\output\\nfa.txt");
 
 	CDfanew dfa1;
 
 	dfa1.FromNFA(nfa1, NULL, 0);
 
 	outPutDfa(dfa1, "..\\..\\output\\dfa.txt");
+
+	std::cout << (size_t)dfa1.Size() << std::endl;
+
+	for (size_t i = 0; i < dfa1.Size(); ++i)
+	{
+		std::cout << dfa1[i].GetFlag() << std::endl;
+	}
 
 	dfa1.Minimize();
 

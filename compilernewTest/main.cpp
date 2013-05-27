@@ -12,6 +12,7 @@ void main()
 	CTimer t;
 	CResNew result;
 	//result.ReadFromFile(_T("..\\..\\output\\result.cdt"));
+	//result.WriteToFile(_T("..\\..\\output\\result1.cdt"));
 	//for (size_t i = 0; i < result.GetRegexTbl().Size(); ++i)
 	//{
 	//	if (result.GetRegexTbl()[i].GetSigCnt() == 0)
@@ -80,6 +81,15 @@ void main()
 	compilenew(_T("..\\..\\input\\allrules.rule"), result);
 	result.WriteToFile(_T("..\\..\\output\\result.cdt"));
 	std::cout << result.GetDfaTable().Size() << std::endl;
+	size_t count = 0;
+	for (size_t i = 0; i < result.GetDfaTable().Size(); ++i)
+	{
+		if (result.GetDfaTable()[i].Size() == 0)
+		{
+			++count;
+		}
+	}
+	std::cout << count << std::endl;
 	std::cout << t.Reset() << std::endl;
 	system("pause");
 }

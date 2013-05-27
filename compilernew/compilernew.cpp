@@ -268,12 +268,12 @@ COMPILERNEW size_t CResNew::WriteToFile(LPCTSTR filename)
 	for (size_t i = 0; i < m_sidDfaIds.Size(); ++i)
 	{
 		COMPILEDRULENEW &ruleResult = m_sidDfaIds[i];
-		WriteNum(fout, ruleResult.m_nSid, 4);
-		WriteNum(fout, ruleResult.m_nResult, 4);
-		WriteNum(fout, ruleResult.m_dfaIds.Size(), 4);
+		WriteNum(fout, ruleResult.m_nSid);
+		WriteNum(fout, ruleResult.m_nResult);
+		WriteNum(fout, ruleResult.m_dfaIds.Size());
 		for (size_t j = 0; j < ruleResult.m_dfaIds.Size(); ++j)
 		{
-			WriteNum(fout, ruleResult.m_dfaIds[j], 4);
+			WriteNum(fout, ruleResult.m_dfaIds[j]);
 		}
 	}
 	//ÌîÐ´DFAsÆ«ÒÆ
@@ -491,20 +491,6 @@ void Rule2Dfas(const CSnortRule &rule, CResNew &result, COMPILEDRULENEW &ruleRes
 	}
 	else
 	{
-		bool bHasSigs = false;
-		for (size_t i = 0; i < regrule.Size(); ++i)
-		{
-			if (regrule[i].GetSigCnt() > 0)
-			{
-				bHasSigs = true;
-				break;
-			}
-		}
-		if (!bHasSigs)
-		{
-			ruleResult.m_nResult = COMPILEDRULENEW::RES_HASNOSIG;
-			return;
-		}
 		ruleResult.m_nResult = COMPILEDRULENEW::RES_SUCCESS;
 		const size_t nDfaTblSize = result.GetDfaTable().Size();
 		const size_t nIncrement = regrule.Size();
@@ -516,6 +502,7 @@ void Rule2Dfas(const CSnortRule &rule, CResNew &result, COMPILEDRULENEW &ruleRes
 		size_t nDfaId;
 		//size_t nDfasInfoId;
 		size_t nChainId;
+		bool bHasSigs = false;
 		for (size_t i = 0; i < nIncrement; ++i)
 		{
 			CNfa nfa;
@@ -523,6 +510,11 @@ void Rule2Dfas(const CSnortRule &rule, CResNew &result, COMPILEDRULENEW &ruleRes
 			ctime.Reset();//ÓÃÓÚ²âÊÔ
 			size_t nToNFAFlag = CRegChainToNFA(regrule[i], nfa);
 			pcre2nfatime += ctime.Reset();//ÓÃÓÚ²âÊÔ
+
+			if (regrule[i].GetSigCnt() > 0)
+			{
+				bHasSigs = true;
+			}
 
 			nDfaId = nDfaTblSize + i;
 			//nDfasInfoId = nDfasInfoSize + i;
@@ -565,6 +557,15 @@ void Rule2Dfas(const CSnortRule &rule, CResNew &result, COMPILEDRULENEW &ruleRes
 			//result.GetDfasInfo()[nDfasInfoId].dfaId = nDfaId;
 			//result.GetDfasInfo()[nDfasInfoId].chainId = nChainId;
 			result.GetRegexTbl()[nChainId] = regrule[i];
+		}
+
+		if (!bHasSigs)
+		{
+			ruleResult.m_nResult = COMPILEDRULENEW::RES_HASNOSIG;
+			ruleResult.m_dfaIds.Clear();
+			result.GetDfaTable().Resize(nDfaTblSize);
+			result.GetRegexTbl().Resize(nRegexTblSize);
+			return;
 		}
 
 		if (ruleResult.m_nResult != COMPILEDRULENEW::RES_ERROR)
