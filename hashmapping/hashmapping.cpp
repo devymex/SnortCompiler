@@ -26,7 +26,7 @@ HASHMAPPINGSC void Mapping()
 	fout.clear();
 	fout.close();
 
-	std::map<size_t, size_t> hashMap;
+	std::map<size_t, std::vector<SIGNATURE>> hashMap;
 	for (size_t i = 0; i < groupRes.GetGroups().Size(); ++i)
 	{
 		size_t min = groupRes.GetGroups().Size();
@@ -34,24 +34,24 @@ HASHMAPPINGSC void Mapping()
 		size_t idx;
 		for (size_t j = 0; j < groupRes.GetGroups()[i].vecSigs.size(); ++j)
 		{
-			if (hashMap[hash(groupRes.GetGroups()[i].vecSigs[j])] == 0)
+			if (hashMap[hash(groupRes.GetGroups()[i].vecSigs[j])].size() == 0)
 			{
 				flag = true;
-				++hashMap[hash(groupRes.GetGroups()[i].vecSigs[j])];
+				hashMap[hash(groupRes.GetGroups()[i].vecSigs[j])].push_back(groupRes.GetGroups()[i].vecSigs[j]);
 				break;
 			}
 			else
 			{
-				if (min > hashMap[hash(groupRes.GetGroups()[i].vecSigs[j])])
+				if (min > hashMap[hash(groupRes.GetGroups()[i].vecSigs[j])].size())
 				{
-					min = hashMap[hash(groupRes.GetGroups()[i].vecSigs[j])];
+					min = hashMap[hash(groupRes.GetGroups()[i].vecSigs[j])].size();
 					idx = j;
 				}
 			}
 		}
 		if (!flag)
 		{
-			++hashMap[hash(groupRes.GetGroups()[i].vecSigs[idx])];
+			hashMap[hash(groupRes.GetGroups()[i].vecSigs[idx])].push_back(groupRes.GetGroups()[i].vecSigs[idx]);
 		}
 	}
 	std::cout << groupRes.GetGroups().Size() << std::endl;

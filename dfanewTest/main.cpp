@@ -22,7 +22,7 @@ void main()
 
 	//PcreToNFA("/^\\x3A[^\\r\\n]*IP\\s+Con.*X-Mailer\\x3A[^\\r\\n]*EBT\\s+Reporter.*Subjecwq\\x3A[^\\r\\n]*Vic/smi", nfa1, regChain);
 
-	PcreToNFA("/a((.*b)?c)+/s", nfa1, regChain);
+	PcreToNFA("/^a{1,2}b+/s", nfa1, regChain);
 	
 	std::cout << nfa1.Size() << std::endl;
 
