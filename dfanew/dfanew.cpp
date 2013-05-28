@@ -801,7 +801,7 @@ DFANEWSC void CDfanew::Load(BYTE *beg, size_t len)
 	m_nId = dfaId;
 	//读DFA的状态个数
 	STATEID dfaSize;//DFA的状态数
-	ReadNum(beg, dfaSize, sizeof(STATEID));
+	ReadNum(beg, dfaSize);
 	if (dfaSize == 0)
 	{
 		return;
@@ -817,6 +817,7 @@ DFANEWSC void CDfanew::Load(BYTE *beg, size_t len)
 	//读DFA跳转表
 	m_pDfa->resize(dfaSize, CDfaRow(m_nColNum));
 	size_t nFlag;
+	BYTE tmp;
 	for (size_t i = 0; i < m_pDfa->size(); ++i)
 	{
 		//读该状态的Flag(NORMAL、START、TERMINAL)
@@ -824,18 +825,28 @@ DFANEWSC void CDfanew::Load(BYTE *beg, size_t len)
 		(*m_pDfa)[i].SetFlag(nFlag);
 		for (size_t j = 0; j < m_nColNum; ++j)
 		{
-			ReadNum(beg, (*m_pDfa)[i][j], sizeof(BYTE));
+			ReadNum(beg, tmp, sizeof(BYTE));
+			if (tmp == BYTE(-1))
+			{
+				(*m_pDfa)[i][j] = STATEID(-1);
+			}
+			else
+			{
+				(*m_pDfa)[i][j] = tmp;
+			}
 		}
 	}
 	//读DFA的开始状态编号
-	ReadNum(beg, m_StartId, sizeof(BYTE));
+	ReadNum(beg, tmp, sizeof(BYTE));
+	m_StartId = tmp;
 	//读DFA的终态与DFAId的对应关系
 	size_t TermSetSize;
 	ReadNum(beg, TermSetSize);
 	m_TermSet->resize(TermSetSize);
 	for (size_t i = 0; i < TermSetSize; ++i)
 	{
-		ReadNum(beg, (*m_TermSet)[i].dfaSta, sizeof(BYTE));
+		ReadNum(beg, tmp, sizeof(BYTE));
+		(*m_TermSet)[i].dfaSta = tmp;
 		ReadNum(beg, (*m_TermSet)[i].dfaId);
 	}
 }
