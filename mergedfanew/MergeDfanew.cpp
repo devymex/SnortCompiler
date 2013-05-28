@@ -345,6 +345,10 @@ MERDFANEW bool NOrMerge(std::vector<CDfanew> &dfas, CDfanew &lastDfa)
 	//std::cout << "方法二合并dfa用时: " << mergtime.Reset() << std::endl;//用于测试
 
 	lastDfa.Minimize();
+	if (lastDfa.Size() > SC_FINALDFALIMIT)
+	{
+		return false;
+	}
 	//std::cout << "方法二lastDfa最小化用时：" << mergtime.Reset() << std::endl;//用于测试
 	return true;
 }

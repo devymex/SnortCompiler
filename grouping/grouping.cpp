@@ -187,6 +187,17 @@ GROUPINGSC size_t CGROUPRes::WriteToFile(LPCTSTR filename)
 		{
 			WriteNum(fout, m_groups[i].vecSigs[j]);
 		}
+		WriteNum(fout, m_groups[i].chains.size());
+		size_t len;
+		for (size_t j = 0; j < m_groups[i].chains.size(); ++j)
+		{
+			len = m_groups[i].chains[j].length();
+			WriteNum(fout, len);
+			for (std::string::iterator k = m_groups[i].chains[j].begin(); k != m_groups[i].chains[j].end(); ++k)
+			{
+				WriteNum(fout, *k);
+			}
+		}
 	}
 	//填写文件尺寸
 	endPos = fout.tellp();
@@ -254,6 +265,7 @@ GROUPINGSC size_t CGROUPRes::ReadFromFile(LPCTSTR filename)
 	//读分组
 	m_groups.Resize(groupNum);
 	size_t nSigNum;
+	size_t nChainNum;
 	for (size_t i = 0; i < groupNum; ++i)
 	{
 		GROUP &oneGroup = m_groups[i];
@@ -264,6 +276,19 @@ GROUPINGSC size_t CGROUPRes::ReadFromFile(LPCTSTR filename)
 		{
 			SIGNATURE &oneSig = oneGroup.vecSigs[j];
 			fin.read((char*)&oneSig, sizeof(SIGNATURE));
+		}
+		fin.read((char*)&nChainNum, 4);
+		oneGroup.chains.resize(nChainNum);
+		size_t nChainLen;
+		char c;
+		for (size_t j = 0; j < nChainNum; ++j)
+		{
+			fin.read((char*)&nChainLen, 4);
+			for (size_t k = 0; k < nChainLen; ++k)
+			{
+				fin.read((char*)&c, 1);
+				oneGroup.chains[j].push_back(c);
+			}
 		}
 	}
 	fin.close();
@@ -946,7 +971,7 @@ void ClearUselessDfa(const std::vector<CHAINGROUP> &vecChainGroups, CResNew &res
 	}
 }
 
-void BuildGroupRes(const std::vector<CHAINGROUP> &vecChainGroups, const CResNew &res, CGROUPRes &groupRes)
+void BuildGroupRes(const std::vector<RULECHAIN> &chainSet, const std::vector<CHAINGROUP> &vecChainGroups, const CResNew &res, CGROUPRes &groupRes)
 {
 	groupRes.GetGroups().Resize(vecChainGroups.size());
 	groupRes.GetDfaTable().Resize(vecChainGroups.size());
@@ -955,6 +980,10 @@ void BuildGroupRes(const std::vector<CHAINGROUP> &vecChainGroups, const CResNew 
 	{
 		groupRes.GetGroups()[idx].dfaId = idx;
 		groupRes.GetGroups()[idx].vecSigs = i->comSigs;
+		for (size_t j = 0; j < i->chainIds.size(); ++j)
+		{
+			groupRes.GetGroups()[idx].chains.push_back(chainSet[i->chainIds[j]].strChain);
+		}
 		groupRes.GetDfaTable()[idx] = res.GetDfaTable()[i->mergeDfaId];
 	}
 	groupRes.GetSidDfaIds() = res.GetSidDfaIds();
@@ -1051,7 +1080,7 @@ GROUPINGSC void grouping(CResNew &res, CGROUPRes &groupRes)
 
 	//Build group result...
 	std::cout << "Build group result..." << std::endl;
-	BuildGroupRes(vecChainGroups, res, groupRes);
+	BuildGroupRes(chainSet, vecChainGroups, res, groupRes);
 	std::cout << "Completed in " << t1.Reset() << " Sec." << std::endl << std::endl;
 
 	std::cout << vecChainGroups.size() << std::endl;

@@ -12,6 +12,8 @@
 //#define SC_STATELIMIT 255
 #define SC_STATELIMIT 1000
 
+#define SC_FINALDFALIMIT 255
+
 #define EMPTY 256
 
 #ifndef DFANEW_H_

@@ -68,6 +68,7 @@ struct GROUP
 {
 	std::vector<SIGNATURE> vecSigs;
 	std::size_t dfaId;
+	std::vector<std::string> chains;
 };
 
 class GROUPINGSC CGROUPS
