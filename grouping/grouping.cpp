@@ -645,7 +645,6 @@ void MergeMore(std::vector<CHAINGROUP> &vecChainGroups, CResNew &res, std::vecto
 		std::cout << "Total: " << vecChainGroups.size() << std::endl << std::endl;
 		std::vector<CDfanew> vecDfas(2);
 		vecDfas[0] = res.GetDfaTable()[i->chainIds[0]];
-		//outPutDfa(vecDfas[0], "F:\\cppProject\\huawei\\PreciseMatch\\testMerg\\dfa0.txt");
 		vecDfas[1] = res.GetDfaTable()[i->chainIds[1]];
 		if (!NOrMerge(vecDfas, MergeDfa))
 		{
@@ -960,6 +959,26 @@ void BuildGroupRes(const std::vector<CHAINGROUP> &vecChainGroups, const CResNew 
 	groupRes.GetSidDfaIds() = res.GetSidDfaIds();
 }
 
+void outPutGroup(std::vector<CHAINGROUP> &vecChainGroups, const char* fileName)
+{
+	std::ofstream fout(fileName);
+	if(!fout)
+	{
+		std::cerr << "Open group_result file Failed!" << std::endl;
+		return;
+	}
+	for(size_t i = 0; i < vecChainGroups.size(); ++i)
+	{
+		fout << i << "\t";
+		for(size_t j = 0; j < vecChainGroups[i].chainIds.size(); ++j)
+		{
+			fout << vecChainGroups[i].chainIds[j] << std::endl << "\t";
+		}
+		fout << std::endl << std::endl;
+	}
+	fout.close();
+}
+
 GROUPINGSC void grouping(CResNew &res, CGROUPRes &groupRes)
 {
 	//Load all rules chains from file
@@ -1057,4 +1076,6 @@ GROUPINGSC void grouping(CResNew &res, CGROUPRes &groupRes)
 	std::cout << vecChainGroups.size() << std::endl;
 
 	std::cout << "Total time: " << tAll.Reset() << " Sec." << std::endl;
+
+	outPutGroup(vecChainGroups, "F:\\cppProject\\huawei\\PreciseMatch\\output\\group_result_1.txt");
 }
