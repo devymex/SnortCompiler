@@ -137,7 +137,7 @@ DFANEWSC const CDfaRow& CDfanew::operator[](STATEID index) const
 	return (*m_pDfa)[index];
 }
 
-DFANEWSC void CDfanew::reserve(STATEID Maxnum)
+DFANEWSC void CDfanew::reserve(size_t Maxnum)
 {
 	m_pDfa->reserve(Maxnum);
 }
