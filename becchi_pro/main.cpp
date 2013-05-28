@@ -424,7 +424,7 @@ size_t CompareWithPcre(const char *pPcre)
 	//outPut(nfa1, "..//nfaresult1.txt");
 	CDfanew OwnDfa;
 	OwnDfa.FromNFA(nfa1, NULL, 0);
-	std::cout << (size_t)OwnDfa.Size() << std::endl;
+	//std::cout << (size_t)OwnDfa.Size() << std::endl;
 	OwnDfa.Minimize();
 	FoldDFA(OwnDfa);
 	//fdisplay(OwnDfa,"..//result1.txt");
@@ -435,6 +435,7 @@ size_t CompareWithPcre(const char *pPcre)
 
 	NFA* nfa2 = CreatNFA(bPcre);
 	nfa2->remove_epsilon();
+	nfa2->output();
 	nfa2->reduce();
 	//nfa2->output();
 	DFA* BeDfa = nfa2->nfa2dfa();
@@ -445,7 +446,7 @@ size_t CompareWithPcre(const char *pPcre)
 	}
 	CDfanew newBeDfa;
 	BeDfa->Dfa2CDfanew(newBeDfa);
-	std::cout << (size_t)newBeDfa.Size() << std::endl;
+	//std::cout << (size_t)newBeDfa.Size() << std::endl;
 	//newBeDfa.Process((BYTE* )str, strlen(str), tmp);
 	//std::cout << tmp.Size() << std::endl;
 	//std::cout << std::endl;
@@ -506,7 +507,7 @@ int main(int argc, char **argv)
 	parser=new regex_parser(false,false);
 
 	CResNew result;
-	CompileRuleSet(_T("..\\allrules.rule"), Process, &result);
+	CompileRuleSet(_T("..\\..\\input\\testrules.rule"), Process, &result);
 
 
 	//std::vector<std::string> regset;
