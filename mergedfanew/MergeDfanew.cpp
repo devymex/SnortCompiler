@@ -185,7 +185,7 @@ MERDFANEW bool NOrMerge(std::vector<CDfanew> &dfas, CDfanew &lastDfa)
 
 	for(size_t i = 0; i < dfasSize; ++i)
 	{
-		size_t nSta = dfas[i].GetStartId();
+		STATEID nSta = dfas[i].GetStartId();
 		if((dfas[i][nSta].GetFlag() & CDfaRow::TERMINAL) != 0)
 		{
 			//是终态
@@ -244,7 +244,7 @@ MERDFANEW bool NOrMerge(std::vector<CDfanew> &dfas, CDfanew &lastDfa)
 			NextVec.clear();
 			NextVec.resize(dfasSize + 2);
 
-			size_t lastDfaGroup = lastDfa.Char2Group(curChar);
+			BYTE lastDfaGroup = lastDfa.Char2Group(curChar);
 			if(computFlag[lastDfaGroup] == 1)
 			{
 				continue;
@@ -258,7 +258,7 @@ MERDFANEW bool NOrMerge(std::vector<CDfanew> &dfas, CDfanew &lastDfa)
 				
 				if(sta != (STATEID)-1)
 				{
-					size_t curgroup = dfas[i].Char2Group(curChar);
+					BYTE curgroup = dfas[i].Char2Group(curChar);
 					STATEID nextId = dfas[i][sta][curgroup];//第i个dfa从curVec[i]状态经过curChar跳转的下一状态
 					if(nextId != (STATEID)-1)
 					{

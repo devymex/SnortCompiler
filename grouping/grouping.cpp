@@ -600,6 +600,39 @@ void SplitByComSig(const std::vector<RULECHAIN> &chainSet, std::vector<CHAINGROU
 	SortChainId(vecChainGroups, chainSet);
 }
 
+void fdisplay(CDfanew &newdfa, const char* fileName)
+{
+	std::ofstream fout(fileName);
+	fout << (size_t)newdfa.GetStartId() << std::endl;
+	for(size_t i = 0; i != newdfa.Size(); ++i)
+	{
+		std::map<STATEID, size_t> rowStateCnt;
+		for(size_t j = 0; j != newdfa.GetGroupCount(); ++j)
+		{
+			rowStateCnt[newdfa[i][j]]++;
+		}
+		STATEID maxId = 0;
+		for (std::map<STATEID, size_t>::iterator j = rowStateCnt.begin(); j != rowStateCnt.end(); ++j)
+		{
+			if (j->second > rowStateCnt[maxId])
+			{
+				maxId = j->first;
+			}
+		}
+		fout << "s"<< i << ", maxId: " << (size_t)maxId << ", ";
+		for(size_t j = 0; j != newdfa.GetGroupCount(); ++j)
+		{
+			if (newdfa[i][j] != maxId)
+			{
+				fout << "<" << j << "," <<  (size_t)newdfa[i][j] << "> " ;
+			}
+		}
+		fout << std::endl;
+	}
+	fout.close();
+}
+
+
 void MergeMore(std::vector<CHAINGROUP> &vecChainGroups, CResNew &res, std::vector<size_t> &vecWaitForGroup)
 {
 	bool mergeFlag;
@@ -612,6 +645,7 @@ void MergeMore(std::vector<CHAINGROUP> &vecChainGroups, CResNew &res, std::vecto
 		std::cout << "Total: " << vecChainGroups.size() << std::endl << std::endl;
 		std::vector<CDfanew> vecDfas(2);
 		vecDfas[0] = res.GetDfaTable()[i->chainIds[0]];
+		outPutDfa(vecDfas[0], "F:\\cppProject\\huawei\\PreciseMatch\\testMerg\\dfa_7371_2.txt");
 		vecDfas[1] = res.GetDfaTable()[i->chainIds[1]];
 		if (!NOrMerge(vecDfas, MergeDfa))
 		{
