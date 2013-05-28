@@ -24,12 +24,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "rule2nfatest", "rule2nfates
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "common", "common\common.vcxproj", "{0C639590-DE81-4AB4-AA71-6CE6CAB424E4}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{26C91374-F23D-4A57-A710-0F3AC1EF99FE}"
-	ProjectSection(SolutionItems) = preProject
-		allrules.rule = allrules.rule
-		smallrules.rule = smallrules.rule
-	EndProjectSection
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "grouping", "grouping\grouping.vcxproj", "{E6C145F2-A57F-48D4-8B34-EA8166B984F8}"
 	ProjectSection(ProjectDependencies) = postProject
 		{F6606B01-EE46-44B3-B199-A8A58B004BD9} = {F6606B01-EE46-44B3-B199-A8A58B004BD9}
@@ -59,6 +53,7 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "compilernewTest", "compilernewTest\compilernewTest.vcxproj", "{46B05E98-FC07-4C2A-A5D1-0E80CFFFC04A}"
 	ProjectSection(ProjectDependencies) = postProject
 		{F6606B01-EE46-44B3-B199-A8A58B004BD9} = {F6606B01-EE46-44B3-B199-A8A58B004BD9}
+		{673B9C32-B6AA-4451-80DE-93DF369B64DC} = {673B9C32-B6AA-4451-80DE-93DF369B64DC}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mergedfanew", "mergedfanew\mergedfanew.vcxproj", "{F0E71E24-2091-4670-883B-B3CC085AF034}"
@@ -88,6 +83,15 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "matchpkttest", "matchpkttest\matchpkttest.vcxproj", "{EACE9D83-7444-4E9D-A9DE-3D089E02B3A4}"
 	ProjectSection(ProjectDependencies) = postProject
 		{F9E57E55-B880-46AA-AB2F-9AA68DC71214} = {F9E57E55-B880-46AA-AB2F-9AA68DC71214}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "becchi_pro", "becchi_pro\becchi_pro.vcxproj", "{92DFD284-88F5-4E8C-A3E1-D5D88F022E9D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{F6606B01-EE46-44B3-B199-A8A58B004BD9} = {F6606B01-EE46-44B3-B199-A8A58B004BD9}
+		{673B9C32-B6AA-4451-80DE-93DF369B64DC} = {673B9C32-B6AA-4451-80DE-93DF369B64DC}
+		{F95D1A40-7011-4922-BB31-5134A752F07E} = {F95D1A40-7011-4922-BB31-5134A752F07E}
+		{0C639590-DE81-4AB4-AA71-6CE6CAB424E4} = {0C639590-DE81-4AB4-AA71-6CE6CAB424E4}
+		{E3086FE7-DF5C-4705-B134-C6FD0830A86B} = {E3086FE7-DF5C-4705-B134-C6FD0830A86B}
 	EndProjectSection
 EndProject
 Global
@@ -160,6 +164,10 @@ Global
 		{EACE9D83-7444-4E9D-A9DE-3D089E02B3A4}.Debug|Win32.Build.0 = Debug|Win32
 		{EACE9D83-7444-4E9D-A9DE-3D089E02B3A4}.Release|Win32.ActiveCfg = Release|Win32
 		{EACE9D83-7444-4E9D-A9DE-3D089E02B3A4}.Release|Win32.Build.0 = Release|Win32
+		{92DFD284-88F5-4E8C-A3E1-D5D88F022E9D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{92DFD284-88F5-4E8C-A3E1-D5D88F022E9D}.Debug|Win32.Build.0 = Debug|Win32
+		{92DFD284-88F5-4E8C-A3E1-D5D88F022E9D}.Release|Win32.ActiveCfg = Release|Win32
+		{92DFD284-88F5-4E8C-A3E1-D5D88F022E9D}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

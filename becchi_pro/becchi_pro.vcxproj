@@ -10,12 +10,9 @@
       <Platform>Win32</Platform>
     </ProjectConfiguration>
   </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="main.cpp" />
-  </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{3C8C83EE-9D02-43F5-905A-E7601AC87A53}</ProjectGuid>
-    <RootNamespace>dfanewTest</RootNamespace>
+    <ProjectGuid>{92DFD284-88F5-4E8C-A3E1-D5D88F022E9D}</ProjectGuid>
+    <RootNamespace>becchi_pro</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -46,11 +43,12 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>$(SolutionDir)$(Configuration)\dfanew.lib;$(SolutionDir)$(Configuration)\common.lib;$(SolutionDir)$(Configuration)\pcre2nfa.lib;$(SolutionDir)$(Configuration)\mergedfanew.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(SolutionDir)$(Configuration)\rule2nfa.lib;$(SolutionDir)$(Configuration)\common.lib;$(SolutionDir)$(Configuration)\dfanew.lib;$(SolutionDir)$(Configuration)\compilernew.lib;$(SolutionDir)$(Configuration)\pcre2nfa.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -59,15 +57,41 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>$(SolutionDir)$(Configuration)\dfanew.lib;$(SolutionDir)$(Configuration)\common.lib;$(SolutionDir)$(Configuration)\pcre2nfa.lib;$(SolutionDir)$(Configuration)\mergedfanew.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(SolutionDir)$(Configuration)\rule2nfa.lib;$(SolutionDir)$(Configuration)\common.lib;$(SolutionDir)$(Configuration)\dfanew.lib;$(SolutionDir)$(Configuration)\compilernew.lib;$(SolutionDir)$(Configuration)\pcre2nfa.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="dfa.h" />
+    <ClInclude Include="dheap.h" />
+    <ClInclude Include="int_set.h" />
+    <ClInclude Include="linked_set.h" />
+    <ClInclude Include="nfa.h" />
+    <ClInclude Include="parser.h" />
+    <ClInclude Include="partition.h" />
+    <ClInclude Include="stdinc.h" />
+    <ClInclude Include="subset.h" />
+    <ClInclude Include="wgraph.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="dfa.cpp" />
+    <ClCompile Include="dheap.cpp" />
+    <ClCompile Include="int_set.cpp" />
+    <ClCompile Include="linked_set.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="nfa.cpp" />
+    <ClCompile Include="parser.cpp" />
+    <ClCompile Include="partition.cpp" />
+    <ClCompile Include="stdinc.cpp" />
+    <ClCompile Include="subset.cpp" />
+    <ClCompile Include="wgraph.cpp" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

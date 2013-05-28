@@ -1,5 +1,6 @@
 #include "../common/common.h"
 #include "../dfanew/dfanew.h"
+#include "../dfanew/NCreDfa.h"
 
 #ifndef MERDFANEW_H_
 #define MERDFANEW __declspec(dllimport)
@@ -8,4 +9,5 @@
 #endif
 
 MERDFANEW bool NOrMerge(std::vector<CDfanew> &dfas, CDfanew &lastDfa);
+//MERDFANEW size_t NOrMerge(std::vector<CDfanew> &dfas, CDfanew &lastDfa);
 

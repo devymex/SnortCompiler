@@ -41,4 +41,4 @@ struct NSTATESET_HASH
 	}
 };
 
-void NAvaiEdges(const CNfa &oneNfaTab, BYTE *group);
+DFANEWSC void NAvaiEdges(const CNfa &oneNfaTab, BYTE *group);

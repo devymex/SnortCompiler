@@ -2,6 +2,7 @@
 
 #include <windows.h>
 #include <vector>
+#include <map>
 #include "../common/common.h"
 
 #define DFACOLSIZE 256
@@ -40,12 +41,18 @@ public:
 	~CDfanew();
 	CDfanew(const CDfanew &other);
 	CDfanew& operator=(const CDfanew &other);
-	STATEID Size() const;
+	size_t Size() const;
 	CDfaRow& operator[](STATEID index);
 	const CDfaRow& operator[](STATEID index) const;
+	CDfaRow& BackRow();
+	void ReservRow(size_t nCount);
+	void ResizeRow(size_t nSize, size_t nCol);
 	void Init(BYTE *pGroup);
 	void Clear();
+	void reserve(STATEID Maxnum);
+	void PushBackDfa(CDfaRow &sta);
 	void PushBackTermSet(TERMSET &term);
+	TERMSET& BackTermSet();
 	size_t FromNFA(const CNfa &nfa, NFALOG *nfalog, size_t Count, bool combine = false);
 	size_t Minimize();
 	WORD GetGroupCount() const;
@@ -53,6 +60,7 @@ public:
 	const BYTE* GetGroup() const;
 	const BYTE GetOneGroup(STATEID charNum) const;
 	STATEID GetStartId() const;
+	void SetStartId(size_t id);
 	void SetId(size_t id);
 	size_t GetId();
 	size_t Process(BYTE *ByteStream, size_t len, CStateSet &StaSet);

@@ -406,6 +406,7 @@ DFANEWSC size_t CDfanew::FromNFA(const CNfa &nfa, NFALOG *nfalog, size_t Count, 
 					//	std::cerr << "Fatal Error!" << std::endl;
 					//	return (size_t)-1;
 					//}
+					size_t dfasize = m_pDfa->size();
 					m_pDfa->push_back(CDfaRow(m_nColNum));
 					//std::cout << m_pDfa->size() << std::endl;//用于测试
 					if (m_pDfa->size() > SC_STATELIMIT)// || nTotalSize >= 2048
@@ -418,7 +419,6 @@ DFANEWSC size_t CDfanew::FromNFA(const CNfa &nfa, NFALOG *nfalog, size_t Count, 
 
 					nTotalSize += m_nColNum;
 					(*m_pDfa)[ssh[curNfaVec]][curGroup] = nextSta;
-
 					// is final state
 					if (nextNfaVec.back() == nfa.Size())
 					{
@@ -441,7 +441,9 @@ DFANEWSC size_t CDfanew::FromNFA(const CNfa &nfa, NFALOG *nfalog, size_t Count, 
 				else
 				{
 					(*m_pDfa)[ssh[curNfaVec]][curGroup] = ssh[nextNfaVec];
+
 				}
+
 			}
 		}
 	}
@@ -770,16 +772,16 @@ DFANEWSC size_t CDfanew::Save(BYTE *beg)
 		WriteNum(beg, (*m_pDfa)[i].GetFlag());
 		for (size_t j = 0; j < m_nColNum; ++j)
 		{
-			WriteNum(beg, (*m_pDfa)[i][j], sizeof(BYTE));
+			WriteNum(beg, (*m_pDfa)[i][j]);
 		}
 	}
 	//写DFA的开始状态编号
-	WriteNum(beg, m_StartId, sizeof(BYTE));
+	WriteNum(beg, m_StartId);
 	//写DFA的终态与DFAId的对应关系
 	WriteNum(beg, m_TermSet->size());
 	for (size_t i = 0; i < m_TermSet->size(); ++i)
 	{
-		WriteNum(beg, (*m_TermSet)[i].dfaSta, sizeof(BYTE));
+		WriteNum(beg, (*m_TermSet)[i].dfaSta);
 		WriteNum(beg, (*m_TermSet)[i].dfaId);
 	}
 
@@ -801,7 +803,7 @@ DFANEWSC void CDfanew::Load(BYTE *beg, size_t len)
 	m_nId = dfaId;
 	//读DFA的状态个数
 	STATEID dfaSize;//DFA的状态数
-	ReadNum(beg, dfaSize, sizeof(STATEID));
+	ReadNum(beg, dfaSize);
 	if (dfaSize == 0)
 	{
 		return;
@@ -824,18 +826,18 @@ DFANEWSC void CDfanew::Load(BYTE *beg, size_t len)
 		(*m_pDfa)[i].SetFlag(nFlag);
 		for (size_t j = 0; j < m_nColNum; ++j)
 		{
-			ReadNum(beg, (*m_pDfa)[i][j], sizeof(BYTE));
+			ReadNum(beg, (*m_pDfa)[i][j]);
 		}
 	}
 	//读DFA的开始状态编号
-	ReadNum(beg, m_StartId, sizeof(BYTE));
+	ReadNum(beg, m_StartId);
 	//读DFA的终态与DFAId的对应关系
 	size_t TermSetSize;
 	ReadNum(beg, TermSetSize);
 	m_TermSet->resize(TermSetSize);
 	for (size_t i = 0; i < TermSetSize; ++i)
 	{
-		ReadNum(beg, (*m_TermSet)[i].dfaSta, sizeof(BYTE));
+		ReadNum(beg, (*m_TermSet)[i].dfaSta);
 		ReadNum(beg, (*m_TermSet)[i].dfaId);
 	}
 }

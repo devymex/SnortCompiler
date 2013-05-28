@@ -486,20 +486,6 @@ void Rule2Dfas(const CSnortRule &rule, CResNew &result, COMPILEDRULENEW &ruleRes
 	}
 	else
 	{
-		bool bHasSigs = false;
-		for (size_t i = 0; i < regrule.Size(); ++i)
-		{
-			if (regrule[i].GetSigCnt() > 0)
-			{
-				bHasSigs = true;
-				break;
-			}
-		}
-		if (!bHasSigs)
-		{
-			ruleResult.m_nResult = COMPILEDRULENEW::RES_HASNOSIG;
-			return;
-		}
 		ruleResult.m_nResult = COMPILEDRULENEW::RES_SUCCESS;
 		const size_t nDfaTblSize = result.GetDfaTable().Size();
 		const size_t nIncrement = regrule.Size();
@@ -511,6 +497,7 @@ void Rule2Dfas(const CSnortRule &rule, CResNew &result, COMPILEDRULENEW &ruleRes
 		size_t nDfaId;
 		//size_t nDfasInfoId;
 		size_t nChainId;
+		bool bHasSigs = false;
 		for (size_t i = 0; i < nIncrement; ++i)
 		{
 			CNfa nfa;
@@ -518,6 +505,11 @@ void Rule2Dfas(const CSnortRule &rule, CResNew &result, COMPILEDRULENEW &ruleRes
 			ctime.Reset();//用于测试
 			size_t nToNFAFlag = CRegChainToNFA(regrule[i], nfa);
 			pcre2nfatime += ctime.Reset();//用于测试
+
+			if (regrule[i].GetSigCnt() > 0)
+			{
+				bHasSigs = true;
+			}
 
 			nDfaId = nDfaTblSize + i;
 			//nDfasInfoId = nDfasInfoSize + i;
@@ -540,7 +532,7 @@ void Rule2Dfas(const CSnortRule &rule, CResNew &result, COMPILEDRULENEW &ruleRes
 			{
 				ctime.Reset();//用于测试
 				size_t nToDFAFlag = dfa.FromNFA(nfa, NULL, 0);
-//				std::cout << "  "<< dfa.LinkSize() << ", " << dfa.GetGroupCount() * dfa.Size() << std::endl;
+				//				std::cout << "  "<< dfa.LinkSize() << ", " << dfa.GetGroupCount() * dfa.Size() << std::endl;
 				nfa2dfatime += ctime.Reset();//用于测试
 
 				if (nToDFAFlag == -1)
@@ -562,11 +554,21 @@ void Rule2Dfas(const CSnortRule &rule, CResNew &result, COMPILEDRULENEW &ruleRes
 			result.GetRegexTbl()[nChainId] = regrule[i];
 		}
 
+		if (!bHasSigs)
+		{
+			ruleResult.m_nResult = COMPILEDRULENEW::RES_HASNOSIG;
+			ruleResult.m_dfaIds.Clear();
+			result.GetDfaTable().Resize(nDfaTblSize);
+			result.GetRegexTbl().Resize(nRegexTblSize);
+			return;
+		}
+
 		if (ruleResult.m_nResult != COMPILEDRULENEW::RES_ERROR)
 		{
 			AssignSig(result, nRegexTblSize, nRegexTblSize + nIncrement);
 		}
 	}
+
 }
 
 void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
