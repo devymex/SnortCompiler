@@ -47,6 +47,11 @@
 //	if(tmp == 0)
 //	{
 //		lastDfa.Minimize();
+//		if(lastDfa.Size() > DFA_SIZE_LIMIT)
+//		{
+//			std::cerr << "DFA_SIZE_LIMIT" << std::endl;
+//			return false;
+//		}
 //		//std::cout << "方法一lastDfa最小化用时: " << c.Reset() << std::endl;
 //
 //		return true;
@@ -342,14 +347,15 @@ MERDFANEW bool NOrMerge(std::vector<CDfanew> &dfas, CDfanew &lastDfa)
 		}
 	}
 
-	//std::cout << "方法二合并dfa用时: " << mergtime.Reset() << std::endl;//用于测试
-
+	//std::cout << "Before Min: " << lastDfa.Size() << std::endl;
 	lastDfa.Minimize();
-	if (lastDfa.Size() > SC_FINALDFALIMIT)
+	if(lastDfa.Size() > DFA_SIZE_LIMIT)
 	{
+		std::cerr << "DFA_SIZE_LIMIT!" << std::endl;
 		return false;
 	}
-	//std::cout << "方法二lastDfa最小化用时：" << mergtime.Reset() << std::endl;//用于测试
+	//std::cout << "After Min: " << lastDfa.Size() << std::endl;
+
 	return true;
 }
 
