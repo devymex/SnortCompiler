@@ -34,7 +34,7 @@ void main()
 	//dfa3.SetId(3);
 	//dfa4.SetId(4);
 	//dfa5.SetId(5);
-
+	
 	std::cout << nfa1.Size() << std::endl;
 	//dfa3.FromNFA(nfa3, NULL, 0);
 	//dfa4.FromNFA(nfa4, NULL, 0);
@@ -51,6 +51,10 @@ void main()
 	//dfas.push_back(dfa3);
 	//dfas.push_back(dfa4);
 	//dfas.push_back(dfa5);
+	for (size_t i = 0; i < dfa1.Size(); ++i)
+	{
+		std::cout << dfa1[i].GetFlag() << std::endl;
+	}
 
 	dfa1.Minimize();
 
