@@ -645,7 +645,7 @@ void MergeMore(std::vector<CHAINGROUP> &vecChainGroups, CResNew &res, std::vecto
 		std::cout << "Total: " << vecChainGroups.size() << std::endl << std::endl;
 		std::vector<CDfanew> vecDfas(2);
 		vecDfas[0] = res.GetDfaTable()[i->chainIds[0]];
-		outPutDfa(vecDfas[0], "F:\\cppProject\\huawei\\PreciseMatch\\testMerg\\dfa_7371_2.txt");
+		//outPutDfa(vecDfas[0], "F:\\cppProject\\huawei\\PreciseMatch\\testMerg\\dfa0.txt");
 		vecDfas[1] = res.GetDfaTable()[i->chainIds[1]];
 		if (!NOrMerge(vecDfas, MergeDfa))
 		{
