@@ -415,19 +415,19 @@ size_t CompareWithPcre(const char *pPcre)
 	char* str = ":IP ConaaX-Mailer:EBT ReporterbbbSubjecwq:Vic";
 
 
-	CNfa nfa1;
-	CRegChain regChain;
-	if (SC_SUCCESS != PcreToNFA(oPcre, nfa1, regChain))
-	{
-		return 1;
-	}
-	//outPut(nfa1, "..//nfaresult1.txt");
+	//CNfa nfa1;
+	//CRegChain regChain;
+	//if (SC_SUCCESS != PcreToNFA(oPcre, nfa1, regChain))
+	//{
+	//	return 1;
+	//}
+	////outPut(nfa1, "..//nfaresult1.txt");
 	CDfanew OwnDfa;
-	OwnDfa.FromNFA(nfa1, NULL, 0);
-	std::cout << (size_t)OwnDfa.Size() << std::endl;
-	OwnDfa.Minimize();
-	FoldDFA(OwnDfa);
-	//fdisplay(OwnDfa,"..//result1.txt");
+	//OwnDfa.FromNFA(nfa1, NULL, 0);
+	//std::cout << (size_t)OwnDfa.Size() << std::endl;
+	//OwnDfa.Minimize();
+	//FoldDFA(OwnDfa);
+	////fdisplay(OwnDfa,"..//result1.txt");
 	//OwnDfa.Process((BYTE*)str, strlen(str), tmp);
 	//std::cout << tmp.Size() << std::endl;
 	//std::cout << std::endl;

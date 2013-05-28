@@ -5,7 +5,7 @@
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LocalDebuggerCommandArguments>"" "-p" "ruleset\ruleset04.txt" "-t" ""</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>"" "-p" "D:\projects\input\test.rules" "-t" ""</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
 </Project>
