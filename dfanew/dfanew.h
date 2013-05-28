@@ -49,7 +49,7 @@ public:
 	void ResizeRow(size_t nSize, size_t nCol);
 	void Init(BYTE *pGroup);
 	void Clear();
-	void reserve(STATEID Maxnum);
+	void reserve(size_t Maxnum);
 	void PushBackDfa(CDfaRow &sta);
 	void PushBackTermSet(TERMSET &term);
 	TERMSET& BackTermSet();
