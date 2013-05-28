@@ -10,7 +10,7 @@
 #define HASHMODULO 1000000
 
 //#define SC_STATELIMIT 255
-#define SC_STATELIMIT 1000
+#define SC_STATELIMIT ((1 << (sizeof(STATEID) * 8)) - 1)
 
 #define EMPTY 256
 
@@ -28,7 +28,7 @@ struct DFANEWSC NFALOG
 
 struct DFANEWSC TERMSET
 {
-	TERMSET(STATEID dfaStateId = (STATEID)-1, size_t nDfaId = (size_t)-1)
+	TERMSET(STATEID dfaStateId = (STATEID)-1, size_t nDfaId = (size_t)1)
 		: dfaSta(dfaStateId), dfaId(nDfaId) {}
 	STATEID dfaSta;
 	size_t dfaId;

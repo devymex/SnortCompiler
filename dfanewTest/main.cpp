@@ -6,7 +6,7 @@
 
 void main()
 {
-	CNfa nfa1;
+	//CNfa nfa1;
 
 	//const char* a1 = "/^User-Agent\x3A[^\r\n]*URLBlaze/smi";
 	//const char* a2 = "/^User-Agent\x3A[^\r\n]*iMeshBar/smi";
@@ -40,7 +40,7 @@ void main()
 	//dfa4.FromNFA(nfa4, NULL, 0);
 	//dfa5.FromNFA(nfa5, NULL, 0);
 
-	CDfanew dfa1;
+	//CDfanew dfa1;
 	//dfa3.Minimize();
 	//dfa4.Minimize();
 	//dfa5.Minimize();
