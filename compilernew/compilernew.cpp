@@ -57,6 +57,11 @@ COMPILERNEW void CDfaTblNew::PushBack(const CDfanew &dfa)
 	m_pdfaTbl->push_back(dfa);
 }
 
+COMPILERNEW void CDfaTblNew::Clear()
+{
+	m_pdfaTbl->clear();
+}
+
 COMPILERNEW CSidDfaIdsNew::CSidDfaIdsNew()
 {
 	m_ruleResult = new std::vector<COMPILEDRULENEW>;
@@ -263,12 +268,12 @@ COMPILERNEW size_t CResNew::WriteToFile(LPCTSTR filename)
 	for (size_t i = 0; i < m_sidDfaIds.Size(); ++i)
 	{
 		COMPILEDRULENEW &ruleResult = m_sidDfaIds[i];
-		WriteNum(fout, ruleResult.m_nSid, 4);
-		WriteNum(fout, ruleResult.m_nResult, 4);
-		WriteNum(fout, ruleResult.m_dfaIds.Size(), 4);
+		WriteNum(fout, ruleResult.m_nSid);
+		WriteNum(fout, ruleResult.m_nResult);
+		WriteNum(fout, ruleResult.m_dfaIds.Size());
 		for (size_t j = 0; j < ruleResult.m_dfaIds.Size(); ++j)
 		{
-			WriteNum(fout, ruleResult.m_dfaIds[j], 4);
+			WriteNum(fout, ruleResult.m_dfaIds[j]);
 		}
 	}
 	//ÌîÐ´DFAsÆ«ÒÆ

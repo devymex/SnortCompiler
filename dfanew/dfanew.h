@@ -9,8 +9,8 @@
 
 #define HASHMODULO 1000000
 
-#define SC_STATELIMIT 255
-//#define SC_STATELIMIT 510
+//#define SC_STATELIMIT 255
+#define SC_STATELIMIT 1000
 
 #define EMPTY 256
 
@@ -49,7 +49,7 @@ public:
 	void ResizeRow(size_t nSize, size_t nCol);
 	void Init(BYTE *pGroup);
 	void Clear();
-	void reserve(STATEID Maxnum);
+	void reserve(size_t Maxnum);
 	void PushBackDfa(CDfaRow &sta);
 	void PushBackTermSet(TERMSET &term);
 	TERMSET& BackTermSet();

@@ -149,7 +149,9 @@ void DfaColGroup(std::vector<CDfanew> &dfas, BYTE* groups)
 //可以先根据每个dfa的分组情况，通过hash将最终的lastDfa进行分组
 MERDFANEW bool NOrMerge(std::vector<CDfanew> &dfas, CDfanew &lastDfa)
 {
+	size_t dfaId = lastDfa.GetId();
 	lastDfa.Clear();
+	lastDfa.SetId(dfaId);
 	//CTimer mergtime;//用于测试
 #undef max
 
@@ -179,11 +181,12 @@ MERDFANEW bool NOrMerge(std::vector<CDfanew> &dfas, CDfanew &lastDfa)
 	std::deque<std::vector<size_t> > statesStack;
 	std::vector<size_t> startVec(dfasSize + 2);//使用一个大小为dfas.size() + 2的vector表示合并后的nfa的状态，其中第0个元素表示dfa1的状态，..., 最后两个元素表示虚拟的初始状态0和终止状态nTermSta
 	
+	lastDfa.ReservRow(CHARSETSIZE);
 	lastDfa.ResizeRow(lastDfa.Size() + 1, colCnt);
 
 	for(size_t i = 0; i < dfasSize; ++i)
 	{
-		size_t nSta = dfas[i].GetStartId();
+		STATEID nSta = dfas[i].GetStartId();
 		if((dfas[i][nSta].GetFlag() & CDfaRow::TERMINAL) != 0)
 		{
 			//是终态
@@ -242,7 +245,7 @@ MERDFANEW bool NOrMerge(std::vector<CDfanew> &dfas, CDfanew &lastDfa)
 			NextVec.clear();
 			NextVec.resize(dfasSize + 2);
 
-			size_t lastDfaGroup = lastDfa.Char2Group(curChar);
+			BYTE lastDfaGroup = lastDfa.Char2Group(curChar);
 			if(computFlag[lastDfaGroup] == 1)
 			{
 				continue;
@@ -256,7 +259,7 @@ MERDFANEW bool NOrMerge(std::vector<CDfanew> &dfas, CDfanew &lastDfa)
 				
 				if(sta != (STATEID)-1)
 				{
-					size_t curgroup = dfas[i].Char2Group(curChar);
+					BYTE curgroup = dfas[i].Char2Group(curChar);
 					STATEID nextId = dfas[i][sta][curgroup];//第i个dfa从curVec[i]状态经过curChar跳转的下一状态
 					if(nextId != (STATEID)-1)
 					{
@@ -290,7 +293,7 @@ MERDFANEW bool NOrMerge(std::vector<CDfanew> &dfas, CDfanew &lastDfa)
 				STATESETHASH::iterator nextIt = statehash.find(NextVec);
 				if(nextIt == statehash.end())
 				{
-#undef max
+#undef max 
 					//if (statehash.size() >= std::numeric_limits<STATEID>::max())
 					//{
 					//	std::cerr << "Size limit!" << std::endl;

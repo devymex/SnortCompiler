@@ -415,19 +415,19 @@ size_t CompareWithPcre(const char *pPcre)
 	char* str = ":IP ConaaX-Mailer:EBT ReporterbbbSubjecwq:Vic";
 
 
-	//CNfa nfa1;
-	//CRegChain regChain;
-	//if (SC_SUCCESS != PcreToNFA(oPcre, nfa1, regChain))
-	//{
-	//	return 1;
-	//}
-	////outPut(nfa1, "..//nfaresult1.txt");
+	CNfa nfa1;
+	CRegChain regChain;
+	if (SC_SUCCESS != PcreToNFA(oPcre, nfa1, regChain))
+	{
+		return 1;
+	}
+	//outPut(nfa1, "..//nfaresult1.txt");
 	CDfanew OwnDfa;
-	//OwnDfa.FromNFA(nfa1, NULL, 0);
+	OwnDfa.FromNFA(nfa1, NULL, 0);
 	//std::cout << (size_t)OwnDfa.Size() << std::endl;
-	//OwnDfa.Minimize();
-	//FoldDFA(OwnDfa);
-	////fdisplay(OwnDfa,"..//result1.txt");
+	OwnDfa.Minimize();
+	FoldDFA(OwnDfa);
+	//fdisplay(OwnDfa,"..//result1.txt");
 	//OwnDfa.Process((BYTE*)str, strlen(str), tmp);
 	//std::cout << tmp.Size() << std::endl;
 	//std::cout << std::endl;
@@ -435,6 +435,7 @@ size_t CompareWithPcre(const char *pPcre)
 
 	NFA* nfa2 = CreatNFA(bPcre);
 	nfa2->remove_epsilon();
+	nfa2->output();
 	nfa2->reduce();
 	//nfa2->output();
 	DFA* BeDfa = nfa2->nfa2dfa();
@@ -445,7 +446,7 @@ size_t CompareWithPcre(const char *pPcre)
 	}
 	CDfanew newBeDfa;
 	BeDfa->Dfa2CDfanew(newBeDfa);
-	std::cout << (size_t)newBeDfa.Size() << std::endl;
+	//std::cout << (size_t)newBeDfa.Size() << std::endl;
 	//newBeDfa.Process((BYTE* )str, strlen(str), tmp);
 	//std::cout << tmp.Size() << std::endl;
 	//std::cout << std::endl;
@@ -506,7 +507,7 @@ int main(int argc, char **argv)
 	parser=new regex_parser(false,false);
 
 	CResNew result;
-	CompileRuleSet(_T("..\\allrules.rule"), Process, &result);
+	CompileRuleSet(_T("..\\..\\input\\testrules.rule"), Process, &result);
 
 
 	//std::vector<std::string> regset;

@@ -9,7 +9,7 @@
 #endif
 
 #define THRESHOLD 8
-#define NUMOFCOMSIGS 2
+#define NUMOFCOMSIGS 1
 
 struct CHAINTRAIT
 {
@@ -85,6 +85,7 @@ public:
 	void PushBack(const GROUP &oneGroup);
 	GROUP &Back();
 	void Sort();
+	void Clear();
 private:
 	std::vector<GROUP> *m_pGroups;
 };
@@ -105,5 +106,7 @@ public:
 	size_t WriteToFile(LPCTSTR filename);
 	size_t ReadFromFile(LPCTSTR filename);
 };
+
+GROUPINGSC void UpdateComSigs(std::vector<SIGNATURE> &oldSigs, const std::vector<SIGNATURE> &newSigs);
 
 GROUPINGSC void grouping(CResNew &res, CGROUPRes &groupRes);

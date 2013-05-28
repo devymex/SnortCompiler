@@ -160,16 +160,39 @@ void NFA::output()
 {
 	nfa_list *queue=new nfa_list();
 	traverse(queue);
-	for (nfa_list::iterator iState = queue->begin(); iState != queue->end(); ++iState)
+	struct COMP
+	{
+		bool operator()(pair<symbol_t,NFA*>* &p1, pair<symbol_t,NFA*>* &p2)
+		{
+			return p1->first < p2->first;
+		}
+	};
+	size_t idx = 0;
+	for (nfa_list::iterator iState = queue->begin(); iState != queue->end(); ++iState, ++idx)
 	{
 		std::cout << (*iState)->id << ":";
 		pair_set *curState = (*iState)->transitions;
-		for (pair_set::iterator ipair = curState->begin(); ipair  != curState->end(); ++ipair)
+		std::vector<pair<symbol_t,NFA*>*> tmp(curState->begin(), curState->end());
+		std::sort(tmp.begin(), tmp.end(), COMP());
+		for (std::vector<pair<symbol_t,NFA*>*>::iterator i = tmp.begin(); i != tmp.end(); ++i)
 		{
-			std::cout <<  "<" << (*ipair)->first << "," << (*ipair)->second->id << ">";  
+			std::cout <<  "<" << (*i)->first << "," << (*i)->second->id << ">";  
 		}
 		std::cout << std::endl;
 	}
+
+	//nfa_list *queue=new nfa_list();
+	//traverse(queue);
+	//for (nfa_list::iterator iState = queue->begin(); iState != queue->end(); ++iState)
+	//{
+	//	std::cout << (*iState)->id << ":";
+	//	pair_set *curState = (*iState)->transitions;
+	//	for (pair_set::iterator ipair = curState->begin(); ipair  != curState->end(); ++ipair)
+	//	{
+	//		std::cout <<  "<" << (*ipair)->first << "," << (*ipair)->second->id << ">";  
+	//	}
+	//	std::cout << std::endl;
+	//}
 }
 
 void NFA::reset_marking(){
@@ -808,7 +831,7 @@ void NFA::remove_duplicates(){
 					FOREACH_SET(queue,it3){
 						FOREACH_PAIRSET((*it3)->transitions, it4) if ((*it4)->second==target) (*it4)->second=source;
 						if (first==target) first=source;
-						if (last==target)  last==source;
+						if (last==target)  last=source;
 					}
 					target->delete_only_me=1;
 					to_del->insert(target); 
