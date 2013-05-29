@@ -11,7 +11,7 @@ void main()
 	//const char* a1 = "/^(ab|bc)d(ef|g)/";
 	//const char* a2 = "/^.{2}.*ab/si";
 	//const char* a3 = "/^(a|b)abb/";
-	const char* a1 = "/^.*a.*b.{3}y/i";
+	const char* a1 = "/^ab+m.{3}/";
 	const char* a2 = "/^d.*ef/";
 	CRegChain regChain;
 	CNfa nfa1, nfa2;

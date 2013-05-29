@@ -550,6 +550,11 @@ void Rule2Dfas(const CSnortRule &rule, CResNew &result, COMPILEDRULENEW &ruleRes
 					ctime.Reset();//用于测试
 					dfa.Minimize();
 					dfamintimetime += ctime.Reset();//用于测试
+					if (dfa.Size() > DFA_SIZE_LIMIT)
+					{
+						ruleResult.m_nResult = COMPILEDRULENEW::RES_EXCEEDLIMIT;
+						dfa.Clear();
+					}
 				}
 			}
 			dfa.SetId(nDfaId);
