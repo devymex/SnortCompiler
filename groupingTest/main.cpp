@@ -1,8 +1,11 @@
 #include <iostream>
 #include <fstream>
 #include <tchar.h>
+#include "../common/common.h"
+#include "../dfanew/dfanew.h"
 #include "../grouping/grouping.h"
 #include "../compilernew/compilernew.h"
+#include "../mergedfanew/MergeDfanew.h"
 
 int main()
 {
@@ -20,19 +23,41 @@ int main()
 	//	}
 	//}
 	CResNew result;
-	//compilenew(_T("..\\..\\input\\allrules.rule"), result);
-	//result.WriteToFile(_T("..\\..\\output\\result.cdt"));
+	////compilenew(_T("..\\..\\input\\allrules.rule"), result);
+	////result.WriteToFile(_T("..\\..\\output\\result.cdt"));
 	result.ReadFromFile(_T("..\\..\\output\\result.cdt"));
 	CGROUPRes groupRes;
 
-	CTimer ctime;
-	grouping(result, groupRes);
-	std::cout << "分组时间： " << ctime.Reset() << std::endl;
+	//CTimer ctime;
+	//grouping(result, groupRes);
+	//std::cout << "分组时间： " << ctime.Reset() << std::endl;
 
-	groupRes.WriteToFile(_T("..\\..\\output\\GroupResut.cdt"));
+	//groupRes.WriteToFile(_T("..\\..\\output\\GroupResut.cdt"));
 
-	//groupRes.ReadFromFile(_T("..\\..\\output\\GroupResut.cdt"));
+	groupRes.ReadFromFile(_T("..\\..\\output\\GroupResut.cdt"));
 	//groupRes.WriteToFile(_T("..\\..\\output\\GroupResut1.cdt"));
+
+	std::ifstream fin("..\\..\\output\\mergetest.txt");
+	std::vector<size_t> vecIds;
+	size_t tmp;
+	while (fin >> tmp)
+	{
+		vecIds.push_back(tmp);
+	}
+
+	std::vector<CDfanew> vecDfas(2);
+	CDfanew MergeDfa;
+	vecDfas[0] = result.GetDfaTable()[vecIds[0]];
+	for (size_t i = 1; i < vecIds.size(); ++i)
+	{
+		vecDfas[1] = result.GetDfaTable()[vecIds[i]];
+		if (!NOrMerge(vecDfas, MergeDfa))
+		{
+			std::cout << "ERROR" << std::endl;
+		}
+		vecDfas[0] = MergeDfa;
+	}
+	std::cout << MergeDfa.Size() << std::endl;
 
 	system("pause");
 	return 0;

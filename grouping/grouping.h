@@ -1,5 +1,5 @@
 #pragma once
-#include <unordered_map>
+#include "../common/common.h"
 #include "../compilernew/compilernew.h"
 
 #ifndef GROUPING_H_
@@ -8,67 +8,34 @@
 #define GROUPINGSC __declspec(dllexport)
 #endif
 
-#define THRESHOLD 8
-#define NUMOFCOMSIGS 1
-
-struct CHAINTRAIT
+class CSIGNATURES
 {
-	enum {TRAIT_LEN = 64};
-	char szTrait[TRAIT_LEN];
+public:
+	CSIGNATURES();
+	CSIGNATURES(const CSIGNATURES& other);
+	const CSIGNATURES &operator=(const CSIGNATURES &other);
+	~CSIGNATURES();
+	const size_t Size() const;
+	void Resize(size_t nSize);
+	void PushBack(SIGNATURE Sig);
+	SIGNATURE &operator[](size_t nIdx);
+	const SIGNATURE &operator[](size_t nIdx) const;
+	void Clear();
+private:
+	std::vector<SIGNATURE> *m_pSigs;
 };
 
-bool operator == (const CHAINTRAIT &r1, const CHAINTRAIT &r2)
+struct DFAINFO
 {
-	__int64 *p1 = (__int64*)r1.szTrait;
-	__int64 *p2 = (__int64*)r2.szTrait;
-	for (size_t i = 0; i < CHAINTRAIT::TRAIT_LEN / sizeof(__int64); ++i)
-	{
-		if (p1[i] != p2[i])
-		{
-			return false;
-		}
-	}
-	return true;
-}
-
-struct CHAINTRAITHASH
-{
-	enum {HASH_SIZE = 1000000};
-	size_t operator()(const CHAINTRAIT &rt)
-	{
-		const size_t *p = (size_t*)rt.szTrait;
-		size_t n = 1;
-		for (size_t i = 0; i < CHAINTRAIT::TRAIT_LEN / sizeof(size_t); ++i)
-		{
-			n *= p[i];
-		}
-
-		return n % HASH_SIZE;
-	}
+	std::vector<SIGNATURE> Sigs;
 };
 
-typedef std::unordered_map<CHAINTRAIT, std::vector<size_t>, CHAINTRAITHASH> TRAITMAP;
-
-struct RULECHAIN
-{
-	CDfanew dfa;
-	std::string strChain;
-	std::vector<SIGNATURE> sigs;
-};
-
-struct CHAINGROUP
-{
-	std::vector<size_t> chainIds;
-	std::string comStr;
-	std::vector<SIGNATURE> comSigs;
-	std::size_t mergeDfaId;
-};
 
 struct GROUP
 {
-	std::vector<SIGNATURE> vecSigs;
-	std::size_t dfaId;
-	std::vector<std::string> chains;
+	CVectorNumber DfaIds;
+	CSIGNATURES ComSigs;
+	std::size_t mergeDfaId;
 };
 
 class GROUPINGSC CGROUPS
@@ -78,15 +45,14 @@ public:
 	CGROUPS(const CGROUPS& other);
 	const CGROUPS &operator=(const CGROUPS &other);
 	~CGROUPS();
-	GROUP &operator[](size_t index);
-	const GROUP &operator[](size_t index) const;
-	void Reserve(size_t nCount);
-	void Resize(size_t nSize);
 	const size_t Size() const;
-	void PushBack(const GROUP &oneGroup);
-	GROUP &Back();
-	void Sort();
+	void Resize(size_t nSize);
+	void PushBack(GROUP oneGroup);
+	GROUP& Back();
+	GROUP &operator[](size_t nIdx);
+	const GROUP &operator[](size_t nIdx) const;
 	void Clear();
+	void Erase(size_t nIdx);
 private:
 	std::vector<GROUP> *m_pGroups;
 };
@@ -107,7 +73,5 @@ public:
 	size_t WriteToFile(LPCTSTR filename);
 	size_t ReadFromFile(LPCTSTR filename);
 };
-
-GROUPINGSC void UpdateComSigs(std::vector<SIGNATURE> &oldSigs, const std::vector<SIGNATURE> &newSigs);
 
 GROUPINGSC void grouping(CResNew &res, CGROUPRes &groupRes);
