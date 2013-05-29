@@ -1034,6 +1034,38 @@ void outPutResultDfa(std::vector<CHAINGROUP> &vecChainGroups, CResNew &res, cons
 
 GROUPINGSC void grouping(CResNew &res, CGROUPRes &groupRes)
 {
+	//std::vector<CDfanew> dfas;
+	//CDfanew mergeDfa;
+	//dfas.push_back(res.GetDfaTable()[1342]);
+	//dfas.push_back(res.GetDfaTable()[1343]);
+	//dfas.push_back(res.GetDfaTable()[1623]);
+	//dfas.push_back(res.GetDfaTable()[1624]);
+	//dfas.push_back(res.GetDfaTable()[4806]);
+	//dfas.push_back(res.GetDfaTable()[5136]);
+	//NOrMerge(dfas, mergeDfa);
+	//outPutDfa(mergeDfa, "F:\\cppProject\\huawei\\PreciseMatch\\mytestTmp\\mergeDfa_hebing.txt");
+	//mergeDfa.printTerms();
+
+	//NOrMerge(dfas, mergeDfa);
+	//dfas[0] = mergeDfa;
+	//dfas[1] = res.GetDfaTable()[1623];
+	//NOrMerge(dfas, mergeDfa);
+	//dfas[0] = mergeDfa;
+	//dfas[1] = res.GetDfaTable()[1624];
+	//NOrMerge(dfas, mergeDfa);
+	//dfas[0] = mergeDfa;
+	//dfas[1] = res.GetDfaTable()[4806];
+	//NOrMerge(dfas, mergeDfa);
+	//dfas[0] = mergeDfa;
+	//dfas[1] = res.GetDfaTable()[5136];
+	//NOrMerge(dfas, mergeDfa);
+	//outPutDfa(mergeDfa, "F:\\cppProject\\huawei\\PreciseMatch\\mytestTmp\\mergeDfa_2_2.txt");
+
+	//std::cout << std::endl;
+	//mergeDfa.printTerms();
+
+
+
 	//Load all rules chains from file
 	CTimer t1, tAll;
 

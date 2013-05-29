@@ -37,14 +37,26 @@ void main()
 	//outPutDfa(dfa1, "F:\\cppProject\\huawei\\PreciseMatch\\testMerg\\dfa1.txt");
 	//outPutDfa(dfa2, "F:\\cppProject\\huawei\\PreciseMatch\\testMerg\\dfa2.txt");
 
-	std::vector<CDfanew> dfas;
-	dfas.push_back(dfa1);
-	dfas.push_back(dfa2);
-	dfas.push_back(dfa3);
 	CDfanew mergeDfa;
-	NOrMerge(dfas, mergeDfa);
+	std::vector<CDfanew> dfas(2);
+	//dfas.push_back(dfa1);
+	//dfas.push_back(dfa2);
+	//dfas.push_back(dfa3);
+	//NOrMerge(dfas, mergeDfa);
+	//mergeDfa.printTerms();
+	//outPutDfa(mergeDfa, "F:\\cppProject\\huawei\\PreciseMatch\\testMerg\\mergeDfa.txt");
 
-	outPutDfa(mergeDfa, "F:\\cppProject\\huawei\\PreciseMatch\\testMerg\\mergeDfa2.txt");
+	//dfas[0] = dfa1;
+	//dfas[1] = dfa2;
+	//NOrMerge(dfas, mergeDfa);
+	//outPutDfa(mergeDfa, "F:\\cppProject\\huawei\\PreciseMatch\\testMerg\\mergeDfa_1_2.txt");
+	//mergeDfa.printTerms();
+	//std::cout << std::endl;
+	//dfas[0] = mergeDfa;
+	//dfas[1] = dfa3;
+	//NOrMerge(dfas, mergeDfa);
+	//mergeDfa.printTerms();
+	//outPutDfa(mergeDfa, "F:\\cppProject\\huawei\\PreciseMatch\\testMerg\\mergeDfa_1_2_3.txt");
 
 	std::cout << (size_t)dfa1.Size() << std::endl;
 

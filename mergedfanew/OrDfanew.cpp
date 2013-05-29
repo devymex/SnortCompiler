@@ -32,7 +32,7 @@ void NInsertDfa(CDfanew &dfa, CNfa &nfa, size_t nTermSta, NFALOG *nfalog, size_t
 		{
 			nfaRow.AddDest(EMPTYEDGE, nTermSta);
 
-			nfalog[count].dfaId = dfa.GetId();
+			nfalog[count].dfaId = dfa.GetId();//´Ë´¦´íÎó£¡
 			nfalog[count].nfaStateId = temp + i;
 			++count;
 		}

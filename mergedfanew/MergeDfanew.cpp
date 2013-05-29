@@ -197,10 +197,10 @@ MERDFANEW bool NOrMerge(std::vector<CDfanew> &dfas, CDfanew &lastDfa)
 		{
 			//是终态
 			finFlag = 1;
-			//dfaIds.dfaIds.push_back(dfas[i].GetId());
-			lastDfa.PushBackTermSet(TERMSET());
-			lastDfa.BackTermSet().dfaId = dfas[i].GetId();
-			lastDfa.BackTermSet().dfaId = 0;
+			lastDfa.AddTermIntoDFA(nSta, dfas[i], 0);//将dfas[i]根据nSta找到的dfaId插入到lastDfa的0状态中
+			//lastDfa.PushBackTermSet(TERMSET());
+			//lastDfa.BackTermSet().dfaId = dfas[i].GetId();
+			//lastDfa.BackTermSet().dfaSta = 0;
 		}
 		startVec[i] = nSta;
 	}
@@ -328,9 +328,10 @@ MERDFANEW bool NOrMerge(std::vector<CDfanew> &dfas, CDfanew &lastDfa)
 							{
 								if((dfas[k][NextVec[k]].GetFlag() & CDfaRow::TERMINAL) != 0)
 								{
-									lastDfa.PushBackTermSet(TERMSET());
-									lastDfa.BackTermSet().dfaId = dfas[k].GetId();
-									lastDfa.BackTermSet().dfaSta = nextSta;
+									lastDfa.AddTermIntoDFA(NextVec[k], dfas[k], nextSta);
+									//lastDfa.PushBackTermSet(TERMSET());
+									//lastDfa.BackTermSet().dfaId = dfas[k].GetId();
+									//lastDfa.BackTermSet().dfaSta = nextSta;
 								}
 							}
 						}
@@ -351,15 +352,13 @@ MERDFANEW bool NOrMerge(std::vector<CDfanew> &dfas, CDfanew &lastDfa)
 			}
 		}
 	}
-
-	//std::cout << "Before Min: " << lastDfa.Size() << std::endl;
-	lastDfa.Minimize();
+	lastDfa.UniqueTermSet();
+	//lastDfa.Minimize();
 	if(lastDfa.Size() > DFA_SIZE_LIMIT)
 	{
 		std::cerr << "DFA_SIZE_LIMIT!" << std::endl;
 		return false;
 	}
-	//std::cout << "After Min: " << lastDfa.Size() << std::endl;
 
 	return true;
 }

@@ -536,6 +536,7 @@ void Rule2Dfas(const CSnortRule &rule, CResNew &result, COMPILEDRULENEW &ruleRes
 			else
 			{
 				ctime.Reset();//用于测试
+				dfa.SetId(nDfaId);
 				size_t nToDFAFlag = dfa.FromNFA(nfa, NULL, 0);
 //				std::cout << "  "<< dfa.LinkSize() << ", " << dfa.GetGroupCount() * dfa.Size() << std::endl;
 				nfa2dfatime += ctime.Reset();//用于测试
@@ -557,7 +558,6 @@ void Rule2Dfas(const CSnortRule &rule, CResNew &result, COMPILEDRULENEW &ruleRes
 					}
 				}
 			}
-			dfa.SetId(nDfaId);
 			ruleResult.m_dfaIds.PushBack(nDfaId);
 			//result.GetDfasInfo()[nDfasInfoId].dfaId = nDfaId;
 			//result.GetDfasInfo()[nDfasInfoId].chainId = nChainId;
