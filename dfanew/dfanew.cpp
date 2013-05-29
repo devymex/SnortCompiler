@@ -66,7 +66,14 @@ DFANEWSC void outPutDfa(CDfanew &dfa, const char* filename)
 	fout << std::endl;
 	for(size_t i = 0; i != dfa.Size(); ++i)
 	{
-		fout << i << "\t";
+		if((dfa[i].GetFlag() & CDfaRow::TERMINAL) != 0)
+		{
+			fout << i << ",Term\t";
+		}
+		else
+		{
+			fout << i << "\t";
+		}
 		for(BYTE j = 0; j != dfa.GetGroupCount(); ++j)
 		{
 			fout << (size_t)dfa[i][j] << "\t";
@@ -150,6 +157,11 @@ DFANEWSC void CDfanew::PushBackDfa(CDfaRow &sta)
 DFANEWSC void CDfanew::PushBackTermSet(TERMSET &term)
 {
 	m_TermSet->push_back(term);
+}
+
+DFANEWSC size_t CDfanew::GetTermCnt() const
+{
+	return m_TermSet->size();
 }
 
 DFANEWSC TERMSET& CDfanew::BackTermSet()

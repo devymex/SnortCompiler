@@ -57,6 +57,7 @@ public:
 	size_t FromNFA(const CNfa &nfa, NFALOG *nfalog, size_t Count, bool combine = false);
 	size_t Minimize();
 	WORD GetGroupCount() const;
+	size_t GetTermCnt() const;
 	BYTE Char2Group(BYTE nIdx);
 	const BYTE* GetGroup() const;
 	const BYTE GetOneGroup(STATEID charNum) const;

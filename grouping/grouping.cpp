@@ -988,6 +988,7 @@ void BuildGroupRes(const std::vector<RULECHAIN> &chainSet, const std::vector<CHA
 	groupRes.GetSidDfaIds() = res.GetSidDfaIds();
 }
 
+//输出合并后的分组结果
 void outPutGroup(std::vector<CHAINGROUP> &vecChainGroups, const char* fileName)
 {
 	std::ofstream fout(fileName);
@@ -999,11 +1000,34 @@ void outPutGroup(std::vector<CHAINGROUP> &vecChainGroups, const char* fileName)
 	for(size_t i = 0; i < vecChainGroups.size(); ++i)
 	{
 		fout << i << "\t";
+		fout << vecChainGroups[i].mergeDfaId << "\t";
 		for(size_t j = 0; j < vecChainGroups[i].chainIds.size(); ++j)
 		{
-			fout << vecChainGroups[i].chainIds[j] << std::endl << "\t";
+			fout << vecChainGroups[i].chainIds[j] << std::endl << "\t" << "\t";
 		}
 		fout << std::endl << std::endl;
+	}
+	fout.close();
+}
+
+//输出合并后的dfa信息
+void outPutResultDfa(std::vector<CHAINGROUP> &vecChainGroups, CResNew &res, const char* fileName)
+{
+	std::ofstream fout(fileName);
+	if(!fout)
+	{
+		std::cerr << "Open group_result file Failed!" << std::endl;
+		return;
+	}
+	fout << "mergeDfaId" << "\t" << "ColumCnt" << "\t" << "Size" << "\t" << "TermSet" << std::endl;
+	for(std::vector<CHAINGROUP>::iterator iter = vecChainGroups.begin(); 
+		iter != vecChainGroups.end(); ++iter)
+	{
+		CDfanew mergeDfa = res.GetDfaTable()[iter->mergeDfaId];
+		fout << iter->mergeDfaId << "\t";
+		fout << mergeDfa.GetGroupCount() << "\t";
+		fout << mergeDfa.Size() << "\t";
+		fout << mergeDfa.GetTermCnt() << std::endl;
 	}
 	fout.close();
 }
@@ -1103,6 +1127,9 @@ GROUPINGSC void grouping(CResNew &res, CGROUPRes &groupRes)
 	std::cout << "Completed in " << t1.Reset() << " Sec." << std::endl << std::endl;
 
 	std::cout << vecChainGroups.size() << std::endl;
+	//outPutGroup(vecChainGroups, "F:\\cppProject\\huawei\\PreciseMatch\\testMerg\\group_result_2.txt");
+	//outPutResultDfa(vecChainGroups, res, "F:\\cppProject\\huawei\\PreciseMatch\\testMerg\\result_2.txt");
+	//outPutDfa(res.GetDfaTable()[11821], "F:\\cppProject\\huawei\\PreciseMatch\\testMerg\\dfa2_11821.txt");
 
 	std::cout << "Total time: " << tAll.Reset() << " Sec." << std::endl;
 }
