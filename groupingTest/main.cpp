@@ -29,7 +29,7 @@ int main()
 	grouping(result, groupRes);
 	std::cout << "分组时间： " << ctime.Reset() << std::endl;
 
-	groupRes.WriteToFile(_T("..\\..\\output\\GroupResut.cdt"));
+	groupRes.WriteToFile(_T("..\\..\\output\\GroupResut_2.cdt"));
 
 	//groupRes.ReadFromFile(_T("..\\..\\output\\GroupResut.cdt"));
 	//groupRes.WriteToFile(_T("..\\..\\output\\GroupResut1.cdt"));

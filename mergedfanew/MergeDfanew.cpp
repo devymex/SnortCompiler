@@ -38,7 +38,7 @@
 //	}
 //	//outPutDfa(dfas[0], "F:\\cppProject\\huawei\\PreciseMatch\\testMerg\\dfas_0_incre.txt");//用于测试
 //	//outPutDfa(dfas[1], "F:\\cppProject\\huawei\\PreciseMatch\\testMerg\\dfas_1_incre.txt");//用于测试
-//	//outPut(oneNfa, "F:\\cppProject\\huawei\\PreciseMatch\\testMerg\\Nfa_merge.txt");
+//	//outPut(oneNfa, "F:\\cppProject\\huawei\\PreciseMatch\\testMerg\\Nfa1_merge.txt");
 //
 //	size_t tmp = lastDfa.FromNFA(oneNfa, nfalog, count, true);
 //	//std::cout << "方法一合并dfa用时：" << c.Reset() << std::endl;
@@ -183,7 +183,8 @@ MERDFANEW bool NOrMerge(std::vector<CDfanew> &dfas, CDfanew &lastDfa)
 	STATESETHASH statehash;
 
 	size_t finFlag = 0;//判断是否终态
-	std::deque<std::vector<size_t> > statesStack;
+	//std::deque<std::vector<size_t> > statesStack;
+	std::stack<std::vector<size_t> > statesStack;//测试
 	std::vector<size_t> startVec(dfasSize + 2);//使用一个大小为dfas.size() + 2的vector表示合并后的nfa的状态，其中第0个元素表示dfa1的状态，..., 最后两个元素表示虚拟的初始状态0和终止状态nTermSta
 	
 	lastDfa.ReservRow(CHARSETSIZE);
@@ -196,10 +197,10 @@ MERDFANEW bool NOrMerge(std::vector<CDfanew> &dfas, CDfanew &lastDfa)
 		{
 			//是终态
 			finFlag = 1;
-			//dfaIds.dfaIds.push_back(dfas[i].GetId());
-			lastDfa.PushBackTermSet(TERMSET());
-			lastDfa.BackTermSet().dfaId = dfas[i].GetId();
-			lastDfa.BackTermSet().dfaId = 0;
+			lastDfa.AddTermIntoDFA(nSta, dfas[i], 0);//将dfas[i]根据nSta找到的dfaId插入到lastDfa的0状态中
+			//lastDfa.PushBackTermSet(TERMSET());
+			//lastDfa.BackTermSet().dfaId = dfas[i].GetId();
+			//lastDfa.BackTermSet().dfaSta = 0;
 		}
 		startVec[i] = nSta;
 	}
@@ -218,7 +219,8 @@ MERDFANEW bool NOrMerge(std::vector<CDfanew> &dfas, CDfanew &lastDfa)
 	
 	statehash[startVec] = 0;
 
-	statesStack.push_back(startVec);
+	//statesStack.push_back(startVec);
+	statesStack.push(startVec);
 
 	std::vector<size_t> NextVec;
 	BYTE computFlag[CHARSETSIZE];
@@ -231,9 +233,11 @@ MERDFANEW bool NOrMerge(std::vector<CDfanew> &dfas, CDfanew &lastDfa)
 		//}
 		//std::cout << (size_t)lastDfa.Size() << std::endl;//用于测试
 
-		std::vector<size_t> curVec = statesStack.front();//当前状态集合, curVec共有dfasSize + 2个状态
-		statesStack.pop_front();
-
+		//std::vector<size_t> curVec = statesStack.front();//当前状态集合, curVec共有dfasSize + 2个状态
+		//statesStack.pop_front();
+		std::vector<size_t> curVec = statesStack.top();//当前状态集合, curVec共有dfasSize + 2个状态
+		statesStack.pop();
+		
 		STATESETHASH::iterator ir = statehash.find(curVec);
 		if (ir == statehash.end())
 		{
@@ -324,16 +328,18 @@ MERDFANEW bool NOrMerge(std::vector<CDfanew> &dfas, CDfanew &lastDfa)
 							{
 								if((dfas[k][NextVec[k]].GetFlag() & CDfaRow::TERMINAL) != 0)
 								{
-									lastDfa.PushBackTermSet(TERMSET());
-									lastDfa.BackTermSet().dfaId = dfas[k].GetId();
-									lastDfa.BackTermSet().dfaSta = nextSta;
+									lastDfa.AddTermIntoDFA(NextVec[k], dfas[k], nextSta);
+									//lastDfa.PushBackTermSet(TERMSET());
+									//lastDfa.BackTermSet().dfaId = dfas[k].GetId();
+									//lastDfa.BackTermSet().dfaSta = nextSta;
 								}
 							}
 						}
 						lastDfa[nextSta].SetFlag(lastDfa[nextSta].GetFlag() | CDfaRow::TERMINAL);
 					}
 				
-					statesStack.push_back(NextVec);
+					//statesStack.push_back(NextVec);
+					statesStack.push(NextVec);
 				}
 				else
 				{
@@ -346,15 +352,13 @@ MERDFANEW bool NOrMerge(std::vector<CDfanew> &dfas, CDfanew &lastDfa)
 			}
 		}
 	}
-
-	//std::cout << "Before Min: " << lastDfa.Size() << std::endl;
-	lastDfa.Minimize();
+	lastDfa.UniqueTermSet();
+	//lastDfa.Minimize();
 	if(lastDfa.Size() > DFA_SIZE_LIMIT)
 	{
 		std::cerr << "DFA_SIZE_LIMIT!" << std::endl;
 		return false;
 	}
-	//std::cout << "After Min: " << lastDfa.Size() << std::endl;
 
 	return true;
 }
