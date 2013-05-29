@@ -376,8 +376,6 @@ size_t CompDfa(CDfanew &OwnDfa, CDfanew &BeDfa)
 	std::fill(visited1.begin(), visited1.end(), 0);
 	std::vector<BYTE> visited2(BeDfa.Size());
 	std::fill(visited2.begin(), visited2.end(), 0);
-	std::cout << OwnDfa.Size();
-	std::cout << BeDfa.Size();
 	if (OwnDfa.Size() == BeDfa.Size())
 	{
 		if(EqualDFA(OwnDfa, visited1, OwnDfa.GetStartId(), BeDfa, visited2, BeDfa.GetStartId()))
@@ -446,9 +444,10 @@ size_t CompareWithPcre(const char *pPcre)
 	}
 	OwnDfa.Minimize();	
 	FoldDFA(OwnDfa);
+	std::cout << OwnDfa.Size() << std::endl;
+	fdisplay(OwnDfa,"..//result1.txt");
 	//std::cout << (size_t)OwnDfa.Size() << std::endl;
 	//display(OwnDfa);
-	fdisplay(OwnDfa,"..//result1.txt");
 	//OwnDfa.Process((BYTE*)str, strlen(str), tmp);
 	//std::cout << tmp.Size() << std::endl;
 	//std::cout << std::endl;
@@ -463,13 +462,13 @@ size_t CompareWithPcre(const char *pPcre)
 	//outPut(tmpnfa, "..//nfaresult2.txt");
 	//nfa2->output();
 	DFA* BeDfa = nfa2->nfa2dfa();
-	//BeDfa->dump();
-	//std::cout << BeDfa->size() << std::endl;
+	std::cout << BeDfa->size() << std::endl;
 	delete nfa2;
 	if (BeDfa != NULL)
 	{
 		BeDfa->minimize();
 	}
+	//BeDfa->dump();
 	//std::cout << BeDfa->size() << std::endl;
 	CDfanew newBeDfa;
 	BeDfa->Dfa2CDfanew(newBeDfa);
@@ -503,9 +502,9 @@ void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 			switch(CompareWithPcre(rr[i][j].C_Str()))
 			{
 			case 0:
-				//std::cout << rule.GetSid() << std::endl;
-				NoMatchSids.push_back(rule.GetSid());
-				//system("pause");
+				std::cout << rule.GetSid() << std::endl;
+				//NoMatchSids.push_back(rule.GetSid());
+				system("pause");
 				continue;
 			case 1:
 				continue;

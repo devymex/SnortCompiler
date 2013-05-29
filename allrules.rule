@@ -1,1 +1,1 @@
-alert tcp $HOME_NET 18713 -> $EXTERNAL_NET any (pcre:"/a((.*b)?c)+/s"; sid:6338; )
+alert tcp $HOME_NET any -> $EXTERNAL_NET any (content:"V S N";sid:1292;)

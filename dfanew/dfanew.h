@@ -34,6 +34,12 @@ struct DFANEWSC TERMSET
 	size_t dfaId;
 };
 
+struct PARTSET
+{
+	std::vector<STATEID> StaSet;
+	BYTE* pAble;
+};
+
 class DFANEWSC CDfanew
 {
 public:
@@ -80,8 +86,8 @@ private:
 	void RemoveUnreachable(const std::vector<STATEID> *Tab, const STALIST &begs, 
 		const size_t &col, std::vector<STATEID> &reachable);
 	void MergeReachable(std::vector<STATEID> &reachable);
-	void PartitionNonDisState(std::vector<STATEID> *pRevTbl, SETLIST &pSets) const;
-	void MergeNonDisStates(SETLIST &Partition);
+	void PartitionNonDisState(std::vector<STATEID> *pRevTbl, std::list<PARTSET> *BSets) const;
+	//void MergeNonDisStates(std::list<PARTSET> *BSets);
 
 };
 
