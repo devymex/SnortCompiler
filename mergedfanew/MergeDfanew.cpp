@@ -207,7 +207,6 @@ MERDFANEW bool NOrMerge(std::vector<CDfanew> &dfas, CDfanew &lastDfa)
 	
 	statehash[startVec] = 0;
 
-	//statesStack.push_back(startVec);
 	statesStack.push(startVec);
 
 	std::vector<size_t> NextVec;

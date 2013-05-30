@@ -1036,10 +1036,10 @@ GROUPINGSC void grouping(CResNew &res, CGROUPRes &groupRes)
 {
 	//std::vector<CDfanew> dfas;
 	//CDfanew mergeDfa;
-	//dfas.push_back(res.GetDfaTable()[458]);
-	//dfas.push_back(res.GetDfaTable()[459]);
-	//outPutDfa(dfas[0], "F:\\cppProject\\huawei\\PreciseMatch\\mytestTmp\\dfa0.txt");
-	//outPutDfa(dfas[1], "F:\\cppProject\\huawei\\PreciseMatch\\mytestTmp\\dfa1.txt");
+	//dfas.push_back(res.GetDfaTable()[531]);
+	//dfas.push_back(res.GetDfaTable()[8060]);
+	//outPutDfa(dfas[0], "F:\\cppProject\\huawei\\PreciseMatch\\mytestTmp\\dfa_531_2.txt");
+	//outPutDfa(dfas[1], "F:\\cppProject\\huawei\\PreciseMatch\\mytestTmp\\dfa_8060_2.txt");
 	//dfas.push_back(res.GetDfaTable()[1623]);
 	//dfas.push_back(res.GetDfaTable()[1624]);
 	//dfas.push_back(res.GetDfaTable()[4806]);
@@ -1050,20 +1050,48 @@ GROUPINGSC void grouping(CResNew &res, CGROUPRes &groupRes)
 
 	//NOrMerge(dfas, mergeDfa);
 	//dfas[0] = mergeDfa;
-	//dfas[1] = res.GetDfaTable()[1623];
+	////outPutDfa(mergeDfa, "F:\\cppProject\\huawei\\PreciseMatch\\mytestTmp\\merge_2_01.txt");
+	//dfas[1] = res.GetDfaTable()[8063];
+	////outPutDfa(dfas[1], "F:\\cppProject\\huawei\\PreciseMatch\\mytestTmp\\dfa_8063_2.txt");
 	//NOrMerge(dfas, mergeDfa);
+	////outPutDfa(mergeDfa, "F:\\cppProject\\huawei\\PreciseMatch\\mytestTmp\\merge_2_012.txt");
 	//dfas[0] = mergeDfa;
-	//dfas[1] = res.GetDfaTable()[1624];
+	//dfas[1] = res.GetDfaTable()[2402];
+	////outPutDfa(dfas[1], "F:\\cppProject\\huawei\\PreciseMatch\\mytestTmp\\dfa_2402_2.txt");
 	//NOrMerge(dfas, mergeDfa);
-	//dfas[0] = mergeDfa;
-	//dfas[1] = res.GetDfaTable()[4806];
-	//NOrMerge(dfas, mergeDfa);
-	//dfas[0] = mergeDfa;
-	//dfas[1] = res.GetDfaTable()[5136];
-	//NOrMerge(dfas, mergeDfa);
-	//outPutDfa(mergeDfa, "F:\\cppProject\\huawei\\PreciseMatch\\mytestTmp\\mergeDfa_2_2.txt");
+	////outPutDfa(mergeDfa, "F:\\cppProject\\huawei\\PreciseMatch\\mytestTmp\\merge_2_0123.txt");
 
-	//std::cout << std::endl;
+	//dfas[0] = mergeDfa;
+	//dfas[1] = res.GetDfaTable()[80];
+	////outPutDfa(dfas[1], "F:\\cppProject\\huawei\\PreciseMatch\\mytestTmp\\dfa_80_2.txt");
+	//NOrMerge(dfas, mergeDfa);
+
+	//dfas[0] = mergeDfa;
+	//dfas[1] = res.GetDfaTable()[112];
+	////outPutDfa(dfas[1], "F:\\cppProject\\huawei\\PreciseMatch\\mytestTmp\\dfa_112_2.txt");
+	//NOrMerge(dfas, mergeDfa);
+
+	//dfas[0] = mergeDfa;
+	//dfas[1] = res.GetDfaTable()[146];
+	////outPutDfa(dfas[1], "F:\\cppProject\\huawei\\PreciseMatch\\mytestTmp\\dfa_146_2.txt");
+	//NOrMerge(dfas, mergeDfa);
+
+	//dfas[0] = mergeDfa;
+	//dfas[1] = res.GetDfaTable()[155];
+	////outPutDfa(dfas[1], "F:\\cppProject\\huawei\\PreciseMatch\\mytestTmp\\dfa_155_2.txt");
+	//NOrMerge(dfas, mergeDfa);
+
+	//dfas[0] = mergeDfa;
+	//dfas[1] = res.GetDfaTable()[691];
+	////outPutDfa(dfas[1], "F:\\cppProject\\huawei\\PreciseMatch\\mytestTmp\\dfa_691_2.txt");
+	//NOrMerge(dfas, mergeDfa);
+
+	//dfas[0] = mergeDfa;
+	//dfas[1] = res.GetDfaTable()[887];
+	////outPutDfa(dfas[1], "F:\\cppProject\\huawei\\PreciseMatch\\mytestTmp\\dfa_887_2.txt");
+	//NOrMerge(dfas, mergeDfa);
+
+	//outPutDfa(mergeDfa, "F:\\cppProject\\huawei\\PreciseMatch\\mytestTmp\\mergeDfa_1.txt");
 	//mergeDfa.printTerms();
 
 
