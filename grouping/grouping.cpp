@@ -1036,14 +1036,16 @@ GROUPINGSC void grouping(CResNew &res, CGROUPRes &groupRes)
 {
 	//std::vector<CDfanew> dfas;
 	//CDfanew mergeDfa;
-	//dfas.push_back(res.GetDfaTable()[1342]);
-	//dfas.push_back(res.GetDfaTable()[1343]);
+	//dfas.push_back(res.GetDfaTable()[458]);
+	//dfas.push_back(res.GetDfaTable()[459]);
+	//outPutDfa(dfas[0], "F:\\cppProject\\huawei\\PreciseMatch\\mytestTmp\\dfa0.txt");
+	//outPutDfa(dfas[1], "F:\\cppProject\\huawei\\PreciseMatch\\mytestTmp\\dfa1.txt");
 	//dfas.push_back(res.GetDfaTable()[1623]);
 	//dfas.push_back(res.GetDfaTable()[1624]);
 	//dfas.push_back(res.GetDfaTable()[4806]);
 	//dfas.push_back(res.GetDfaTable()[5136]);
 	//NOrMerge(dfas, mergeDfa);
-	//outPutDfa(mergeDfa, "F:\\cppProject\\huawei\\PreciseMatch\\mytestTmp\\mergeDfa_hebing.txt");
+	//outPutDfa(mergeDfa, "F:\\cppProject\\huawei\\PreciseMatch\\mytestTmp\\mergeDfa_1_8492.txt");
 	//mergeDfa.printTerms();
 
 	//NOrMerge(dfas, mergeDfa);
@@ -1161,7 +1163,7 @@ GROUPINGSC void grouping(CResNew &res, CGROUPRes &groupRes)
 	std::cout << vecChainGroups.size() << std::endl;
 	//outPutGroup(vecChainGroups, "F:\\cppProject\\huawei\\PreciseMatch\\testMerg\\group_result_2.txt");
 	//outPutResultDfa(vecChainGroups, res, "F:\\cppProject\\huawei\\PreciseMatch\\testMerg\\result_2.txt");
-	//outPutDfa(res.GetDfaTable()[11821], "F:\\cppProject\\huawei\\PreciseMatch\\testMerg\\dfa2_11821.txt");
+	//outPutDfa(res.GetDfaTable()[9623], "F:\\cppProject\\huawei\\PreciseMatch\\testMerg\\dfa2_9623.txt");
 
 	std::cout << "Total time: " << tAll.Reset() << " Sec." << std::endl;
 }

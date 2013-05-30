@@ -31,9 +31,6 @@ int main()
 
 	groupRes.WriteToFile(_T("..\\..\\output\\GroupResut_2.cdt"));
 
-	//groupRes.ReadFromFile(_T("..\\..\\output\\GroupResut.cdt"));
-	//groupRes.WriteToFile(_T("..\\..\\output\\GroupResut1.cdt"));
-
 	system("pause");
 	return 0;
 }

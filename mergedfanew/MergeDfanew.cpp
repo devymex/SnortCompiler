@@ -7,10 +7,6 @@
 //{
 //	CTimer c;//用于测试
 //#undef max
-//
-//	//outPutDfa(dfas[0], "F:\\cppProject\\huawei\\PreciseMatch\\testMerg\\dfas_0_ori.txt");//用于测试
-//	//outPutDfa(dfas[1], "F:\\cppProject\\huawei\\PreciseMatch\\testMerg\\dfas_1_ori.txt");//用于测试
-//
 //	size_t nTermSta = 0;//合并后nfa总状态数
 //	for(size_t i = 0; i < dfas.size(); ++i)
 //	{
@@ -36,17 +32,13 @@
 //		//NIncreDfaNum(dfas[i], oneNfa.Size());
 //		NInsertDfa(dfas[i], oneNfa, nTermSta, nfalog, count);
 //	}
-//	//outPutDfa(dfas[0], "F:\\cppProject\\huawei\\PreciseMatch\\testMerg\\dfas_0_incre.txt");//用于测试
-//	//outPutDfa(dfas[1], "F:\\cppProject\\huawei\\PreciseMatch\\testMerg\\dfas_1_incre.txt");//用于测试
-//	//outPut(oneNfa, "F:\\cppProject\\huawei\\PreciseMatch\\testMerg\\Nfa1_merge.txt");
 //
 //	size_t tmp = lastDfa.FromNFA(oneNfa, nfalog, count, true);
-//	//std::cout << "方法一合并dfa用时：" << c.Reset() << std::endl;
-//
 //	//if(lastDfa.FromNFA(oneNfa, nfalog, count, true) == 0)
 //	if(tmp == 0)
 //	{
-//		lastDfa.Minimize();
+//		lastDfa.UniqueTermSet();
+//		//lastDfa.Minimize();
 //		if(lastDfa.Size() > DFA_SIZE_LIMIT)
 //		{
 //			std::cerr << "DFA_SIZE_LIMIT" << std::endl;
@@ -183,7 +175,6 @@ MERDFANEW bool NOrMerge(std::vector<CDfanew> &dfas, CDfanew &lastDfa)
 	STATESETHASH statehash;
 
 	size_t finFlag = 0;//判断是否终态
-	//std::deque<std::vector<size_t> > statesStack;
 	std::stack<std::vector<size_t> > statesStack;//测试
 	std::vector<size_t> startVec(dfasSize + 2);//使用一个大小为dfas.size() + 2的vector表示合并后的nfa的状态，其中第0个元素表示dfa1的状态，..., 最后两个元素表示虚拟的初始状态0和终止状态nTermSta
 	
@@ -198,9 +189,6 @@ MERDFANEW bool NOrMerge(std::vector<CDfanew> &dfas, CDfanew &lastDfa)
 			//是终态
 			finFlag = 1;
 			lastDfa.AddTermIntoDFA(nSta, dfas[i], 0);//将dfas[i]根据nSta找到的dfaId插入到lastDfa的0状态中
-			//lastDfa.PushBackTermSet(TERMSET());
-			//lastDfa.BackTermSet().dfaId = dfas[i].GetId();
-			//lastDfa.BackTermSet().dfaSta = 0;
 		}
 		startVec[i] = nSta;
 	}
@@ -227,14 +215,6 @@ MERDFANEW bool NOrMerge(std::vector<CDfanew> &dfas, CDfanew &lastDfa)
 
 	while(!statesStack.empty())
 	{
-		//if(lastDfa.Size() > std::numeric_limits<STATEID>::max())
-		//{
-		//	return (size_t)-1;
-		//}
-		//std::cout << (size_t)lastDfa.Size() << std::endl;//用于测试
-
-		//std::vector<size_t> curVec = statesStack.front();//当前状态集合, curVec共有dfasSize + 2个状态
-		//statesStack.pop_front();
 		std::vector<size_t> curVec = statesStack.top();//当前状态集合, curVec共有dfasSize + 2个状态
 		statesStack.pop();
 		
@@ -303,11 +283,6 @@ MERDFANEW bool NOrMerge(std::vector<CDfanew> &dfas, CDfanew &lastDfa)
 				if(nextIt == statehash.end())
 				{
 #undef max 
-					//if (statehash.size() >= std::numeric_limits<STATEID>::max())
-					//{
-					//	std::cerr << "Size limit!" << std::endl;
-					//	return false;
-					//}
 					lastDfa.ResizeRow(lastDfa.Size() + 1, colCnt);
 					if(lastDfa.Size() > SC_STATELIMIT)
 					{
@@ -317,8 +292,6 @@ MERDFANEW bool NOrMerge(std::vector<CDfanew> &dfas, CDfanew &lastDfa)
 					STATEID nextSta = (STATEID)statehash.size();
 					statehash[NextVec] = nextSta;
 					lastDfa[curStaNum][lastDfaGroup] = nextSta;
-					//std::cout << (size_t)lastDfa.Size() << std::endl;//用于测试
-					//lastDfa.ResizeRow(nextSta + 1, colCnt);
 
 					if(finFlag)
 					{
@@ -329,16 +302,12 @@ MERDFANEW bool NOrMerge(std::vector<CDfanew> &dfas, CDfanew &lastDfa)
 								if((dfas[k][NextVec[k]].GetFlag() & CDfaRow::TERMINAL) != 0)
 								{
 									lastDfa.AddTermIntoDFA(NextVec[k], dfas[k], nextSta);
-									//lastDfa.PushBackTermSet(TERMSET());
-									//lastDfa.BackTermSet().dfaId = dfas[k].GetId();
-									//lastDfa.BackTermSet().dfaSta = nextSta;
 								}
 							}
 						}
 						lastDfa[nextSta].SetFlag(lastDfa[nextSta].GetFlag() | CDfaRow::TERMINAL);
 					}
 				
-					//statesStack.push_back(NextVec);
 					statesStack.push(NextVec);
 				}
 				else
@@ -353,6 +322,11 @@ MERDFANEW bool NOrMerge(std::vector<CDfanew> &dfas, CDfanew &lastDfa)
 		}
 	}
 	lastDfa.UniqueTermSet();
+
+	//对lastDfa进行进一步按列分组
+
+
+
 	//lastDfa.Minimize();
 	if(lastDfa.Size() > DFA_SIZE_LIMIT)
 	{
