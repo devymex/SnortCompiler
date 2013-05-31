@@ -585,11 +585,11 @@ DFANEWSC size_t CDfanew::Minimize()
 	//divide nondistinguishable states
 	PartitionNonDisState(pRevTab, partSet);
 
-	//if (Blocks[0].size() < nSize)
-	//{
-	//	//DFA minization
-	//	MergeNonDisStates(Blocks);
-	//}
+	if (partSet.size() < nSize)
+	{
+		//DFA minization
+		MergeNonDisStates(partSet);
+	}
 
 	delete []pRevTab;
 	return 0;

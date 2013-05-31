@@ -142,7 +142,7 @@ private:
 		const size_t &col, std::vector<STATEID> &reachable);
 	void MergeReachable(std::vector<STATEID> &reachable);
 	void PartitionNonDisState(std::vector<STATEID> *pRevTbl, std::vector<struct PARTSET> &partSet) const;
-	//void MergeNonDisStates(std::vector<PARTSET> *BSets);
+	void MergeNonDisStates(std::vector<struct PARTSET> &partSet);
 
 };
 
