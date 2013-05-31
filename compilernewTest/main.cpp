@@ -77,8 +77,8 @@ void main()
 	//std::cout << success_cNt + error_cNt + exceed_cNt + hasbyte_cNt + hasnot_cNt + empty_cNt + hasnosig_cNt + exceedlimit_cNt << std::endl;
 	//std::cout << result.GetSidDfaIds().Size() << std::endl;
 
-	compilenew(_T("..\\..\\input\\allrules.rule"), result);
-	result.WriteToFile(_T("..\\..\\output\\result.cdt"));
+	compilenew(_T("..\\allrules.rule"), result);
+	result.WriteToFile(_T("..\\result.cdt"));
 	std::cout << t.Reset() << std::endl;
 	system("pause");
 }
