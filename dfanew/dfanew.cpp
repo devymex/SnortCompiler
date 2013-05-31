@@ -956,10 +956,14 @@ void ReleaseAbleTo(std::vector<BYTE*> &ableTo)
 
 void CalcAbleTo(std::vector<STATEID> *pRevTbl, size_t nGrpNum, size_t nStaNum, PARTSET &ps)
 {
+	//清空AbleTo
 	ReleaseAbleTo(ps.AbleTo);
+
+	//计算AbleTo的值，每产生一个新的或者更新PARTSET对象计算一次
 	for (size_t j = 0; j < nGrpNum; ++j)
 	{
 		BYTE *pAbleTo = (BYTE*)VirtualAlloc(NULL, nStaNum, MEM_COMMIT, PAGE_READWRITE);
+		//遍历PARTSET中的每个状态t，若存在δ(-1)(t,j)≠Φ，AbleTo[t]标记为1
 		for (std::list<STATEID>::iterator k = ps.StaSet.begin(); k != ps.StaSet.end(); ++k)
 		{
 			pAbleTo[*k] = !(pRevTbl[*k * nGrpNum + j].empty());
@@ -975,6 +979,7 @@ void CDfanew::InitPartSet(std::vector<PARTSET> &partSet) const
 
 	partSet.clear();
 
+	//用于区分属于不同DFA的终态集合
 	std::set<size_t> *pTerm2Dfa = new std::set<size_t>[nStaNum];
 
 	for (STATEID i = 0; i < m_TermSet->size(); ++i)
@@ -983,6 +988,8 @@ void CDfanew::InitPartSet(std::vector<PARTSET> &partSet) const
 		pTerm2Dfa[ts.dfaSta].insert(ts.dfaId);
 	}
 
+	//区别终态集合和非终态集合，map的first为空，则表示对应的PARTSET为非终态集合，反之，为终态集合
+	//initBSet中集合无序
 	std::map<std::set<size_t>, PARTSET> initBSet;
 	for (STATEID i = 0; i < nStaNum; ++i)
 	{
@@ -991,6 +998,7 @@ void CDfanew::InitPartSet(std::vector<PARTSET> &partSet) const
 	}
 	delete []pTerm2Dfa;
 
+	//调整终态和非终态集合的顺序，vector中的last为非终态集合
 	for (std::map<std::set<size_t>, PARTSET>::iterator i = initBSet.begin();
 		i != initBSet.end(); ++i)
 	{
@@ -1016,11 +1024,16 @@ void CDfanew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, std::vector<PA
 
 	for (std::vector<PARTSET>::iterator i = partSet.begin(); i != partSet.end(); ++i)
 	{
+		//对于partSet中每个集合，根据不同的nGrpNum计算不同AbleTo，AbleTo对应论文中的a(i)
 		CalcAbleTo(pRevTbl, nGrpNum, nStaNum, *i);
 	}
 
+	//pWait表示用于切分partSet中每个集合的集合下标，
+	//对于不同的输入字符会保存多个不同集合下标。对应论文中L(a)
 	std::vector<size_t> *pWait = new std::vector<size_t>[nGrpNum];
 
+	//初始化pWait，要求若满足0<|ij|<=|ik|，则将j存入pWait，反之，存入k
+	//对应论文中初始化L(a)过程，这里的i对应a
 	for (size_t i = 0; i < nGrpNum; ++i)
 	{
 		size_t nMinId = 0;
@@ -1043,11 +1056,13 @@ void CDfanew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, std::vector<PA
 		}
 	}
 
+	//标记能够经过某一输入字符，能够到达ISet中的状态的状态集合
 	BYTE *pAbleToI = (BYTE*)VirtualAlloc(NULL, nStaNum, MEM_COMMIT, PAGE_READWRITE);
 	for (; ; )
 	{
 		BYTE byCurGrp = -1;
 		size_t nCurSet = -1;
+		//从pWait中取一个值并remove该值
 		for (size_t i = 0; i < nGrpNum; ++i)
 		{
 			if (!pWait[i].empty())
@@ -1058,6 +1073,7 @@ void CDfanew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, std::vector<PA
 				break;
 			}
 		}
+		//最外层循环的终止条件
 		if (nCurSet == -1)
 		{
 			break;
@@ -1066,6 +1082,7 @@ void CDfanew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, std::vector<PA
 		PARTSET *pISet = &partSet[nCurSet];
 		ZeroMemory(pAbleToI, nStaNum);
 		size_t nRevCnt = 0;
+		//初始化pAbleToI
 		for (std::list<STATEID>::iterator iSta = pISet->StaSet.begin();
 			iSta != pISet->StaSet.end(); ++iSta)
 		{
@@ -1082,9 +1099,14 @@ void CDfanew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, std::vector<PA
 		{
 			for (size_t j = 0; j != partSet.size(); ++j)
 			{
+				//取partSet中的一个集合j，B(j)中存在t满足条件δ(t,a)∈a(i)，
+				//B’(j)为t的集合，B“(j)为B(j)-B‘(j)
 				PARTSET *pJSet = &partSet[j];
 				std::list<STATEID>::iterator t = pJSet->StaSet.begin();
+				//将满足条件的t存在集合j的前段，不满足的存在集合j的后段
+				//满足条件的t标记为1，先滤去pAbleToI中前段为1的值
 				for (; t != pJSet->StaSet.end() && pAbleToI[*t] != 0; ++t);
+				//将后段中出现的值为1的插入至前段
 				for (; t != pJSet->StaSet.end();)
 				{
 					if (pAbleToI[*t] == 1)
@@ -1102,15 +1124,18 @@ void CDfanew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, std::vector<PA
 				pISet = &partSet[nCurSet];
 
 				std::list<STATEID>::iterator part = pJSet->StaSet.begin();
+				//查找产生0,1分段的切分点，记为part
 				for (; part != pJSet->StaSet.end() && pAbleToI[*part] != 0; ++part);
 				if (part != pJSet->StaSet.begin() && part != pJSet->StaSet.end())
 				{
+					//保存产生的新的划分
 					PARTSET &lastPart = partSet.back();
 					lastPart.StaSet.splice(lastPart.StaSet.begin(),
 						pJSet->StaSet, part, pJSet->StaSet.end());
 					CalcAbleTo(pRevTbl, nGrpNum, nStaNum, *pJSet);
 					CalcAbleTo(pRevTbl, nGrpNum, nStaNum, lastPart);
 
+					//更新pWait
 					for (BYTE m = 0; m < nGrpNum; ++m)
 					{
 						int k = partSet.size() - 1;
