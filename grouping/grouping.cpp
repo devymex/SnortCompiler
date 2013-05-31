@@ -1152,9 +1152,9 @@ GROUPINGSC void grouping(CResNew &res, CGROUPRes &groupRes)
 	std::cout << "Completed in " << t1.Reset() << " Sec." << std::endl << std::endl;
 
 	std::cout << vecChainGroups.size() << std::endl;
-	//outPutGroup(vecChainGroups, "F:\\cppProject\\huawei\\PreciseMatch\\testMerg\\group_result_3.txt");
-	//outPutResultDfa(vecChainGroups, res, "F:\\cppProject\\huawei\\PreciseMatch\\testMerg\\result_3.txt");
-	//outPuttermset(vecChainGroups, res, "F:\\cppProject\\huawei\\PreciseMatch\\testMerg\\termset_3.txt");
+	outPutGroup(vecChainGroups, "F:\\cppProject\\huawei\\PreciseMatch\\testMerg\\group_result_3.txt");
+	outPutResultDfa(vecChainGroups, res, "F:\\cppProject\\huawei\\PreciseMatch\\testMerg\\result_3.txt");
+	outPuttermset(vecChainGroups, res, "F:\\cppProject\\huawei\\PreciseMatch\\testMerg\\termset_3.txt");
 	//outPutDfa(res.GetDfaTable()[9623], "F:\\cppProject\\huawei\\PreciseMatch\\testMerg\\dfa2_9623.txt");
 
 	std::cout << "Total time: " << tAll.Reset() << " Sec." << std::endl;
