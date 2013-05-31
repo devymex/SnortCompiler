@@ -9,6 +9,7 @@
 #define PMATCHPKT __declspec(dllexport)
 #endif
 
+
 struct REGRULES
 {
 	size_t m_nSid;
