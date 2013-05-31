@@ -16,7 +16,7 @@ void main()
 	const char* a1 = "/^abcdef/smi";
 	const char* a2 = "/^abcijk/smi";
 	CRegChain regChain;
-	CNfa nfa1, nfa2;//, nfa3, nfa4, nfa5;
+	//CNfa nfa1, nfa2, nfa3, nfa4, nfa5;
 	//PcreToNFA("/xml/s", nfa2, regChain);
 	//PcreToNFA("/<method>/s", nfa3, regChain);
 	//PcreToNFA(a5, nfa5, regChain);

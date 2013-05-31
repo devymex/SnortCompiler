@@ -1040,6 +1040,7 @@ void CDfanew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, std::vector<PA
 		}
 	}
 
+	BYTE *pAbleToI = (BYTE*)VirtualAlloc(NULL, nStaNum, MEM_COMMIT, PAGE_READWRITE);
 	for (; ; )
 	{
 		BYTE byCurGrp = -1;
@@ -1060,71 +1061,77 @@ void CDfanew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, std::vector<PA
 		}
 
 		PARTSET *pISet = &partSet[nCurSet];
-		for (size_t j = 0; j != partSet.size(); ++j)
+		ZeroMemory(pAbleToI, nStaNum);
+		size_t nRevCnt = 0;
+		for (std::list<STATEID>::iterator iSta = pISet->StaSet.begin();
+			iSta != pISet->StaSet.end(); ++iSta)
 		{
-			PARTSET *pJSet = &partSet[j];
-			std::list<STATEID>::iterator t = pJSet->StaSet.begin();
-			for (; t != pJSet->StaSet.end(); ++t)
+			std::vector<STATEID> &revI = pRevTbl[*iSta * nGrpNum + byCurGrp];
+			for (std::vector<STATEID>::iterator iRevSta = revI.begin();
+				iRevSta != revI.end(); ++iRevSta)
 			{
-				STATEID tNext = (*m_pDfa)[*t][byCurGrp];
-				if (tNext == STATEID(-1) || pISet->AbleTo[byCurGrp][tNext] == 0)
-				{
-					break;
-				}
+				pAbleToI[*iRevSta] = 1;
+				++nRevCnt;
 			}
-			for (; t != pJSet->StaSet.end();)
+		}
+
+		if (nRevCnt != 0)
+		{
+			for (size_t j = 0; j != partSet.size(); ++j)
 			{
-				STATEID tNext = (*m_pDfa)[*t][byCurGrp];
-				if (tNext != STATEID(-1) && pISet->AbleTo[byCurGrp][tNext])
+				PARTSET *pJSet = &partSet[j];
+				std::list<STATEID>::iterator t = pJSet->StaSet.begin();
+				for (; t != pJSet->StaSet.end() && pAbleToI[*t] != 0; ++t);
+				for (; t != pJSet->StaSet.end();)
 				{
-					pJSet->StaSet.insert(pJSet->StaSet.begin(), *t);
-					t = pJSet->StaSet.erase(t);
+					if (pAbleToI[*t] == 1)
+					{
+						pJSet->StaSet.insert(pJSet->StaSet.begin(), *t);
+						t = pJSet->StaSet.erase(t);
+					}
+					else
+					{
+						++t;
+					}
+				}
+				partSet.push_back(PARTSET());
+				pJSet = &partSet[j];
+				pISet = &partSet[nCurSet];
+
+				std::list<STATEID>::iterator part = pJSet->StaSet.begin();
+				for (; part != pJSet->StaSet.end() && pAbleToI[*part] != 0; ++part);
+				if (part != pJSet->StaSet.begin() && part != pJSet->StaSet.end())
+				{
+					PARTSET &lastPart = partSet.back();
+					lastPart.StaSet.splice(lastPart.StaSet.begin(),
+						pJSet->StaSet, part, pJSet->StaSet.end());
+					CalcAbleTo(pRevTbl, nGrpNum, nStaNum, *pJSet);
+					CalcAbleTo(pRevTbl, nGrpNum, nStaNum, lastPart);
+
+					for (BYTE m = 0; m < nGrpNum; ++m)
+					{
+						int k = partSet.size() - 1;
+						std::vector<size_t> &curWait = pWait[m];
+						int aj = CountOnes(pJSet->AbleTo[m], nStaNum);
+						int ak = CountOnes(lastPart.AbleTo[m], nStaNum);
+						if (aj > 0 && aj <= ak)
+						{
+							if (std::find(curWait.begin(), curWait.end(), j) == curWait.end())
+							{
+								k = j;
+							}
+						}
+						curWait.push_back(k);
+					}
 				}
 				else
 				{
-					++t;
+					partSet.pop_back();
 				}
-			}
-			int k = partSet.size();
-			partSet.push_back(PARTSET());
-			pJSet = &partSet[j];
-			pISet = &partSet[nCurSet];
-
-			std::list<STATEID>::iterator part = pJSet->StaSet.begin();
-			for (; part != pJSet->StaSet.end(); ++part)
-			{
-				STATEID partNext = (*m_pDfa)[*part][byCurGrp];
-				if (partNext == STATEID(-1) || pISet->AbleTo[byCurGrp][partNext] == 0)
-				{
-					break;
-				}
-			}
-			if (part != pJSet->StaSet.begin() && part != pJSet->StaSet.end())
-			{
-				PARTSET &lastPart = partSet.back();
-				lastPart.StaSet.splice(lastPart.StaSet.begin(),
-					pJSet->StaSet, part, pJSet->StaSet.end());
-				CalcAbleTo(pRevTbl, nGrpNum, nStaNum, *pISet);
-				CalcAbleTo(pRevTbl, nGrpNum, nStaNum, lastPart);
-
-				std::vector<size_t> &curWait = pWait[byCurGrp];
-				int aj = CountOnes(pISet->AbleTo[byCurGrp], nStaNum);
-				int ak = CountOnes(lastPart.AbleTo[byCurGrp], nStaNum);
-				if (aj > 0 && aj <= ak)
-				{
-					if (std::find(curWait.begin(), curWait.end(), j) == curWait.end())
-					{
-						k = j;
-					}
-				}
-				curWait.push_back(k);
-			}
-			else
-			{
-				partSet.pop_back();
 			}
 		}
 	}
+	VirtualFree(pAbleToI, nStaNum, MEM_RELEASE);
 	for (std::vector<PARTSET>::iterator i = partSet.begin(); i != partSet.end(); ++i)
 	{
 		ReleaseAbleTo(i->AbleTo);
@@ -1312,6 +1319,8 @@ void CDfanew::MergeNonDisStates(std::vector<PARTSET> &partSet)
 		curRow.SetFlag(orgRow.GetFlag());
 		++nSetIdx;
 	}
+
+	UniqueTermSet();
 
 	//Ìæ»»m_pDfa
 	delete m_pDfa;

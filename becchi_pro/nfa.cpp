@@ -157,29 +157,6 @@ unsigned int NFA::size(){
 	return size;	
 }
 
-	{
-		bool operator()(pair<symbol_t,NFA*>* &p1, pair<symbol_t,NFA*>* &p2)
-		{
-			return p1->first < p2->first;
-		}
-	};
-	size_t idx = 0;
-	for (nfa_list::iterator iState = queue->begin(); iState != queue->end(); ++iState, ++idx)
-		std::sort(tmp.begin(), tmp.end(), COMP());
-		for (std::vector<pair<symbol_t,NFA*>*>::iterator i = tmp.begin(); i != tmp.end(); ++i)
-
-	//nfa_list *queue=new nfa_list();
-	//traverse(queue);
-	//for (nfa_list::iterator iState = queue->begin(); iState != queue->end(); ++iState)
-	//{
-	//	std::cout << (*iState)->id << ":";
-	//	pair_set *curState = (*iState)->transitions;
-	//	for (pair_set::iterator ipair = curState->begin(); ipair  != curState->end(); ++ipair)
-	//	{
-	//		std::cout <<  "<" << (*ipair)->first << "," << (*ipair)->second->id << ">";  
-	//	}
-	//	std::cout << std::endl;
-	//}
 void NFA::reset_marking(){
 	if (!marked) return;
 	marked=0;
