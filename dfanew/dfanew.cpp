@@ -986,63 +986,69 @@ void CDfanew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, std::vector<PA
 			break;
 		}
 
-		PARTSET &iSet = partSet[nCurSet];
+		PARTSET *pISet = &partSet[nCurSet];
 		for (size_t j = 0; j != partSet.size(); ++j)
 		{
-			PARTSET &jSet = partSet[j];
-			std::list<STATEID>::iterator t = jSet.StaSet.begin();
-			for (; t != jSet.StaSet.end(); ++t)
+			PARTSET *pJSet = &partSet[j];
+			std::list<STATEID>::iterator t = pJSet->StaSet.begin();
+			for (; t != pJSet->StaSet.end(); ++t)
 			{
 				STATEID tNext = (*m_pDfa)[*t][byCurGrp];
-				if (tNext == STATEID(-1) || iSet.AbleTo[byCurGrp][tNext] == 0)
+				if (tNext == STATEID(-1) || pISet->AbleTo[byCurGrp][tNext] == 0)
 				{
 					break;
 				}
 			}
-			for (; t != jSet.StaSet.end();)
+			for (; t != pJSet->StaSet.end();)
 			{
 				STATEID tNext = (*m_pDfa)[*t][byCurGrp];
-				if (tNext != STATEID(-1) && iSet.AbleTo[byCurGrp][tNext])
+				if (tNext != STATEID(-1) && pISet->AbleTo[byCurGrp][tNext])
 				{
-					jSet.StaSet.insert(jSet.StaSet.begin(), *t);
-					t = jSet.StaSet.erase(t);
+					pJSet->StaSet.insert(pJSet->StaSet.begin(), *t);
+					t = pJSet->StaSet.erase(t);
 				}
 				else
 				{
 					++t;
 				}
 			}
-			std::list<STATEID>::iterator part = jSet.StaSet.begin();
-			for (; part != jSet.StaSet.end(); ++part)
+			int k = partSet.size();
+			partSet.push_back(PARTSET());
+			pJSet = &partSet[j];
+			pISet = &partSet[nCurSet];
+
+			std::list<STATEID>::iterator part = pJSet->StaSet.begin();
+			for (; part != pJSet->StaSet.end(); ++part)
 			{
 				STATEID partNext = (*m_pDfa)[*part][byCurGrp];
-				if (!iSet.AbleTo[byCurGrp][partNext])
+				if (partNext == STATEID(-1) || pISet->AbleTo[byCurGrp][partNext] == 0)
 				{
 					break;
 				}
 			}
-			if (part != jSet.StaSet.begin())
+			if (part != pJSet->StaSet.begin() && part != pJSet->StaSet.end())
 			{
-				int k = partSet.size();
+				PARTSET &lastPart = partSet.back();
+				lastPart.StaSet.splice(lastPart.StaSet.begin(),
+					pJSet->StaSet, part, pJSet->StaSet.end());
+				CalcAbleTo(pRevTbl, nGrpNum, nStaNum, *pISet);
+				CalcAbleTo(pRevTbl, nGrpNum, nStaNum, lastPart);
+
 				std::vector<size_t> &curWait = pWait[byCurGrp];
-				if (part != jSet.StaSet.end())
+				int aj = CountOnes(pISet->AbleTo[byCurGrp], nStaNum);
+				int ak = CountOnes(lastPart.AbleTo[byCurGrp], nStaNum);
+				if (aj > 0 && aj <= ak)
 				{
-					partSet.push_back(PARTSET());
-					partSet.back().StaSet.splice(partSet.back().StaSet.begin(),
-						iSet.StaSet, part, iSet.StaSet.end());
-					CalcAbleTo(pRevTbl, nGrpNum, nStaNum, iSet);
-					CalcAbleTo(pRevTbl, nGrpNum, nStaNum, partSet.back());
-					int aj = CountOnes(iSet.AbleTo[byCurGrp], nStaNum);
-					int ak = CountOnes(partSet.back().AbleTo[byCurGrp], nStaNum);
-					if (aj <= ak)
+					if (std::find(curWait.begin(), curWait.end(), j) == curWait.end())
 					{
-						if (std::find(curWait.begin(), curWait.end(), j) == curWait.end())
-						{
-							k = j;
-						}
+						k = j;
 					}
 				}
 				curWait.push_back(k);
+			}
+			else
+			{
+				partSet.pop_back();
 			}
 		}
 	}
