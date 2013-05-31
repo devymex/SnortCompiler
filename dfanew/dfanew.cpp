@@ -1059,154 +1059,6 @@ void CDfanew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, std::vector<PA
 	delete []pWait;
 }
 
-//groupnum表示字符集长度，size表示原DFA的状态数，pRevTbl表示逆向访问表
-//pSets表示输入一个状态集的初始划分，输出一个状态集的最终划分结果
-//pSets初始值为终态和非终态集合，其中最后一个为非终态集合
-//void CDfanew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, std::vector<PARTSET> *BSets) const
-//{
-//	size_t groupnum = GetGroupCount();
-//	size_t nSize = m_pDfa->size();
-//	std::vector<size_t> *LChar = new std::vector<size_t>[groupnum];
-//
-//	for (BYTE byChar = 0; byChar < groupnum; ++byChar)
-//	{
-//		size_t bSize = BSets[byChar].size();
-//		std::vector<size_t> cnt(bSize, -1);
-//		size_t idx = 0;
-//		for (std::vector<PARTSET>::iterator iBlock = BSets[byChar].begin();
-//			iBlock != BSets[byChar].end(); ++iBlock)
-//		{
-//			cnt[idx++] = iBlock->GetOnes();
-//		}
-//		
-//		size_t min = 0;
-//		idx = 0;
-//		for (; idx < bSize; ++idx)
-//		{
-//			if (cnt[idx] > 0)
-//			{
-//				min = cnt[idx];
-//				break;
-//			}
-//		}
-//		for (size_t i = idx; i < bSize; ++i)
-//		{
-//			if (min > cnt[i] && cnt[i] > 0)
-//			{
-//				min = cnt[i];
-//				idx = i;
-//			}
-//		}
-//		if (min > 0)
-//		{
-//			LChar[byChar].push_back(idx);
-//		}
-//	}
-//
-//	std::vector<BYTE> ableToW(nSize, 0);
-//	bool bAllZero = true;
-//	while(true)
-//	{
-//		size_t curLStas = -1;
-//		BYTE byCurChar = 0;
-//		for (; byCurChar < groupnum; ++byCurChar)
-//		{
-//			std::vector<size_t> &curL = LChar[byCurChar];
-//			if (!curL.empty())
-//			{
-//				curLStas = curL.back();
-//				curL.pop_back();
-//				break;
-//			}
-//		}
-//
-//		if (curLStas == -1)
-//		{
-//			break;
-//		}
-//
-//		std::vector<PARTSET> &curCBSets = BSets[byCurChar];
-//		PARTSET &curPartset = curCBSets[curLStas];
-//		for (size_t iSta = 0; iSta < nSize; ++iSta)
-//		{
-//			if (curPartset.Able(iSta) == 1)
-//			{
-//				std::vector<STATEID> &ableToI = pRevTbl[iSta * groupnum + byCurChar];
-//				for (std::vector<STATEID>::iterator i = ableToI.begin(); i != ableToI.end(); ++i)
-//				{
-//					ableToW[*i] = 1;
-//					bAllZero = false;
-//				}
-//			}
-//		}
-//
-//		if (!bAllZero)
-//		{
-//			bAllZero = true;
-//			for (size_t iBlock = 0;	iBlock < curCBSets.size(); ++iBlock)
-//			{
-//				std::list<STATEID> &curB = BSets[byCurChar][iBlock].StaSet;
-//				std::list<STATEID>::iterator iSta = curB.begin();
-//				for (; iSta != curB.end() && ableToW[*iSta++] == (BYTE)0;);
-//				for (; iSta != curB.end();)
-//				{
-//					if (ableToW[*iSta] == (BYTE)0)
-//					{
-//						STATEID tmp = *iSta;
-//						iSta = curB.erase(iSta);
-//						curB.insert(curB.begin(), tmp);
-//					}
-//					else
-//					{
-//						++iSta;
-//					}
-//				}
-//
-//				std::list<STATEID>::iterator iCutBeg = curB.begin(), iCutEnd = curB.end();
-//				for (; iCutBeg != curB.end(); ++iCutBeg)
-//				{
-//					if (ableToW[*iCutBeg] == (BYTE)1)
-//					{
-//						iCutEnd = iCutBeg;
-//						iCutBeg = curB.begin();
-//						break;
-//					}
-//				}
-//
-//				if (iCutBeg != iCutEnd)
-//				{
-//					PARTSET newB;
-//					newB.Resize(nSize);
-//					newB.StaSet.splice(newB.StaSet.begin(), curB, iCutBeg, iCutEnd);
-//					ColCharArray(curCBSets.back(), pRevTbl, groupnum, byCurChar);
-//					BSets[byCurChar].push_back(newB);
-//
-//					BSets[byCurChar][iBlock].Reset();
-//					ColCharArray(BSets[byCurChar][iBlock], pRevTbl, groupnum, byCurChar);
-//
-//					size_t newSize = newB.GetOnes();
-//					size_t curSize = BSets[byCurChar][iBlock].GetOnes();
-//					std::vector<size_t>::iterator result;
-//					result = std::find(LChar[byCurChar].begin(), LChar[byCurChar].end(), curLStas);
-//					if (curSize <= newSize 
-//						&& result == LChar[byCurChar].end())
-//					{
-//						LChar[byCurChar].push_back(curLStas);
-//					}
-//					else
-//					{
-//						LChar[byCurChar].push_back(curCBSets.end() - curCBSets.begin());
-//					}
-//
-//				}
-//
-//			}
-//		}
-//		memset(ableToW.data(), 0, ableToW.size());
-//	}
-//	delete[] LChar;
-//}
-//
 
 //void CDfanew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, SETLIST S&pSets) const
 //{
@@ -1319,74 +1171,76 @@ void CDfanew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, std::vector<PA
 //}
 
 //Partition中的元素为一个状态的集合，集合中元素为多个等价状态，每个集合可以合并为新的DFA中一个状态
-//void CDfanew::MergeNonDisStates(SETLIST &Partition)
-//{
-//	std::vector<STATEID> sta2Part(m_pDfa->size());
-//	
-//	STATEID nCol = (STATEID)GetGroupCount();
-//
-//	//标记终态的dfaId，以保证终态编号更改后，其对应的dfaId保持不变
-//	std::vector<size_t> termFlag(m_pDfa->size(), size_t(-1));
-//	for (size_t i = 0; i < m_TermSet->size(); ++i)
-//	{
-//		termFlag[(*m_TermSet)[i].dfaSta] = (*m_TermSet)[i].dfaId;
-//	}
-//	m_TermSet->clear();
-//
-//	//定义一个同CDfanew中成员变量m_pDfa类型相同的变量，用于存储删除多余状态后的DFA跳转表
-//	std::vector<CDfaRow> *pNewDfa = new std::vector<CDfaRow>(
-//		(STATEID)Partition.size(), CDfaRow(nCol));
-//	std::vector<CDfaRow> &tmpDfa = *pNewDfa;
-//
-//	//等价的状态存于同一个partition中，标记原来的状态存在哪一个新的partition中，并修改新的起始状态编号
-//	STATEID nSetIdx = 0;
-//	for (SETLIST_ITER iSet = Partition.begin(); iSet != Partition.end(); ++iSet)
-//	{
-//		for (STALIST_ITER iSta = iSet->begin(); iSta != iSet->end(); ++iSta)
-//		{
-//			STATEID CurSta = *iSta;
-//			CDfaRow &curRow = (*m_pDfa)[CurSta];
-//			sta2Part[CurSta] = nSetIdx;
-//			//修改新的起始状态
-//			if (curRow.GetFlag() & curRow.START)
-//			{
-//				m_StartId = nSetIdx;
-//			}
-//
-//			//存入新的终态编号
-//			if (curRow.GetFlag() & curRow.TERMINAL)
-//			{
-//				TERMSET tmpSta;
-//				tmpSta.dfaSta = nSetIdx;
-//				tmpSta.dfaId = termFlag[CurSta];
-//				m_TermSet->push_back(tmpSta);
-//			}
-//		}
-//		++nSetIdx;
-//	}
-//
-//	//set new DFA and modify new number
-//	nSetIdx = 0;
-//	for (SETLIST_ITER iSet = Partition.begin(); iSet != Partition.end(); ++iSet)
-//	{
-//		CDfaRow &curRow = tmpDfa[nSetIdx];
-//		CDfaRow &orgRow = (*m_pDfa)[iSet->front()];
-//		for (BYTE iCol = 0; iCol != nCol; ++iCol)
-//		{
-//			STATEID nDest = STATEID(-1);
-//			STATEID nCur = orgRow[iCol];
-//			if (nCur != STATEID(-1))
-//			{
-//				nDest = sta2Part[nCur];
-//			}
-//			curRow[iCol] = nDest;
-//		}
-//		//set a state attribute
-//		curRow.SetFlag(orgRow.GetFlag());
-//		++nSetIdx;
-//	}
-//
-//	//替换m_pDfa
-//	delete m_pDfa;
-//	m_pDfa = pNewDfa;
-//}
+void CDfanew::MergeNonDisStates(std::vector<PARTSET> &partSet)
+{
+	std::vector<STATEID> sta2Part(m_pDfa->size());
+	
+	STATEID nCol = (STATEID)GetGroupCount();
+
+	//标记终态的dfaId，以保证终态编号更改后，其对应的dfaId保持不变
+	std::vector<size_t> *termFlag = new std::vector<size_t>[m_pDfa->size()];
+	for (size_t i = 0; i < m_TermSet->size(); ++i)
+	{
+		termFlag[(*m_TermSet)[i].dfaSta].push_back((*m_TermSet)[i].dfaId);
+	}
+	m_TermSet->clear();
+
+	//定义一个同CDfanew中成员变量m_pDfa类型相同的变量，用于存储合并后的DFA跳转表
+	std::vector<CDfaRow> *pNewDfa = new std::vector<CDfaRow>(
+		(STATEID)partSet.size(), CDfaRow(nCol));
+	std::vector<CDfaRow> &tmpDfa = *pNewDfa;
+
+	//等价的状态存于同一个partition中，标记原来的状态存在哪一个新的partition中，并修改新的起始状态编号
+	STATEID nSetIdx = 0;
+	for (std::vector<PARTSET>::iterator iPart = partSet.begin(); iPart != partSet.end(); ++iPart)
+	{
+		for (std::list<STATEID>::iterator iSta = iPart->StaSet.begin(); iSta != iPart->StaSet.end(); ++iSta)
+		{
+			CDfaRow &curRow = (*m_pDfa)[*iSta];
+			sta2Part[*iSta] = nSetIdx;
+			//修改新的起始状态
+			if (curRow.GetFlag() & curRow.START)
+			{
+				m_StartId = nSetIdx;
+			}
+
+			//存入新的终态编号
+			if (curRow.GetFlag() & curRow.TERMINAL)
+			{
+				TERMSET tmpSta;
+				tmpSta.dfaSta = nSetIdx;
+				for (std::vector<size_t>::iterator i = termFlag[*iSta].begin(); i != termFlag[*iSta].end(); ++i)
+				{
+					tmpSta.dfaId = *i;
+					m_TermSet->push_back(tmpSta);
+				}
+			}
+		}
+		++nSetIdx;
+	}
+
+	//set new DFA and modify new number
+	nSetIdx = 0;
+	for (std::vector<PARTSET>::iterator iPart = partSet.begin(); iPart != partSet.end(); ++iPart)
+	{
+		CDfaRow &curRow = tmpDfa[nSetIdx];
+		CDfaRow &orgRow = (*m_pDfa)[iPart->StaSet.front()];
+		for (BYTE iCol = 0; iCol != nCol; ++iCol)
+		{
+			STATEID nDest = STATEID(-1);
+			STATEID nCur = orgRow[iCol];
+			if (nCur != STATEID(-1))
+			{
+				nDest = sta2Part[nCur];
+			}
+			curRow[iCol] = nDest;
+		}
+		//set a state attribute
+		curRow.SetFlag(orgRow.GetFlag());
+		++nSetIdx;
+	}
+
+	//替换m_pDfa
+	delete m_pDfa;
+	m_pDfa = pNewDfa;
+}
