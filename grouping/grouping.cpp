@@ -1032,70 +1032,33 @@ void outPutResultDfa(std::vector<CHAINGROUP> &vecChainGroups, CResNew &res, cons
 	fout.close();
 }
 
+//输出合并后终态对应关系
+void outPuttermset(std::vector<CHAINGROUP> &vecChainGroups, CResNew &res, const char* fileName)
+{
+	std::ofstream fout(fileName);
+	if(!fout)
+	{
+		std::cerr << "Open group_result file Failed!" << std::endl;
+		return;
+	}
+	fout << "mergeDfaId" << "\t" << "dfaSta" << "\t" << "origdfaId" << std::endl;
+	for(std::vector<CHAINGROUP>::iterator iter = vecChainGroups.begin(); 
+		iter != vecChainGroups.end(); ++iter)
+	{
+		CDfanew mergeDfa = res.GetDfaTable()[iter->mergeDfaId];
+		fout << iter->mergeDfaId << "\t";
+		for(size_t i = 0; i < mergeDfa.GetTermCnt(); ++i)
+		{
+			fout << mergeDfa.GetTerm(i).dfaSta << "\t";
+			fout << mergeDfa.GetTerm(i).dfaId << std::endl << "\t";
+		}
+		fout << std::endl;
+	}
+	fout.close();
+}
+
 GROUPINGSC void grouping(CResNew &res, CGROUPRes &groupRes)
 {
-	//std::vector<CDfanew> dfas;
-	//CDfanew mergeDfa;
-	//dfas.push_back(res.GetDfaTable()[531]);
-	//dfas.push_back(res.GetDfaTable()[8060]);
-	//outPutDfa(dfas[0], "F:\\cppProject\\huawei\\PreciseMatch\\mytestTmp\\dfa_531_2.txt");
-	//outPutDfa(dfas[1], "F:\\cppProject\\huawei\\PreciseMatch\\mytestTmp\\dfa_8060_2.txt");
-	//dfas.push_back(res.GetDfaTable()[1623]);
-	//dfas.push_back(res.GetDfaTable()[1624]);
-	//dfas.push_back(res.GetDfaTable()[4806]);
-	//dfas.push_back(res.GetDfaTable()[5136]);
-	//NOrMerge(dfas, mergeDfa);
-	//outPutDfa(mergeDfa, "F:\\cppProject\\huawei\\PreciseMatch\\mytestTmp\\mergeDfa_1_8492.txt");
-	//mergeDfa.printTerms();
-
-	//NOrMerge(dfas, mergeDfa);
-	//dfas[0] = mergeDfa;
-	////outPutDfa(mergeDfa, "F:\\cppProject\\huawei\\PreciseMatch\\mytestTmp\\merge_2_01.txt");
-	//dfas[1] = res.GetDfaTable()[8063];
-	////outPutDfa(dfas[1], "F:\\cppProject\\huawei\\PreciseMatch\\mytestTmp\\dfa_8063_2.txt");
-	//NOrMerge(dfas, mergeDfa);
-	////outPutDfa(mergeDfa, "F:\\cppProject\\huawei\\PreciseMatch\\mytestTmp\\merge_2_012.txt");
-	//dfas[0] = mergeDfa;
-	//dfas[1] = res.GetDfaTable()[2402];
-	////outPutDfa(dfas[1], "F:\\cppProject\\huawei\\PreciseMatch\\mytestTmp\\dfa_2402_2.txt");
-	//NOrMerge(dfas, mergeDfa);
-	////outPutDfa(mergeDfa, "F:\\cppProject\\huawei\\PreciseMatch\\mytestTmp\\merge_2_0123.txt");
-
-	//dfas[0] = mergeDfa;
-	//dfas[1] = res.GetDfaTable()[80];
-	////outPutDfa(dfas[1], "F:\\cppProject\\huawei\\PreciseMatch\\mytestTmp\\dfa_80_2.txt");
-	//NOrMerge(dfas, mergeDfa);
-
-	//dfas[0] = mergeDfa;
-	//dfas[1] = res.GetDfaTable()[112];
-	////outPutDfa(dfas[1], "F:\\cppProject\\huawei\\PreciseMatch\\mytestTmp\\dfa_112_2.txt");
-	//NOrMerge(dfas, mergeDfa);
-
-	//dfas[0] = mergeDfa;
-	//dfas[1] = res.GetDfaTable()[146];
-	////outPutDfa(dfas[1], "F:\\cppProject\\huawei\\PreciseMatch\\mytestTmp\\dfa_146_2.txt");
-	//NOrMerge(dfas, mergeDfa);
-
-	//dfas[0] = mergeDfa;
-	//dfas[1] = res.GetDfaTable()[155];
-	////outPutDfa(dfas[1], "F:\\cppProject\\huawei\\PreciseMatch\\mytestTmp\\dfa_155_2.txt");
-	//NOrMerge(dfas, mergeDfa);
-
-	//dfas[0] = mergeDfa;
-	//dfas[1] = res.GetDfaTable()[691];
-	////outPutDfa(dfas[1], "F:\\cppProject\\huawei\\PreciseMatch\\mytestTmp\\dfa_691_2.txt");
-	//NOrMerge(dfas, mergeDfa);
-
-	//dfas[0] = mergeDfa;
-	//dfas[1] = res.GetDfaTable()[887];
-	////outPutDfa(dfas[1], "F:\\cppProject\\huawei\\PreciseMatch\\mytestTmp\\dfa_887_2.txt");
-	//NOrMerge(dfas, mergeDfa);
-
-	//outPutDfa(mergeDfa, "F:\\cppProject\\huawei\\PreciseMatch\\mytestTmp\\mergeDfa_1.txt");
-	//mergeDfa.printTerms();
-
-
-
 	//Load all rules chains from file
 	CTimer t1, tAll;
 
@@ -1189,8 +1152,9 @@ GROUPINGSC void grouping(CResNew &res, CGROUPRes &groupRes)
 	std::cout << "Completed in " << t1.Reset() << " Sec." << std::endl << std::endl;
 
 	std::cout << vecChainGroups.size() << std::endl;
-	//outPutGroup(vecChainGroups, "F:\\cppProject\\huawei\\PreciseMatch\\testMerg\\group_result_2.txt");
-	//outPutResultDfa(vecChainGroups, res, "F:\\cppProject\\huawei\\PreciseMatch\\testMerg\\result_2.txt");
+	//outPutGroup(vecChainGroups, "F:\\cppProject\\huawei\\PreciseMatch\\testMerg\\group_result_3.txt");
+	//outPutResultDfa(vecChainGroups, res, "F:\\cppProject\\huawei\\PreciseMatch\\testMerg\\result_3.txt");
+	//outPuttermset(vecChainGroups, res, "F:\\cppProject\\huawei\\PreciseMatch\\testMerg\\termset_3.txt");
 	//outPutDfa(res.GetDfaTable()[9623], "F:\\cppProject\\huawei\\PreciseMatch\\testMerg\\dfa2_9623.txt");
 
 	std::cout << "Total time: " << tAll.Reset() << " Sec." << std::endl;
