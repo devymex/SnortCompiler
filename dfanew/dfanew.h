@@ -114,7 +114,7 @@ public:
 	void PushBackDfa(CDfaRow &sta);
 	void PushBackTermSet(TERMSET &term);
 	void UniqueTermSet();
-	void AddTermIntoDFA(STATEID sta, const CDfanew &other, STATEID thisSta);//根据other的sta查找termset，将找到的TERMSET插入到的this的thisSta中
+	//size_t AddTermIntoDFA(STATEID sta, const CDfanew &other, STATEID thisSta);//根据other的sta查找termset，将找到的TERMSET插入到的this的m_TermSet中，其中this的状态是thisSta中
 	TERMSET& BackTermSet();
 	size_t FromNFA(const CNfa &nfa, NFALOG *nfalog, size_t Count, bool combine = false);
 	size_t Minimize();

@@ -205,19 +205,22 @@ DFANEWSC TERMSET& CDfanew::GetTerm(size_t nIdx) const
 }
 
 
-//根据other的sta查找termset，将找到的TERMSET插入到的this的thisSta中
-DFANEWSC void CDfanew::AddTermIntoDFA(STATEID sta, const CDfanew &other, STATEID thisSta)
-{
-	for(size_t i = 0; i < other.GetTermCnt(); ++i)
-	{
-		if(other.GetTerm(i).dfaSta == sta)
-		{
-			m_TermSet->push_back(TERMSET());
-			m_TermSet->back().dfaSta = thisSta;
-			m_TermSet->back().dfaId = other.GetTerm(i).dfaId;
-		}
-	}
-}
+//根据other的sta查找termset，将找到的TERMSET插入到的this的m_TermSet中，其中this的状态是thisSta中
+//DFANEWSC size_t CDfanew::AddTermIntoDFA(STATEID sta, const CDfanew &other, STATEID thisSta)
+//{
+//	size_t flag = (size_t)-1;
+//	for(size_t i = 0; i < other.GetTermCnt(); ++i)
+//	{
+//		if(other.GetTerm(i).dfaSta == sta)
+//		{
+//			flag = 0;
+//			m_TermSet->push_back(TERMSET());
+//			m_TermSet->back().dfaSta = thisSta;
+//			m_TermSet->back().dfaId = other.GetTerm(i).dfaId;
+//		}
+//	}
+//	return flag;
+//}
 
 DFANEWSC size_t CDfanew::GetTermCnt() const
 {

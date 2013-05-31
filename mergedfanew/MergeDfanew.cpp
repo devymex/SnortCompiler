@@ -143,6 +143,23 @@ void DfaColGroup(std::vector<CDfanew> &dfas, BYTE* groups)
 	}
 }
 
+//根据other的otherSta查找termset，将找到的TERMSET插入到的lastDfa的m_TermSet中，其中lastDfa的状态是lastSta中
+size_t AddTermIntoDFA(STATEID otherSta, CDfanew &other, STATEID lastSta, CDfanew &lastDfa)
+{
+	size_t flag = (size_t)-1;
+	for(size_t i = 0; i < other.GetTermCnt(); ++i)
+	{
+		if(other.GetTerm(i).dfaSta == otherSta)
+		{
+			flag = 0;
+			lastDfa.PushBackTermSet(TERMSET());
+			lastDfa.BackTermSet().dfaSta = lastSta;
+			lastDfa.BackTermSet().dfaId = other.GetTerm(i).dfaId;
+		}
+	}
+	return flag;
+}
+
 //可以先根据每个dfa的分组情况，通过hash将最终的lastDfa进行分组
 MERDFANEW bool NOrMerge(std::vector<CDfanew> &dfas, CDfanew &lastDfa)
 {
@@ -153,7 +170,7 @@ MERDFANEW bool NOrMerge(std::vector<CDfanew> &dfas, CDfanew &lastDfa)
 #undef max
 
 	size_t dfasSize = dfas.size();
-	size_t nTermSta = 0;//合并后nfa总状态数,也是nfa的终态编号
+	size_t nTermSta = 0;//终态标记
 	for(size_t i = 0; i < dfasSize; ++i)
 	{
 		if(dfas[i].Size() > std::numeric_limits<STATEID>::max())
@@ -188,7 +205,12 @@ MERDFANEW bool NOrMerge(std::vector<CDfanew> &dfas, CDfanew &lastDfa)
 		{
 			//是终态
 			finFlag = 1;
-			lastDfa.AddTermIntoDFA(nSta, dfas[i], 0);//将dfas[i]根据nSta找到的dfaId插入到lastDfa的0状态中
+			//将dfas[i]根据nSta找到的dfaId插入到lastDfa的0状态对应的TERMSET中
+			if(AddTermIntoDFA(nSta, dfas[i], 0, lastDfa) != 0)
+			{
+				std::cout << "Termset Error!" << std::endl;
+				return false;
+			}
 		}
 		startVec[i] = nSta;
 	}
@@ -207,7 +229,6 @@ MERDFANEW bool NOrMerge(std::vector<CDfanew> &dfas, CDfanew &lastDfa)
 	
 	statehash[startVec] = 0;
 
-	//statesStack.push_back(startVec);
 	statesStack.push(startVec);
 
 	std::vector<size_t> NextVec;
@@ -286,7 +307,7 @@ MERDFANEW bool NOrMerge(std::vector<CDfanew> &dfas, CDfanew &lastDfa)
 					lastDfa.ResizeRow(lastDfa.Size() + 1, colCnt);
 					if(lastDfa.Size() > SC_STATELIMIT)
 					{
-						std::cerr << "SC_STATELIMIT!" << std::endl;
+						//std::cerr << "SC_STATELIMIT!" << std::endl;
 						return false;
 					}
 					STATEID nextSta = (STATEID)statehash.size();
@@ -301,7 +322,11 @@ MERDFANEW bool NOrMerge(std::vector<CDfanew> &dfas, CDfanew &lastDfa)
 							{
 								if((dfas[k][NextVec[k]].GetFlag() & CDfaRow::TERMINAL) != 0)
 								{
-									lastDfa.AddTermIntoDFA(NextVec[k], dfas[k], nextSta);
+									if(AddTermIntoDFA(NextVec[k], dfas[k], nextSta, lastDfa) != 0)
+									{
+										std::cout << "Termset error!" << std::endl;
+										return false;
+									}
 								}
 							}
 						}
@@ -330,7 +355,7 @@ MERDFANEW bool NOrMerge(std::vector<CDfanew> &dfas, CDfanew &lastDfa)
 	//lastDfa.Minimize();
 	if(lastDfa.Size() > DFA_SIZE_LIMIT)
 	{
-		std::cerr << "DFA_SIZE_LIMIT!" << std::endl;
+		//std::cerr << "DFA_SIZE_LIMIT!" << std::endl;
 		return false;
 	}
 
