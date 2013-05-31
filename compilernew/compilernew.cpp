@@ -481,7 +481,7 @@ void Rule2Dfas(const CSnortRule &rule, CResNew &result, COMPILEDRULENEW &ruleRes
 
 	CTimer ctime;//用于测试
 	ctime.Reset();//用于测试
-	size_t flag = Rule2PcreList(rule, regrule);
+	size_t flag = Rule2PcreList(rule, regrule);//从content中取出sig了
 	rule2pcretime += ctime.Reset();//用于测试
 
 	if (flag == SC_ERROR)
@@ -536,8 +536,9 @@ void Rule2Dfas(const CSnortRule &rule, CResNew &result, COMPILEDRULENEW &ruleRes
 			else
 			{
 				ctime.Reset();//用于测试
+				dfa.SetId(nDfaId);
 				size_t nToDFAFlag = dfa.FromNFA(nfa, NULL, 0);
-//				std::cout << "  "<< dfa.LinkSize() << ", " << dfa.GetGroupCount() * dfa.Size() << std::endl;
+				//				std::cout << "  "<< dfa.LinkSize() << ", " << dfa.GetGroupCount() * dfa.Size() << std::endl;
 				nfa2dfatime += ctime.Reset();//用于测试
 
 				if (nToDFAFlag == -1)
@@ -550,9 +551,13 @@ void Rule2Dfas(const CSnortRule &rule, CResNew &result, COMPILEDRULENEW &ruleRes
 					ctime.Reset();//用于测试
 					dfa.Minimize();
 					dfamintimetime += ctime.Reset();//用于测试
+					if (dfa.Size() > DFA_SIZE_LIMIT)
+					{
+						ruleResult.m_nResult = COMPILEDRULENEW::RES_EXCEEDLIMIT;
+						dfa.Clear();
+					}
 				}
 			}
-			dfa.SetId(nDfaId);
 			ruleResult.m_dfaIds.PushBack(nDfaId);
 			//result.GetDfasInfo()[nDfasInfoId].dfaId = nDfaId;
 			//result.GetDfasInfo()[nDfasInfoId].chainId = nChainId;
@@ -573,6 +578,7 @@ void Rule2Dfas(const CSnortRule &rule, CResNew &result, COMPILEDRULENEW &ruleRes
 			AssignSig(result, nRegexTblSize, nRegexTblSize + nIncrement);
 		}
 	}
+
 }
 
 void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)

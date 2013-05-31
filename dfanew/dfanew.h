@@ -11,6 +11,7 @@
 
 //#define SC_STATELIMIT 255
 #define SC_STATELIMIT ((1 << (sizeof(STATEID) * 8)) - 1)
+#define DFA_SIZE_LIMIT 255
 
 #define EMPTY 256
 
@@ -109,13 +110,17 @@ public:
 	void ResizeRow(size_t nSize, size_t nCol);
 	void Init(BYTE *pGroup);
 	void Clear();
-	void reserve(STATEID Maxnum);
+	void reserve(size_t Maxnum);
 	void PushBackDfa(CDfaRow &sta);
 	void PushBackTermSet(TERMSET &term);
+	void UniqueTermSet();
+	void AddTermIntoDFA(STATEID sta, const CDfanew &other, STATEID thisSta);//根据other的sta查找termset，将找到的TERMSET插入到的this的thisSta中
 	TERMSET& BackTermSet();
 	size_t FromNFA(const CNfa &nfa, NFALOG *nfalog, size_t Count, bool combine = false);
 	size_t Minimize();
 	WORD GetGroupCount() const;
+	size_t GetTermCnt() const;
+	TERMSET& GetTerm(size_t nIdx) const;//取出第nIdx个TERMSET
 	BYTE Char2Group(BYTE nIdx);
 	const BYTE* GetGroup() const;
 	const BYTE GetOneGroup(STATEID charNum) const;

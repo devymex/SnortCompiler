@@ -9,7 +9,7 @@
 #endif
 
 #define THRESHOLD 8
-#define NUMOFCOMSIGS 2
+#define NUMOFCOMSIGS 1
 
 struct CHAINTRAIT
 {
@@ -68,6 +68,7 @@ struct GROUP
 {
 	std::vector<SIGNATURE> vecSigs;
 	std::size_t dfaId;
+	std::vector<std::string> chains;
 };
 
 class GROUPINGSC CGROUPS

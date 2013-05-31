@@ -154,16 +154,16 @@ Fn FUNC[156] =
 	OP_PLUS_FUNC,               /* 35 the minimizing one second. */
 	OP_PLUS_FUNC,               /* 36 */
 	OP_QUERY_FUNC,              /* 37 */
-	NULL,                       /* 38 */
+	OP_QUERY_FUNC,                       /* 38 */
 
 	OP_UPTO_FUNC,               /* 39 From 0 to n matches of one character, caseful*/
-	NULL,                       /* 40 */
+	OP_UPTO_FUNC,                       /* 40 */
 	OP_EXACT_FUNC,              /* 41 Exactly n matches */
 
-	NULL,                       /* 42 Possessified star, caseful */
-	NULL,                       /* 43 Possessified plus, caseful */
-	NULL,                       /* 44 Posesssified query, caseful */
-	NULL,                       /* 45 Possessified upto, caseful */
+	OP_STAR_FUNC,                       /* 42 Possessified star, caseful */
+	OP_PLUS_FUNC,                       /* 43 Possessified plus, caseful */
+	OP_QUERY_FUNC,                       /* 44 Posesssified query, caseful */
+	OP_UPTO_FUNC,                       /* 45 Possessified upto, caseful */
 
 	/**** Single characters, caseless, must follow the caseful ones */
 
@@ -172,16 +172,16 @@ Fn FUNC[156] =
 	OP_PLUSI_FUNC,              /* 48 */
 	OP_PLUSI_FUNC,              /* 49 */
 	OP_QUERYI_FUNC,             /* 50 */
-	NULL,                       /* 51 */
+	OP_QUERYI_FUNC,                       /* 51 */
 
 	OP_UPTOI_FUNC,              /* 52 From 0 to n matches of one character, caseless */
-	NULL,                       /* 53 */
+	OP_UPTOI_FUNC,                       /* 53 */
 	OP_EXACTI_FUNC,             /* 54 */
 
 	OP_STARI_FUNC,              /* 55 Possessified star, caseless */
-	NULL,                       /* 56 Possessified plus, caseless */
-	NULL,                       /* 57 Posesssified query, caseless */
-	NULL,                       /* 58 Possessified upto, caseless */
+	OP_PLUSI_FUNC,                       /* 56 Possessified plus, caseless */
+	OP_QUERYI_FUNC,                       /* 57 Posesssified query, caseless */
+	OP_UPTOI_FUNC,                       /* 58 Possessified upto, caseless */
 
 	/**** The negated ones must follow the non-negated ones, and match them ****/
 	/**** Negated single character, caseful; must precede the caseless ones ****/
@@ -191,10 +191,10 @@ Fn FUNC[156] =
 	OP_NOTPLUS_FUNC,            /* 61 the minimizing one second. They must be in */
 	OP_NOTPLUS_FUNC,            /* 62 exactly the same order as those above. */
 	OP_NOTQUERY_FUNC,           /* 63 */
-	NULL,                       /* 64 */
+	OP_NOTQUERY_FUNC,                       /* 64 */
 
 	OP_NOTUPTO_FUNC,        /* 65 From 0 to n matches, caseful */
-	NULL,     /* 66 */
+	OP_NOTUPTO_FUNC,     /* 66 */
 	OP_NOTEXACT_FUNC,       /* 67 Exactly n matches */
 
 	OP_NOTSTAR_FUNC,     /* 68 Possessified versions, caseful */
@@ -209,7 +209,7 @@ Fn FUNC[156] =
 	OP_NOTPLUSI_FUNC,       /* 74 */
 	OP_NOTPLUSI_FUNC,       /* 75 */
 	OP_NOTQUERYI_FUNC,      /* 76 */
-	NULL,   /* 77 */
+	OP_NOTQUERYI_FUNC,   /* 77 */
 
 	OP_NOTUPTOI_FUNC,       /* 78 From 0 to n matches, caseless */
 	OP_NOTUPTOI_FUNC,       /* 79 */
@@ -227,16 +227,16 @@ Fn FUNC[156] =
 	OP_TYPEPLUS_FUNC,       /* 87 the minimizing one second. These codes must */
 	OP_TYPEPLUS_FUNC,       /* 88 be in exactly the same order as those above. */
 	OP_TYPEQUERY_FUNC,      /* 89 */
-	NULL,   /* 90 */
+	OP_TYPEQUERY_FUNC,   /* 90 */
 
 	OP_TYPEUPTO_FUNC,       /* 91 From 0 to n matches */
-	NULL,    /* 92 */
+	OP_TYPEUPTO_FUNC,    /* 92 */
 	OP_TYPEEXACT_FUNC,      /* 93 Exactly n matches */
 
 	OP_TYPESTAR_FUNC,       /* 94 Possessified versions */
 	OP_TYPEPLUS_FUNC,       /* 95 */
-	NULL,                   /* 96 */
-	NULL,                   /* 97 */
+	OP_TYPEQUERY_FUNC,                   /* 96 */
+	OP_TYPEUPTO_FUNC,                   /* 97 */
 
 	/* These are used for character classes and back references; only the
 	first six are the same as the sets above. */
@@ -841,7 +841,31 @@ void OP_CIRCM_FUNC(CNfa &nfa, size_t &CurState)
 	//}
 	CurState += 2;
 	nfa[nCursize + 1].AddDest('\r', CurState);
+
+//	size_t nCursize = nfa.Size();
+//	nfa.Resize(nCursize + 3);
+//	nfa[nCursize].AddDest(EMPTY, CurState + 1);
+//	nfa[nCursize].AddDest(EMPTY, CurState + 3);
+//	++CurState;
+//
+//	++nCursize;
+//	for (size_t i = 0; i < 10; ++i)
+//	{
+//		nfa[nCursize].AddDest(i, CurState);
+//	}
+//	nfa[nCursize].AddDest('\n', CurState + 1);
+//	nfa[nCursize].AddDest('\n', CurState + 2);
+//	nfa[nCursize].AddDest('\r', CurState + 2);
+//	nfa[nCursize].AddDest(11, CurState);
+//	nfa[nCursize].AddDest(12, CurState);
+//	for (size_t i = 14; i < 256; ++i)
+//	{
+//		nfa[nCursize].AddDest(i, CurState);
+//	}
+//	CurState += 2;
+//	nfa[nCursize + 1].AddDest('\r', CurState);
 }
+
 
 size_t OP_CHAR_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, size_t PreState, bool &ALTBegin, size_t ALTBegState)
 {

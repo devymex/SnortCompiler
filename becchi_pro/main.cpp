@@ -455,6 +455,7 @@ size_t CompareWithPcre(const char *pPcre)
 	NFA* nfa2 = CreatNFA(bPcre);
 	nfa2->output();
 	nfa2->remove_epsilon();
+	nfa2->output();
 	nfa2->reduce();
 	//nfa2->analyze(stdout);
 	//CNfa tmpnfa;
@@ -550,7 +551,7 @@ int main(int argc, char **argv)
 	parser=new regex_parser(false,false);
 
 	CResNew result;
-	CompileRuleSet(_T("..\\allrules.rule"), Process, &result);
+	CompileRuleSet(_T("..\\..\\input\\testrules.rule"), Process, &result);
 
 
 	//std::vector<std::string> regset;

@@ -187,6 +187,17 @@ GROUPINGSC size_t CGROUPRes::WriteToFile(LPCTSTR filename)
 		{
 			WriteNum(fout, m_groups[i].vecSigs[j]);
 		}
+		WriteNum(fout, m_groups[i].chains.size());
+		size_t len;
+		for (size_t j = 0; j < m_groups[i].chains.size(); ++j)
+		{
+			len = m_groups[i].chains[j].length();
+			WriteNum(fout, len);
+			for (std::string::iterator k = m_groups[i].chains[j].begin(); k != m_groups[i].chains[j].end(); ++k)
+			{
+				WriteNum(fout, *k);
+			}
+		}
 	}
 	//填写文件尺寸
 	endPos = fout.tellp();
@@ -254,6 +265,7 @@ GROUPINGSC size_t CGROUPRes::ReadFromFile(LPCTSTR filename)
 	//读分组
 	m_groups.Resize(groupNum);
 	size_t nSigNum;
+	size_t nChainNum;
 	for (size_t i = 0; i < groupNum; ++i)
 	{
 		GROUP &oneGroup = m_groups[i];
@@ -264,6 +276,19 @@ GROUPINGSC size_t CGROUPRes::ReadFromFile(LPCTSTR filename)
 		{
 			SIGNATURE &oneSig = oneGroup.vecSigs[j];
 			fin.read((char*)&oneSig, sizeof(SIGNATURE));
+		}
+		fin.read((char*)&nChainNum, 4);
+		oneGroup.chains.resize(nChainNum);
+		size_t nChainLen;
+		char c;
+		for (size_t j = 0; j < nChainNum; ++j)
+		{
+			fin.read((char*)&nChainLen, 4);
+			for (size_t k = 0; k < nChainLen; ++k)
+			{
+				fin.read((char*)&c, 1);
+				oneGroup.chains[j].push_back(c);
+			}
 		}
 	}
 	fin.close();
@@ -600,6 +625,39 @@ void SplitByComSig(const std::vector<RULECHAIN> &chainSet, std::vector<CHAINGROU
 	SortChainId(vecChainGroups, chainSet);
 }
 
+void fdisplay(CDfanew &newdfa, const char* fileName)
+{
+	std::ofstream fout(fileName);
+	fout << (size_t)newdfa.GetStartId() << std::endl;
+	for(size_t i = 0; i != newdfa.Size(); ++i)
+	{
+		std::map<STATEID, size_t> rowStateCnt;
+		for(size_t j = 0; j != newdfa.GetGroupCount(); ++j)
+		{
+			rowStateCnt[newdfa[i][j]]++;
+		}
+		STATEID maxId = 0;
+		for (std::map<STATEID, size_t>::iterator j = rowStateCnt.begin(); j != rowStateCnt.end(); ++j)
+		{
+			if (j->second > rowStateCnt[maxId])
+			{
+				maxId = j->first;
+			}
+		}
+		fout << "s"<< i << ", maxId: " << (size_t)maxId << ", ";
+		for(size_t j = 0; j != newdfa.GetGroupCount(); ++j)
+		{
+			if (newdfa[i][j] != maxId)
+			{
+				fout << "<" << j << "," <<  (size_t)newdfa[i][j] << "> " ;
+			}
+		}
+		fout << std::endl;
+	}
+	fout.close();
+}
+
+
 void MergeMore(std::vector<CHAINGROUP> &vecChainGroups, CResNew &res, std::vector<size_t> &vecWaitForGroup)
 {
 	bool mergeFlag;
@@ -912,7 +970,7 @@ void ClearUselessDfa(const std::vector<CHAINGROUP> &vecChainGroups, CResNew &res
 	}
 }
 
-void BuildGroupRes(const std::vector<CHAINGROUP> &vecChainGroups, const CResNew &res, CGROUPRes &groupRes)
+void BuildGroupRes(const std::vector<RULECHAIN> &chainSet, const std::vector<CHAINGROUP> &vecChainGroups, const CResNew &res, CGROUPRes &groupRes)
 {
 	groupRes.GetGroups().Resize(vecChainGroups.size());
 	groupRes.GetDfaTable().Resize(vecChainGroups.size());
@@ -921,13 +979,95 @@ void BuildGroupRes(const std::vector<CHAINGROUP> &vecChainGroups, const CResNew 
 	{
 		groupRes.GetGroups()[idx].dfaId = idx;
 		groupRes.GetGroups()[idx].vecSigs = i->comSigs;
+		for (size_t j = 0; j < i->chainIds.size(); ++j)
+		{
+			groupRes.GetGroups()[idx].chains.push_back(chainSet[i->chainIds[j]].strChain);
+		}
 		groupRes.GetDfaTable()[idx] = res.GetDfaTable()[i->mergeDfaId];
 	}
 	groupRes.GetSidDfaIds() = res.GetSidDfaIds();
 }
 
+//输出合并后的分组结果
+void outPutGroup(std::vector<CHAINGROUP> &vecChainGroups, const char* fileName)
+{
+	std::ofstream fout(fileName);
+	if(!fout)
+	{
+		std::cerr << "Open group_result file Failed!" << std::endl;
+		return;
+	}
+	for(size_t i = 0; i < vecChainGroups.size(); ++i)
+	{
+		fout << i << "\t";
+		fout << vecChainGroups[i].mergeDfaId << "\t";
+		for(size_t j = 0; j < vecChainGroups[i].chainIds.size(); ++j)
+		{
+			fout << vecChainGroups[i].chainIds[j] << std::endl << "\t" << "\t";
+		}
+		fout << std::endl << std::endl;
+	}
+	fout.close();
+}
+
+//输出合并后的dfa信息
+void outPutResultDfa(std::vector<CHAINGROUP> &vecChainGroups, CResNew &res, const char* fileName)
+{
+	std::ofstream fout(fileName);
+	if(!fout)
+	{
+		std::cerr << "Open group_result file Failed!" << std::endl;
+		return;
+	}
+	fout << "mergeDfaId" << "\t" << "ColumCnt" << "\t" << "Size" << "\t" << "TermSet" << std::endl;
+	for(std::vector<CHAINGROUP>::iterator iter = vecChainGroups.begin(); 
+		iter != vecChainGroups.end(); ++iter)
+	{
+		CDfanew mergeDfa = res.GetDfaTable()[iter->mergeDfaId];
+		fout << iter->mergeDfaId << "\t";
+		fout << mergeDfa.GetGroupCount() << "\t";
+		fout << mergeDfa.Size() << "\t";
+		fout << mergeDfa.GetTermCnt() << std::endl;
+	}
+	fout.close();
+}
+
 GROUPINGSC void grouping(CResNew &res, CGROUPRes &groupRes)
 {
+	//std::vector<CDfanew> dfas;
+	//CDfanew mergeDfa;
+	//dfas.push_back(res.GetDfaTable()[458]);
+	//dfas.push_back(res.GetDfaTable()[459]);
+	//outPutDfa(dfas[0], "F:\\cppProject\\huawei\\PreciseMatch\\mytestTmp\\dfa0.txt");
+	//outPutDfa(dfas[1], "F:\\cppProject\\huawei\\PreciseMatch\\mytestTmp\\dfa1.txt");
+	//dfas.push_back(res.GetDfaTable()[1623]);
+	//dfas.push_back(res.GetDfaTable()[1624]);
+	//dfas.push_back(res.GetDfaTable()[4806]);
+	//dfas.push_back(res.GetDfaTable()[5136]);
+	//NOrMerge(dfas, mergeDfa);
+	//outPutDfa(mergeDfa, "F:\\cppProject\\huawei\\PreciseMatch\\mytestTmp\\mergeDfa_1_8492.txt");
+	//mergeDfa.printTerms();
+
+	//NOrMerge(dfas, mergeDfa);
+	//dfas[0] = mergeDfa;
+	//dfas[1] = res.GetDfaTable()[1623];
+	//NOrMerge(dfas, mergeDfa);
+	//dfas[0] = mergeDfa;
+	//dfas[1] = res.GetDfaTable()[1624];
+	//NOrMerge(dfas, mergeDfa);
+	//dfas[0] = mergeDfa;
+	//dfas[1] = res.GetDfaTable()[4806];
+	//NOrMerge(dfas, mergeDfa);
+	//dfas[0] = mergeDfa;
+	//dfas[1] = res.GetDfaTable()[5136];
+	//NOrMerge(dfas, mergeDfa);
+	//outPutDfa(mergeDfa, "F:\\cppProject\\huawei\\PreciseMatch\\mytestTmp\\mergeDfa_2_2.txt");
+
+	//std::cout << std::endl;
+	//mergeDfa.printTerms();
+
+
+
 	//Load all rules chains from file
 	CTimer t1, tAll;
 
@@ -1017,10 +1157,13 @@ GROUPINGSC void grouping(CResNew &res, CGROUPRes &groupRes)
 
 	//Build group result...
 	std::cout << "Build group result..." << std::endl;
-	BuildGroupRes(vecChainGroups, res, groupRes);
+	BuildGroupRes(chainSet, vecChainGroups, res, groupRes);
 	std::cout << "Completed in " << t1.Reset() << " Sec." << std::endl << std::endl;
 
 	std::cout << vecChainGroups.size() << std::endl;
+	//outPutGroup(vecChainGroups, "F:\\cppProject\\huawei\\PreciseMatch\\testMerg\\group_result_2.txt");
+	//outPutResultDfa(vecChainGroups, res, "F:\\cppProject\\huawei\\PreciseMatch\\testMerg\\result_2.txt");
+	//outPutDfa(res.GetDfaTable()[9623], "F:\\cppProject\\huawei\\PreciseMatch\\testMerg\\dfa2_9623.txt");
 
 	std::cout << "Total time: " << tAll.Reset() << " Sec." << std::endl;
 }
