@@ -485,6 +485,7 @@ DFANEWSC size_t CDfanew::FromNFA(const CNfa &nfa, NFALOG *nfalog, size_t Count, 
 					//std::cout << m_pDfa->size() << std::endl;//用于测试
 					if (m_pDfa->size() > SC_STATELIMIT)// || nTotalSize >= 2048
 					{
+
 						std::cout << "SC_STATELIMIT!" << std::endl;
 						return (size_t)-1;
 					}
@@ -652,7 +653,10 @@ DFANEWSC size_t CDfanew::Minimize()
 	}
 	std::vector<PARTSET> partSet;
 	//divide nondistinguishable states
-	PartitionNonDisState(pRevTab, partSet);
+	if (0 != PartitionNonDisState(pRevTab, partSet))
+	{
+		return -1;
+	}
 
 	if (partSet.size() < nSize)
 	{
@@ -1015,7 +1019,7 @@ size_t CountOnes(BYTE *pBuf, size_t nBufSize)
 	return std::count(pBuf, pBuf + nBufSize, 1);
 }
 
-void CDfanew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, std::vector<PARTSET> &partSet) const
+size_t CDfanew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, std::vector<PARTSET> &partSet) const
 {
 	size_t nGrpNum = GetGroupCount();
 	size_t nStaNum = m_pDfa->size();
@@ -1128,6 +1132,16 @@ void CDfanew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, std::vector<PA
 				for (; part != pJSet->StaSet.end() && pAbleToI[*part] != 0; ++part);
 				if (part != pJSet->StaSet.begin() && part != pJSet->StaSet.end())
 				{
+					if (partSet.size() > 254)
+					{
+						VirtualFree(pAbleToI, nStaNum, MEM_RELEASE);
+						for (std::vector<PARTSET>::iterator i = partSet.begin(); i != partSet.end(); ++i)
+						{
+							ReleaseAbleTo(i->AbleTo);
+						}
+						delete []pWait;
+						return size_t(-1);
+					}
 					//保存产生的新的划分
 					PARTSET &lastPart = partSet.back();
 					lastPart.StaSet.splice(lastPart.StaSet.begin(),
@@ -1165,6 +1179,7 @@ void CDfanew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, std::vector<PA
 		ReleaseAbleTo(i->AbleTo);
 	}
 	delete []pWait;
+	return 0;
 }
 
 

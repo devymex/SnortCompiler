@@ -250,7 +250,7 @@ COMMONSC void CNfa::Shrink()
 COMMONSC void CNfa::Resize(size_t _Newsize)
 {
 	//CTimer t;
- 	m_pNfa->resize(_Newsize);
+	m_pNfa->resize(_Newsize);
 	for (std::vector<CNfaRow>::iterator i = m_pNfa->begin(); i != m_pNfa->end(); ++i)
 	{
 		i->Resize(CHARSETSIZE);

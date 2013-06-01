@@ -10,7 +10,8 @@
 #define HASHMODULO 1000000
 
 //#define SC_STATELIMIT 255
-#define SC_STATELIMIT ((1 << (sizeof(STATEID) * 8)) - 1)
+//#define SC_STATELIMIT ((1 << (sizeof(STATEID) * 8)) - 1)
+#define SC_STATELIMIT 1000
 #define DFA_SIZE_LIMIT 255
 
 #define EMPTY 256
@@ -146,7 +147,7 @@ private:
 	void RemoveUnreachable(const std::vector<STATEID> *Tab, const STALIST &begs, 
 		const size_t &col, std::vector<STATEID> &reachable);
 	void MergeReachable(std::vector<STATEID> &reachable);
-	void PartitionNonDisState(std::vector<STATEID> *pRevTbl, std::vector<struct PARTSET> &partSet) const;
+	size_t PartitionNonDisState(std::vector<STATEID> *pRevTbl, std::vector<struct PARTSET> &partSet) const;
 	void MergeNonDisStates(std::vector<struct PARTSET> &partSet);
 
 };
