@@ -21,7 +21,7 @@ struct COLUMNKEY
 	}
 };
 
-void NAvaiEdges(const CNfa &nfa, STATEID *group)
+DFANEWSC void NAvaiEdges(const CNfa &nfa, BYTE *group)
 {
 	struct COLUMNKEYHASH
 	{
@@ -30,7 +30,7 @@ void NAvaiEdges(const CNfa &nfa, STATEID *group)
 			return column.hash;
 		}
 	};
-	typedef std::unordered_map<COLUMNKEY, STATEID, COLUMNKEYHASH> COLUMNHASHMAP;
+	typedef std::unordered_map<COLUMNKEY, BYTE, COLUMNKEYHASH> COLUMNHASHMAP;
 	const size_t _FNV_offset_basis = 2166136261U;
 	const size_t _FNV_prime = 16777619U;
 
@@ -93,7 +93,7 @@ void NAvaiEdges(const CNfa &nfa, STATEID *group)
 		COLUMNHASHMAP::iterator same = colHash.find(curCol);
 		if(same == colHash.end())
 		{
-			STATEID curId = colHash.size();
+			BYTE curId = colHash.size();
 			colHash[curCol] = curId;
 			group[i] = curId;
 		}

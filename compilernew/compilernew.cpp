@@ -57,6 +57,11 @@ COMPILERNEW void CDfaTblNew::PushBack(const CDfanew &dfa)
 	m_pdfaTbl->push_back(dfa);
 }
 
+COMPILERNEW void CDfaTblNew::Clear()
+{
+	m_pdfaTbl->clear();
+}
+
 COMPILERNEW CSidDfaIdsNew::CSidDfaIdsNew()
 {
 	m_ruleResult = new std::vector<COMPILEDRULENEW>;
@@ -263,12 +268,12 @@ COMPILERNEW size_t CResNew::WriteToFile(LPCTSTR filename)
 	for (size_t i = 0; i < m_sidDfaIds.Size(); ++i)
 	{
 		COMPILEDRULENEW &ruleResult = m_sidDfaIds[i];
-		WriteNum(fout, ruleResult.m_nSid, 4);
-		WriteNum(fout, ruleResult.m_nResult, 4);
-		WriteNum(fout, ruleResult.m_dfaIds.Size(), 4);
+		WriteNum(fout, ruleResult.m_nSid);
+		WriteNum(fout, ruleResult.m_nResult);
+		WriteNum(fout, ruleResult.m_dfaIds.Size());
 		for (size_t j = 0; j < ruleResult.m_dfaIds.Size(); ++j)
 		{
-			WriteNum(fout, ruleResult.m_dfaIds[j], 4);
+			WriteNum(fout, ruleResult.m_dfaIds[j]);
 		}
 	}
 	//填写DFAs偏移
@@ -476,7 +481,7 @@ void Rule2Dfas(const CSnortRule &rule, CResNew &result, COMPILEDRULENEW &ruleRes
 
 	CTimer ctime;//用于测试
 	ctime.Reset();//用于测试
-	size_t flag = Rule2PcreList(rule, regrule);
+	size_t flag = Rule2PcreList(rule, regrule);//从content中取出sig了
 	rule2pcretime += ctime.Reset();//用于测试
 
 	if (flag == SC_ERROR)
@@ -497,6 +502,7 @@ void Rule2Dfas(const CSnortRule &rule, CResNew &result, COMPILEDRULENEW &ruleRes
 		size_t nDfaId;
 		//size_t nDfasInfoId;
 		size_t nChainId;
+		bool bHasSigs = false;
 		for (size_t i = 0; i < nIncrement; ++i)
 		{
 			CNfa nfa;
@@ -504,6 +510,11 @@ void Rule2Dfas(const CSnortRule &rule, CResNew &result, COMPILEDRULENEW &ruleRes
 			ctime.Reset();//用于测试
 			size_t nToNFAFlag = CRegChainToNFA(regrule[i], nfa);
 			pcre2nfatime += ctime.Reset();//用于测试
+
+			if (regrule[i].GetSigCnt() > 0)
+			{
+				bHasSigs = true;
+			}
 
 			nDfaId = nDfaTblSize + i;
 			//nDfasInfoId = nDfasInfoSize + i;
@@ -525,7 +536,9 @@ void Rule2Dfas(const CSnortRule &rule, CResNew &result, COMPILEDRULENEW &ruleRes
 			else
 			{
 				ctime.Reset();//用于测试
+				dfa.SetId(nDfaId);
 				size_t nToDFAFlag = dfa.FromNFA(nfa, NULL, 0);
+				//				std::cout << "  "<< dfa.LinkSize() << ", " << dfa.GetGroupCount() * dfa.Size() << std::endl;
 				nfa2dfatime += ctime.Reset();//用于测试
 
 				if (nToDFAFlag == -1)
@@ -538,13 +551,26 @@ void Rule2Dfas(const CSnortRule &rule, CResNew &result, COMPILEDRULENEW &ruleRes
 					ctime.Reset();//用于测试
 					dfa.Minimize();
 					dfamintimetime += ctime.Reset();//用于测试
+					if (dfa.Size() > DFA_SIZE_LIMIT)
+					{
+						ruleResult.m_nResult = COMPILEDRULENEW::RES_EXCEEDLIMIT;
+						dfa.Clear();
+					}
 				}
 			}
-			dfa.SetId(nDfaId);
 			ruleResult.m_dfaIds.PushBack(nDfaId);
 			//result.GetDfasInfo()[nDfasInfoId].dfaId = nDfaId;
 			//result.GetDfasInfo()[nDfasInfoId].chainId = nChainId;
 			result.GetRegexTbl()[nChainId] = regrule[i];
+		}
+
+		if (!bHasSigs)
+		{
+			ruleResult.m_nResult = COMPILEDRULENEW::RES_HASNOSIG;
+			ruleResult.m_dfaIds.Clear();
+			result.GetDfaTable().Resize(nDfaTblSize);
+			result.GetRegexTbl().Resize(nRegexTblSize);
+			return;
 		}
 
 		if (ruleResult.m_nResult != COMPILEDRULENEW::RES_ERROR)
@@ -552,6 +578,7 @@ void Rule2Dfas(const CSnortRule &rule, CResNew &result, COMPILEDRULENEW &ruleRes
 			AssignSig(result, nRegexTblSize, nRegexTblSize + nIncrement);
 		}
 	}
+
 }
 
 void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
@@ -577,11 +604,11 @@ void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 		ruleResult.m_nResult = COMPILEDRULENEW::RES_HASBYTE;
 		return;
 	}
-	else if (nFlag & CSnortRule::RULE_HASNOSIG)
-	{
-		ruleResult.m_nResult = COMPILEDRULENEW::RES_HASNOSIG;
-		return;
-	}
+	//else if (nFlag & CSnortRule::RULE_HASNOSIG)
+	//{
+	//	ruleResult.m_nResult = COMPILEDRULENEW::RES_HASNOSIG;
+	//	return;
+	//}
 	else
 	{
 		Rule2Dfas(rule, result, ruleResult);

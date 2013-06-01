@@ -1,3 +1,5 @@
+#pragma once
+
 #include "../common/common.h"
 #include "../dfanew/dfanew.h"
 #include <windows.h>
@@ -39,6 +41,7 @@ public:
 	void Resize(size_t nSize);
 	const size_t Size() const;
 	void PushBack(const CDfanew &dfa);
+	void Clear();
 private:
 	std::vector<CDfanew> *m_pdfaTbl;
 };
