@@ -66,7 +66,14 @@ DFANEWSC void outPutDfa(CDfanew &dfa, const char* filename)
 	fout << std::endl;
 	for(size_t i = 0; i != dfa.Size(); ++i)
 	{
-		fout << i << "\t";
+		if((dfa[i].GetFlag() & CDfaRow::TERMINAL) != 0)
+		{
+			fout << i << ",Term\t";
+		}
+		else
+		{
+			fout << i << "\t";
+		}
 		for(BYTE j = 0; j != dfa.GetGroupCount(); ++j)
 		{
 			fout << (size_t)dfa[i][j] << "\t";
@@ -150,6 +157,65 @@ DFANEWSC void CDfanew::PushBackDfa(CDfaRow &sta)
 DFANEWSC void CDfanew::PushBackTermSet(TERMSET &term)
 {
 	m_TermSet->push_back(term);
+}
+
+DFANEWSC void CDfanew::UniqueTermSet()
+{
+	struct EQUAL
+	{
+		bool operator()(TERMSET &t1, TERMSET &t2)
+		{
+			if((t1.dfaId == t2.dfaId) && (t1.dfaSta == t2.dfaSta))
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+	};
+	struct LESS
+	{
+		bool operator()(TERMSET &t1, TERMSET &t2)
+		{
+			if((t1.dfaSta < t2.dfaSta) || ((t1.dfaSta == t2.dfaSta) && (t1.dfaId < t2.dfaId)))
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+	};
+	std::sort(m_TermSet->begin(), m_TermSet->end(), LESS());
+	m_TermSet->erase(std::unique(m_TermSet->begin(), m_TermSet->end(), EQUAL()), m_TermSet->end());
+}
+
+DFANEWSC TERMSET& CDfanew::GetTerm(size_t nIdx) const
+{
+	return (*m_TermSet)[nIdx];
+}
+
+
+//根据other的sta查找termset，将找到的TERMSET插入到的this的thisSta中
+DFANEWSC void CDfanew::AddTermIntoDFA(STATEID sta, const CDfanew &other, STATEID thisSta)
+{
+	for(size_t i = 0; i < other.GetTermCnt(); ++i)
+	{
+		if(other.GetTerm(i).dfaSta == sta)
+		{
+			m_TermSet->push_back(TERMSET());
+			m_TermSet->back().dfaSta = thisSta;
+			m_TermSet->back().dfaId = other.GetTerm(i).dfaId;
+		}
+	}
+}
+
+DFANEWSC size_t CDfanew::GetTermCnt() const
+{
+	return m_TermSet->size();
 }
 
 DFANEWSC TERMSET& CDfanew::BackTermSet()

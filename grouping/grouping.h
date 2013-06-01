@@ -8,7 +8,7 @@
 #define GROUPINGSC __declspec(dllexport)
 #endif
 
-class CSIGNATURES
+class GROUPINGSC CSIGNATURES
 {
 public:
 	CSIGNATURES();

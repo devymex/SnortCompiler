@@ -481,7 +481,7 @@ void Rule2Dfas(const CSnortRule &rule, CResNew &result, COMPILEDRULENEW &ruleRes
 
 	CTimer ctime;//用于测试
 	ctime.Reset();//用于测试
-	size_t flag = Rule2PcreList(rule, regrule);
+	size_t flag = Rule2PcreList(rule, regrule);//从content中取出sig了
 	rule2pcretime += ctime.Reset();//用于测试
 
 	if (flag == SC_ERROR)
@@ -557,6 +557,14 @@ void Rule2Dfas(const CSnortRule &rule, CResNew &result, COMPILEDRULENEW &ruleRes
 						dfa.Clear();
 					}
 				}
+			}
+			if (dfa.Size() == 0)
+			{
+				ruleResult.m_dfaIds.Clear();
+				result.GetDfaTable().Resize(nDfaTblSize);
+				//result.GetDfasInfo().Resize(nDfasInfoSize);
+				result.GetRegexTbl().Resize(nRegexTblSize);
+				return;
 			}
 			ruleResult.m_dfaIds.PushBack(nDfaId);
 			//result.GetDfasInfo()[nDfasInfoId].dfaId = nDfaId;

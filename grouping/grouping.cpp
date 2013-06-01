@@ -3,52 +3,52 @@
 #include "../compilernew/compilernew.h"
 #include "../mergedfanew/MergeDfanew.h"
 
-CSIGNATURES::CSIGNATURES()
+GROUPINGSC CSIGNATURES::CSIGNATURES()
 {
 	m_pSigs = new std::vector<SIGNATURE>;
 }
-CSIGNATURES::CSIGNATURES(const CSIGNATURES& other)
+GROUPINGSC CSIGNATURES::CSIGNATURES(const CSIGNATURES& other)
 {
 	m_pSigs = new std::vector<SIGNATURE>;
 	*this = other;
 }
-const CSIGNATURES &CSIGNATURES::operator=(const CSIGNATURES &other)
+GROUPINGSC const CSIGNATURES &CSIGNATURES::operator=(const CSIGNATURES &other)
 {
 	*m_pSigs = *other.m_pSigs;
 	return *this;
 }
 
-CSIGNATURES::~CSIGNATURES()
+GROUPINGSC CSIGNATURES::~CSIGNATURES()
 {
 	delete m_pSigs;
 }
 
-const size_t CSIGNATURES::Size() const
+GROUPINGSC const size_t CSIGNATURES::Size() const
 {
 	return m_pSigs->size();
 }
 
-void CSIGNATURES::Resize(size_t nSize)
+GROUPINGSC void CSIGNATURES::Resize(size_t nSize)
 {
 	m_pSigs->resize(nSize);
 }
 
-void CSIGNATURES::PushBack(SIGNATURE Sig)
+GROUPINGSC void CSIGNATURES::PushBack(SIGNATURE Sig)
 {
 	m_pSigs->push_back(Sig);
 }
 
-SIGNATURE &CSIGNATURES::operator[](size_t nIdx)
+GROUPINGSC SIGNATURE &CSIGNATURES::operator[](size_t nIdx)
 {
 	return (*m_pSigs)[nIdx];
 }
 
-const SIGNATURE &CSIGNATURES::operator[](size_t nIdx) const
+GROUPINGSC const SIGNATURE &CSIGNATURES::operator[](size_t nIdx) const
 {
 	return (*m_pSigs)[nIdx];
 }
 
-void CSIGNATURES::Clear()
+GROUPINGSC void CSIGNATURES::Clear()
 {
 	m_pSigs->clear();
 }
@@ -498,12 +498,21 @@ void BuildGroupBySig(CGROUPS &newGroups, std::vector<size_t> &vecWaitForGroup, s
 	}
 }
 
-void ExtractUsedSigs(const CGROUPS &groups, std::vector<SIGNATURE> &vecUsed)
+void ExtractUsedSigs(const CGROUPS &groups, std::vector<size_t> vecExplosion, std::vector<DFAINFO> vecDfaInfo, std::vector<SIGNATURE> &vecUsed)
 {
 	for (size_t i = 0; i < groups.Size(); ++i)
 	{
 		vecUsed.push_back(groups[i].ComSigs[0]);
 	}
+	//for (size_t i = 0; i < vecExplosion.size(); ++i)
+	//{
+	//	if (vecDfaInfo[vecExplosion[i]].Sigs.size() == 1)
+	//	{
+	//		vecUsed.push_back(vecDfaInfo[vecExplosion[i]].Sigs[0]);
+	//	}
+	//}
+	std::sort(vecUsed.begin(), vecUsed.end());
+	vecUsed.erase(std::unique(vecUsed.begin(), vecUsed.end()), vecUsed.end());
 }
 
 void ExtractComSigs(const GROUP &g1, const GROUP &g2, std::vector<SIGNATURE> &vecUsed, std::vector<SIGNATURE> &vecComSigs)
@@ -527,28 +536,126 @@ void ExtractComSigs(const GROUP &g1, const GROUP &g2, std::vector<SIGNATURE> &ve
 	}
 }
 
+size_t AvailableNum(std::map<std::vector<SIGNATURE>, size_t> &SigsToNumMap, const std::vector<SIGNATURE> &vecComSigs)
+{
+	if (vecComSigs.size() <= 1)
+	{
+		return 0;
+	}
+	else
+	{
+		return vecComSigs.size() - 2;
+	}
+
+	//size_t count = vecComSigs.size();
+	//for (std::vector<SIGNATURE>::const_iterator i = vecComSigs.begin(); i != vecComSigs.end(); ++i)
+	//{
+	//	std::vector<SIGNATURE> vecTwoSigs(2);
+	//	std::vector<SIGNATURE> vecThreeSigs(3);
+	//	vecTwoSigs[0] = *i;
+	//	vecThreeSigs[0] = *i;
+	//	for (std::vector<SIGNATURE>::const_iterator j = i + 1; j != vecComSigs.end(); ++j)
+	//	{
+	//		vecTwoSigs[1] = *j;
+	//		vecThreeSigs[1] = *j;
+	//		if (count <= SigsToNumMap[vecTwoSigs])
+	//		{
+	//			return 0;
+	//		}
+	//		count -= SigsToNumMap[vecTwoSigs];
+	//		for (std::vector<SIGNATURE>::const_iterator k = j + 1; k != vecComSigs.end(); ++k)
+	//		{
+	//			vecThreeSigs[2] = *k;
+	//			if (count <= SigsToNumMap[vecThreeSigs])
+	//			{
+	//				return 0;
+	//			}
+	//			count -= SigsToNumMap[vecThreeSigs];
+	//		}
+	//	}
+	//}
+	//if (count < 2)
+	//{
+	//	return 0;
+	//}
+	//return count - 2;
+}
+
 void MergeGroup(CResNew &res, std::vector<SIGNATURE> &vecUsed, CGROUPS &newGroups)
 {
+	std::map<std::vector<SIGNATURE>, size_t> SigsToNumMap;
+	for (size_t i = 0; i < newGroups.Size(); ++i)
+	{
+		std::vector<SIGNATURE> vecSigs;
+		for (size_t j = 0; j < newGroups[i].ComSigs.Size(); ++j)
+		{
+			if (std::find(vecUsed.begin(), vecUsed.end(), newGroups[i].ComSigs[j]) == vecUsed.end())
+			{
+				vecSigs.push_back(newGroups[i].ComSigs[j]);
+			}
+		}
+		if (vecSigs.size() == 1)
+		{
+			vecUsed.push_back(vecSigs[0]);
+		}
+		else
+		{
+			++SigsToNumMap[vecSigs];
+		}
+	}
 	for (size_t i = 0; i < newGroups.Size(); ++i)
 	{
 		std::cout << "MergeGroup " << std::endl;
 		std::cout << "NO: " << i << std::endl;
 		std::cout << "Total: " << newGroups.Size() << std::endl << std::endl;
+		std::vector<SIGNATURE> vecSigs;
+		for (size_t j = 0; j < newGroups[i].ComSigs.Size(); ++j)
+		{
+			if (std::find(vecUsed.begin(), vecUsed.end(), newGroups[i].ComSigs[j]) == vecUsed.end())
+			{
+				vecSigs.push_back(newGroups[i].ComSigs[j]);
+			}
+		}
+		//++SigsToNumMap[vecSigs];
 		std::vector<CDfanew> vecDfas(2);
 		vecDfas[0] = res.GetDfaTable()[newGroups[i].mergeDfaId];
 		for (size_t j = i + 1; j < newGroups.Size(); )
 		{
 			std::vector<SIGNATURE> vecComSigs;
 			ExtractComSigs(newGroups[i], newGroups[j], vecUsed, vecComSigs);
-			if (!vecComSigs.empty())
+			if (SigsToNumMap[vecComSigs] >= AvailableNum(SigsToNumMap, vecComSigs))
+			{
+				++j;
+				continue;
+			}
+			//if (!vecComSigs.empty())
+			if (vecComSigs.size() > 1)
 			{
 				vecDfas[1] = res.GetDfaTable()[newGroups[j].mergeDfaId];
 				CDfanew MergeDfa;
 				if (NOrMerge(vecDfas, MergeDfa))
 				{
-					if (vecComSigs.size() == 1)
+					if (SigsToNumMap[vecSigs] > 0)
 					{
-						vecUsed.push_back(vecComSigs[0]);
+						if (SigsToNumMap[vecSigs] == AvailableNum(SigsToNumMap, vecSigs))
+						{
+							for (size_t k = 0; k < vecSigs.size(); ++k)
+							{
+								std::vector<SIGNATURE>::iterator iter = std::find(vecUsed.begin(), vecUsed.end(), vecSigs[k]);
+								if (iter != vecUsed.end())
+								{
+									vecUsed.erase(iter);
+								}
+							}
+						}
+						--SigsToNumMap[vecSigs];
+					}
+					++SigsToNumMap[vecComSigs];
+					if (SigsToNumMap[vecComSigs] == AvailableNum(SigsToNumMap, vecComSigs))
+					{
+						vecUsed.insert(vecUsed.end(), vecComSigs.begin(), vecComSigs.end());
+						std::sort(vecUsed.begin(), vecUsed.end());
+						vecUsed.erase(std::unique(vecUsed.begin(), vecUsed.end()), vecUsed.end());
 					}
 					for (size_t k = 0; k < newGroups[j].DfaIds.Size(); ++k)
 					{
@@ -559,9 +666,11 @@ void MergeGroup(CResNew &res, std::vector<SIGNATURE> &vecUsed, CGROUPS &newGroup
 					{
 						newGroups[i].ComSigs.PushBack(vecComSigs[k]);
 					}
+					vecSigs = vecComSigs;
 					res.GetDfaTable().PushBack(MergeDfa);
 					newGroups[i].mergeDfaId = res.GetDfaTable().Size() - 1;
 					newGroups.Erase(j);
+					vecDfas[0] = MergeDfa;
 				}
 				else
 				{
@@ -583,18 +692,18 @@ void AddNewGroups(CGROUPS &newGroups, std::vector<size_t> &vecExplosion, std::ve
 		groups.PushBack(newGroups[i]);
 	}
 	newGroups.Clear();
-	size_t nSize = groups.Size();
-	size_t idx = 0;
-	groups.Resize(nSize + vecExplosion.size());
-	for (std::vector<size_t>::iterator i = vecExplosion.begin(); i != vecExplosion.end(); ++i, ++idx)
-	{
-		groups[nSize + idx].DfaIds.PushBack(*i);
-		for (size_t j = 0; j < vecDfaInfo[*i].Sigs.size(); ++j)
-		{
-			groups[nSize + idx].ComSigs.PushBack(vecDfaInfo[*i].Sigs[j]);
-		}
-		groups[nSize + idx].mergeDfaId = *i;
-	}
+	//size_t nSize = groups.Size();
+	//size_t idx = 0;
+	//groups.Resize(nSize + vecExplosion.size());
+	//for (std::vector<size_t>::iterator i = vecExplosion.begin(); i != vecExplosion.end(); ++i, ++idx)
+	//{
+	//	groups[nSize + idx].DfaIds.PushBack(*i);
+	//	for (size_t j = 0; j < vecDfaInfo[*i].Sigs.size(); ++j)
+	//	{
+	//		groups[nSize + idx].ComSigs.PushBack(vecDfaInfo[*i].Sigs[j]);
+	//	}
+	//	groups[nSize + idx].mergeDfaId = *i;
+	//}
 }
 
 void ClearUpRes(CResNew &res, CGROUPS &groups, CGROUPRes &groupRes)
@@ -627,6 +736,42 @@ void ClearUpRes(CResNew &res, CGROUPS &groups, CGROUPRes &groupRes)
 		groupRes.GetGroups()[i].DfaIds = groups[i].DfaIds;
 		groupRes.GetGroups()[i].ComSigs = groups[i].ComSigs;
 		groupRes.GetGroups()[i].mergeDfaId = oldToNewMap[groups[i].mergeDfaId];
+	}
+
+	std::vector<SIGNATURE> vecSpecialSigs;
+	for (size_t i = 0; i < groupRes.GetGroups().Size(); ++i)
+	{
+		if (groupRes.GetGroups()[i].ComSigs.Size() == 1)
+		{
+			vecSpecialSigs.push_back(groupRes.GetGroups()[i].ComSigs[0]);
+		}
+	}
+	for (size_t i = 0; i < groupRes.GetGroups().Size(); ++i)
+	{
+		if (groupRes.GetGroups()[i].ComSigs.Size() >= 2)
+		{
+			std::vector<SIGNATURE> vecSigs;
+			for (size_t j = 0; j < groupRes.GetGroups()[i].ComSigs.Size(); ++j)
+			{
+				vecSigs.push_back(groupRes.GetGroups()[i].ComSigs[j]);
+			}
+			for (std::vector<SIGNATURE>::iterator j = vecSigs.begin(); j != vecSigs.end();)
+			{
+				if (std::find(vecSpecialSigs.begin(), vecSpecialSigs.end(), *j) != vecSpecialSigs.end())
+				{
+					j = vecSigs.erase(j);
+				}
+				else
+				{
+					++j;
+				}
+			}
+			groupRes.GetGroups()[i].ComSigs.Clear();
+			for (std::vector<SIGNATURE>::iterator j = vecSigs.begin(); j != vecSigs.end(); ++j)
+			{
+				groupRes.GetGroups()[i].ComSigs.PushBack(*j);
+			}
+		}
 	}
 }
 
@@ -666,7 +811,7 @@ GROUPINGSC void grouping(CResNew &res, CGROUPRes &groupRes)
 	//Extract the already used signatures...
 	std::cout << "Extract the already used signatures..." << std::endl;
 	std::vector<SIGNATURE> vecUsed;
-	ExtractUsedSigs(groups, vecUsed);
+	ExtractUsedSigs(groups, vecExplosion, vecDfaInfo, vecUsed);
 	std::cout << "Completed in " << t1.Reset() << " Sec." << std::endl << std::endl;
 
 	//Merge group which have the same signature...
