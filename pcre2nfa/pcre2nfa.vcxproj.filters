@@ -48,6 +48,9 @@
     <ClInclude Include="..\common\snortcom.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="match.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pcre_byte_order.c">
@@ -126,6 +129,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="GetSignature.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="match.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -9,7 +9,7 @@ struct PARTSET
 	std::vector<STATEID> Ones;
 };
 
-void fdisplay(CDfaNew &newdfa, const char* fileName)
+DFANEWSC void fdisplay(CDfaNew &newdfa, const char* fileName)
 {
 	std::ofstream fout(fileName);
 	fout << "digraph G {" << std::endl;
@@ -630,7 +630,6 @@ DFANEWSC size_t CDfaNew::Minimize()
 	//error: DFA is empty
 
 	//CTimer time1;//ÓÃÓÚ²âÊÔ
-
 	size_t nSize = m_pDfa->size();
 	size_t nCols = GetGroupCount();
 	if (nSize == 0)
@@ -687,7 +686,7 @@ DFANEWSC size_t CDfaNew::Minimize()
 	if (reachable.size() < nSize)
 	{
 		std::cout << "Has unreachables" << std::endl;
-		system("pause");
+		//system("pause");
 		//remove unreachable states, generate new DFA
 		MergeReachable(reachable);
 	}
