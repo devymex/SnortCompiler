@@ -35,8 +35,8 @@
 //
 //	size_t tmp = lastDfa.FromNFA(oneNfa, nfalog, count, true);
 //	//if(lastDfa.FromNFA(oneNfa, nfalog, count, true) == 0)
-//	if(tmp == 0)
-//	{
+	//if(tmp == 0)
+	//{
 //		lastDfa.UniqueTermSet();
 //		//lastDfa.Minimize();
 //		if(lastDfa.Size() > DFA_SIZE_LIMIT)
@@ -44,14 +44,14 @@
 //			std::cerr << "DFA_SIZE_LIMIT" << std::endl;
 //			return false;
 //		}
-//		//std::cout << "方法一lastDfa最小化用时: " << c.Reset() << std::endl;
+	//	//std::cout << "方法一lastDfa最小化用时: " << c.Reset() << std::endl;
 //
-//		return true;
-//	}
-//	else
-//	{
-//		return false;
-//	}
+	//	return true;
+	//}
+	//else
+	//{
+	//	return false;
+	//}
 //}
 
 struct TODFA_HASH

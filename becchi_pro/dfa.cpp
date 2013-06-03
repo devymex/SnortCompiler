@@ -134,7 +134,7 @@ void DFA::dump(FILE *log){
     		while (s!=NULL){ fprintf(log,"[%ld]",s->value());s=s->succ();}
     	}
     	fprintf(log,"\n");
-    	for(int j=97;j<101;j++){
+    	for(int j=0;j<CSIZE;j++){
 			if (state_table[i]!=NULL && state_table[i][j]!= this->dead_state) 
 	    		fprintf(log," - [%d/%c] %d\n",j,j,state_table[i][j]);
     	}

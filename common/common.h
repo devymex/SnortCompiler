@@ -20,7 +20,7 @@ double COMMONSC g_dTimer;
 typedef WORD STATEID;
 typedef std::list<STATEID> STALIST;
 typedef std::list<STATEID>::iterator STALIST_ITER;
-typedef std::list<std::list<STATEID>> SETLIST;
+typedef std::vector<std::vector<STATEID>> SETVEC;
 typedef std::list<std::list<STATEID>>::iterator SETLIST_ITER;
 typedef DWORD SIGNATURE;
 
