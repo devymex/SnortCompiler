@@ -383,12 +383,19 @@ void Merge(CResNew &res, CGROUPS &groups)
 		}
 		std::vector<CDfaNew> vecDfas(2);
 		CDfaNew MergeDfa;
-		MergeDfa = res.GetDfaTable()[groups[i].DfaIds[0]];
-		vecDfas[0] = MergeDfa;
+		MergeDfa.SetId(res.GetDfaTable().Size());
+		vecDfas[0] = res.GetDfaTable()[groups[i].DfaIds[0]];
 		bool mergeFlag = true;
 		for (size_t j = 1; j < groups[i].DfaIds.Size(); ++j)
 		{
 			vecDfas[1] = res.GetDfaTable()[groups[i].DfaIds[j]];
+			for (size_t k = 0; k <= j; ++k)
+			{
+				std::cout << groups[i].DfaIds[k] << " ";
+			}
+			std::cout << std::endl;
+			outPutDfa(vecDfas[1], "..//..//output//dfa1.txt");
+			outPutDfa(vecDfas[0], "..//..//output//dfa2.txt");
 			if (!NOrMerge(vecDfas, MergeDfa))
 			{
 				mergeFlag = false;
@@ -449,15 +456,16 @@ void PutInBySig(CResNew &res, CGROUPS &groups, std::vector<size_t> &vecWaitForGr
 				for (size_t k = 0; k < sigToGroupsMap[vecDfaInfo[*i].Sigs[j]].size(); ++k)
 				{
 					CDfaNew MergeDfa;
+					MergeDfa.SetId(res.GetDfaTable().Size());
 					vecDfas[1] = res.GetDfaTable()[groups[sigToGroupsMap[vecDfaInfo[*i].Sigs[j]][k]].mergeDfaId];
-					std::cout << *i << std::endl;
-					for (size_t ii = 0; ii < groups[sigToGroupsMap[vecDfaInfo[*i].Sigs[j]][k]].DfaIds.Size(); ++ii)
-					{
-						std::cout << groups[sigToGroupsMap[vecDfaInfo[*i].Sigs[j]][k]].DfaIds[ii] << " ";
-					}
-					std::cout << std::endl;
-					outPutDfa(vecDfas[1], "..//..//output//dfa1.txt");
-					outPutDfa(vecDfas[0], "..//..//output//dfa2.txt");
+					//std::cout << *i << std::endl;
+					//for (size_t ii = 0; ii < groups[sigToGroupsMap[vecDfaInfo[*i].Sigs[j]][k]].DfaIds.Size(); ++ii)
+					//{
+					//	std::cout << groups[sigToGroupsMap[vecDfaInfo[*i].Sigs[j]][k]].DfaIds[ii] << " ";
+					//}
+					//std::cout << std::endl;
+					//outPutDfa(vecDfas[1], "..//..//output//dfa1.txt");
+					//outPutDfa(vecDfas[0], "..//..//output//dfa2.txt");
 					if (NOrMerge(vecDfas, MergeDfa))
 					{
 						flag = true;
@@ -641,6 +649,7 @@ void MergeGroup(CResNew &res, std::vector<SIGNATURE> &vecUsed, CGROUPS &newGroup
 			{
 				vecDfas[1] = res.GetDfaTable()[newGroups[j].mergeDfaId];
 				CDfaNew MergeDfa;
+				MergeDfa.SetId(res.GetDfaTable().Size());
 				if (NOrMerge(vecDfas, MergeDfa))
 				{
 					if (SigsToNumMap[vecSigs] > 0)

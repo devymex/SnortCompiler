@@ -29,11 +29,11 @@ int main()
 	result.ReadFromFile(_T("..\\..\\output\\result.cdt"));
 	CGROUPRes groupRes;
 
-	//CTimer ctime;
+	CTimer ctime;
 	grouping(result, groupRes);
-	//std::cout << "分组时间： " << ctime.Reset() << std::endl;
+	std::cout << "分组时间： " << ctime.Reset() << std::endl;
 
-	//groupRes.WriteToFile(_T("..\\..\\output\\GroupResut.cdt"));
+	groupRes.WriteToFile(_T("..\\..\\output\\GroupResut.cdt"));
 
 	//groupRes.ReadFromFile(_T("..\\..\\output\\GroupResut.cdt"));
 	//groupRes.WriteToFile(_T("..\\..\\output\\GroupResut1.cdt"));
@@ -48,17 +48,23 @@ int main()
 
 	//std::vector<CDfaNew> vecDfas(2);
 	//CDfaNew MergeDfa;
-	//vecDfas[0] = result.GetDfaTable()[vecIds[0]];
-	//for (size_t i = 1; i < vecIds.size() - 1; ++i)
+	//MergeDfa = result.GetDfaTable()[vecIds[0]];
+	//vecDfas[0] = MergeDfa;
+	//for (size_t i = 1; i < vecIds.size(); ++i)
 	//{
 	//	vecDfas[1] = result.GetDfaTable()[vecIds[i]];
 	//	if (!NOrMerge(vecDfas, MergeDfa))
 	//	{
 	//		std::cout << "ERROR" << std::endl;
 	//	}
-	//	vecDfas[0] = MergeDfa;
+	//	else
+	//	{
+	//		vecDfas[0] = MergeDfa;
+	//	}
 	//}
-	//std::cout << MergeDfa.Size() << std::endl;
+	////vecDfas[1] = result.GetDfaTable()[vecIds[vecIds.size() - 1]];
+	////NOrMerge(vecDfas, MergeDfa);
+	////std::cout << MergeDfa.Size() << std::endl;
 	//outPutDfa(MergeDfa, "..//..//output//dfa1_1.txt");
 	//outPutDfa(result.GetDfaTable()[vecIds[vecIds.size() - 1]], "..//..//output//dfa2_2.txt");
 
