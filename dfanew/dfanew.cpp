@@ -630,6 +630,8 @@ DFANEWSC size_t CDfaNew::Minimize()
 
 	//CTimer time1;//ÓÃÓÚ²âÊÔ
 
+	try
+	{
 	size_t nSize = m_pDfa->size();
 	size_t nCols = GetGroupCount();
 	if (nSize == 0)
@@ -734,7 +736,12 @@ DFANEWSC size_t CDfaNew::Minimize()
 		std::cout << "Warshall" << std::endl;
 		system("pause");
 	}
-
+	}
+	catch(...)
+	{
+		std::cout << "All" << std::endl;
+		system("pause");
+	}
 
 	return 0;
 }
