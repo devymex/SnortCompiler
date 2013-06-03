@@ -15,43 +15,43 @@ void ReadPcres(std::vector<std::string> &vecPcres)
 
 void main()
 {
-	//const char* a = "/.*AUTH\\s[^\\n]{2}/";
-	//CNfa nfa;
-	//CRegChain regchain;
-	//PcreToNFA(a, nfa, regchain);
-	//for (size_t i = 0; i < nfa.Size(); ++i)
-	//{
-	//	const CNfaRow &row = nfa[i];
-	//	for (size_t j = 0; j < CHARSETSIZE; ++j)
-	//	{
-	//		size_t nCnt = row.DestCnt(j);
-	//		for (size_t k = 0; k < nCnt; ++k)
-	//		{
-	//			std::cout << "(" << i << "," << j << "," << row.GetDest(j, k) << ")" << std::endl;
-	//		}
-	//	}
-	//}
-	std::vector<std::string> vecPcres;
-	ReadPcres(vecPcres);
-	std::ofstream foutExceed("c:\\Exceed.txt");
-	std::ofstream foutError("c:\\Error.txt");
-	for (std::vector<std::string>::iterator i = vecPcres.begin(); i != vecPcres.end(); ++i)
+	const char* a = "/mine\\s(and|or)/";
+	CNfa nfa;
+	CRegChain regchain;
+	PcreToNFA(a, nfa, regchain);
+	for (size_t i = 0; i < nfa.Size(); ++i)
 	{
-		CNfa nfa;
-		CRegChain regchain;
-		size_t res = PcreToNFA(i->c_str(), nfa, regchain);
-		if (res == SC_EXCEED)
+		const CNfaRow &row = nfa[i];
+		for (size_t j = 0; j < CHARSETSIZE; ++j)
 		{
-			foutExceed << i - vecPcres.begin() + 1 << std::endl;
+			size_t nCnt = row.DestCnt(j);
+			for (size_t k = 0; k < nCnt; ++k)
+			{
+				std::cout << "(" << i << "," << j << "," << row.GetDest(j, k) << ")" << std::endl;
+			}
 		}
-		if (res == SC_ERROR)
-		{
-			foutError << i - vecPcres.begin() + 1 << std::endl;
-		}
-		std::cout << i - vecPcres.begin() + 1 << std::endl;	
 	}
-	foutExceed.close();
-	foutError.close();
+	//std::vector<std::string> vecPcres;
+	//ReadPcres(vecPcres);
+	//std::ofstream foutExceed("c:\\Exceed.txt");
+	//std::ofstream foutError("c:\\Error.txt");
+	//for (std::vector<std::string>::iterator i = vecPcres.begin(); i != vecPcres.end(); ++i)
+	//{
+	//	CNfa nfa;
+	//	CRegChain regchain;
+	//	size_t res = PcreToNFA(i->c_str(), nfa, regchain);
+	//	if (res == SC_EXCEED)
+	//	{
+	//		foutExceed << i - vecPcres.begin() + 1 << std::endl;
+	//	}
+	//	if (res == SC_ERROR)
+	//	{
+	//		foutError << i - vecPcres.begin() + 1 << std::endl;
+	//	}
+	//	std::cout << i - vecPcres.begin() + 1 << std::endl;	
+	//}
+	//foutExceed.close();
+	//foutError.close();
 
 	system("pause");
 }
