@@ -397,8 +397,8 @@ void FormatPcre (_Iter pBeg, _Iter pEnd, std::string &bPcre, std::string &oPcre)
 		}
 		oPcre.push_back('s');
 
-		std::cout << bPcre << std::endl;
-		std::cout << oPcre << std::endl;
+		//std::cout << bPcre << std::endl;
+		//std::cout << oPcre << std::endl;
 }
 
 size_t CompareWithPcre(const char *pPcre)
@@ -430,9 +430,9 @@ size_t CompareWithPcre(const char *pPcre)
 	}
 	//outPutDfa(OwnDfa,"..//result3.txt");
 	//std::cout << OwnDfa.Size() << std::endl;
-	//fdisplay(OwnDfa,"..//result1.txt");
 	OwnDfa.Minimize();	
 	FoldDFA(OwnDfa);
+	//fdisplay(OwnDfa,"..//result1.txt");
 	//std::cout << (size_t)OwnDfa.Size() << std::endl;
 	//display(OwnDfa);
 	//OwnDfa.Process((BYTE*)str, strlen(str), tmp);
