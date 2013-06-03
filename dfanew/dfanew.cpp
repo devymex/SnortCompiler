@@ -1182,117 +1182,6 @@ size_t CDfanew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, std::vector<
 	return 0;
 }
 
-
-//void CDfanew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, SETLIST S&pSets) const
-//{
-//	//将需要查找的划分的iterator存入wSets，初始化时只保存终态集合
-//	std::list<SETLIST_ITER> wSets;
-//	SETLIST_ITER iLast = pSets.end();
-//	--iLast;
-//
-//	//initialize wSets
-//	size_t TermCnt = 0; 
-//	for (SETLIST_ITER iCurSet = pSets.begin(); iCurSet != iLast; ++iCurSet)
-//	{
-//		TermCnt += iCurSet->size();
-//	}
-//	if (TermCnt < pSets.back().size())
-//	{
-//		for (SETLIST_ITER iCurSet = pSets.begin(); iCurSet != iLast; ++iCurSet)
-//		{
-//			wSets.push_back(iCurSet);
-//		}
-//	}
-//	else
-//	{
-//		wSets.push_back(iLast);
-//	}
-//
-//
-//	//each element in ableToW present a property of according state of tmpDfa,
-//	//and has two labels, 0 and 1. 1 indicates the according state has the specific
-//	//transition to one state of curWSet, 0 otherwise
-//	std::vector<BYTE> ableToW(m_pDfa->size(), 0);
-//	bool bAllZero = true;
-//	BYTE groupnum = (BYTE)GetGroupCount();
-//	for (; !wSets.empty(); )
-//	{
-//		STALIST curWSet = *wSets.front();
-//		wSets.pop_front();
-//		for (BYTE byChar = 0; byChar < groupnum; ++byChar)
-//		{
-//			//initialize the ableToW
-//			//for each state in curWSet find source states of it in pRecTbl
-//			//if exist at last one source state to curWSet, the bAllZero is set to false
-//			for (STALIST_ITER iSta = curWSet.begin(); iSta != curWSet.end(); ++iSta)
-//			{
-//				std::vector<STATEID> &ableToI = pRevTbl[*iSta * groupnum + byChar];
-//				for (std::vector<STATEID>::iterator i = ableToI.begin(); i != ableToI.end(); ++i)
-//				{
-//					ableToW[*i] = 1;
-//					bAllZero = false;
-//				}
-//			}
-//			if (!bAllZero)
-//			{
-//				bAllZero = true;
-//				for (SETLIST_ITER iPSet = pSets.begin(); iPSet != pSets.end(); ++iPSet)
-//				{
-//					//each partition in pSets,according to the label of a state in partition adjust position 
-//					//all unvisited states lie in the front of list, visited states locate
-//					//at the rear end of list
-//					STALIST_ITER iCur = iPSet->begin();
-//					for (; ableToW[*iCur++] == 1 && iCur != iPSet->end(); );
-//					for (; iCur != iPSet->end();)
-//					{
-//						if (ableToW[*iCur] == 1)
-//						{
-//							STATEID tmp = *iCur;
-//							iCur = iPSet->erase(iCur);
-//							iPSet->insert(iPSet->begin(), tmp);
-//						}
-//						else
-//						{
-//							++iCur;
-//						}
-//					} 
-//
-//					//mark the position of two new partition
-//					size_t nUnableCnt = 0;
-//					STALIST_ITER iCutBeg = iPSet->begin(), iCutEnd = iPSet->end();
-//					for (; iCutBeg != iPSet->end(); ++iCutBeg)
-//					{
-//						if (ableToW[*iCutBeg] == 0)
-//						{
-//							break;
-//						}
-//						++nUnableCnt;
-//					}
-//
-//					//record start position of the less partition 
-//					if (nUnableCnt <= iPSet->size() / 2)
-//					{
-//						iCutEnd = iCutBeg;
-//						iCutBeg = iPSet->begin();
-//					}
-//
-//					//the less partition insert into pSets, its iterator insert into wSets
-//					if (iCutBeg != iCutEnd)
-//					{
-//						SETLIST_ITER iOldSet = iPSet;
-//						iPSet = pSets.insert(++iPSet, STALIST());
-//						iPSet->splice(iPSet->begin(), *iOldSet, iCutBeg, iCutEnd);
-//						wSets.push_back(iPSet);
-//					}
-//				}
-//
-//				//initialize ableToW and bAllZero before read the next char, 
-//				memset(ableToW.data(), 0, ableToW.size());
-//			}
-//		}
-//	}
-//}
-
 //Partition中的元素为一个状态的集合，集合中元素为多个等价状态，每个集合可以合并为新的DFA中一个状态
 void CDfanew::MergeNonDisStates(std::vector<PARTSET> &partSet)
 {
@@ -1322,13 +1211,13 @@ void CDfanew::MergeNonDisStates(std::vector<PARTSET> &partSet)
 			CDfaRow &curRow = (*m_pDfa)[*iSta];
 			sta2Part[*iSta] = nSetIdx;
 			//修改新的起始状态
-			if (curRow.GetFlag() & curRow.START)
+			if (curRow.GetFlag() & CDfaRow::START)
 			{
 				m_StartId = nSetIdx;
 			}
 
 			//存入新的终态编号
-			if (curRow.GetFlag() & curRow.TERMINAL)
+			if (curRow.GetFlag() & CDfaRow::TERMINAL)
 			{
 				TERMSET tmpSta;
 				tmpSta.dfaSta = nSetIdx;
