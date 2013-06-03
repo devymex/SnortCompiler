@@ -352,7 +352,9 @@ MERDFANEW bool NOrMerge(std::vector<CDfaNew> &dfas, CDfaNew &lastDfa)
 
 
 	std::cout << "before min" << std::endl;
+	fdisplay(lastDfa, "..\\lastDfa.txt");
 	lastDfa.Minimize();
+	fdisplay(lastDfa, "..\\minlast.txt");
 	std::cout << "after min" << std::endl;
 	if(lastDfa.Size() > DFA_SIZE_LIMIT)
 	{

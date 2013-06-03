@@ -1277,17 +1277,23 @@ void CDfaNew::MergeNonDisStates(std::vector<PARTSET> &partSet)
 	std::vector<CDfaRow> &tmpDfa = *pNewDfa;
 
 	//等价的状态存于同一个partition中，标记原来的状态存在哪一个新的partition中，并修改新的起始状态编号
-	STATEID nSetIdx = 0;
+	STATEID nSetIdx = 0, nStart = -1;
 	for (std::vector<PARTSET>::iterator iPart = partSet.begin(); iPart != partSet.end(); ++iPart)
 	{
 		for (std::list<STATEID>::iterator iSta = iPart->StaSet.begin(); iSta != iPart->StaSet.end(); ++iSta)
 		{
 			CDfaRow &curRow = (*m_pDfa)[*iSta];
 			sta2Part[*iSta] = nSetIdx;
+			std::cout << *iSta << std::endl;
 			//修改新的起始状态
 			if (curRow.GetFlag() & CDfaRow::START)
 			{
-				m_StartId = nSetIdx;
+				if (nStart != (STATEID)-1)
+				{
+					std::cout << "nStart != -1" << std::endl;
+					system("pause");
+				}
+				nStart = nSetIdx;
 			}
 
 			//存入新的终态编号
@@ -1304,6 +1310,9 @@ void CDfaNew::MergeNonDisStates(std::vector<PARTSET> &partSet)
 		}
 		++nSetIdx;
 	}
+
+	m_StartId = nStart;
+	UniqueTermSet();
 
 	//set new DFA and modify new number
 	nSetIdx = 0;
@@ -1326,7 +1335,6 @@ void CDfaNew::MergeNonDisStates(std::vector<PARTSET> &partSet)
 		++nSetIdx;
 	}
 
-	UniqueTermSet();
 
 	//替换m_pDfa
 	delete m_pDfa;
