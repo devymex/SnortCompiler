@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "MatchPkt.h"
 
+static size_t edata = 0;
 void packet_handler(u_char *param, const struct pcap_pkthdr *header, const u_char *pkt_data)
 {
 	ip_header *ih;
@@ -37,6 +38,10 @@ void CALLBACK PktParam(const ip_header *ih, const BYTE *data, void* user)
 				allPkt.resize(allPkt.size() + 1);
 				allPkt.back().insert(allPkt.back().begin(), data, data + tcpdatalen);
 			}
+			else
+			{
+				++edata;
+			}
 			break;
 		}
 
@@ -50,6 +55,10 @@ void CALLBACK PktParam(const ip_header *ih, const BYTE *data, void* user)
 			{
 				allPkt.resize(allPkt.size() + 1);
 				allPkt.back().insert(allPkt.back().begin(), data, data + udpdatalen);
+			}
+			else
+			{
+				++edata;
 			}
 			break;
 		}

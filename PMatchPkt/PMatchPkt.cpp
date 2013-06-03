@@ -60,7 +60,9 @@ PMATCHPKT void MchCompile(LPCTSTR filename, LPVOID lpVoid)
 					}
 					else
 					{
-						rulesmap.sigmap[sig] = pos;
+						SIGSMAP &temp = rulesmap.sigmap;
+						temp[sig].resize(temp[sig].size() + 1);
+						temp[sig].back() = pos;
 						//sigvec.push_back(sig);
 						//sids[pos] = 1;
 						flag |= 1;
@@ -71,7 +73,9 @@ PMATCHPKT void MchCompile(LPCTSTR filename, LPVOID lpVoid)
 		}
 END:	if(((flag & 1) == 0) && ((flag & 1 << 1) != 0))
 		{
-			rulesmap.sigmap[tempsig] = pos;
+			SIGSMAP &temp = rulesmap.sigmap;
+			temp[tempsig].resize(temp[tempsig].size() + 1);
+			temp[tempsig].back() = pos;
 			//sigvec.push_back(tempsig);
 			//sids[pos] = 1;
 
@@ -89,5 +93,19 @@ END:	if(((flag & 1) == 0) && ((flag & 1 << 1) != 0))
 	//		std::cout << rulesmap.result[i].m_nSid << std::endl;
 	//	}
 	//}
+	size_t e0 = 0, e1 = 0, e2 = 0;
+	SIGSMAP &temp = rulesmap.sigmap;
+	for(SIGSMAP::iterator iter = temp.begin(); iter != temp.end(); ++ iter)
+	{
+		size_t size = iter->second.size();
+		if (size == 0)
+		{
+			++e0;
+		}
+		else if(size == 1)
+			++e1;
+		else 
+			++e2;
+	}
 	std::cout << std::endl;
 }

@@ -34,7 +34,7 @@ struct SIG_HASH
 	}
 };
 
-typedef std::unordered_map<SIGNATURE, size_t, SIG_HASH> SIGSMAP;
+typedef std::unordered_map<SIGNATURE, std::vector<size_t>, SIG_HASH> SIGSMAP;
 struct REGRULESMAP
 {
 	std::vector<REGRULES> result;
