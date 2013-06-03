@@ -951,9 +951,13 @@ void CDfanew::MergeReachable(std::vector<STATEID> &reachable)
 
 void ReleaseAbleTo(std::vector<BYTE*> &ableTo)
 {
-	for (std::vector<BYTE*>::iterator i = ableTo.begin(); i != ableTo.end(); ++i)
+	//for (std::vector<BYTE*>::iterator i = ableTo.begin(); i != ableTo.end(); ++i)
+	//{
+	//	VirtualFree(*i, 0, MEM_RELEASE);
+	//}
+	if (!ableTo.empty())
 	{
-		VirtualFree(*i, 0, MEM_RELEASE);
+		VirtualFree(ableTo.front(), 0, MEM_RELEASE);
 	}
 	ableTo.clear();
 }
@@ -963,16 +967,19 @@ void CalcAbleTo(std::vector<STATEID> *pRevTbl, size_t nGrpNum, size_t nStaNum, P
 	//清空AbleTo
 	ReleaseAbleTo(ps.AbleTo);
 
+	BYTE *pBuf = (BYTE*)VirtualAlloc(NULL, nStaNum * nGrpNum, MEM_COMMIT, PAGE_READWRITE);
+	ps.AbleTo.resize(nGrpNum);
 	//计算AbleTo的值，每产生一个新的或者更新PARTSET对象计算一次
 	for (size_t j = 0; j < nGrpNum; ++j)
 	{
-		BYTE *pAbleTo = (BYTE*)VirtualAlloc(NULL, nStaNum, MEM_COMMIT, PAGE_READWRITE);
+		BYTE *pAbleTo = pBuf + j * nStaNum;
 		//遍历PARTSET中的每个状态t，若存在δ(-1)(t,j)≠Φ，AbleTo[t]标记为1
 		for (std::list<STATEID>::iterator k = ps.StaSet.begin(); k != ps.StaSet.end(); ++k)
 		{
-			pAbleTo[*k] = !(pRevTbl[*k * nGrpNum + j].empty());
+			BOOL br = !(pRevTbl[*k * nGrpNum + j].empty());
+			pAbleTo[*k] = br;
 		}
-		ps.AbleTo.push_back(pAbleTo);
+		ps.AbleTo[j] = pAbleTo;
 	}
 }
 
@@ -1034,7 +1041,8 @@ size_t CDfanew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, std::vector<
 
 	//pWait表示用于切分partSet中每个集合的集合下标，
 	//对于不同的输入字符会保存多个不同集合下标。对应论文中L(a)
-	std::vector<size_t> *pWait = new std::vector<size_t>[nGrpNum];
+	//std::vector<size_t> *pWait = new std::vector<size_t>[nGrpNum];
+	std::vector<size_t> pWait[256];
 
 	//初始化pWait，要求若满足0<|ij|<=|ik|，则将j存入pWait，反之，存入k
 	//对应论文中初始化L(a)过程，这里的i对应a
@@ -1101,6 +1109,7 @@ size_t CDfanew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, std::vector<
 
 		if (nRevCnt != 0)
 		{
+			partSet.reserve(1000);
 			for (size_t j = 0; j != partSet.size(); ++j)
 			{
 				//取partSet中的一个集合j，B(j)中存在t满足条件δ(t,a)∈a(i)，
@@ -1110,19 +1119,30 @@ size_t CDfanew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, std::vector<
 				//将满足条件的t存在集合j的前段，不满足的存在集合j的后段
 				//满足条件的t标记为1，先滤去pAbleToI中前段为1的值
 				for (; t != pJSet->StaSet.end() && pAbleToI[*t] != 0; ++t);
+				if (t == pJSet->StaSet.end())
+				{
+					continue;
+				}
 				//将后段中出现的值为1的插入至前段
+				bool bNoUnable = false;
 				for (; t != pJSet->StaSet.end();)
 				{
 					if (pAbleToI[*t] == 1)
 					{
 						pJSet->StaSet.insert(pJSet->StaSet.begin(), *t);
 						t = pJSet->StaSet.erase(t);
+						bNoUnable = true;
 					}
 					else
 					{
 						++t;
 					}
 				}
+				if (bNoUnable == false)
+				{
+					continue;
+				}
+
 				partSet.push_back(PARTSET());
 				pJSet = &partSet[j];
 				pISet = &partSet[nCurSet];
@@ -1130,45 +1150,38 @@ size_t CDfanew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, std::vector<
 				std::list<STATEID>::iterator part = pJSet->StaSet.begin();
 				//查找产生0,1分段的切分点，记为part
 				for (; part != pJSet->StaSet.end() && pAbleToI[*part] != 0; ++part);
-				if (part != pJSet->StaSet.begin() && part != pJSet->StaSet.end())
+				if (partSet.size() > 254)
 				{
-					if (partSet.size() > 254)
+					VirtualFree(pAbleToI, nStaNum, MEM_RELEASE);
+					for (std::vector<PARTSET>::iterator i = partSet.begin(); i != partSet.end(); ++i)
 					{
-						VirtualFree(pAbleToI, nStaNum, MEM_RELEASE);
-						for (std::vector<PARTSET>::iterator i = partSet.begin(); i != partSet.end(); ++i)
-						{
-							ReleaseAbleTo(i->AbleTo);
-						}
-						delete []pWait;
-						return size_t(-1);
+						ReleaseAbleTo(i->AbleTo);
 					}
-					//保存产生的新的划分
-					PARTSET &lastPart = partSet.back();
-					lastPart.StaSet.splice(lastPart.StaSet.begin(),
-						pJSet->StaSet, part, pJSet->StaSet.end());
-					CalcAbleTo(pRevTbl, nGrpNum, nStaNum, *pJSet);
-					CalcAbleTo(pRevTbl, nGrpNum, nStaNum, lastPart);
-
-					//更新pWait
-					for (BYTE m = 0; m < nGrpNum; ++m)
-					{
-						int k = partSet.size() - 1;
-						std::vector<size_t> &curWait = pWait[m];
-						int aj = CountOnes(pJSet->AbleTo[m], nStaNum);
-						int ak = CountOnes(lastPart.AbleTo[m], nStaNum);
-						if (aj > 0 && aj <= ak)
-						{
-							if (std::find(curWait.begin(), curWait.end(), j) == curWait.end())
-							{
-								k = j;
-							}
-						}
-						curWait.push_back(k);
-					}
+					//delete []pWait;
+					return size_t(-1);
 				}
-				else
+				//保存产生的新的划分
+				PARTSET &lastPart = partSet.back();
+				lastPart.StaSet.splice(lastPart.StaSet.begin(),
+					pJSet->StaSet, part, pJSet->StaSet.end());
+				CalcAbleTo(pRevTbl, nGrpNum, nStaNum, *pJSet);
+				CalcAbleTo(pRevTbl, nGrpNum, nStaNum, lastPart);
+
+				//更新pWait
+				for (BYTE m = 0; m < nGrpNum; ++m)
 				{
-					partSet.pop_back();
+					int k = partSet.size() - 1;
+					std::vector<size_t> &curWait = pWait[m];
+					int aj = CountOnes(pJSet->AbleTo[m], nStaNum);
+					int ak = CountOnes(lastPart.AbleTo[m], nStaNum);
+					if (aj > 0 && aj <= ak)
+					{
+						if (std::find(curWait.begin(), curWait.end(), j) == curWait.end())
+						{
+							k = j;
+						}
+					}
+					curWait.push_back(k);
 				}
 			}
 		}
@@ -1178,7 +1191,7 @@ size_t CDfanew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, std::vector<
 	{
 		ReleaseAbleTo(i->AbleTo);
 	}
-	delete []pWait;
+	//delete []pWait;
 	return 0;
 }
 
