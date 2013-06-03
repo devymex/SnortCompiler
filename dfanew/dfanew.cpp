@@ -9,7 +9,7 @@ struct PARTSET
 	std::vector<STATEID> Ones;
 };
 
-void fdisplay(CDfanew &newdfa, const char* fileName)
+void fdisplay(CDfaNew &newdfa, const char* fileName)
 {
 	std::ofstream fout(fileName);
 	fout << "digraph G {" << std::endl;

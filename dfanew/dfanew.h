@@ -155,5 +155,5 @@ private:
 DFANEWSC void GetDfaSig(CDfaNew &dfa,std::vector<std::vector<BYTE>> &allStr);
 DFANEWSC void outPut(CNfa &nfa, const char* fileName);//用于测试输出一个nfa
 DFANEWSC void outPutDfa(CDfaNew &dfa, const char* filename);//用于测试输出一个dfa
-DFANEWSC void fdisplay(CDfanew &newdfa, const char* fileName);
+DFANEWSC void fdisplay(CDfaNew &newdfa, const char* fileName);
 
