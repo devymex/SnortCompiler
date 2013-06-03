@@ -626,7 +626,6 @@ void PrintMatrix(BYTE *pMat, size_t nWidth, size_t nHeight)
 
 DFANEWSC size_t CDfaNew::Minimize()
 {
-	std::cout << "begin minimize" << std::endl;
 	//error: DFA is empty
 
 	//CTimer time1;//用于测试
@@ -667,7 +666,6 @@ DFANEWSC size_t CDfaNew::Minimize()
 			pMat[i * nMatWidth + nSize] = 1;
 		}
 	}
-	std::cout << "after warshall" << std::endl;
 	Warshall(pMat, nMatWidth, nMatHeight);
 
 	size_t nStartRow = m_StartId * nMatWidth;
@@ -718,7 +716,6 @@ DFANEWSC size_t CDfaNew::Minimize()
 		MergeNonDisStates(partSet);
 	}
 	delete []pRevTab;
-	std::cout << "minimize finished" << std::endl;
 
 	return 0;
 }
@@ -1092,6 +1089,7 @@ size_t CDfaNew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, std::vector<
 {
 	size_t nGrpNum = GetGroupCount();
 	size_t nStaNum = m_pDfa->size();
+	size_t nRevSize = nGrpNum * nStaNum;
 
 	InitPartSet(partSet);
 
@@ -1149,7 +1147,7 @@ size_t CDfaNew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, std::vector<
 		//从pWait中取一个值并remove该值
 		for (size_t i = 0; i < nGrpNum; ++i)
 		{
-			if (i >= 256)
+			if (i >= 255)
 			{
 				std::cout << "i >= 256" << std::endl;
 				system("pause");
@@ -1180,7 +1178,13 @@ size_t CDfaNew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, std::vector<
 		for (std::list<STATEID>::iterator iSta = pISet->StaSet.begin();
 			iSta != pISet->StaSet.end(); ++iSta)
 		{
-			std::vector<STATEID> &revI = pRevTbl[*iSta * nGrpNum + byCurGrp];
+			size_t nRevIdx = *iSta * nGrpNum + byCurGrp;
+			if (nRevIdx >= nRevSize)
+			{
+				std::cout << "nRevIdx >= nRevSize" << std::endl;
+				system("pause");
+			}
+			std::vector<STATEID> &revI = pRevTbl[nRevIdx];
 			for (std::vector<STATEID>::iterator iRevSta = revI.begin();
 				iRevSta != revI.end(); ++iRevSta)
 			{
