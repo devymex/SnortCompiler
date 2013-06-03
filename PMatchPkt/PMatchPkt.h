@@ -2,12 +2,20 @@
 #include "../common/common.h"
 #include "../rule2nfa/rule2nfa.h"
 #include "../compilernew/compilernew.h"
+#include "../pcre2nfa/pcre.h"
+#include "match.h"
 
 #ifndef PMATCHPKT_H_
 #define PMATCHPKT __declspec(dllimport)
 #else
 #define PMATCHPKT __declspec(dllexport)
 #endif
+
+enum MATHCH_FLAG
+{
+	HAS_MATHCHED = 0,
+	NOT_MATHCED = 1
+};
 
 struct REGRULES
 {
@@ -33,7 +41,7 @@ struct SIG_HASH
 	}
 };
 
-typedef std::unordered_map<SIGNATURE, size_t, SIG_HASH> SIGSMAP;
+typedef std::unordered_map<SIGNATURE, std::vector<size_t>, SIG_HASH> SIGSMAP;
 struct REGRULESMAP
 {
 	std::vector<REGRULES> result;
@@ -42,3 +50,4 @@ struct REGRULESMAP
 
 void CALLBACK MyProcess(const CSnortRule &rule, LPVOID lpParam);
 PMATCHPKT void MchCompile(LPCTSTR filename, LPVOID result);
+bool TradithinalMathch(std::vector<u_char> &dataSrc, CRegRule &regRule);//调用pcre库进行匹配
