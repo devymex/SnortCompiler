@@ -475,6 +475,7 @@ size_t CompareWithPcre(const char *pPcre)
 void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 {
 	CResNew &result = *(CResNew*)lpVoid;
+	std::vector<size_t> NoMatchSids;
 	size_t nFlag = rule.GetFlag();
 	if (rule.Size() == 0)
 	{
@@ -494,7 +495,6 @@ void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 		Rule2PcreList(rule, rr);
 		static size_t num = 0;
 		std::cout << ++num << std::endl;
-		std::vector<size_t> NoMatchSids;
 		for (size_t i = 0; i < rr.Size(); ++i)
 		{
 			for (size_t j = 0; j < rr[i].Size(); ++j)
@@ -505,9 +505,9 @@ void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 					switch(CompareWithPcre(tmp))
 					{
 					case 0:
-						std::cout << rule.GetSid() << std::endl;
-						//NoMatchSids.push_back(rule.GetSid());
-						system("pause");
+						//std::cout << rule.GetSid() << std::endl;
+						NoMatchSids.push_back(rule.GetSid());
+						//system("pause");
 						continue;
 					case 1:
 						continue;
@@ -522,11 +522,11 @@ void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 			}
 		}
 	}
-	//std::ofstream fout("..//NoMatchSids.txt", ios::app);
-	//for (std::vector<size_t>::iterator i = NoMatchSids.begin(); i != NoMatchSids.end(); ++i)
-	//{
-	//	fout << "sid: " << *i << std::endl;
-	//}
+	std::ofstream fout("..//NoMatchSids.txt", ios::app);
+	for (std::vector<size_t>::iterator i = NoMatchSids.begin(); i != NoMatchSids.end(); ++i)
+	{
+		fout << "sid: " << *i << std::endl;
+	}
 }
 
 /*
