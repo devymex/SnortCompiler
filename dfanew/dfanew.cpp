@@ -9,6 +9,51 @@ struct PARTSET
 	std::vector<STATEID> Ones;
 };
 
+void fdisplay(CDfaNew &newdfa, const char* fileName)
+{
+	std::ofstream fout(fileName);
+	fout << "digraph G {" << std::endl;
+	fout << "S -> " << (size_t)newdfa.GetStartId() << std::endl;
+
+	for(size_t i = 0; i != newdfa.Size(); ++i)
+	{
+		std::map<STATEID, size_t> rowStateCnt;
+		for(size_t j = 0; j != newdfa.GetGroupCount(); ++j)
+		{
+			rowStateCnt[newdfa[i][j]]++;
+		}
+		STATEID maxId = 0;
+		for (std::map<STATEID, size_t>::iterator j = rowStateCnt.begin(); j != rowStateCnt.end(); ++j)
+		{
+			if (j->second > rowStateCnt[maxId])
+			{
+				maxId = j->first;
+			}
+		}
+		for(size_t j = 0; j != newdfa.GetGroupCount(); ++j)
+		{
+			if (newdfa[i][j] != maxId)
+			{
+				fout << i << " -> " << (size_t)newdfa[i][j] << " [label=\"" << j << "\"];" << std::endl;
+			}
+			else if (maxId != (STATEID)-1)
+			{
+				fout << i << " -> "  << (size_t)maxId << " [label=\"" << j << "\"];" << std::endl;
+			}
+		}
+	}
+	for (size_t i = 0; i < newdfa.Size(); ++i)
+	{
+		if (newdfa[i].GetFlag() & CDfaRow::TERMINAL)
+		{
+			fout << (size_t)i << " [peripheries=2];" << std::endl;
+		}
+	}
+	fout << "}" << std::endl;
+	fout.close();
+}
+
+
 //测试函数:输出一个nfa
 DFANEWSC void outPut(CNfa &nfa, const char* fileName)
 {
