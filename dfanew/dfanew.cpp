@@ -629,7 +629,6 @@ DFANEWSC size_t CDfaNew::Minimize()
 	//error: DFA is empty
 
 	//CTimer time1;//ÓÃÓÚ²âÊÔ
-
 	try
 	{
 	size_t nSize = m_pDfa->size();

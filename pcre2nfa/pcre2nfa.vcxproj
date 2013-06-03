@@ -74,6 +74,7 @@
   <ItemGroup>
     <ClInclude Include="..\common\snortcom.h" />
     <ClInclude Include="config.h" />
+    <ClInclude Include="match.h" />
     <ClInclude Include="pcre2nfa.h" />
     <ClInclude Include="pcre.h" />
     <ClInclude Include="pcrecpp.h" />
@@ -86,6 +87,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GetSignature.cpp" />
+    <ClCompile Include="match.cpp" />
     <ClCompile Include="pcre2nfa.cpp" />
     <ClCompile Include="p2nmain.cpp" />
     <ClCompile Include="pcre_byte_order.c">
