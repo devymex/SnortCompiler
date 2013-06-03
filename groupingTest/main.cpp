@@ -24,13 +24,21 @@ int main()
 	//	}
 	//}
 	CResNew result;
-	//compilenew(_T("..\\..\\input\\allrules.rule"), result);
+	compilenew(_T("..\\..\\input\\testrules.rule"), result);
 	//result.WriteToFile(_T("..\\..\\output\\result.cdt"));
-	result.ReadFromFile(_T("..\\..\\output\\result.cdt"));
-	//CGROUPRes groupRes;
+	//result.ReadFromFile(_T("..\\..\\output\\result.cdt"));
+	//for (size_t i = 0; i < result.GetSidDfaIds().Size(); ++i)
+	//{
+	//	if (result.GetSidDfaIds()[i].m_dfaIds.Size() > 0 && result.GetSidDfaIds()[i].m_dfaIds[0] == 1244)
+	//	{
+	//		std::cout << result.GetSidDfaIds()[i].m_nSid << std::endl;
+	//		break;
+	//	}
+	//}
+	CGROUPRes groupRes;
 
 	//CTimer ctime;
-	//grouping(result, groupRes);
+	grouping(result, groupRes);
 	//std::cout << "分组时间： " << ctime.Reset() << std::endl;
 
 	//groupRes.WriteToFile(_T("..\\..\\output\\GroupResut.cdt"));
@@ -38,35 +46,35 @@ int main()
 	//groupRes.ReadFromFile(_T("..\\..\\output\\GroupResut.cdt"));
 	//groupRes.WriteToFile(_T("..\\..\\output\\GroupResut1.cdt"));
 
-	std::ifstream fin("..\\..\\output\\test.txt");
-	std::vector<size_t> vecIds;
-	size_t tmp;
-	while (fin >> tmp)
-	{
-		vecIds.push_back(tmp);
-	}
+	//std::ifstream fin("..\\..\\output\\test.txt");
+	//std::vector<size_t> vecIds;
+	//size_t tmp;
+	//while (fin >> tmp)
+	//{
+	//	vecIds.push_back(tmp);
+	//}
 
-	std::vector<CDfaNew> vecDfas(2);
-	CDfaNew MergeDfa;
-	MergeDfa = result.GetDfaTable()[vecIds[0]];
-	vecDfas[0] = MergeDfa;
-	for (size_t i = 1; i < vecIds.size(); ++i)
-	{
-		vecDfas[1] = result.GetDfaTable()[vecIds[i]];
-		if (!NOrMerge(vecDfas, MergeDfa))
-		{
-			std::cout << "ERROR" << std::endl;
-		}
-		else
-		{
-			vecDfas[0] = MergeDfa;
-		}
-	}
-	//vecDfas[1] = result.GetDfaTable()[vecIds[vecIds.size() - 1]];
-	//NOrMerge(vecDfas, MergeDfa);
-	//std::cout << MergeDfa.Size() << std::endl;
-	outPutDfa(MergeDfa, "..//..//output//dfa1_1.txt");
-	outPutDfa(result.GetDfaTable()[vecIds[vecIds.size() - 1]], "..//..//output//dfa2_2.txt");
+	//std::vector<CDfaNew> vecDfas(2);
+	//CDfaNew MergeDfa;
+	//MergeDfa = result.GetDfaTable()[vecIds[0]];
+	//vecDfas[0] = MergeDfa;
+	//for (size_t i = 1; i < vecIds.size(); ++i)
+	//{
+	//	vecDfas[1] = result.GetDfaTable()[vecIds[i]];
+	//	if (!NOrMerge(vecDfas, MergeDfa))
+	//	{
+	//		std::cout << "ERROR" << std::endl;
+	//	}
+	//	else
+	//	{
+	//		vecDfas[0] = MergeDfa;
+	//	}
+	//}
+	////vecDfas[1] = result.GetDfaTable()[vecIds[vecIds.size() - 1]];
+	////NOrMerge(vecDfas, MergeDfa);
+	////std::cout << MergeDfa.Size() << std::endl;
+	//outPutDfa(MergeDfa, "..//..//output//dfa1_1.txt");
+	//outPutDfa(result.GetDfaTable()[vecIds[vecIds.size() - 1]], "..//..//output//dfa2_2.txt");
 
 	system("pause");
 	return 0;

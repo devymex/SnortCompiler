@@ -350,50 +350,12 @@ MERDFANEW bool NOrMerge(std::vector<CDfaNew> &dfas, CDfaNew &lastDfa)
 
 	//对lastDfa进行进一步按列分组
 
-	std::cout << lastDfa.Size() << std::endl;
 	std::cout << "before min" << std::endl;
-	std::ofstream fout("..//..//output//dfa.txt");
-	fout << "digraph G {" << std::endl;
-	fout << "S -> " << (size_t)dfas[1].GetStartId() << std::endl;
-
-	for(size_t i = 0; i != dfas[1].Size(); ++i)
-	{
-		std::map<STATEID, size_t> rowStateCnt;
-		for(size_t j = 0; j != dfas[1].GetGroupCount(); ++j)
-		{
-			rowStateCnt[dfas[1][i][j]]++;
-		}
-		STATEID maxId = 0;
-		for (std::map<STATEID, size_t>::iterator j = rowStateCnt.begin(); j != rowStateCnt.end(); ++j)
-		{
-			if (j->second > rowStateCnt[maxId])
-			{
-				maxId = j->first;
-			}
-		}
-		for(size_t j = 0; j != dfas[1].GetGroupCount(); ++j)
-		{
-			if (dfas[1][i][j] != maxId)
-			{
-				fout << i << " -> " << (size_t)dfas[1][i][j] << " [label=\"" << j << "\"];" << std::endl;
-			}
-			else if (maxId != (STATEID)-1)
-			{
-				fout << i << " -> "  << (size_t)maxId << " [label=\"" << j << "\"];" << std::endl;
-			}
-		}
-	}
-	for (size_t i = 0; i < dfas[1].Size(); ++i)
-	{
-		if (dfas[1][i].GetFlag() & CDfaRow::TERMINAL)
-		{
-			fout << (size_t)i << " [peripheries=2];" << std::endl;
-		}
-	}
-	fout << "}" << std::endl;
-	fout.close();
+	//fdisplay(dfas[0], "..//..//output//dfa1.txt");
+	//fdisplay(dfas[1], "..//..//output//dfa2.txt");
+	//fdisplay(lastDfa, "..//..//output//dfa12.txt");
 	lastDfa.Minimize();
-	std::cout << lastDfa.Size() << std::endl;
+	//fdisplay(lastDfa, "..//..//output//dfa12min.txt");
 	std::cout << "after min" << std::endl;
 	if(lastDfa.Size() > DFA_SIZE_LIMIT)
 	{
