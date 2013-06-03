@@ -475,33 +475,49 @@ size_t CompareWithPcre(const char *pPcre)
 void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 {
 	CResNew &result = *(CResNew*)lpVoid;
-	CRegRule rr;
-	Rule2PcreList(rule, rr);
-	static size_t num = 0;
-	std::cout << ++num << std::endl;
-	std::vector<size_t> NoMatchSids;
-	for (size_t i = 0; i < rr.Size(); ++i)
+	size_t nFlag = rule.GetFlag();
+	if (rule.Size() == 0)
 	{
-		for (size_t j = 0; j < rr[i].Size(); ++j)
+		return;
+	}
+	else if (nFlag & CSnortRule::RULE_HASNOT)
+	{
+		return;
+	}
+	else if (nFlag & CSnortRule::RULE_HASBYTE)
+	{
+		return;
+	}	
+	else
+	{
+		CRegRule rr;
+		Rule2PcreList(rule, rr);
+		static size_t num = 0;
+		std::cout << ++num << std::endl;
+		std::vector<size_t> NoMatchSids;
+		for (size_t i = 0; i < rr.Size(); ++i)
 		{
-			const char *tmp = rr[i][j].C_Str();
-			if (tmp != NULL && tmp[0] != '\0')
+			for (size_t j = 0; j < rr[i].Size(); ++j)
 			{
-				switch(CompareWithPcre(tmp))
+				const char *tmp = rr[i][j].C_Str();
+				if (tmp != NULL && tmp[0] != '\0')
 				{
-				case 0:
-					std::cout << rule.GetSid() << std::endl;
-					//NoMatchSids.push_back(rule.GetSid());
-					system("pause");
-					continue;
-				case 1:
-					continue;
-				case 2:
-					std::cout << "nfa error" << std::endl;
-					continue;
-				case 3:
-					std::cout << "dfa error" << std::endl;
-					continue;
+					switch(CompareWithPcre(tmp))
+					{
+					case 0:
+						std::cout << rule.GetSid() << std::endl;
+						//NoMatchSids.push_back(rule.GetSid());
+						system("pause");
+						continue;
+					case 1:
+						continue;
+					case 2:
+						std::cout << "nfa error" << std::endl;
+						continue;
+					case 3:
+						std::cout << "dfa error" << std::endl;
+						continue;
+					}
 				}
 			}
 		}
