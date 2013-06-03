@@ -6,6 +6,7 @@ struct PARTSET
 {
 	std::list<STATEID> StaSet;
 	std::vector<BYTE*> AbleTo;
+	std::vector<STATEID> Ones;
 };
 
 //测试函数:输出一个nfa
@@ -969,6 +970,7 @@ void CalcAbleTo(std::vector<STATEID> *pRevTbl, size_t nGrpNum, size_t nStaNum, P
 
 	BYTE *pBuf = (BYTE*)VirtualAlloc(NULL, nStaNum * nGrpNum, MEM_COMMIT, PAGE_READWRITE);
 	ps.AbleTo.resize(nGrpNum);
+	ps.Ones.resize(nGrpNum, 0);
 	//计算AbleTo的值，每产生一个新的或者更新PARTSET对象计算一次
 	for (size_t j = 0; j < nGrpNum; ++j)
 	{
@@ -977,7 +979,11 @@ void CalcAbleTo(std::vector<STATEID> *pRevTbl, size_t nGrpNum, size_t nStaNum, P
 		for (std::list<STATEID>::iterator k = ps.StaSet.begin(); k != ps.StaSet.end(); ++k)
 		{
 			BOOL br = !(pRevTbl[*k * nGrpNum + j].empty());
-			pAbleTo[*k] = br;
+			if (br == TRUE && pAbleTo[*k] == 0)
+			{
+				pAbleTo[*k] = br;
+				++ps.Ones[j];
+			}
 		}
 		ps.AbleTo[j] = pAbleTo;
 	}
@@ -1021,7 +1027,7 @@ void CDfanew::InitPartSet(std::vector<PARTSET> &partSet) const
 	partSet.push_back(initBSet[std::set<size_t>()]);
 }
 
-size_t CountOnes(BYTE *pBuf, size_t nBufSize)
+inline size_t CountOnes(BYTE *pBuf, size_t nBufSize)
 {
 	return std::count(pBuf, pBuf + nBufSize, 1);
 }
@@ -1172,8 +1178,10 @@ size_t CDfanew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, std::vector<
 				{
 					int k = partSet.size() - 1;
 					std::vector<size_t> &curWait = pWait[m];
-					int aj = CountOnes(pJSet->AbleTo[m], nStaNum);
-					int ak = CountOnes(lastPart.AbleTo[m], nStaNum);
+					//int aj = CountOnes(pJSet->AbleTo[m], nStaNum);
+					//int ak = CountOnes(lastPart.AbleTo[m], nStaNum);
+					int aj = pJSet->Ones[m];
+					int ak = lastPart.Ones[m];
 					if (aj > 0 && aj <= ak)
 					{
 						if (std::find(curWait.begin(), curWait.end(), j) == curWait.end())
