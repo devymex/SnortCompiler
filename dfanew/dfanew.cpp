@@ -950,23 +950,20 @@ void CDfanew::MergeReachable(std::vector<STATEID> &reachable)
 	m_pDfa = pNewDfa;
 }
 
-void ReleaseAbleTo(std::vector<BYTE*> &ableTo)
+void ReleaseAbleTo(PARTSET &ps)
 {
-	//for (std::vector<BYTE*>::iterator i = ableTo.begin(); i != ableTo.end(); ++i)
-	//{
-	//	VirtualFree(*i, 0, MEM_RELEASE);
-	//}
-	if (!ableTo.empty())
+	if (!ps.AbleTo.empty())
 	{
-		VirtualFree(ableTo.front(), 0, MEM_RELEASE);
+		VirtualFree(ps.AbleTo.front(), 0, MEM_RELEASE);
 	}
-	ableTo.clear();
+	ps.AbleTo.clear();
+	ps.Ones.clear();
 }
 
 void CalcAbleTo(std::vector<STATEID> *pRevTbl, size_t nGrpNum, size_t nStaNum, PARTSET &ps)
 {
 	//Çå¿ÕAbleTo
-	ReleaseAbleTo(ps.AbleTo);
+	ReleaseAbleTo(ps);
 
 	BYTE *pBuf = (BYTE*)VirtualAlloc(NULL, nStaNum * nGrpNum, MEM_COMMIT, PAGE_READWRITE);
 	ps.AbleTo.resize(nGrpNum);
@@ -1161,7 +1158,7 @@ size_t CDfanew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, std::vector<
 					VirtualFree(pAbleToI, nStaNum, MEM_RELEASE);
 					for (std::vector<PARTSET>::iterator i = partSet.begin(); i != partSet.end(); ++i)
 					{
-						ReleaseAbleTo(i->AbleTo);
+						ReleaseAbleTo(*i);
 					}
 					//delete []pWait;
 					return size_t(-1);
@@ -1197,7 +1194,7 @@ size_t CDfanew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, std::vector<
 	VirtualFree(pAbleToI, nStaNum, MEM_RELEASE);
 	for (std::vector<PARTSET>::iterator i = partSet.begin(); i != partSet.end(); ++i)
 	{
-		ReleaseAbleTo(i->AbleTo);
+		ReleaseAbleTo(*i);
 	}
 	//delete []pWait;
 	return 0;
