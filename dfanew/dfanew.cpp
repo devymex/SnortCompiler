@@ -1122,26 +1122,30 @@ size_t CDfanew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, std::vector<
 				//将满足条件的t存在集合j的前段，不满足的存在集合j的后段
 				//满足条件的t标记为1，先滤去pAbleToI中前段为1的值
 				for (; t != pJSet->StaSet.end() && pAbleToI[*t] != 0; ++t);
+				bool bHasAble = true;
 				if (t == pJSet->StaSet.end())
 				{
 					continue;
 				}
+				if (t == pJSet->StaSet.begin())
+				{
+					bHasAble = false;
+				}
 				//将后段中出现的值为1的插入至前段
-				bool bNoUnable = false;
 				for (; t != pJSet->StaSet.end();)
 				{
 					if (pAbleToI[*t] == 1)
 					{
 						pJSet->StaSet.insert(pJSet->StaSet.begin(), *t);
 						t = pJSet->StaSet.erase(t);
-						bNoUnable = true;
+						bHasAble = true;
 					}
 					else
 					{
 						++t;
 					}
 				}
-				if (bNoUnable == false)
+				if (bHasAble == false)
 				{
 					continue;
 				}
