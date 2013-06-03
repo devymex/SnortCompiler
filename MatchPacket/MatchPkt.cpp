@@ -102,7 +102,7 @@ void FindSig(size_t sig, std::map<size_t, std::vector<SIGSID>> &hashtable, std::
 }
 
 //返回 0 表示没有匹配上，返回 1 表示匹配上
-size_t MatchOnedfa(std::vector<u_char> &onepkt, CDfanew &dfa, std::vector<size_t> &matchedDids)
+size_t MatchOnedfa(std::vector<u_char> &onepkt, CDfaNew &dfa, std::vector<size_t> &matchedDids)
 {
 	std::unordered_map<size_t, std::vector<size_t>> dfaids;
 	for (size_t i = 0; i < dfa.GetTermCnt(); ++i)
@@ -142,7 +142,7 @@ size_t MatchOnedfa(std::vector<u_char> &onepkt, CDfanew &dfa, std::vector<size_t
 	}
 }
 
-MATCHPKT void MatchPkt(std::vector<std::vector<u_char>> &allPkt, std::map<size_t, std::vector<SIGSID>> &hashtable, std::vector<CDfanew> &alldfas, std::vector<MATCHRESULT> &matchresult)
+MATCHPKT void MatchPkt(std::vector<std::vector<u_char>> &allPkt, std::map<size_t, std::vector<SIGSID>> &hashtable, std::vector<CDfaNew> &alldfas, std::vector<MATCHRESULT> &matchresult)
 {
 	for (std::vector<std::vector<u_char>>::iterator allPktIter = allPkt.begin(); allPktIter != allPkt.end(); ++allPktIter)
 	{

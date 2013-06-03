@@ -8,6 +8,6 @@
 #define MERDFANEW __declspec(dllexport)
 #endif
 
-MERDFANEW bool NOrMerge(std::vector<CDfanew> &dfas, CDfanew &lastDfa);
-//MERDFANEW size_t NOrMerge(std::vector<CDfanew> &dfas, CDfanew &lastDfa);
+MERDFANEW bool NOrMerge(std::vector<CDfaNew> &dfas, CDfaNew &lastDfa);
+//MERDFANEW size_t NOrMerge(std::vector<CDfaNew> &dfas, CDfaNew &lastDfa);
 

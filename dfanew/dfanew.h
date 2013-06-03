@@ -96,13 +96,13 @@ struct DFANEWSC TERMSET
 //	BYTE *pAble;
 //};
 //
-class DFANEWSC CDfanew
+class DFANEWSC CDfaNew
 {
 public:
-	CDfanew();
-	~CDfanew();
-	CDfanew(const CDfanew &other);
-	CDfanew& operator=(const CDfanew &other);
+	CDfaNew();
+	~CDfaNew();
+	CDfaNew(const CDfaNew &other);
+	CDfaNew& operator=(const CDfaNew &other);
 	size_t Size() const;
 	CDfaRow& operator[](STATEID index);
 	const CDfaRow& operator[](STATEID index) const;
@@ -115,7 +115,7 @@ public:
 	void PushBackDfa(CDfaRow &sta);
 	void PushBackTermSet(TERMSET &term);
 	void UniqueTermSet();
-	//size_t AddTermIntoDFA(STATEID sta, const CDfanew &other, STATEID thisSta);//根据other的sta查找termset，将找到的TERMSET插入到的this的m_TermSet中，其中this的状态是thisSta中
+	//size_t AddTermIntoDFA(STATEID sta, const CDfaNew &other, STATEID thisSta);//根据other的sta查找termset，将找到的TERMSET插入到的this的m_TermSet中，其中this的状态是thisSta中
 	TERMSET& BackTermSet();
 	size_t FromNFA(const CNfa &nfa, NFALOG *nfalog, size_t Count, bool combine = false);
 	size_t Minimize();
@@ -152,8 +152,8 @@ private:
 
 };
 
-DFANEWSC void GetDfaSig(CDfanew &dfa,std::vector<std::vector<BYTE>> &allStr);
+DFANEWSC void GetDfaSig(CDfaNew &dfa,std::vector<std::vector<BYTE>> &allStr);
 DFANEWSC void outPut(CNfa &nfa, const char* fileName);//用于测试输出一个nfa
-DFANEWSC void outPutDfa(CDfanew &dfa, const char* filename);//用于测试输出一个dfa
+DFANEWSC void outPutDfa(CDfaNew &dfa, const char* filename);//用于测试输出一个dfa
 DFANEWSC void fdisplay(CDfanew &newdfa, const char* fileName);
 

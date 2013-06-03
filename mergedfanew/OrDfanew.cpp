@@ -2,7 +2,7 @@
 #include "OrDfanew.h"
 
 //根据other的sta查找termset，将找到的TERMSET插入到nfalog的staNum中，同时增加count
-void AddDIdToNFALog(STATEID sta, const CDfanew &other, NFALOG *nfalog, size_t &count, size_t staNum)
+void AddDIdToNFALog(STATEID sta, const CDfaNew &other, NFALOG *nfalog, size_t &count, size_t staNum)
 {
 	for(size_t i = 0; i < other.GetTermCnt(); ++i)
 	{
@@ -16,7 +16,7 @@ void AddDIdToNFALog(STATEID sta, const CDfanew &other, NFALOG *nfalog, size_t &c
 }
 
 //termSta is the terminal state of nfa which is caculated in advance
-void NInsertDfa(CDfanew &dfa, CNfa &nfa, size_t nTermSta, NFALOG *nfalog, size_t &count)
+void NInsertDfa(CDfaNew &dfa, CNfa &nfa, size_t nTermSta, NFALOG *nfalog, size_t &count)
 {
 	size_t temp = nfa.Size();
 	nfa.Resize(nfa.Size() + dfa.Size());
