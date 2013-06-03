@@ -1,24 +1,20 @@
 #include "stdafx.h"
 #include "OrDfanew.h"
 
-//void NIncreDfaNum(CDfanew &dfa, size_t num)
-//{
-//	for(size_t i = 0; i < dfa.Size(); ++i)
-//	{
-//		for(size_t charNum = 0; charNum < dfa.GetGroupCount(); ++charNum)
-//		{
-//			STATEID sta = dfa[i][charNum];
-//			if(sta != STATEID(-1))
-//			{
-//				dfa[i][charNum] += num;
-//			}
-//			else
-//			{
-//				dfa[i][charNum] = (size_t)-1;
-//			}
-//		}
-//	}
-//}
+//根据other的sta查找termset，将找到的TERMSET插入到nfalog的staNum中，同时增加count
+void AddDIdToNFALog(STATEID sta, const CDfanew &other, NFALOG *nfalog, size_t &count, size_t staNum)
+{
+	for(size_t i = 0; i < other.GetTermCnt(); ++i)
+	{
+		if(other.GetTerm(i).dfaSta == sta)
+		{
+			nfalog[count].dfaId = other.GetTerm(i).dfaId;
+			nfalog[count].nfaStateId = staNum;
+			++count;
+		}
+	}
+}
+
 //termSta is the terminal state of nfa which is caculated in advance
 void NInsertDfa(CDfanew &dfa, CNfa &nfa, size_t nTermSta, NFALOG *nfalog, size_t &count)
 {
@@ -31,10 +27,8 @@ void NInsertDfa(CDfanew &dfa, CNfa &nfa, size_t nTermSta, NFALOG *nfalog, size_t
 		if((dfaRow.GetFlag() & CDfaRow::TERMINAL) != 0)
 		{
 			nfaRow.AddDest(EMPTYEDGE, nTermSta);
-
-			nfalog[count].dfaId = dfa.GetId();//此处错误！
-			nfalog[count].nfaStateId = temp + i;
-			++count;
+			size_t staNum = temp + i;
+			AddDIdToNFALog(i, dfa, nfalog, count, staNum);
 		}
 		for(size_t charNum = 0; charNum < DFACOLSIZE; ++charNum)
 		{

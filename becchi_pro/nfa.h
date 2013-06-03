@@ -300,6 +300,7 @@ public:
 
 	void output();
 
+	void nfa2CNfa(CNfa &cnfa);
 private:
 	
 	/* returns the set of identifiers corresponding to the given set of NFA states
