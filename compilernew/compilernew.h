@@ -35,15 +35,15 @@ public:
 	CDfaTblNew(const CDfaTblNew& other);
 	const CDfaTblNew &operator=(const CDfaTblNew &other);
 	~CDfaTblNew();
-	CDfanew& operator[](size_t index);
-	const CDfanew& operator[](size_t index) const;
+	CDfaNew& operator[](size_t index);
+	const CDfaNew& operator[](size_t index) const;
 	void Reserve(size_t nCount);
 	void Resize(size_t nSize);
 	const size_t Size() const;
-	void PushBack(const CDfanew &dfa);
+	void PushBack(const CDfaNew &dfa);
 	void Clear();
 private:
-	std::vector<CDfanew> *m_pdfaTbl;
+	std::vector<CDfaNew> *m_pdfaTbl;
 };
 
 class COMPILERNEW CSidDfaIdsNew

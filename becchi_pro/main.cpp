@@ -136,7 +136,7 @@ void ReadRegexs(std::string filename, std::vector<std::string> &regset)
 	fin.close();
 }
 
-void display(CDfanew &newdfa)
+void display(CDfaNew &newdfa)
 {
 	for(size_t i = 0; i != newdfa.Size(); ++i)
 	{
@@ -166,7 +166,7 @@ void display(CDfanew &newdfa)
 }
 
 
-void fdisplay(CDfanew &newdfa, const char* fileName)
+void fdisplay(CDfaNew &newdfa, const char* fileName)
 {
 	std::ofstream fout(fileName);
 	fout << (size_t)newdfa.GetStartId() << std::endl;
@@ -225,7 +225,7 @@ NFA* CreatNFA(const char* re)
 	return nfa->get_first();
 }
 
-//void DFSTraverse(CDfanew &dfa, STATEID &sta, std::vector<BYTE> &visited)
+//void DFSTraverse(CDfaNew &dfa, STATEID &sta, std::vector<BYTE> &visited)
 //{
 //	std::cout << "深度优先搜索遍历：状态" << (size_t)sta << std::endl;
 //	visited[sta] = 1;
@@ -239,7 +239,7 @@ NFA* CreatNFA(const char* re)
 //	}
 //}
 //
-//void DFS(CDfanew &dfa, std::vector<BYTE> &visited)
+//void DFS(CDfaNew &dfa, std::vector<BYTE> &visited)
 //{
 //	for (STATEID sta = 0; sta != (STATEID)dfa.Size(); ++sta)
 //	{
@@ -276,7 +276,7 @@ struct COMPARESTATOGROUP
 //	return (x == y);
 //}
 
-void GetChargroup(CDfanew &dfa, STATEID &sta, std::vector<std::vector<BYTE>> &chargroup)
+void GetChargroup(CDfaNew &dfa, STATEID &sta, std::vector<std::vector<BYTE>> &chargroup)
 {
 	CDfaRow &cur = dfa[sta];
 
@@ -292,7 +292,7 @@ void GetChargroup(CDfanew &dfa, STATEID &sta, std::vector<std::vector<BYTE>> &ch
 	}
 }
 
-size_t EqualDFA(CDfanew &dfa1, std::vector<BYTE> &visited1, STATEID sta1, CDfanew &dfa2, std::vector<BYTE> &visited2, STATEID sta2)
+size_t EqualDFA(CDfaNew &dfa1, std::vector<BYTE> &visited1, STATEID sta1, CDfaNew &dfa2, std::vector<BYTE> &visited2, STATEID sta2)
 {
 	visited1[sta1] = 1;
 	visited2[sta2] = 1;
@@ -344,9 +344,9 @@ size_t EqualDFA(CDfanew &dfa1, std::vector<BYTE> &visited1, STATEID sta1, CDfane
 	return 1;
 }
 
-void FoldDFA(CDfanew &curDfa)
+void FoldDFA(CDfaNew &curDfa)
 {
-	CDfanew foldDfa;
+	CDfaNew foldDfa;
 	BYTE group[CSIZE];
 	for (int i = 0; i < CSIZE; ++i)
 	{
@@ -369,7 +369,7 @@ void FoldDFA(CDfanew &curDfa)
 	curDfa = foldDfa;
 }
 
-size_t CompDfa(CDfanew &OwnDfa, CDfanew &BeDfa)
+size_t CompDfa(CDfaNew &OwnDfa, CDfaNew &BeDfa)
 {
 	size_t Result = 0;
 	std::vector<BYTE> visited1(OwnDfa.Size());
@@ -437,7 +437,7 @@ size_t CompareWithPcre(const char *pPcre)
 	}
 	//std::cout << nfa1.Size() << std::endl;
 	//outPut(nfa1, "..//nfaresult1.txt");
-	CDfanew OwnDfa;
+	CDfaNew OwnDfa;
 	if (-1 == OwnDfa.FromNFA(nfa1, NULL, 0))
 	{
 		return 3;
@@ -471,8 +471,8 @@ size_t CompareWithPcre(const char *pPcre)
 	//BeDfa->dump();
 	//std::cout << BeDfa->size() << std::endl;
 	//std::cout << BeDfa->size() << std::endl;
-	CDfanew newBeDfa;
-	BeDfa->Dfa2CDfanew(newBeDfa);
+	CDfaNew newBeDfa;
+	BeDfa->Dfa2CDfaNew(newBeDfa);
 	//fdisplay(newBeDfa, "..//result2.txt");
 	//std::cout << (size_t)newBeDfa.Size() << std::endl;
 	//newBeDfa.Process((BYTE* )str, strlen(str), tmp);
@@ -558,7 +558,7 @@ int main(int argc, char **argv)
 	//ReadRegexs(argv[3], regset);
 
 
-	//std::vector<CDfanew> dfaset;
+	//std::vector<CDfaNew> dfaset;
 	//for (std::vector<std::string>::iterator iReg = regset.begin(); iReg != regset.end(); ++iReg)
 	//{
 	//	const char* re = iReg->c_str();
@@ -576,14 +576,14 @@ int main(int argc, char **argv)
 	//	//dfa->output();
 	//	//std::cout << std::endl;
 	//	//dfa->dump();
-	//	CDfanew newdfa;
-	//	dfa->Dfa2CDfanew(newdfa);
+	//	CDfaNew newdfa;
+	//	dfa->Dfa2CDfaNew(newdfa);
 	//	//display(newdfa);
 	//	dfaset.push_back(newdfa);
 	//	delete dfa;
 	//}
 
-	//for (std::vector<CDfanew>::iterator iDfa = dfaset.begin() + 1; iDfa != dfaset.end(); ++iDfa)
+	//for (std::vector<CDfaNew>::iterator iDfa = dfaset.begin() + 1; iDfa != dfaset.end(); ++iDfa)
 	//{
 	//	std::vector<BYTE> visited1((iDfa - 1)->Size());
 	//	std::fill(visited1.begin(), visited1.end(), 0);

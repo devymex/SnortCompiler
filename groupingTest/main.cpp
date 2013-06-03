@@ -24,74 +24,21 @@ int main()
 	//	}
 	//}
 	CResNew result;
-	compilenew(_T("..\\..\\input\\testrules.rule"), result);
-	result.WriteToFile(_T("..\\..\\output\\result.cdt"));
-	//result.ReadFromFile(_T("..\\..\\output\\result.cdt"));
+	//compilenew(_T("..\\..\\input\\allrules.rule"), result);
+	//result.WriteToFile(_T("..\\..\\output\\result.cdt"));
+	result.ReadFromFile(_T("..\\..\\output\\result.cdt"));
 	CGROUPRes groupRes;
 
-	CTimer ctime;
+	//CTimer ctime;
 	grouping(result, groupRes);
-	std::cout << "分组时间： " << ctime.Reset() << std::endl;
+	//std::cout << "分组时间： " << ctime.Reset() << std::endl;
 
-	groupRes.WriteToFile(_T("..\\..\\output\\GroupResut.cdt"));
+	//groupRes.WriteToFile(_T("..\\..\\output\\GroupResut.cdt"));
 
 	//groupRes.ReadFromFile(_T("..\\..\\output\\GroupResut.cdt"));
 	//groupRes.WriteToFile(_T("..\\..\\output\\GroupResut1.cdt"));
 
-	//std::cout << groupRes.GetGroups().Size() << std::endl;
-	//std::vector<SIGNATURE> vecUsedSigs;
-	//for (size_t i = 0; i < groupRes.GetGroups().Size(); ++i)
-	//{
-	//	if (groupRes.GetGroups()[i].ComSigs.Size() == 1)
-	//	{
-	//		vecUsedSigs.push_back(groupRes.GetGroups()[i].ComSigs[0]);
-	//	}
-	//}
-	//std::sort(vecUsedSigs.begin(), vecUsedSigs.end());
-	//vecUsedSigs.erase(std::unique(vecUsedSigs.begin(), vecUsedSigs.end()), vecUsedSigs.end());
-	//std::ofstream fout("..\\..\\output\\test.txt");
-	//for (size_t i = 0; i < groupRes.GetGroups().Size(); ++i)
-	//{
-	//	if (groupRes.GetGroups()[i].ComSigs.Size() >= 2)
-	//	{
-	//		size_t count = 0;
-	//		SIGNATURE sig;
-	//		for (size_t j = 0; j < groupRes.GetGroups()[i].ComSigs.Size(); ++j)
-	//		{
-	//			if (std::find(vecUsedSigs.begin(), vecUsedSigs.end(), groupRes.GetGroups()[i].ComSigs[j]) == vecUsedSigs.end())
-	//			{
-	//				++count;
-	//				sig = groupRes.GetGroups()[i].ComSigs[j];
-	//			}
-	//		}
-	//		if (count == 1)
-	//		{
-	//			fout << sig << std::endl;
-	//		}
-	//		//fout << std::endl;
-	//	}
-	//}
-
-	//std::ofstream fout("..\\..\\output\\test.txt");
-	//for (size_t i = 0; i < groupRes.GetGroups().Size(); ++i)
-	//{
-	//	if (groupRes.GetGroups()[i].ComSigs.Size() == 1)
-	//	{
-	//		fout << groupRes.GetGroups()[i].ComSigs[0] << std::endl;
-	//	}
-	//}
-
-	//std::ofstream fout("..\\..\\output\\test.txt");
-	//for (size_t i = 0; i < groupRes.GetGroups().Size(); ++i)
-	//{
-	//	for (size_t j = 0; j < groupRes.GetGroups()[i].DfaIds.Size(); ++j)
-	//	{
-	//		fout << groupRes.GetGroups()[i].DfaIds[j] << " ";
-	//	}
-	//	fout << groupRes.GetDfaTable()[groupRes.GetGroups()[i].mergeDfaId].Size() << std::endl;
-	//}
-
-	//std::ifstream fin("..\\..\\output\\mergetest.txt");
+	//std::ifstream fin("..\\..\\output\\test.txt");
 	//std::vector<size_t> vecIds;
 	//size_t tmp;
 	//while (fin >> tmp)
@@ -99,10 +46,10 @@ int main()
 	//	vecIds.push_back(tmp);
 	//}
 
-	//std::vector<CDfanew> vecDfas(2);
-	//CDfanew MergeDfa;
+	//std::vector<CDfaNew> vecDfas(2);
+	//CDfaNew MergeDfa;
 	//vecDfas[0] = result.GetDfaTable()[vecIds[0]];
-	//for (size_t i = 1; i < vecIds.size(); ++i)
+	//for (size_t i = 1; i < vecIds.size() - 1; ++i)
 	//{
 	//	vecDfas[1] = result.GetDfaTable()[vecIds[i]];
 	//	if (!NOrMerge(vecDfas, MergeDfa))
@@ -112,6 +59,8 @@ int main()
 	//	vecDfas[0] = MergeDfa;
 	//}
 	//std::cout << MergeDfa.Size() << std::endl;
+	//outPutDfa(MergeDfa, "..//..//output//dfa1_1.txt");
+	//outPutDfa(result.GetDfaTable()[vecIds[vecIds.size() - 1]], "..//..//output//dfa2_2.txt");
 
 	system("pause");
 	return 0;

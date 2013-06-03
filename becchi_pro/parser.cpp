@@ -318,8 +318,8 @@ unsigned long regex_parser::parse_regex_group(FILE *file, int group[]){
 			dfa->minimize();
 		}
 		//dfa->dump();
-		//CDfanew newdfa;
-		//dfa->Dfa2CDfanew(newdfa);
+		//CDfaNew newdfa;
+		//dfa->Dfa2CDfaNew(newdfa);
 		size = dfa->size();
 		delete dfa;
 	} while (0);

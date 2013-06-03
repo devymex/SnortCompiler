@@ -10,7 +10,8 @@
 #define HASHMODULO 1000000
 
 //#define SC_STATELIMIT 255
-#define SC_STATELIMIT ((1 << (sizeof(STATEID) * 8)) - 1)
+//#define SC_STATELIMIT ((1 << (sizeof(STATEID) * 8)) - 1)
+#define SC_STATELIMIT 1000
 #define DFA_SIZE_LIMIT 255
 
 #define EMPTY 256
@@ -95,13 +96,13 @@ struct DFANEWSC TERMSET
 //	BYTE *pAble;
 //};
 //
-class DFANEWSC CDfanew
+class DFANEWSC CDfaNew
 {
 public:
-	CDfanew();
-	~CDfanew();
-	CDfanew(const CDfanew &other);
-	CDfanew& operator=(const CDfanew &other);
+	CDfaNew();
+	~CDfaNew();
+	CDfaNew(const CDfaNew &other);
+	CDfaNew& operator=(const CDfaNew &other);
 	size_t Size() const;
 	CDfaRow& operator[](STATEID index);
 	const CDfaRow& operator[](STATEID index) const;
@@ -114,7 +115,7 @@ public:
 	void PushBackDfa(CDfaRow &sta);
 	void PushBackTermSet(TERMSET &term);
 	void UniqueTermSet();
-	//size_t AddTermIntoDFA(STATEID sta, const CDfanew &other, STATEID thisSta);//根据other的sta查找termset，将找到的TERMSET插入到的this的m_TermSet中，其中this的状态是thisSta中
+	//size_t AddTermIntoDFA(STATEID sta, const CDfaNew &other, STATEID thisSta);//根据other的sta查找termset，将找到的TERMSET插入到的this的m_TermSet中，其中this的状态是thisSta中
 	TERMSET& BackTermSet();
 	size_t FromNFA(const CNfa &nfa, NFALOG *nfalog, size_t Count, bool combine = false);
 	size_t Minimize();
@@ -146,12 +147,12 @@ private:
 	void RemoveUnreachable(const std::vector<STATEID> *Tab, const STALIST &begs, 
 		const size_t &col, std::vector<STATEID> &reachable);
 	void MergeReachable(std::vector<STATEID> &reachable);
-	void PartitionNonDisState(std::vector<STATEID> *pRevTbl, std::vector<struct PARTSET> &partSet) const;
+	size_t PartitionNonDisState(std::vector<STATEID> *pRevTbl, std::vector<struct PARTSET> &partSet) const;
 	void MergeNonDisStates(std::vector<struct PARTSET> &partSet);
 
 };
 
-DFANEWSC void GetDfaSig(CDfanew &dfa,std::vector<std::vector<BYTE>> &allStr);
+DFANEWSC void GetDfaSig(CDfaNew &dfa,std::vector<std::vector<BYTE>> &allStr);
 DFANEWSC void outPut(CNfa &nfa, const char* fileName);//用于测试输出一个nfa
-DFANEWSC void outPutDfa(CDfanew &dfa, const char* filename);//用于测试输出一个dfa
+DFANEWSC void outPutDfa(CDfaNew &dfa, const char* filename);//用于测试输出一个dfa
 

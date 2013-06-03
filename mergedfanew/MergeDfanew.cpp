@@ -3,7 +3,7 @@
 #include "MergeDfanew.h"
 
 //原始代码，有小问题，慢
-//MERDFANEW bool NOrMerge(std::vector<CDfanew> &dfas, CDfanew &lastDfa)
+//MERDFANEW bool NOrMerge(std::vector<CDfaNew> &dfas, CDfaNew &lastDfa)
 //{
 //	CTimer c;//用于测试
 //#undef max
@@ -92,7 +92,7 @@ struct GROUPKEY
 };
 
 //按照每个dfa的m_pGroup进行分组
-void DfaColGroup(std::vector<CDfanew> &dfas, BYTE* groups)
+void DfaColGroup(std::vector<CDfaNew> &dfas, BYTE* groups)
 {
 	struct GROUPKEYHASH
 	{
@@ -144,7 +144,7 @@ void DfaColGroup(std::vector<CDfanew> &dfas, BYTE* groups)
 }
 
 //根据other的otherSta查找termset，将找到的TERMSET插入到的lastDfa的m_TermSet中，其中lastDfa的状态是lastSta中
-size_t AddTermIntoDFA(STATEID otherSta, CDfanew &other, STATEID lastSta, CDfanew &lastDfa)
+size_t AddTermIntoDFA(STATEID otherSta, CDfaNew &other, STATEID lastSta, CDfaNew &lastDfa)
 {
 	size_t flag = (size_t)-1;
 	for(size_t i = 0; i < other.GetTermCnt(); ++i)
@@ -161,7 +161,7 @@ size_t AddTermIntoDFA(STATEID otherSta, CDfanew &other, STATEID lastSta, CDfanew
 }
 
 //可以先根据每个dfa的分组情况，通过hash将最终的lastDfa进行分组
-MERDFANEW bool NOrMerge(std::vector<CDfanew> &dfas, CDfanew &lastDfa)
+MERDFANEW bool NOrMerge(std::vector<CDfaNew> &dfas, CDfaNew &lastDfa)
 {
 	size_t dfaId = lastDfa.GetId();
 	lastDfa.Clear();
@@ -351,8 +351,9 @@ MERDFANEW bool NOrMerge(std::vector<CDfanew> &dfas, CDfanew &lastDfa)
 	//对lastDfa进行进一步按列分组
 
 
-
-	//lastDfa.Minimize();
+	std::cout << "before min" << std::endl;
+	lastDfa.Minimize();
+	std::cout << "after min" << std::endl;
 	if(lastDfa.Size() > DFA_SIZE_LIMIT)
 	{
 		//std::cerr << "DFA_SIZE_LIMIT!" << std::endl;

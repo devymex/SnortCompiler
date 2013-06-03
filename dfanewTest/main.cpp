@@ -26,7 +26,7 @@ void main()
 	PcreToNFA("/^POST/s", nfa3, regChain);
 	//dfa5.SetId(5);
 	
-	CDfanew dfa1, dfa2, dfa3;
+	CDfaNew dfa1, dfa2, dfa3;
 	dfa1.SetId(1);
 	dfa2.SetId(2);
 	dfa3.SetId(3);
@@ -39,8 +39,8 @@ void main()
 	outPutDfa(dfa2, "F:\\cppProject\\huawei\\PreciseMatch\\testMerg\\dfa2.txt");
 	outPutDfa(dfa3, "F:\\cppProject\\huawei\\PreciseMatch\\testMerg\\dfa3.txt");
 
-	CDfanew mergeDfa;
-	std::vector<CDfanew> dfas;
+	CDfaNew mergeDfa;
+	std::vector<CDfaNew> dfas;
 	dfas.push_back(dfa1);
 	dfas.push_back(dfa2);
 	dfas.push_back(dfa3);

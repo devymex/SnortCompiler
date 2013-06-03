@@ -287,7 +287,7 @@ GROUPINGSC size_t CGROUPRes::ReadFromFile(LPCTSTR filename)
 	BYTE dfaDetails[100000];
 	for (size_t i = 0; i < dfaNum; ++i)
 	{
-		CDfanew &dfa = m_dfaTbl[i];
+		CDfaNew &dfa = m_dfaTbl[i];
 		size_t len;
 		fin.read((char*)&len, 4);
 		fin.read((char*)dfaDetails, len * sizeof(BYTE));
@@ -381,8 +381,8 @@ void Merge(CResNew &res, CGROUPS &groups)
 		{
 			continue;
 		}
-		std::vector<CDfanew> vecDfas(2);
-		CDfanew MergeDfa;
+		std::vector<CDfaNew> vecDfas(2);
+		CDfaNew MergeDfa;
 		MergeDfa = res.GetDfaTable()[groups[i].DfaIds[0]];
 		vecDfas[0] = MergeDfa;
 		bool mergeFlag = true;
@@ -439,7 +439,7 @@ void PutInBySig(CResNew &res, CGROUPS &groups, std::vector<size_t> &vecWaitForGr
 		std::cout << "PutInBySig " << std::endl;
 		std::cout << "NO: " << i - vecWaitForGroup.begin() << std::endl;
 		std::cout << "Total: " << vecWaitForGroup.size() << std::endl << std::endl;
-		std::vector<CDfanew> vecDfas(2);
+		std::vector<CDfaNew> vecDfas(2);
 		vecDfas[0] = res.GetDfaTable()[*i];
 		bool flag = false;
 		for (size_t j = 0; j < vecDfaInfo[*i].Sigs.size(); ++j)
@@ -448,8 +448,16 @@ void PutInBySig(CResNew &res, CGROUPS &groups, std::vector<size_t> &vecWaitForGr
 			{
 				for (size_t k = 0; k < sigToGroupsMap[vecDfaInfo[*i].Sigs[j]].size(); ++k)
 				{
-					CDfanew MergeDfa;
+					CDfaNew MergeDfa;
 					vecDfas[1] = res.GetDfaTable()[groups[sigToGroupsMap[vecDfaInfo[*i].Sigs[j]][k]].mergeDfaId];
+					std::cout << *i << std::endl;
+					for (size_t ii = 0; ii < groups[sigToGroupsMap[vecDfaInfo[*i].Sigs[j]][k]].DfaIds.Size(); ++ii)
+					{
+						std::cout << groups[sigToGroupsMap[vecDfaInfo[*i].Sigs[j]][k]].DfaIds[ii] << " ";
+					}
+					std::cout << std::endl;
+					outPutDfa(vecDfas[1], "..//..//output//dfa1.txt");
+					outPutDfa(vecDfas[0], "..//..//output//dfa2.txt");
 					if (NOrMerge(vecDfas, MergeDfa))
 					{
 						flag = true;
@@ -617,7 +625,7 @@ void MergeGroup(CResNew &res, std::vector<SIGNATURE> &vecUsed, CGROUPS &newGroup
 			}
 		}
 		//++SigsToNumMap[vecSigs];
-		std::vector<CDfanew> vecDfas(2);
+		std::vector<CDfaNew> vecDfas(2);
 		vecDfas[0] = res.GetDfaTable()[newGroups[i].mergeDfaId];
 		for (size_t j = i + 1; j < newGroups.Size(); )
 		{
@@ -632,7 +640,7 @@ void MergeGroup(CResNew &res, std::vector<SIGNATURE> &vecUsed, CGROUPS &newGroup
 			if (vecComSigs.size() > 1)
 			{
 				vecDfas[1] = res.GetDfaTable()[newGroups[j].mergeDfaId];
-				CDfanew MergeDfa;
+				CDfaNew MergeDfa;
 				if (NOrMerge(vecDfas, MergeDfa))
 				{
 					if (SigsToNumMap[vecSigs] > 0)
