@@ -1055,10 +1055,10 @@ size_t CDfanew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, std::vector<
 	for (size_t i = 0; i < nGrpNum; ++i)
 	{
 		size_t nMinId = 0;
-		size_t nMinCnt = CountOnes(partSet[nMinId].AbleTo[i], nStaNum);
+		size_t nMinCnt = partSet[nMinId].Ones[i];
 		for (size_t j = 1; j < partSet.size(); ++j)
 		{
-			size_t nCurCnt = CountOnes(partSet[j].AbleTo[i], nStaNum);
+			size_t nCurCnt = partSet[j].Ones[i];
 			if (nCurCnt != 0)
 			{
 				if (nMinCnt == 0 || nCurCnt < nMinCnt)

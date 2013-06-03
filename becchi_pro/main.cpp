@@ -490,9 +490,9 @@ void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 				switch(CompareWithPcre(tmp))
 				{
 				case 0:
-					//std::cout << rule.GetSid() << std::endl;
-					NoMatchSids.push_back(rule.GetSid());
-					//system("pause");
+					std::cout << rule.GetSid() << std::endl;
+					//NoMatchSids.push_back(rule.GetSid());
+					system("pause");
 					continue;
 				case 1:
 					continue;
@@ -506,11 +506,11 @@ void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 			}
 		}
 	}
-	std::ofstream fout("..//NoMatchSids.txt", ios::app);
-	for (std::vector<size_t>::iterator i = NoMatchSids.begin(); i != NoMatchSids.end(); ++i)
-	{
-		fout << "sid: " << *i << std::endl;
-	}
+	//std::ofstream fout("..//NoMatchSids.txt", ios::app);
+	//for (std::vector<size_t>::iterator i = NoMatchSids.begin(); i != NoMatchSids.end(); ++i)
+	//{
+	//	fout << "sid: " << *i << std::endl;
+	//}
 }
 
 /*
