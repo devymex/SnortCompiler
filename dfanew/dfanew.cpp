@@ -1006,6 +1006,11 @@ void CDfaNew::InitPartSet(std::vector<PARTSET> &partSet) const
 	for (STATEID i = 0; i < m_TermSet->size(); ++i)
 	{
 		TERMSET &ts = (*m_TermSet)[i];
+		if (ts.dfaSta >= nStaNum)
+		{
+			std::cout << "ts.dfaSta >= nStaNum" << std::endl;
+			system("pause");
+		}
 		pTerm2Dfa[ts.dfaSta].insert(ts.dfaId);
 	}
 
@@ -1087,6 +1092,11 @@ size_t CDfaNew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, std::vector<
 		//从pWait中取一个值并remove该值
 		for (size_t i = 0; i < nGrpNum; ++i)
 		{
+			if (i >= 256)
+			{
+				std::cout << "i >= 256" << std::endl;
+				system("pause");
+			}
 			if (!pWait[i].empty())
 			{
 				byCurGrp = i;
@@ -1101,6 +1111,11 @@ size_t CDfaNew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, std::vector<
 			break;
 		}
 
+		if (nCurSet >= partSet.size())
+		{
+			std::cout << "nCurSet >= partSet.size()" << std::endl;
+			system("pause");
+		}
 		PARTSET *pISet = &partSet[nCurSet];
 		ZeroMemory(pAbleToI, nStaNum);
 		size_t nRevCnt = 0;
@@ -1112,6 +1127,11 @@ size_t CDfaNew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, std::vector<
 			for (std::vector<STATEID>::iterator iRevSta = revI.begin();
 				iRevSta != revI.end(); ++iRevSta)
 			{
+				if (*iRevSta >= nStaNum)
+				{
+					std::cout << "*iRevSta >= nStaNum" << std::endl;
+					system("pause");
+				}
 				pAbleToI[*iRevSta] = 1;
 				++nRevCnt;
 			}
@@ -1141,6 +1161,11 @@ size_t CDfaNew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, std::vector<
 				//将后段中出现的值为1的插入至前段
 				for (; t != pJSet->StaSet.end();)
 				{
+					if (*t >= nStaNum)
+					{
+						std::cout << "*t >= nStaNum" << std::endl;
+						system("pause");
+					}
 					if (pAbleToI[*t] == 1)
 					{
 						pJSet->StaSet.insert(pJSet->StaSet.begin(), *t);
