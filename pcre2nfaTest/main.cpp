@@ -2,6 +2,7 @@
 #include <fstream>
 #include <string>
 #include "../pcre2nfa/pcre2nfa.h"
+#include "../pcre2nfa/match.h"
 
 void ReadPcres(std::vector<std::string> &vecPcres)
 {
@@ -15,22 +16,30 @@ void ReadPcres(std::vector<std::string> &vecPcres)
 
 void main()
 {
-	const char* a = "/mine\\s(and|or)/";
-	CNfa nfa;
-	CRegChain regchain;
-	PcreToNFA(a, nfa, regchain);
-	for (size_t i = 0; i < nfa.Size(); ++i)
-	{
-		const CNfaRow &row = nfa[i];
-		for (size_t j = 0; j < CHARSETSIZE; ++j)
-		{
-			size_t nCnt = row.DestCnt(j);
-			for (size_t k = 0; k < nCnt; ++k)
-			{
-				std::cout << "(" << i << "," << j << "," << row.GetDest(j, k) << ")" << std::endl;
-			}
-		}
-	}
+	std::string Regex = "/a\\x00b/";
+	char src [] = {'a', 0, 'b'};
+	
+	int length = 3;
+	int Pos = -1;
+	bool bMatch = match(src, length, Regex, Pos);
+	std::cout << bMatch << std::endl;
+
+	//const char* a = "/mine\\s(and|or)/";
+	//CNfa nfa;
+	//CRegChain regchain;
+	//PcreToNFA(a, nfa, regchain);
+	//for (size_t i = 0; i < nfa.Size(); ++i)
+	//{
+	//	const CNfaRow &row = nfa[i];
+	//	for (size_t j = 0; j < CHARSETSIZE; ++j)
+	//	{
+	//		size_t nCnt = row.DestCnt(j);
+	//		for (size_t k = 0; k < nCnt; ++k)
+	//		{
+	//			std::cout << "(" << i << "," << j << "," << row.GetDest(j, k) << ")" << std::endl;
+	//		}
+	//	}
+	//}
 	//std::vector<std::string> vecPcres;
 	//ReadPcres(vecPcres);
 	//std::ofstream foutExceed("c:\\Exceed.txt");

@@ -389,13 +389,13 @@ void Merge(CResNew &res, CGROUPS &groups)
 		for (size_t j = 1; j < groups[i].DfaIds.Size(); ++j)
 		{
 			vecDfas[1] = res.GetDfaTable()[groups[i].DfaIds[j]];
-			for (size_t k = 0; k <= j; ++k)
-			{
-				std::cout << groups[i].DfaIds[k] << " ";
-			}
-			std::cout << std::endl;
-			outPutDfa(vecDfas[1], "..//..//output//dfa1.txt");
-			outPutDfa(vecDfas[0], "..//..//output//dfa2.txt");
+			//for (size_t k = 0; k <= j; ++k)
+			//{
+			//	std::cout << groups[i].DfaIds[k] << " ";
+			//}
+			//std::cout << std::endl;
+			//outPutDfa(vecDfas[1], "..//..//output//dfa1.txt");
+			//outPutDfa(vecDfas[0], "..//..//output//dfa2.txt");
 			if (!NOrMerge(vecDfas, MergeDfa))
 			{
 				mergeFlag = false;
