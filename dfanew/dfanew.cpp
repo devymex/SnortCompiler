@@ -685,7 +685,7 @@ DFANEWSC size_t CDfaNew::Minimize()
 	if (reachable.size() < nSize)
 	{
 		std::cout << "Has unreachables" << std::endl;
-		system("pause");
+		//system("pause");
 		//remove unreachable states, generate new DFA
 		MergeReachable(reachable);
 	}
