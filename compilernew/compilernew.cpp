@@ -511,6 +511,8 @@ void Rule2Dfas(const CSnortRule &rule, CResNew &result, COMPILEDRULENEW &ruleRes
 			size_t nToNFAFlag = CRegChainToNFA(regrule[i], nfa);
 			pcre2nfatime += ctime.Reset();//用于测试
 
+			std::cout << nfa.Size() << std::endl;
+
 			if (regrule[i].GetSigCnt() > 0)
 			{
 				bHasSigs = true;
@@ -541,6 +543,8 @@ void Rule2Dfas(const CSnortRule &rule, CResNew &result, COMPILEDRULENEW &ruleRes
 				//				std::cout << "  "<< dfa.LinkSize() << ", " << dfa.GetGroupCount() * dfa.Size() << std::endl;
 				nfa2dfatime += ctime.Reset();//用于测试
 				//outPutDfa(dfa, "..//..//output//test.txt");
+
+				std::cout << dfa.Size() << std::endl;
 
 				if (nToDFAFlag == -1)
 				{
