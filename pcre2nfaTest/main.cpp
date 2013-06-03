@@ -22,6 +22,7 @@ void main()
 	int length = 3;
 	int Pos = -1;
 	bool bMatch = match(src, length, Regex, Pos);
+	std::cout << bMatch << std::endl;
 
 	//const char* a = "/mine\\s(and|or)/";
 	//CNfa nfa;
