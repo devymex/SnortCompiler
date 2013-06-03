@@ -626,11 +626,10 @@ void PrintMatrix(BYTE *pMat, size_t nWidth, size_t nHeight)
 
 DFANEWSC size_t CDfaNew::Minimize()
 {
+	std::cout << "begin minimize" << std::endl;
 	//error: DFA is empty
 
 	//CTimer time1;//用于测试
-	try
-	{
 	size_t nSize = m_pDfa->size();
 	size_t nCols = GetGroupCount();
 	if (nSize == 0)
@@ -647,12 +646,9 @@ DFANEWSC size_t CDfaNew::Minimize()
 	}
 	BYTE *pMat = NULL;
 	std::vector<STATEID> reachable;
-	try
-	{
 	pMat = (BYTE*)_aligned_malloc(nMatWidth * nMatHeight, 128);
 	memset(pMat, 0, nMatWidth * nMatHeight);
 
-	//pMat[0] = 1;
 	for (size_t i = 0; i < nSize; ++i)
 	{
 		for (size_t j = 0; j < nCols; ++j)
@@ -671,6 +667,7 @@ DFANEWSC size_t CDfaNew::Minimize()
 			pMat[i * nMatWidth + nSize] = 1;
 		}
 	}
+	std::cout << "after warshall" << std::endl;
 	Warshall(pMat, nMatWidth, nMatHeight);
 
 	size_t nStartRow = m_StartId * nMatWidth;
@@ -683,12 +680,6 @@ DFANEWSC size_t CDfaNew::Minimize()
 		}
 	}
 	_aligned_free(pMat);
-	}
-	catch(...)
-	{
-		std::cout << "Warshall" << std::endl;
-		system("pause");
-	}
 
 	//std::cout << "准备工作： " << time1.Reset() << std::endl;//测试
 
@@ -700,8 +691,6 @@ DFANEWSC size_t CDfaNew::Minimize()
 		MergeReachable(reachable);
 	}
 
-	try
-	{
 	//计算逆向状态查找表
 	nSize = m_pDfa->size();
 	std::vector<STATEID> *pRevTab = new std::vector<STATEID>[nSize * nCols];
@@ -729,18 +718,7 @@ DFANEWSC size_t CDfaNew::Minimize()
 		MergeNonDisStates(partSet);
 	}
 	delete []pRevTab;
-	}
-	catch(...)
-	{
-		std::cout << "Warshall" << std::endl;
-		system("pause");
-	}
-	}
-	catch(...)
-	{
-		std::cout << "All" << std::endl;
-		system("pause");
-	}
+	std::cout << "minimize finished" << std::endl;
 
 	return 0;
 }
@@ -1038,8 +1016,6 @@ void ReleaseAbleTo(PARTSET &ps)
 
 void CalcAbleTo(std::vector<STATEID> *pRevTbl, size_t nGrpNum, size_t nStaNum, PARTSET &ps)
 {
-	try
-	{
 	//清空AbleTo
 	ReleaseAbleTo(ps);
 
@@ -1061,12 +1037,6 @@ void CalcAbleTo(std::vector<STATEID> *pRevTbl, size_t nGrpNum, size_t nStaNum, P
 			}
 		}
 		ps.AbleTo[j] = pAbleTo;
-	}
-	}
-	catch(...)
-	{
-		std::cout << "CalcAbleTo" << std::endl;
-		system("pause");
 	}
 }
 
@@ -1123,16 +1093,6 @@ size_t CDfaNew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, std::vector<
 	size_t nGrpNum = GetGroupCount();
 	size_t nStaNum = m_pDfa->size();
 
-	try
-	{
-		InitPartSet(partSet);
-	}
-	catch(...)
-	{
-		std::cout << "InitPartSet" << std::endl;
-		system("pause");
-	}
-
 	for (std::vector<PARTSET>::iterator i = partSet.begin(); i != partSet.end(); ++i)
 	{
 		//对于partSet中每个集合，根据不同的nGrpNum计算不同AbleTo，AbleTo对应论文中的a(i)
@@ -1144,8 +1104,6 @@ size_t CDfaNew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, std::vector<
 	//std::vector<size_t> *pWait = new std::vector<size_t>[nGrpNum];
 	std::vector<size_t> pWait[256];
 
-	try
-	{
 	//初始化pWait，要求若满足0<|ij|<=|ik|，则将j存入pWait，反之，存入k
 	//对应论文中初始化L(a)过程，这里的i对应a
 	for (size_t i = 0; i < nGrpNum; ++i)
@@ -1170,14 +1128,6 @@ size_t CDfaNew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, std::vector<
 		}
 	}
 
-	}
-	catch(...)
-	{
-		std::cout << "Init pWait" << std::endl;
-	}
-
-	try
-	{
 	//标记能够经过某一输入字符，能够到达ISet中的状态的状态集合
 	BYTE *pAbleToI = (BYTE*)VirtualAlloc(NULL, nStaNum, MEM_COMMIT, PAGE_READWRITE);
 	for (; ; )
@@ -1323,11 +1273,7 @@ size_t CDfaNew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, std::vector<
 		}
 	}
 	VirtualFree(pAbleToI, nStaNum, MEM_RELEASE);
-	}
-	catch(...)
-	{
-		std::cout << "Main Circle" << std::endl;
-	}
+
 	for (std::vector<PARTSET>::iterator i = partSet.begin(); i != partSet.end(); ++i)
 	{
 		ReleaseAbleTo(*i);
