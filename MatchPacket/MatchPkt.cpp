@@ -92,9 +92,45 @@ void FindSig(size_t sig, std::map<size_t, std::vector<SIGSID>> &hashtable, std::
 	}
 }
 
-void MatchOnedfa(std::vector<u_char> &onepkt, CDfanew &dfa, std::vector<size_t> &matchedSids)
+//返回 0 表示没有匹配上，返回 1 表示匹配上
+size_t MatchOnedfa(std::vector<u_char> &onepkt, CDfanew &dfa, std::vector<size_t> &matchedDids)
 {
+	std::unordered_map<size_t, std::vector<size_t>> dfaids;
+	for (size_t i = 0; i < dfa.GetTermCnt(); ++i)
+	{
+		TERMSET &term = dfa.GetTerm(i);
+		if (dfaids.count(term.dfaSta))
+		{
+			dfaids[term.dfaSta].push_back(term.dfaId);
+		}
+		else
+		{
+			dfaids[term.dfaSta].resize(1);
+			dfaids[term.dfaSta].push_back(term.dfaId);
+		}
+	}
 
+	STATEID curSta = dfa.GetStartId();
+	for (std::vector<u_char>::iterator edgeiter = onepkt.begin(); edgeiter != onepkt.end(); ++edgeiter)
+	{
+		BYTE group = dfa.GetOneGroup(*edgeiter);
+
+		if (0 == (dfa[curSta].GetFlag() & CDfaRow::TERMINAL))
+		{
+			if (dfa[curSta][group] != -1)
+			{
+				curSta = dfa[curSta][group];
+			}
+			else
+			{
+				return 0;
+			}
+		}
+		else
+		{
+
+		}
+	}
 }
 
 MATCHPKT void MatchPkt(std::vector<std::vector<u_char>> &allPkt, std::map<size_t, std::vector<SIGSID>> &hashtable, std::vector<CDfanew> &alldfas, std::vector<MATCHRESULT> &matchresult)
