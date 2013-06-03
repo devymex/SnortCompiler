@@ -399,12 +399,10 @@ void FormatPcre (_Iter pBeg, _Iter pEnd, std::string &bPcre, std::string &oPcre)
 		}
 		oPcre.push_back('s');
 
-		std::cout << bPcre << std::endl;
-		std::cout << oPcre << std::endl;
+		//std::cout << bPcre << std::endl;
+		//std::cout << oPcre << std::endl;
 }
 
-std::vector<CDfaNew> dfas;
-static size_t num = 0;
 size_t CompareWithPcre(const char *pPcre)
 {
 	std::string Pcre1;
@@ -428,7 +426,6 @@ size_t CompareWithPcre(const char *pPcre)
 	//std::cout << nfa1.Size() << std::endl;
 	//outPut(nfa1, "..//nfaresult1.txt");
 	CDfaNew OwnDfa;
-	OwnDfa.SetId(num);
 	if (-1 == OwnDfa.FromNFA(nfa1, NULL, 0))
 	{
 		return 3;
@@ -436,9 +433,8 @@ size_t CompareWithPcre(const char *pPcre)
 	//std::cout << OwnDfa.Size() << std::endl;
 	OwnDfa.Minimize();	
 	//outPutDfa(OwnDfa,"..\\first.txt");
-	dfas.push_back(OwnDfa);
 	FoldDFA(OwnDfa);
-	//fdisplay(OwnDfa,"..//result1.txt");
+	//fdisplay(OwnDfa,"..\\result1.txt");
 	//std::cout << (size_t)OwnDfa.Size() << std::endl;
 	//display(OwnDfa);
 	//OwnDfa.Process((BYTE*)str, strlen(str), tmp);
@@ -452,7 +448,7 @@ size_t CompareWithPcre(const char *pPcre)
 	//nfa2->analyze(stdout);
 	//CNfa tmpnfa;
 	//nfa2->nfa2CNfa(tmpnfa);
-	//outPut(tmpnfa, "..//nfaresult2.txt");
+	//outPut(tmpnfa, "..\\nfaresult2.txt");
 	DFA* BeDfa = nfa2->nfa2dfa();
 	delete nfa2;
 	if (BeDfa != NULL)
@@ -463,7 +459,7 @@ size_t CompareWithPcre(const char *pPcre)
 	//std::cout << BeDfa->size() << std::endl;
 	CDfaNew newBeDfa;
 	BeDfa->Dfa2CDfaNew(newBeDfa);
-	//fdisplay(newBeDfa, "..//result2.txt");
+	//fdisplay(newBeDfa, "..\\result2.txt");
 	//std::cout << (size_t)newBeDfa.Size() << std::endl;
 	//newBeDfa.Process((BYTE* )str, strlen(str), tmp);
 	//std::cout << tmp.Size() << std::endl;
@@ -499,7 +495,7 @@ void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 	{
 		CRegRule rr;
 		Rule2PcreList(rule, rr);
-		//static size_t num = 0;
+		static size_t num = 0;
 		std::cout << ++num << std::endl;
 		for (size_t i = 0; i < rr.Size(); ++i)
 		{
@@ -511,9 +507,9 @@ void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 					switch(CompareWithPcre(tmp))
 					{
 					case 0:
-						//std::cout << rule.GetSid() << std::endl;
-						NoMatchSids.push_back(rule.GetSid());
-						//system("pause");
+						std::cout << rule.GetSid() << std::endl;
+						//NoMatchSids.push_back(rule.GetSid());
+						system("pause");
 						continue;
 					case 1:
 						continue;
@@ -528,11 +524,11 @@ void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 			}
 		}
 	}
-	std::ofstream fout("..//NoMatchSids.txt", ios::app);
-	for (std::vector<size_t>::iterator i = NoMatchSids.begin(); i != NoMatchSids.end(); ++i)
-	{
-		fout << "sid: " << *i << std::endl;
-	}
+	//std::ofstream fout("..\\NoMatchSids.txt", ios::app);
+	//for (std::vector<size_t>::iterator i = NoMatchSids.begin(); i != NoMatchSids.end(); ++i)
+	//{
+	//	fout << "sid: " << *i << std::endl;
+	//}
 }
 
 /*
@@ -562,9 +558,6 @@ int main(int argc, char **argv)
 
 	CResNew result;
 	CompileRuleSet(_T("..\\allrules.rule"), Process, &result);
-	CDfaNew lastDfa;
-	NOrMerge(dfas, lastDfa);
-
 
 	//std::vector<std::string> regset;
 	//ReadRegexs(argv[3], regset);

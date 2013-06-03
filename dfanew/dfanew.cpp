@@ -1093,6 +1093,8 @@ size_t CDfaNew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, std::vector<
 	size_t nGrpNum = GetGroupCount();
 	size_t nStaNum = m_pDfa->size();
 
+	InitPartSet(partSet);
+
 	for (std::vector<PARTSET>::iterator i = partSet.begin(); i != partSet.end(); ++i)
 	{
 		//对于partSet中每个集合，根据不同的nGrpNum计算不同AbleTo，AbleTo对应论文中的a(i)
@@ -1108,23 +1110,33 @@ size_t CDfaNew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, std::vector<
 	//对应论文中初始化L(a)过程，这里的i对应a
 	for (size_t i = 0; i < nGrpNum; ++i)
 	{
-		size_t nMinId = 0;
-		size_t nMinCnt = partSet[nMinId].Ones[i];
-		for (size_t j = 1; j < partSet.size(); ++j)
+		size_t AcpSum = 0, NonAcpSum = 0;
+		for (std::vector<PARTSET>::iterator j = partSet.begin(); j != partSet.end() - 1; ++j)
 		{
-			size_t nCurCnt = partSet[j].Ones[i];
-			if (nCurCnt != 0)
+			AcpSum += j->Ones[i];
+		}
+		NonAcpSum = partSet.back().Ones[i];
+		if (AcpSum != 0 && NonAcpSum == 0)
+		{
+			for (size_t k = 0; k < partSet.size() - 1; ++k)
 			{
-				if (nMinCnt == 0 || nCurCnt < nMinCnt)
-				{
-					nMinId = j;
-					nMinCnt = nCurCnt;
-				}
+				pWait[i].push_back(k);
 			}
 		}
-		if (nMinCnt != 0)
+		else if (AcpSum == 0 && NonAcpSum != 0)
 		{
-			pWait[i].push_back(nMinId);
+			pWait[i].push_back(partSet.size() - 1);
+		}
+		else if (AcpSum != 0 && NonAcpSum != 0)
+		{
+			if (AcpSum < NonAcpSum)
+			{
+				pWait[i].push_back(partSet.size() - 1);
+			}
+			for (size_t k = 0; k < partSet.size() - 1; ++k)
+			{
+				pWait[i].push_back(k);
+			}
 		}
 	}
 
