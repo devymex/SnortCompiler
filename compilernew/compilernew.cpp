@@ -538,8 +538,9 @@ void Rule2Dfas(const CSnortRule &rule, CResNew &result, COMPILEDRULENEW &ruleRes
 				ctime.Reset();//用于测试
 				dfa.SetId(nDfaId);
 				size_t nToDFAFlag = dfa.FromNFA(nfa, NULL, 0);
-//				std::cout << "  "<< dfa.LinkSize() << ", " << dfa.GetGroupCount() * dfa.Size() << std::endl;
+				//				std::cout << "  "<< dfa.LinkSize() << ", " << dfa.GetGroupCount() * dfa.Size() << std::endl;
 				nfa2dfatime += ctime.Reset();//用于测试
+				//outPutDfa(dfa, "..//..//output//test.txt");
 
 				if (nToDFAFlag == -1)
 				{
@@ -586,6 +587,7 @@ void Rule2Dfas(const CSnortRule &rule, CResNew &result, COMPILEDRULENEW &ruleRes
 			AssignSig(result, nRegexTblSize, nRegexTblSize + nIncrement);
 		}
 	}
+
 }
 
 void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)

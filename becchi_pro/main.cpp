@@ -140,10 +140,23 @@ void display(CDfanew &newdfa)
 {
 	for(size_t i = 0; i != newdfa.Size(); ++i)
 	{
-		std::cout << "state # "<< i << ":  ";
+		std::map<STATEID, size_t> rowStateCnt;
 		for(size_t j = 0; j != newdfa.GetGroupCount(); ++j)
 		{
-			if (newdfa[i][j] != (STATEID)-1)
+			rowStateCnt[newdfa[i][j]]++;
+		}
+		STATEID maxId = 0;
+		for (std::map<STATEID, size_t>::iterator j = rowStateCnt.begin(); j != rowStateCnt.end(); ++j)
+		{
+			if (j->second > rowStateCnt[maxId])
+			{
+				maxId = j->first;
+			}
+		}
+		std::cout << "state # "<< i << ", maxId: " << (size_t)maxId << ", ";
+		for(size_t j = 0; j != newdfa.GetGroupCount(); ++j)
+		{
+			if (newdfa[i][j] != maxId)
 			{
 				std::cout << "< " << j << "," <<  (size_t)newdfa[i][j] << " >" ;
 			}
@@ -151,6 +164,7 @@ void display(CDfanew &newdfa)
 		std::cout << std::endl;
 	}
 }
+
 
 void fdisplay(CDfanew &newdfa, const char* fileName)
 {
@@ -396,8 +410,8 @@ void FormatPcre (_Iter pBeg, _Iter pEnd, std::string &bPcre, std::string &oPcre)
 	}
 	oPcre.push_back('s');
 
-	std::cout << bPcre << std::endl;
-	std::cout << oPcre << std::endl;
+	//std::cout << bPcre << std::endl;
+	//std::cout << oPcre << std::endl;
 
 }
 
@@ -411,32 +425,42 @@ size_t CompareWithPcre(const char *pPcre)
 	const char* oPcre = Pcre2.c_str();
 
 	size_t Result = 0;
-	CStateSet tmp;
-	char* str = ":IP ConaaX-Mailer:EBT ReporterbbbSubjecwq:Vic";
+	//CStateSet tmp;
+	//char* str = ":IP ConaaX-Mailer:EBT ReporterbbbSubjecwq:Vic";
 
 
 	CNfa nfa1;
 	CRegChain regChain;
 	if (SC_SUCCESS != PcreToNFA(oPcre, nfa1, regChain))
 	{
-		return 1;
+		return 2;
 	}
+	//std::cout << nfa1.Size() << std::endl;
 	//outPut(nfa1, "..//nfaresult1.txt");
 	CDfanew OwnDfa;
-	OwnDfa.FromNFA(nfa1, NULL, 0);
-	//std::cout << (size_t)OwnDfa.Size() << std::endl;
-	OwnDfa.Minimize();
+	if (-1 == OwnDfa.FromNFA(nfa1, NULL, 0))
+	{
+		return 3;
+	}
+	OwnDfa.Minimize();	
 	FoldDFA(OwnDfa);
+	//std::cout << OwnDfa.Size() << std::endl;
 	//fdisplay(OwnDfa,"..//result1.txt");
+	//std::cout << (size_t)OwnDfa.Size() << std::endl;
+	//display(OwnDfa);
 	//OwnDfa.Process((BYTE*)str, strlen(str), tmp);
 	//std::cout << tmp.Size() << std::endl;
 	//std::cout << std::endl;
-	//display(OwnDfa);
 
 	NFA* nfa2 = CreatNFA(bPcre);
+	nfa2->output();
 	nfa2->remove_epsilon();
 	nfa2->output();
 	nfa2->reduce();
+	//nfa2->analyze(stdout);
+	//CNfa tmpnfa;
+	//nfa2->nfa2CNfa(tmpnfa);
+	//outPut(tmpnfa, "..//nfaresult2.txt");
 	//nfa2->output();
 	DFA* BeDfa = nfa2->nfa2dfa();
 	delete nfa2;
@@ -444,14 +468,17 @@ size_t CompareWithPcre(const char *pPcre)
 	{
 		BeDfa->minimize();
 	}
+	//BeDfa->dump();
+	//std::cout << BeDfa->size() << std::endl;
+	//std::cout << BeDfa->size() << std::endl;
 	CDfanew newBeDfa;
 	BeDfa->Dfa2CDfanew(newBeDfa);
+	//fdisplay(newBeDfa, "..//result2.txt");
 	//std::cout << (size_t)newBeDfa.Size() << std::endl;
 	//newBeDfa.Process((BYTE* )str, strlen(str), tmp);
 	//std::cout << tmp.Size() << std::endl;
 	//std::cout << std::endl;
 	//display(newBeDfa);
-	//fdisplay(newBeDfa, "..//result2.txt");
 
 	if (CompDfa(OwnDfa, newBeDfa))
 	{
@@ -468,16 +495,33 @@ void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 	Rule2PcreList(rule, rr);
 	static size_t num = 0;
 	std::cout << ++num << std::endl;
+	std::vector<size_t> NoMatchSids;
 	for (size_t i = 0; i < rr.Size(); ++i)
 	{
 		for (size_t j = 0; j < rr[i].Size(); ++j)
 		{
-			if (!CompareWithPcre(rr[i][j].C_Str()))
+			switch(CompareWithPcre(rr[i][j].C_Str()))
 			{
+			case 0:
 				std::cout << rule.GetSid() << std::endl;
+				//NoMatchSids.push_back(rule.GetSid());
 				system("pause");
+				continue;
+			case 1:
+				continue;
+			case 2:
+				std::cout << "nfa error" << std::endl;
+				continue;
+			case 3:
+				std::cout << "dfa error" << std::endl;
+				continue;
 			}
 		}
+	}
+	std::ofstream fout("..//NoMatchSids.txt", ios::app);
+	for (std::vector<size_t>::iterator i = NoMatchSids.begin(); i != NoMatchSids.end(); ++i)
+	{
+		fout << "sid: " << *i << std::endl;
 	}
 }
 
@@ -507,7 +551,7 @@ int main(int argc, char **argv)
 	parser=new regex_parser(false,false);
 
 	CResNew result;
-	CompileRuleSet(_T("..\\..\\input\\testrules.rule"), Process, &result);
+	CompileRuleSet(_T("..//..//input//testrules.rule"), Process, &result);
 
 
 	//std::vector<std::string> regset;

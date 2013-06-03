@@ -841,7 +841,31 @@ void OP_CIRCM_FUNC(CNfa &nfa, size_t &CurState)
 	//}
 	CurState += 2;
 	nfa[nCursize + 1].AddDest('\r', CurState);
+
+//	size_t nCursize = nfa.Size();
+//	nfa.Resize(nCursize + 3);
+//	nfa[nCursize].AddDest(EMPTY, CurState + 1);
+//	nfa[nCursize].AddDest(EMPTY, CurState + 3);
+//	++CurState;
+//
+//	++nCursize;
+//	for (size_t i = 0; i < 10; ++i)
+//	{
+//		nfa[nCursize].AddDest(i, CurState);
+//	}
+//	nfa[nCursize].AddDest('\n', CurState + 1);
+//	nfa[nCursize].AddDest('\n', CurState + 2);
+//	nfa[nCursize].AddDest('\r', CurState + 2);
+//	nfa[nCursize].AddDest(11, CurState);
+//	nfa[nCursize].AddDest(12, CurState);
+//	for (size_t i = 14; i < 256; ++i)
+//	{
+//		nfa[nCursize].AddDest(i, CurState);
+//	}
+//	CurState += 2;
+//	nfa[nCursize + 1].AddDest('\r', CurState);
 }
+
 
 size_t OP_CHAR_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, size_t PreState, bool &ALTBegin, size_t ALTBegState)
 {
