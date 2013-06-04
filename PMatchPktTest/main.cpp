@@ -8,9 +8,15 @@ void GetMchRule(std::vector<u_char> &pkt, REGRULESMAP &rulesmap, std::vector<siz
 {
 	SIGSMAP sigmap = rulesmap.sigmap;
 	SIGNATURE sig;
+	u_char csig[4];
 	for(std::vector<u_char>::iterator iter = pkt.begin(); iter + 3 != pkt.end(); ++iter)
 	{
-		sig = *(SIGNATURE *)&(*iter);
+		for(size_t i = 0; i < 4; ++i)
+		{
+			csig[i] = *(iter + i);
+			tolower(csig[i]);
+		}
+		sig = *(SIGNATURE *)csig;
 		if(sigmap.count(sig))
 		{
 			rules.insert(rules.end(), sigmap[sig].begin(), sigmap[sig].end());
