@@ -641,59 +641,59 @@ DFANEWSC size_t CDfaNew::Minimize()
 		return size_t(-1);
 	}
 
-	size_t nMatHeight = nSize + 1;
-	size_t nMatWidth = nMatHeight;
+	//size_t nMatHeight = nSize + 1;
+	//size_t nMatWidth = nMatHeight;
 
-	if (nMatWidth % 16 != 0)
-	{
-		nMatWidth = (nMatWidth / 16) * 16 + 16;
-	}
-	BYTE *pMat = NULL;
-	std::vector<STATEID> reachable;
+	//if (nMatWidth % 16 != 0)
+	//{
+	//	nMatWidth = (nMatWidth / 16) * 16 + 16;
+	//}
+	//BYTE *pMat = NULL;
+	//std::vector<STATEID> reachable;
 
-	pMat = (BYTE*)_aligned_malloc(nMatWidth * nMatHeight, 128);
-	memset(pMat, 0, nMatWidth * nMatHeight);
+	//pMat = (BYTE*)_aligned_malloc(nMatWidth * nMatHeight, 128);
+	//memset(pMat, 0, nMatWidth * nMatHeight);
 
-	for (size_t i = 0; i < nSize; ++i)
-	{
-		for (size_t j = 0; j < nCols; ++j)
-		{
-			STATEID nextSta = (STATEID)(*m_pDfa)[i][j];
-			if (nextSta != STATEID(-1))
-			{
-				pMat[i * nMatWidth + nextSta] = 1;
-			}
-		}
-	}
-	for (STATEID i = 0; i < nSize; ++i)
-	{
-		if ((*m_pDfa)[i].GetFlag() & CDfaRow::TERMINAL)
-		{
-			pMat[i * nMatWidth + nSize] = 1;
-		}
-	}
-	Warshall(pMat, nMatWidth, nMatHeight);
+	//for (size_t i = 0; i < nSize; ++i)
+	//{
+	//	for (size_t j = 0; j < nCols; ++j)
+	//	{
+	//		STATEID nextSta = (STATEID)(*m_pDfa)[i][j];
+	//		if (nextSta != STATEID(-1))
+	//		{
+	//			pMat[i * nMatWidth + nextSta] = 1;
+	//		}
+	//	}
+	//}
+	//for (STATEID i = 0; i < nSize; ++i)
+	//{
+	//	if ((*m_pDfa)[i].GetFlag() & CDfaRow::TERMINAL)
+	//	{
+	//		pMat[i * nMatWidth + nSize] = 1;
+	//	}
+	//}
+	//Warshall(pMat, nMatWidth, nMatHeight);
 
-	size_t nStartRow = m_StartId * nMatWidth;
-	pMat[nStartRow + m_StartId] = 1;
-	for (size_t i = 0; i < nSize; ++i)
-	{
-		if (pMat[nStartRow + i] && pMat[i * nMatWidth + nSize])
-		{
-			reachable.push_back(i);
-		}
-	}
-	_aligned_free(pMat);
+	//size_t nStartRow = m_StartId * nMatWidth;
+	//pMat[nStartRow + m_StartId] = 1;
+	//for (size_t i = 0; i < nSize; ++i)
+	//{
+	//	if (pMat[nStartRow + i] && pMat[i * nMatWidth + nSize])
+	//	{
+	//		reachable.push_back(i);
+	//	}
+	//}
+	//_aligned_free(pMat);
 
-	//std::cout << "准备工作： " << time1.Reset() << std::endl;//测试
+	////std::cout << "准备工作： " << time1.Reset() << std::endl;//测试
 
-	if (reachable.size() < nSize)
-	{
-		std::cout << "Has unreachables" << std::endl;
-		system("pause");
-		//remove unreachable states, generate new DFA
-		MergeReachable(reachable);
-	}
+	//if (reachable.size() < nSize)
+	//{
+	//	std::cout << "Has unreachables" << std::endl;
+	//	system("pause");
+	//	//remove unreachable states, generate new DFA
+	//	MergeReachable(reachable);
+	//}
 
 	////计算逆向状态查找表
 	nSize = m_pDfa->size();
@@ -728,7 +728,7 @@ DFANEWSC size_t CDfaNew::Minimize()
 	partSet.reserve(0);
 	partSet.shrink_to_fit();
 	//_CrtMemDumpStatistics( &s1 );
-	system("pause");
+	//system("pause");
 	delete []pRevTab;
 	--nAllocCnt;
 
@@ -1076,7 +1076,7 @@ void CDfaNew::InitPartSet(std::vector<PARTSET> &partSet) const
 	partSet.clear();
 
 	//用于区分属于不同DFA的终态集合
-	std::set<size_t> pTerm2Dfa[100000];
+	std::set<size_t> pTerm2Dfa[10000];
 	//std::set<size_t> *pTerm2Dfa = new std::set<size_t>[nStaNum];
 
 	for (STATEID i = 0; i < m_TermSet->size(); ++i)
