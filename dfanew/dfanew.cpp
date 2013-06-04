@@ -959,7 +959,6 @@ void CDfaNew::MergeReachable(std::vector<STATEID> &reachable)
 	std::vector<CDfaRow> &tmpDfa = *pNewDfa;
 
 	size_t nMemSize = nDfaSize * sizeof(STATEID);
-	//STATEID *pOldToNew = (STATEID*)VirtualAlloc(NULL, nMemSize, MEM_COMMIT, PAGE_READWRITE);
 	STATEID *pOldToNew = new STATEID[nMemSize];
 	memset(pOldToNew, 0xFF, nMemSize);
 
@@ -995,7 +994,6 @@ void CDfaNew::MergeReachable(std::vector<STATEID> &reachable)
 		}
 	}
 	delete []pOldToNew;
-	//VirtualFree(pOldToNew, 0, MEM_RELEASE);
 
 	//替换m_pDfa
 	delete m_pDfa;
@@ -1006,7 +1004,7 @@ void ReleaseAbleTo(PARTSET &ps)
 {
 	if (!ps.AbleTo.empty())
 	{
-		VirtualFree(ps.AbleTo.front(), 0, MEM_RELEASE);
+		delete []ps.AbleTo.front();
 	}
 	ps.AbleTo.clear();
 	ps.Ones.clear();
@@ -1017,12 +1015,8 @@ void CalcAbleTo(std::vector<STATEID> *pRevTbl, size_t nGrpNum, size_t nStaNum, P
 	//清空AbleTo
 	ReleaseAbleTo(ps);
 
-	BYTE *pBuf = (BYTE*)VirtualAlloc(NULL, nStaNum * nGrpNum, MEM_COMMIT, PAGE_READWRITE);
-	if (pBuf == NULL)
-	{
-		std::cout << "pBuf == NULL: " << nStaNum << "*" << nGrpNum << std::endl;
-		system("pause");
-	}
+	BYTE *pBuf = new BYTE[nStaNum * nGrpNum];
+	ZeroMemory(pBuf, nStaNum * nGrpNum);
 	ps.AbleTo.resize(nGrpNum, 0);
 	ps.Ones.resize(nGrpNum, 0);
 	//计算AbleTo的值，每产生一个新的或者更新PARTSET对象计算一次
@@ -1134,7 +1128,6 @@ size_t CDfaNew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, std::vector<
 	}
 
 	//标记能够经过某一输入字符，能够到达ISet中的状态的状态集合
-	//BYTE *pAbleToI = (BYTE*)VirtualAlloc(NULL, nStaNum, MEM_COMMIT, PAGE_READWRITE);
 	BYTE *pAbleToI = new BYTE[nStaNum];
 	partSet.reserve(1000);
 	size_t nr = 0;
@@ -1255,7 +1248,6 @@ size_t CDfaNew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, std::vector<
 			}
 		}
 	}
-	//VirtualFree(pAbleToI, 0, MEM_RELEASE);
 	delete []pAbleToI;
 
 	for (std::vector<PARTSET>::iterator i = partSet.begin(); i != partSet.end(); ++i)
