@@ -667,7 +667,7 @@ DFANEWSC size_t CDfaNew::Minimize()
 			pMat[i * nMatWidth + nSize] = 1;
 		}
 	}
-	std::cout << "after warshall" << std::endl;
+	
 	Warshall(pMat, nMatWidth, nMatHeight);
 
 	size_t nStartRow = m_StartId * nMatWidth;
@@ -705,13 +705,14 @@ DFANEWSC size_t CDfaNew::Minimize()
 			}
 		}
 	}
+	
 	std::vector<PARTSET> partSet;
 	//divide nondistinguishable states
 	if (0 != PartitionNonDisState(pRevTab, partSet))
 	{
 		return -1;
 	}
-
+	
 	if (partSet.size() < nSize)
 	{
 		//DFA minization
@@ -1092,7 +1093,7 @@ size_t CDfaNew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, std::vector<
 {
 	size_t nGrpNum = GetGroupCount();
 	size_t nStaNum = m_pDfa->size();
-
+	InitPartSet(partSet);
 	for (std::vector<PARTSET>::iterator i = partSet.begin(); i != partSet.end(); ++i)
 	{
 		//对于partSet中每个集合，根据不同的nGrpNum计算不同AbleTo，AbleTo对应论文中的a(i)

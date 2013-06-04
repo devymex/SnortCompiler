@@ -577,14 +577,14 @@ void Rule2Dfas(const CSnortRule &rule, CResNew &result, COMPILEDRULENEW &ruleRes
 			result.GetRegexTbl()[nChainId] = regrule[i];
 		}
 
-		if (!bHasSigs)
-		{
-			ruleResult.m_nResult = COMPILEDRULENEW::RES_HASNOSIG;
-			ruleResult.m_dfaIds.Clear();
-			result.GetDfaTable().Resize(nDfaTblSize);
-			result.GetRegexTbl().Resize(nRegexTblSize);
-			return;
-		}
+		//if (!bHasSigs)
+		//{
+		//	ruleResult.m_nResult = COMPILEDRULENEW::RES_HASNOSIG;
+		//	ruleResult.m_dfaIds.Clear();
+		//	result.GetDfaTable().Resize(nDfaTblSize);
+		//	result.GetRegexTbl().Resize(nRegexTblSize);
+		//	return;
+		//}
 
 		if (ruleResult.m_nResult != COMPILEDRULENEW::RES_ERROR)
 		{

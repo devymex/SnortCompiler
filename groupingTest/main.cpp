@@ -54,34 +54,21 @@ int main()
 	//	vecIds.push_back(tmp);
 	//}
 
-	std::cout << result.GetRegexTbl()[0][0].C_Str() << std::endl;
-	std::cout << result.GetRegexTbl()[1][0].C_Str() << std::endl;
+	//std::cout << result.GetRegexTbl()[0][0].C_Str() << std::endl;
+	//std::cout << result.GetRegexTbl()[1][0].C_Str() << std::endl;
 
 	std::vector<CDfaNew> vecDfas(2);
 	CDfaNew MergeDfa;
 	vecDfas[0] = result.GetDfaTable()[0];
-	//vecDfas[0] = MergeDfa;
-	//for (size_t i = 1; i < vecIds.size(); ++i)
-	//{
-	//	vecDfas[1] = result.GetDfaTable()[vecIds[i]];
-	//	if (!NOrMerge(vecDfas, MergeDfa))
-	//	{
-	//		std::cout << "ERROR" << std::endl;
-	//	}
-	//	else
-	//	{
-	//		vecDfas[0] = MergeDfa;
-	//	}
-	//}
 	vecDfas[1] = result.GetDfaTable()[1];
 	std::cout << vecDfas[0].Size() << std::endl;
 	std::cout << vecDfas[1].Size() << std::endl;
 	outPutDfa(vecDfas[0], "..//..//output//dfa1.txt");
 	outPutDfa(vecDfas[1], "..//..//output//dfa2.txt");
 	NOrMerge(vecDfas, MergeDfa);
+	std::cout << MergeDfa.GetStartId() << std::endl;
 	std::cout << MergeDfa.Size() << std::endl;
 	outPutDfa(MergeDfa, "..//..//output//dfa.txt");
-	//outPutDfa(result.GetDfaTable()[vecIds[vecIds.size() - 1]], "..//..//output//dfa2_2.txt");
 
 	system("pause");
 	return 0;

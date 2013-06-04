@@ -354,6 +354,8 @@ MERDFANEW bool NOrMerge(std::vector<CDfaNew> &dfas, CDfaNew &lastDfa)
 	//fdisplay(dfas[0], "..//..//output//dfa1.txt");
 	//fdisplay(dfas[1], "..//..//output//dfa2.txt");
 	//fdisplay(lastDfa, "..//..//output//dfa12.txt");
+	//std::cout << lastDfa.GetStartId() << std::endl;
+	//outPutDfa(lastDfa, "..//..//output//beforemin.txt");
 	lastDfa.Minimize();
 	//fdisplay(lastDfa, "..//..//output//dfa12min.txt");
 	std::cout << "after min" << std::endl;
