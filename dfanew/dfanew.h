@@ -36,66 +36,7 @@ struct DFANEWSC TERMSET
 	size_t dfaId;
 };
 
-//struct PARTSET1
-//{
-//	PARTSET() : pAble(NULL), nLen(0) { }
-//	explicit PARTSET(size_t len) : pAble(NULL), nLen(0)
-//	{
-//		if (len != 0)
-//		{
-//			pAble = (BYTE*)VirtualAlloc(NULL, len, MEM_COMMIT, PAGE_READWRITE);
-//			nLen = len;
-//		}
-//	}
-//	PARTSET(const PARTSET &other)
-//	{
-//		*this = other;
-//	}
-//	const PARTSET& operator = (const PARTSET &other)
-//	{
-//		Resize(other.nLen);
-//		memcpy(pAble, other.pAble, nLen);
-//		return *this;
-//	}
-//	~PARTSET()
-//	{
-//		VirtualFree(pAble, 0, MEM_RELEASE);
-//	}
-//	void Resize(size_t len)
-//	{
-//		if (len != nLen)
-//		{
-//			if (nLen != 0)
-//			{
-//				VirtualFree(pAble, 0, MEM_RELEASE);
-//				pAble = NULL;
-//			}
-//			pAble = (BYTE*)VirtualAlloc(NULL, len, MEM_COMMIT, PAGE_READWRITE);
-//			nLen = len;
-//		}
-//	}
-//	void Reset()
-//	{
-//		memset(pAble, 0, nLen);
-//	}
-//	BYTE& Able(size_t nIdx)
-//	{
-//		if (nIdx >= nLen || pAble == NULL)
-//		{
-//			throw 0;
-//		}
-//		return pAble[nIdx];
-//	}
-//	size_t GetOnes()
-//	{
-//		return std::count(pAble, pAble + nLen, (BYTE)1);
-//	}
-//	std::list<STATEID> StaSet;
-//	size_t nLen;
-//private:
-//	BYTE *pAble;
-//};
-//
+
 class DFANEWSC CDfaNew
 {
 public:
