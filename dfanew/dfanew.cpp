@@ -134,6 +134,7 @@ DFANEWSC void outPutDfa(CDfaNew &dfa, const char* filename)
 		fout << std::endl;
 	}
 	fout << std::endl;
+	fout << "dfa state" << "\t" << "dfaId" << std::endl;
 	for(size_t i = 0; i < dfa.GetTermCnt(); ++i)
 	{
 		fout << (size_t)dfa.GetTerm(i).dfaSta << "\t" << dfa.GetTerm(i).dfaId << std::endl;
