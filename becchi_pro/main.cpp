@@ -7,6 +7,8 @@
 #include "../dfanew/dfanew.h"
 #include "../rule2nfa/rule2nfa.h"
 #include "../pcre2nfa/pcre2nfa.h"
+#include "../mergedfanew/MergeDfanew.h"
+
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -428,11 +430,11 @@ size_t CompareWithPcre(const char *pPcre)
 	{
 		return 3;
 	}
-	//outPutDfa(OwnDfa,"..//result3.txt");
 	//std::cout << OwnDfa.Size() << std::endl;
 	OwnDfa.Minimize();	
+	//outPutDfa(OwnDfa,"..\\first.txt");
 	FoldDFA(OwnDfa);
-	//fdisplay(OwnDfa,"..//result1.txt");
+	//fdisplay(OwnDfa,"..\\result1.txt");
 	//std::cout << (size_t)OwnDfa.Size() << std::endl;
 	//display(OwnDfa);
 	//OwnDfa.Process((BYTE*)str, strlen(str), tmp);
@@ -446,7 +448,7 @@ size_t CompareWithPcre(const char *pPcre)
 	//nfa2->analyze(stdout);
 	//CNfa tmpnfa;
 	//nfa2->nfa2CNfa(tmpnfa);
-	//outPut(tmpnfa, "..//nfaresult2.txt");
+	//outPut(tmpnfa, "..\\nfaresult2.txt");
 	DFA* BeDfa = nfa2->nfa2dfa();
 	delete nfa2;
 	if (BeDfa != NULL)
@@ -457,7 +459,7 @@ size_t CompareWithPcre(const char *pPcre)
 	//std::cout << BeDfa->size() << std::endl;
 	CDfaNew newBeDfa;
 	BeDfa->Dfa2CDfaNew(newBeDfa);
-	//fdisplay(newBeDfa, "..//result2.txt");
+	//fdisplay(newBeDfa, "..\\result2.txt");
 	//std::cout << (size_t)newBeDfa.Size() << std::endl;
 	//newBeDfa.Process((BYTE* )str, strlen(str), tmp);
 	//std::cout << tmp.Size() << std::endl;
@@ -505,9 +507,9 @@ void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 					switch(CompareWithPcre(tmp))
 					{
 					case 0:
-						//std::cout << rule.GetSid() << std::endl;
-						NoMatchSids.push_back(rule.GetSid());
-						//system("pause");
+						std::cout << rule.GetSid() << std::endl;
+						//NoMatchSids.push_back(rule.GetSid());
+						system("pause");
 						continue;
 					case 1:
 						continue;
@@ -522,11 +524,11 @@ void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 			}
 		}
 	}
-	std::ofstream fout("..//NoMatchSids.txt", ios::app);
-	for (std::vector<size_t>::iterator i = NoMatchSids.begin(); i != NoMatchSids.end(); ++i)
-	{
-		fout << "sid: " << *i << std::endl;
-	}
+	//std::ofstream fout("..\\NoMatchSids.txt", ios::app);
+	//for (std::vector<size_t>::iterator i = NoMatchSids.begin(); i != NoMatchSids.end(); ++i)
+	//{
+	//	fout << "sid: " << *i << std::endl;
+	//}
 }
 
 /*
@@ -556,7 +558,6 @@ int main(int argc, char **argv)
 
 	CResNew result;
 	CompileRuleSet(_T("..\\allrules.rule"), Process, &result);
-
 
 	//std::vector<std::string> regset;
 	//ReadRegexs(argv[3], regset);
