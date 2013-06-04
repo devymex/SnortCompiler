@@ -1026,7 +1026,7 @@ void CalcAbleTo(std::vector<STATEID> *pRevTbl, size_t nGrpNum, size_t nStaNum, P
 		std::cout << "pBuf == NULL " << GetLastError() << std::endl;
 		system("pause");
 	}
-	ps.AbleTo.resize(nGrpNum);
+	ps.AbleTo.resize(nGrpNum, 0);
 	ps.Ones.resize(nGrpNum, 0);
 	//计算AbleTo的值，每产生一个新的或者更新PARTSET对象计算一次
 	for (size_t j = 0; j < nGrpNum; ++j)
@@ -1361,6 +1361,7 @@ void CDfaNew::MergeNonDisStates(std::vector<PARTSET> &partSet)
 		++nSetIdx;
 	}
 
+	delete []termFlag;
 	m_StartId = nStart;
 	UniqueTermSet();
 
