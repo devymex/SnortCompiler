@@ -13,8 +13,7 @@ void GetMchRule(std::vector<u_char> &pkt, REGRULESMAP &rulesmap, std::vector<siz
 	{
 		for(size_t i = 0; i < 4; ++i)
 		{
-			csig[i] = *(iter + i);
-			tolower(csig[i]);
+			csig[i] = tolower(*(iter + i));
 		}
 		sig = *(SIGNATURE *)csig;
 		if(sigmap.count(sig))
