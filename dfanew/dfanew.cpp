@@ -645,6 +645,7 @@ DFANEWSC size_t CDfaNew::Minimize()
 	}
 	BYTE *pMat = NULL;
 	std::vector<STATEID> reachable;
+
 	pMat = (BYTE*)_aligned_malloc(nMatWidth * nMatHeight, 128);
 	memset(pMat, 0, nMatWidth * nMatHeight);
 
