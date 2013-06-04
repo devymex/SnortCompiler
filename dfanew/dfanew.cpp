@@ -5,7 +5,8 @@
 struct PARTSET
 {
 	std::list<STATEID> StaSet;
-	std::vector<BYTE*> AbleTo;
+	//std::vector<BYTE*> AbleTo;
+	std::vector<std::vector<BYTE>> AbleTo;
 	std::vector<STATEID> Ones;
 };
 
@@ -625,8 +626,11 @@ void PrintMatrix(BYTE *pMat, size_t nWidth, size_t nHeight)
 	}
 }
 
+size_t nAllocCnt = 0;
+
 DFANEWSC size_t CDfaNew::Minimize()
 {
+	nAllocCnt = 0;
 	//error: DFA is empty
 
 	//CTimer time1;//用于测试
@@ -646,6 +650,7 @@ DFANEWSC size_t CDfaNew::Minimize()
 	}
 	BYTE *pMat = NULL;
 	std::vector<STATEID> reachable;
+
 	pMat = (BYTE*)_aligned_malloc(nMatWidth * nMatHeight, 128);
 	memset(pMat, 0, nMatWidth * nMatHeight);
 
@@ -690,9 +695,10 @@ DFANEWSC size_t CDfaNew::Minimize()
 		MergeReachable(reachable);
 	}
 
-	//计算逆向状态查找表
+	////计算逆向状态查找表
 	nSize = m_pDfa->size();
 	std::vector<STATEID> *pRevTab = new std::vector<STATEID>[nSize * nCols];
+	++nAllocCnt;
 	for (STATEID i = 0; i < nSize; ++i)
 	{
 		for (STATEID j = 0; j < nCols; ++j)
@@ -705,19 +711,32 @@ DFANEWSC size_t CDfaNew::Minimize()
 		}
 	}
 	std::vector<PARTSET> partSet;
+	//_CrtMemState s1;
+	//_CrtMemCheckpoint( &s1 );
 	//divide nondistinguishable states
 	if (0 != PartitionNonDisState(pRevTab, partSet))
 	{
 		return -1;
 	}
 
-	if (partSet.size() < nSize)
-	{
-		//DFA minization
-		MergeNonDisStates(partSet);
-	}
+	//if (partSet.size() < nSize)
+	//{
+	//	//DFA minization
+	//	MergeNonDisStates(partSet);
+	//}
+	partSet.clear();
+	partSet.reserve(0);
+	partSet.shrink_to_fit();
+	//_CrtMemDumpStatistics( &s1 );
+	system("pause");
 	delete []pRevTab;
+	--nAllocCnt;
 
+	if (nAllocCnt != 0)
+	{
+		std::cout << "nAllocCnt: " << nAllocCnt << std::endl;
+		system("pause");
+	}
 	return 0;
 }
 
@@ -1004,14 +1023,15 @@ void CDfaNew::MergeReachable(std::vector<STATEID> &reachable)
 
 void ReleaseAbleTo(PARTSET &ps)
 {
-	if (!ps.AbleTo.empty())
-	{
-		if (TRUE != VirtualFree(ps.AbleTo.front(), 0, MEM_RELEASE))
-		{
-			std::cout << "VirtualFree " << GetLastError() << std::endl;
-			system("pause");
-		}
-	}
+	//if (!ps.AbleTo.empty())
+	//{
+	//	if (TRUE != VirtualFree(ps.AbleTo.front(), 0, MEM_RELEASE))
+	//	{
+	//		std::cout << "VirtualFree " << GetLastError() << std::endl;
+	//		system("pause");
+	//	}
+	//	--nAllocCnt;
+	//}
 	ps.AbleTo.clear();
 	ps.Ones.clear();
 }
@@ -1021,18 +1041,20 @@ void CalcAbleTo(std::vector<STATEID> *pRevTbl, size_t nGrpNum, size_t nStaNum, P
 	//清空AbleTo
 	ReleaseAbleTo(ps);
 
-	BYTE *pBuf = (BYTE*)VirtualAlloc(NULL, nStaNum * nGrpNum, MEM_COMMIT, PAGE_READWRITE);
-	if (pBuf == NULL)
-	{
-		std::cout << "pBuf == NULL " << GetLastError() << std::endl;
-		system("pause");
-	}
-	ps.AbleTo.resize(nGrpNum, 0);
+	//BYTE *pBuf = (BYTE*)VirtualAlloc(NULL, nStaNum * nGrpNum, MEM_COMMIT, PAGE_READWRITE);
+	//if (pBuf == NULL)
+	//{
+	//	std::cout << "pBuf == NULL " << GetLastError() << "\t" << nStaNum << "\t"<< nGrpNum << std::endl;
+	//	system("pause");
+	//}
+	//++nAllocCnt;
+	ps.AbleTo.resize(nGrpNum);
 	ps.Ones.resize(nGrpNum, 0);
 	//计算AbleTo的值，每产生一个新的或者更新PARTSET对象计算一次
 	for (size_t j = 0; j < nGrpNum; ++j)
 	{
-		BYTE *pAbleTo = pBuf + j * nStaNum;
+		ps.AbleTo[j].resize(nStaNum);
+		BYTE *pAbleTo = ps.AbleTo[j].data();
 		//遍历PARTSET中的每个状态t，若存在δ(-1)(t,j)≠Φ，AbleTo[t]标记为1
 		for (std::list<STATEID>::iterator k = ps.StaSet.begin(); k != ps.StaSet.end(); ++k)
 		{
@@ -1043,7 +1065,6 @@ void CalcAbleTo(std::vector<STATEID> *pRevTbl, size_t nGrpNum, size_t nStaNum, P
 				++ps.Ones[j];
 			}
 		}
-		ps.AbleTo[j] = pAbleTo;
 	}
 }
 
@@ -1055,7 +1076,8 @@ void CDfaNew::InitPartSet(std::vector<PARTSET> &partSet) const
 	partSet.clear();
 
 	//用于区分属于不同DFA的终态集合
-	std::set<size_t> *pTerm2Dfa = new std::set<size_t>[nStaNum];
+	std::set<size_t> pTerm2Dfa[100000];
+	//std::set<size_t> *pTerm2Dfa = new std::set<size_t>[nStaNum];
 
 	for (STATEID i = 0; i < m_TermSet->size(); ++i)
 	{
@@ -1076,7 +1098,7 @@ void CDfaNew::InitPartSet(std::vector<PARTSET> &partSet) const
 		std::set<size_t> &curDfaSet = pTerm2Dfa[i];
 		initBSet[curDfaSet].StaSet.push_back(i);
 	}
-	delete []pTerm2Dfa;
+	//delete []pTerm2Dfa;
 
 	//调整终态和非终态集合的顺序，vector中的last为非终态集合
 	for (std::map<std::set<size_t>, PARTSET>::iterator i = initBSet.begin();
@@ -1111,7 +1133,6 @@ size_t CDfaNew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, std::vector<
 
 	//pWait表示用于切分partSet中每个集合的集合下标，
 	//对于不同的输入字符会保存多个不同集合下标。对应论文中L(a)
-	//std::vector<size_t> *pWait = new std::vector<size_t>[nGrpNum];
 	std::vector<size_t> pWait[256];
 
 	//初始化pWait，要求若满足0<|ij|<=|ik|，则将j存入pWait，反之，存入k
@@ -1149,8 +1170,12 @@ size_t CDfaNew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, std::vector<
 	}
 
 	//标记能够经过某一输入字符，能够到达ISet中的状态的状态集合
-	BYTE *pAbleToI = (BYTE*)VirtualAlloc(NULL, nStaNum, MEM_COMMIT, PAGE_READWRITE);
-	for (; ; )
+	BYTE pAbleToI[100000];
+	//BYTE *pAbleToI = (BYTE*)VirtualAlloc(NULL, nStaNum, MEM_COMMIT, PAGE_READWRITE);
+	//++nAllocCnt;
+	//partSet.reserve(1000);
+	size_t nr = 0;
+	for (; nr == 0; )
 	{
 		BYTE byCurGrp = -1;
 		size_t nCurSet = -1;
@@ -1210,7 +1235,6 @@ size_t CDfaNew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, std::vector<
 
 		if (nRevCnt != 0)
 		{
-			partSet.reserve(1000);
 			for (size_t j = 0; j != partSet.size(); ++j)
 			{
 				//取partSet中的一个集合j，B(j)中存在t满足条件δ(t,a)∈a(i)，
@@ -1262,13 +1286,8 @@ size_t CDfaNew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, std::vector<
 				for (; part != pJSet->StaSet.end() && pAbleToI[*part] != 0; ++part);
 				if (partSet.size() > 254)
 				{
-					VirtualFree(pAbleToI, nStaNum, MEM_RELEASE);
-					for (std::vector<PARTSET>::iterator i = partSet.begin(); i != partSet.end(); ++i)
-					{
-						ReleaseAbleTo(*i);
-					}
-					//delete []pWait;
-					return size_t(-1);
+					nr = size_t(-1);
+					break;
 				}
 				//保存产生的新的划分
 				PARTSET &lastPart = partSet.back();
@@ -1277,13 +1296,11 @@ size_t CDfaNew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, std::vector<
 				CalcAbleTo(pRevTbl, nGrpNum, nStaNum, *pJSet);
 				CalcAbleTo(pRevTbl, nGrpNum, nStaNum, lastPart);
 
-				//更新pWait
+				////更新pWait
 				for (BYTE m = 0; m < nGrpNum; ++m)
 				{
 					int k = partSet.size() - 1;
 					std::vector<size_t> &curWait = pWait[m];
-					//int aj = CountOnes(pJSet->AbleTo[m], nStaNum);
-					//int ak = CountOnes(lastPart.AbleTo[m], nStaNum);
 					int aj = pJSet->Ones[m];
 					int ak = lastPart.Ones[m];
 					if (aj > 0 && aj <= ak)
@@ -1298,14 +1315,14 @@ size_t CDfaNew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, std::vector<
 			}
 		}
 	}
-	VirtualFree(pAbleToI, nStaNum, MEM_RELEASE);
+	//VirtualFree(pAbleToI, 0, MEM_RELEASE);
+	//--nAllocCnt;
 
 	for (std::vector<PARTSET>::iterator i = partSet.begin(); i != partSet.end(); ++i)
 	{
 		ReleaseAbleTo(*i);
 	}
-	//delete []pWait;
-	return 0;
+	return nr;
 }
 
 //Partition中的元素为一个状态的集合，集合中元素为多个等价状态，每个集合可以合并为新的DFA中一个状态
@@ -1389,6 +1406,6 @@ void CDfaNew::MergeNonDisStates(std::vector<PARTSET> &partSet)
 
 
 	//替换m_pDfa
-	delete m_pDfa;
-	m_pDfa = pNewDfa;
+	swap(m_pDfa, pNewDfa);
+	delete pNewDfa;
 }

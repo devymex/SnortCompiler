@@ -350,15 +350,15 @@ MERDFANEW bool NOrMerge(std::vector<CDfaNew> &dfas, CDfaNew &lastDfa)
 
 	//对lastDfa进行进一步按列分组
 
-	lastDfa.printTerms();
-	std::cout << "before min" << std::endl;
+	//lastDfa.printTerms();
+	//std::cout << "before min" << std::endl;
 	//fdisplay(dfas[0], "..//..//output//dfa1.txt");
 	//fdisplay(dfas[1], "..//..//output//dfa2.txt");
-	fdisplay(lastDfa, "..//dfa12.txt");
+	//fdisplay(lastDfa, "..//dfa12.txt");
 	lastDfa.Minimize();
-	lastDfa.printTerms();
-	fdisplay(lastDfa, "..//dfa12min.txt");
-	std::cout << "after min" << std::endl;
+	//lastDfa.printTerms();
+	//fdisplay(lastDfa, "..//dfa12min.txt");
+	//std::cout << "after min" << std::endl;
 	if(lastDfa.Size() > DFA_SIZE_LIMIT)
 	{
 		//std::cerr << "DFA_SIZE_LIMIT!" << std::endl;

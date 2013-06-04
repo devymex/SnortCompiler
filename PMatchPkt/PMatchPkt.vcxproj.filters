@@ -33,4 +33,9 @@
   <ItemGroup>
     <None Include="PMatchPkt.def" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="D:\Program Files\745936646\Image\~H81Q)$9(MFHHG%MQ`UL8F3.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
 </Project>
