@@ -5,7 +5,7 @@
 
 
 
-DFANEWSC void GetDfaSig(CDfanew &dfa, std::vector<std::vector<BYTE>> &allStr)
+DFANEWSC void GetDfaSig(CDfaNew &dfa, std::vector<std::vector<BYTE>> &allStr)
 {
 	static STATEID serNum = 0;
 
@@ -38,7 +38,7 @@ DFANEWSC void GetDfaSig(CDfanew &dfa, std::vector<std::vector<BYTE>> &allStr)
 }
 
 //深度遍历dfa，填写deepser,terRow,staRow
-void DeepSearch(STATEID startSta, STATEID &serNum, CDfanew &dfa, std::vector<STATEID> &termStas, size_t visited[], STATEID deepSer[], STATEID staRow[])
+void DeepSearch(STATEID startSta, STATEID &serNum, CDfaNew &dfa, std::vector<STATEID> &termStas, size_t visited[], STATEID deepSer[], STATEID staRow[])
 {
 	if((dfa[startSta].GetFlag() & CDfaRow::TERMINAL) != 0)
 	{
@@ -72,7 +72,7 @@ void DeepSearch(STATEID startSta, STATEID &serNum, CDfanew &dfa, std::vector<STA
 	}
 }
 
-void Dominates(CDfanew &dfa, std::vector<STATEID> termStas, INT64 domMax[], STATEID deepSer[], STATEID staRow[], std::vector<STATEID> &doms)
+void Dominates(CDfaNew &dfa, std::vector<STATEID> termStas, INT64 domMax[], STATEID deepSer[], STATEID staRow[], std::vector<STATEID> &doms)
 {
 	std::vector<STATEID> inStas[DFACOLSIZE];
 	InStas(dfa, inStas);
@@ -184,7 +184,7 @@ void RowAnd(INT64* firRow, INT64* secRow, INT64* lastRow)
 }
 
 //pre states of each state of dfa
-void InStas(CDfanew &dfa, std::vector<STATEID> *inStas)
+void InStas(CDfaNew &dfa, std::vector<STATEID> *inStas)
 {
 	UINT8 visited[DFACOLSIZE][DFACOLSIZE];
 	std::memset(visited, 0, sizeof(visited));
@@ -220,7 +220,7 @@ bool Change(INT64* before, INT64* after)
 	return chg;
 }
 
-void WFSDfa(CDfanew &dfa, std::vector<STATEID> doms, STATEID *staRow, std::vector<std::vector<BYTE>> &allStr)
+void WFSDfa(CDfaNew &dfa, std::vector<STATEID> doms, STATEID *staRow, std::vector<std::vector<BYTE>> &allStr)
 {
 	//入度
 	size_t in[DFACOLSIZE - 1];

@@ -3,6 +3,6 @@
 
 void main()
 {
-	Mapping();
+	HashMapping();
 	system("pause");
 }

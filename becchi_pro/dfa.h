@@ -301,7 +301,7 @@ class DFA {
 	 * Returns the resulting number of trees.
 	 */
 	unsigned CD2FA();
-	void Dfa2CDfanew(CDfanew &curDFA);
+	void Dfa2CDfaNew(CDfaNew &curDFA);
 };
 
 inline void DFA::add_transition(state_t old_state, symbol_t c, state_t new_state){ state_table[old_state][c]=new_state;}	

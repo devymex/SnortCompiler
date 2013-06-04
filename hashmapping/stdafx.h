@@ -5,5 +5,7 @@
 #include <iomanip>
 #include <set>
 #include <vector>
+#include <string>
+#include <algorithm>
 
 #define HASHMAPPING_H_

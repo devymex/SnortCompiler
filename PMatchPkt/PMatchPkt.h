@@ -2,20 +2,13 @@
 #include "../common/common.h"
 #include "../rule2nfa/rule2nfa.h"
 #include "../compilernew/compilernew.h"
-#include "../pcre2nfa/pcre.h"
-#include "match.h"
+#include "../pcre2nfa/match.h"
 
 #ifndef PMATCHPKT_H_
 #define PMATCHPKT __declspec(dllimport)
 #else
 #define PMATCHPKT __declspec(dllexport)
 #endif
-
-enum MATHCH_FLAG
-{
-	HAS_MATHCHED = 0,
-	NOT_MATHCED = 1
-};
 
 struct REGRULES
 {
@@ -50,4 +43,4 @@ struct REGRULESMAP
 
 void CALLBACK MyProcess(const CSnortRule &rule, LPVOID lpParam);
 PMATCHPKT void MchCompile(LPCTSTR filename, LPVOID result);
-bool TradithinalMathch(std::vector<u_char> &dataSrc, CRegRule &regRule);//调用pcre库进行匹配
+PMATCHPKT bool TradithinalMatch(std::vector<u_char> &dataSrc, CRegRule &regRule);//调用pcrePMATCHPKT 

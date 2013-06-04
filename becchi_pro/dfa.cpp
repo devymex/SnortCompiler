@@ -3409,7 +3409,7 @@ void DFA::output()
 	std::cout << std::endl;
 }
 
-void DFA::Dfa2CDfanew(CDfanew &curDFA)
+void DFA::Dfa2CDfaNew(CDfaNew &curDFA)
 {
 	BYTE group[CSIZE];
 	for (int i = 0; i < CSIZE; ++i)

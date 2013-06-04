@@ -1,6 +1,7 @@
+#include "stdafx.h"
 #include "match.h"
 
-bool match(const char* src, int length, std::string Regex, int &Pos)
+MATCHSC bool match(char* src, int length, std::string Regex, int &Pos)
 {
 	pcre *re;
 	const char *error;
@@ -34,8 +35,8 @@ bool match(const char* src, int length, std::string Regex, int &Pos)
 
 	const char* pattern = Pcre.c_str();
 
-	//printf("string : %s\n", src);
-	//printf("pattern: \"%s\"\n", pattern);
+	printf("string : %s\n", src);
+	printf("pattern: \"%s\"\n", pattern);
 
 	re = pcre_compile(pattern, options, &error, &erroffset, NULL);
 

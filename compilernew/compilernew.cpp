@@ -7,12 +7,12 @@
 
 COMPILERNEW CDfaTblNew::CDfaTblNew()
 {
-	m_pdfaTbl = new std::vector<CDfanew>;	
+	m_pdfaTbl = new std::vector<CDfaNew>;	
 }
 
 COMPILERNEW CDfaTblNew::CDfaTblNew(const CDfaTblNew& other)
 {
-	m_pdfaTbl = new std::vector<CDfanew>;
+	m_pdfaTbl = new std::vector<CDfaNew>;
 	*this = other;
 }
 
@@ -27,12 +27,12 @@ COMPILERNEW CDfaTblNew::~CDfaTblNew()
 	delete m_pdfaTbl;
 }
 
-COMPILERNEW CDfanew& CDfaTblNew::operator[](size_t index)
+COMPILERNEW CDfaNew& CDfaTblNew::operator[](size_t index)
 {
 	return (*m_pdfaTbl)[index];
 }
 
-COMPILERNEW const CDfanew& CDfaTblNew::operator[](size_t index) const
+COMPILERNEW const CDfaNew& CDfaTblNew::operator[](size_t index) const
 {
 	return (*m_pdfaTbl)[index];
 }
@@ -52,7 +52,7 @@ COMPILERNEW const size_t CDfaTblNew::Size() const
 	return m_pdfaTbl->size();
 }
 
-COMPILERNEW void CDfaTblNew::PushBack(const CDfanew &dfa)
+COMPILERNEW void CDfaTblNew::PushBack(const CDfaNew &dfa)
 {
 	m_pdfaTbl->push_back(dfa);
 }
@@ -397,7 +397,7 @@ COMPILERNEW size_t CResNew::ReadFromFile(LPCTSTR filename)
 	BYTE dfaDetails[100000];
 	for (size_t i = 0; i < dfaNum; ++i)
 	{
-		CDfanew &dfa = m_dfaTbl[i];
+		CDfaNew &dfa = m_dfaTbl[i];
 		size_t len;
 		fin.read((char*)&len, 4);
 		fin.read((char*)dfaDetails, len * sizeof(BYTE));
@@ -519,7 +519,7 @@ void Rule2Dfas(const CSnortRule &rule, CResNew &result, COMPILEDRULENEW &ruleRes
 			nDfaId = nDfaTblSize + i;
 			//nDfasInfoId = nDfasInfoSize + i;
 			nChainId = nRegexTblSize + i;
-			CDfanew &dfa = result.GetDfaTable()[nDfaId];
+			CDfaNew &dfa = result.GetDfaTable()[nDfaId];
 			if (nToNFAFlag == SC_ERROR)
 			{
 				ruleResult.m_nResult = COMPILEDRULENEW::RES_ERROR;
@@ -540,6 +540,7 @@ void Rule2Dfas(const CSnortRule &rule, CResNew &result, COMPILEDRULENEW &ruleRes
 				size_t nToDFAFlag = dfa.FromNFA(nfa, NULL, 0);
 				//				std::cout << "  "<< dfa.LinkSize() << ", " << dfa.GetGroupCount() * dfa.Size() << std::endl;
 				nfa2dfatime += ctime.Reset();//ÓÃÓÚ²âÊÔ
+				//outPutDfa(dfa, "..//..//output//test.txt");
 
 				if (nToDFAFlag == -1)
 				{
@@ -557,6 +558,14 @@ void Rule2Dfas(const CSnortRule &rule, CResNew &result, COMPILEDRULENEW &ruleRes
 						dfa.Clear();
 					}
 				}
+			}
+			if (dfa.Size() == 0)
+			{
+				ruleResult.m_dfaIds.Clear();
+				result.GetDfaTable().Resize(nDfaTblSize);
+				//result.GetDfasInfo().Resize(nDfasInfoSize);
+				result.GetRegexTbl().Resize(nRegexTblSize);
+				return;
 			}
 			ruleResult.m_dfaIds.PushBack(nDfaId);
 			//result.GetDfasInfo()[nDfasInfoId].dfaId = nDfaId;
