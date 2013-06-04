@@ -423,8 +423,7 @@ void GetNextEClosureSet(const CNfa &nfa, const std::vector<STATESET> &eClosure,
 		return;
 	}
 
-	static STATESET nextSet;
-	nextSet.clear();
+	STATESET nextSet;
 	nextSet.reserve(1000);
 	size_t nSize = nfa.Size();
 	for(STATESET::const_iterator i = curSet.begin(); i != curSet.end(); ++i)
@@ -498,8 +497,7 @@ DFANEWSC size_t CDfaNew::FromNFA(const CNfa &nfa, NFALOG *nfalog, size_t Count, 
 	}
 
 	std::vector<size_t> curNfaVec;
-	static std::vector<size_t> nextNfaVec;
-	nextNfaVec.clear();
+	std::vector<size_t> nextNfaVec;
 	BYTE compuFlag[CHARSETSIZE];
 
 	size_t nTotalSize = m_TermSet->size() * sizeof(TERMSET) +
@@ -684,7 +682,7 @@ DFANEWSC size_t CDfaNew::Minimize()
 	if (reachable.size() < nSize)
 	{
 		std::cout << "Has unreachables" << std::endl;
-		system("pause");
+		//system("pause");
 		//remove unreachable states, generate new DFA
 		MergeReachable(reachable);
 	}
@@ -705,19 +703,19 @@ DFANEWSC size_t CDfaNew::Minimize()
 	}
 	std::vector<PARTSET> partSet;
 	//divide nondistinguishable states
-	if (0 != PartitionNonDisState(pRevTab, partSet))
+	size_t nr = PartitionNonDisState(pRevTab, partSet);
+	if (0 == nr)
 	{
-		return -1;
+		if (partSet.size() < nSize)
+		{
+			//DFA minization
+			MergeNonDisStates(partSet);
+		}
 	}
 
-	if (partSet.size() < nSize)
-	{
-		//DFA minization
-		MergeNonDisStates(partSet);
-	}
 	delete []pRevTab;
 
-	return 0;
+	return nr;
 }
 
 DFANEWSC WORD CDfaNew::GetGroupCount() const
@@ -1361,7 +1359,7 @@ void CDfaNew::MergeNonDisStates(std::vector<PARTSET> &partSet)
 		++nSetIdx;
 	}
 
-	delete []termFlag;
+	delete[] termFlag;
 	m_StartId = nStart;
 	UniqueTermSet();
 

@@ -23,10 +23,12 @@ int main()
 	//		std::cout << i << std::endl;
 	//	}
 	//}
+
 	CResNew result;
-	compilenew(_T("..\\..\\input\\allrules.rule"), result);
+	//compilenew(_T("..\\..\\input\\allrules.rule"), result);
 	//result.WriteToFile(_T("..\\..\\output\\result.cdt"));
-	//result.ReadFromFile(_T("..\\..\\output\\result.cdt"));
+	result.ReadFromFile(_T("..\\..\\output\\result.cdt"));
+
 	//for (size_t i = 0; i < result.GetSidDfaIds().Size(); ++i)
 	//{
 	//	if (result.GetSidDfaIds()[i].m_dfaIds.Size() > 0 && result.GetSidDfaIds()[i].m_dfaIds[0] == 1244)
