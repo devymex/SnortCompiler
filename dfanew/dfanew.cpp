@@ -631,7 +631,7 @@ DFANEWSC size_t CDfaNew::Minimize()
 	{
 		return size_t(-1);
 	}
-
+#ifdef DFA_REMOVE_UNREACHABLE
 	size_t nMatHeight = nSize + 1;
 	size_t nMatWidth = nMatHeight;
 
@@ -685,7 +685,7 @@ DFANEWSC size_t CDfaNew::Minimize()
 		//remove unreachable states, generate new DFA
 		MergeReachable(reachable);
 	}
-
+#endif
 	////计算逆向状态查找表
 	nSize = m_pDfa->size();
 	std::vector<STATEID> *pRevTab = NULL;
@@ -711,6 +711,7 @@ DFANEWSC size_t CDfaNew::Minimize()
 		{
 			//DFA minization
 			MergeNonDisStates(partSet);
+			std::cout << "Minimized: " << nSize - partSet.size() << std::endl;
 		}
 	}
 
