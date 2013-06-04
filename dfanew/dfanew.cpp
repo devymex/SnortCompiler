@@ -1326,7 +1326,6 @@ void CDfaNew::MergeNonDisStates(std::vector<PARTSET> &partSet)
 		{
 			CDfaRow &curRow = (*m_pDfa)[*iSta];
 			sta2Part[*iSta] = nSetIdx;
-			std::cout << *iSta << std::endl;
 			//修改新的起始状态
 			if (curRow.GetFlag() & CDfaRow::START)
 			{
