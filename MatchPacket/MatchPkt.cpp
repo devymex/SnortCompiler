@@ -101,7 +101,7 @@ void FindSig(size_t sig, std::map<size_t, std::vector<SIGSID>> &hashtable, std::
 	}
 }
 
-//返回 0 表示没有匹配上，返回 1 表示匹配上
+//锟斤拷锟斤拷 0 锟斤拷示没锟斤拷匹锟斤拷锟较ｏ拷锟斤拷锟斤拷 1 锟斤拷示匹锟斤拷锟斤拷
 size_t MatchOnedfa(std::vector<u_char> &onepkt, CDfaNew &dfa, std::vector<size_t> &matchedDids)
 {
 	std::unordered_map<size_t, std::vector<size_t>> dfaids;

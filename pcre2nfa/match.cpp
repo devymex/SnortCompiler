@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "match.h"
 
-MATCHSC bool match(char* src, int length, std::string Regex, int &Pos)
+MATCHSC bool match(const char* src, int length, std::string Regex, int &Pos)
 {
 	pcre *re;
 	const char *error;

@@ -82,6 +82,7 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MatchPacket", "MatchPacket\MatchPacket.vcxproj", "{F9E57E55-B880-46AA-AB2F-9AA68DC71214}"
 	ProjectSection(ProjectDependencies) = postProject
 		{673B9C32-B6AA-4451-80DE-93DF369B64DC} = {673B9C32-B6AA-4451-80DE-93DF369B64DC}
+		{0C639590-DE81-4AB4-AA71-6CE6CAB424E4} = {0C639590-DE81-4AB4-AA71-6CE6CAB424E4}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "matchpkttest", "matchpkttest\matchpkttest.vcxproj", "{EACE9D83-7444-4E9D-A9DE-3D089E02B3A4}"
@@ -101,6 +102,7 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PMatchPkt", "PMatchPkt\PMatchPkt.vcxproj", "{5864C6E3-583F-4698-93A7-5A852B10F228}"
 	ProjectSection(ProjectDependencies) = postProject
 		{F6606B01-EE46-44B3-B199-A8A58B004BD9} = {F6606B01-EE46-44B3-B199-A8A58B004BD9}
+		{F95D1A40-7011-4922-BB31-5134A752F07E} = {F95D1A40-7011-4922-BB31-5134A752F07E}
 		{0C639590-DE81-4AB4-AA71-6CE6CAB424E4} = {0C639590-DE81-4AB4-AA71-6CE6CAB424E4}
 		{E3086FE7-DF5C-4705-B134-C6FD0830A86B} = {E3086FE7-DF5C-4705-B134-C6FD0830A86B}
 	EndProjectSection
@@ -197,5 +199,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
 	EndGlobalSection
 EndGlobal

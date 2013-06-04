@@ -10,4 +10,4 @@
 #define EBUFLEN 128
 #define BUFLEN 1024
 
-MATCHSC bool match(char* src, int length, std::string Regex, int &Pos);
+MATCHSC bool match(const char* src, int length, std::string Regex, int &Pos);

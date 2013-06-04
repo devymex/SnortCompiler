@@ -133,6 +133,7 @@ DFANEWSC void outPutDfa(CDfaNew &dfa, const char* filename)
 		fout << std::endl;
 	}
 	fout << std::endl;
+	fout << "dfa state" << "\t" << "dfaId" << std::endl;
 	for(size_t i = 0; i < dfa.GetTermCnt(); ++i)
 	{
 		fout << (size_t)dfa.GetTerm(i).dfaSta << "\t" << dfa.GetTerm(i).dfaId << std::endl;
@@ -423,7 +424,8 @@ void GetNextEClosureSet(const CNfa &nfa, const std::vector<STATESET> &eClosure,
 		return;
 	}
 
-	STATESET nextSet;
+	static STATESET nextSet; //
+	nextSet.clear();
 	nextSet.reserve(1000);
 	size_t nSize = nfa.Size();
 	for(STATESET::const_iterator i = curSet.begin(); i != curSet.end(); ++i)
@@ -497,7 +499,8 @@ DFANEWSC size_t CDfaNew::FromNFA(const CNfa &nfa, NFALOG *nfalog, size_t Count, 
 	}
 
 	std::vector<size_t> curNfaVec;
-	std::vector<size_t> nextNfaVec;
+	static std::vector<size_t> nextNfaVec; //
+	nextNfaVec.clear();
 	BYTE compuFlag[CHARSETSIZE];
 
 	size_t nTotalSize = m_TermSet->size() * sizeof(TERMSET) +
@@ -525,11 +528,6 @@ DFANEWSC size_t CDfaNew::FromNFA(const CNfa &nfa, NFALOG *nfalog, size_t Count, 
 			{
 				if(ssh.count(nextNfaVec) == 0)
 				{
-					//if (ssh.size() > std::numeric_limits<STATEID>::max())
-					//{
-					//	std::cerr << "Fatal Error!" << std::endl;
-					//	return (size_t)-1;
-					//}
 					m_pDfa->push_back(CDfaRow(m_nColNum));
 					//std::cout << m_pDfa->size() << std::endl;//用于测试
 					if (m_pDfa->size() > SC_STATELIMIT)// || nTotalSize >= 2048
@@ -643,6 +641,7 @@ DFANEWSC size_t CDfaNew::Minimize()
 	}
 	BYTE *pMat = NULL;
 	std::vector<STATEID> reachable;
+
 	pMat = (BYTE*)_aligned_malloc(nMatWidth * nMatHeight, 128);
 	memset(pMat, 0, nMatWidth * nMatHeight);
 
@@ -682,14 +681,15 @@ DFANEWSC size_t CDfaNew::Minimize()
 	if (reachable.size() < nSize)
 	{
 		std::cout << "Has unreachables" << std::endl;
-		//system("pause");
+		system("pause");
 		//remove unreachable states, generate new DFA
 		MergeReachable(reachable);
 	}
 
-	//计算逆向状态查找表
+	////计算逆向状态查找表
 	nSize = m_pDfa->size();
-	std::vector<STATEID> *pRevTab = new std::vector<STATEID>[nSize * nCols];
+	std::vector<STATEID> *pRevTab = NULL;
+	pRevTab = new std::vector<STATEID>[nSize * nCols];
 	for (STATEID i = 0; i < nSize; ++i)
 	{
 		for (STATEID j = 0; j < nCols; ++j)
@@ -701,9 +701,10 @@ DFANEWSC size_t CDfaNew::Minimize()
 			}
 		}
 	}
+
 	std::vector<PARTSET> partSet;
-	//divide nondistinguishable states
 	size_t nr = PartitionNonDisState(pRevTab, partSet);
+	//divide nondistinguishable states
 	if (0 == nr)
 	{
 		if (partSet.size() < nSize)
@@ -958,7 +959,7 @@ void CDfaNew::MergeReachable(std::vector<STATEID> &reachable)
 	std::vector<CDfaRow> &tmpDfa = *pNewDfa;
 
 	size_t nMemSize = nDfaSize * sizeof(STATEID);
-	STATEID *pOldToNew = (STATEID*)VirtualAlloc(NULL, nMemSize, MEM_COMMIT, PAGE_READWRITE);
+	STATEID *pOldToNew = new STATEID[nMemSize];
 	memset(pOldToNew, 0xFF, nMemSize);
 
 	//将m_pDfa中编号对应为可达状态的复制到tmpDfa中，并修改reachable中可达状态的编号
@@ -992,7 +993,7 @@ void CDfaNew::MergeReachable(std::vector<STATEID> &reachable)
 			}
 		}
 	}
-	VirtualFree(pOldToNew, 0, MEM_RELEASE);
+	delete []pOldToNew;
 
 	//替换m_pDfa
 	delete m_pDfa;
@@ -1003,11 +1004,7 @@ void ReleaseAbleTo(PARTSET &ps)
 {
 	if (!ps.AbleTo.empty())
 	{
-		if (TRUE != VirtualFree(ps.AbleTo.front(), 0, MEM_RELEASE))
-		{
-			std::cout << "VirtualFree " << GetLastError() << std::endl;
-			system("pause");
-		}
+		delete []ps.AbleTo.front();
 	}
 	ps.AbleTo.clear();
 	ps.Ones.clear();
@@ -1018,18 +1015,15 @@ void CalcAbleTo(std::vector<STATEID> *pRevTbl, size_t nGrpNum, size_t nStaNum, P
 	//清空AbleTo
 	ReleaseAbleTo(ps);
 
-	BYTE *pBuf = (BYTE*)VirtualAlloc(NULL, nStaNum * nGrpNum, MEM_COMMIT, PAGE_READWRITE);
-	if (pBuf == NULL)
-	{
-		std::cout << "pBuf == NULL " << GetLastError() << std::endl;
-		system("pause");
-	}
+	BYTE *pBuf = new BYTE[nStaNum * nGrpNum];
+	ZeroMemory(pBuf, nStaNum * nGrpNum);
 	ps.AbleTo.resize(nGrpNum, 0);
 	ps.Ones.resize(nGrpNum, 0);
 	//计算AbleTo的值，每产生一个新的或者更新PARTSET对象计算一次
 	for (size_t j = 0; j < nGrpNum; ++j)
 	{
 		BYTE *pAbleTo = pBuf + j * nStaNum;
+		ps.AbleTo[j] = pAbleTo;
 		//遍历PARTSET中的每个状态t，若存在δ(-1)(t,j)≠Φ，AbleTo[t]标记为1
 		for (std::list<STATEID>::iterator k = ps.StaSet.begin(); k != ps.StaSet.end(); ++k)
 		{
@@ -1040,7 +1034,6 @@ void CalcAbleTo(std::vector<STATEID> *pRevTbl, size_t nGrpNum, size_t nStaNum, P
 				++ps.Ones[j];
 			}
 		}
-		ps.AbleTo[j] = pAbleTo;
 	}
 }
 
@@ -1057,11 +1050,6 @@ void CDfaNew::InitPartSet(std::vector<PARTSET> &partSet) const
 	for (STATEID i = 0; i < m_TermSet->size(); ++i)
 	{
 		TERMSET &ts = (*m_TermSet)[i];
-		if (ts.dfaSta >= nStaNum)
-		{
-			std::cout << "ts.dfaSta >= nStaNum" << std::endl;
-			system("pause");
-		}
 		pTerm2Dfa[ts.dfaSta].insert(ts.dfaId);
 	}
 
@@ -1087,11 +1075,6 @@ void CDfaNew::InitPartSet(std::vector<PARTSET> &partSet) const
 	partSet.push_back(initBSet[std::set<size_t>()]);
 }
 
-inline size_t CountOnes(BYTE *pBuf, size_t nBufSize)
-{
-	return std::count(pBuf, pBuf + nBufSize, 1);
-}
-
 size_t CDfaNew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, std::vector<PARTSET> &partSet) const
 {
 	size_t nGrpNum = GetGroupCount();
@@ -1099,16 +1082,15 @@ size_t CDfaNew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, std::vector<
 	size_t nRevSize = nGrpNum * nStaNum;
 
 	InitPartSet(partSet);
-	
+
 	for (std::vector<PARTSET>::iterator i = partSet.begin(); i != partSet.end(); ++i)
 	{
 		//对于partSet中每个集合，根据不同的nGrpNum计算不同AbleTo，AbleTo对应论文中的a(i)
 		CalcAbleTo(pRevTbl, nGrpNum, nStaNum, *i);
 	}
-	
+
 	//pWait表示用于切分partSet中每个集合的集合下标，
 	//对于不同的输入字符会保存多个不同集合下标。对应论文中L(a)
-	//std::vector<size_t> *pWait = new std::vector<size_t>[nGrpNum];
 	std::vector<size_t> pWait[256];
 
 	//初始化pWait，要求若满足0<|ij|<=|ik|，则将j存入pWait，反之，存入k
@@ -1144,21 +1126,18 @@ size_t CDfaNew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, std::vector<
 			}
 		}
 	}
-	
+
 	//标记能够经过某一输入字符，能够到达ISet中的状态的状态集合
-	BYTE *pAbleToI = (BYTE*)VirtualAlloc(NULL, nStaNum, MEM_COMMIT, PAGE_READWRITE);
-	for (; ; )
+	BYTE *pAbleToI = new BYTE[nStaNum];
+	partSet.reserve(1000);
+	size_t nr = 0;
+	for (; nr == 0; )
 	{
 		BYTE byCurGrp = -1;
 		size_t nCurSet = -1;
 		//从pWait中取一个值并remove该值
 		for (size_t i = 0; i < nGrpNum; ++i)
 		{
-			if (i >= 255)
-			{
-				std::cout << "i >= 256" << std::endl;
-				system("pause");
-			}
 			if (!pWait[i].empty())
 			{
 				byCurGrp = i;
@@ -1172,12 +1151,7 @@ size_t CDfaNew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, std::vector<
 		{
 			break;
 		}
-		
-		if (nCurSet >= partSet.size())
-		{
-			std::cout << "nCurSet >= partSet.size()" << std::endl;
-			system("pause");
-		}
+
 		PARTSET *pISet = &partSet[nCurSet];
 		ZeroMemory(pAbleToI, nStaNum);
 		size_t nRevCnt = 0;
@@ -1186,28 +1160,17 @@ size_t CDfaNew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, std::vector<
 			iSta != pISet->StaSet.end(); ++iSta)
 		{
 			size_t nRevIdx = *iSta * nGrpNum + byCurGrp;
-			if (nRevIdx >= nRevSize)
-			{
-				std::cout << "nRevIdx >= nRevSize" << std::endl;
-				system("pause");
-			}
 			std::vector<STATEID> &revI = pRevTbl[nRevIdx];
 			for (std::vector<STATEID>::iterator iRevSta = revI.begin();
 				iRevSta != revI.end(); ++iRevSta)
 			{
-				if (*iRevSta >= nStaNum)
-				{
-					std::cout << "*iRevSta >= nStaNum" << std::endl;
-					system("pause");
-				}
 				pAbleToI[*iRevSta] = 1;
 				++nRevCnt;
 			}
 		}
-		
+
 		if (nRevCnt != 0)
 		{
-			partSet.reserve(1000);
 			for (size_t j = 0; j != partSet.size(); ++j)
 			{
 				//取partSet中的一个集合j，B(j)中存在t满足条件δ(t,a)∈a(i)，
@@ -1229,11 +1192,6 @@ size_t CDfaNew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, std::vector<
 				//将后段中出现的值为1的插入至前段
 				for (; t != pJSet->StaSet.end();)
 				{
-					if (*t >= nStaNum)
-					{
-						std::cout << "*t >= nStaNum" << std::endl;
-						system("pause");
-					}
 					if (pAbleToI[*t] == 1)
 					{
 						pJSet->StaSet.insert(pJSet->StaSet.begin(), *t);
@@ -1253,34 +1211,29 @@ size_t CDfaNew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, std::vector<
 				partSet.push_back(PARTSET());
 				pJSet = &partSet[j];
 				pISet = &partSet[nCurSet];
-				
+
 				std::list<STATEID>::iterator part = pJSet->StaSet.begin();
 				//查找产生0,1分段的切分点，记为part
 				for (; part != pJSet->StaSet.end() && pAbleToI[*part] != 0; ++part);
 				if (partSet.size() > 254)
 				{
-					VirtualFree(pAbleToI, nStaNum, MEM_RELEASE);
-					for (std::vector<PARTSET>::iterator i = partSet.begin(); i != partSet.end(); ++i)
-					{
-						ReleaseAbleTo(*i);
-					}
-					//delete []pWait;
-					return size_t(-1);
+					nr = size_t(-1);
+					break;
 				}
 				//保存产生的新的划分
 				PARTSET &lastPart = partSet.back();
 				lastPart.StaSet.splice(lastPart.StaSet.begin(),
 					pJSet->StaSet, part, pJSet->StaSet.end());
+
 				CalcAbleTo(pRevTbl, nGrpNum, nStaNum, *pJSet);
 				CalcAbleTo(pRevTbl, nGrpNum, nStaNum, lastPart);
-				
-				//更新pWait
+
+
+				////更新pWait
 				for (BYTE m = 0; m < nGrpNum; ++m)
 				{
 					int k = partSet.size() - 1;
 					std::vector<size_t> &curWait = pWait[m];
-					//int aj = CountOnes(pJSet->AbleTo[m], nStaNum);
-					//int ak = CountOnes(lastPart.AbleTo[m], nStaNum);
 					int aj = pJSet->Ones[m];
 					int ak = lastPart.Ones[m];
 					if (aj > 0 && aj <= ak)
@@ -1295,14 +1248,13 @@ size_t CDfaNew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, std::vector<
 			}
 		}
 	}
-	VirtualFree(pAbleToI, nStaNum, MEM_RELEASE);
-	
+	delete []pAbleToI;
+
 	for (std::vector<PARTSET>::iterator i = partSet.begin(); i != partSet.end(); ++i)
 	{
 		ReleaseAbleTo(*i);
 	}
-	//delete []pWait;
-	return 0;
+	return nr;
 }
 
 //Partition中的元素为一个状态的集合，集合中元素为多个等价状态，每个集合可以合并为新的DFA中一个状态
@@ -1326,7 +1278,7 @@ void CDfaNew::MergeNonDisStates(std::vector<PARTSET> &partSet)
 	std::vector<CDfaRow> &tmpDfa = *pNewDfa;
 
 	//等价的状态存于同一个partition中，标记原来的状态存在哪一个新的partition中，并修改新的起始状态编号
-	STATEID nSetIdx = 0, nStart = -1;
+	STATEID nSetIdx = 0;
 	for (std::vector<PARTSET>::iterator iPart = partSet.begin(); iPart != partSet.end(); ++iPart)
 	{
 		for (std::list<STATEID>::iterator iSta = iPart->StaSet.begin(); iSta != iPart->StaSet.end(); ++iSta)
@@ -1336,12 +1288,7 @@ void CDfaNew::MergeNonDisStates(std::vector<PARTSET> &partSet)
 			//修改新的起始状态
 			if (curRow.GetFlag() & CDfaRow::START)
 			{
-				if (nStart != (STATEID)-1)
-				{
-					std::cout << "nStart != -1" << std::endl;
-					system("pause");
-				}
-				nStart = nSetIdx;
+				m_StartId = nSetIdx;
 			}
 
 			//存入新的终态编号
@@ -1359,8 +1306,7 @@ void CDfaNew::MergeNonDisStates(std::vector<PARTSET> &partSet)
 		++nSetIdx;
 	}
 
-	delete[] termFlag;
-	m_StartId = nStart;
+	delete []termFlag;
 	UniqueTermSet();
 
 	//set new DFA and modify new number
@@ -1386,6 +1332,6 @@ void CDfaNew::MergeNonDisStates(std::vector<PARTSET> &partSet)
 
 
 	//替换m_pDfa
-	delete m_pDfa;
-	m_pDfa = pNewDfa;
+	swap(m_pDfa, pNewDfa);
+	delete pNewDfa;
 }

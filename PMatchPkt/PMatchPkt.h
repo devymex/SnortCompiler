@@ -2,13 +2,13 @@
 #include "../common/common.h"
 #include "../rule2nfa/rule2nfa.h"
 #include "../compilernew/compilernew.h"
+#include "../pcre2nfa/match.h"
 
 #ifndef PMATCHPKT_H_
 #define PMATCHPKT __declspec(dllimport)
 #else
 #define PMATCHPKT __declspec(dllexport)
 #endif
-
 
 struct REGRULES
 {
@@ -43,3 +43,4 @@ struct REGRULESMAP
 
 void CALLBACK MyProcess(const CSnortRule &rule, LPVOID lpParam);
 PMATCHPKT void MchCompile(LPCTSTR filename, LPVOID result);
+PMATCHPKT bool TradithinalMatch(std::vector<u_char> &dataSrc, CRegRule &regRule);//µ÷ÓÃpcrePMATCHPKT 
