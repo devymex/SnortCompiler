@@ -246,7 +246,7 @@ MERDFANEW bool NOrMerge(std::vector<CDfaNew> &dfas, CDfaNew &lastDfa)
 			return false;
 		}
 		STATEID curStaNum = ir->second;
-		memset(computFlag, 0, sizeof(computFlag));
+		ZeroMemory(computFlag, sizeof(computFlag));
 
 		//下一状态集合
 		for(size_t curChar = 0; curChar < DFACOLSIZE; ++curChar)
