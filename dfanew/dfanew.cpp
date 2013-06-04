@@ -1006,7 +1006,11 @@ void ReleaseAbleTo(PARTSET &ps)
 {
 	if (!ps.AbleTo.empty())
 	{
-		VirtualFree(ps.AbleTo.front(), 0, MEM_RELEASE);
+		if (TRUE != VirtualFree(ps.AbleTo.front(), 0, MEM_RELEASE))
+		{
+			std::cout << "VirtualFree " << GetLastError() << std::endl;
+			system("pause");
+		}
 	}
 	ps.AbleTo.clear();
 	ps.Ones.clear();
@@ -1018,6 +1022,11 @@ void CalcAbleTo(std::vector<STATEID> *pRevTbl, size_t nGrpNum, size_t nStaNum, P
 	ReleaseAbleTo(ps);
 
 	BYTE *pBuf = (BYTE*)VirtualAlloc(NULL, nStaNum * nGrpNum, MEM_COMMIT, PAGE_READWRITE);
+	if (pBuf == NULL)
+	{
+		std::cout << "pBuf == NULL " << GetLastError() << std::endl;
+		system("pause");
+	}
 	ps.AbleTo.resize(nGrpNum);
 	ps.Ones.resize(nGrpNum, 0);
 	//计算AbleTo的值，每产生一个新的或者更新PARTSET对象计算一次
