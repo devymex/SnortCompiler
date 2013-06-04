@@ -26,14 +26,14 @@ void GetMchRule(std::vector<u_char> &pkt, REGRULESMAP &rulesmap, std::vector<siz
 void main(size_t argc, char* argv[])
 {
 	std::vector<std::vector<u_char>> allPkt;
-	//LoadCapFile("F:\\cppProject\\huawei\\PreciseMatch\\PacketMatch\\2_71_u_2.cap00_up.cap", &allPkt);
+	LoadCapFile("F:\\cppProject\\huawei\\PreciseMatch\\PacketMatch\\2_71_u_2.cap00_up.cap", &allPkt);
 
 	REGRULESMAP rulesmap;
 	MchCompile(_T("../../input/test.rules"), &rulesmap);
 
-	u_char p[] = {0, 0, 'f', 'g', 0, 'a', 'b', 'C', 'd', 0, 'd', 'e', 235, 0, 42, 'A', 123, 'B', 40, '1', '2', 93, 63, 'a', 'b', 'c', 'd'};
-	std::vector<u_char> tmpvec(p, p + sizeof(p));
-	allPkt.push_back (tmpvec);
+	//u_char p[] = {0, 0, 'f', 'g', 0, 'a', 'b', 'C', 'd', 0, 'd', 'e', 235, 0, 42, 'A', 123, 'B', 40, '1', '2', 93, 63, 'a', 'b', 'c', 'd', 'e', 'a'};
+	//std::vector<u_char> tmpvec(p, p + sizeof(p));
+	//allPkt.push_back (tmpvec);
 	for(std::vector<std::vector<u_char>>::iterator allIter = allPkt.begin(); allIter != allPkt.end(); ++allIter)
 	{
 		std::vector<size_t> rules;
