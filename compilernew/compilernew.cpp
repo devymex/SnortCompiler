@@ -511,8 +511,6 @@ void Rule2Dfas(const CSnortRule &rule, CResNew &result, COMPILEDRULENEW &ruleRes
 			size_t nToNFAFlag = CRegChainToNFA(regrule[i], nfa);
 			pcre2nfatime += ctime.Reset();//用于测试
 
-			std::cout << nfa.Size() << std::endl;
-
 			if (regrule[i].GetSigCnt() > 0)
 			{
 				bHasSigs = true;
@@ -543,8 +541,6 @@ void Rule2Dfas(const CSnortRule &rule, CResNew &result, COMPILEDRULENEW &ruleRes
 				//				std::cout << "  "<< dfa.LinkSize() << ", " << dfa.GetGroupCount() * dfa.Size() << std::endl;
 				nfa2dfatime += ctime.Reset();//用于测试
 				//outPutDfa(dfa, "..//..//output//test.txt");
-
-				std::cout << dfa.Size() << std::endl;
 
 				if (nToDFAFlag == -1)
 				{
@@ -577,14 +573,14 @@ void Rule2Dfas(const CSnortRule &rule, CResNew &result, COMPILEDRULENEW &ruleRes
 			result.GetRegexTbl()[nChainId] = regrule[i];
 		}
 
-		//if (!bHasSigs)
-		//{
-		//	ruleResult.m_nResult = COMPILEDRULENEW::RES_HASNOSIG;
-		//	ruleResult.m_dfaIds.Clear();
-		//	result.GetDfaTable().Resize(nDfaTblSize);
-		//	result.GetRegexTbl().Resize(nRegexTblSize);
-		//	return;
-		//}
+		if (!bHasSigs)
+		{
+			ruleResult.m_nResult = COMPILEDRULENEW::RES_HASNOSIG;
+			ruleResult.m_dfaIds.Clear();
+			result.GetDfaTable().Resize(nDfaTblSize);
+			result.GetRegexTbl().Resize(nRegexTblSize);
+			return;
+		}
 
 		if (ruleResult.m_nResult != COMPILEDRULENEW::RES_ERROR)
 		{

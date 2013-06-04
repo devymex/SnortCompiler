@@ -24,7 +24,7 @@ int main()
 	//	}
 	//}
 	CResNew result;
-	compilenew(_T("..\\..\\input\\testrules.rule"), result);
+	compilenew(_T("..\\..\\input\\allrules.rule"), result);
 	//result.WriteToFile(_T("..\\..\\output\\result.cdt"));
 	//result.ReadFromFile(_T("..\\..\\output\\result.cdt"));
 	//for (size_t i = 0; i < result.GetSidDfaIds().Size(); ++i)
@@ -35,13 +35,13 @@ int main()
 	//		break;
 	//	}
 	//}
-	//CGROUPRes groupRes;
+	CGROUPRes groupRes;
 
-	//CTimer ctime;
-	//grouping(result, groupRes);
-	//std::cout << "分组时间： " << ctime.Reset() << std::endl;
+	CTimer ctime;
+	grouping(result, groupRes);
+	std::cout << "分组时间： " << ctime.Reset() << std::endl;
 
-	//groupRes.WriteToFile(_T("..\\..\\output\\GroupResut.cdt"));
+	groupRes.WriteToFile(_T("..\\..\\output\\GroupResut.cdt"));
 
 	//groupRes.ReadFromFile(_T("..\\..\\output\\GroupResut.cdt"));
 	//groupRes.WriteToFile(_T("..\\..\\output\\GroupResut1.cdt"));
@@ -57,18 +57,18 @@ int main()
 	//std::cout << result.GetRegexTbl()[0][0].C_Str() << std::endl;
 	//std::cout << result.GetRegexTbl()[1][0].C_Str() << std::endl;
 
-	std::vector<CDfaNew> vecDfas(2);
-	CDfaNew MergeDfa;
-	vecDfas[0] = result.GetDfaTable()[0];
-	vecDfas[1] = result.GetDfaTable()[1];
-	std::cout << vecDfas[0].Size() << std::endl;
-	std::cout << vecDfas[1].Size() << std::endl;
-	outPutDfa(vecDfas[0], "..//..//output//dfa1.txt");
-	outPutDfa(vecDfas[1], "..//..//output//dfa2.txt");
-	NOrMerge(vecDfas, MergeDfa);
-	std::cout << MergeDfa.GetStartId() << std::endl;
-	std::cout << MergeDfa.Size() << std::endl;
-	outPutDfa(MergeDfa, "..//..//output//dfa.txt");
+	//std::vector<CDfaNew> vecDfas(2);
+	//CDfaNew MergeDfa;
+	//vecDfas[0] = result.GetDfaTable()[0];
+	//vecDfas[1] = result.GetDfaTable()[1];
+	//std::cout << vecDfas[0].Size() << std::endl;
+	//std::cout << vecDfas[1].Size() << std::endl;
+	//outPutDfa(vecDfas[0], "..//..//output//dfa1.txt");
+	//outPutDfa(vecDfas[1], "..//..//output//dfa2.txt");
+	//NOrMerge(vecDfas, MergeDfa);
+	//std::cout << MergeDfa.GetStartId() << std::endl;
+	//std::cout << MergeDfa.Size() << std::endl;
+	//outPutDfa(MergeDfa, "..//..//output//dfa.txt");
 
 	system("pause");
 	return 0;
