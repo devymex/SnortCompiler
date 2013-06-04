@@ -1101,6 +1101,7 @@ size_t CDfaNew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, std::vector<
 	size_t nRevSize = nGrpNum * nStaNum;
 
 	InitPartSet(partSet);
+
 	for (std::vector<PARTSET>::iterator i = partSet.begin(); i != partSet.end(); ++i)
 	{
 		//对于partSet中每个集合，根据不同的nGrpNum计算不同AbleTo，AbleTo对应论文中的a(i)
@@ -1116,23 +1117,33 @@ size_t CDfaNew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, std::vector<
 	//对应论文中初始化L(a)过程，这里的i对应a
 	for (size_t i = 0; i < nGrpNum; ++i)
 	{
-		size_t nMinId = 0;
-		size_t nMinCnt = partSet[nMinId].Ones[i];
-		for (size_t j = 1; j < partSet.size(); ++j)
+		size_t AcpSum = 0, NonAcpSum = 0;
+		for (std::vector<PARTSET>::iterator j = partSet.begin(); j != partSet.end() - 1; ++j)
 		{
-			size_t nCurCnt = partSet[j].Ones[i];
-			if (nCurCnt != 0)
+			AcpSum += j->Ones[i];
+		}
+		NonAcpSum = partSet.back().Ones[i];
+		if (AcpSum != 0 && NonAcpSum == 0)
+		{
+			for (size_t k = 0; k < partSet.size() - 1; ++k)
 			{
-				if (nMinCnt == 0 || nCurCnt < nMinCnt)
-				{
-					nMinId = j;
-					nMinCnt = nCurCnt;
-				}
+				pWait[i].push_back(k);
 			}
 		}
-		if (nMinCnt != 0)
+		else if (AcpSum == 0 && NonAcpSum != 0)
 		{
-			pWait[i].push_back(nMinId);
+			pWait[i].push_back(partSet.size() - 1);
+		}
+		else if (AcpSum != 0 && NonAcpSum != 0)
+		{
+			if (AcpSum < NonAcpSum)
+			{
+				pWait[i].push_back(partSet.size() - 1);
+			}
+			for (size_t k = 0; k < partSet.size() - 1; ++k)
+			{
+				pWait[i].push_back(k);
+			}
 		}
 	}
 
@@ -1317,7 +1328,7 @@ void CDfaNew::MergeNonDisStates(std::vector<PARTSET> &partSet)
 	std::vector<CDfaRow> &tmpDfa = *pNewDfa;
 
 	//等价的状态存于同一个partition中，标记原来的状态存在哪一个新的partition中，并修改新的起始状态编号
-	STATEID nSetIdx = 0;
+	STATEID nSetIdx = 0, nStart = -1;
 	for (std::vector<PARTSET>::iterator iPart = partSet.begin(); iPart != partSet.end(); ++iPart)
 	{
 		for (std::list<STATEID>::iterator iSta = iPart->StaSet.begin(); iSta != iPart->StaSet.end(); ++iSta)
@@ -1327,7 +1338,12 @@ void CDfaNew::MergeNonDisStates(std::vector<PARTSET> &partSet)
 			//修改新的起始状态
 			if (curRow.GetFlag() & CDfaRow::START)
 			{
-				m_StartId = nSetIdx;
+				if (nStart != (STATEID)-1)
+				{
+					std::cout << "nStart != -1" << std::endl;
+					system("pause");
+				}
+				nStart = nSetIdx;
 			}
 
 			//存入新的终态编号
@@ -1344,6 +1360,9 @@ void CDfaNew::MergeNonDisStates(std::vector<PARTSET> &partSet)
 		}
 		++nSetIdx;
 	}
+
+	m_StartId = nStart;
+	UniqueTermSet();
 
 	//set new DFA and modify new number
 	nSetIdx = 0;
@@ -1366,7 +1385,6 @@ void CDfaNew::MergeNonDisStates(std::vector<PARTSET> &partSet)
 		++nSetIdx;
 	}
 
-	UniqueTermSet();
 
 	//替换m_pDfa
 	delete m_pDfa;
