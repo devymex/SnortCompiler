@@ -1024,7 +1024,7 @@ void CalcAbleTo(std::vector<STATEID> *pRevTbl, size_t nGrpNum, size_t nStaNum, P
 	BYTE *pBuf = (BYTE*)VirtualAlloc(NULL, nStaNum * nGrpNum, MEM_COMMIT, PAGE_READWRITE);
 	if (pBuf == NULL)
 	{
-		std::cout << "pBuf == NULL " << GetLastError() << std::endl;
+		std::cout << "pBuf == NULL " << GetLastError() << "\t" << nStaNum << "\t"<< nGrpNum << std::endl;
 		system("pause");
 	}
 	ps.AbleTo.resize(nGrpNum);
