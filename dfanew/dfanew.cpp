@@ -1018,6 +1018,11 @@ void CalcAbleTo(std::vector<STATEID> *pRevTbl, size_t nGrpNum, size_t nStaNum, P
 	ReleaseAbleTo(ps);
 
 	BYTE *pBuf = (BYTE*)VirtualAlloc(NULL, nStaNum * nGrpNum, MEM_COMMIT, PAGE_READWRITE);
+	if (pBuf == NULL)
+	{
+		std::cout << "pBuf == NULL: " << nStaNum << "*" << nGrpNum << std::endl;
+		system("pause");
+	}
 	ps.AbleTo.resize(nGrpNum, 0);
 	ps.Ones.resize(nGrpNum, 0);
 	//计算AbleTo的值，每产生一个新的或者更新PARTSET对象计算一次
