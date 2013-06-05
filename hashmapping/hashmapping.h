@@ -40,4 +40,4 @@ struct COMP
 
 HASHMAPPINGSC size_t hash(const SIGNATURE &oneSig);
 
-HASHMAPPINGSC void HashMapping(CGROUPRes &groupRes, HASHRES &HashResMap);
+HASHMAPPINGSC void HashMapping(const CGROUPRes &groupRes, HASHRES &HashResMap);

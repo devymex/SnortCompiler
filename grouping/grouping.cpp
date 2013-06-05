@@ -322,7 +322,7 @@ GROUPINGSC size_t CGROUPRes::ReadFromFile(LPCTSTR filename)
 	return 0;
 }
 
-void ExtractDfaInfo(CResNew &res, std::vector<DFAINFO> &vecDfaInfo, std::vector<size_t> &vecWaitForGroup)
+void ExtractDfaInfo(const CResNew &res, std::vector<DFAINFO> &vecDfaInfo, std::vector<size_t> &vecWaitForGroup)
 {
 	std::size_t nSize = res.GetRegexTbl().Size();
 	vecDfaInfo.resize(nSize);
@@ -336,7 +336,7 @@ void ExtractDfaInfo(CResNew &res, std::vector<DFAINFO> &vecDfaInfo, std::vector<
 	}
 }
 
-void GroupOnlyOneSig(std::vector<DFAINFO> &vecDfaInfo, std::vector<size_t> &vecWaitForGroup, CGROUPS &groups)
+void GroupOnlyOneSig(const std::vector<DFAINFO> &vecDfaInfo, std::vector<size_t> &vecWaitForGroup, CGROUPS &groups)
 {
 	std::map<SIGNATURE, CVectorNumber> sigToIdsMap;
 	for (std::vector<size_t>::iterator i = vecWaitForGroup.begin(); i != vecWaitForGroup.end();)
@@ -418,7 +418,7 @@ void Merge(CResNew &res, CGROUPS &groups)
 	}
 }
 
-void PutInBySig(CResNew &res, CGROUPS &groups, std::vector<size_t> &vecWaitForGroup, std::vector<DFAINFO> &vecDfaInfo)
+void PutInBySig(const std::vector<DFAINFO> &vecDfaInfo, CResNew &res, CGROUPS &groups, std::vector<size_t> &vecWaitForGroup)
 {
 	std::map<SIGNATURE, std::vector<size_t>> sigToGroupsMap;
 	size_t idx = 0;
@@ -504,7 +504,7 @@ void PutInBySig(CResNew &res, CGROUPS &groups, std::vector<size_t> &vecWaitForGr
 	//}
 }
 
-void BuildGroupBySig(CGROUPS &newGroups, std::vector<size_t> &vecWaitForGroup, std::vector<DFAINFO> &vecDfaInfo)
+void BuildGroupBySig(const std::vector<DFAINFO> &vecDfaInfo, CGROUPS &newGroups, std::vector<size_t> &vecWaitForGroup)
 {
 	std::map<std::vector<SIGNATURE>, CVectorNumber> sigsToIdsMap;
 	for (size_t i = 0; i < vecWaitForGroup.size(); ++i)
@@ -536,7 +536,7 @@ void ExtractUsedSigs(const CGROUPS &groups, std::vector<SIGNATURE> &vecUsed)
 	vecUsed.erase(std::unique(vecUsed.begin(), vecUsed.end()), vecUsed.end());
 }
 
-void ExtractComSigs(const GROUP &g1, const GROUP &g2, std::vector<SIGNATURE> &vecUsed, std::vector<SIGNATURE> &vecComSigs)
+void ExtractComSigs(const GROUP &g1, const GROUP &g2, const std::vector<SIGNATURE> &vecUsed, std::vector<SIGNATURE> &vecComSigs)
 {
 	std::map<SIGNATURE, size_t> sigToNumMap;
 	for (size_t i = 0; i < g1.ComSigs.Size(); ++i)
@@ -705,7 +705,7 @@ void AddNewGroups(CGROUPS &newGroups, CGROUPS &groups)
 	newGroups.Clear();
 }
 
-void ClearUpRes(CResNew &res, CGROUPS &groups, CGROUPRes &groupRes)
+void ClearUpRes(CResNew &res, const CGROUPS &groups, CGROUPRes &groupRes)
 {
 	groupRes.GetSidDfaIds() = res.GetSidDfaIds();
 	std::vector<size_t> occurred(res.GetDfaTable().Size(), 0);
@@ -799,13 +799,13 @@ GROUPINGSC void grouping(CResNew &res, CGROUPRes &groupRes)
 
 	//Put dfa in group which have the same signature...
 	std::cout << "Put dfa in group which have the same signature..." << std::endl;
-	PutInBySig(res, groups, vecWaitForGroup, vecDfaInfo);
+	PutInBySig(vecDfaInfo, res, groups, vecWaitForGroup);
 	std::cout << "Completed in " << t1.Reset() << " Sec." << std::endl << std::endl;
 
 	//Build group which has the same signature...
 	std::cout << "Build group which has the same signature..." << std::endl;
 	CGROUPS newGroups;
-	BuildGroupBySig(newGroups, vecWaitForGroup, vecDfaInfo);
+	BuildGroupBySig(vecDfaInfo, newGroups, vecWaitForGroup);
 	Merge(res, newGroups);
 	std::cout << "Completed in " << t1.Reset() << " Sec." << std::endl << std::endl;
 

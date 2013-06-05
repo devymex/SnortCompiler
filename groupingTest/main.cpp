@@ -25,9 +25,9 @@ int main()
 	//}
 
 	CResNew result;
-	//compilenew(_T("..\\..\\input\\allrules.rule"), result);
-	//result.WriteToFile(_T("..\\..\\output\\result.cdt"));
-	result.ReadFromFile(_T("..\\..\\output\\result.cdt"));
+	compilenew(_T("..\\..\\input\\allrules.rule"), result);
+	result.WriteToFile(_T("..\\..\\output\\result.cdt"));
+	//result.ReadFromFile(_T("..\\..\\output\\result.cdt"));
 
 	//for (size_t i = 0; i < result.GetSidDfaIds().Size(); ++i)
 	//{
