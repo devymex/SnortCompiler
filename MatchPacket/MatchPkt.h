@@ -165,5 +165,7 @@ MATCHPKT bool LoadCapFile(const char* pFile, void* pUser);
 void CALLBACK MyProcess(const CSnortRule &rule, LPVOID lpParam);
 MATCHPKT void MchCompile(LPCTSTR filename, LPVOID result);
 MATCHPKT bool TradithinalMatch(std::vector<u_char> &dataSrc, CRegRule &regRule);//µ÷ÓÃpcreMATCHPKT 
-MATCHPKT void HandleAllFile(const std::string &path, REGRULESMAP &rulesmap);
 
+void GetMchRule(u_char *data, size_t len, REGRULESMAP &rulesmap, std::vector<size_t> &rules);
+void HdlOnePkt(const u_char *data, size_t len, void*user);
+MATCHPKT void HandleAllFile(const std::string &path, void* user);
