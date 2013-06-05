@@ -166,7 +166,6 @@ MERDFANEW bool NOrMerge(std::vector<CDfaNew> &dfas, CDfaNew &lastDfa)
 	size_t dfaId = lastDfa.GetId();
 	lastDfa.Clear();
 	lastDfa.SetId(dfaId);
-	//CTimer mergtime;//”√”⁄≤‚ ‘
 #undef max
 
 	size_t dfasSize = dfas.size();
@@ -254,10 +253,6 @@ MERDFANEW bool NOrMerge(std::vector<CDfaNew> &dfas, CDfaNew &lastDfa)
 		{
 			finFlag = 0;
 			ZeroMemory(NextVec.data(), NextVec.size() * sizeof(size_t));
-			//NextVec.clear();
-			//NextVec.resize(dfasSize + 2);
-
-			//BYTE lastDfaGroup = lastDfa.Char2Group(curChar);
 			BYTE lastDfaGroup = groups[curChar];
 			if(computFlag[lastDfaGroup] == 1)
 			{
@@ -358,7 +353,7 @@ MERDFANEW bool NOrMerge(std::vector<CDfaNew> &dfas, CDfaNew &lastDfa)
 	//fdisplay(dfas[0], "..//..//output//dfa1.txt");
 	//fdisplay(dfas[1], "..//..//output//dfa2.txt");
 	//fdisplay(lastDfa, "..//dfa12.txt");
-	//lastDfa.Minimize();
+	lastDfa.Minimize();
 	//lastDfa.printTerms();
 	//fdisplay(lastDfa, "..//dfa12min.txt");
 	//std::cout << "after min" << std::endl;

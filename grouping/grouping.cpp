@@ -909,9 +909,9 @@ GROUPINGSC void grouping(CResNew &res, CGROUPRes &groupRes)
 	ClearUpRes(res, groups, groupRes);
 
 
-	outPutGroups(groupRes, "F:\\cppProject\\huawei\\PreciseMatch\\testMerg\\groupRes_4.txt");
-	outPutResult(groupRes, "F:\\cppProject\\huawei\\PreciseMatch\\testMerg\\result_4.txt");
-	outPutTermSet(groupRes, "F:\\cppProject\\huawei\\PreciseMatch\\testMerg\\termset_4.txt");
+	//outPutGroups(groupRes, "F:\\cppProject\\huawei\\PreciseMatch\\testMerg\\groupRes_4.txt");
+	//outPutResult(groupRes, "F:\\cppProject\\huawei\\PreciseMatch\\testMerg\\result_4.txt");
+	//outPutTermSet(groupRes, "F:\\cppProject\\huawei\\PreciseMatch\\testMerg\\termset_4.txt");
 	std::cout << "Completed in " << t1.Reset() << " Sec." << std::endl << std::endl;
 
 	std::cout << groupRes.GetGroups().Size() << std::endl;
