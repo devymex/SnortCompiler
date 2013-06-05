@@ -34,7 +34,7 @@ DFANEWSC void NAvaiEdges(const CNfa &nfa, BYTE *group)
 	const size_t _FNV_offset_basis = 2166136261U;
 	const size_t _FNV_prime = 16777619U;
 
-	static COLUMNKEY columns[CHARSETSIZE];
+	static COLUMNKEY columns[CHARSETSIZE]; //
 	size_t zeroCnts[CHARSETSIZE] = {0};
 
 	size_t nSize = nfa.Size();
@@ -85,7 +85,7 @@ DFANEWSC void NAvaiEdges(const CNfa &nfa, BYTE *group)
 		memset(curCol.data() + nCurSize, 0, zeroCnts[i] * sizeof(size_t));
 	}
 
-	static COLUMNHASHMAP colHash;
+	static COLUMNHASHMAP colHash; //
 	colHash.clear();
 	for(size_t i = 0; i < DFACOLSIZE; ++i)
 	{
