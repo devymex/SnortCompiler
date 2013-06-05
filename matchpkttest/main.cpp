@@ -9,6 +9,6 @@ void main()
 	REGRULESMAP rulesmap;
 	rulesmap.mchresult.open("E:\\test\\matchresult.txt");
 	MchCompile(_T("../../input/allrules.rule"), &rulesmap);
-	HandleAllFile("E:\\test", &rulesmap);
+	HandleAllFile("E:\\allPkt", &rulesmap);
 	rulesmap.mchresult.close();
 }

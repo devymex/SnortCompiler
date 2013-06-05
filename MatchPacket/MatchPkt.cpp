@@ -3,12 +3,13 @@
 
 static size_t edata = 0;
 
-void GetMchRule(std::vector<u_char> &pkt, REGRULESMAP &rulesmap, std::vector<size_t> &rules)
+void GetMchRule(const u_char *data, size_t len, void* user, std::vector<size_t> &rules)
 {
+	REGRULESMAP &rulesmap = *(REGRULESMAP *)user;
 	SIGSMAP sigmap = rulesmap.sigmap;
 	SIGNATURE sig;
 	u_char csig[4];
-	for(std::vector<u_char>::iterator iter = pkt.begin(); iter + 3 != pkt.end(); ++iter)
+	for(const u_char* iter = data; iter != &data[len - 4]; ++iter)
 	{
 		for(size_t i = 0; i < 4; ++i)
 		{
@@ -20,6 +21,13 @@ void GetMchRule(std::vector<u_char> &pkt, REGRULESMAP &rulesmap, std::vector<siz
 			rules.insert(rules.end(), sigmap[sig].begin(), sigmap[sig].end());
 		}
 	}
+}
+
+void HdlOnePkt(const u_char *data, size_t len, void*user)
+{
+	REGRULESMAP &rulesmap = *(REGRULESMAP *)user;
+	std::vector<size_t> rules;
+	GetMchRule(data, len, user, rules);
 }
 
 MATCHPKT void HandleAllFile(const std::string &path, void* user)
@@ -57,31 +65,6 @@ MATCHPKT void HandleAllFile(const std::string &path, void* user)
 	}
 }
 
-void GetMchRule(const u_char *data, size_t len, void* user, std::vector<size_t> &rules)
-{
-	REGRULESMAP &rulesmap = *(REGRULESMAP *)user;
-	SIGSMAP sigmap = rulesmap.sigmap;
-	SIGNATURE sig;
-	u_char csig[4];
-	for(const u_char* iter = data; iter != &data[len - 4]; ++iter)
-	{
-		for(size_t i = 0; i < 4; ++i)
-		{
-			csig[i] = tolower(*(iter + i));
-		}
-		sig = *(SIGNATURE *)csig;
-		if(sigmap.count(sig))
-		{
-			rules.insert(rules.end(), sigmap[sig].begin(), sigmap[sig].end());
-		}
-	}
-}
-
-void HdlOnePkt(const u_char *data, size_t len, void*user)
-{
-	std::vector<size_t> rules;
-	GetMchRule(data, len, user, rules);
-}
 void packet_handler(u_char *param, const struct pcap_pkthdr *header, const u_char *pkt_data)
 {
 	ip_header *ih;
