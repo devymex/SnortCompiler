@@ -26,11 +26,55 @@ void GetMchRule(const u_char *data, size_t len, void* user, std::vector<size_t> 
 	}
 }
 
+//调用pcre库进行数据包匹配
+bool TradithinalMatch(const u_char *data, size_t len, CRegRule &regRule)
+{
+	for(size_t i = 0; i < regRule.Size(); ++i)
+	{
+		//从数据包头开始匹配
+		const u_char *pData = data;
+		size_t dataSize = len;
+		for(size_t j = 0; j < regRule[i].Size(); ++j)
+		{
+			//对规则选项进行匹配
+			int Pos = -1;
+			bool flag = match((const char*)pData, dataSize, regRule[i][j].GetString(), Pos);
+			if(!flag)
+			{
+				return false;
+			}
+			else if(Pos < dataSize)
+			{
+				pData += Pos;
+				dataSize -= Pos;
+			}
+			else
+			{
+				pData = NULL;
+				dataSize = 0;
+			}
+		}
+	}
+	return true;
+}
+
 void HdlOnePkt(const u_char *data, size_t len, void*user)
 {
+	//const u_char p[] = {0, 0, 'f', 'g', 0, 'a', 'b', 'C', 'd', 0, 'd', 'e', 235, 0, 42, 'A', 123, 'B', 40, '1', '2', 93, 63, 'a', 'b', 'c', 'd', 'e', 'a'};
+	//data = p;
+	//len = sizeof(p);
 	REGRULESMAP &rulesmap = *(REGRULESMAP *)user;
 	std::vector<size_t> rules;
 	GetMchRule(data, len, user, rules);
+	std::vector<size_t> matchSid;
+	for(size_t i = 0; i < rules.size(); ++i)
+	{
+		bool flag = TradithinalMatch(data, len, rulesmap.result[rules[i]].regrule);
+		if(flag)
+		{
+			matchSid.push_back(rulesmap.result[rules[i]].m_nSid);
+		}
+	}
 }
 
 MATCHPKT void HandleAllFile(const std::string &path, void* user)

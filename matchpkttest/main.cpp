@@ -7,8 +7,8 @@
 void main()
 {
 	REGRULESMAP rulesmap;
-	rulesmap.mchresult.open("E:\\test\\matchresult.txt");
-	MchCompile(_T("../../input/allrules.rule"), &rulesmap);
-	HandleAllFile("E:\\allPkt", &rulesmap);
+	rulesmap.mchresult.open(_T("../../output/matchresult.txt"));
+	MchCompile(_T("../../input/test.rules"), &rulesmap);
+	HandleAllFile("F:\\cppProject\\huawei\\PreciseMatch\\input", &rulesmap);
 	rulesmap.mchresult.close();
 }
