@@ -1,3 +1,5 @@
 LIBRARY MatchPacket
 EXPORTS
 LoadCapFile @1
+MchCompile @2
+HandleAllFile @3
