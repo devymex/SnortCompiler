@@ -55,7 +55,7 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ModuleDefinitionFile>MatchPkt.def</ModuleDefinitionFile>
-      <AdditionalDependencies>$(SolutionDir)$(Configuration)\common.lib;$(SolutionDir)$(Configuration)\dfanew.lib;$(SolutionDir)$(Configuration)\rule2nfa.lib;$(SolutionDir)$(Configuration)\compilernew.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(SolutionDir)$(Configuration)\common.lib;$(SolutionDir)$(Configuration)\dfanew.lib;$(SolutionDir)$(Configuration)\rule2nfa.lib;$(SolutionDir)$(Configuration)\compilernew.lib;$(SolutionDir)$(Configuration)\grouping.lib;$(SolutionDir)$(Configuration)\hashmapping.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -72,7 +72,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <ModuleDefinitionFile>MatchPkt.def</ModuleDefinitionFile>
-      <AdditionalDependencies>$(SolutionDir)$(Configuration)\common.lib;$(SolutionDir)$(Configuration)\dfanew.lib;$(SolutionDir)$(Configuration)\rule2nfa.lib;$(SolutionDir)$(Configuration)\compilernew.lib;$(SolutionDir)$(Configuration)\pcre2nfa.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(SolutionDir)$(Configuration)\common.lib;$(SolutionDir)$(Configuration)\dfanew.lib;$(SolutionDir)$(Configuration)\rule2nfa.lib;$(SolutionDir)$(Configuration)\compilernew.lib;$(SolutionDir)$(Configuration)\grouping.lib;$(SolutionDir)$(Configuration)\hashmapping.lib;$(SolutionDir)$(Configuration)\pcre2nfa.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Bscmake>
       <PreserveSbr>true</PreserveSbr>
@@ -88,6 +88,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="DfaMatch.h" />
     <ClInclude Include="MatchPkt.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>

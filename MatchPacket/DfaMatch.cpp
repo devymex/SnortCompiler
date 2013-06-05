@@ -1,24 +1,7 @@
 ﻿#include "stdafx.h"
-#include "MatchPkt.h"
+#include "DfaMatch.h"
+//#include "../grouping/grouping.h"
 
-void FindSig(size_t sig, std::map<size_t, std::vector<SIGSID>> &hashtable, std::vector<size_t> &matchSids)
-{
-	if (hashtable.count(sig))
-	{
-		std::vector<SIGSID> &onevec = hashtable[sig];
-		if (!onevec.empty())
-		{
-			for(std::vector<SIGSID>::iterator iter = onevec.begin(); iter != onevec.end(); ++iter)
-			{
-				if (sig == iter->sig)
-				{
-					matchSids.resize(matchSids.size() + 1);
-					matchSids.back() = iter->sig;
-				}
-			}
-		}
-	}
-}
 
 //���� 0 ��ʾû��ƥ���ϣ����� 1 ��ʾƥ����
 size_t MatchOnedfa(std::vector<u_char> &onepkt, CDfaNew &dfa, std::vector<size_t> &matchedDids)
@@ -61,33 +44,100 @@ size_t MatchOnedfa(std::vector<u_char> &onepkt, CDfaNew &dfa, std::vector<size_t
 	}
 }
 
-MATCHPKT void DfaMatchPkt(std::vector<std::vector<u_char>> &allPkt, std::map<size_t, std::vector<SIGSID>> &hashtable, std::vector<CDfaNew> &alldfas, std::vector<MATCHRESULT> &matchresult)
+void MchDfaHdler(u_char *param, const struct pcap_pkthdr *header, const u_char *pkt_data)
 {
-	for (std::vector<std::vector<u_char>>::iterator allPktIter = allPkt.begin(); allPktIter != allPkt.end(); ++allPktIter)
+	ip_header *ih;
+	ih = (ip_header *)(pkt_data + ETHDRLEN);
+	pkt_data = pkt_data + ETHDRLEN;
+	PACKETPARAM *pParam = (PACKETPARAM*)param;
+	pParam->pFunc(ih, pkt_data, pParam->pUser);
+}
+
+void CALLBACK DPktPara(const ip_header *ih, const BYTE *data, void* user)
+{
+	DFAMCH &dfamch = *(DFAMCH *)user;
+	u_short  _ihl = (ih->ver_ihl & 0x0f) * 4;
+	
+	u_short _tlen = ih->tlen;
+	std::swap(((BYTE*)&_tlen)[0], ((BYTE*)&_tlen)[1]);
+
+	u_char  _proto = ih->proto;
+
+	tcp_header *ptcp = (tcp_header *)data;
+	udp_header *pudp = (udp_header *)data;
+
+	switch (_proto)
 	{
-		SIGNATURE onesig = -1;
-		std::vector<size_t> matchDids;
-		std::vector<size_t> matchedSids;
-
-		for (std::vector<u_char>::iterator pktIter = allPktIter->begin(); pktIter + 3 != allPktIter->end(); ++pktIter)
+	case _TCP:
 		{
-			onesig = *(SIGNATURE *)&(*pktIter);
-			FindSig(HashFcn(onesig), hashtable, matchDids);
-		}
+			ptcp = (tcp_header*)((BYTE*) ptcp + _ihl);
+			u_short tcpHdrLen = ((ptcp->lenres & 0xf0) >> 4) * 4;
+			data += _ihl + tcpHdrLen;
 
-		if (!matchDids.empty())
-		{
-			for(std::vector<size_t>::iterator idIter = matchDids.begin(); idIter != matchDids.end(); ++idIter)
+			if(*data == 227)
 			{
-				MatchOnedfa(*allPktIter, alldfas[*idIter], matchedSids);
+				std::cout <<std::endl;
 			}
+			size_t tcpdatalen = _tlen - _ihl - tcpHdrLen;
+			if(tcpdatalen > 0)
+			{
+				DfaMatchPkt(data, tcpdatalen, dfamch);
+			}
+
+			break;
 		}
 
-		if(!matchedSids.empty())
+	case _UDP:
 		{
-			matchresult.resize(matchresult.size() + 1);
-			matchresult.back().pktnum = allPktIter - allPkt.begin();
-			matchresult.back().matchedSids = matchedSids;
+			pudp = (udp_header*)((BYTE*) pudp + _ihl);
+			data += _ihl + UDPHDRLEN;
+
+			if(*data == 227)
+			{
+				std::cout <<std::endl;
+			}
+			size_t udpdatalen = _tlen - _ihl - UDPHDRLEN;
+			if(udpdatalen > 0)
+			{
+				DfaMatchPkt(data, udpdatalen, dfamch);
+			}
+
+			break;
 		}
 	}
+}
+
+void GetMchDfas(const u_char *data, size_t len, HASHRES &hashtable, std::vector<size_t> &matchdfas)
+{
+	if (len > 3)
+	{
+		SIGNATURE sig;
+		u_char csig[4];
+		for (const u_char* iter = data; iter != &data[len - 4]; ++iter)
+		{
+			for (size_t i = 0; i < 4; ++i)
+			{
+				csig[i] = tolower(*(iter + i));
+			}
+			sig = *(SIGNATURE *)csig;
+
+			size_t hashsig = hash(sig);
+			if (hashtable.count(hashsig))
+			{
+				for (std::vector<HASHNODE>::iterator iter = hashtable[hashsig].begin(); iter != hashtable[hashsig].end(); ++iter)
+				{
+					if (sig == iter->m_sig)
+					{
+						matchdfas.push_back(iter->m_nDfaId);
+					}
+				}
+			}
+		}
+	}
+}
+
+MATCHPKT void DfaMatchPkt(const u_char *data, size_t len, DFAMCH dfamch)
+{
+	std::vector<size_t> matchdfas;
+	GetMchDfas(data, len, dfamch.hashtable, matchdfas);
 }

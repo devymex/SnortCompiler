@@ -6,11 +6,11 @@
 #include <Windows.h>
 #include <pcap.h>
 
-
 #include <iostream>
 #include <vector>
 #include <unordered_map>
 #include <fstream>
+
 #include "../dfanew/dfanew.h"
 #include "../common/common.h"
 #include "../rule2nfa/rule2nfa.h"
