@@ -1,8 +1,9 @@
 #include "../MatchPacket/MatchPkt.h"
+#include <fstream>
 
 
 void main()
 {
-	std::vector<std::vector<u_char>> allPkt;
-	LoadCapFile("c://test//firpack.cap", &allPkt);
+	std::ofstream matchresult("E:\\test\\matchresult.txt");
+	LoadCapFile("c://test//firpack.cap", &matchresult);
 }

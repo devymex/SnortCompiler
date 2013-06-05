@@ -2,6 +2,10 @@
 #include "MatchPkt.h"
 
 static size_t edata = 0;
+
+void HdlOnePkt(const u_char *data, size_t len)
+{
+}
 void packet_handler(u_char *param, const struct pcap_pkthdr *header, const u_char *pkt_data)
 {
 	ip_header *ih;
@@ -13,7 +17,7 @@ void packet_handler(u_char *param, const struct pcap_pkthdr *header, const u_cha
 
 void CALLBACK PktParam(const ip_header *ih, const BYTE *data, void* user)
 {
-	std::vector<std::vector<u_char>> &allPkt = *(std::vector<std::vector<u_char>> *)user;
+	std::ofstream &matchresult = *(std::ofstream *)user;
 	u_short  _ihl = (ih->ver_ihl & 0x0f) * 4;
 	
 	u_short _tlen = ih->tlen;
@@ -35,8 +39,7 @@ void CALLBACK PktParam(const ip_header *ih, const BYTE *data, void* user)
 			size_t tcpdatalen = _tlen - _ihl - tcpHdrLen;
 			if(tcpdatalen > 0)
 			{
-				allPkt.resize(allPkt.size() + 1);
-				allPkt.back().insert(allPkt.back().begin(), data, data + tcpdatalen);
+				HdlOnePkt(data, tcpdatalen);
 			}
 			else
 			{
@@ -53,8 +56,7 @@ void CALLBACK PktParam(const ip_header *ih, const BYTE *data, void* user)
 			size_t udpdatalen = _tlen - _ihl - UDPHDRLEN;
 			if(udpdatalen > 0)
 			{
-				allPkt.resize(allPkt.size() + 1);
-				allPkt.back().insert(allPkt.back().begin(), data, data + udpdatalen);
+				HdlOnePkt(data, udpdatalen);
 			}
 			else
 			{

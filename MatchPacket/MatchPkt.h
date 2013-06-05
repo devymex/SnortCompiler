@@ -9,8 +9,12 @@
 
 #include <iostream>
 #include <vector>
-#include "../common/common.h"
+#include <unordered_map>
 #include "../dfanew/dfanew.h"
+#include "../common/common.h"
+#include "../rule2nfa/rule2nfa.h"
+#include "../compilernew/compilernew.h"
+#include "../pcre2nfa/match.h"
 
 #pragma comment(lib, "Ws2_32.lib")
 #pragma comment(lib, "Packet.lib")
