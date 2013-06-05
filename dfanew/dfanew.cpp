@@ -631,61 +631,61 @@ DFANEWSC size_t CDfaNew::Minimize()
 	{
 		return size_t(-1);
 	}
+#ifdef DFA_REMOVE_UNREACHABLE
+	size_t nMatHeight = nSize + 1;
+	size_t nMatWidth = nMatHeight;
 
-	//size_t nMatHeight = nSize + 1;
-	//size_t nMatWidth = nMatHeight;
+	if (nMatWidth % 16 != 0)
+	{
+		nMatWidth = (nMatWidth / 16) * 16 + 16;
+	}
+	BYTE *pMat = NULL;
+	std::vector<STATEID> reachable;
 
-	//if (nMatWidth % 16 != 0)
-	//{
-	//	nMatWidth = (nMatWidth / 16) * 16 + 16;
-	//}
-	//BYTE *pMat = NULL;
-	//std::vector<STATEID> reachable;
+	pMat = (BYTE*)_aligned_malloc(nMatWidth * nMatHeight, 128);
+	memset(pMat, 0, nMatWidth * nMatHeight);
 
-	//pMat = (BYTE*)_aligned_malloc(nMatWidth * nMatHeight, 128);
-	//memset(pMat, 0, nMatWidth * nMatHeight);
+	for (size_t i = 0; i < nSize; ++i)
+	{
+		for (size_t j = 0; j < nCols; ++j)
+		{
+			STATEID nextSta = (STATEID)(*m_pDfa)[i][j];
+			if (nextSta != STATEID(-1))
+			{
+				pMat[i * nMatWidth + nextSta] = 1;
+			}
+		}
+	}
+	for (STATEID i = 0; i < nSize; ++i)
+	{
+		if ((*m_pDfa)[i].GetFlag() & CDfaRow::TERMINAL)
+		{
+			pMat[i * nMatWidth + nSize] = 1;
+		}
+	}
+	Warshall(pMat, nMatWidth, nMatHeight);
 
-	//for (size_t i = 0; i < nSize; ++i)
-	//{
-	//	for (size_t j = 0; j < nCols; ++j)
-	//	{
-	//		STATEID nextSta = (STATEID)(*m_pDfa)[i][j];
-	//		if (nextSta != STATEID(-1))
-	//		{
-	//			pMat[i * nMatWidth + nextSta] = 1;
-	//		}
-	//	}
-	//}
-	//for (STATEID i = 0; i < nSize; ++i)
-	//{
-	//	if ((*m_pDfa)[i].GetFlag() & CDfaRow::TERMINAL)
-	//	{
-	//		pMat[i * nMatWidth + nSize] = 1;
-	//	}
-	//}
-	//Warshall(pMat, nMatWidth, nMatHeight);
+	size_t nStartRow = m_StartId * nMatWidth;
+	pMat[nStartRow + m_StartId] = 1;
+	for (size_t i = 0; i < nSize; ++i)
+	{
+		if (pMat[nStartRow + i] && pMat[i * nMatWidth + nSize])
+		{
+			reachable.push_back(i);
+		}
+	}
+	_aligned_free(pMat);
 
-	//size_t nStartRow = m_StartId * nMatWidth;
-	//pMat[nStartRow + m_StartId] = 1;
-	//for (size_t i = 0; i < nSize; ++i)
-	//{
-	//	if (pMat[nStartRow + i] && pMat[i * nMatWidth + nSize])
-	//	{
-	//		reachable.push_back(i);
-	//	}
-	//}
-	//_aligned_free(pMat);
+	//std::cout << "准备工作： " << time1.Reset() << std::endl;//测试
 
-	////std::cout << "准备工作： " << time1.Reset() << std::endl;//测试
-
-	//if (reachable.size() < nSize)
-	//{
-	//	std::cout << "Has unreachables" << std::endl;
-	//	system("pause");
-	//	//remove unreachable states, generate new DFA
-	//	MergeReachable(reachable);
-	//}
-
+	if (reachable.size() < nSize)
+	{
+		std::cout << "Has unreachables" << std::endl;
+		system("pause");
+		//remove unreachable states, generate new DFA
+		MergeReachable(reachable);
+	}
+#endif
 	////计算逆向状态查找表
 	nSize = m_pDfa->size();
 	std::vector<STATEID> *pRevTab = NULL;
@@ -711,6 +711,7 @@ DFANEWSC size_t CDfaNew::Minimize()
 		{
 			//DFA minization
 			MergeNonDisStates(partSet);
+			std::cout << "Minimized: " << nSize - partSet.size() << std::endl;
 		}
 	}
 
@@ -959,7 +960,6 @@ void CDfaNew::MergeReachable(std::vector<STATEID> &reachable)
 	std::vector<CDfaRow> &tmpDfa = *pNewDfa;
 
 	size_t nMemSize = nDfaSize * sizeof(STATEID);
-	//STATEID *pOldToNew = (STATEID*)VirtualAlloc(NULL, nMemSize, MEM_COMMIT, PAGE_READWRITE);
 	STATEID *pOldToNew = new STATEID[nMemSize];
 	memset(pOldToNew, 0xFF, nMemSize);
 
@@ -995,7 +995,6 @@ void CDfaNew::MergeReachable(std::vector<STATEID> &reachable)
 		}
 	}
 	delete []pOldToNew;
-	//VirtualFree(pOldToNew, 0, MEM_RELEASE);
 
 	//替换m_pDfa
 	delete m_pDfa;
@@ -1006,7 +1005,7 @@ void ReleaseAbleTo(PARTSET &ps)
 {
 	if (!ps.AbleTo.empty())
 	{
-		VirtualFree(ps.AbleTo.front(), 0, MEM_RELEASE);
+		delete []ps.AbleTo.front();
 	}
 	ps.AbleTo.clear();
 	ps.Ones.clear();
@@ -1017,7 +1016,8 @@ void CalcAbleTo(std::vector<STATEID> *pRevTbl, size_t nGrpNum, size_t nStaNum, P
 	//清空AbleTo
 	ReleaseAbleTo(ps);
 
-	BYTE *pBuf = (BYTE*)VirtualAlloc(NULL, nStaNum * nGrpNum, MEM_COMMIT, PAGE_READWRITE);
+	BYTE *pBuf = new BYTE[nStaNum * nGrpNum];
+	ZeroMemory(pBuf, nStaNum * nGrpNum);
 	ps.AbleTo.resize(nGrpNum, 0);
 	ps.Ones.resize(nGrpNum, 0);
 	//计算AbleTo的值，每产生一个新的或者更新PARTSET对象计算一次
@@ -1129,7 +1129,6 @@ size_t CDfaNew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, std::vector<
 	}
 
 	//标记能够经过某一输入字符，能够到达ISet中的状态的状态集合
-	//BYTE *pAbleToI = (BYTE*)VirtualAlloc(NULL, nStaNum, MEM_COMMIT, PAGE_READWRITE);
 	BYTE *pAbleToI = new BYTE[nStaNum];
 	partSet.reserve(1000);
 	size_t nr = 0;
@@ -1250,7 +1249,6 @@ size_t CDfaNew::PartitionNonDisState(std::vector<STATEID> *pRevTbl, std::vector<
 			}
 		}
 	}
-	//VirtualFree(pAbleToI, 0, MEM_RELEASE);
 	delete []pAbleToI;
 
 	for (std::vector<PARTSET>::iterator i = partSet.begin(); i != partSet.end(); ++i)
