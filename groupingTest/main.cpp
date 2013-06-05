@@ -24,9 +24,9 @@ int main()
 	//	}
 	//}
 	CResNew result;
-	compilenew(_T("..\\allrules.rule"), result);
-	//result.WriteToFile(_T("..\\result.cdt"));
-	//result.ReadFromFile(_T("..\\result.cdt"));
+	//compilenew(_T("../../input/allrules.rule"), result);
+	//result.WriteToFile(_T("../../input/result.cdt"));
+	result.ReadFromFile(_T("../../output/result.cdt"));
 	//for (size_t i = 0; i < result.GetSidDfaIds().Size(); ++i)
 	//{
 	//	if (result.GetSidDfaIds()[i].m_dfaIds.Size() > 0 && result.GetSidDfaIds()[i].m_dfaIds[0] == 1244)
@@ -41,7 +41,7 @@ int main()
 	grouping(result, groupRes);
 	std::cout << "分组时间： " << ctime.Reset() << std::endl;
 
-	//groupRes.WriteToFile(_T("..\\..\\output\\GroupResut.cdt"));
+	groupRes.WriteToFile(_T("..\\..\\output\\GroupResut.cdt"));
 
 	//groupRes.ReadFromFile(_T("..\\..\\output\\GroupResut.cdt"));
 	//groupRes.WriteToFile(_T("..\\..\\output\\GroupResut1.cdt"));
