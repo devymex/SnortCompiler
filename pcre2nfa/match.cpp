@@ -60,7 +60,7 @@ MATCHSC bool match(const char* src, int length, std::string Regex, int &Pos)
 		return false;
 	}
 
-	printf("\nOK, has matched ...\n\n");
+	//printf("\nOK, has matched ...\n\n");
 
 	for (i = 0; i < rc; i++)
 	{
