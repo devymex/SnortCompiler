@@ -168,4 +168,5 @@ MATCHPKT bool TradithinalMatch(std::vector<u_char> &dataSrc, CRegRule &regRule);
 
 void GetMchRule(const u_char *data, size_t len, void* user, std::vector<size_t> &rules);
 void HdlOnePkt(const u_char *data, size_t len, void*user);
+bool TradithinalMatch(const u_char *data, size_t len, CRegRule &regRule);
 MATCHPKT void HandleAllFile(const std::string &path, void* user);
