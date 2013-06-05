@@ -2,7 +2,7 @@
 #include "hashmapping.h"
 #include "../grouping/grouping.h"
 
-size_t hash(const SIGNATURE &oneSig)
+HASHMAPPINGSC size_t hash(const SIGNATURE &oneSig)
 {
 	return oneSig % 16001;
 }
@@ -200,18 +200,6 @@ void Mapping(std::vector<GROUPHASH> vecGroups, const SIGNATUREMAP &gmap, const I
 
 	RecursiveAdjust(vecGroups, dmap, result);
 
-	//for (RESULTMAP::iterator i = result.begin(); i != result.end(); ++i)
-	//{
-	//	if (i->second.size() > 1)
-	//	{
-	//		for (std::vector<size_t>::iterator j = i->second.begin(); j != i->second.end(); ++j)
-	//		{
-	//			std::cout << vecGroups[*j].currSig << " ";
-	//		}
-	//		std::cout << std::endl;
-	//	}
-	//}
-
 	std::cout << vecGroups.size() << std::endl;
 	std::cout << (vecGroups.size() - result.size())/double(vecGroups.size()) << std::endl;
 	size_t count = 0;
@@ -222,9 +210,19 @@ void Mapping(std::vector<GROUPHASH> vecGroups, const SIGNATUREMAP &gmap, const I
 	std::cout << count << std::endl;
 }
 
-HASHMAPPINGSC void HashMapping()
+void ClearUpHashRes(const std::vector<GROUPHASH> &vecGroups, const RESULTMAP &result, HASHRES &HashResMap)
 {
-	CGROUPRes groupRes;
+	for (RESULTMAP::const_iterator i = result.begin(); i != result.end(); ++i)
+	{
+		for (std::vector<size_t>::const_iterator j = i->second.begin(); j != i->second.end(); ++j)
+		{
+			HashResMap[i->first].push_back(HASHNODE(vecGroups[*j].currSig, vecGroups[*j].mergeDfaId));
+		}
+	}
+}
+
+HASHMAPPINGSC void HashMapping(CGROUPRes &groupRes, HASHRES &HashResMap)
+{
 	groupRes.ReadFromFile(_T("..\\..\\output\\GroupResut.cdt"));
 
 	std::vector<GROUPHASH> vecGroups;
@@ -237,7 +235,7 @@ HASHMAPPINGSC void HashMapping()
 		}
 		vecGroups[i].mergeDfaId = groupRes.GetGroups()[i].mergeDfaId;
 	}
-	std::sort(vecGroups.begin(), vecGroups.end(), COMP());
+	//std::sort(vecGroups.begin(), vecGroups.end(), COMP());
 
 	SIGNATUREMAP gmap;
 	for (size_t i = 0; i < vecGroups.size(); ++i)
@@ -258,4 +256,6 @@ HASHMAPPINGSC void HashMapping()
 
 	RESULTMAP result;
 	Mapping(vecGroups, gmap, dmap, result);
+
+	ClearUpHashRes(vecGroups, result, HashResMap);
 }

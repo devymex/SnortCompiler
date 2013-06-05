@@ -349,7 +349,7 @@ MERDFANEW bool NOrMerge(std::vector<CDfaNew> &dfas, CDfaNew &lastDfa)
 	lastDfa.UniqueTermSet();
 
 	//对lastDfa进行进一步按列分组
-	lastDfa.Minimize();
+	//lastDfa.Minimize();
 	if(lastDfa.Size() > DFA_SIZE_LIMIT)
 	{
 		//std::cerr << "DFA_SIZE_LIMIT!" << std::endl;
