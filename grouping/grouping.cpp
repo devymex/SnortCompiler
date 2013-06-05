@@ -55,12 +55,12 @@ GROUPINGSC void CSIGNATURES::Clear()
 
 GROUPINGSC CGROUPS::CGROUPS()
 {
-	m_pGroups = new std::vector<GROUP>;
+	m_pGroups = new std::vector<ONEGROUP>;
 }
 
 GROUPINGSC CGROUPS::CGROUPS(const CGROUPS& other)
 {
-	m_pGroups = new std::vector<GROUP>;
+	m_pGroups = new std::vector<ONEGROUP>;
 	*this = other;
 }
 
@@ -85,22 +85,22 @@ GROUPINGSC void CGROUPS::Resize(size_t nSize)
 	m_pGroups->resize(nSize);
 }
 
-GROUPINGSC GROUP &CGROUPS::operator[](size_t nIdx)
+GROUPINGSC ONEGROUP &CGROUPS::operator[](size_t nIdx)
 {
 	return (*m_pGroups)[nIdx];
 }
 
-GROUPINGSC const GROUP &CGROUPS::operator[](size_t nIdx) const
+GROUPINGSC const ONEGROUP &CGROUPS::operator[](size_t nIdx) const
 {
 	return (*m_pGroups)[nIdx];
 }
 
-GROUPINGSC void CGROUPS::PushBack(GROUP oneGroup)
+GROUPINGSC void CGROUPS::PushBack(ONEGROUP oneGroup)
 {
 	m_pGroups->push_back(oneGroup);
 }
 
-GROUPINGSC GROUP& CGROUPS::Back()
+GROUPINGSC ONEGROUP& CGROUPS::Back()
 {
 	return m_pGroups->back();
 }
@@ -299,7 +299,7 @@ GROUPINGSC size_t CGROUPRes::ReadFromFile(LPCTSTR filename)
 	size_t nSigNum;
 	for (size_t i = 0; i < groupNum; ++i)
 	{
-		GROUP &oneGroup = m_groups[i];
+		ONEGROUP &oneGroup = m_groups[i];
 		fin.read((char*)&nDfaIdNum, 4);
 		oneGroup.DfaIds.Resize(nDfaIdNum);
 		for (size_t j = 0; j < nDfaIdNum; ++j)
@@ -390,7 +390,7 @@ void Merge(CResNew &res, CGROUPS &groups)
 					res.GetDfaTable().PushBack(vecDfas[0]);
 					groups[i].mergeDfaId = res.GetDfaTable().Size() - 1;
 				}
-				groups.PushBack(GROUP());
+				groups.PushBack(ONEGROUP());
 				for (size_t k = j; k < groups[i].DfaIds.Size(); ++k)
 				{
 					groups.Back().DfaIds.PushBack(groups[i].DfaIds[k]);
@@ -536,7 +536,7 @@ void ExtractUsedSigs(const CGROUPS &groups, std::vector<SIGNATURE> &vecUsed)
 	vecUsed.erase(std::unique(vecUsed.begin(), vecUsed.end()), vecUsed.end());
 }
 
-void ExtractComSigs(const GROUP &g1, const GROUP &g2, const std::vector<SIGNATURE> &vecUsed, std::vector<SIGNATURE> &vecComSigs)
+void ExtractComSigs(const ONEGROUP &g1, const ONEGROUP &g2, const std::vector<SIGNATURE> &vecUsed, std::vector<SIGNATURE> &vecComSigs)
 {
 	std::map<SIGNATURE, size_t> sigToNumMap;
 	for (size_t i = 0; i < g1.ComSigs.Size(); ++i)
