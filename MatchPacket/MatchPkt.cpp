@@ -112,7 +112,6 @@ MATCHPKT void HandleAllFile(const std::string &path, void* user)
 			if(ext1 == ".cap")
 			{
 				LoadCapFile(temp.c_str(), &rulesmap);
-				std::cout << temp << std::endl;
 			}
 		}
 	}
