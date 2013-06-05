@@ -172,7 +172,7 @@ void Optimize(std::vector<GROUPHASH> &vecGroups, const IDMAP &dmap, std::vector<
 	}
 }
 
-void Mapping(std::vector<GROUPHASH> vecGroups, const SIGNATUREMAP &gmap, const IDMAP &dmap, RESULTMAP &result)
+void Mapping(std::vector<GROUPHASH> &vecGroups, const SIGNATUREMAP &gmap, const IDMAP &dmap, RESULTMAP &result)
 {
 	std::vector<size_t> vecIds;
 	for (IDMAP::const_iterator i = dmap.begin(); i != dmap.end(); ++i)
@@ -221,10 +221,8 @@ void ClearUpHashRes(const std::vector<GROUPHASH> &vecGroups, const RESULTMAP &re
 	}
 }
 
-HASHMAPPINGSC void HashMapping(CGROUPRes &groupRes, HASHRES &HashResMap)
+HASHMAPPINGSC void HashMapping(const CGROUPRes &groupRes, HASHRES &HashResMap)
 {
-	groupRes.ReadFromFile(_T("..\\..\\output\\GroupResut.cdt"));
-
 	std::vector<GROUPHASH> vecGroups;
 	vecGroups.resize(groupRes.GetGroups().Size());
 	for (size_t i = 0; i < groupRes.GetGroups().Size(); ++i)

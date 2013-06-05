@@ -484,22 +484,6 @@ void Rule2Dfas(const CSnortRule &rule, CResNew &result, COMPILEDRULENEW &ruleRes
 	size_t flag = Rule2PcreList(rule, regrule);//从content中取出sig了
 	rule2pcretime += ctime.Reset();//用于测试
 
-	//if (flag != SC_ERROR)
-	//{
-	//	_CrtMemState s1, s2, s3;
-	//	_CrtMemCheckpoint(&s1);
-	//	{
-	//		CRegChain tmpChain = regrule[0];
-	//		CNfa nfatmp;
-	//		CRegChainToNFA(tmpChain, nfatmp);
-	//	}
-	//	_CrtMemCheckpoint(&s2);
-	//	if (_CrtMemDifference(&s3, &s1, &s2))
-	//	{
-	//		_CrtMemDumpStatistics(&s3);
-	//		system("pause");
-	//	}
-	//}
 	if (flag == SC_ERROR)
 	{
 		ruleResult.m_nResult = COMPILEDRULENEW::RES_ERROR;
@@ -628,26 +612,8 @@ void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 		ruleResult.m_nResult = COMPILEDRULENEW::RES_HASBYTE;
 		return;
 	}
-	//else if (nFlag & CSnortRule::RULE_HASNOSIG)
-	//{
-	//	ruleResult.m_nResult = COMPILEDRULENEW::RES_HASNOSIG;
-	//	return;
-	//}
 	else
 	{
-		//_CrtMemState s1, s2, s3;
-		//_CrtMemCheckpoint(&s1);
-		//{
-		//	CResNew resulttmp;
-		//	COMPILEDRULENEW ruletmp;
-		//	Rule2Dfas(rule, resulttmp, ruletmp);
-		//}
-		//_CrtMemCheckpoint(&s2);
-		//if (_CrtMemDifference(&s3, &s1, &s2))
-		//{
-		//	_CrtMemDumpStatistics(&s3);
-		//	system("pause");
-		//}
 		Rule2Dfas(rule, result, ruleResult);
 	}
 }

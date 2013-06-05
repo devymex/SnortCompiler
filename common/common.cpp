@@ -840,6 +840,11 @@ COMMONSC CRegChain& CRegRule::operator[](size_t nIdx)
 	return (*m_pRegVec)[nIdx];
 }
 
+COMMONSC const CRegChain& CRegRule::operator[](size_t nIdx) const
+{
+	return (*m_pRegVec)[nIdx];
+}
+
 COMMONSC const CRegRule& CRegRule::operator = (const CRegRule &other)
 {
 	*this->m_pRegVec = *other.m_pRegVec;

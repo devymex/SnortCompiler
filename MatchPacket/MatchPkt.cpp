@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "MatchPkt.h"
 
-static size_t edata = 0;
+static size_t pktnum = 0;
 
 void GetMchRule(const u_char *data, size_t len, void* user, std::vector<size_t> &rules)
 {
@@ -20,17 +20,67 @@ void GetMchRule(const u_char *data, size_t len, void* user, std::vector<size_t> 
 			sig = *(SIGNATURE *)csig;
 			if(sigmap.count(sig))
 			{
+				size_t size = sigmap[sig].size();
 				rules.insert(rules.end(), sigmap[sig].begin(), sigmap[sig].end());
 			}
 		}
 	}
+	std::sort(rules.begin(), rules.end());
+	rules.erase(std::unique(rules.begin(), rules.end()), rules.end());
+}
+
+//调用pcre库进行数据包匹配
+bool TradithinalMatch(const u_char *data, size_t len, CRegRule &regRule)
+{
+	for(size_t i = 0; i < regRule.Size(); ++i)
+	{
+		//从数据包头开始匹配
+		const u_char *pData = data;
+		size_t dataSize = len;
+		for(size_t j = 0; j < regRule[i].Size(); ++j)
+		{
+			//对规则选项进行匹配
+			int Pos = -1;
+			bool flag = match((const char*)pData, dataSize, regRule[i][j].GetString(), Pos);
+			if(!flag)
+			{
+				return false;
+			}
+			else if(Pos < dataSize)
+			{
+				pData += Pos;
+				dataSize -= Pos;
+			}
+			else
+			{
+				pData = NULL;
+				dataSize = 0;
+			}
+		}
+	}
+	return true;
 }
 
 void HdlOnePkt(const u_char *data, size_t len, void*user)
 {
+	//const u_char p[] = {0, 0, 'f', 'g', 0, 'a', 'b', 'C', 'd', 0, 'd', 'e', 235, 0, 42, 'A', 123, 'B', 40, '1', '2', 93, 63, 'a', 'b', 'c', 'd', 'e', 'a'};
+	//data = p;
+	//len = sizeof(p);
 	REGRULESMAP &rulesmap = *(REGRULESMAP *)user;
 	std::vector<size_t> rules;
 	GetMchRule(data, len, user, rules);
+	//std::vector<size_t> matchSid;
+	rulesmap.mchresult << pktnum << " : ";
+	for(size_t i = 0; i < rules.size(); ++i)
+	{
+		bool flag = TradithinalMatch(data, len, rulesmap.result[rules[i]].regrule);
+		if(flag)
+		{
+			//matchSid.push_back(rulesmap.result[rules[i]].m_nSid);
+			rulesmap.mchresult << rulesmap.result[rules[i]].m_nSid << "  ";
+		}
+	}
+	rulesmap.mchresult << std::endl;
 }
 
 MATCHPKT void HandleAllFile(const std::string &path, void* user)
@@ -79,6 +129,7 @@ void packet_handler(u_char *param, const struct pcap_pkthdr *header, const u_cha
 
 void CALLBACK PktParam(const ip_header *ih, const BYTE *data, void* user)
 {
+	++pktnum;	
 	REGRULESMAP &rulesmap = *(REGRULESMAP *)user;
 	u_short  _ihl = (ih->ver_ihl & 0x0f) * 4;
 	
@@ -107,10 +158,7 @@ void CALLBACK PktParam(const ip_header *ih, const BYTE *data, void* user)
 			{
 				HdlOnePkt(data, tcpdatalen, user);
 			}
-			else
-			{
-				++edata;
-			}
+
 			break;
 		}
 
@@ -127,10 +175,6 @@ void CALLBACK PktParam(const ip_header *ih, const BYTE *data, void* user)
 			if(udpdatalen > 0)
 			{
 				HdlOnePkt(data, udpdatalen, user);
-			}
-			else
-			{
-				++edata;
 			}
 			break;
 		}
