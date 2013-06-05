@@ -127,10 +127,15 @@ bool TradithinalMatch(std::vector<u_char> &dataSrc, CRegRule &regRule)
 			{
 				return false;
 			}
-			else if(flag && Pos < dataSize)
+			else if(Pos < dataSize)
 			{
 				pData = pData.substr(Pos);
 				dataSize -= Pos;
+			}
+			else
+			{
+				pData = "";
+				dataSize = 0;
 			}
 		}
 	}
