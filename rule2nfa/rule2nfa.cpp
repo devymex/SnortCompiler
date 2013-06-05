@@ -972,7 +972,7 @@ CRECHANFA size_t CRegChainToNFA(CRegChain &regchain, CNfa &nfa)
 			return flag;
 		}
 	}
-	nfa.Reserve(nfa.Size() + 1);
+	//nfa.Reserve(nfa.Size() + 1);
 	return 0;
 }
 
