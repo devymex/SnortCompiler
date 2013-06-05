@@ -178,6 +178,7 @@ void CALLBACK PktParam(const ip_header *ih, const BYTE *data, void* user)
 			break;
 		}
 	}
+	std::cout << pktnum << std::endl;
 }
 
 bool MyLoadCapFile(const char* pFile, PACKETRECV cv, void* pUser)
