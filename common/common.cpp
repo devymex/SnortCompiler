@@ -922,6 +922,7 @@ const CSnortRule& CSnortRule::operator = (const CSnortRule &other)
 
 COMMONSC CSnortRule::~CSnortRule()
 {
+	Release();
 	delete m_pOptions;
 }
 

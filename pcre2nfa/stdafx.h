@@ -3,6 +3,10 @@
 #pragma warning (disable : 4018)
 #define PCRETONFA_H_
 
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+
 #include <iostream>
 #include <vector>
 #include <list>

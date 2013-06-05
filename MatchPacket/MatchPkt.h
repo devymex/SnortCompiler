@@ -9,8 +9,13 @@
 
 #include <iostream>
 #include <vector>
-#include "../common/common.h"
+#include <unordered_map>
+#include <fstream>
 #include "../dfanew/dfanew.h"
+#include "../common/common.h"
+#include "../rule2nfa/rule2nfa.h"
+#include "../compilernew/compilernew.h"
+#include "../pcre2nfa/match.h"
 
 #pragma comment(lib, "Ws2_32.lib")
 #pragma comment(lib, "Packet.lib")
@@ -119,9 +124,48 @@ struct SIGSID
 };
 
 
+struct REGRULES
+{
+	size_t m_nSid;
+	CRegRule regrule;
+};
+
+struct SIG_HASH
+{
+	size_t operator()(const SIGNATURE &str)
+	{
+		const size_t _FNV_offset_basis = 2166136261U;
+		const size_t _FNV_prime = 16777619U;
+
+		size_t _Val = _FNV_offset_basis;	
+		for(size_t i = 0; i < 4; ++i)
+		{
+			_Val ^= str >> (8 * i);
+			_Val *= _FNV_prime;
+		}
+
+		return (_Val);
+	}
+};
+
+typedef std::unordered_map<SIGNATURE, std::vector<size_t>, SIG_HASH> SIGSMAP;
+struct REGRULESMAP
+{
+	std::vector<REGRULES> result;
+	SIGSMAP sigmap;
+	std::ofstream mchresult;
+};
 
 void CALLBACK PktParam(const ip_header *ih, const BYTE *data, void* user);
 
 void packet_handler(u_char *param, const struct pcap_pkthdr *header, const u_char *pkt_data);
 bool MyLoadCapFile(const char* pFile, PACKETRECV cv, void* pUser);
 MATCHPKT bool LoadCapFile(const char* pFile, void* pUser);
+
+void CALLBACK MyProcess(const CSnortRule &rule, LPVOID lpParam);
+MATCHPKT void MchCompile(LPCTSTR filename, LPVOID result);
+MATCHPKT bool TradithinalMatch(std::vector<u_char> &dataSrc, CRegRule &regRule);//µ÷ÓÃpcreMATCHPKT 
+
+void GetMchRule(const u_char *data, size_t len, void* user, std::vector<size_t> &rules);
+void HdlOnePkt(const u_char *data, size_t len, void*user);
+MATCHPKT void HandleAllFile(const std::string &path, void* user);

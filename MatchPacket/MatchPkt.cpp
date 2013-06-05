@@ -2,6 +2,69 @@
 #include "MatchPkt.h"
 
 static size_t edata = 0;
+
+void GetMchRule(const u_char *data, size_t len, void* user, std::vector<size_t> &rules)
+{
+	REGRULESMAP &rulesmap = *(REGRULESMAP *)user;
+	SIGSMAP sigmap = rulesmap.sigmap;
+	SIGNATURE sig;
+	u_char csig[4];
+	for(const u_char* iter = data; iter != &data[len - 4]; ++iter)
+	{
+		for(size_t i = 0; i < 4; ++i)
+		{
+			csig[i] = tolower(*(iter + i));
+		}
+		sig = *(SIGNATURE *)csig;
+		if(sigmap.count(sig))
+		{
+			rules.insert(rules.end(), sigmap[sig].begin(), sigmap[sig].end());
+		}
+	}
+}
+
+void HdlOnePkt(const u_char *data, size_t len, void*user)
+{
+	REGRULESMAP &rulesmap = *(REGRULESMAP *)user;
+	std::vector<size_t> rules;
+	GetMchRule(data, len, user, rules);
+}
+
+MATCHPKT void HandleAllFile(const std::string &path, void* user)
+{
+	REGRULESMAP &rulesmap = *(REGRULESMAP *)user;
+	WIN32_FIND_DATAA wfda;
+	const std::string ext = "*.*";
+	std::string str = path + std::string("\\");
+	std::string pat = str + ext;
+	HANDLE hff = ::FindFirstFileA(pat.c_str(), &wfda);
+	if(hff == INVALID_HANDLE_VALUE)
+	{
+		return;
+	}
+
+	for(BOOL br = TRUE; br == TRUE; br = FindNextFileA(hff, &wfda))
+	{
+		if(wfda.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY )
+		{
+			if (wfda.cFileName[0] != '.')
+			{
+				HandleAllFile(str + std::string(wfda.cFileName), user);
+			}
+		}
+		else
+		{
+			std::string &temp = str + std::string(wfda.cFileName);
+			std::string &ext1 = temp.substr(temp.size() - 4, 4);
+			if(ext1 == ".cap")
+			{
+				LoadCapFile(temp.c_str(), &rulesmap);
+				std::cout << temp << std::endl;
+			}
+		}
+	}
+}
+
 void packet_handler(u_char *param, const struct pcap_pkthdr *header, const u_char *pkt_data)
 {
 	ip_header *ih;
@@ -13,7 +76,7 @@ void packet_handler(u_char *param, const struct pcap_pkthdr *header, const u_cha
 
 void CALLBACK PktParam(const ip_header *ih, const BYTE *data, void* user)
 {
-	std::vector<std::vector<u_char>> &allPkt = *(std::vector<std::vector<u_char>> *)user;
+	REGRULESMAP &rulesmap = *(REGRULESMAP *)user;
 	u_short  _ihl = (ih->ver_ihl & 0x0f) * 4;
 	
 	u_short _tlen = ih->tlen;
@@ -35,8 +98,7 @@ void CALLBACK PktParam(const ip_header *ih, const BYTE *data, void* user)
 			size_t tcpdatalen = _tlen - _ihl - tcpHdrLen;
 			if(tcpdatalen > 0)
 			{
-				allPkt.resize(allPkt.size() + 1);
-				allPkt.back().insert(allPkt.back().begin(), data, data + tcpdatalen);
+				HdlOnePkt(data, tcpdatalen, user);
 			}
 			else
 			{
@@ -53,8 +115,7 @@ void CALLBACK PktParam(const ip_header *ih, const BYTE *data, void* user)
 			size_t udpdatalen = _tlen - _ihl - UDPHDRLEN;
 			if(udpdatalen > 0)
 			{
-				allPkt.resize(allPkt.size() + 1);
-				allPkt.back().insert(allPkt.back().begin(), data, data + udpdatalen);
+				HdlOnePkt(data, udpdatalen, user);
 			}
 			else
 			{
@@ -172,3 +233,4 @@ MATCHPKT void MatchPkt(std::vector<std::vector<u_char>> &allPkt, std::map<size_t
 		}
 	}
 }
+
