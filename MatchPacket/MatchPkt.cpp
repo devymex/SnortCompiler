@@ -200,12 +200,11 @@ bool MyLoadCapFile(const char* pFile, PACKETRECV cv, void* pUser)
 {
 	char* ebuff = new char;
 	pcap_t *mypcap = pcap_open_offline(pFile, ebuff);
-	delete ebuff;//”√”⁄≤‚ ‘
 	PACKETPARAM pp;
 	pp.pUser = pUser;
 	pp.pFunc = cv;
 	pcap_loop(mypcap, 0, packet_handler, (BYTE*)&pp);
-	delete(ebuff);
+	delete ebuff;
 	return true;
 }
 
