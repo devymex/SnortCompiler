@@ -11,6 +11,8 @@ void GetMchRule(const u_char *data, size_t len, void* user, std::vector<size_t> 
 		SIGSMAP &sigmap = rulesmap.sigmap;
 		SIGNATURE sig;
 		u_char csig[4];
+		size_t flag = 0;
+
 		for(const u_char* iter = data; iter != &data[len - 4]; ++iter)
 		{
 			for(size_t i = 0; i < 4; ++i)
@@ -20,8 +22,18 @@ void GetMchRule(const u_char *data, size_t len, void* user, std::vector<size_t> 
 			sig = *(SIGNATURE *)csig;
 			if(sigmap.count(sig))
 			{
-				size_t size = sigmap[sig].size();
-				rules.insert(rules.end(), sigmap[sig].begin(), sigmap[sig].end());
+				if(sig == 0)
+				{
+					flag = 1;
+					size_t size = sigmap[sig].size();
+					rules.insert(rules.end(), sigmap[sig].begin(), sigmap[sig].end());
+				}
+
+				if(flag == 0)
+				{
+					size_t size = sigmap[sig].size();
+					rules.insert(rules.end(), sigmap[sig].begin(), sigmap[sig].end());
+				}
 			}
 		}
 	}
@@ -109,10 +121,13 @@ MATCHPKT void HandleAllFile(const std::string &path, void* user)
 		{
 			std::string &temp = str + std::string(wfda.cFileName);
 			std::string &ext1 = temp.substr(temp.size() - 4, 4);
+			rulesmap.mchresult << "-----------------------" << temp << "-----------------------" << std::endl;
 			if(ext1 == ".cap")
 			{
 				LoadCapFile(temp.c_str(), &rulesmap);
 			}
+
+			pktnum = 0;
 		}
 	}
 }
@@ -190,7 +205,7 @@ bool MyLoadCapFile(const char* pFile, PACKETRECV cv, void* pUser)
 	pp.pUser = pUser;
 	pp.pFunc = cv;
 	pcap_loop(mypcap, 0, packet_handler, (BYTE*)&pp);
-
+	delete(ebuff);
 	return true;
 }
 
