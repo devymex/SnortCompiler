@@ -35,8 +35,8 @@
 //
 //	size_t tmp = lastDfa.FromNFA(oneNfa, nfalog, count, true);
 //	//if(lastDfa.FromNFA(oneNfa, nfalog, count, true) == 0)
-	//if(tmp == 0)
-	//{
+//	if(tmp == 0)
+//	{
 //		lastDfa.UniqueTermSet();
 //		//lastDfa.Minimize();
 //		if(lastDfa.Size() > DFA_SIZE_LIMIT)
@@ -44,14 +44,14 @@
 //			std::cerr << "DFA_SIZE_LIMIT" << std::endl;
 //			return false;
 //		}
-	//	//std::cout << "方法一lastDfa最小化用时: " << c.Reset() << std::endl;
+//		//std::cout << "方法一lastDfa最小化用时: " << c.Reset() << std::endl;
 //
-	//	return true;
-	//}
-	//else
-	//{
-	//	return false;
-	//}
+//		return true;
+//	}
+//	else
+//	{
+//		return false;
+//	}
 //}
 
 struct TODFA_HASH
@@ -166,20 +166,19 @@ MERDFANEW bool NOrMerge(std::vector<CDfaNew> &dfas, CDfaNew &lastDfa)
 	size_t dfaId = lastDfa.GetId();
 	lastDfa.Clear();
 	lastDfa.SetId(dfaId);
-	//CTimer mergtime;//用于测试
 #undef max
 
 	size_t dfasSize = dfas.size();
-	size_t nTermSta = 0;//终态标记
-	for(size_t i = 0; i < dfasSize; ++i)
-	{
-		if(dfas[i].Size() > std::numeric_limits<STATEID>::max())
-		{
-			return false;
-		}
-		nTermSta += dfas[i].Size();
-	}
-	++nTermSta;
+	size_t nTermSta = 1;//终态标记
+	//for(size_t i = 0; i < dfasSize; ++i)
+	//{
+	//	if(dfas[i].Size() > std::numeric_limits<STATEID>::max())
+	//	{
+	//		return false;
+	//	}
+	//	nTermSta += dfas[i].Size();
+	//}
+	//++nTermSta;
 
 	//对lastDfa分组
 	BYTE groups[DFACOLSIZE];
@@ -232,6 +231,7 @@ MERDFANEW bool NOrMerge(std::vector<CDfaNew> &dfas, CDfaNew &lastDfa)
 	statesStack.push(startVec);
 
 	std::vector<size_t> NextVec;
+	NextVec.resize(dfasSize + 2);
 	BYTE computFlag[CHARSETSIZE];
 
 	while(!statesStack.empty())
@@ -246,16 +246,14 @@ MERDFANEW bool NOrMerge(std::vector<CDfaNew> &dfas, CDfaNew &lastDfa)
 			return false;
 		}
 		STATEID curStaNum = ir->second;
-		memset(computFlag, 0, sizeof(computFlag));
+		ZeroMemory(computFlag, sizeof(computFlag));
 
 		//下一状态集合
 		for(size_t curChar = 0; curChar < DFACOLSIZE; ++curChar)
 		{
 			finFlag = 0;
-			NextVec.clear();
-			NextVec.resize(dfasSize + 2);
-
-			BYTE lastDfaGroup = lastDfa.Char2Group(curChar);
+			ZeroMemory(NextVec.data(), NextVec.size() * sizeof(size_t));
+			BYTE lastDfaGroup = groups[curChar];
 			if(computFlag[lastDfaGroup] == 1)
 			{
 				continue;
@@ -349,18 +347,9 @@ MERDFANEW bool NOrMerge(std::vector<CDfaNew> &dfas, CDfaNew &lastDfa)
 	lastDfa.UniqueTermSet();
 
 	//对lastDfa进行进一步按列分组
-
-	//lastDfa.printTerms();
-	//std::cout << "before min" << std::endl;
-	//fdisplay(dfas[0], "..//..//output//dfa1.txt");
-	//fdisplay(dfas[1], "..//..//output//dfa2.txt");
-	//fdisplay(lastDfa, "..//dfa12.txt");
+	//lastDfa.Minimize();
 	//std::cout << lastDfa.Size() << std::endl;
-	lastDfa.Minimize();
 	//std::cout << lastDfa.Size() << std::endl;
-	//lastDfa.printTerms();
-	//fdisplay(lastDfa, "..//dfa12min.txt");
-	//std::cout << "after min" << std::endl;
 	if(lastDfa.Size() > DFA_SIZE_LIMIT)
 	{
 		//std::cerr << "DFA_SIZE_LIMIT!" << std::endl;

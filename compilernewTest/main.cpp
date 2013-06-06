@@ -41,8 +41,8 @@ void main()
 {
 	CTimer t;
 	CResNew result;
-	compilenew(_T("..\\allrules.rule"), result);
-	result.WriteToFile(_T("..\\result.cdt"));
+	compilenew(_T("../../input/allrules.rule"), result);
+	result.WriteToFile(_T("../../output/result.cdt"));
 	//StatisticsSigToFile(_T("..\\contentSig.txt"), result);
 	//StatisticsSigToFile(_T("..\\allSig.txt"), result);
 	//result.ReadFromFile(_T("..\\..\\output\\result.cdt"));
