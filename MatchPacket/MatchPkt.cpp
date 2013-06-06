@@ -8,7 +8,7 @@ void GetMchRule(const u_char *data, size_t len, void* user, std::vector<size_t> 
 	if(len > 3)
 	{
 		REGRULESMAP &rulesmap = *(REGRULESMAP *)user;
-		SIGSMAP sigmap = rulesmap.sigmap;
+		SIGSMAP &sigmap = rulesmap.sigmap;
 		SIGNATURE sig;
 		u_char csig[4];
 		for(const u_char* iter = data; iter != &data[len - 4]; ++iter)
@@ -185,6 +185,7 @@ bool MyLoadCapFile(const char* pFile, PACKETRECV cv, void* pUser)
 {
 	char* ebuff = new char;
 	pcap_t *mypcap = pcap_open_offline(pFile, ebuff);
+	delete ebuff;//”√”⁄≤‚ ‘
 	PACKETPARAM pp;
 	pp.pUser = pUser;
 	pp.pFunc = cv;
