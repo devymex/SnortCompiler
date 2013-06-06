@@ -7,12 +7,44 @@
 #include "../compilernew/compilernew.h"
 #include "../pcre2nfa/pcre2nfa.h"
 
+
+
+size_t StatisticsSigToFile(LPCTSTR filename, CResNew &result)
+{
+	std::ofstream fout(filename);
+	if (!fout)
+	{
+		std::cerr << "Open file Failed!" << std::endl;
+		return (size_t)-1;
+	}
+
+	CSidDfaIdsNew &sdi = result.GetSidDfaIds();
+	CRegRule &rg = result.GetRegexTbl();
+
+	for (size_t i = 0; i < sdi.Size(); ++i)
+	{
+		COMPILEDRULENEW &tmpRes = sdi[i];
+		if (tmpRes.m_nResult == COMPILEDRULENEW::RES_SUCCESS)
+		{
+			if (tmpRes.m_dfaIds.Size() > 0)
+			{
+				fout << tmpRes.m_nSid << "\t" << rg[tmpRes.m_dfaIds[0]].GetSigCnt() << std::endl;
+			}
+		}
+	}
+
+	fout.close();
+}
+
+
 void main()
 {
 	CTimer t;
 	CResNew result;
 	compilenew(_T("..\\allrules.rule"), result);
 	result.WriteToFile(_T("..\\result.cdt"));
+	//StatisticsSigToFile(_T("..\\contentSig.txt"), result);
+	//StatisticsSigToFile(_T("..\\allSig.txt"), result);
 	//result.ReadFromFile(_T("..\\..\\output\\result.cdt"));
 	//result.WriteToFile(_T("..\\..\\output\\result1.cdt"));
 	//size_t success_cNt = 0;
