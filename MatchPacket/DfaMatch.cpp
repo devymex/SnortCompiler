@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
+#include "../compilernew/compilernew.h"
 #include "DfaMatch.h"
-//#include "../grouping/grouping.h"
+#include "../grouping/grouping.h"
 
 
 //���� 0 ��ʾû��ƥ���ϣ����� 1 ��ʾƥ����
@@ -49,59 +50,7 @@ void MchDfaHdler(u_char *param, const struct pcap_pkthdr *header, const u_char *
 	pParam->pFunc(ih, pkt_data, pParam->pUser);
 }
 
-void CALLBACK DPktPara(const ip_header *ih, const BYTE *data, void* user)
-{
-	DFAMCH &dfamch = *(DFAMCH *)user;
-	u_short  _ihl = (ih->ver_ihl & 0x0f) * 4;
-	
-	u_short _tlen = ih->tlen;
-	std::swap(((BYTE*)&_tlen)[0], ((BYTE*)&_tlen)[1]);
 
-	u_char  _proto = ih->proto;
-
-	tcp_header *ptcp = (tcp_header *)data;
-	udp_header *pudp = (udp_header *)data;
-
-	switch (_proto)
-	{
-	case _TCP:
-		{
-			ptcp = (tcp_header*)((BYTE*) ptcp + _ihl);
-			u_short tcpHdrLen = ((ptcp->lenres & 0xf0) >> 4) * 4;
-			data += _ihl + tcpHdrLen;
-
-			if(*data == 227)
-			{
-				std::cout <<std::endl;
-			}
-			size_t tcpdatalen = _tlen - _ihl - tcpHdrLen;
-			if(tcpdatalen > 0)
-			{
-				//DfaMatchPkt(data, tcpdatalen, dfamch);
-			}
-
-			break;
-		}
-
-	case _UDP:
-		{
-			pudp = (udp_header*)((BYTE*) pudp + _ihl);
-			data += _ihl + UDPHDRLEN;
-
-			if(*data == 227)
-			{
-				std::cout <<std::endl;
-			}
-			size_t udpdatalen = _tlen - _ihl - UDPHDRLEN;
-			if(udpdatalen > 0)
-			{
-				//DfaMatchPkt(data, udpdatalen, dfamch);
-			}
-
-			break;
-		}
-	}
-}
 
 void GetMchDfas(const u_char *data, size_t len, HASHRES &hashtable, std::vector<size_t> &matchdfas)
 {
@@ -132,22 +81,22 @@ void GetMchDfas(const u_char *data, size_t len, HASHRES &hashtable, std::vector<
 	}
 }
 
-//MATCHPKT void DfaMatchPkt(const u_char *data, size_t len, DFAMCH dfamch)
-//{
-//	std::vector<size_t> matchdfas;
-//	std::vector<size_t> matcheddfaids;
-//	GetMchDfas(data, len, dfamch.hashtable, matchdfas);
-//
-//	for (std::vector<size_t>::iterator iter = matchdfas.begin(); iter != matchdfas.end(); ++iter)
-//	{
-//		MatchOnedfa(data, len, dfamch.mergedDfas.GetDfaTable()[*iter], matcheddfaids);
-//	}
-//
-//	if (!matcheddfaids.empty())
-//	{
-//
-//	}
-//}
+MATCHPKT void DfaMatchPkt(const u_char *data, size_t len, DFAMCH dfamch)
+{
+	std::vector<size_t> matchdfas;
+	std::vector<size_t> matcheddfaids;
+	GetMchDfas(data, len, dfamch.hashtable, matchdfas);
+
+	for (std::vector<size_t>::iterator iter = matchdfas.begin(); iter != matchdfas.end(); ++iter)
+	{
+		MatchOnedfa(data, len, dfamch.mergedDfas.GetDfaTable()[*iter], matcheddfaids);
+	}
+
+	if (!matcheddfaids.empty())
+	{
+
+	}
+}
 //
 //void DfaidSidMap(CGROUPRes &mergedDfas, std::unordered_map<size_t, size_t> &didSid)
 //{
@@ -162,3 +111,97 @@ void GetMchDfas(const u_char *data, size_t len, HASHRES &hashtable, std::vector<
 //		}
 //	}
 //}
+
+void CALLBACK DPktParam(const ip_header *ih, const BYTE *data, void* user)
+{
+	DFAMCH &dfamch = *(DFAMCH *)user;
+	u_short  _ihl = (ih->ver_ihl & 0x0f) * 4;
+	
+	u_short _tlen = ih->tlen;
+	std::swap(((BYTE*)&_tlen)[0], ((BYTE*)&_tlen)[1]);
+
+	u_char  _proto = ih->proto;
+
+	tcp_header *ptcp = (tcp_header *)data;
+	udp_header *pudp = (udp_header *)data;
+
+	switch (_proto)
+	{
+	case _TCP:
+		{
+			ptcp = (tcp_header*)((BYTE*) ptcp + _ihl);
+			u_short tcpHdrLen = ((ptcp->lenres & 0xf0) >> 4) * 4;
+			data += _ihl + tcpHdrLen;
+
+			if(*data == 227)
+			{
+				std::cout <<std::endl;
+			}
+			size_t tcpdatalen = _tlen - _ihl - tcpHdrLen;
+			if(tcpdatalen > 0)
+			{
+				DfaMatchPkt(data, tcpdatalen, dfamch);
+			}
+
+			break;
+		}
+
+	case _UDP:
+		{
+			pudp = (udp_header*)((BYTE*) pudp + _ihl);
+			data += _ihl + UDPHDRLEN;
+
+			if(*data == 227)
+			{
+				std::cout <<std::endl;
+			}
+			size_t udpdatalen = _tlen - _ihl - UDPHDRLEN;
+			if(udpdatalen > 0)
+			{
+				DfaMatchPkt(data, udpdatalen, dfamch);
+			}
+
+			break;
+		}
+	}
+}
+
+MATCHPKT bool DLoadCapFile(const char* pFile, void* pUser)
+{
+	return MyLoadCapFile(pFile, DPktParam, pUser);
+}
+
+MATCHPKT void DHandleAllFile(const std::string &path, void* user)
+{
+	DFAMCH &dfamch = *(DFAMCH *)user;
+	WIN32_FIND_DATAA wfda;
+	const std::string ext = "*.*";
+	std::string str = path + std::string("\\");
+	std::string pat = str + ext;
+	HANDLE hff = ::FindFirstFileA(pat.c_str(), &wfda);
+	if(hff == INVALID_HANDLE_VALUE)
+	{
+		return;
+	}
+
+	for(BOOL br = TRUE; br == TRUE; br = FindNextFileA(hff, &wfda))
+	{
+		if(wfda.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY )
+		{
+			if (wfda.cFileName[0] != '.')
+			{
+				DHandleAllFile(str + std::string(wfda.cFileName), user);
+			}
+		}
+		else
+		{
+			std::string &temp = str + std::string(wfda.cFileName);
+			std::string &ext1 = temp.substr(temp.size() - 4, 4);
+			dfamch.matchresult << "-----------------------" << temp << "-----------------------" << std::endl;
+			if(ext1 == ".cap")
+			{
+				DLoadCapFile(temp.c_str(), &dfamch);
+			}
+		}
+	}
+}
