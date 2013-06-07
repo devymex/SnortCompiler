@@ -2,6 +2,7 @@
 
 #include "../common/common.h"
 #include "../dfanew/dfanew.h"
+
 #include <windows.h>
 
 #ifndef COMPILERNEW_H_
