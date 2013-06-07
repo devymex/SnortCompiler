@@ -42,7 +42,7 @@ void GetMchRule(const u_char *data, size_t len, void* user, std::vector<size_t> 
 }
 
 //调用pcre库进行数据包匹配
-bool TradithinalMatch(const u_char *data, size_t len, CRegRule &regRule)
+bool PcreMatch(const u_char *data, size_t len, CRegRule &regRule)
 {
 	for(size_t i = 0; i < regRule.Size(); ++i)
 	{
@@ -86,7 +86,7 @@ void HdlOnePkt(const u_char *data, size_t len, void*user)
 	rulesmap.mchresult << pktnum << " : ";
 	for(size_t i = 0; i < rules.size(); ++i)
 	{
-		bool flag = TradithinalMatch(data, len, rulesmap.result[rules[i]].regrule);
+		bool flag = PcreMatch(data, len, rulesmap.result[rules[i]].regrule);
 		if(flag)
 		{
 			//matchSid.push_back(rulesmap.result[rules[i]].m_nSid);
@@ -122,10 +122,14 @@ MATCHPKT void HandleAllFile(const std::string &path, void* user)
 		{
 			std::string &temp = str + std::string(wfda.cFileName);
 			std::string &ext1 = temp.substr(temp.size() - 4, 4);
-			rulesmap.mchresult << "-----------------------" << temp << "-----------------------" << std::endl;
+
 			if(ext1 == ".cap")
 			{
-				LoadCapFile(temp.c_str(), &rulesmap);
+			std::string str = rulesmap.resultpath + "\\" +std::string(wfda.cFileName) +".txt";
+			rulesmap.mchresult.open(rulesmap.resultpath + "\\" +std::string(wfda.cFileName) +".txt");	
+			rulesmap.mchresult << "-----------------------" << temp << "-----------------------" << std::endl;
+			LoadCapFile(temp.c_str(), &rulesmap);
+			rulesmap.mchresult.close();
 			}
 
 			pktnum = 0;

@@ -50,10 +50,11 @@
 void main()
 {
 	REGRULESMAP rulesmap;
-	rulesmap.mchresult.open(_T("../../output/matchresult.txt"));
+//	rulesmap.mchresult.open(_T("../../output/matchresult.txt"));
 	MchCompile(_T("../../input/allrules.rule"), &rulesmap);
 
-	HandleAllFile("E:\\dataPacket_huawei", &rulesmap);
+	rulesmap.resultpath = "E:\\test\\result";
+	HandleAllFile("E:\\test", &rulesmap);
 
-	rulesmap.mchresult.close();
+//	rulesmap.mchresult.close();
 }
