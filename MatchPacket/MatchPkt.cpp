@@ -165,10 +165,6 @@ void CALLBACK PktParam(const ip_header *ih, const BYTE *data, void* user)
 			u_short tcpHdrLen = ((ptcp->lenres & 0xf0) >> 4) * 4;
 			data += _ihl + tcpHdrLen;
 
-			if(*data == 227)
-			{
-				std::cout <<std::endl;
-			}
 			size_t tcpdatalen = _tlen - _ihl - tcpHdrLen;
 			if(tcpdatalen > 0)
 			{
@@ -183,10 +179,6 @@ void CALLBACK PktParam(const ip_header *ih, const BYTE *data, void* user)
 			pudp = (udp_header*)((BYTE*) pudp + _ihl);
 			data += _ihl + UDPHDRLEN;
 
-			if(*data == 227)
-			{
-				std::cout <<std::endl;
-			}
 			size_t udpdatalen = _tlen - _ihl - UDPHDRLEN;
 			if(udpdatalen > 0)
 			{
