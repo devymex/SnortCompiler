@@ -25,9 +25,9 @@ int main()
 	//}
 
 	CResNew result;
-	//compilenew(_T("..\\..\\input\\allrules.rule"), result);
-	//result.WriteToFile(_T("..\\..\\output\\result.cdt"));
-	result.ReadFromFile(_T("..\\..\\output\\result.cdt"));
+	compilenew(_T("..\\..\\input\\allrules.rule"), result);
+	result.WriteToFile(_T("..\\..\\output\\result.cdt"));
+	//result.ReadFromFile(_T("..\\..\\output\\result.cdt"));
 
 	//for (size_t i = 0; i < result.GetSidDfaIds().Size(); ++i)
 	//{
@@ -48,7 +48,7 @@ int main()
 	//groupRes.ReadFromFile(_T("..\\..\\output\\GroupResut.cdt"));
 	//groupRes.WriteToFile(_T("..\\..\\output\\GroupResut1.cdt"));
 
-	//std::ifstream fin("..\\..\\output\\test.txt");
+	//std::ifstream fin("..\\..\\output\\Ids.txt");
 	//std::vector<size_t> vecIds;
 	//size_t tmp;
 	//while (fin >> tmp)
@@ -56,21 +56,42 @@ int main()
 	//	vecIds.push_back(tmp);
 	//}
 
-	//std::cout << result.GetRegexTbl()[0][0].C_Str() << std::endl;
-	//std::cout << result.GetRegexTbl()[1][0].C_Str() << std::endl;
+	//SIGNATURE Sig = vecIds.back();
+	//vecIds.pop_back();
+	//for (size_t i = 0; i < vecIds.size(); ++i)
+	//{
+	//	bool flag = false;
+	//	for (size_t j = 0; j < result.GetRegexTbl()[vecIds[i]].GetSigCnt(); ++j)
+	//	{
+	//		if (result.GetRegexTbl()[vecIds[i]].GetSig(j) == Sig)
+	//		{
+	//			flag = true;
+	//			break;
+	//		}
+	//	}
+	//	if (!flag)
+	//	{
+	//		std::cout << "No Sig" << std::endl;
+	//	}
+	//}
 
 	//std::vector<CDfaNew> vecDfas(2);
 	//CDfaNew MergeDfa;
-	//vecDfas[0] = result.GetDfaTable()[0];
-	//vecDfas[1] = result.GetDfaTable()[1];
+	//vecDfas[0] = result.GetDfaTable()[vecIds[0]];
+	//for (size_t i = 1; i < vecIds.size(); ++i)
+	//{
+	//	vecDfas[1] = result.GetDfaTable()[vecIds[i]];
+	//	if (NOrMerge(vecDfas, MergeDfa))
+	//	{
+	//		vecDfas[0] = MergeDfa;
+	//	}
+	//	else
+	//	{
+	//		std::cout << "ERROR" << std::endl;
+	//		break;
+	//	}
+	//}
 	//std::cout << vecDfas[0].Size() << std::endl;
-	//std::cout << vecDfas[1].Size() << std::endl;
-	//outPutDfa(vecDfas[0], "..//..//output//dfa1.txt");
-	//outPutDfa(vecDfas[1], "..//..//output//dfa2.txt");
-	//NOrMerge(vecDfas, MergeDfa);
-	//std::cout << MergeDfa.GetStartId() << std::endl;
-	//std::cout << MergeDfa.Size() << std::endl;
-	//outPutDfa(MergeDfa, "..//..//output//dfa.txt");
 
 	system("pause");
 	return 0;

@@ -35,6 +35,7 @@ struct ONEGROUP
 {
 	CVectorNumber DfaIds;
 	CSIGNATURES ComSigs;
+	SIGNATURE currSig;
 	std::size_t mergeDfaId;
 };
 

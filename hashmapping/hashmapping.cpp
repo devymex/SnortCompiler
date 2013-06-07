@@ -1,6 +1,10 @@
 #include "stdafx.h"
 #include "hashmapping.h"
+#include "../dfanew/dfanew.h"
+#include "../common/common.h"
+#include "../compilernew/compilernew.h"
 #include "../grouping/grouping.h"
+#include "../mergedfanew/MergeDfanew.h"
 
 HASHMAPPINGSC size_t hash(const SIGNATURE &oneSig)
 {
@@ -200,28 +204,239 @@ void Mapping(std::vector<GROUPHASH> &vecGroups, const SIGNATUREMAP &gmap, const 
 
 	RecursiveAdjust(vecGroups, dmap, result);
 
-	std::cout << vecGroups.size() << std::endl;
-	std::cout << (vecGroups.size() - result.size())/double(vecGroups.size()) << std::endl;
-	size_t count = 0;
-	for (RESULTMAP::iterator i = result.begin(); i != result.end(); ++i)
-	{
-		count += i->second.size();
-	}
-	std::cout << count << std::endl;
+	//std::cout << vecGroups.size() << std::endl;
+	//std::cout << (vecGroups.size() - result.size())/double(vecGroups.size()) << std::endl;
+	//size_t count = 0;
+	//for (RESULTMAP::iterator i = result.begin(); i != result.end(); ++i)
+	//{
+	//	count += i->second.size();
+	//}
+	//std::cout << count << std::endl;
 }
 
-void ClearUpHashRes(const std::vector<GROUPHASH> &vecGroups, const RESULTMAP &result, HASHRES &HashResMap)
+void CommonSigs(const GROUPHASH &g1, const GROUPHASH &g2, std::vector<SIGNATURE> &vecComSigs)
 {
-	for (RESULTMAP::const_iterator i = result.begin(); i != result.end(); ++i)
+	std::map<SIGNATURE, size_t> sigToNumMap;
+	for (size_t i = 0; i < g1.vecSigs.size(); ++i)
 	{
-		for (std::vector<size_t>::const_iterator j = i->second.begin(); j != i->second.end(); ++j)
+		++sigToNumMap[g1.vecSigs[i]];
+	}
+	for (size_t i = 0; i < g2.vecSigs.size(); ++i)
+	{
+		++sigToNumMap[g2.vecSigs[i]];
+	}
+
+	for (std::map<SIGNATURE, size_t>::iterator i = sigToNumMap.begin(); i != sigToNumMap.end(); ++i)
+	{
+		if (i->second == 2)
 		{
-			HashResMap[i->first].push_back(HASHNODE(vecGroups[*j].currSig, vecGroups[*j].mergeDfaId));
+			vecComSigs.push_back(i->first);
 		}
 	}
 }
 
-HASHMAPPINGSC void HashMapping(const CGROUPRes &groupRes, HASHRES &HashResMap)
+void UpdateSigs(GROUPHASH &g1, const GROUPHASH &g2)
+{
+	std::vector<SIGNATURE> vecComSigs;
+	CommonSigs(g1, g2, vecComSigs);
+	g1.vecSigs.clear();
+	for (std::vector<SIGNATURE>::iterator i = vecComSigs.begin(); i != vecComSigs.end(); ++i)
+	{
+		g1.vecSigs.push_back(*i);
+	}
+}
+
+bool CanCombine(const GROUPHASH &g1, const GROUPHASH &g2, RESULTMAP &result, SIGNATURE &Sig)
+{
+	std::vector<SIGNATURE> vecComSigs;
+	CommonSigs(g1, g2, vecComSigs);
+	for (std::vector<SIGNATURE>::iterator i = vecComSigs.begin(); i != vecComSigs.end(); ++i)
+	{
+		if (result[hash(*i)].size() == 0)
+		{
+			Sig = *i;
+			return true;
+		}
+	}
+
+	for (std::vector<SIGNATURE>::iterator i = vecComSigs.begin(); i != vecComSigs.end(); ++i)
+	{
+		if (hash(*i) == hash(g1.currSig) || hash(*i) == hash(g2.currSig))
+		{
+			Sig = *i;
+			return true;
+		}
+	}
+	return false;
+}
+
+void Combine(CGROUPRes &groupRes, std::vector<GROUPHASH> &vecGroups, RESULTMAP &result)
+{
+	for (RESULTMAP::iterator i = result.begin(); i != result.end(); ++i)
+	{
+		if (i->second.size() > 1)
+		{
+			for (std::vector<size_t>::iterator j = i->second.begin(); j != i->second.end(); ++j)
+			{
+				std::vector<CDfaNew> vecDfas(2);
+				vecDfas[0] = groupRes.GetDfaTable()[vecGroups[*j].mergeDfaId];
+				for (std::vector<size_t>::iterator k = j + 1; k != i->second.end(); )
+				{
+					CDfaNew MergeDfa;
+					vecDfas[1] = groupRes.GetDfaTable()[vecGroups[*k].mergeDfaId];
+					if (NOrMerge(vecDfas, MergeDfa))
+					{
+						for (size_t idx = 0; idx < vecGroups[*k].vecDfaIds.size(); ++idx)
+						{
+							vecGroups[*j].vecDfaIds.push_back(vecGroups[*k].vecDfaIds[idx]);
+						}
+						UpdateSigs(vecGroups[*j], vecGroups[*k]);
+						groupRes.GetDfaTable().PushBack(MergeDfa);
+						vecGroups[*j].mergeDfaId = groupRes.GetDfaTable().Size() - 1;
+						vecGroups[*k].vecSigs.clear();
+						vecGroups[*k].vecDfaIds.clear();
+						vecGroups[*k].mergeDfaId = (size_t)-1;
+						//groupRes.GetGroups().Erase(*k);
+						k = i->second.erase(k);
+					}
+					else
+					{
+						++k;
+					}
+				}
+			}
+		}
+	}
+
+	std::vector<size_t> vecKeys;
+	for (RESULTMAP::iterator i = result.begin(); i != result.end(); ++i)
+	{
+		vecKeys.push_back(i->first);
+	}
+
+	for (size_t i = 0; i < vecKeys.size(); ++i)
+	{
+		std::cout << "Combine" << std::endl;
+		std::cout << "NO: " << i << std::endl;
+		std::cout << "Total: " << vecKeys.size() << std::endl;
+		if (result[vecKeys[i]].size() == 1)
+		{
+			for (size_t j = 0; j < vecKeys.size(); ++j)
+			{
+				if (i == j)
+				{
+					continue;
+				}
+				if (result[vecKeys[j]].size() == 1)
+				{
+					SIGNATURE Sig;
+					GROUPHASH &g1 = vecGroups[result[vecKeys[i]][0]];
+					GROUPHASH &g2 = vecGroups[result[vecKeys[j]][0]];
+					if (CanCombine(g1, g2, result, Sig))
+					{
+						std::vector<CDfaNew> vecDfas(2);
+						vecDfas[0] = groupRes.GetDfaTable()[g1.mergeDfaId];
+						vecDfas[1] = groupRes.GetDfaTable()[g2.mergeDfaId];
+						CDfaNew MergeDfa;
+						if (NOrMerge(vecDfas, MergeDfa))
+						{
+							for (size_t idx = 0; idx < g2.vecDfaIds.size(); ++idx)
+							{
+								g1.vecDfaIds.push_back(g2.vecDfaIds[idx]);
+							}
+							UpdateSigs(g1, g2);
+							groupRes.GetDfaTable().PushBack(MergeDfa);
+							g1.mergeDfaId = groupRes.GetDfaTable().Size() - 1;
+							if (hash(Sig) == hash(g1.currSig))
+							{
+								result[vecKeys[j]].clear();
+							}
+							else if (hash(Sig) == hash(g2.currSig))
+							{
+								result[vecKeys[j]].clear();
+								result[vecKeys[j]].push_back(result[vecKeys[i]][0]);
+								result[vecKeys[i]].clear();
+							}
+							else
+							{
+								result[hash(Sig)].push_back(result[vecKeys[i]][0]);
+								if (std::find(vecKeys.begin(), vecKeys.end(), hash(Sig)) == vecKeys.end())
+								{
+									vecKeys.push_back(hash(Sig));
+								}
+								result[vecKeys[i]].clear();
+								result[vecKeys[j]].clear();
+							}
+							g1.currSig = Sig;
+							g2.vecSigs.clear();
+							g2.vecDfaIds.clear();
+							g2.mergeDfaId = (size_t)-1;
+						}
+						if (result[vecKeys[i]].size() == 0)
+						{
+							break;
+						}
+						if (result[vecKeys[j]].size() == 0)
+						{
+							continue;
+						}
+					}
+				}
+			}
+			if (result[vecKeys[i]].size() == 0)
+			{
+				continue;
+			}
+		}
+	}
+}
+
+void ClearUpHashRes(std::vector<GROUPHASH> &vecGroups, RESULTMAP &result, CGROUPRes &groupRes, HASHRES &HashResMap)
+{
+	size_t count = 0;
+	std::vector<CDfaNew> vecDfas;
+	groupRes.GetGroups().Clear();
+	for (std::vector<GROUPHASH>::iterator i = vecGroups.begin(); i != vecGroups.end(); ++i)
+	{
+		if (i->mergeDfaId != size_t(-1))
+		{
+			groupRes.GetGroups().PushBack(ONEGROUP());
+			ONEGROUP &group = groupRes.GetGroups().Back();
+			for (size_t j = 0; j < i->vecDfaIds.size(); ++j)
+			{
+				group.DfaIds.PushBack(i->vecDfaIds[j]);
+			}
+			for (size_t j = 0; j < i->vecSigs.size(); ++j)
+			{
+				group.ComSigs.PushBack(i->vecSigs[j]);
+			}
+			group.mergeDfaId = count;
+			group.currSig = i->currSig;
+			vecDfas.push_back(groupRes.GetDfaTable()[i->mergeDfaId]);
+			i->mergeDfaId = count;
+			++count;
+		}
+	}
+	
+	groupRes.GetDfaTable().Clear();
+	for (std::vector<CDfaNew>::iterator i = vecDfas.begin(); i != vecDfas.end(); ++i)
+	{
+		groupRes.GetDfaTable().PushBack(*i);
+	}
+
+	for (RESULTMAP::iterator i = result.begin(); i != result.end(); ++i)
+	{
+		for (std::vector<size_t>::iterator j = i->second.begin(); j != i->second.end(); ++j)
+		{
+			if (vecGroups[*j].mergeDfaId != size_t(-1))
+			{
+				HashResMap[i->first].push_back(HASHNODE(vecGroups[*j].currSig, vecGroups[*j].mergeDfaId));
+			}
+		}
+	}
+}
+
+HASHMAPPINGSC void HashMapping(CGROUPRes &groupRes, HASHRES &HashResMap)
 {
 	std::vector<GROUPHASH> vecGroups;
 	vecGroups.resize(groupRes.GetGroups().Size());
@@ -232,6 +447,10 @@ HASHMAPPINGSC void HashMapping(const CGROUPRes &groupRes, HASHRES &HashResMap)
 			vecGroups[i].vecSigs.push_back(groupRes.GetGroups()[i].ComSigs[j]);
 		}
 		vecGroups[i].mergeDfaId = groupRes.GetGroups()[i].mergeDfaId;
+		for (size_t j = 0; j < groupRes.GetGroups()[i].DfaIds.Size(); ++j)
+		{
+			vecGroups[i].vecDfaIds.push_back(groupRes.GetGroups()[i].DfaIds[j]);
+		}
 	}
 	//std::sort(vecGroups.begin(), vecGroups.end(), COMP());
 
@@ -255,5 +474,21 @@ HASHMAPPINGSC void HashMapping(const CGROUPRes &groupRes, HASHRES &HashResMap)
 	RESULTMAP result;
 	Mapping(vecGroups, gmap, dmap, result);
 
-	ClearUpHashRes(vecGroups, result, HashResMap);
+	Combine(groupRes, vecGroups, result);
+
+	//size_t count = 0;
+	//size_t slots = 0;
+	//for (RESULTMAP::iterator i = result.begin(); i != result.end(); ++i)
+	//{
+	//	count += i->second.size();
+	//	if (i->second.size() > 0)
+	//	{
+	//		++slots;
+	//	}
+	//}
+	//std::cout << count << std::endl;
+	//std::cout << slots << std::endl;
+	//std::cout << (count - slots)/double(count) << std::endl;
+
+	ClearUpHashRes(vecGroups, result, groupRes, HashResMap);
 }
