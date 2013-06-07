@@ -42,7 +42,7 @@ void GetMchRule(const u_char *data, size_t len, void* user, std::vector<size_t> 
 }
 
 //调用pcre库进行数据包匹配
-bool TradithinalMatch(const u_char *data, size_t len, CRegRule &regRule)
+bool PcreMatch(const u_char *data, size_t len, CRegRule &regRule)
 {
 	for(size_t i = 0; i < regRule.Size(); ++i)
 	{
@@ -53,6 +53,7 @@ bool TradithinalMatch(const u_char *data, size_t len, CRegRule &regRule)
 		{
 			//对规则选项进行匹配
 			int Pos = -1;
+
 			bool flag = match((const char*)pData, dataSize, regRule[i][j].GetString(), Pos);
 			if(!flag)
 			{
@@ -85,7 +86,7 @@ void HdlOnePkt(const u_char *data, size_t len, void*user)
 	rulesmap.mchresult << pktnum << " : ";
 	for(size_t i = 0; i < rules.size(); ++i)
 	{
-		bool flag = TradithinalMatch(data, len, rulesmap.result[rules[i]].regrule);
+		bool flag = PcreMatch(data, len, rulesmap.result[rules[i]].regrule);
 		if(flag)
 		{
 			//matchSid.push_back(rulesmap.result[rules[i]].m_nSid);
@@ -138,6 +139,7 @@ void packet_handler(u_char *param, const struct pcap_pkthdr *header, const u_cha
 	ih = (ip_header *)(pkt_data + ETHDRLEN);
 	pkt_data = pkt_data + ETHDRLEN;
 	PACKETPARAM *pParam = (PACKETPARAM*)param;
+
 	pParam->pFunc(ih, pkt_data, pParam->pUser);
 }
 
@@ -198,13 +200,15 @@ void CALLBACK PktParam(const ip_header *ih, const BYTE *data, void* user)
 
 bool MyLoadCapFile(const char* pFile, PACKETRECV cv, void* pUser)
 {
-	char* ebuff = new char;
-	pcap_t *mypcap = pcap_open_offline(pFile, ebuff);
+	//char* ebuff = new char;
+	pcap_t *mypcap = pcap_open_offline(pFile, NULL);
 	PACKETPARAM pp;
 	pp.pUser = pUser;
 	pp.pFunc = cv;
+
 	pcap_loop(mypcap, 0, packet_handler, (BYTE*)&pp);
-	delete ebuff;
+	pcap_close(mypcap);
+	//delete(ebuff);
 	return true;
 }
 
