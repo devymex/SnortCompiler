@@ -1,3 +1,17 @@
+/**
+**  @file        grouping.cpp
+**
+**  @author      Lab 435, Xidian University
+**
+**  @brief       Support functions for grouping dfa
+**
+**  This implements grouping dfa algorithm, the algorithm has four steps
+**  in general. At first, it groups dfa which has only one signature. Then, 
+**  push the remain dfa into the group. Thirdly, it groups dfa with the same 
+**  signatures. Finally, it merges two groups.
+**
+*/
+
 #include "stdafx.h"
 #include "grouping.h"
 #include "../compilernew/compilernew.h"

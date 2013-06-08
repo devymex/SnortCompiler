@@ -1,3 +1,15 @@
+/**
+**  @file        hashmapping.cpp
+**
+**  @author      Lab 435, Xidian University
+**
+**  @brief       Support functions for mapping groups into hash table
+**
+**  This implements mapping groups into hash table algorithm, the algorithm has 
+**  four steps in general. 
+**
+*/
+
 #include "stdafx.h"
 #include "hashmapping.h"
 #include "../dfanew/dfanew.h"
