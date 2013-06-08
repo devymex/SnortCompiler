@@ -140,7 +140,7 @@ size_t AddTermIntoDFA(STATEID otherSta, CDfaNew &other, STATEID lastSta, CDfaNew
 
 /*
 **  NAME
-**    NOrMerge::
+**    MergeMultipleDfas::
 */
 /**
 **  This function merges mutiple dfas into one dfa. And mark the terminal states to 
@@ -158,7 +158,7 @@ size_t AddTermIntoDFA(STATEID otherSta, CDfaNew &other, STATEID lastSta, CDfaNew
 **  @retval fasle fatal error
 */
 
-MERDFANEW bool NOrMerge(std::vector<CDfaNew> &dfas, CDfaNew &lastDfa)
+MERDFANEW bool MergeMultipleDfas(std::vector<CDfaNew> &dfas, CDfaNew &lastDfa)
 {
 	size_t dfaId = lastDfa.GetId();
 	lastDfa.Clear();
