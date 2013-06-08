@@ -81,7 +81,7 @@ int main()
 	//for (size_t i = 1; i < vecIds.size(); ++i)
 	//{
 	//	vecDfas[1] = result.GetDfaTable()[vecIds[i]];
-	//	if (NOrMerge(vecDfas, MergeDfa))
+	//	if (MergeMultipleDfas(vecDfas, MergeDfa))
 	//	{
 	//		vecDfas[0] = MergeDfa;
 	//	}

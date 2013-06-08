@@ -384,7 +384,7 @@ void Merge(CResNew &res, CGROUPS &groups)
 		for (size_t j = 1; j < groups[i].DfaIds.Size(); ++j)
 		{
 			vecDfas[1] = res.GetDfaTable()[groups[i].DfaIds[j]];
-			if (!NOrMerge(vecDfas, MergeDfa))
+			if (!MergeMultipleDfas(vecDfas, MergeDfa))
 			{
 				mergeFlag = false;
 				if (j != 1)
@@ -448,7 +448,7 @@ void PutInBySig(const std::vector<DFAINFO> &vecDfaInfo, CResNew &res, CGROUPS &g
 				}
 				vecDfas[1] = res.GetDfaTable()[*k];
 				CDfaNew MergeDfa;
-				if (NOrMerge(vecDfas, MergeDfa))
+				if (MergeMultipleDfas(vecDfas, MergeDfa))
 				{
 					res.GetDfaTable().PushBack(MergeDfa);
 					groups[*j].DfaIds.PushBack(*k);
@@ -480,7 +480,7 @@ void PutInBySig(const std::vector<DFAINFO> &vecDfaInfo, CResNew &res, CGROUPS &g
 	//				CDfaNew MergeDfa;
 	//				MergeDfa.SetId(res.GetDfaTable().Size());
 	//				vecDfas[1] = res.GetDfaTable()[groups[sigToGroupsMap[vecDfaInfo[*i].Sigs[j]][k]].mergeDfaId];
-	//				if (NOrMerge(vecDfas, MergeDfa))
+	//				if (MergeMultipleDfas(vecDfas, MergeDfa))
 	//				{
 	//					flag = true;
 	//					groups[sigToGroupsMap[vecDfaInfo[*i].Sigs[j]][k]].DfaIds.PushBack(*i);
@@ -627,7 +627,7 @@ void MergeGroup(CResNew &res, std::vector<SIGNATURE> &vecUsed, CGROUPS &newGroup
 				{
 					vecDfas[1] = res.GetDfaTable()[newGroups[j].mergeDfaId];
 					CDfaNew MergeDfa;
-					if (NOrMerge(vecDfas, MergeDfa))
+					if (MergeMultipleDfas(vecDfas, MergeDfa))
 					{
 						int nReduceSize = vecDfas[0].Size() + vecDfas[1].Size() - MergeDfa.Size();
 						//double nReduceSize = (vecDfas[0].Size() + vecDfas[1].Size() - MergeDfa.Size())/(double)MergeDfa.Size();
@@ -649,7 +649,7 @@ void MergeGroup(CResNew &res, std::vector<SIGNATURE> &vecUsed, CGROUPS &newGroup
 				ExtractComSigs(newGroups[i], newGroups[idx], vecUsed, vecComSigs);
 				vecDfas[1] = res.GetDfaTable()[newGroups[idx].mergeDfaId];
 				CDfaNew MergeDfa;
-				if (NOrMerge(vecDfas, MergeDfa))
+				if (MergeMultipleDfas(vecDfas, MergeDfa))
 				{
 					if (SigsToNumMap[vecSigs] > 0)
 					{
