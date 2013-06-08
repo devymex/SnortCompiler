@@ -1,6 +1,5 @@
 #include "stdafx.h"
-#include "PMatchPkt.h"
-
+#include "MatchPkt.h"
 void CALLBACK MyProcess(const CSnortRule &rule, LPVOID lpVoid)
 {
 	REGRULESMAP &rulesmap = *(REGRULESMAP*)lpVoid;
@@ -27,7 +26,7 @@ void CALLBACK MyProcess(const CSnortRule &rule, LPVOID lpVoid)
 	}
 }
 
-PMATCHPKT void MchCompile(LPCTSTR filename, LPVOID lpVoid)
+MATCHPKT void MchCompile(LPCTSTR filename, LPVOID lpVoid)
 {
 	//int sids[4653];
 	//std::memset(sids, 0, sizeof(sids));
@@ -108,36 +107,4 @@ END:	if(((flag & 1) == 0) && ((flag & 1 << 1) != 0))
 			++e2;
 	}
 	std::cout << std::endl;
-}
-
-//调用pcre库进行规则匹配
-bool TradithinalMatch(std::vector<u_char> &dataSrc, CRegRule &regRule)
-{
-	for(size_t i = 0; i < regRule.Size(); ++i)
-	{
-		//从数据包头开始匹配
-		std::string pData(dataSrc.begin(), dataSrc.end());
-		size_t dataSize = dataSrc.size();
-		for(size_t j = 0; j < regRule[i].Size(); ++j)
-		{
-			//对规则选项进行匹配
-			int Pos = -1;
-			bool flag = match(pData.c_str(), dataSize, regRule[i][j].GetString(), Pos);
-			if(!flag)
-			{
-				return false;
-			}
-			else if(Pos < dataSize)
-			{
-				pData = pData.substr(Pos);
-				dataSize -= Pos;
-			}
-			else
-			{
-				pData = "";
-				dataSize = 0;
-			}
-		}
-	}
-	return true;
 }

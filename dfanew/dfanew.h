@@ -58,7 +58,8 @@ public:
 	void UniqueTermSet();
 	//size_t AddTermIntoDFA(STATEID sta, const CDfaNew &other, STATEID thisSta);//根据other的sta查找termset，将找到的TERMSET插入到的this的m_TermSet中，其中this的状态是thisSta中
 	TERMSET& BackTermSet();
-	size_t FromNFA(const CNfa &nfa, NFALOG *nfalog, size_t Count, bool combine = false);
+	//size_t FromNFA(const CNfa &nfa, NFALOG *nfalog, size_t Count, bool combine = false);
+	size_t FromNFA(const CNfa &nfa);
 	size_t Minimize();
 	WORD GetGroupCount() const;
 	size_t GetTermCnt() const;

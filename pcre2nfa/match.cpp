@@ -35,15 +35,14 @@ MATCHSC bool match(const char* src, int length, std::string Regex, int &Pos)
 
 	const char* pattern = Pcre.c_str();
 
-	printf("string : %s\n", src);
-	printf("pattern: \"%s\"\n", pattern);
+	//printf("string : %s\n", src);
+	//printf("pattern: \"%s\"\n", pattern);
 
 	re = pcre_compile(pattern, options, &error, &erroffset, NULL);
 
 	if (re == NULL)
 	{
-		printf("pcre compilation failed at offset %d: %s\n", erroffset, error);
-		//system("pause");
+		//printf("pcre compilation failed at offset %d: %s\n", erroffset, error);
 		return false;
 	}
 
@@ -52,16 +51,17 @@ MATCHSC bool match(const char* src, int length, std::string Regex, int &Pos)
 
 	//rc = pcre_exec(re, NULL, src, length, 0, 0, ovector, OVECCOUNT);
 	rc = pcre_dfa_exec(re, NULL,src, length, 0, 0, ovector, OVECCOUNT, workspace, wscount);
+	delete workspace;
 	if (rc < 0)
 	{
-		if (rc == PCRE_ERROR_NOMATCH) printf("Sorry, no match ...\n");
-		else printf("Matching error %d\n", rc);
+		//if (rc == PCRE_ERROR_NOMATCH) printf("Sorry, no match ...\n");
+		//else printf("Matching error %d\n", rc);
 		free(re);
 		//system("pause");
 		return false;
 	}
 
-	printf("\nOK, has matched ...\n\n");
+	//printf("\nOK, has matched ...\n\n");
 
 	for (i = 0; i < rc; i++)
 	{

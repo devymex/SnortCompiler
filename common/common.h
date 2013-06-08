@@ -355,6 +355,7 @@ public:
 	void Resize(size_t nSize);
 	void PushBack(CRegChain &nRegChain);
 	CRegChain& operator[](size_t nIdx);
+	const CRegChain& operator[](size_t nIdx) const;
 	const CRegRule& operator = (const CRegRule &other);
 private:
 	std::vector<CRegChain> *m_pRegVec;

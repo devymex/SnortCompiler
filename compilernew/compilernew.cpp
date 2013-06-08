@@ -478,9 +478,9 @@ double dfamintimetime = 0.0;
 void Rule2Dfas(const CSnortRule &rule, CResNew &result, COMPILEDRULENEW &ruleResult)
 {
 	CRegRule regrule;
-
 	CTimer ctime;//用于测试
 	ctime.Reset();//用于测试
+
 	size_t flag = Rule2PcreList(rule, regrule);//从content中取出sig了
 	rule2pcretime += ctime.Reset();//用于测试
 
@@ -537,7 +537,7 @@ void Rule2Dfas(const CSnortRule &rule, CResNew &result, COMPILEDRULENEW &ruleRes
 			{
 				ctime.Reset();//用于测试
 				dfa.SetId(nDfaId);
-				size_t nToDFAFlag = dfa.FromNFA(nfa, NULL, 0);
+				size_t nToDFAFlag = dfa.FromNFA(nfa);
 				//				std::cout << "  "<< dfa.LinkSize() << ", " << dfa.GetGroupCount() * dfa.Size() << std::endl;
 				nfa2dfatime += ctime.Reset();//用于测试
 				//outPutDfa(dfa, "..//..//output//test.txt");
@@ -550,9 +550,7 @@ void Rule2Dfas(const CSnortRule &rule, CResNew &result, COMPILEDRULENEW &ruleRes
 				else
 				{
 					ctime.Reset();//用于测试
-					//std::cout << dfa.GetTermCnt() << std::endl;
 					size_t nr = dfa.Minimize();
-					//std::cout << dfa.GetTermCnt() << std::endl;
 					dfamintimetime += ctime.Reset();//用于测试
 					if (0 != nr || dfa.Size() > DFA_SIZE_LIMIT)
 					{
@@ -589,7 +587,6 @@ void Rule2Dfas(const CSnortRule &rule, CResNew &result, COMPILEDRULENEW &ruleRes
 			AssignSig(result, nRegexTblSize, nRegexTblSize + nIncrement);
 		}
 	}
-
 }
 
 void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
@@ -615,11 +612,6 @@ void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 		ruleResult.m_nResult = COMPILEDRULENEW::RES_HASBYTE;
 		return;
 	}
-	//else if (nFlag & CSnortRule::RULE_HASNOSIG)
-	//{
-	//	ruleResult.m_nResult = COMPILEDRULENEW::RES_HASNOSIG;
-	//	return;
-	//}
 	else
 	{
 		Rule2Dfas(rule, result, ruleResult);

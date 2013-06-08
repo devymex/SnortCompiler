@@ -1,3 +1,10 @@
 LIBRARY MatchPacket
 EXPORTS
 LoadCapFile @1
+MchCompile @2
+HandleAllFile @3
+
+DfaMatchPkt @4
+DLoadCapFile @5
+DHandleAllFile @6
+DfaidSidMap @7

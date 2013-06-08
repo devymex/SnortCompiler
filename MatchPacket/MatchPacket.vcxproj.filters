@@ -21,12 +21,21 @@
     <ClInclude Include="MatchPkt.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DfaMatch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MatchPkt.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CompileRules.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DfaMatch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

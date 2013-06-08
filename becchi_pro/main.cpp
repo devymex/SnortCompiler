@@ -426,7 +426,7 @@ size_t CompareWithPcre(const char *pPcre)
 	//std::cout << nfa1.Size() << std::endl;
 	//outPut(nfa1, "..//nfaresult1.txt");
 	CDfaNew OwnDfa;
-	if (-1 == OwnDfa.FromNFA(nfa1, NULL, 0))
+	if (-1 == OwnDfa.FromNFA(nfa1))
 	{
 		return 3;
 	}

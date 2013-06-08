@@ -31,10 +31,11 @@ struct DFAINFO
 };
 
 
-struct GROUP
+struct ONEGROUP
 {
 	CVectorNumber DfaIds;
 	CSIGNATURES ComSigs;
+	SIGNATURE currSig;
 	std::size_t mergeDfaId;
 };
 
@@ -47,14 +48,14 @@ public:
 	~CGROUPS();
 	const size_t Size() const;
 	void Resize(size_t nSize);
-	void PushBack(GROUP oneGroup);
-	GROUP& Back();
-	GROUP &operator[](size_t nIdx);
-	const GROUP &operator[](size_t nIdx) const;
+	void PushBack(ONEGROUP oneGroup);
+	ONEGROUP& Back();
+	ONEGROUP &operator[](size_t nIdx);
+	const ONEGROUP &operator[](size_t nIdx) const;
 	void Clear();
 	void Erase(size_t nIdx);
 private:
-	std::vector<GROUP> *m_pGroups;
+	std::vector<ONEGROUP> *m_pGroups;
 };
 
 class GROUPINGSC CGROUPRes

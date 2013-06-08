@@ -23,10 +23,12 @@ int main()
 	//		std::cout << i << std::endl;
 	//	}
 	//}
+
 	CResNew result;
-	//compilenew(_T("..\\allrules.rule"), result);
-	//result.WriteToFile(_T("..\\result.cdt"));
-	result.ReadFromFile(_T("..\\result.cdt"));
+	compilenew(_T("..\\..\\input\\allrules.rule"), result);
+	result.WriteToFile(_T("..\\..\\output\\result.cdt"));
+	//result.ReadFromFile(_T("..\\..\\output\\result.cdt"));
+
 	//for (size_t i = 0; i < result.GetSidDfaIds().Size(); ++i)
 	//{
 	//	if (result.GetSidDfaIds()[i].m_dfaIds.Size() > 0 && result.GetSidDfaIds()[i].m_dfaIds[0] == 1244)
@@ -41,12 +43,12 @@ int main()
 	grouping(result, groupRes);
 	std::cout << "分组时间： " << ctime.Reset() << std::endl;
 
-	//groupRes.WriteToFile(_T("..\\..\\output\\GroupResut.cdt"));
+	groupRes.WriteToFile(_T("..\\..\\output\\GroupResut.cdt"));
 
 	//groupRes.ReadFromFile(_T("..\\..\\output\\GroupResut.cdt"));
 	//groupRes.WriteToFile(_T("..\\..\\output\\GroupResut1.cdt"));
 
-	//std::ifstream fin("..\\..\\output\\test.txt");
+	//std::ifstream fin("..\\..\\output\\Ids.txt");
 	//std::vector<size_t> vecIds;
 	//size_t tmp;
 	//while (fin >> tmp)
@@ -54,13 +56,42 @@ int main()
 	//	vecIds.push_back(tmp);
 	//}
 
+	//SIGNATURE Sig = vecIds.back();
+	//vecIds.pop_back();
+	//for (size_t i = 0; i < vecIds.size(); ++i)
+	//{
+	//	bool flag = false;
+	//	for (size_t j = 0; j < result.GetRegexTbl()[vecIds[i]].GetSigCnt(); ++j)
+	//	{
+	//		if (result.GetRegexTbl()[vecIds[i]].GetSig(j) == Sig)
+	//		{
+	//			flag = true;
+	//			break;
+	//		}
+	//	}
+	//	if (!flag)
+	//	{
+	//		std::cout << "No Sig" << std::endl;
+	//	}
+	//}
+
 	//std::vector<CDfaNew> vecDfas(2);
 	//CDfaNew MergeDfa;
-	//vecDfas[0] = result.GetDfaTable()[0];
-	//vecDfas[1] = result.GetDfaTable()[1];
-	//NOrMerge(vecDfas, MergeDfa);
-
-	//std::cout << MergeDfa.Size() << std::endl;
+	//vecDfas[0] = result.GetDfaTable()[vecIds[0]];
+	//for (size_t i = 1; i < vecIds.size(); ++i)
+	//{
+	//	vecDfas[1] = result.GetDfaTable()[vecIds[i]];
+	//	if (NOrMerge(vecDfas, MergeDfa))
+	//	{
+	//		vecDfas[0] = MergeDfa;
+	//	}
+	//	else
+	//	{
+	//		std::cout << "ERROR" << std::endl;
+	//		break;
+	//	}
+	//}
+	//std::cout << vecDfas[0].Size() << std::endl;
 
 	system("pause");
 	return 0;
