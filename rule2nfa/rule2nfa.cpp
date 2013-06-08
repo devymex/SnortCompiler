@@ -1,3 +1,14 @@
+/**
+**  @file        rule2nfa.cpp
+**
+**  @author      Lab 435, Xidian University
+**
+**  @brief       Support functions for transforming a rule to a nfa tree
+**
+**  This nfa tree processing for rule options.
+**
+*/
+
 #include "stdafx.h"
 #include "rule2nfa.h"
 #include "CombineTree.h"
@@ -6,6 +17,9 @@
 #define nfaTreeReserve 100
 #define nfaReserve 10000
 
+/*
+**	some special symbols to be considered when construct "content" to "pcre"
+*/
 #define ANY '.'
 #define ESCAPE '\\'
 #define STAR '*'
@@ -746,7 +760,7 @@ void content2Nfa(OPTIONCONTENT *content, CNfa &nfa)
 	}
 }
 
-//测试函数:输出一个nfa
+//test function: output a nfa
 void outPut(CNfa &nfa, std::string &fileName)
 {
 	size_t stateNum = nfa.Size();
