@@ -34,5 +34,14 @@ void main()
 	//fout.clear();
 	//fout.close();
 
+	//CTimer ctime;
+	//CResNew result;
+	//compilenew(_T("..\\..\\input\\allrules.rule"), result);
+	//CGROUPRes groupRes;
+	//grouping(result, groupRes);
+	//HASHRES HashResMap;
+	//HashMapping(groupRes, HashResMap);
+	//std::cout << "×ÜÊ±¼ä£º " << ctime.Reset() << std::endl;
+
 	system("pause");
 }

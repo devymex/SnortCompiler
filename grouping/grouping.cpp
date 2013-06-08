@@ -151,6 +151,16 @@ void WriteNum(std::ofstream &fout, _Ty _num, size_t nBytes = sizeof(_Ty))
 	fout.write((char*)&_num, nBytes);
 }
 
+/* Write the relationship between sid and dfa id, dfa table and result of grouping
+to file
+
+Arguments:
+  filename    path of the file waiting for written
+
+Returns:      0 success
+              -1 error occurred
+*/
+
 GROUPINGSC size_t CGROUPRes::WriteToFile(LPCTSTR filename)
 {
 	std::ofstream fout(filename, std::ios::binary);
@@ -159,31 +169,41 @@ GROUPINGSC size_t CGROUPRes::WriteToFile(LPCTSTR filename)
 		std::cerr << "Open file Failed!" << std::endl;
 		return (size_t)-1;
 	}
-	//记录文件尺寸填写位置
+
+	//mark the position used for file size
 	std::streamoff fileSizePos = fout.tellp();
 	fout.seekp(4, std::ios_base::cur);
-	//规则数量
+
+	//write the number of rules
 	WriteNum(fout, m_sidDfaIds.Size());
-	//记录规则偏移填写位置
+
+	//mark the position used for the offset of rule
 	std::streamoff ruleOffsetPos = fout.tellp();
 	fout.seekp(4, std::ios_base::cur);
-	//DFAs数量
+
+	//write the number of dfas
 	WriteNum(fout, m_dfaTbl.Size());
-	//记录DFAs偏移填写位置
+
+	//mark the position used for the offset of dfa
 	std::streamoff dfaOffsetPos = fout.tellp();
 	fout.seekp(4, std::ios_base::cur);
-	//group数量
+
+	//write the number of groups
 	WriteNum(fout, m_groups.Size());
-	//记录groups偏移填写位置
+
+	//mark the position used for the offset of group
 	std::streamoff groupOffsetPos = fout.tellp();
 	fout.seekp(4, std::ios_base::cur);
-	//填写规则偏移
+
+	//write the offset of group
 	std::streamoff endPos = fout.tellp();
 	fout.seekp(ruleOffsetPos, std::ios_base::beg);
 	WriteNum(fout, endPos, 4);
-	//定位文件到末尾
+
+	//location to the end of the file
 	fout.seekp(endPos, std::ios_base::beg);
-	//开始写规则表
+
+	//start to write the relationship between sid and dfa id
 	for (size_t i = 0; i < m_sidDfaIds.Size(); ++i)
 	{
 		COMPILEDRULENEW &ruleResult = m_sidDfaIds[i];
@@ -195,13 +215,16 @@ GROUPINGSC size_t CGROUPRes::WriteToFile(LPCTSTR filename)
 			WriteNum(fout, ruleResult.m_dfaIds[j], 4);
 		}
 	}
-	//填写DFAs偏移
+
+	//write the offset of dfa
 	endPos = fout.tellp();
 	fout.seekp(dfaOffsetPos, std::ios_base::beg);
 	WriteNum(fout, endPos, 4);
-	//定位文件到末尾
+
+	//location to the end of the file
 	fout.seekp(0, std::ios_base::end);
-	//开始写DFAs
+
+	//start to write dfas
 	BYTE dfaDetails[100000];
 	for (size_t i = 0; i < m_dfaTbl.Size(); ++i)
 	{
@@ -209,13 +232,16 @@ GROUPINGSC size_t CGROUPRes::WriteToFile(LPCTSTR filename)
 		WriteNum(fout, len);
 		fout.write((char*)dfaDetails, len * sizeof(BYTE));
 	}
-	//填写分组偏移
+
+	//write the offset of group
 	endPos = fout.tellp();
 	fout.seekp(groupOffsetPos, std::ios_base::beg);
 	WriteNum(fout, endPos, 4);
-	//定位文件到末尾
+
+	//location to the end of the file
 	fout.seekp(0, std::ios_base::end);
-	//开始写groups
+
+	//start to write groups
 	for (size_t i = 0; i < m_groups.Size(); ++i)
 	{
 		WriteNum(fout, m_groups[i].DfaIds.Size());
@@ -231,7 +257,7 @@ GROUPINGSC size_t CGROUPRes::WriteToFile(LPCTSTR filename)
 		WriteNum(fout, m_groups[i].currSig);
 		WriteNum(fout, m_groups[i].mergeDfaId);
 	}
-	//填写文件尺寸
+	//write the file size
 	endPos = fout.tellp();
 	fout.seekp(fileSizePos, std::ios_base::beg);
 	WriteNum(fout, endPos, 4);
@@ -242,6 +268,16 @@ GROUPINGSC size_t CGROUPRes::WriteToFile(LPCTSTR filename)
 	return 0;
 }
 
+/* Read the relationship between sid and dfa id, dfa table and result of grouping
+from file
+
+Arguments:
+  filename    path of the file to read from
+
+Returns:      0 success
+              -1 error occurred
+*/
+
 GROUPINGSC size_t CGROUPRes::ReadFromFile(LPCTSTR filename)
 {
 	std::ifstream fin(filename, std::ios::binary);
@@ -250,25 +286,33 @@ GROUPINGSC size_t CGROUPRes::ReadFromFile(LPCTSTR filename)
 		std::cerr << "Open file Failed!" << std::endl;
 		return (size_t)-1;
 	}
-	//读取文件尺寸
+
+	//read the file size
 	size_t fileSize;
 	fin.read((char*)&fileSize, 4);
-	//读取规则数量
+
+	//read the number of rules
 	size_t ruleNum;
 	fin.read((char*)&ruleNum, 4);
-	//跳过规则偏移
+
+	//skip the offset of rule
 	fin.seekg(4, std::ios_base::cur);
-	//DFAs数量
+
+	//read the number of dfas
 	size_t dfaNum;
 	fin.read((char*)&dfaNum, 4);
-	//跳过DFAs偏移
+
+	//skip the offset of dfa
 	fin.seekg(4, std::ios_base::cur);
-	//group数量
+
+	//read the number of groups
 	size_t groupNum;
 	fin.read((char*)&groupNum, 4);
-	//跳过分组偏移
+
+	//skip the offset of group
 	fin.seekg(4, std::ios_base::cur);
-	//开始读规则表
+
+	//start to read the relationship between sid and dfa id
 	m_sidDfaIds.Resize(ruleNum);
 	size_t SidDfaNum;
 	for (size_t i = 0; i < ruleNum; ++i)
@@ -283,7 +327,8 @@ GROUPINGSC size_t CGROUPRes::ReadFromFile(LPCTSTR filename)
 			fin.read((char*)&(ruleResult.m_dfaIds[j]), 4);
 		}
 	}
-	//开始读DFAs
+
+	//start to read dfas
 	m_dfaTbl.Resize(dfaNum);
 	BYTE dfaDetails[100000];
 	for (size_t i = 0; i < dfaNum; ++i)
@@ -294,7 +339,8 @@ GROUPINGSC size_t CGROUPRes::ReadFromFile(LPCTSTR filename)
 		fin.read((char*)dfaDetails, len * sizeof(BYTE));
 		dfa.Load(dfaDetails, len);
 	}
-	//读分组
+
+	//start to read groups
 	m_groups.Resize(groupNum);
 	size_t nDfaIdNum;
 	size_t nSigNum;
@@ -324,6 +370,17 @@ GROUPINGSC size_t CGROUPRes::ReadFromFile(LPCTSTR filename)
 	return 0;
 }
 
+/* Extract signatures from res to vecDfaInfo and add all index to vecWaitForGroup
+
+Arguments:
+  res               the compile result
+  vecDfaInfo        signatures correspond to each dfa
+  vecWaitForGroup   the index of dfa waiting for grouping
+
+Returns:            nothing
+
+*/
+
 void ExtractDfaInfo(const CResNew &res, std::vector<DFAINFO> &vecDfaInfo, std::vector<size_t> &vecWaitForGroup)
 {
 	std::size_t nSize = res.GetRegexTbl().Size();
@@ -338,6 +395,17 @@ void ExtractDfaInfo(const CResNew &res, std::vector<DFAINFO> &vecDfaInfo, std::v
 	}
 }
 
+/* group dfa which has only one signature by its only signature
+
+Arguments:
+  vecDfaInfo        signatures correspond to each dfa
+  vecWaitForGroup   the index of dfa waiting for grouping
+  groups            the group result
+
+Returns:            nothing
+
+*/
+
 void GroupOnlyOneSig(const std::vector<DFAINFO> &vecDfaInfo, std::vector<size_t> &vecWaitForGroup, CGROUPS &groups)
 {
 	std::map<SIGNATURE, CVectorNumber> sigToIdsMap;
@@ -346,6 +414,8 @@ void GroupOnlyOneSig(const std::vector<DFAINFO> &vecDfaInfo, std::vector<size_t>
 		if (vecDfaInfo[*i].Sigs.size() == 1)
 		{
 			sigToIdsMap[vecDfaInfo[*i].Sigs[0]].PushBack(*i);
+
+			//update the index of dfa waiting for grouping
 			i = vecWaitForGroup.erase(i);
 		}
 		else
@@ -364,6 +434,16 @@ void GroupOnlyOneSig(const std::vector<DFAINFO> &vecDfaInfo, std::vector<size_t>
 	}
 }
 
+/* try to merge dfa in one group, merge if success, otherwise seperate the group into two
+
+Arguments:
+  res               the compile result, the merged dfa will be pushed into the res's dfa table
+  groups            the group result
+
+Returns:            nothing
+
+*/
+
 void Merge(CResNew &res, CGROUPS &groups)
 {
 	for (size_t i = 0; i < groups.Size(); ++i)
@@ -372,6 +452,8 @@ void Merge(CResNew &res, CGROUPS &groups)
 		std::cout << "NO: " << i << std::endl;
 		std::cout << "Total: " << groups.Size() << std::endl << std::endl;
 		groups[i].mergeDfaId = groups[i].DfaIds[0];
+
+		//not need merge for group with only one dfa
 		if (groups[i].DfaIds.Size() == 1)
 		{
 			continue;
@@ -380,6 +462,8 @@ void Merge(CResNew &res, CGROUPS &groups)
 		CDfaNew MergeDfa;
 		MergeDfa.SetId(res.GetDfaTable().Size());
 		vecDfas[0] = res.GetDfaTable()[groups[i].DfaIds[0]];
+		
+		//flag if all dfas in the group can merge together
 		bool mergeFlag = true;
 		for (size_t j = 1; j < groups[i].DfaIds.Size(); ++j)
 		{
@@ -387,6 +471,8 @@ void Merge(CResNew &res, CGROUPS &groups)
 			if (!MergeMultipleDfas(vecDfas, MergeDfa))
 			{
 				mergeFlag = false;
+
+				//if first merge is success, it indicates that a new merged dfa need push into res's dfa table
 				if (j != 1)
 				{
 					res.GetDfaTable().PushBack(vecDfas[0]);
@@ -412,6 +498,8 @@ void Merge(CResNew &res, CGROUPS &groups)
 				vecDfas[0] = MergeDfa;
 			}
 		}
+
+		//all dfas in the group can merge together
 		if (mergeFlag)
 		{
 			res.GetDfaTable().PushBack(MergeDfa);
@@ -419,6 +507,19 @@ void Merge(CResNew &res, CGROUPS &groups)
 		}
 	}
 }
+
+/* put dfa waiting for grouping into a group, if the dfa has the group's signature and 
+can merge with the group's dfa merged before
+
+Arguments:
+  vecDfaInfo        signatures correspond to each dfa
+  res               the compile result, the merged dfa will be pushed into the res's dfa table
+  groups            the group result
+  vecWaitForGroup   the index of dfa waiting for grouping
+
+Returns:            nothing
+
+*/
 
 void PutInBySig(const std::vector<DFAINFO> &vecDfaInfo, CResNew &res, CGROUPS &groups, std::vector<size_t> &vecWaitForGroup)
 {
@@ -441,6 +542,8 @@ void PutInBySig(const std::vector<DFAINFO> &vecDfaInfo, CResNew &res, CGROUPS &g
 			vecDfas[0] = res.GetDfaTable()[groups[*j].mergeDfaId];
 			for (std::vector<size_t>::iterator k = vecWaitForGroup.begin(); k != vecWaitForGroup.end(); )
 			{
+
+				//the dfa doesn't have the group's signature
 				if (std::find(vecDfaInfo[*k].Sigs.begin(), vecDfaInfo[*k].Sigs.end(), i->first) == vecDfaInfo[*k].Sigs.end())
 				{
 					++k;
@@ -454,6 +557,8 @@ void PutInBySig(const std::vector<DFAINFO> &vecDfaInfo, CResNew &res, CGROUPS &g
 					groups[*j].DfaIds.PushBack(*k);
 					groups[*j].mergeDfaId = res.GetDfaTable().Size() - 1;
 					vecDfas[0] = MergeDfa;
+
+					//update the index of dfa waiting for grouping
 					k = vecWaitForGroup.erase(k);
 				}
 				else
@@ -463,48 +568,18 @@ void PutInBySig(const std::vector<DFAINFO> &vecDfaInfo, CResNew &res, CGROUPS &g
 			}
 		}
 	}
-	//for (std::vector<size_t>::iterator i = vecWaitForGroup.begin(); i != vecWaitForGroup.end();)
-	//{
-	//	std::cout << "PutInBySig " << std::endl;
-	//	std::cout << "NO: " << i - vecWaitForGroup.begin() << std::endl;
-	//	std::cout << "Total: " << vecWaitForGroup.size() << std::endl << std::endl;
-	//	std::vector<CDfaNew> vecDfas(2);
-	//	vecDfas[0] = res.GetDfaTable()[*i];
-	//	bool flag = false;
-	//	for (size_t j = 0; j < vecDfaInfo[*i].Sigs.size(); ++j)
-	//	{
-	//		if (sigToGroupsMap[vecDfaInfo[*i].Sigs[j]].size() != 0)
-	//		{
-	//			for (size_t k = 0; k < sigToGroupsMap[vecDfaInfo[*i].Sigs[j]].size(); ++k)
-	//			{
-	//				CDfaNew MergeDfa;
-	//				MergeDfa.SetId(res.GetDfaTable().Size());
-	//				vecDfas[1] = res.GetDfaTable()[groups[sigToGroupsMap[vecDfaInfo[*i].Sigs[j]][k]].mergeDfaId];
-	//				if (MergeMultipleDfas(vecDfas, MergeDfa))
-	//				{
-	//					flag = true;
-	//					groups[sigToGroupsMap[vecDfaInfo[*i].Sigs[j]][k]].DfaIds.PushBack(*i);
-	//					res.GetDfaTable().PushBack(MergeDfa);
-	//					groups[sigToGroupsMap[vecDfaInfo[*i].Sigs[j]][k]].mergeDfaId = res.GetDfaTable().Size() - 1;
-	//					break;
-	//				}
-	//			}
-	//			if (flag)
-	//			{
-	//				break;
-	//			}
-	//		}
-	//	}
-	//	if (flag)
-	//	{
-	//		i = vecWaitForGroup.erase(i);
-	//	}
-	//	else
-	//	{
-	//		++i;
-	//	}
-	//}
 }
+
+/* group dfa which has the same signatures by its signatures
+
+Arguments:
+  vecDfaInfo        signatures correspond to each dfa
+  newGroups         the new group result
+  vecWaitForGroup   the index of dfa waiting for grouping
+
+Returns:            nothing
+
+*/
 
 void BuildGroupBySig(const std::vector<DFAINFO> &vecDfaInfo, CGROUPS &newGroups, std::vector<size_t> &vecWaitForGroup)
 {
@@ -528,6 +603,16 @@ void BuildGroupBySig(const std::vector<DFAINFO> &vecDfaInfo, CGROUPS &newGroups,
 	}
 }
 
+/* extract signatures from group with only one signature
+
+Arguments:
+  groups            the group result, each group has only one signature
+  vecUsed           the signatures which are used by group with only one signature
+
+Returns:            nothing
+
+*/
+
 void ExtractUsedSigs(const CGROUPS &groups, std::vector<SIGNATURE> &vecUsed)
 {
 	for (size_t i = 0; i < groups.Size(); ++i)
@@ -537,6 +622,18 @@ void ExtractUsedSigs(const CGROUPS &groups, std::vector<SIGNATURE> &vecUsed)
 	std::sort(vecUsed.begin(), vecUsed.end());
 	vecUsed.erase(std::unique(vecUsed.begin(), vecUsed.end()), vecUsed.end());
 }
+
+/* extract common signatures from two groups
+
+Arguments:
+  g1                the first group
+  g2                the second group
+  vecUsed           the signatures which are used by group with only one signature
+  vecComSigs        common signatures of the two groups
+
+Returns:            nothing
+
+*/
 
 void ExtractComSigs(const ONEGROUP &g1, const ONEGROUP &g2, const std::vector<SIGNATURE> &vecUsed, std::vector<SIGNATURE> &vecComSigs)
 {
@@ -552,6 +649,8 @@ void ExtractComSigs(const ONEGROUP &g1, const ONEGROUP &g2, const std::vector<SI
 
 	for (std::map<SIGNATURE, size_t>::iterator i = sigToNumMap.begin(); i != sigToNumMap.end(); ++i)
 	{
+
+		//the two group both have the signature and the signature is not contained in vecUsed
 		if (i->second == 2 && std::find(vecUsed.begin(), vecUsed.end(), i->first) == vecUsed.end())
 		{
 			vecComSigs.push_back(i->first);
@@ -559,17 +658,38 @@ void ExtractComSigs(const ONEGROUP &g1, const ONEGROUP &g2, const std::vector<SI
 	}
 }
 
-size_t AvailableNum(const std::vector<SIGNATURE> &vecComSigs)
+/* the used upper limit of the signatures
+
+Arguments:
+  vecSigs           signatures
+
+Returns:            the used upper limit of the signatures
+
+*/
+
+size_t AvailableNum(const std::vector<SIGNATURE> &vecSigs)
 {
-	if (vecComSigs.size() <= 1)
+	if (vecSigs.size() <= 1)
 	{
 		return 0;
 	}
 	else
 	{
-		return vecComSigs.size() - 2;
+		return vecSigs.size() - 2;
 	}
 }
+
+/* try to merge two groups, merge if the two group have common signatures , the used number 
+of the common signatures isn't exceed its upper limit and the two groups merged dfa can merge
+
+Arguments:
+  res               the compile result, the merged dfa will be pushed into the res's dfa table
+  vecUsed           the signatures which can not be used
+  newGroups         the new group result
+
+Returns:            nothing
+
+*/
 
 void MergeGroup(CResNew &res, std::vector<SIGNATURE> &vecUsed, CGROUPS &newGroups)
 {
@@ -614,7 +734,6 @@ void MergeGroup(CResNew &res, std::vector<SIGNATURE> &vecUsed, CGROUPS &newGroup
 			size_t idx = 0;
 #undef min
 			int nMax = std::numeric_limits<int>::min();
-			//double nMax = std::numeric_limits<double>::min();
 			for (size_t j = i + 1; j < newGroups.Size(); ++j)
 			{
 				std::vector<SIGNATURE> vecComSigs;
@@ -629,8 +748,9 @@ void MergeGroup(CResNew &res, std::vector<SIGNATURE> &vecUsed, CGROUPS &newGroup
 					CDfaNew MergeDfa;
 					if (MergeMultipleDfas(vecDfas, MergeDfa))
 					{
+
+						//select the fittest group to merge
 						int nReduceSize = vecDfas[0].Size() + vecDfas[1].Size() - MergeDfa.Size();
-						//double nReduceSize = (vecDfas[0].Size() + vecDfas[1].Size() - MergeDfa.Size())/(double)MergeDfa.Size();
 						if (nMax < nReduceSize)
 						{
 							nMax = nReduceSize;
@@ -639,6 +759,8 @@ void MergeGroup(CResNew &res, std::vector<SIGNATURE> &vecUsed, CGROUPS &newGroup
 					}
 				}
 			}
+
+			//no group can merge with the current group
 			if (idx == 0)
 			{
 				break;
@@ -698,6 +820,16 @@ void MergeGroup(CResNew &res, std::vector<SIGNATURE> &vecUsed, CGROUPS &newGroup
 	}
 }
 
+/* add new group result to group result
+
+Arguments:
+  groups            the group result
+  newGroups         the new group result
+
+Returns:            nothing
+
+*/
+
 void AddNewGroups(CGROUPS &newGroups, CGROUPS &groups)
 {
 	for (size_t i = 0; i < newGroups.Size(); ++i)
@@ -706,6 +838,17 @@ void AddNewGroups(CGROUPS &newGroups, CGROUPS &groups)
 	}
 	newGroups.Clear();
 }
+
+/* clear up the group result
+
+Arguments:
+  res               the compile result and its dfa table contains the merged dfas
+  groups            the group result
+  groupRes          the relationship between sid and dfa id, dfa table and result of grouping
+
+Returns:            nothing
+
+*/
 
 void ClearUpRes(CResNew &res, const CGROUPS &groups, CGROUPRes &groupRes)
 {
@@ -842,6 +985,16 @@ void outPutTermSet(CGROUPRes &groupRes, const char* fileName)
 	fout.close();
 }
 
+/* the grouping algorithm
+
+Arguments:
+  res               the compile result
+  groupRes          the relationship between sid and dfa id, dfa table and result of grouping
+
+Returns:            nothing
+
+*/
+
 GROUPINGSC void grouping(CResNew &res, CGROUPRes &groupRes)
 {
 	CTimer t1, tAll;
@@ -868,7 +1021,7 @@ GROUPINGSC void grouping(CResNew &res, CGROUPRes &groupRes)
 	std::cout << "Completed in " << t1.Reset() << " Sec." << std::endl << std::endl;
 
 	//Build group which has the same signature...
-	std::cout << "Build group which has the same signature..." << std::endl;
+	std::cout << "Build group which has the same signatures..." << std::endl;
 	CGROUPS newGroups;
 	BuildGroupBySig(vecDfaInfo, newGroups, vecWaitForGroup);
 	Merge(res, newGroups);
@@ -881,7 +1034,7 @@ GROUPINGSC void grouping(CResNew &res, CGROUPRes &groupRes)
 	std::cout << "Completed in " << t1.Reset() << " Sec." << std::endl << std::endl;
 
 	//Merge group which have the same signature...
-	std::cout << "Merge group which have the same signature..." << std::endl;
+	std::cout << "Merge group which have the same signatures..." << std::endl;
 	MergeGroup(res, vecUsed, newGroups);
 	std::cout << "Completed in " << t1.Reset() << " Sec." << std::endl << std::endl;
 	
