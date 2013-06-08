@@ -71,11 +71,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="MergeDfanew.cpp" />
-    <ClCompile Include="OrDfanew.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MergeDfanew.h" />
-    <ClInclude Include="OrDfanew.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>

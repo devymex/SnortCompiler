@@ -464,10 +464,10 @@ void GetNextEClosureSet(const CNfa &nfa, const std::vector<STATESET> &eClosure,
 		eClosureSet.end()), eClosureSet.end());
 }
 
-DFANEWSC size_t CDfaNew::FromNFA(const CNfa &nfa, NFALOG *nfalog, size_t Count, bool combine)
+DFANEWSC size_t CDfaNew::FromNFA(const CNfa &nfa)
 {
 	typedef std::unordered_map<std::vector<size_t>, STATEID, NSTATESET_HASH> STATESETHASH;
-	std::vector<std::pair<std::vector<size_t>, STATEID>> termStasVec;
+	//std::vector<std::pair<std::vector<size_t>, STATEID>> termStasVec;
 
 	size_t dfaId = m_nId;
 	Clear();
@@ -529,11 +529,10 @@ DFANEWSC size_t CDfaNew::FromNFA(const CNfa &nfa, NFALOG *nfalog, size_t Count, 
 				if(ssh.count(nextNfaVec) == 0)
 				{
 					m_pDfa->push_back(CDfaRow(m_nColNum));
-					//std::cout << m_pDfa->size() << std::endl;//ÓÃÓÚ²âÊÔ
 					if (m_pDfa->size() > SC_STATELIMIT)// || nTotalSize >= 2048
 					{
 
-						std::cout << "SC_STATELIMIT!" << std::endl;
+						//std::cout << "SC_STATELIMIT!" << std::endl;
 						return (size_t)-1;
 					}
 					STATEID nextSta = (STATEID)ssh.size();
@@ -547,17 +546,10 @@ DFANEWSC size_t CDfaNew::FromNFA(const CNfa &nfa, NFALOG *nfalog, size_t Count, 
 					{
 						CDfaRow &lastRow = m_pDfa->back();
 						lastRow.SetFlag(lastRow.GetFlag() | lastRow.TERMINAL);
-						if(combine)
-						{
-							termStasVec.push_back(std::make_pair(nextNfaVec, nextSta));
-						}
-						else
-						{
-							m_TermSet->push_back(TERMSET());
-							m_TermSet->back().dfaSta = nextSta;
-							m_TermSet->back().dfaId = m_nId;
-							nTotalSize += sizeof(TERMSET);
-						}
+						m_TermSet->push_back(TERMSET());
+						m_TermSet->back().dfaSta = nextSta;
+						m_TermSet->back().dfaId = m_nId;
+						nTotalSize += sizeof(TERMSET);
 					}
 					nfaStasStack.push(nextNfaVec);
 				}
@@ -569,33 +561,6 @@ DFANEWSC size_t CDfaNew::FromNFA(const CNfa &nfa, NFALOG *nfalog, size_t Count, 
 		}
 	}
 
-	if(combine)
-	{
-		if(!termStasVec.empty())
-		{
-			for(size_t i = 0; i < Count; ++i)
-			{
-				for(size_t j = 0; j < termStasVec.size(); ++j)
-				{
-					for(size_t k = 0; k < termStasVec[j].first.size(); ++k)
-					{
-						if(nfalog[i].nfaStateId == termStasVec[j].first[k])
-						{
-							m_TermSet->push_back(TERMSET());
-							m_TermSet->back().dfaSta = termStasVec[j].second;
-							m_TermSet->back().dfaId = nfalog[i].dfaId;
-							nTotalSize += sizeof(TERMSET);
-							break;
-						}
-					}
-				}
-			}
-		}
-		if (nTotalSize >= 2048)
-		{
-			//return (size_t)-1;
-		}
-	}
 	m_pDfa->shrink_to_fit();
 	return 0;
 }

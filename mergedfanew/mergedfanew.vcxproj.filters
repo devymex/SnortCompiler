@@ -18,14 +18,8 @@
     <ClCompile Include="MergeDfanew.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="OrDfanew.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="OrDfanew.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="MergeDfanew.h">
       <Filter>Header Files</Filter>
     </ClInclude>
