@@ -228,6 +228,7 @@ GROUPINGSC size_t CGROUPRes::WriteToFile(LPCTSTR filename)
 		{
 			WriteNum(fout, m_groups[i].ComSigs[j]);
 		}
+		WriteNum(fout, m_groups[i].currSig);
 		WriteNum(fout, m_groups[i].mergeDfaId);
 	}
 	//ÌîÐ´ÎÄ¼þ³ß´ç
@@ -314,6 +315,7 @@ GROUPINGSC size_t CGROUPRes::ReadFromFile(LPCTSTR filename)
 			SIGNATURE &oneSig = oneGroup.ComSigs[j];
 			fin.read((char*)&oneSig, sizeof(SIGNATURE));
 		}
+		fin.read((char*)&oneGroup.currSig, sizeof(SIGNATURE));
 		fin.read((char*)&oneGroup.mergeDfaId, 4);
 	}
 	fin.close();
