@@ -1,3 +1,12 @@
+/**
+**  @file        MergeDfaNew.cpp
+**
+**  @author      Lab 435, Xidian University
+**
+**  @brief       merge mutiple dfas into one dfa
+**
+*/
+
 #include "stdafx.h"
 #include "MergeDfanew.h"
 
@@ -38,7 +47,16 @@ struct GROUPKEY
 	}
 };
 
-//按照每个dfa的m_pGroup进行分组
+
+/*
+**	This function groups the merged dfa's columns on the ground of
+**	the column groups of dfas to be merged.
+**
+**	We use a hash function to group.
+**	
+**	First of all, merge the dfas's column groups into a table of n*256, n means the size of dfas
+**	Then hash the table columns to get the merged dfa's colums group.
+*/
 void DfaColGroup(std::vector<CDfaNew> &dfas, BYTE* groups)
 {
 	struct GROUPKEYHASH
@@ -90,7 +108,19 @@ void DfaColGroup(std::vector<CDfaNew> &dfas, BYTE* groups)
 	}
 }
 
-//根据other的otherSta查找termset，将找到的TERMSET插入到的lastDfa的m_TermSet中，其中lastDfa的状态是lastSta中
+/*
+**	this function marks the lastDfa's terminal states.
+**	
+**  @param otherSta	   the state to be found in other
+**  @param other       one dfa to be merged
+**	@param lastSta     the state to be marked
+**	@param lastDfa     the merged dfa
+**
+**  @return a integer
+**
+**  @retval 0 function successful
+**  @retval -1 fatal error
+*/
 size_t AddTermIntoDFA(STATEID otherSta, CDfaNew &other, STATEID lastSta, CDfaNew &lastDfa)
 {
 	size_t flag = (size_t)-1;
@@ -107,7 +137,26 @@ size_t AddTermIntoDFA(STATEID otherSta, CDfaNew &other, STATEID lastSta, CDfaNew
 	return flag;
 }
 
-//可以先根据每个dfa的分组情况，通过hash将最终的lastDfa进行分组
+/*
+**  NAME
+**    NOrMerge::
+*/
+/**
+**  This function merges mutiple dfas into one dfa. And mark the terminal states to 
+**	distinguish which dfas the terminal state belongs to.
+**
+**	In order to speed up, we need one support function:DfaColGroup to group
+**	the lastDfa's columns.
+**
+**  @param dfas      a vector contains mutiple CDfaNew
+**  @param lastDfa   the merged dfa
+**
+**  @return bool
+**
+**  @retval true function successful
+**  @retval fasle fatal error
+*/
+
 MERDFANEW bool NOrMerge(std::vector<CDfaNew> &dfas, CDfaNew &lastDfa)
 {
 	size_t dfaId = lastDfa.GetId();
@@ -116,9 +165,9 @@ MERDFANEW bool NOrMerge(std::vector<CDfaNew> &dfas, CDfaNew &lastDfa)
 #undef max
 
 	size_t dfasSize = dfas.size();
-	size_t nTermSta = 1;//终态标记
+	size_t nTermSta = 1;//nTermSta: terminal flag. 1: terminal, -1: non-terminal
 
-	//对lastDfa分组
+	//group the lastDfa's columns
 	BYTE groups[DFACOLSIZE];
 	DfaColGroup(dfas, groups);
 	lastDfa.Init(groups);
@@ -128,9 +177,15 @@ MERDFANEW bool NOrMerge(std::vector<CDfaNew> &dfas, CDfaNew &lastDfa)
 	typedef std::unordered_map<std::vector<size_t>, STATEID, TODFA_HASH> STATESETHASH;
 	STATESETHASH statehash;
 
-	size_t finFlag = 0;//判断是否终态
-	std::stack<std::vector<size_t> > statesStack;//测试
-	std::vector<size_t> startVec(dfasSize + 2);//使用一个大小为dfas.size() + 2的vector表示合并后的nfa的状态，其中第0个元素表示dfa1的状态，..., 最后两个元素表示虚拟的初始状态0和终止状态nTermSta
+	size_t finFlag = 0;//terminal state flag, 1: terminal state, 0: normal state
+	std::stack<std::vector<size_t> > statesStack;
+
+	/*
+	**	use a size of (dfas.size() + 2) vector to represent a state of the merged dfa.
+	**	element 0 represents the state of dfas[0], ..., element n represents the state of dfas[n].
+	**	element n + 1 and element n + 2 are flags which show that whether this state is a start state or terminal state.
+	*/
+	std::vector<size_t> startVec(dfasSize + 2);
 	
 	lastDfa.ReservRow(CHARSETSIZE);
 	lastDfa.ResizeRow(lastDfa.Size() + 1, colCnt);
@@ -140,9 +195,8 @@ MERDFANEW bool NOrMerge(std::vector<CDfaNew> &dfas, CDfaNew &lastDfa)
 		STATEID nSta = dfas[i].GetStartId();
 		if((dfas[i][nSta].GetFlag() & CDfaRow::TERMINAL) != 0)
 		{
-			//是终态
+			//this is a terminal state
 			finFlag = 1;
-			//将dfas[i]根据nSta找到的dfaId插入到lastDfa的0状态对应的TERMSET中
 			if(AddTermIntoDFA(nSta, dfas[i], 0, lastDfa) != 0)
 			{
 				std::cout << "Termset Error!" << std::endl;
@@ -151,10 +205,9 @@ MERDFANEW bool NOrMerge(std::vector<CDfaNew> &dfas, CDfaNew &lastDfa)
 		}
 		startVec[i] = nSta;
 	}
-	startVec[dfasSize] = 0;//0是添加的虚拟状态
+	startVec[dfasSize] = 0;//this is start state
 	if(finFlag)
 	{
-		//说明这是个终态
 		startVec[dfasSize + 1] = nTermSta;
 		lastDfa[0].SetFlag(lastDfa[0].GetFlag() | CDfaRow::START | CDfaRow::TERMINAL);
 	}
@@ -174,7 +227,7 @@ MERDFANEW bool NOrMerge(std::vector<CDfaNew> &dfas, CDfaNew &lastDfa)
 
 	while(!statesStack.empty())
 	{
-		std::vector<size_t> curVec = statesStack.top();//当前状态集合, curVec共有dfasSize + 2个状态
+		std::vector<size_t> curVec = statesStack.top();//current state, size is:dfasSize + 2
 		statesStack.pop();
 		
 		STATESETHASH::iterator ir = statehash.find(curVec);
@@ -186,7 +239,7 @@ MERDFANEW bool NOrMerge(std::vector<CDfaNew> &dfas, CDfaNew &lastDfa)
 		STATEID curStaNum = ir->second;
 		ZeroMemory(computFlag, sizeof(computFlag));
 
-		//下一状态集合
+		//get next states
 		for(size_t curChar = 0; curChar < DFACOLSIZE; ++curChar)
 		{
 			finFlag = 0;
@@ -198,7 +251,7 @@ MERDFANEW bool NOrMerge(std::vector<CDfaNew> &dfas, CDfaNew &lastDfa)
 			}
 			computFlag[lastDfaGroup] = 1;
 
-			size_t flag = 0;//标记下一状态集是否为空
+			size_t flag = 0;//flag = 0: empty next state
 			for(size_t i = 0; i < dfasSize; ++i)
 			{
 				STATEID sta = curVec[i];
@@ -206,13 +259,12 @@ MERDFANEW bool NOrMerge(std::vector<CDfaNew> &dfas, CDfaNew &lastDfa)
 				if(sta != (STATEID)-1)
 				{
 					BYTE curgroup = dfas[i].Char2Group(curChar);
-					STATEID nextId = dfas[i][sta][curgroup];//第i个dfa从curVec[i]状态经过curChar跳转的下一状态
+					STATEID nextId = dfas[i][sta][curgroup];//the next state the ith dfa transforms from state curVec[i] through curChar to
 					if(nextId != (STATEID)-1)
 					{
 						flag = 1;
 						if((dfas[i][nextId].GetFlag() & CDfaRow::TERMINAL) != 0)
 						{
-							//判断是否终态
 							finFlag = 1;
 						}
 					}
@@ -226,7 +278,6 @@ MERDFANEW bool NOrMerge(std::vector<CDfaNew> &dfas, CDfaNew &lastDfa)
 			NextVec[dfasSize] = -1;
 			if(finFlag)
 			{
-				//该状态是终态
 				NextVec[dfasSize + 1] = nTermSta;
 			}
 			else
@@ -283,8 +334,6 @@ MERDFANEW bool NOrMerge(std::vector<CDfaNew> &dfas, CDfaNew &lastDfa)
 		}
 	}
 	lastDfa.UniqueTermSet();
-
-	//对lastDfa进行进一步按列分组
 	lastDfa.Minimize();
 	if(lastDfa.Size() > DFA_SIZE_LIMIT)
 	{
