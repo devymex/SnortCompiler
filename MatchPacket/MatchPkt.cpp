@@ -125,11 +125,11 @@ MATCHPKT void HandleAllFile(const std::string &path, void* user)
 
 			if(ext1 == ".cap")
 			{
-			std::string str = rulesmap.resultpath + "\\" +std::string(wfda.cFileName) +".txt";
-			rulesmap.mchresult.open(rulesmap.resultpath + "\\" +std::string(wfda.cFileName) +".txt");	
-			rulesmap.mchresult << "-----------------------" << temp << "-----------------------" << std::endl;
-			LoadCapFile(temp.c_str(), &rulesmap);
-			rulesmap.mchresult.close();
+				std::string str = rulesmap.resultpath + "\\" +std::string(wfda.cFileName) +".txt";
+				rulesmap.mchresult.open(rulesmap.resultpath + "\\" +std::string(wfda.cFileName) +".txt");	
+				rulesmap.mchresult << "-----------------------" << temp << "-----------------------" << std::endl;
+				LoadCapFile(temp.c_str(), &rulesmap);
+				rulesmap.mchresult.close();
 			}
 
 			pktnum = 0;

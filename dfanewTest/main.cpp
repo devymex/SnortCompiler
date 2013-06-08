@@ -31,9 +31,9 @@ void main()
 	dfa2.SetId(2);
 	dfa3.SetId(3);
 
-	dfa1.FromNFA(nfa1, NULL, 0);
-	dfa2.FromNFA(nfa2, NULL, 0);
-	dfa3.FromNFA(nfa3, NULL, 0);
+	dfa1.FromNFA(nfa1);
+	dfa2.FromNFA(nfa2);
+	dfa3.FromNFA(nfa3);
 	//dfa5.Minimize();
 	outPutDfa(dfa1, "F:\\cppProject\\huawei\\PreciseMatch\\testMerg\\dfa1.txt");
 	outPutDfa(dfa2, "F:\\cppProject\\huawei\\PreciseMatch\\testMerg\\dfa2.txt");

@@ -1,58 +1,5 @@
 #include "stdafx.h"
-#include "OrDfanew.h"
 #include "MergeDfanew.h"
-
-//原始代码，有小问题，慢
-//MERDFANEW bool NOrMerge(std::vector<CDfaNew> &dfas, CDfaNew &lastDfa)
-//{
-//	CTimer c;//用于测试
-//#undef max
-//	size_t nTermSta = 0;//合并后nfa总状态数
-//	for(size_t i = 0; i < dfas.size(); ++i)
-//	{
-//		if(dfas[i].Size() > std::numeric_limits<STATEID>::max())
-//		{
-//			return false;
-//		}
-//		nTermSta += dfas[i].Size();
-//	}
-//	++nTermSta;
-//
-//	NFALOG nfalog[CHARSETSIZE * 2];//nfa状态与dfaID的对应， 这样的数组有问题！如果是两两合并，这样也可以
-//	size_t count = 0;
-//	
-//	CNfa oneNfa;//合并后的nfa
-//	//oneNfa.Reserve(nTermSta + 1);
-//	oneNfa.Reserve(CHARSETSIZE * 2);
-//	oneNfa.Resize(1);
-//
-//	for(size_t i = 0; i < dfas.size(); ++i)
-//	{
-//		oneNfa[0].AddDest(EMPTYEDGE, oneNfa.Size() + dfas[i].GetStartId());
-//		//NIncreDfaNum(dfas[i], oneNfa.Size());
-//		NInsertDfa(dfas[i], oneNfa, nTermSta, nfalog, count);
-//	}
-//
-//	size_t tmp = lastDfa.FromNFA(oneNfa, nfalog, count, true);
-//	//if(lastDfa.FromNFA(oneNfa, nfalog, count, true) == 0)
-//	if(tmp == 0)
-//	{
-//		lastDfa.UniqueTermSet();
-//		//lastDfa.Minimize();
-//		if(lastDfa.Size() > DFA_SIZE_LIMIT)
-//		{
-//			std::cerr << "DFA_SIZE_LIMIT" << std::endl;
-//			return false;
-//		}
-//		//std::cout << "方法一lastDfa最小化用时: " << c.Reset() << std::endl;
-//
-//		return true;
-//	}
-//	else
-//	{
-//		return false;
-//	}
-//}
 
 struct TODFA_HASH
 {
@@ -170,15 +117,6 @@ MERDFANEW bool NOrMerge(std::vector<CDfaNew> &dfas, CDfaNew &lastDfa)
 
 	size_t dfasSize = dfas.size();
 	size_t nTermSta = 1;//终态标记
-	//for(size_t i = 0; i < dfasSize; ++i)
-	//{
-	//	if(dfas[i].Size() > std::numeric_limits<STATEID>::max())
-	//	{
-	//		return false;
-	//	}
-	//	nTermSta += dfas[i].Size();
-	//}
-	//++nTermSta;
 
 	//对lastDfa分组
 	BYTE groups[DFACOLSIZE];
@@ -347,7 +285,7 @@ MERDFANEW bool NOrMerge(std::vector<CDfaNew> &dfas, CDfaNew &lastDfa)
 	lastDfa.UniqueTermSet();
 
 	//对lastDfa进行进一步按列分组
-	//lastDfa.Minimize();
+	lastDfa.Minimize();
 	if(lastDfa.Size() > DFA_SIZE_LIMIT)
 	{
 		//std::cerr << "DFA_SIZE_LIMIT!" << std::endl;

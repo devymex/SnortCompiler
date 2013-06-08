@@ -537,7 +537,7 @@ void Rule2Dfas(const CSnortRule &rule, CResNew &result, COMPILEDRULENEW &ruleRes
 			{
 				ctime.Reset();//用于测试
 				dfa.SetId(nDfaId);
-				size_t nToDFAFlag = dfa.FromNFA(nfa, NULL, 0);
+				size_t nToDFAFlag = dfa.FromNFA(nfa);
 				//				std::cout << "  "<< dfa.LinkSize() << ", " << dfa.GetGroupCount() * dfa.Size() << std::endl;
 				nfa2dfatime += ctime.Reset();//用于测试
 				//outPutDfa(dfa, "..//..//output//test.txt");
