@@ -947,15 +947,6 @@ CRECHANFA size_t Rule2PcreList(const CSnortRule &rule, CRegRule &regrule)
 			regrule[i].Unique();
 		}
 	}
-	//for(size_t i = 0; i < regrule.Size(); ++i)
-	//{
-	//	for(size_t j = 0; j < regrule[i].GetSigCnt(); ++j)
-	//	{
-	//		BYTE *p  = (BYTE*)&regrule[i].GetSig(j);
-	//		std::cout << *p << *(p + 1) << *(p + 2) << *(p + 3) << "  ";
-	//	}
-	//	std::cout << std::endl;
-	//}
 	return 0;
 }
 

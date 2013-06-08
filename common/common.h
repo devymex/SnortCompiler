@@ -99,28 +99,6 @@ private:
 	std::vector<size_t> *m_pDestSet;
 };
 
-//class COMMONSC CDfaRow
-//{
-//public:
-//	enum STATEFLAG
-//	{
-//		NORMAL   = 1 << 0,
-//		START    = 1 << 1,
-//		TERMINAL = 1 << 2
-//	};
-//	CDfaRow();
-//	~CDfaRow();
-//	CDfaRow(const CDfaRow &other);
-//	CDfaRow& operator=(const CDfaRow &other);
-//	size_t& operator[](size_t index);
-//	const size_t& operator[](size_t index) const;
-//	void SetFlag(size_t nFlag);
-//	size_t GetFlag();
-//private:
-//	size_t m_nFlag;
-//	size_t m_pDest[CHARSETSIZE];
-//};
-
 class COMMONSC CDfaRow
 {
 public:
@@ -146,47 +124,6 @@ private:
 	std::vector<STATEID> *m_pDest;
 };
 
-class COMMONSC CDfa
-{
-public:
-	struct TERMSET
-	{
-		STATEID dfaSta;
-		size_t dfaId;
-	};
-
-	CDfa();
-	~CDfa();
-	CDfa(const CDfa &other);
-	CDfa& operator=(const CDfa &other);
-	void Reserve(size_t _Count);
-	void Resize(STATEID _Newsize);
-	STATEID Size() const;
-	CDfaRow &Back();
-	CDfaRow& operator[](STATEID index);
-	const CDfaRow& operator[](STATEID index) const;
-	void Clear();
-	size_t GetId();
-	void SetId(size_t id);
-	size_t GetColNum();
-	void SetGroup(const BYTE *pGroup);
-	BYTE GetGroup(size_t nIdx);
-	const BYTE* GetGroup() const;
-	STATEID GetStartId()const;
-	void SetStartId(STATEID id);
-	void PushTermSet(TERMSET oneTerm);
-	STATEID GetTermSetNum();
-	TERMSET GetTermSet(STATEID num);
-private:
-	size_t m_nId;
-	size_t m_nColNum;
-	STATEID m_StartId;
-	BYTE m_pGroup[DFACOLSIZE];
-	std::vector<CDfaRow> *m_pDfa;
-	//pair.first 用来存放dfa的某一终态, pair.second 用来存放该终态对应哪一个dfaid
-	std::vector<TERMSET> *m_TermSet;
-};
-
 class COMMONSC CNfa
 {
 public:
@@ -199,12 +136,10 @@ public:
 	~CNfa();
 	CNfa(const CNfa &other);
 	CNfa& operator=(const CNfa &other);
-	//size_t GetRowNum(void);
 	void Reserve(size_t _Count);
 	void Resize(size_t _Newsize);
 	void Shrink();
 	size_t Size() const;
-	void FromDfa(CDfa &dfa);
 	void PushBack(const CNfaRow &row);
 	void PopBack();
 	void SetPcre(const char* lpPcre);
@@ -219,85 +154,11 @@ public:
 	CNfaRow &operator[](size_t index);
 	const CNfaRow &operator[](size_t index) const;
 private:
-	//std::string *m_pRegex;
 	std::vector<CNfaRow> *m_pNfa;
 	std::string *m_pPcre;
 	//如果该nfa是由dfa合并过程中生成的，该成员用于记录哪个状态能够识别哪个dfa终态
 	std::vector<DFATERMS> *m_DfaTerms;
 };
-
-//class COMMONSC CDfa
-//{
-//public:
-//	CDfa();
-//	~CDfa();
-//	CDfa(const CDfa &other);
-//	CDfa& operator=(const CDfa &other);
-//	void Reserve(size_t _Count);
-//	void Resize(size_t _Newsize);
-//	size_t Size() const;
-//	CDfaRow &Back();
-//	CDfaRow& operator[](size_t index);
-//	const CDfaRow& operator[](size_t index) const;
-//	void Clear();
-//private:
-//	std::vector<CDfaRow> *m_pDfa;
-//};
-
-//class COMMONSC CAndDfaRow : public CDfaRow
-//{
-//public:
-//	enum DFAFLAG
-//	{
-//		NONE = 0,
-//		FIRST = 1 << 0,
-//		SECOND = 1 << 1,
-//		ALL = 1 | 1 << 1
-//	};
-//	CAndDfaRow();
-//	void SetDFlag(size_t cFlag);
-//	char GetDFlag();
-//private:
-//	size_t m_cFlag;
-//	size_t m_pAndDest[CHARSETSIZE];
-//};
-
-
-//class COMMONSC CAndDfa
-//{
-//public:
-//	CAndDfa();
-//	~CAndDfa();
-//	CAndDfa(const CDfa &other);
-//	CAndDfa& operator=(const CAndDfa &other);
-//	void Reserve(size_t _Count);
-//	void Resize(size_t _Newsize);
-//	size_t Size() const;
-//	CAndDfaRow &Back();
-//	CAndDfaRow& operator[](size_t index);
-//private:
-//	std::vector<CAndDfaRow> *m_pAndDfa;
-//};
-//
-
-//class COMMONSC CNfaChain
-//{
-//public:
-//	CNfaChain();
-//	~CNfaChain();
-//	CNfaChain(const CNfaChain &other);
-//	const CNfaChain& operator = (const CNfaChain &other);
-//
-//	size_t Size() const;
-//	void Resize(size_t nSize);
-//	CNfa& Back();
-//	void PushBack(const CNfa &cnfa);
-//	CNfa& operator[](size_t nIdx);
-//	const CNfa& operator[](size_t nIdx) const;
-//private:
-//	std::vector<CNfa> *m_pChain;
-//};
-
 
 class COMMONSC CNfaTree
 {
@@ -316,7 +177,6 @@ public:
 	const CNfa& operator[](size_t nIdx) const;
 
 private:
-	//std::vector<CNfaChain> *m_pTree;
 	std::vector<CNfa> *m_pTree;
 };
 
