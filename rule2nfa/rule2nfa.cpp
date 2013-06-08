@@ -1,3 +1,14 @@
+/**
+**  @file        rule2nfa.cpp
+**
+**  @author      Lab 435, Xidian University
+**
+**  @brief       Support functions for transforming a rule to a nfa tree
+**
+**  This nfa tree processing for rule options.
+**
+*/
+
 #include "stdafx.h"
 #include "rule2nfa.h"
 #include "CombineTree.h"
@@ -6,6 +17,9 @@
 #define nfaTreeReserve 100
 #define nfaReserve 10000
 
+/*
+**	some special symbols to be considered when construct "content" to "pcre"
+*/
 #define ANY '.'
 #define ESCAPE '\\'
 #define STAR '*'
@@ -23,6 +37,11 @@
 #define MINUS_RANGE '-'  
 
 
+/*
+**	content type
+**	CONBYTE: transform content to vector<BYTE>
+**	CONPCRE: transform content to string
+*/
 enum CONTYPE
 {
 	CONBYTE,
@@ -31,11 +50,11 @@ enum CONTYPE
 
 struct OPTIONCONTENT : public RULEOPTION
 {
-	std::vector<BYTE> vecconts;
-	int nOffset;
-	int nDepth;
-	int nDistance;
-	int nWithin;
+	std::vector<BYTE> vecconts;//content data
+	int nOffset;// offset constraint in snort rule
+	int nDepth;//depth constraint in snort rule
+	int nDistance;//distance constraint in snort rule
+	int nWithin;//within constraint in snort rule
 };
 
 struct OPTIONPCRE : public RULEOPTION
@@ -746,7 +765,7 @@ void content2Nfa(OPTIONCONTENT *content, CNfa &nfa)
 	}
 }
 
-//测试函数:输出一个nfa
+//test function: output a nfa
 void outPut(CNfa &nfa, std::string &fileName)
 {
 	size_t stateNum = nfa.Size();
@@ -782,6 +801,17 @@ void outPut(CNfa &nfa, std::string &fileName)
 	fout.close();
 }
 
+/*
+**	this function transforms content to pcre
+**	based on the content constraints: distance, within, offset, depth, nocase
+**
+**	@param pContent    pointer to the original content option
+**	@param pcreStr	   the transformed pcre
+**
+**	@return
+**  @retval  0 function successful
+**  @retval -1 fatal error
+*/
 size_t content2Pcre(OPTIONCONTENT *pContent, CCString &pcreStr)
 {
 	std::stringstream ss;
@@ -804,12 +834,12 @@ size_t content2Pcre(OPTIONCONTENT *pContent, CCString &pcreStr)
 	}
 	if(!((pContent->nFlags & CF_DEPTH) || pContent->nFlags & CF_WITHIN))
 	{
-		//既没有depth也没有within
+		//without depth and without within
 		if(!((pContent->nFlags & CF_OFFSET) || (pContent->nFlags & CF_DISTANCE))
 			|| ((pContent->nFlags & CF_OFFSET) && pContent->nOffset == 0)
 			|| ((pContent->nFlags & CF_DISTANCE) && pContent->nDistance == 0))
 		{
-			//既没有offset约束也没有distance约束
+			//without offset and without distance
 			pcreStr = CCString("/");
 		}
 		else
@@ -842,12 +872,14 @@ size_t content2Pcre(OPTIONCONTENT *pContent, CCString &pcreStr)
 		}
 	}
 
-	//需处理管道
+	//handle the data in content pipe
 	std::string con;
 	con.resize(pContent->GetPattern(NULL, 0));
 	pContent->GetPattern(&con[0], con.size());
 	std::string::iterator  opValueBeg= con.begin(), opValueEnd = con.end();
 	std::vector<BYTE> conVec;
+
+	//transform the pipe data into a special string
 	FormatOptionContent(opValueBeg, opValueEnd, conVec, CONPCRE);
 	const char* str = (char*)&conVec[0];
 	pcreStr.Append(str);
@@ -863,7 +895,28 @@ size_t content2Pcre(OPTIONCONTENT *pContent, CCString &pcreStr)
 	return 0;
 }
 
-//convert rule to pcre list
+/*
+**  NAME
+**    Rule2PcreList::
+*/
+/**
+**  This function converts a CSnortRule to a CRegRule and extract signatures from content option
+**
+**	According to the constraints of rule options, we split a snort rule into some option chains.
+**	For every option chain, the datapacket matchs from the first byte.
+**	Then we transfrom every option into pcre.
+**
+**  @param rule       a CSnortRule object which contains the original information
+**					  of a snort rule. 
+**  @param regrule    the transformed CRegRule object which makes up of a number of pcre lists
+**                    and the signatures in every pcre list.
+**
+**  @return integer
+**
+**  @retval  0 function successful
+**  @retval <>0 fatal error
+*/
+
 CRECHANFA size_t Rule2PcreList(const CSnortRule &rule, CRegRule &regrule)
 {
 	regrule.Reserve(nfaTreeReserve);
@@ -886,14 +939,16 @@ CRECHANFA size_t Rule2PcreList(const CSnortRule &rule, CRegRule &regrule)
 				}
 			}
 			CCString conPcreStr;
+
+			//transfrom content to pcre
 			cFlag = content2Pcre(pContent, conPcreStr);
 			if(cFlag != 0)
 			{
 				return cFlag;
 			}
-			//提取content中的signature
 			if(pContent->vecconts.size() >= 4)
 			{
+				//extract signatures
 				std::vector<BYTE> contentTmp;
 				contentTmp.reserve(pContent->vecconts.size());
 				for(std::vector<BYTE>::iterator itTmp = pContent->vecconts.begin();
@@ -914,9 +969,6 @@ CRECHANFA size_t Rule2PcreList(const CSnortRule &rule, CRegRule &regrule)
 					sigIt + 3 != contentTmp.end(); ++sigIt)
 				{
 					SIGNATURE sig = *(SIGNATURE*)&(*sigIt);
-
-					//BYTE *p = (BYTE*)&sig;
-					//std::cout << *p << *(p + 1) << *(p + 2) << *(p + 3) << std::endl;
 					regrule.Back().PushBackSig(sig);
 				}
 			}
@@ -939,7 +991,7 @@ CRECHANFA size_t Rule2PcreList(const CSnortRule &rule, CRegRule &regrule)
 		}
 	}
 
-	regrule.Reserve(++regChain_size);
+	//regrule.Reserve(++regChain_size);
 	for(size_t i = 0; i < regrule.Size(); ++i)
 	{
 		if(regrule[i].GetSigCnt() > 1)
@@ -949,6 +1001,25 @@ CRECHANFA size_t Rule2PcreList(const CSnortRule &rule, CRegRule &regrule)
 	}
 	return 0;
 }
+
+
+/*
+**  NAME
+**    CRegChainToNFA::
+*/
+/**
+**  This function converts a CRegChain to a CNfa
+**
+**	use pcre library to construct a nfa from a pcre
+**	
+**  @param regchain   a CRegChain object which contains a pcre list
+**  @param nfa        the transformed CNfa object 
+**
+**  @return integer
+**
+**  @retval  0 function successful
+**  @retval <>0 fatal error
+*/
 
 CRECHANFA size_t CRegChainToNFA(CRegChain &regchain, CNfa &nfa)
 {
@@ -963,7 +1034,6 @@ CRECHANFA size_t CRegChainToNFA(CRegChain &regchain, CNfa &nfa)
 			return flag;
 		}
 	}
-	//nfa.Reserve(nfa.Size() + 1);
 	return 0;
 }
 

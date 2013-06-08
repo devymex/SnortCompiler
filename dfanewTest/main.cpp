@@ -44,16 +44,16 @@ void main()
 	dfas.push_back(dfa1);
 	dfas.push_back(dfa2);
 	dfas.push_back(dfa3);
-	NOrMerge(dfas, mergeDfa);
+	MergeMultipleDfas(dfas, mergeDfa);
 	mergeDfa.printTerms();
 	outPutDfa(mergeDfa, "F:\\cppProject\\huawei\\PreciseMatch\\testMerg\\mergeDfa2.txt");
 
 	//dfas[0] = dfa1;
 	//dfas[1] = dfa2;
-	//NOrMerge(dfas, mergeDfa);
+	//MergeMultipleDfas(dfas, mergeDfa);
 	//dfas[0] = mergeDfa;
 	//dfas[1] = dfa3;
-	//NOrMerge(dfas, mergeDfa);
+	//MergeMultipleDfas(dfas, mergeDfa);
 	//mergeDfa.printTerms();
 	//outPutDfa(mergeDfa, "F:\\cppProject\\huawei\\PreciseMatch\\testMerg\\mergeDfa_1_2_3.txt");
 	for (size_t i = 0; i < dfa1.Size(); ++i)

@@ -284,7 +284,7 @@ void Combine(CGROUPRes &groupRes, std::vector<GROUPHASH> &vecGroups, RESULTMAP &
 				{
 					CDfaNew MergeDfa;
 					vecDfas[1] = groupRes.GetDfaTable()[vecGroups[*k].mergeDfaId];
-					if (NOrMerge(vecDfas, MergeDfa))
+					if (MergeMultipleDfas(vecDfas, MergeDfa))
 					{
 						for (size_t idx = 0; idx < vecGroups[*k].vecDfaIds.size(); ++idx)
 						{
@@ -338,7 +338,7 @@ void Combine(CGROUPRes &groupRes, std::vector<GROUPHASH> &vecGroups, RESULTMAP &
 						vecDfas[0] = groupRes.GetDfaTable()[g1.mergeDfaId];
 						vecDfas[1] = groupRes.GetDfaTable()[g2.mergeDfaId];
 						CDfaNew MergeDfa;
-						if (NOrMerge(vecDfas, MergeDfa))
+						if (MergeMultipleDfas(vecDfas, MergeDfa))
 						{
 							for (size_t idx = 0; idx < g2.vecDfaIds.size(); ++idx)
 							{
