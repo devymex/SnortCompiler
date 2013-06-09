@@ -139,6 +139,7 @@ DFANEWSC CDfaRow::~CDfaRow()
 {
 	delete m_pDest;
 }
+
 DFANEWSC CDfaRow::CDfaRow(const CDfaRow &other)
 {
 	m_pDest = new STATEVEC;
