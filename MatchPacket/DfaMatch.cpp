@@ -59,8 +59,6 @@ void MchDfaHdler(u_char *param, const struct pcap_pkthdr *header, const u_char *
 	pParam->pFunc(ih, pkt_data, pParam->pUser);
 }
 
-
-
 void GetMchDfas(const u_char *data, size_t len, HASHRES &hashtable, std::vector<size_t> &matchdfas)
 {
 	if (len > 3)

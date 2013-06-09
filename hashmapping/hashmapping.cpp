@@ -21,7 +21,6 @@
 #include "../common/common.h"
 #include "../compilernew/compilernew.h"
 #include "../grouping/grouping.h"
-#include "../mergedfanew/MergeDfanew.h"
 
 /* hash function, correspond to a hash slot for a given signature
 
