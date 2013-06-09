@@ -13,14 +13,6 @@
 #define DFANEWSC __declspec(dllexport)
 #endif
 
-struct DFANEWSC TERMSET
-{
-	TERMSET(STATEID dfaStateId = (STATEID)-1, size_t nDfaId = (size_t)1)
-		: dfaSta(dfaStateId), dfaId(nDfaId) {}
-	STATEID dfaSta;
-	size_t dfaId;
-};
-
 class DFANEWSC CFinalStates
 {
 	typedef std::unordered_map<STATEID, std::set<size_t>> FINSTAMAP;
@@ -36,8 +28,11 @@ public:
 	size_t Size() const;
 	void Clear();
 	void PushBack(STATEID nStaId, size_t nDfaId);
-	std::set<size_t>& GetDfaIds(STATEID nStaId);
-	const std::set<size_t>& GetDfaIds(STATEID nStaId) const;
+	size_t GetDfaIdCount(STATEID nStaId) const;
+	void GetDfaIds(STATEID nStaId, CVectorUnsigned &ids) const;
+
+	std::set<size_t>& _GetDfaIds(STATEID nStaId);
+	const std::set<size_t>& _GetDfaIds(STATEID nStaId) const;
 
 protected:
 	std::vector<STATEID> *m_pStates;
