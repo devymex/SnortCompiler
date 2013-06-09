@@ -112,7 +112,7 @@ class DFA {
 	//---trick
 	//state_t *swap_table;
 
-	private:
+	protected:
 
 	/* number of entry allocated (for dynamic allocation) */
 	unsigned int entry_allocated;

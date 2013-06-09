@@ -75,13 +75,11 @@
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="NCreDfa.h" />
     <ClInclude Include="dfanew.h" />
     <ClInclude Include="GetDfaSig.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="NCreDfa.cpp" />
     <ClCompile Include="dfanew.cpp" />
     <ClCompile Include="GetDfaSig.cpp" />
     <ClCompile Include="stdafx.cpp">

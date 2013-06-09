@@ -168,7 +168,7 @@ void display(CDfaNew &newdfa)
 }
 
 //
-//void fdisplay(CDfaNew &newdfa, const char* fileName)
+//void PrintDfaToGv(CDfaNew &newdfa, const char* fileName)
 //{
 //	std::ofstream fout(fileName);
 //	fout << "digraph G {" << std::endl;
@@ -424,7 +424,7 @@ size_t CompareWithPcre(const char *pPcre)
 		return 2;
 	}
 	//std::cout << nfa1.Size() << std::endl;
-	//outPut(nfa1, "..//nfaresult1.txt");
+	//PrintDfaToText(nfa1, "..//nfaresult1.txt");
 	CDfaNew OwnDfa;
 	if (-1 == OwnDfa.FromNFA(nfa1))
 	{
@@ -432,9 +432,9 @@ size_t CompareWithPcre(const char *pPcre)
 	}
 	//std::cout << OwnDfa.Size() << std::endl;
 	OwnDfa.Minimize();	
-	//outPutDfa(OwnDfa,"..\\first.txt");
+	//PrintDfaToText(OwnDfa,"..\\first.txt");
 	FoldDFA(OwnDfa);
-	//fdisplay(OwnDfa,"..\\result1.txt");
+	//PrintDfaToGv(OwnDfa,"..\\result1.txt");
 	//std::cout << (size_t)OwnDfa.Size() << std::endl;
 	//display(OwnDfa);
 	//OwnDfa.Process((BYTE*)str, strlen(str), tmp);
@@ -448,7 +448,7 @@ size_t CompareWithPcre(const char *pPcre)
 	//nfa2->analyze(stdout);
 	//CNfa tmpnfa;
 	//nfa2->nfa2CNfa(tmpnfa);
-	//outPut(tmpnfa, "..\\nfaresult2.txt");
+	//PrintDfaToText(tmpnfa, "..\\nfaresult2.txt");
 	DFA* BeDfa = nfa2->nfa2dfa();
 	delete nfa2;
 	if (BeDfa != NULL)
@@ -459,7 +459,7 @@ size_t CompareWithPcre(const char *pPcre)
 	//std::cout << BeDfa->size() << std::endl;
 	CDfaNew newBeDfa;
 	BeDfa->Dfa2CDfaNew(newBeDfa);
-	//fdisplay(newBeDfa, "..\\result2.txt");
+	//PrintDfaToGv(newBeDfa, "..\\result2.txt");
 	//std::cout << (size_t)newBeDfa.Size() << std::endl;
 	//newBeDfa.Process((BYTE* )str, strlen(str), tmp);
 	//std::cout << tmp.Size() << std::endl;
@@ -501,7 +501,7 @@ void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 		{
 			for (size_t j = 0; j < rr[i].Size(); ++j)
 			{
-				const char *tmp = rr[i][j].C_Str();
+				const char *tmp = rr[i][j].GetStr();
 				if (tmp != NULL && tmp[0] != '\0')
 				{
 					switch(CompareWithPcre(tmp))

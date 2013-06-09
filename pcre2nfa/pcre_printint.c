@@ -38,7 +38,7 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-/* This module contains a PCRE private debugging function for printing out the
+/* This module contains a PCRE protected debugging function for printing out the
 internal form of a compiled regular expression, along with some supporting
 local functions. This source file is used in two places:
 
@@ -76,7 +76,7 @@ having a separate .h file just for this. */
 #endif /* PCRE_INCLUDED */
 
 #ifdef PCRE_INCLUDED
-static /* Keep the following function as private. */
+static /* Keep the following function as protected. */
 #endif
 
 #if defined COMPILE_PCRE8
@@ -296,7 +296,7 @@ They can be turned off from pcretest so that automatic tests on bytecode can be
 written that do not depend on the value of LINK_SIZE. */
 
 #ifdef PCRE_INCLUDED
-static /* Keep the following function as private. */
+static /* Keep the following function as protected. */
 #endif
 #if defined COMPILE_PCRE8
 void

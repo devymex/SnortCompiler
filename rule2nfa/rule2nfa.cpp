@@ -11,7 +11,6 @@
 
 #include "stdafx.h"
 #include "rule2nfa.h"
-#include "CombineTree.h"
 #include "stdafx.h"
 
 #define nfaTreeReserve 100
@@ -48,7 +47,7 @@ enum CONTYPE
 	CONPCRE
 };
 
-struct OPTIONCONTENT : public RULEOPTION
+struct OPTIONCONTENT : public CRuleOption
 {
 	std::vector<BYTE> vecconts;//content data
 	int nOffset;// offset constraint in snort rule
@@ -57,7 +56,7 @@ struct OPTIONCONTENT : public RULEOPTION
 	int nWithin;//within constraint in snort rule
 };
 
-struct OPTIONPCRE : public RULEOPTION
+struct OPTIONPCRE : public CRuleOption
 {
 };
 
@@ -114,7 +113,7 @@ struct ISSPACE
 	{
 		return g_map[c] == 1;
 	}
-private:
+protected:
 	char g_map[256];
 };
 
@@ -224,7 +223,7 @@ bool QuotedContext(_Iter &beg, _Iter &end)
 template<typename _Iter>
 size_t FormatPcre (_Iter pBeg, _Iter pEnd, OPTIONPCRE &pcre)
 {
-	pcre.nFlags = 0;
+	pcre.SetFlag(0);
 
 	if (*std::find_if_not(pBeg, pEnd, ISSPACE()) == '!')
 	{
@@ -255,67 +254,67 @@ size_t FormatPcre (_Iter pBeg, _Iter pEnd, OPTIONPCRE &pcre)
 		switch (*j)
 		{
 		case 'i':
-			pcre.nFlags |= PF_i;
+			pcre.AddFlag(PF_i);
 			continue;
 		case 's':
-			pcre.nFlags |= PF_s;
+			pcre.AddFlag(PF_s);
 			continue;
 		case 'm':
-			pcre.nFlags |= PF_m;
+			pcre.AddFlag(PF_m);
 			continue;
 		case 'x':
-			pcre.nFlags |= PF_x;
+			pcre.AddFlag(PF_x);
 			continue;
 		case 'A':
-			pcre.nFlags |= PF_A;
+			pcre.AddFlag(PF_A);
 			continue;
 		case 'E':
-			pcre.nFlags |= PF_E;
+			pcre.AddFlag(PF_E);
 			continue;
 		case 'G':
-			pcre.nFlags |= PF_G;
+			pcre.AddFlag(PF_G);
 			continue;
 		case 'R':
-			pcre.nFlags |= PF_R;
+			pcre.AddFlag(PF_R);
 			continue;
 		case 'U':
-			pcre.nFlags |= PF_U;
+			pcre.AddFlag(PF_U);
 			continue;
 		case 'B':
-			pcre.nFlags |= PF_B;
+			pcre.AddFlag(PF_B);
 			continue;
 		case 'P':
-			pcre.nFlags |= PF_P;
+			pcre.AddFlag(PF_P);
 			continue;
 		case 'H':
-			pcre.nFlags |= PF_H;
+			pcre.AddFlag(PF_H);
 			continue;
 		case 'M':
-			pcre.nFlags |= PF_M;
+			pcre.AddFlag(PF_M);
 			continue;
 		case 'C':
-			pcre.nFlags |= PF_C;
+			pcre.AddFlag(PF_C);
 			continue;
 		case 'O':
-			pcre.nFlags |= PF_O;
+			pcre.AddFlag(PF_O);
 			continue;
 		case 'I':
-			pcre.nFlags |= PF_I;
+			pcre.AddFlag(PF_I);
 			continue;
 		case 'D':
-			pcre.nFlags |= PF_D;
+			pcre.AddFlag(PF_D);
 			continue;
 		case 'K':
-			pcre.nFlags |= PF_K;
+			pcre.AddFlag(PF_K);
 			continue;
 		case 'S':
-			pcre.nFlags |= PF_S;
+			pcre.AddFlag(PF_S);
 			continue;
 		case 'Y':
-			pcre.nFlags |= PF_Y;
+			pcre.AddFlag(PF_Y);
 			continue;			
 		default:
-			pcre.nFlags |= 0;
+			pcre.AddFlag(0);
 		}
 	}
 	return 0;
@@ -464,7 +463,7 @@ size_t ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
 			0 == stricmp("uricontent", iOp->name.c_str()))
 		{
 			OPTIONCONTENT *pContent = new OPTIONCONTENT;
-			pContent->nFlags = 0;
+			pContent->SetFlag(0);
 			pContent->nOffset = 0;
 			pContent->nDepth =0;
 			pContent->nDistance = 0;
@@ -503,67 +502,67 @@ size_t ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
 			}
 			else
 			{
-				temp->nFlags |= CF_NOCASE;
+				temp->AddFlag(CF_NOCASE);
 			}
 		}
 		else if (0 == stricmp("offset", iOp->name.c_str()))
 		{
 			size_t last = snortRule.Size() - 1;
-			OPTIONCONTENT * temp = dynamic_cast<OPTIONCONTENT *>(snortRule[last]);
-			if (NULL == temp)
+			OPTIONCONTENT *pTemp = dynamic_cast<OPTIONCONTENT*>(snortRule[last]);
+			if (NULL == pTemp)
 			{
 				nResult = size_t(-1);
 				break;
 			}
 			else
 			{
-				temp->nOffset = atoi(&*opValueBeg);
-				temp->nFlags |= CF_OFFSET;
+				pTemp->nOffset = atoi(&*opValueBeg);
+				pTemp->AddFlag(CF_OFFSET);
 			}
 		}
 		else if (0 == stricmp("depth", iOp->name.c_str()))
 		{
 			size_t last = snortRule.Size() - 1;
-			OPTIONCONTENT * temp = dynamic_cast<OPTIONCONTENT *>(snortRule[last]);
-			if (NULL == temp)
+			OPTIONCONTENT *pTemp = dynamic_cast<OPTIONCONTENT *>(snortRule[last]);
+			if (NULL == pTemp)
 			{
 				nResult = size_t(-1);
 				break;
 			}
 			else
 			{
-				temp->nDepth = atoi(&*opValueBeg);
-				temp->nFlags |= CF_DEPTH;
+				pTemp->nDepth = atoi(&*opValueBeg);
+				pTemp->AddFlag(CF_DEPTH);
 			}
 		}
 		else if (0 == stricmp("distance", iOp->name.c_str()))
 		{
 			size_t last = snortRule.Size() - 1;
-			OPTIONCONTENT * temp = dynamic_cast<OPTIONCONTENT *>(snortRule[last]);
-			if (NULL == temp)
+			OPTIONCONTENT *pTemp = dynamic_cast<OPTIONCONTENT *>(snortRule[last]);
+			if (NULL == pTemp)
 			{
 				nResult = size_t(-1);
 				break;
 			}
 			else
 			{
-				temp->nDistance = atoi(&*opValueBeg);
-				temp->nFlags |= CF_DISTANCE;
+				pTemp->nDistance = atoi(&*opValueBeg);
+				pTemp->AddFlag(CF_DISTANCE);
 			}
 		}
 		else if (0 == stricmp("within", iOp->name.c_str()))
 		{
 			size_t last = snortRule.Size() - 1;
-			OPTIONCONTENT * temp = dynamic_cast<OPTIONCONTENT *>(snortRule[last]);
-			if (NULL == temp)
+			OPTIONCONTENT *pTemp = dynamic_cast<OPTIONCONTENT *>(snortRule[last]);
+			if (NULL == pTemp)
 			{
 				nResult = size_t(-1);
 				break;
 			}
 			else
 			{
-				temp->nWithin = atoi(&*opValueBeg);
-				temp->nFlags |= CF_WITHIN;
+				pTemp->nWithin = atoi(&*opValueBeg);
+				pTemp->AddFlag(CF_WITHIN);
 			}
 		}
 	}
@@ -625,22 +624,22 @@ CRECHANFA size_t CompileRuleSet(LPCTSTR fileName, RECIEVER recv, LPVOID lpUser)
 * content has depth or within constraint
 * construct it to linear NFA
 */
-void contentToLinearNFA(OPTIONCONTENT *content, CNfa &nfa)
+void contentToLinearNFA(OPTIONCONTENT *pContent, CNfa &nfa)
 {
 	nfa.Reserve(nfaReserve);
 	size_t state_size = 0;
 
-	size_t patternLen = content->vecconts.size();
+	size_t patternLen = pContent->vecconts.size();
 	size_t mustCnt = 0, maxCnt = 0;//mustCnt和maxCnt分别代表经过任意字符跳转出现的最少和最多次数
-	if((content->nFlags & CF_DEPTH))
+	if(pContent->TestFlag(CF_DEPTH))
 	{
-		mustCnt = content->nOffset;//必须跳转mustCnt次
-		maxCnt = content->nDepth - patternLen;//跳转了mustCnt次后，还需跳0-maxCnt次
+		mustCnt = pContent->nOffset;//必须跳转mustCnt次
+		maxCnt = pContent->nDepth - patternLen;//跳转了mustCnt次后，还需跳0-maxCnt次
 	}
-	else if((content->nFlags & CF_WITHIN))
+	else if(pContent->TestFlag(CF_WITHIN))
 	{
-		mustCnt = content->nDistance;
-		maxCnt = content->nWithin - patternLen;
+		mustCnt = pContent->nDistance;
+		maxCnt = pContent->nWithin - patternLen;
 	}
 
 	//共offset + depth + 1或者distance + within + 1个状态，有一个初始状态
@@ -664,14 +663,14 @@ void contentToLinearNFA(OPTIONCONTENT *content, CNfa &nfa)
 	}
 
 	++stateID;
-	for(std::vector<BYTE>::const_iterator iter = content->vecconts.begin();
-		iter != content->vecconts.end(); ++iter)
+	for(std::vector<BYTE>::const_iterator iter = pContent->vecconts.begin();
+		iter != pContent->vecconts.end(); ++iter)
 	{
 		nfa.Resize(++state_size);
 		//nfa.PushBack(CNfaRow());
 		CNfaRow &row = nfa.Back();
 
-		if((content->nFlags & CF_NOCASE) && isalpha(*iter))
+		if(pContent->TestFlag(CF_NOCASE) && isalpha(*iter))
 		{
 			row.AddDest(toupper(*iter), stateID);
 			row.AddDest(tolower(*iter), stateID);
@@ -688,20 +687,20 @@ void contentToLinearNFA(OPTIONCONTENT *content, CNfa &nfa)
 }
 
 //没有depth或者within标记的
-void contentToDefaultNFA(OPTIONCONTENT *content, CNfa &nfa)
+void contentToDefaultNFA(OPTIONCONTENT *pContent, CNfa &nfa)
 {
 	nfa.Reserve(nfaReserve);
 	size_t state_size = 0;
 
 	size_t mustCnt = 0;//经过的偏移字符个数
-	if((content->nFlags & CF_OFFSET))
+	if((pContent->GetFlag() & CF_OFFSET))
 	{
-		mustCnt = content->nOffset;
+		mustCnt = pContent->nOffset;
 
 	}
-	else if((content->nFlags & CF_DISTANCE))
+	else if((pContent->GetFlag() & CF_DISTANCE))
 	{
-		mustCnt = content->nDistance;
+		mustCnt = pContent->nDistance;
 	}
 
 	for(size_t i = 0; i < mustCnt; ++i)
@@ -718,12 +717,12 @@ void contentToDefaultNFA(OPTIONCONTENT *content, CNfa &nfa)
 	}
 
 	size_t stateID = mustCnt;//从stateID开始进行content.vecconts的匹配
-	size_t patternLen = content->vecconts.size(); 
+	size_t patternLen = pContent->vecconts.size(); 
 	std::vector<BYTE> pattern;
-	for(std::vector<BYTE>::const_iterator iter = content->vecconts.begin();
-		iter != content->vecconts.end(); ++iter)
+	for(std::vector<BYTE>::const_iterator iter = pContent->vecconts.begin();
+		iter != pContent->vecconts.end(); ++iter)
 	{
-		BYTE c = BYTE((content->nFlags & CF_NOCASE) ? tolower(*iter) : *iter);
+		BYTE c = BYTE((pContent->GetFlag() & CF_NOCASE) ? tolower(*iter) : *iter);
 		pattern.push_back(c);//如果content有nocase标记，则把模式串用字符的小写形式表示
 	}
 
@@ -740,7 +739,7 @@ void contentToDefaultNFA(OPTIONCONTENT *content, CNfa &nfa)
 			{
 				row.AddDest(c, stateID);
 			}
-			BYTE character = BYTE((content->nFlags & CF_NOCASE) ? tolower(c) : c);
+			BYTE character = BYTE((pContent->GetFlag() & CF_NOCASE) ? tolower(c) : c);
 			if(character == pattern[i])
 			{
 				row.AddDest(c, id);
@@ -750,23 +749,23 @@ void contentToDefaultNFA(OPTIONCONTENT *content, CNfa &nfa)
 	nfa.Reserve(++state_size);
 }
 
-void content2Nfa(OPTIONCONTENT *content, CNfa &nfa)
+void content2Nfa(OPTIONCONTENT *pContent, CNfa &nfa)
 {
 	/*
 	如果有depth或者within，则构造成线性的FA; 否则，构造成默认FA
 	*/
-	if((content->nFlags & CF_DEPTH) || (content->nFlags & CF_WITHIN))
+	if((pContent->GetFlag() & CF_DEPTH) || (pContent->GetFlag() & CF_WITHIN))
 	{
-		contentToLinearNFA(content, nfa);
+		contentToLinearNFA(pContent, nfa);
 	}
 	else
 	{
-		contentToDefaultNFA(content, nfa);
+		contentToDefaultNFA(pContent, nfa);
 	}
 }
 
 //test function: output a nfa
-void outPut(CNfa &nfa, std::string &fileName)
+void PrintDfaToText(CNfa &nfa, std::string &fileName)
 {
 	size_t stateNum = nfa.Size();
 	std::ofstream fout(fileName);
@@ -816,7 +815,7 @@ size_t content2Pcre(OPTIONCONTENT *pContent, CCString &pcreStr)
 {
 	std::stringstream ss;
 	pcreStr = CCString("/^");
-	if((pContent->nFlags & CF_OFFSET) && pContent->nOffset > 0)
+	if(pContent->TestFlag(CF_OFFSET) && pContent->nOffset > 0)
 	{
 		ss.str("");
 		ss << pContent->nOffset;
@@ -824,7 +823,7 @@ size_t content2Pcre(OPTIONCONTENT *pContent, CCString &pcreStr)
 		pcreStr.Append(ss.str().c_str());
 		pcreStr.Append("}");
 	}
-	if((pContent->nFlags & CF_DISTANCE) && pContent->nDistance > 0)
+	if(pContent->TestFlag(CF_DISTANCE) && pContent->nDistance > 0)
 	{
 		ss.str("");
 		ss << pContent->nDistance;
@@ -832,12 +831,12 @@ size_t content2Pcre(OPTIONCONTENT *pContent, CCString &pcreStr)
 		pcreStr.Append(ss.str().c_str());
 		pcreStr.Append("}");
 	}
-	if(!((pContent->nFlags & CF_DEPTH) || pContent->nFlags & CF_WITHIN))
+	if(!(pContent->TestFlag(CF_DEPTH) || pContent->TestFlag(CF_WITHIN)))
 	{
 		//without depth and without within
-		if(!((pContent->nFlags & CF_OFFSET) || (pContent->nFlags & CF_DISTANCE))
-			|| ((pContent->nFlags & CF_OFFSET) && pContent->nOffset == 0)
-			|| ((pContent->nFlags & CF_DISTANCE) && pContent->nDistance == 0))
+		if(!(pContent->TestFlag(CF_OFFSET) || pContent->TestFlag(CF_DISTANCE))
+			|| (pContent->TestFlag(CF_OFFSET) && pContent->nOffset == 0)
+			|| (pContent->TestFlag(CF_DISTANCE) && pContent->nDistance == 0))
 		{
 			//without offset and without distance
 			pcreStr = CCString("/");
@@ -850,11 +849,11 @@ size_t content2Pcre(OPTIONCONTENT *pContent, CCString &pcreStr)
 	else
 	{
 		int n = 0;
-		if((pContent->nFlags & CF_DEPTH))
+		if(pContent->TestFlag(CF_DEPTH))
 		{
 			n = pContent->nDepth - pContent->vecconts.size();
 		}
-		else if((pContent->nFlags & CF_WITHIN))
+		else if(pContent->TestFlag(CF_WITHIN))
 		{
 			n = pContent->nWithin - pContent->vecconts.size();
 		}
@@ -884,7 +883,7 @@ size_t content2Pcre(OPTIONCONTENT *pContent, CCString &pcreStr)
 	const char* str = (char*)&conVec[0];
 	pcreStr.Append(str);
 
-	if(pContent->nFlags & CF_NOCASE)
+	if(pContent->TestFlag(CF_NOCASE))
 	{
 		pcreStr.Append("/si");
 	}
@@ -931,7 +930,7 @@ CRECHANFA size_t Rule2PcreList(const CSnortRule &rule, CRegRule &regrule)
 		
 		if(pContent != NULL)
 		{
-			if(!((pContent->nFlags & CF_DISTANCE) || (pContent->nFlags& CF_WITHIN)))
+			if(!(pContent->TestFlag(CF_DISTANCE) || pContent->TestFlag(CF_WITHIN)))
 			{
 				if(regrule.Back().Size() != 0)
 				{
@@ -976,7 +975,7 @@ CRECHANFA size_t Rule2PcreList(const CSnortRule &rule, CRegRule &regrule)
 		}
 		else if(pPcre != NULL)
 		{
-			if(!(pPcre->nFlags & PF_R))
+			if(!(pPcre->GetFlag() & PF_R))
 			{
 				if(regrule.Back().Size() != 0)
 				{
@@ -1027,7 +1026,7 @@ CRECHANFA size_t CRegChainToNFA(CRegChain &regchain, CNfa &nfa)
 	int flag = 0;
 	for(size_t i = 0; i < regchain.Size(); ++i)
 	{
-		flag = PcreToNFA(regchain[i].C_Str(), nfa, regchain);
+		flag = PcreToNFA(regchain[i].GetStr(), nfa, regchain);
 		if(flag != 0)
 		{
 			nfa.Clear();
@@ -1036,179 +1035,4 @@ CRECHANFA size_t CRegChainToNFA(CRegChain &regchain, CNfa &nfa)
 	}
 	return 0;
 }
-
-//原始程序
-//CRECHANFA size_t InterpretRule(const CSnortRule &rule, CNfaTree &outTree)
-//{
-//	outTree.Reserve(nfaTreeReserve);
-//
-//	size_t flag = 0;
-//	//outTree.PushBack(CNfaChain());
-//	size_t nfaChain_size = 0;
-//	outTree.Resize(++nfaChain_size);
-//	size_t nfa_size = 0;
-//
-//	for(size_t i = 0; i < rule.Size(); ++i)
-//	{
-//		OPTIONCONTENT *pContent = dynamic_cast<OPTIONCONTENT*>(rule[i]);
-//		OPTIONPCRE *pPcre = dynamic_cast<OPTIONPCRE*>(rule[i]);
-//		if(pContent != NULL)
-//		{
-//			if(!((pContent->nFlags & CF_DISTANCE) || (pContent->nFlags& CF_WITHIN)))
-//			{
-//				if(outTree.Back().Size() != 0)
-//				{
-//					//outTree.PushBack(CNfaChain());
-//					outTree.Resize(++nfaChain_size);
-//					nfa_size = 0;
-//				}
-//			}
-//			//outTree.Back().PushBack(CNfa());
-//			outTree.Back().Resize(++nfa_size);
-//			content2Nfa(pContent, outTree.Back().Back());
-//		}
-//		else if(pPcre != NULL)
-//		{
-//
-//			if(!(pPcre->nFlags & PF_R))
-//			{
-//				if(outTree.Back().Size() != 0)
-//				{
-//					//outTree.PushBack(CNfaChain());
-//					outTree.Resize(++nfaChain_size);
-//					nfa_size = 0;
-//				}
-//			}
-//			//outTree.Back().PushBack(CNfa());
-//			outTree.Back().Resize(++nfa_size);
-//			std::string strPattern;
-//			strPattern.resize(pPcre->GetPattern(NULL, 0));
-//			pPcre->GetPattern(&strPattern[0], strPattern.size());
-//
-//			//std::cout << "pcre:" << strPattern << "; ";//测试输出
-//
-//			flag = PcreToNFA(strPattern.c_str(), outTree.Back().Back());
-//
-//			if(flag != 0)
-//			{
-//				return flag;
-//			}
-//		}
-//	}
-//
-//	outTree.Reserve(++nfaChain_size);
-//	return 0;
-//}
-
-
-//CRECHANFA size_t InterpretRule(const CSnortRule &rule, CNfaTree &outTree)
-//{
-//	outTree.Reserve(nfaTreeReserve);
-//
-//	size_t flag = 0;
-//	size_t cFlag = 0;
-//	size_t nfaChain_size = 0;
-//	outTree.Resize(++nfaChain_size);
-//	outTree.Back().Reserve(nfaReserve);
-//	std::string str = "";
-//
-//	for(size_t i = 0; i < rule.Size(); ++i)
-//	{
-//		OPTIONCONTENT *pContent = dynamic_cast<OPTIONCONTENT*>(rule[i]);
-//		OPTIONPCRE *pPcre = dynamic_cast<OPTIONPCRE*>(rule[i]);
-//		std::string pcreStr = "";
-//		if(pContent != NULL)
-//		{
-//			if(!((pContent->nFlags & CF_DISTANCE) || (pContent->nFlags& CF_WITHIN)))
-//			{
-//				if(outTree.Back().Size() != 0)
-//				{
-//					outTree.Back().Reserve(outTree.Back().Size() + 1);
-//					outTree.Back().SetPcre(str.c_str());
-//					str = "";
-//					outTree.Resize(++nfaChain_size);
-//					outTree.Back().Reserve(nfaReserve);
-//				}
-//			}
-//
-//			cFlag = content2Pcre(pContent, pcreStr);
-//			if(cFlag != 0)
-//			{
-//				return cFlag;
-//			}
-//		}
-//		else if(pPcre != NULL)
-//		{
-//
-//			if(!(pPcre->nFlags & PF_R))
-//			{
-//				if(outTree.Back().Size() != 0)
-//				{
-//					outTree.Back().Reserve(outTree.Back().Size() + 1);
-//					outTree.Back().SetPcre(str.c_str());
-//					str = "";
-//					outTree.Resize(++nfaChain_size);
-//					outTree.Back().Reserve(nfaReserve);
-//				}
-//			}
-//			pcreStr.resize(pPcre->GetPattern(NULL, 0));
-//			pPcre->GetPattern(&pcreStr[0], pcreStr.size());
-//		}
-//		flag = PcreToNFA(pcreStr.c_str(), outTree.Back());
-//		if(flag != 0)
-//		{
-//			return flag;
-//		}
-//
-//		//std::string str = outTree.Back().GetPcre();
-//
-//		//erase header and tail of a pcre 
-//		std::string::iterator it1 = std::find(pcreStr.begin(), pcreStr.end(), '/');
-//		if(*(++it1) == '^')
-//		{
-//			pcreStr.erase(pcreStr.begin(), ++it1);
-//		}
-//		else
-//		{
-//			pcreStr.erase(pcreStr.begin(), it1);
-//			std::string tmp = ".*";
-//			pcreStr.insert(pcreStr.begin(), tmp.begin(), tmp.end());
-//		}
-//		pcreStr.erase(std::find(pcreStr.rbegin(), pcreStr.rend(), '/').base() - 1, pcreStr.end());
-//
-//		str += pcreStr;
-//	}
-//
-//	outTree.Reserve(++nfaChain_size);
-//	outTree.Back().SetPcre(str.c_str());
-//
-//	return 0;
-//}
-
-
-//CRECHANFA void SerializeNfa(CNfaChain &nfaChain, CNfa &seriaNfa)
-//{
-//	CNfaRow oneSta;
-//
-//	for(size_t n = 0; n < nfaChain.Size(); ++n)
-//	{
-//		size_t temp = seriaNfa.Size();
-//		if(n != 0)
-//		{
-//			IncreNfaStaNum(seriaNfa.Size(), nfaChain[n]);
-//		}
-//		seriaNfa.Resize(temp + nfaChain[n].Size());
-//		for (size_t i = 0; i < nfaChain[n].Size(); ++i)
-//		{
-//			seriaNfa[temp + i] = nfaChain[n][i];
-//		}
-//
-//		if(n != nfaChain.Size() - 1)
-//		{
-//			seriaNfa.Back()[EMPTYEDGE].PushBack(seriaNfa.Size());
-//			seriaNfa.Resize(seriaNfa.Size() + 1);
-//			seriaNfa.Back()[EMPTYEDGE].PushBack(seriaNfa.Size());
-//		}		
-//	}
-//}
 

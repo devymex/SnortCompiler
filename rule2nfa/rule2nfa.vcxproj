@@ -73,12 +73,10 @@
     <None Include="rule2nfa.def" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="CombineTree.h" />
     <ClInclude Include="rule2nfa.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="CombineTree.cpp" />
     <ClCompile Include="rule2nfa.cpp" />
     <ClCompile Include="stdafx.cpp" />
   </ItemGroup>

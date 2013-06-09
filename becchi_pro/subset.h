@@ -99,7 +99,7 @@ public:
 	//dumps the subset (for logging purposes)
 	void dump(FILE *file=stdout);
 	
-private:	
+protected:	
 	
 	//analyze the subsets and populates the heap with the number of
 	//NFA/DFA states corresponding to a subset w/ different size 

@@ -314,7 +314,7 @@ COMPILERNEW size_t CResNew::WriteToFile(LPCTSTR filename)
 		for (size_t j = 0; j < m_RegexTbl[i].Size(); ++j)
 		{
 			WriteNum(fout, m_RegexTbl[i][j].Size());
-			const char *pString = m_RegexTbl[i][j].C_Str();
+			const char *pString = m_RegexTbl[i][j].GetStr();
 			fout.write(pString, strlen(pString));
 		}
 		WriteNum(fout, m_RegexTbl[i].GetSigCnt());
@@ -540,7 +540,7 @@ void Rule2Dfas(const CSnortRule &rule, CResNew &result, COMPILEDRULENEW &ruleRes
 				size_t nToDFAFlag = dfa.FromNFA(nfa);
 				//				std::cout << "  "<< dfa.LinkSize() << ", " << dfa.GetGroupCount() * dfa.Size() << std::endl;
 				nfa2dfatime += ctime.Reset();//ÓÃÓÚ²âÊÔ
-				//outPutDfa(dfa, "..//..//output//test.txt");
+				//PrintDfaToText(dfa, "..//..//output//test.txt");
 
 				if (nToDFAFlag == -1)
 				{

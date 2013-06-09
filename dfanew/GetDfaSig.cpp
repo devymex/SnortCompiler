@@ -9,9 +9,9 @@ DFANEWSC void GetDfaSig(CDfaNew &dfa, std::vector<std::vector<BYTE>> &allStr)
 {
 	static STATEID serNum = 0;
 
-	std::vector<STATEID> doms;
+	STATEVEC doms;
 	//记录所有的终态
-	std::vector<STATEID> termStas;
+	STATEVEC termStas;
 	//深度优先遍历DFA时标记已被访问过的状态
 	size_t visited[DFACOLSIZE];
 	std::memset((char*)visited, 0, sizeof(visited));
@@ -38,14 +38,14 @@ DFANEWSC void GetDfaSig(CDfaNew &dfa, std::vector<std::vector<BYTE>> &allStr)
 }
 
 //深度遍历dfa，填写deepser,terRow,staRow
-void DeepSearch(STATEID startSta, STATEID &serNum, CDfaNew &dfa, std::vector<STATEID> &termStas, size_t visited[], STATEID deepSer[], STATEID staRow[])
+void DeepSearch(STATEID startSta, STATEID &serNum, CDfaNew &dfa, STATEVEC &termStas, size_t visited[], STATEID deepSer[], STATEID staRow[])
 {
 	if((dfa[startSta].GetFlag() & CDfaRow::TERMINAL) != 0)
 	{
 		termStas.push_back(startSta);
 	}
 	visited[startSta] = 1;
-	std::vector<STATEID> stack;
+	STATEVEC stack;
 
 	STATEID cursta = startSta;
 	staRow[cursta] = serNum;
@@ -72,9 +72,9 @@ void DeepSearch(STATEID startSta, STATEID &serNum, CDfaNew &dfa, std::vector<STA
 	}
 }
 
-void Dominates(CDfaNew &dfa, std::vector<STATEID> termStas, INT64 domMax[], STATEID deepSer[], STATEID staRow[], std::vector<STATEID> &doms)
+void Dominates(CDfaNew &dfa, STATEVEC termStas, INT64 domMax[], STATEID deepSer[], STATEID staRow[], STATEVEC &doms)
 {
-	std::vector<STATEID> inStas[DFACOLSIZE];
+	STATEVEC inStas[DFACOLSIZE];
 	InStas(dfa, inStas);
 	//initial domMax first row
 	domMax[0] &= (INT64)1 << 63;
@@ -184,7 +184,7 @@ void RowAnd(INT64* firRow, INT64* secRow, INT64* lastRow)
 }
 
 //pre states of each state of dfa
-void InStas(CDfaNew &dfa, std::vector<STATEID> *inStas)
+void InStas(CDfaNew &dfa, STATEVEC *inStas)
 {
 	UINT8 visited[DFACOLSIZE][DFACOLSIZE];
 	std::memset(visited, 0, sizeof(visited));
@@ -220,7 +220,7 @@ bool Change(INT64* before, INT64* after)
 	return chg;
 }
 
-void WFSDfa(CDfaNew &dfa, std::vector<STATEID> doms, STATEID *staRow, std::vector<std::vector<BYTE>> &allStr)
+void WFSDfa(CDfaNew &dfa, STATEVEC doms, STATEID *staRow, std::vector<std::vector<BYTE>> &allStr)
 {
 	//入度
 	size_t in[DFACOLSIZE - 1];
@@ -239,7 +239,7 @@ void WFSDfa(CDfaNew &dfa, std::vector<STATEID> doms, STATEID *staRow, std::vecto
 	std::memset(inEdges, 0, sizeof(inEdges));
 	std::memset(inEdgeVis, 0, sizeof(inEdgeVis));
 
-	std::vector<STATEID> stack;
+	STATEVEC stack;
 	stack.push_back(dfa.GetStartId());
 	deeps[dfa.GetStartId()] = 0;
 	while (!stack.empty())
@@ -281,7 +281,7 @@ void WFSDfa(CDfaNew &dfa, std::vector<STATEID> doms, STATEID *staRow, std::vecto
 	//judge if all the in edges are the same
 	STATEID sameIn[DFACOLSIZE - 1];
 	std::memset(sameIn, 0, sizeof(sameIn));
-	for(std::vector<STATEID>::iterator iter = doms.begin(); iter != doms.end(); ++iter)
+	for(STATEVEC_ITER iter = doms.begin(); iter != doms.end(); ++iter)
 	{
 		size_t count = 0;
 		for(size_t i = 0; i < DFACOLSIZE; ++i)
@@ -299,7 +299,7 @@ void WFSDfa(CDfaNew &dfa, std::vector<STATEID> doms, STATEID *staRow, std::vecto
 
 	std::vector<BYTE> str;
 
-	for(std::vector<STATEID>::iterator iter = doms.begin(); iter != doms.end(); ++iter)
+	for(STATEVEC_ITER iter = doms.begin(); iter != doms.end(); ++iter)
 	{
 		if(sameIn[*iter] != 1)
 		{

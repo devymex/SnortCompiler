@@ -21,7 +21,7 @@ public:
 	SIGNATURE &operator[](size_t nIdx);
 	const SIGNATURE &operator[](size_t nIdx) const;
 	void Clear();
-private:
+protected:
 	std::vector<SIGNATURE> *m_pSigs;
 };
 
@@ -33,7 +33,7 @@ struct DFAINFO
 
 struct ONEGROUP
 {
-	CVectorNumber DfaIds;
+	CVectorUnsigned DfaIds;
 	CSIGNATURES ComSigs;
 	SIGNATURE currSig;
 	std::size_t mergeDfaId;
@@ -54,13 +54,13 @@ public:
 	const ONEGROUP &operator[](size_t nIdx) const;
 	void Clear();
 	void Erase(size_t nIdx);
-private:
+protected:
 	std::vector<ONEGROUP> *m_pGroups;
 };
 
 class GROUPINGSC CGROUPRes
 {
-private:
+protected:
 	CDfaTblNew m_dfaTbl;
 	CSidDfaIdsNew m_sidDfaIds; 
 	CGROUPS m_groups;

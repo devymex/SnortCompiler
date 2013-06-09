@@ -26,7 +26,7 @@ struct COMPILERNEW COMPILEDRULENEW
 	};
 	size_t m_nSid;
 	size_t m_nResult;
-	CVectorNumber m_dfaIds;
+	CVectorUnsigned m_dfaIds;
 };
 
 class COMPILERNEW CDfaTblNew
@@ -43,7 +43,7 @@ public:
 	const size_t Size() const;
 	void PushBack(const CDfaNew &dfa);
 	void Clear();
-private:
+protected:
 	std::vector<CDfaNew> *m_pdfaTbl;
 };
 
@@ -61,7 +61,7 @@ public:
 	const size_t Size() const;
 	void PushBack(const COMPILEDRULENEW &sidDfaIds);
 	COMPILEDRULENEW& Back();
-private:
+protected:
 	std::vector<COMPILEDRULENEW> *m_ruleResult;
 };
 //ÆúÓÃ
@@ -85,13 +85,13 @@ private:
 //	const size_t Size() const;
 //	void PushBack(const DFAINFO &dfaDetail);
 //	DFAINFO& Back();
-//private:
+//protected:
 //	std::vector<DFAINFO> *m_pDfas;
 //};
 
 class COMPILERNEW CResNew
 {
-private:
+protected:
 	CDfaTblNew m_dfaTbl;
 	CSidDfaIdsNew m_sidDfaIds;
 	//CDFASINFO m_DfasInfo;

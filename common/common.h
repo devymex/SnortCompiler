@@ -1,12 +1,19 @@
+/**
+**  @file        common.h
+**
+**  @author      Lab 435, Xidian University
+**
+**  @brief       Common classes declaration
+**
+**  Include CVectorUnsigned, CCString
+**
+*/
+
 #pragma once
 
-#include <Windows.h>
+#include <windows.h>
 #include <vector>
 #include <list>
-
-#define CHARSETSIZE 260
-#define EMPTYEDGE 256
-#define DFACOLSIZE 256
 
 #ifndef COMMON_H_
 #define COMMONSC __declspec(dllimport)
@@ -14,67 +21,90 @@
 #define COMMONSC __declspec(dllexport)
 #endif
 
-double COMMONSC g_dTimer;
+#define CHARSETSIZE 260
+#define EMPTYEDGE 256
+#define DFACOLSIZE 256
 
-//typedef BYTE STATEID;
-typedef WORD STATEID;
-typedef std::list<STATEID> STALIST;
-typedef std::list<STATEID>::iterator STALIST_ITER;
-typedef std::vector<std::vector<STATEID>> SETVEC;
-typedef std::list<std::list<STATEID>>::iterator SETLIST_ITER;
-typedef DWORD SIGNATURE;
+/*
+* Common type define
+*/
+//typedef unsigned char STATEID;
+typedef unsigned short			STATEID;
+typedef unsigned long			SIGNATURE;
+typedef std::list<STATEID>		STATELIST;
+typedef std::vector<STATEID>	STATEVEC;
+typedef STATELIST::iterator		STATELIST_ITER;
+typedef STATEVEC::iterator		STATEVEC_ITER;
+typedef class CVectorUnsigned	CStateSet;
 
-class COMMONSC CVectorNumber
+/*
+* Capsulate the std::vector<size_t> for dll using.
+*/
+class COMMONSC CVectorUnsigned
 {
 public:
-	CVectorNumber();
-	~CVectorNumber();
-	CVectorNumber(const CVectorNumber &other);
-	const CVectorNumber& operator = (const CVectorNumber &other);
+// CDCA
+	CVectorUnsigned();
+	~CVectorUnsigned();
+	CVectorUnsigned(const CVectorUnsigned &other);
+	const CVectorUnsigned& operator = (const CVectorUnsigned &other);
+
+// Overided operators
 	size_t& operator[](size_t nIdx);
 	const size_t& operator[](size_t nIdx) const;
-	bool operator == (const CVectorNumber &other);
+	bool operator == (const CVectorUnsigned &other);
 
-	const size_t Size() const;
+// Access member
+	void Clear();
+	size_t Size() const;
 	void PopBack();
 	void PushBack(size_t nState);
 	void Reserve(size_t nCount);
 	void Resize(size_t nSize);
 	size_t& Back();
+
+// Algorithms
 	void Sort();
 	void Unique();
 	void Fill(size_t _Val);
-	void Clear();
-private:
+
+protected:
 	std::vector<size_t> *m_pSet;
 };
 
-typedef CVectorNumber CStateSet;
-
-
+/*
+* Capsulate the std::string for dll using.
+*/
 class COMMONSC CCString
 {
 public:
+// CDCA
 	CCString();
 	explicit CCString(const char *pStr);
 	~CCString();
 	CCString(const CCString &other);
 	CCString& operator = (const CCString &other);
+
+// Overided operators
 	char operator[](size_t nIdx) const;
-	void Append(const char* pChar);
-	const char* GetString();
-	const char* C_Str();
 
 	const size_t Size() const;
-	void PushBack(const char nChar);
-	char Back() const;
-	void Clear();
 	bool Empty();
+	void Clear();
+	void Append(const char* pChar);
+	char Back() const;
+	void PushBack(const char nChar);
+	const char* GetStr();
 	
-private:
+protected:
 	std::string *m_pString;
 };
 
+/*
+* Store a row for CNfa. Array of std::vector<size_t>. Each element of the
+* array stand by a column that indicates the jumping character.
+* Each number in vector is the next state would be jump to by the character.
+*/
 class COMMONSC CNfaRow
 {
 public:
@@ -94,34 +124,9 @@ public:
 	void AddDest(size_t nCol, size_t nDest);
 	void SortAll();
 
-private:
+protected:
 	size_t m_nSize;
 	std::vector<size_t> *m_pDestSet;
-};
-
-class COMMONSC CDfaRow
-{
-public:
-	enum STATEFLAG
-	{
-		NORMAL   = 1 << 0,
-		START    = 1 << 1,
-		TERMINAL = 1 << 2
-	};
-	explicit CDfaRow(size_t col);
-	void Fill(STATEID _Val);
-	~CDfaRow();
-	CDfaRow(const CDfaRow &other);
-	CDfaRow& operator=(const CDfaRow &other);
-	STATEID& operator[](STATEID index);
-	const STATEID& operator[](STATEID index) const;
-	void SetFlag(size_t nFlag);
-	size_t GetFlag() const;
-	size_t GetColNum() const;
-private:
-	size_t m_nFlag;//标记该状态/行的属性：NORMAL、START、TERMINAL
-	size_t m_nColNum;
-	std::vector<STATEID> *m_pDest;
 };
 
 class COMMONSC CNfa
@@ -153,7 +158,7 @@ public:
 	CNfaRow &Back();
 	CNfaRow &operator[](size_t index);
 	const CNfaRow &operator[](size_t index) const;
-private:
+protected:
 	std::vector<CNfaRow> *m_pNfa;
 	std::string *m_pPcre;
 	//如果该nfa是由dfa合并过程中生成的，该成员用于记录哪个状态能够识别哪个dfa终态
@@ -176,7 +181,7 @@ public:
 	CNfa& operator[](size_t nIdx);
 	const CNfa& operator[](size_t nIdx) const;
 
-private:
+protected:
 	std::vector<CNfa> *m_pTree;
 };
 
@@ -197,7 +202,7 @@ public:
 	SIGNATURE& GetSig(size_t nIdx) const;
 	void Unique();
 	void ClearSigList();
-private:
+protected:
 	std::vector<CCString> *m_pRegList;
 	std::vector<SIGNATURE> *m_pSigList;
 };
@@ -217,21 +222,29 @@ public:
 	CRegChain& operator[](size_t nIdx);
 	const CRegChain& operator[](size_t nIdx) const;
 	const CRegRule& operator = (const CRegRule &other);
-private:
+
+protected:
 	std::vector<CRegChain> *m_pRegVec;
 };
 
-struct COMMONSC RULEOPTION
+class COMMONSC CRuleOption
 {
-	RULEOPTION();
-	RULEOPTION(const RULEOPTION &other);
-	const RULEOPTION& operator=(const RULEOPTION &other);
-	virtual ~RULEOPTION();
+public:
+	CRuleOption();
+	CRuleOption(const CRuleOption &other);
+	const CRuleOption& operator=(const CRuleOption &other);
+	virtual ~CRuleOption();
 
 	void SetPattern(LPCSTR lpStr);
 	size_t GetPattern(LPSTR lpStr, size_t nLen) const;
 
-	size_t nFlags;
+	size_t GetFlag() const;
+	void SetFlag(size_t nFlag);
+	void AddFlag(size_t nFlag);
+	BOOL TestFlag(size_t nFlag) const;
+
+protected:
+	size_t m_nFlag;
 	std::string *m_pPattern;
 };
 
@@ -249,14 +262,15 @@ public:
 	size_t GetSid() const;
 	void SetFlag(size_t flag);
 	size_t GetFlag() const;
-	void PushBack(RULEOPTION* ruleoption);
+	void PushBack(CRuleOption* ruleoption);
 	void PopBack();
 	size_t Size() const;
-	RULEOPTION* operator[](size_t nIdx) const;
-private:
+	CRuleOption* operator[](size_t nIdx) const;
+
+protected:
 	size_t m_nSid;
 	size_t m_nFlag;
-	std::vector<RULEOPTION*> *m_pOptions;
+	std::vector<CRuleOption*> *m_pOptions;
 };
 
 class CTimer
@@ -288,9 +302,9 @@ public:
 
 		return dCur;
 	}
-private:
+protected:
 	__int64 m_nFreq;
 	__int64 m_nStart;
 };
 
-COMMONSC void printNfa(const CNfa &nfa);
+COMMONSC void PrintNfaToText(CNfa &nfa, const char* fileName);//用于测试输出一个nfa
