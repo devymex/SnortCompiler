@@ -423,7 +423,7 @@ Returns:            nothing
 
 void GroupOnlyOneSig(const std::vector<DFAINFO> &vecDfaInfo, std::vector<size_t> &vecWaitForGroup, CGROUPS &groups)
 {
-	std::map<SIGNATURE, CVectorNumber> sigToIdsMap;
+	std::map<SIGNATURE, CVectorUnsigned> sigToIdsMap;
 	for (std::vector<size_t>::iterator i = vecWaitForGroup.begin(); i != vecWaitForGroup.end();)
 	{
 		if (vecDfaInfo[*i].Sigs.size() == 1)
@@ -441,7 +441,7 @@ void GroupOnlyOneSig(const std::vector<DFAINFO> &vecDfaInfo, std::vector<size_t>
 
 	groups.Resize(sigToIdsMap.size());
 	std::size_t idx = 0;
-	for (std::map<SIGNATURE, CVectorNumber>::iterator i = sigToIdsMap.begin(); i != sigToIdsMap.end(); ++i, ++idx)
+	for (std::map<SIGNATURE, CVectorUnsigned>::iterator i = sigToIdsMap.begin(); i != sigToIdsMap.end(); ++i, ++idx)
 	{
 		groups[idx].ComSigs.PushBack(i->first);
 		groups[idx].DfaIds = i->second;
@@ -500,7 +500,7 @@ void Merge(CResNew &res, CGROUPS &groups)
 				}
 				groups.Back().mergeDfaId = -1;
 				groups.Back().ComSigs = groups[i].ComSigs;
-				CVectorNumber tmp(groups[i].DfaIds);
+				CVectorUnsigned tmp(groups[i].DfaIds);
 				groups[i].DfaIds.Clear();
 				for (size_t k = 0; k < j; ++k)
 				{
@@ -598,7 +598,7 @@ Returns:            nothing
 
 void BuildGroupBySig(const std::vector<DFAINFO> &vecDfaInfo, CGROUPS &newGroups, std::vector<size_t> &vecWaitForGroup)
 {
-	std::map<std::vector<SIGNATURE>, CVectorNumber> sigsToIdsMap;
+	std::map<std::vector<SIGNATURE>, CVectorUnsigned> sigsToIdsMap;
 	for (size_t i = 0; i < vecWaitForGroup.size(); ++i)
 	{
 		sigsToIdsMap[vecDfaInfo[vecWaitForGroup[i]].Sigs].PushBack(vecWaitForGroup[i]);
@@ -607,7 +607,7 @@ void BuildGroupBySig(const std::vector<DFAINFO> &vecDfaInfo, CGROUPS &newGroups,
 
 	newGroups.Resize(sigsToIdsMap.size());
 	size_t idx = 0;
-	for (std::map<std::vector<SIGNATURE>, CVectorNumber>::iterator i = sigsToIdsMap.begin(); i != sigsToIdsMap.end(); ++i, ++idx)
+	for (std::map<std::vector<SIGNATURE>, CVectorUnsigned>::iterator i = sigsToIdsMap.begin(); i != sigsToIdsMap.end(); ++i, ++idx)
 	{
 		for (size_t j = 0; j < i->first.size(); ++j)
 		{

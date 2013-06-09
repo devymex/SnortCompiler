@@ -514,7 +514,7 @@ static const char error_texts[] =
 patterns. Note that the tables in chartables are dependent on the locale, and
 may mark arbitrary characters as digits - but the PCRE compiling code expects
 to handle only 0-9, a-z, and A-Z as digits when compiling. That is why we have
-a private table here. It costs 256 bytes, but it is a lot faster than doing
+a protected table here. It costs 256 bytes, but it is a lot faster than doing
 character value tests (at least in some simple cases I timed), and in some
 applications one wants PCRE to compile efficiently as well as match
 efficiently.

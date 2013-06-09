@@ -269,7 +269,7 @@ COMPILERNEW size_t CResNew::WriteToFile(LPCTSTR filename)
 		for (size_t j = 0; j < m_RegexTbl[i].Size(); ++j)
 		{
 			WriteNum(fout, m_RegexTbl[i][j].Size());
-			const char *pString = m_RegexTbl[i][j].C_Str();
+			const char *pString = m_RegexTbl[i][j].GetStr();
 			fout.write(pString, strlen(pString));
 		}
 		WriteNum(fout, m_RegexTbl[i].GetSigCnt());

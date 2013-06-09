@@ -188,8 +188,8 @@ MERDFANEW bool MergeMultipleDfas(std::vector<CDfaNew> &dfas, CDfaNew &lastDfa)
 	*/
 	std::vector<size_t> startVec(dfasSize + 2);
 	
-	lastDfa.ReservRow(CHARSETSIZE);
-	lastDfa.ResizeRow(lastDfa.Size() + 1, colCnt);
+	lastDfa.Reserve(CHARSETSIZE);
+	lastDfa.Resize(lastDfa.Size() + 1, colCnt);
 
 	for(size_t i = 0; i < dfasSize; ++i)
 	{
@@ -292,7 +292,7 @@ MERDFANEW bool MergeMultipleDfas(std::vector<CDfaNew> &dfas, CDfaNew &lastDfa)
 				if(nextIt == statehash.end())
 				{
 #undef max 
-					lastDfa.ResizeRow(lastDfa.Size() + 1, colCnt);
+					lastDfa.Resize(lastDfa.Size() + 1, colCnt);
 					if(lastDfa.Size() > SC_STATELIMIT)
 					{
 						//std::cerr << "SC_STATELIMIT!" << std::endl;

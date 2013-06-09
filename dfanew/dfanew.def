@@ -1,6 +1,3 @@
 LIBRARY
 EXPORTS
-GetDfaSig @ 1
-outPut @ 2
-outPutDfa @ 3
-fdisplay @ 4
+PrintDfaToGv @ 1

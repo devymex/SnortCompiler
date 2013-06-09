@@ -54,7 +54,7 @@ bool PcreMatch(const u_char *data, size_t len, CRegRule &regRule)
 			//对规则选项进行匹配
 			int Pos = -1;
 
-			bool flag = match((const char*)pData, dataSize, regRule[i][j].GetString(), Pos);
+			bool flag = match((const char*)pData, dataSize, regRule[i][j].GetStr(), Pos);
 			if(!flag)
 			{
 				return false;

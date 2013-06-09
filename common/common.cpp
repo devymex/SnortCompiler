@@ -1,132 +1,101 @@
+/**
+**  @file        common.h
+**
+**  @author      Lab 435, Xidian University
+**
+**  @brief       Common classes declaration
+**
+**  Include CVectorUnsigned, CCString
+**
+*/
+
 #include "stdafx.h"
 #include "common.h"
 
-RULEOPTION::RULEOPTION()
-{
-	m_pPattern = new std::string;
-}
-
-RULEOPTION::RULEOPTION(const RULEOPTION &other)
-{
-	m_pPattern = new std::string;
-	*this = other;
-}
-
-RULEOPTION::~RULEOPTION()
-{
-	delete m_pPattern;
-}
-
-const RULEOPTION& RULEOPTION::operator=(const RULEOPTION &other)
-{
-	*m_pPattern = *other.m_pPattern;
-	nFlags = other.nFlags;
-	return *this;
-}
-
-size_t RULEOPTION::GetPattern(LPSTR lpStr, size_t nLen) const
-{
-	if (lpStr == NULL || nLen == 0)
-	{
-		return m_pPattern->length();
-	}
-	if (nLen > m_pPattern->length())
-	{
-		nLen = m_pPattern->length();
-	}
-	CopyMemory(lpStr, &(*m_pPattern)[0], nLen);
-	return nLen;
-}
-
-void RULEOPTION::SetPattern(LPCSTR lpStr)
-{
-	*m_pPattern = lpStr;
-}
-
-COMMONSC CVectorNumber::CVectorNumber()
+COMMONSC CVectorUnsigned::CVectorUnsigned()
 {
 	m_pSet = new std::vector<size_t>;
 }
 
-COMMONSC CVectorNumber::~CVectorNumber()
+COMMONSC CVectorUnsigned::~CVectorUnsigned()
 {
 	delete m_pSet;
 }
 
-COMMONSC CVectorNumber::CVectorNumber(const CVectorNumber &other)
+COMMONSC CVectorUnsigned::CVectorUnsigned(const CVectorUnsigned &other)
 {
 	m_pSet = new std::vector<size_t>;
 	*this = other;
 }
 
-COMMONSC const CVectorNumber& CVectorNumber::operator = (const CVectorNumber &other)
+COMMONSC const CVectorUnsigned& CVectorUnsigned::operator = (const CVectorUnsigned &other)
 {
 	*m_pSet = *other.m_pSet;
 	return *this;
 }
 
-COMMONSC size_t& CVectorNumber::operator[](size_t nIdx)
+COMMONSC size_t& CVectorUnsigned::operator[](size_t nIdx)
 {
 	return (*m_pSet)[nIdx];
 }
 
-COMMONSC const size_t& CVectorNumber::operator[](size_t nIdx) const
+COMMONSC const size_t& CVectorUnsigned::operator[](size_t nIdx) const
 {
 	return (*m_pSet)[nIdx];
 }
 
-COMMONSC bool CVectorNumber::operator == (const CVectorNumber &other)
+COMMONSC bool CVectorUnsigned::operator == (const CVectorUnsigned &other)
 {
 	return *m_pSet == *other.m_pSet;
 }
 
-COMMONSC const size_t CVectorNumber::Size() const
+COMMONSC size_t CVectorUnsigned::Size() const
 {
 	return m_pSet->size();
 }
 
-COMMONSC void CVectorNumber::PopBack()
+COMMONSC void CVectorUnsigned::PopBack()
 {
 	m_pSet->pop_back();
 }
 
-COMMONSC void CVectorNumber::PushBack(size_t nState)
+COMMONSC void CVectorUnsigned::PushBack(size_t nState)
 {
 	m_pSet->push_back(nState);
 }
 
-COMMONSC void CVectorNumber::Reserve(size_t nCount)
+COMMONSC void CVectorUnsigned::Reserve(size_t nCount)
 {
 	m_pSet->reserve(nCount);
 }
 
-COMMONSC void CVectorNumber::Resize(size_t nSize)
+COMMONSC void CVectorUnsigned::Resize(size_t nSize)
 {
 	m_pSet->resize(nSize);
 }
 
-COMMONSC size_t& CVectorNumber::Back()
+COMMONSC size_t& CVectorUnsigned::Back()
 {
 	return m_pSet->back();
 }
 
-COMMONSC void CVectorNumber::Sort()
+COMMONSC void CVectorUnsigned::Sort()
 {
 	std::sort(m_pSet->begin(), m_pSet->end());
 }
 
-COMMONSC void CVectorNumber::Unique()
+COMMONSC void CVectorUnsigned::Unique()
 {
 	Sort();
 	m_pSet->erase(std::unique(m_pSet->begin(), m_pSet->end()), m_pSet->end());
 }
 
-COMMONSC void CVectorNumber::Fill(size_t _Val)
+COMMONSC void CVectorUnsigned::Fill(size_t _Val)
 {
 	std::fill(m_pSet->begin(), m_pSet->end(), _Val);
 }
 
-COMMONSC void CVectorNumber::Clear()
+COMMONSC void CVectorUnsigned::Clear()
 {
 	m_pSet->clear();
 }
@@ -244,7 +213,7 @@ COMMONSC void CNfa::Reserve(size_t _Count)
 
 COMMONSC void CNfa::Shrink()
 {
-//	m_pNfa->shrink_to_fit();
+	m_pNfa->shrink_to_fit();
 }
 
 COMMONSC void CNfa::Resize(size_t _Newsize)
@@ -323,12 +292,12 @@ COMMONSC  void CNfa::PushDfaTerms(DFATERMS dfaTerms)
 	m_DfaTerms->push_back(dfaTerms);
 }
 
-COMMONSC size_t CNfa::GetDfaTermsNum()
+COMMONSC size_t CNfa::GetDfaTermsNum() const
 {
 	return m_DfaTerms->size();
 }
 
-COMMONSC CNfa::DFATERMS CNfa::GetDfaTerms(size_t num)
+COMMONSC CNfa::DFATERMS CNfa::GetDfaTerms(size_t num) const
 {
 	return (*m_DfaTerms)[num];
 }
@@ -341,60 +310,39 @@ COMMONSC void CNfa::SortAll()
 	}
 }
 
-COMMONSC CDfaRow::CDfaRow(size_t col)
-	: m_nFlag(NORMAL), m_nColNum(col)
+COMMONSC void CNfa::Dump(const char *pFile) const
 {
-	m_pDest = new std::vector<STATEID>;
-	m_pDest->resize(m_nColNum);
-	Fill(STATEID(-1));
-}
-
-COMMONSC void CDfaRow::Fill(STATEID _Val)
-{
-	std::fill(m_pDest->begin(), m_pDest->end(), _Val);
-}
-
-COMMONSC CDfaRow::~CDfaRow()
-{
-	delete m_pDest;
-}
-COMMONSC CDfaRow::CDfaRow(const CDfaRow &other)
-{
-	m_pDest = new std::vector<STATEID>;
-	*this = other;
-}
-
-COMMONSC CDfaRow& CDfaRow::operator=(const CDfaRow &other)
-{
-	m_nFlag = other.m_nFlag;
-	m_nColNum = other.m_nColNum;
-	*m_pDest = *other.m_pDest;
-	return *this;
-}
-
-COMMONSC STATEID& CDfaRow::operator[](STATEID index)
-{
-	return (*m_pDest)[index];
-}
-
-COMMONSC const STATEID& CDfaRow::operator[](STATEID index) const
-{
-	return (*m_pDest)[index];
-}
-
-COMMONSC void CDfaRow::SetFlag(size_t nFlag)
-{
-	m_nFlag = nFlag;
-}
-
-COMMONSC size_t CDfaRow::GetFlag() const
-{
-	return m_nFlag;
-}
-
-COMMONSC size_t CDfaRow::GetColNum() const
-{
-	return m_nColNum;
+	size_t stateNum = m_pNfa->size();
+	std::ofstream fout(pFile);
+	fout << "\t";
+	for(size_t t = 0; t < 257; ++t)
+	{
+		fout << t << "\t";
+	}
+	fout << std::endl;
+	for(size_t i = 0; i < stateNum; ++i)
+	{
+		fout << i << "\t";
+		const CNfaRow &row = (*m_pNfa)[i];
+		for(size_t j = 0; j < 257; ++j)
+		{
+			size_t nCnt = row.DestCnt(j);
+			if(nCnt == 0)
+			{
+				fout << -1 << "\t";
+			}
+			else
+			{
+				for(size_t k = 0; k < nCnt; ++k)
+				{
+					fout << row.GetDest(j, k) << ", ";
+				}
+				fout << "\t";
+			}
+		}
+		fout << std::endl;
+	}
+	fout.close();
 }
 
 COMMONSC CCString::CCString()
@@ -442,17 +390,13 @@ COMMONSC void CCString::PushBack(const char nChar)
 {
 	m_pString->push_back(nChar);
 }
+
 COMMONSC char CCString::Back() const
 {
 	return m_pString->back();
 }
 
-COMMONSC const char* CCString::GetString()
-{
-	return m_pString->c_str();
-}
-
-COMMONSC const char* CCString::C_Str()
+COMMONSC const char* CCString::GetStr()
 {
 	return m_pString->c_str();
 }
@@ -494,14 +438,17 @@ COMMONSC CCString& CRegChain::Back() const
 {
 	return m_pRegList->back();
 }
-COMMONSC void CRegChain::PushBack(CCString &pcreStr)
+
+COMMONSC void CRegChain::PushBack(const CCString &pcreStr)
 {
 	m_pRegList->push_back(pcreStr);
 }
+
 COMMONSC CCString& CRegChain::operator[](size_t nIdx)
 {
 	return (*m_pRegList)[nIdx];
 }
+
 COMMONSC const CRegChain& CRegChain::operator = (const CRegChain &other)
 {
 	*this->m_pRegList = *other.m_pRegList;
@@ -519,7 +466,7 @@ COMMONSC size_t CRegChain::GetSigCnt() const
 	return m_pSigList->size();
 }
 
-COMMONSC void CRegChain::PushBackSig(SIGNATURE &signature)
+COMMONSC void CRegChain::PushBackSig(const SIGNATURE &signature)
 {
 	m_pSigList->push_back(signature);
 }
@@ -596,73 +543,82 @@ COMMONSC const CRegRule& CRegRule::operator = (const CRegRule &other)
 	return *this;
 }
 
-COMMONSC CNfaTree::CNfaTree()
+COMMONSC CRuleOption::CRuleOption()
+	: m_nFlag(0)
 {
-	m_pTree = new std::vector<CNfa>;
+	m_pPattern = new std::string;
 }
 
-COMMONSC CNfaTree::~CNfaTree()
+COMMONSC CRuleOption::CRuleOption(const CRuleOption &other)
 {
-	delete m_pTree;
-}
-
-COMMONSC CNfaTree::CNfaTree(const CNfaTree &other)
-{
-	m_pTree = new std::vector<CNfa>;
+	m_pPattern = new std::string;
 	*this = other;
 }
 
-COMMONSC const CNfaTree& CNfaTree::operator = (const CNfaTree &other)
+COMMONSC CRuleOption::~CRuleOption()
 {
-	*m_pTree = *other.m_pTree;
+	delete m_pPattern;
+}
+
+COMMONSC const CRuleOption& CRuleOption::operator=(const CRuleOption &other)
+{
+	*m_pPattern = *other.m_pPattern;
+	m_nFlag = other.m_nFlag;
 	return *this;
 }
 
-COMMONSC size_t CNfaTree::Size() const
+COMMONSC size_t CRuleOption::GetPattern(LPSTR lpStr, size_t nLen) const
 {
-	return m_pTree->size();
+	if (lpStr == NULL || nLen == 0)
+	{
+		return m_pPattern->length();
+	}
+	if (nLen > m_pPattern->length())
+	{
+		nLen = m_pPattern->length();
+	}
+	CopyMemory(lpStr, &(*m_pPattern)[0], nLen);
+	return nLen;
 }
 
-COMMONSC void CNfaTree::Reserve(size_t nCount)
+COMMONSC void CRuleOption::SetPattern(LPCSTR lpStr)
 {
-	m_pTree->reserve(nCount);
+	*m_pPattern = lpStr;
 }
 
-COMMONSC void CNfaTree::Resize(size_t nSize)
+COMMONSC size_t CRuleOption::GetFlag() const
 {
-	m_pTree->resize(nSize);
-}
-COMMONSC CNfa& CNfaTree::Back()
-{
-	return m_pTree->back();
-}
-COMMONSC void CNfaTree::PushBack(const CNfa &cnfa)
-{
-	m_pTree->push_back(cnfa);
-}
-CNfa& CNfaTree::operator[](size_t nIdx)
-{
-	return (*m_pTree)[nIdx];
+	return m_nFlag;
 }
 
-const CNfa& CNfaTree::operator[](size_t nIdx) const
+COMMONSC void CRuleOption::SetFlag(size_t nFlag)
 {
-	return (*m_pTree)[nIdx];
+	m_nFlag = nFlag;
+}
+
+COMMONSC void CRuleOption::AddFlag(size_t nFlag)
+{
+	m_nFlag |= nFlag;
+}
+
+COMMONSC BOOL CRuleOption::TestFlag(size_t nFlag) const
+{
+	return ((m_nFlag & nFlag) != 0);
 }
 
 COMMONSC CSnortRule::CSnortRule()
 	: m_nSid(0), m_nFlag(0)
 {
-	m_pOptions = new std::vector<RULEOPTION*>;
+	m_pOptions = new std::vector<CRuleOption*>;
 }
 
 COMMONSC CSnortRule::CSnortRule(const CSnortRule &other)
 {
-	m_pOptions = new std::vector<RULEOPTION*>;
+	m_pOptions = new std::vector<CRuleOption*>;
 	*this = other;
 }
 
-const CSnortRule& CSnortRule::operator = (const CSnortRule &other)
+COMMONSC const CSnortRule& CSnortRule::operator = (const CSnortRule &other)
 {
 	m_nSid = other.m_nSid;
 	m_nFlag = other.m_nFlag;
@@ -672,18 +628,13 @@ const CSnortRule& CSnortRule::operator = (const CSnortRule &other)
 
 COMMONSC CSnortRule::~CSnortRule()
 {
-	Release();
-	delete m_pOptions;
-}
-
-void CSnortRule::Release()
-{
-	std::vector<RULEOPTION*> &opts = *m_pOptions;
-	for (std::vector<RULEOPTION*>::iterator i = opts.begin(); i != opts.end(); ++i)
+	std::vector<CRuleOption*> &opts = *m_pOptions;
+	for (std::vector<CRuleOption*>::iterator i = opts.begin(); i != opts.end(); ++i)
 	{
 		delete *i;
 	}
 	opts.clear();
+	delete m_pOptions;
 }
 
 COMMONSC void CSnortRule::SetSid(size_t sid)
@@ -706,7 +657,7 @@ COMMONSC size_t CSnortRule::GetFlag() const
 	return m_nFlag;
 }
 
-COMMONSC void CSnortRule::PushBack(RULEOPTION* ruleoption)
+COMMONSC void CSnortRule::PushBack(CRuleOption* ruleoption)
 {
 	m_pOptions->push_back(ruleoption);
 }
@@ -720,26 +671,8 @@ COMMONSC size_t CSnortRule::Size() const
 	return m_pOptions->size();
 }
 
-COMMONSC RULEOPTION* CSnortRule::operator[](size_t nIdx) const
+COMMONSC CRuleOption* CSnortRule::operator[](size_t nIdx) const
 {
 	return (*m_pOptions)[nIdx];
-}
-
-COMMONSC void printNfa(const CNfa &nfa)
-{
-	for (size_t i = 0; i < nfa.Size(); ++i)
-	{
-		const CNfaRow &row = nfa[i];
-		std::cout << i << ": ";
-		for (size_t j = 0; j < CHARSETSIZE; ++j)
-		{
-			size_t nCnt = row.DestCnt(j);
-			for (size_t k = 0; k < nCnt; ++k)
-			{
-				std::cout << "(" << j << "," << row.GetDest(j, k) << ")";
-			}
-		}
-		std::cout << std::endl;
-	}
 }
 
