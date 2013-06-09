@@ -40,6 +40,7 @@ DFANEWSC size_t CFinalStates::Size() const
 
 DFANEWSC void CFinalStates::Clear()
 {
+	m_pDfaIds->clear();
 	m_pStates->clear();
 }
 
@@ -78,6 +79,10 @@ DFANEWSC void CFinalStates::GetDfaIds(STATEID nStaId, CVectorUnsigned &ids) cons
 	for (std::set<size_t>::const_iterator i = curSet.begin();
 		i != curSet.end(); ++i)
 	{
+		if (*i > 10000)
+		{
+			system("pause");
+		}
 		ids.PushBack(*i);
 	}
 }
