@@ -38,7 +38,7 @@ HASHMAPPINGSC size_t hash(const SIGNATURE &oneSig)
 }
 
 //one point in the adjust path
-struct POINT
+struct STATION
 {
 	size_t dfaId;
 	SIGNATURE sig;
@@ -58,7 +58,7 @@ Returns:            true if find a adjust path to reduce conflict
 
 */
 
-bool myFind(std::vector<GROUPHASH> &vecGroups, RESULTMAP &result, SIGNATURE &currSig, std::vector<POINT> &vecPath, size_t &depth)
+bool myFind(std::vector<GROUPHASH> &vecGroups, RESULTMAP &result, SIGNATURE &currSig, std::vector<STATION> &vecPath, size_t &depth)
 {
 	++depth;
 
@@ -83,7 +83,7 @@ bool myFind(std::vector<GROUPHASH> &vecGroups, RESULTMAP &result, SIGNATURE &cur
 				}
 				if (myFind(vecGroups, result, *j, vecPath, depth))
 				{
-					vecPath.push_back(POINT());
+					vecPath.push_back(STATION());
 					vecPath.back().dfaId = *i;
 					vecPath.back().sig = *j;
 					return true;
@@ -118,7 +118,7 @@ void RecursiveAdjust(std::vector<GROUPHASH> &vecGroups, const IDMAP &dmap, RESUL
 			{
 				for (std::vector<size_t>::iterator j = i->second.begin(); j != i->second.end();)
 				{
-					std::vector<POINT> vecPath;
+					std::vector<STATION> vecPath;
 					size_t depth;
 					for (std::vector<SIGNATURE>::iterator k = vecGroups[*j].vecSigs.begin(); k != vecGroups[*j].vecSigs.end(); ++k)
 					{
@@ -415,6 +415,7 @@ void Combine(CGROUPRes &groupRes, std::vector<GROUPHASH> &vecGroups, RESULTMAP &
 				{
 					if (vecGroups[*k].currSig != vecGroups[*j].currSig)
 					{
+						++k;
 						continue;
 					}
 					CDfaNew MergeDfa;

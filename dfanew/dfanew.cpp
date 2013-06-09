@@ -805,32 +805,38 @@ void WriteNum(BYTE*& pBuf, _Ty _num, size_t nBytes = sizeof(_Ty))
 DFANEWSC size_t CDfaNew::Save(BYTE *beg)
 {
 	BYTE *pOld = beg;
-	//写DFA的Id
+
+	//write dfa id
 	WriteNum(beg, m_nId);
-	//写DFA的状态个数
+
+	//write number of dfa states
 	WriteNum(beg, m_pDfa->size(), sizeof(BYTE));
 	if (m_pDfa->size() == 0)
 	{
 		return beg - pOld;
 	}
-	//写分组
+
+	//write group
 	for (size_t i = 0; i < DFACOLSIZE; ++i)
 	{
 		WriteNum(beg, m_pGroup[i]);
 	}
-	//写DFA跳转表
+
+	//write dfa table
 	for (size_t i = 0; i < m_pDfa->size(); ++i)
 	{
-		//写该状态的Flag(NORMAL、START、TERMINAL)
+		//write the flag of dfa state
 		WriteNum(beg, (*m_pDfa)[i].GetFlag());
 		for (size_t j = 0; j < m_nColNum; ++j)
 		{
 			WriteNum(beg, (*m_pDfa)[i][j], sizeof(BYTE));
 		}
 	}
-	//写DFA的开始状态编号
+
+	//write the dfa's start state id
 	WriteNum(beg, m_StartId, sizeof(BYTE));
-	//写DFA的终态与DFAId的对应关系
+
+	//write the relationship between dfa's terminal state and dfa id
 	WriteNum(beg, m_TermSet->size());
 	for (size_t i = 0; i < m_TermSet->size(); ++i)
 	{
@@ -850,18 +856,20 @@ void ReadNum(BYTE*& pBuf, _Ty &_num, size_t nBytes = sizeof(_Ty))
 
 DFANEWSC void CDfaNew::Load(BYTE *beg, size_t len)
 {
-	//读DFA的Id
+	//read dfa id
 	size_t dfaId;
 	ReadNum(beg, dfaId);
 	m_nId = dfaId;
-	//读DFA的状态个数
-	BYTE dfaSize;//DFA的状态数
+
+	//read number of dfa states
+	BYTE dfaSize;
 	ReadNum(beg, dfaSize);
 	if (dfaSize == 0)
 	{
 		return;
 	}
-	//读分组
+	
+	//read group
 	BYTE pGroup[DFACOLSIZE];
 	for (size_t i = 0; i < DFACOLSIZE; ++i)
 	{
@@ -869,12 +877,13 @@ DFANEWSC void CDfaNew::Load(BYTE *beg, size_t len)
 	}
 	Init(pGroup);
 	m_nId = dfaId;
-	//读DFA跳转表
+
+	//read dfa table
 	m_pDfa->resize(dfaSize, CDfaRow(m_nColNum));
 	size_t nFlag;
 	for (size_t i = 0; i < m_pDfa->size(); ++i)
 	{
-		//读该状态的Flag(NORMAL、START、TERMINAL)
+		//read the flag of dfa state
 		ReadNum(beg, nFlag);
 		(*m_pDfa)[i].SetFlag(nFlag);
 		for (size_t j = 0; j < m_nColNum; ++j)
@@ -887,10 +896,12 @@ DFANEWSC void CDfaNew::Load(BYTE *beg, size_t len)
 			}
 		}
 	}
-	//读DFA的开始状态编号
+	
+	//read the dfa's start state id
 	m_StartId = 0;
 	ReadNum(beg, m_StartId, sizeof(BYTE));
-	//读DFA的终态与DFAId的对应关系
+	
+	//read the relationship between dfa's terminal state and dfa id
 	size_t TermSetSize;
 	ReadNum(beg, TermSetSize);
 	m_TermSet->resize(TermSetSize);

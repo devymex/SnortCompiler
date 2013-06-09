@@ -64,46 +64,19 @@ public:
 private:
 	std::vector<COMPILEDRULENEW> *m_ruleResult;
 };
-//ÆúÓÃ
-//struct DFAINFO
-//{
-//	size_t dfaId;
-//	size_t chainId;
-//};
-//
-//class COMPILERNEW CDFASINFO
-//{
-//public:
-//	CDFASINFO();
-//	CDFASINFO(const CDFASINFO& other);
-//	const CDFASINFO &operator=(const CDFASINFO &other);
-//	~CDFASINFO();
-//	DFAINFO& operator[](size_t index);
-//	const DFAINFO& operator[](size_t index) const;
-//	void Reserve(size_t nCount);
-//	void Resize(size_t nSize);
-//	const size_t Size() const;
-//	void PushBack(const DFAINFO &dfaDetail);
-//	DFAINFO& Back();
-//private:
-//	std::vector<DFAINFO> *m_pDfas;
-//};
 
 class COMPILERNEW CResNew
 {
 private:
 	CDfaTblNew m_dfaTbl;
 	CSidDfaIdsNew m_sidDfaIds;
-	//CDFASINFO m_DfasInfo;
 	CRegRule m_RegexTbl;
 public:
 	CDfaTblNew& GetDfaTable();
 	CSidDfaIdsNew& GetSidDfaIds();
-	//CDFASINFO &GetDfasInfo();
 	CRegRule &GetRegexTbl();
 	const CDfaTblNew& GetDfaTable() const;
 	const CSidDfaIdsNew& GetSidDfaIds() const;
-	//const CDFASINFO &GetDfasInfo() const;
 	const CRegRule &GetRegexTbl() const;
 	size_t WriteToFile(LPCTSTR filename);
 	size_t ReadFromFile(LPCTSTR filename);
