@@ -40,6 +40,7 @@ DFANEWSC size_t CFinalStates::Size() const
 
 DFANEWSC void CFinalStates::Clear()
 {
+	m_pDfaIds->clear();
 	m_pStates->clear();
 }
 
@@ -63,14 +64,6 @@ DFANEWSC void CFinalStates::PushBack(STATEID nStaId, size_t nDfaId)
 	}
 	else
 	{
-		if (nDfaId > 10000)
-		{
-			system("pause");
-		}
-		if (iter->second.count(nDfaId) != 0)
-		{
-			//system("pause");
-		}
 		iter->second.insert(nDfaId);
 	}
 }
