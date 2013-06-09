@@ -6,7 +6,12 @@
 **  @brief       Support functions for mapping groups into hash table
 **
 **  This implements mapping groups into hash table algorithm, the algorithm has 
-**  four steps in general. 
+**  four steps in general. At first, it maps groups which has only one signature. 
+**  Then, it maps groups which has two or more signatures, for one group, select
+**  a signature which corresponds to a hash slot with least groups. Thirdly, 
+**  simple adjust for conflict hash slot. Finally, recursive adjust for conflict 
+**  hash slot. After that, try to combine two groups in a hash slot or two hash 
+**  slots in some situations.
 **
 */
 
@@ -18,20 +23,46 @@
 #include "../grouping/grouping.h"
 #include "../mergedfanew/MergeDfanew.h"
 
+/* hash function, correspond to a hash slot for a given signature
+
+Arguments:
+  oneSig            signature
+
+Returns:            hash slot
+
+*/
+
 HASHMAPPINGSC size_t hash(const SIGNATURE &oneSig)
 {
 	return oneSig % 16001;
 }
 
-struct PATH
+//one point in the adjust path
+struct POINT
 {
 	size_t dfaId;
 	SIGNATURE sig;
 };
 
-bool myFind(std::vector<GROUPHASH> &vecGroups, RESULTMAP &result, SIGNATURE &currSig, std::vector<PATH> &vecPath, size_t &depth)
+/* find the adjust path
+
+Arguments:
+  vecGroups         the result of group
+  result            the hash table state
+  currSig           check the hash slot the currSig corresponds to
+  vecPath           record the adjust path
+  depth             the find depth
+
+Returns:            true if find a adjust path to reduce conflict
+                    false otherwise
+
+*/
+
+bool myFind(std::vector<GROUPHASH> &vecGroups, RESULTMAP &result, SIGNATURE &currSig, std::vector<POINT> &vecPath, size_t &depth)
 {
 	++depth;
+
+	//the hash slot has no group
 	if (result[hash(currSig)].size() == 0)
 	{
 		return true;
@@ -52,7 +83,7 @@ bool myFind(std::vector<GROUPHASH> &vecGroups, RESULTMAP &result, SIGNATURE &cur
 				}
 				if (myFind(vecGroups, result, *j, vecPath, depth))
 				{
-					vecPath.push_back(PATH());
+					vecPath.push_back(POINT());
 					vecPath.back().dfaId = *i;
 					vecPath.back().sig = *j;
 					return true;
@@ -63,6 +94,17 @@ bool myFind(std::vector<GROUPHASH> &vecGroups, RESULTMAP &result, SIGNATURE &cur
 	}
 }
 
+/* recursive adjust for conflict hash slot.
+
+Arguments:
+  vecGroups         the result of group
+  dmap              the correspondence between dfa and its signatures
+  result            the hash table state
+
+Returns:            nothing
+
+*/
+
 void RecursiveAdjust(std::vector<GROUPHASH> &vecGroups, const IDMAP &dmap, RESULTMAP &result)
 {
 	bool flag = true;
@@ -71,11 +113,12 @@ void RecursiveAdjust(std::vector<GROUPHASH> &vecGroups, const IDMAP &dmap, RESUL
 		flag = false;
 		for (RESULTMAP::iterator i = result.begin(); i != result.end(); ++i)
 		{
+			//try to adjust the conflict hash slot
 			if (i->second.size() > 1)
 			{
 				for (std::vector<size_t>::iterator j = i->second.begin(); j != i->second.end();)
 				{
-					std::vector<PATH> vecPath;
+					std::vector<POINT> vecPath;
 					size_t depth;
 					for (std::vector<SIGNATURE>::iterator k = vecGroups[*j].vecSigs.begin(); k != vecGroups[*j].vecSigs.end(); ++k)
 					{
@@ -125,10 +168,22 @@ void RecursiveAdjust(std::vector<GROUPHASH> &vecGroups, const IDMAP &dmap, RESUL
 	}
 }
 
+/* simple adjust for conflict hash slot.
+
+Arguments:
+  vecGroups         the result of group
+  dmap              the correspondence between dfa and its signatures
+  result            the hash table state
+
+Returns:            nothing
+
+*/
+
 void Adjust(std::vector<GROUPHASH> &vecGroups, const IDMAP &dmap, RESULTMAP &result)
 {
 	for (RESULTMAP::iterator i = result.begin(); i != result.end(); ++i)
 	{
+		//try to adjust the conflict hash slot
 		if (i->second.size() > 1)
 		{
 			for (std::vector<size_t>::iterator j = i->second.begin(); j != i->second.end();)
@@ -161,6 +216,19 @@ void Adjust(std::vector<GROUPHASH> &vecGroups, const IDMAP &dmap, RESULTMAP &res
 	}
 }
 
+/* map groups which has two or more signatures, for one group, select
+a signature which corresponds to a hash slot with least groups
+
+Arguments:
+  vecGroups         the result of group
+  dmap              the correspondence between dfa and its signatures
+  vecIds            the index of group waiting for mapping
+  result            the hash table state
+
+Returns:            nothing
+
+*/
+
 void Optimize(std::vector<GROUPHASH> &vecGroups, const IDMAP &dmap, std::vector<size_t> &vecIds, RESULTMAP &result)
 {
 	for (IDMAP::const_iterator i = dmap.begin(); i != dmap.end(); ++i)
@@ -187,6 +255,18 @@ void Optimize(std::vector<GROUPHASH> &vecGroups, const IDMAP &dmap, std::vector<
 		}
 	}
 }
+
+/* map groups into hash slot
+
+Arguments:
+  vecGroups         the result of group
+  gmap              the correspondence between signature and dfas
+  dmap              the correspondence between dfa and its signatures
+  result            the hash table state
+
+Returns:            nothing
+
+*/
 
 void Mapping(std::vector<GROUPHASH> &vecGroups, const SIGNATUREMAP &gmap, const IDMAP &dmap, RESULTMAP &result)
 {
@@ -215,16 +295,18 @@ void Mapping(std::vector<GROUPHASH> &vecGroups, const SIGNATUREMAP &gmap, const 
 	Adjust(vecGroups, dmap, result);
 
 	RecursiveAdjust(vecGroups, dmap, result);
-
-	//std::cout << vecGroups.size() << std::endl;
-	//std::cout << (vecGroups.size() - result.size())/double(vecGroups.size()) << std::endl;
-	//size_t count = 0;
-	//for (RESULTMAP::iterator i = result.begin(); i != result.end(); ++i)
-	//{
-	//	count += i->second.size();
-	//}
-	//std::cout << count << std::endl;
 }
+
+/* extract common signatures from two groups
+
+Arguments:
+  g1                the first group
+  g2                the second group
+  vecComSigs        common signatures of the two groups
+
+Returns:            nothing
+
+*/
 
 void CommonSigs(const GROUPHASH &g1, const GROUPHASH &g2, std::vector<SIGNATURE> &vecComSigs)
 {
@@ -247,6 +329,16 @@ void CommonSigs(const GROUPHASH &g1, const GROUPHASH &g2, std::vector<SIGNATURE>
 	}
 }
 
+/* update g1's signatures to the common signatures of g1 and g2
+
+Arguments:
+  g1                the first group
+  g2                the second group
+
+Returns:            nothing
+
+*/
+
 void UpdateSigs(GROUPHASH &g1, const GROUPHASH &g2)
 {
 	std::vector<SIGNATURE> vecComSigs;
@@ -257,6 +349,21 @@ void UpdateSigs(GROUPHASH &g1, const GROUPHASH &g2)
 		g1.vecSigs.push_back(*i);
 	}
 }
+
+/* judge the group g1 and g2 can combine or not
+
+Arguments:
+  g1                the first group
+  g2                the second group
+  result            the hash table state
+  Sig               the signature selected to be used for hash
+
+Returns:            true if there has a signature which can represent group g1 and g2
+                    and the signature corresponds to an empty hash slot or g1 or g2's 
+					hash slot
+					false otherwise
+
+*/
 
 bool CanCombine(const GROUPHASH &g1, const GROUPHASH &g2, RESULTMAP &result, SIGNATURE &Sig)
 {
@@ -282,8 +389,20 @@ bool CanCombine(const GROUPHASH &g1, const GROUPHASH &g2, RESULTMAP &result, SIG
 	return false;
 }
 
+/* try to combine two groups in a hash slot or two hash slots in some situations.
+
+Arguments:
+  groupRes          the merged dfa will be pushed into the groupRes's dfa table
+  vecGroups         the result of group
+  result            the hash table state
+
+Returns:            nothing
+
+*/
+
 void Combine(CGROUPRes &groupRes, std::vector<GROUPHASH> &vecGroups, RESULTMAP &result)
 {
+	//combine groups in one hash slot
 	for (RESULTMAP::iterator i = result.begin(); i != result.end(); ++i)
 	{
 		if (i->second.size() > 1)
@@ -294,6 +413,10 @@ void Combine(CGROUPRes &groupRes, std::vector<GROUPHASH> &vecGroups, RESULTMAP &
 				vecDfas[0] = groupRes.GetDfaTable()[vecGroups[*j].mergeDfaId];
 				for (std::vector<size_t>::iterator k = j + 1; k != i->second.end(); )
 				{
+					if (vecGroups[*k].currSig != vecGroups[*j].currSig)
+					{
+						continue;
+					}
 					CDfaNew MergeDfa;
 					vecDfas[1] = groupRes.GetDfaTable()[vecGroups[*k].mergeDfaId];
 					if (MergeMultipleDfas(vecDfas, MergeDfa))
@@ -320,6 +443,7 @@ void Combine(CGROUPRes &groupRes, std::vector<GROUPHASH> &vecGroups, RESULTMAP &
 		}
 	}
 
+	//combine groups in two hash slots and both hash slots have only one group
 	std::vector<size_t> vecKeys;
 	for (RESULTMAP::iterator i = result.begin(); i != result.end(); ++i)
 	{
@@ -403,6 +527,18 @@ void Combine(CGROUPRes &groupRes, std::vector<GROUPHASH> &vecGroups, RESULTMAP &
 	}
 }
 
+/* clear up the group result and hash table
+
+Arguments:
+  vecGroups         the result of group
+  result            the hash table state
+  groupRes          the relationship between sid and dfa id, dfa table and result of grouping
+  HashResMap        the hash table after clear up
+
+Returns:            nothing
+
+*/
+
 void ClearUpHashRes(std::vector<GROUPHASH> &vecGroups, RESULTMAP &result, CGROUPRes &groupRes, HASHRES &HashResMap)
 {
 	size_t count = 0;
@@ -448,6 +584,17 @@ void ClearUpHashRes(std::vector<GROUPHASH> &vecGroups, RESULTMAP &result, CGROUP
 	}
 }
 
+/* mapping groups into hash table and combine groups in some situation to reduce 
+number of groups
+
+Arguments:
+  groupRes          the relationship between sid and dfa id, dfa table and result of grouping
+  HashResMap        the hash table
+
+Returns:            nothing
+
+*/
+
 HASHMAPPINGSC void HashMapping(CGROUPRes &groupRes, HASHRES &HashResMap)
 {
 	std::vector<GROUPHASH> vecGroups;
@@ -464,7 +611,6 @@ HASHMAPPINGSC void HashMapping(CGROUPRes &groupRes, HASHRES &HashResMap)
 			vecGroups[i].vecDfaIds.push_back(groupRes.GetGroups()[i].DfaIds[j]);
 		}
 	}
-	//std::sort(vecGroups.begin(), vecGroups.end(), COMP());
 
 	SIGNATUREMAP gmap;
 	for (size_t i = 0; i < vecGroups.size(); ++i)
@@ -487,20 +633,6 @@ HASHMAPPINGSC void HashMapping(CGROUPRes &groupRes, HASHRES &HashResMap)
 	Mapping(vecGroups, gmap, dmap, result);
 
 	Combine(groupRes, vecGroups, result);
-
-	//size_t count = 0;
-	//size_t slots = 0;
-	//for (RESULTMAP::iterator i = result.begin(); i != result.end(); ++i)
-	//{
-	//	count += i->second.size();
-	//	if (i->second.size() > 0)
-	//	{
-	//		++slots;
-	//	}
-	//}
-	//std::cout << count << std::endl;
-	//std::cout << slots << std::endl;
-	//std::cout << (count - slots)/double(count) << std::endl;
 
 	ClearUpHashRes(vecGroups, result, groupRes, HashResMap);
 }
