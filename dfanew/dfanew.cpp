@@ -97,6 +97,16 @@ DFANEWSC size_t CFinalStates::GetDfaIdCount(STATEID nStaId) const
 	return (*m_pDfaIds)[nStaId].size();
 }
 
+DFANEWSC size_t CFinalStates::GetAllDfaIdCount() const
+{
+	size_t nSum = 0;
+	for (FINSTAMAP_CITER i = m_pDfaIds->cbegin(); i != m_pDfaIds->end(); ++i)
+	{
+		nSum += i->second.size();
+	}
+	return nSum;
+}
+
 DFANEWSC CDfaRow::CDfaRow(size_t col)
 	: m_nFlag(NORMAL), m_nColNum(col)
 {
