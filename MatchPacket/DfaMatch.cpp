@@ -15,7 +15,7 @@ void MatchOnedfa(const u_char * &data, size_t len, CDfaNew &dfa,
 		for (size_t i = 0; i < finStas.Size(); ++i)
 		{
 			STATEID nStaId = finStas[i];
-			dfaids[nStaId] = finStas.GetDfaIds(nStaId);
+			dfaids[nStaId] = finStas._GetDfaIds(nStaId);
 		}
 
 		STATEID curSta = dfa.GetStartId();

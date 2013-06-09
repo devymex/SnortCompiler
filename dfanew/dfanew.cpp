@@ -57,7 +57,22 @@ DFANEWSC void CFinalStates::PushBack(STATEID nStaId, size_t nDfaId)
 	}
 }
 
-DFANEWSC std::set<size_t>& CFinalStates::GetDfaIds(STATEID nStaId)
+DFANEWSC void CFinalStates::GetDfaIds(STATEID nStaId, CVectorUnsigned &ids) const
+{
+	FINSTAMAP_ITER iter = m_pDfaIds->find(nStaId);
+	if (iter == m_pDfaIds->end())
+	{
+		throw 0;
+	}
+	const std::set<size_t> &curSet = iter->second;
+	for (std::set<size_t>::const_iterator i = curSet.begin();
+		i != curSet.end(); ++i)
+	{
+		ids.PushBack(*i);
+	}
+}
+
+DFANEWSC std::set<size_t>& CFinalStates::_GetDfaIds(STATEID nStaId)
 {
 	FINSTAMAP_ITER iter = m_pDfaIds->find(nStaId);
 	if (iter == m_pDfaIds->end())
@@ -67,7 +82,7 @@ DFANEWSC std::set<size_t>& CFinalStates::GetDfaIds(STATEID nStaId)
 	return iter->second;
 }
 
-DFANEWSC const std::set<size_t>& CFinalStates::GetDfaIds(STATEID nStaId) const
+DFANEWSC const std::set<size_t>& CFinalStates::_GetDfaIds(STATEID nStaId) const
 {
 	FINSTAMAP_ITER iter = m_pDfaIds->find(nStaId);
 	if (iter == m_pDfaIds->end())
@@ -75,6 +90,11 @@ DFANEWSC const std::set<size_t>& CFinalStates::GetDfaIds(STATEID nStaId) const
 		throw 0;
 	}
 	return iter->second;
+}
+
+DFANEWSC size_t CFinalStates::GetDfaIdCount(STATEID nStaId) const
+{
+	return (*m_pDfaIds)[nStaId].size();
 }
 
 DFANEWSC CDfaRow::CDfaRow(size_t col)
@@ -550,6 +570,7 @@ DFANEWSC size_t CDfaNew::Save(BYTE *beg)
 
 DFANEWSC void CDfaNew::Load(BYTE *beg, size_t len)
 {
+	len = 0;
 	//read dfa id
 	size_t dfaId;
 	ReadNum(beg, dfaId);
@@ -685,8 +706,8 @@ void CDfaNew::MergeReachable(STATEVEC &reachable)
 		//存入新的终态编号
 		if (oldRow.GetFlag() & oldRow.TERMINAL)
 		{
-			TERMSET tmpSta;
-			tmpSta.dfaSta = nNewId;
+			//TERMSET tmpSta;
+			//tmpSta.dfaSta = nNewId;
 			//tmpSta.dfaId = termFlag[nOldId];
 			//m_pTermSet->push_back(tmpSta);
 		}
@@ -724,7 +745,7 @@ void CDfaNew::InitPartSet(std::vector<PARTSET> &partSet) const
 	for (size_t i = 0; i < m_FinStas.Size(); ++i)
 	{
 		STATEID nFinStaId = m_FinStas[i];
-		pTerm2Dfa[nFinStaId] = m_FinStas.GetDfaIds(nFinStaId);
+		pTerm2Dfa[nFinStaId] = m_FinStas._GetDfaIds(nFinStaId);
 	}
 
 	//区别终态集合和非终态集合，map的first为空，则表示对应的PARTSET为非终态集合，反之，为终态集合
@@ -945,7 +966,7 @@ void CDfaNew::MergeNonDisStates(std::vector<PARTSET> &partSet)
 	for (size_t i = 0; i < m_FinStas.Size(); ++i)
 	{
 		STATEID nFinStaId = m_FinStas[i];
-		finFlag[nFinStaId] = m_FinStas.GetDfaIds(nFinStaId);
+		finFlag[nFinStaId] = m_FinStas._GetDfaIds(nFinStaId);
 	}
 
 	m_FinStas.Clear();

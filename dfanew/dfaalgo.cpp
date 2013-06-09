@@ -331,5 +331,5 @@ void AddTermIntoDFA(STATEID otherSta, const CDfaNew &other,
 {
 	const CFinalStates &orgFinStas = other.GetFinalState();
 	CFinalStates &newFinStas = lastDfa.GetFinalState();
-	newFinStas.GetDfaIds(lastSta) = orgFinStas.GetDfaIds(otherSta);
+	newFinStas._GetDfaIds(lastSta) = orgFinStas._GetDfaIds(otherSta);
 }
