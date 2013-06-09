@@ -658,7 +658,7 @@ void contentToLinearNFA(OPTIONCONTENT *pContent, CNfa &nfa)
 		}
 		if(i >= mustCnt)
 		{
-			row.AddDest(EMPTYEDGE, stateID);
+			row.AddDest(DFACOLSIZE, stateID);
 		}
 	}
 

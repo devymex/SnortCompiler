@@ -21,9 +21,11 @@
 #define COMMONSC __declspec(dllexport)
 #endif
 
-#define CHARSETSIZE 260
-#define EMPTYEDGE 256
+#define SC_STATELIMIT 500
+#define DFA_SIZE_LIMIT 255
 #define DFACOLSIZE 256
+#define CHARSETSIZE 260
+
 
 /*
 * Common type define
@@ -137,52 +139,39 @@ public:
 		size_t nfaSta;
 		size_t dfaId;
 	};
+
 	CNfa();
 	~CNfa();
 	CNfa(const CNfa &other);
 	CNfa& operator=(const CNfa &other);
+
+	CNfaRow &operator[](size_t index);
+	const CNfaRow &operator[](size_t index) const;
+
+	void Clear();
+	void SortAll();
 	void Reserve(size_t _Count);
 	void Resize(size_t _Newsize);
 	void Shrink();
 	size_t Size() const;
+	CNfaRow &Back();
 	void PushBack(const CNfaRow &row);
 	void PopBack();
-	void SetPcre(const char* lpPcre);
-	void PushDfaTerms(DFATERMS dfaTerms);
-	size_t GetDfaTermsNum();
-	DFATERMS GetDfaTerms(size_t num);
-	const char* GetPcre() const;
-	void Clear();
-	void SortAll();
 
-	CNfaRow &Back();
-	CNfaRow &operator[](size_t index);
-	const CNfaRow &operator[](size_t index) const;
+	void SetPcre(const char* lpPcre);
+	const char* GetPcre() const;
+
+	void PushDfaTerms(DFATERMS dfaTerms);
+	size_t GetDfaTermsNum() const;
+	DFATERMS GetDfaTerms(size_t num) const;
+
+	void Dump(const char *pFile) const;
+
 protected:
 	std::vector<CNfaRow> *m_pNfa;
 	std::string *m_pPcre;
 	//如果该nfa是由dfa合并过程中生成的，该成员用于记录哪个状态能够识别哪个dfa终态
 	std::vector<DFATERMS> *m_DfaTerms;
-};
-
-class COMMONSC CNfaTree
-{
-public:
-	CNfaTree();
-	~CNfaTree();
-	CNfaTree(const CNfaTree &other);
-	const CNfaTree& operator = (const CNfaTree &other);
-
-	size_t Size() const;
-	void Reserve(size_t nCount);
-	void Resize(size_t nSize);
-	CNfa& Back();
-	void PushBack(const CNfa &cnfachain);
-	CNfa& operator[](size_t nIdx);
-	const CNfa& operator[](size_t nIdx) const;
-
-protected:
-	std::vector<CNfa> *m_pTree;
 };
 
 class COMMONSC CRegChain
@@ -191,17 +180,22 @@ public:
 	CRegChain();
 	~CRegChain();
 	CRegChain(const CRegChain &other);
+	const CRegChain& operator = (const CRegChain &other);
+
+	CCString& operator[](size_t nIdx);
+
 	size_t Size() const;
 	CCString& Back() const;
-	void PushBack(CCString &pcreStr);
-	CCString& operator[](size_t nIdx);
-	const CRegChain& operator = (const CRegChain &other);
+	void PushBack(const CCString &pcreStr);
 	void Resize(size_t nSize);
+
 	size_t GetSigCnt() const;
-	void PushBackSig(SIGNATURE &signature);
+	void PushBackSig(const SIGNATURE &signature);
 	SIGNATURE& GetSig(size_t nIdx) const;
+
 	void Unique();
 	void ClearSigList();
+
 protected:
 	std::vector<CCString> *m_pRegList;
 	std::vector<SIGNATURE> *m_pSigList;
@@ -213,15 +207,16 @@ public:
 	CRegRule();
 	~CRegRule();
 	CRegRule(const CRegRule &other);
+	const CRegRule& operator = (const CRegRule &other);
+
+	CRegChain& operator[](size_t nIdx);
+	const CRegChain& operator[](size_t nIdx) const;
 
 	size_t Size() const;
 	CRegChain& Back() const;
 	void Reserve(size_t nCount);
 	void Resize(size_t nSize);
 	void PushBack(CRegChain &nRegChain);
-	CRegChain& operator[](size_t nIdx);
-	const CRegChain& operator[](size_t nIdx) const;
-	const CRegRule& operator = (const CRegRule &other);
 
 protected:
 	std::vector<CRegChain> *m_pRegVec;
@@ -232,7 +227,7 @@ class COMMONSC CRuleOption
 public:
 	CRuleOption();
 	CRuleOption(const CRuleOption &other);
-	const CRuleOption& operator=(const CRuleOption &other);
+	const CRuleOption& operator = (const CRuleOption &other);
 	virtual ~CRuleOption();
 
 	void SetPattern(LPCSTR lpStr);
@@ -248,16 +243,18 @@ protected:
 	std::string *m_pPattern;
 };
 
-
 class COMMONSC CSnortRule
 {
 public:
 	enum {RULE_HASBYTE = 0x0001, RULE_HASNOT = 0x0002, RULE_HASNOSIG = 0x0004};
+
 	CSnortRule();
 	CSnortRule(const CSnortRule &other);
 	const CSnortRule& operator = (const CSnortRule &other);
 	~CSnortRule();
-	void Release();
+
+	CRuleOption* operator[](size_t nIdx) const;
+
 	void SetSid(size_t sid);
 	size_t GetSid() const;
 	void SetFlag(size_t flag);
@@ -265,7 +262,6 @@ public:
 	void PushBack(CRuleOption* ruleoption);
 	void PopBack();
 	size_t Size() const;
-	CRuleOption* operator[](size_t nIdx) const;
 
 protected:
 	size_t m_nSid;
@@ -306,5 +302,3 @@ protected:
 	__int64 m_nFreq;
 	__int64 m_nStart;
 };
-
-COMMONSC void PrintNfaToText(CNfa &nfa, const char* fileName);//用于测试输出一个nfa

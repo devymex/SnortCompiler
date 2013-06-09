@@ -1,3 +1,14 @@
+/**
+**  @file        common.h
+**
+**  @author      Lab 435, Xidian University
+**
+**  @brief       Common classes declaration
+**
+**  Include CVectorUnsigned, CCString
+**
+*/
+
 #include "stdafx.h"
 #include "common.h"
 
@@ -202,7 +213,7 @@ COMMONSC void CNfa::Reserve(size_t _Count)
 
 COMMONSC void CNfa::Shrink()
 {
-//	m_pNfa->shrink_to_fit();
+	m_pNfa->shrink_to_fit();
 }
 
 COMMONSC void CNfa::Resize(size_t _Newsize)
@@ -281,12 +292,12 @@ COMMONSC  void CNfa::PushDfaTerms(DFATERMS dfaTerms)
 	m_DfaTerms->push_back(dfaTerms);
 }
 
-COMMONSC size_t CNfa::GetDfaTermsNum()
+COMMONSC size_t CNfa::GetDfaTermsNum() const
 {
 	return m_DfaTerms->size();
 }
 
-COMMONSC CNfa::DFATERMS CNfa::GetDfaTerms(size_t num)
+COMMONSC CNfa::DFATERMS CNfa::GetDfaTerms(size_t num) const
 {
 	return (*m_DfaTerms)[num];
 }
@@ -297,6 +308,41 @@ COMMONSC void CNfa::SortAll()
 	{
 		i->SortAll();
 	}
+}
+
+COMMONSC void CNfa::Dump(const char *pFile) const
+{
+	size_t stateNum = m_pNfa->size();
+	std::ofstream fout(pFile);
+	fout << "\t";
+	for(size_t t = 0; t < 257; ++t)
+	{
+		fout << t << "\t";
+	}
+	fout << std::endl;
+	for(size_t i = 0; i < stateNum; ++i)
+	{
+		fout << i << "\t";
+		const CNfaRow &row = (*m_pNfa)[i];
+		for(size_t j = 0; j < 257; ++j)
+		{
+			size_t nCnt = row.DestCnt(j);
+			if(nCnt == 0)
+			{
+				fout << -1 << "\t";
+			}
+			else
+			{
+				for(size_t k = 0; k < nCnt; ++k)
+				{
+					fout << row.GetDest(j, k) << ", ";
+				}
+				fout << "\t";
+			}
+		}
+		fout << std::endl;
+	}
+	fout.close();
 }
 
 COMMONSC CCString::CCString()
@@ -393,7 +439,7 @@ COMMONSC CCString& CRegChain::Back() const
 	return m_pRegList->back();
 }
 
-COMMONSC void CRegChain::PushBack(CCString &pcreStr)
+COMMONSC void CRegChain::PushBack(const CCString &pcreStr)
 {
 	m_pRegList->push_back(pcreStr);
 }
@@ -420,7 +466,7 @@ COMMONSC size_t CRegChain::GetSigCnt() const
 	return m_pSigList->size();
 }
 
-COMMONSC void CRegChain::PushBackSig(SIGNATURE &signature)
+COMMONSC void CRegChain::PushBackSig(const SIGNATURE &signature)
 {
 	m_pSigList->push_back(signature);
 }
@@ -495,61 +541,6 @@ COMMONSC const CRegRule& CRegRule::operator = (const CRegRule &other)
 {
 	*this->m_pRegVec = *other.m_pRegVec;
 	return *this;
-}
-
-COMMONSC CNfaTree::CNfaTree()
-{
-	m_pTree = new std::vector<CNfa>;
-}
-
-COMMONSC CNfaTree::~CNfaTree()
-{
-	delete m_pTree;
-}
-
-COMMONSC CNfaTree::CNfaTree(const CNfaTree &other)
-{
-	m_pTree = new std::vector<CNfa>;
-	*this = other;
-}
-
-COMMONSC const CNfaTree& CNfaTree::operator = (const CNfaTree &other)
-{
-	*m_pTree = *other.m_pTree;
-	return *this;
-}
-
-COMMONSC size_t CNfaTree::Size() const
-{
-	return m_pTree->size();
-}
-
-COMMONSC void CNfaTree::Reserve(size_t nCount)
-{
-	m_pTree->reserve(nCount);
-}
-
-COMMONSC void CNfaTree::Resize(size_t nSize)
-{
-	m_pTree->resize(nSize);
-}
-COMMONSC CNfa& CNfaTree::Back()
-{
-	return m_pTree->back();
-}
-COMMONSC void CNfaTree::PushBack(const CNfa &cnfa)
-{
-	m_pTree->push_back(cnfa);
-}
-
-COMMONSC CNfa& CNfaTree::operator[](size_t nIdx)
-{
-	return (*m_pTree)[nIdx];
-}
-
-COMMONSC const CNfa& CNfaTree::operator[](size_t nIdx) const
-{
-	return (*m_pTree)[nIdx];
 }
 
 COMMONSC CRuleOption::CRuleOption()
@@ -637,18 +628,13 @@ COMMONSC const CSnortRule& CSnortRule::operator = (const CSnortRule &other)
 
 COMMONSC CSnortRule::~CSnortRule()
 {
-	Release();
-	delete m_pOptions;
-}
-
-COMMONSC void CSnortRule::Release()
-{
 	std::vector<CRuleOption*> &opts = *m_pOptions;
 	for (std::vector<CRuleOption*>::iterator i = opts.begin(); i != opts.end(); ++i)
 	{
 		delete *i;
 	}
 	opts.clear();
+	delete m_pOptions;
 }
 
 COMMONSC void CSnortRule::SetSid(size_t sid)
@@ -690,38 +676,3 @@ COMMONSC CRuleOption* CSnortRule::operator[](size_t nIdx) const
 	return (*m_pOptions)[nIdx];
 }
 
-//测试函数:输出一个nfa
-COMMONSC void PrintNfaToText(CNfa &nfa, const char* fileName)
-{
-	size_t stateNum = nfa.Size();
-	std::ofstream fout(fileName);
-	fout << "\t";
-	for(size_t t = 0; t < 257; ++t)
-	{
-		fout << t << "\t";
-	}
-	fout << std::endl;
-	for(size_t i = 0; i < stateNum; ++i)
-	{
-		fout << i << "\t";
-		const CNfaRow &row = nfa[i];
-		for(size_t j = 0; j < 257; ++j)
-		{
-			size_t nCnt = row.DestCnt(j);
-			if(nCnt == 0)
-			{
-				fout << -1 << "\t";
-			}
-			else
-			{
-				for(size_t k = 0; k < nCnt; ++k)
-				{
-					fout << row.GetDest(j, k) << ", ";
-				}
-				fout << "\t";
-			}
-		}
-		fout << std::endl;
-	}
-	fout.close();
-}

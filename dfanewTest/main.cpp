@@ -35,9 +35,9 @@ void main()
 	dfa2.FromNFA(nfa2);
 	dfa3.FromNFA(nfa3);
 	//dfa5.Minimize();
-	PrintDfaToText(dfa1, "F:\\cppProject\\huawei\\PreciseMatch\\testMerg\\dfa1.txt");
-	PrintDfaToText(dfa2, "F:\\cppProject\\huawei\\PreciseMatch\\testMerg\\dfa2.txt");
-	PrintDfaToText(dfa3, "F:\\cppProject\\huawei\\PreciseMatch\\testMerg\\dfa3.txt");
+	dfa1.Dump("F:\\cppProject\\huawei\\PreciseMatch\\testMerg\\dfa1.txt");
+	dfa2.Dump("F:\\cppProject\\huawei\\PreciseMatch\\testMerg\\dfa2.txt");
+	dfa3.Dump("F:\\cppProject\\huawei\\PreciseMatch\\testMerg\\dfa3.txt");
 
 	CDfaNew mergeDfa;
 	std::vector<CDfaNew> dfas;
@@ -46,7 +46,7 @@ void main()
 	dfas.push_back(dfa3);
 	MergeMultipleDfas(dfas, mergeDfa);
 	mergeDfa.printTerms();
-	PrintDfaToText(mergeDfa, "F:\\cppProject\\huawei\\PreciseMatch\\testMerg\\mergeDfa2.txt");
+	mergeDfa.Dump("F:\\cppProject\\huawei\\PreciseMatch\\testMerg\\mergeDfa2.txt");
 
 	//dfas[0] = dfa1;
 	//dfas[1] = dfa2;
@@ -65,7 +65,7 @@ void main()
 
 	std::cout << (size_t)dfa1.Size() << std::endl;
 
-	PrintDfaToText(dfa1, "..\\..\\output\\dfa_after.txt");
+	dfa1.Dump("..\\..\\output\\dfa_after.txt");
 
 	std::cout << (size_t)dfa1.GetStartId() << std::endl;
 	for (size_t i = 0; i < dfa1.Size(); ++i)
@@ -75,7 +75,7 @@ void main()
 			std::cout << i << std::endl;
 		}
 	}
-	PrintDfaToText(dfa1, "..\\..\\output\\test.txt");
+	dfa1.Dump("..\\..\\output\\test.txt");
 
 	system("pause");
 }

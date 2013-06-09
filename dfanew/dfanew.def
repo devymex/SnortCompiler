@@ -1,6 +1,3 @@
 LIBRARY
 EXPORTS
-GetDfaSig @ 1
-PrintNfaToText @ 2
-PrintDfaToText @ 3
-PrintDfaToGv @ 4
+PrintDfaToGv @ 1

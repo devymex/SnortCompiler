@@ -27,7 +27,7 @@ void MatchOnedfa(const u_char * &data, size_t len, CDfaNew &dfa, std::vector<siz
 	STATEID curSta = dfa.GetStartId();
 	for (size_t edgeiter = 0; edgeiter != len; ++edgeiter)
 	{
-		BYTE group = dfa.GetOneGroup(data[edgeiter]);
+		BYTE group = dfa.GetGroup(data[edgeiter]);
 
 		if (0 == (dfa[curSta].GetFlag() & CDfaRow::TERMINAL))
 		{

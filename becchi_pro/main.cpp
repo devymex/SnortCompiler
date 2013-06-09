@@ -343,11 +343,11 @@ void FoldDFA(CDfaNew &curDfa)
 	}
 
 	foldDfa.Init(group);
-	foldDfa.reserve((STATEID)300);
+	foldDfa.Reserve(300);
 	foldDfa.SetStartId(curDfa.GetStartId());
 	for (size_t i = 0; i < curDfa.Size(); ++i)
 	{
-		foldDfa.PushBackDfa(CDfaRow(CSIZE));
+		foldDfa.PushBack(CDfaRow(CSIZE));
 		for (size_t j = 0; j < CSIZE; ++j)
 		{
 			BYTE z = curDfa.Char2Group((BYTE)j);

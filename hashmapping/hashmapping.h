@@ -32,14 +32,6 @@ struct GROUPHASH
 	std::vector<size_t> vecDfaIds;
 };
 
-struct COMP
-{
-	bool operator()(const GROUPHASH &g1, const GROUPHASH &g2)
-	{
-		return g1.vecSigs.size() < g2.vecSigs.size();
-	}
-};
-
 HASHMAPPINGSC size_t hash(const SIGNATURE &oneSig);
 
 HASHMAPPINGSC void HashMapping(CGROUPRes &groupRes, HASHRES &HashResMap);
