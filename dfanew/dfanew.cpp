@@ -28,9 +28,9 @@ DFANEWSC CFinalStates& CFinalStates::operator=(const CFinalStates &other)
 	return *this;
 }
 
-DFANEWSC STATEID CFinalStates::operator[](size_t nStateId) const
+DFANEWSC STATEID CFinalStates::operator[](size_t nIdx) const
 {
-	return (*m_pStates)[nStateId];
+	return (*m_pStates)[nIdx];
 }
 
 DFANEWSC size_t CFinalStates::Size() const
@@ -189,6 +189,7 @@ DFANEWSC CDfaNew& CDfaNew::operator=(const CDfaNew &other)
 	m_nStartId = other.m_nStartId;
 	CopyMemory(m_pGroup, other.m_pGroup, DFACOLSIZE * sizeof(BYTE));
 	*m_pDfa = *other.m_pDfa;
+	m_FinStas = other.m_FinStas;
 	return *this;
 }
 
@@ -310,6 +311,7 @@ DFANEWSC size_t CDfaNew::FromNFA(const CNfa &nfa)
 	if (startEVec.back() == nfa.Size())
 	{
 		firstRow.SetFlag(firstRow.GetFlag() | firstRow.TERMINAL);
+		m_FinStas.PushBack(0, m_nId);
 	}
 
 	std::vector<size_t> curNfaVec;
@@ -567,13 +569,20 @@ DFANEWSC size_t CDfaNew::Save(BYTE *beg)
 	
 	//write the dfa's start state id
 	WriteNum(beg, m_nStartId, sizeof(BYTE));
+
 	//write the relationship between dfa's terminal state and dfa id
-	//WriteNum(beg, m_pTermSet->size());
-	//for (size_t i = 0; i < m_pTermSet->size(); ++i)
-	//{
-	//	WriteNum(beg, (*m_pTermSet)[i].dfaSta, sizeof(BYTE));
-	//	WriteNum(beg, (*m_pTermSet)[i].dfaId);
-	//}
+	WriteNum(beg, m_FinStas.GetAllDfaIdCount());
+	for (size_t i = 0; i < m_FinStas.Size(); ++i)
+	{
+		STATEID nStaId = m_FinStas[i];
+		CVectorUnsigned ids;
+		m_FinStas.GetDfaIds(nStaId, ids);
+		for (size_t j = 0; j < ids.Size(); ++j)
+		{
+			WriteNum(beg, nStaId, sizeof(BYTE));
+			WriteNum(beg, ids[j]);
+		}
+	}
 
 	return beg - pOld;
 }
@@ -1199,7 +1208,7 @@ DFANEWSC bool MergeMultipleDfas(std::vector<CDfaNew> &dfas, CDfaNew &lastDfa)
 		ZeroMemory(computFlag, sizeof(computFlag));
 
 		//get next states
-		for(BYTE curChar = 0; curChar < DFACOLSIZE; ++curChar)
+		for(size_t curChar = 0; curChar < DFACOLSIZE; ++curChar)
 		{
 			finFlag = 0;
 			ZeroMemory(NextVec.data(), NextVec.size() * sizeof(size_t));
@@ -1217,7 +1226,7 @@ DFANEWSC bool MergeMultipleDfas(std::vector<CDfaNew> &dfas, CDfaNew &lastDfa)
 				
 				if(sta != (STATEID)-1)
 				{
-					BYTE curgroup = dfas[i].Char2Group(curChar);
+					BYTE curgroup = dfas[i].Char2Group((BYTE)curChar);
 					STATEID nextId = dfas[i][sta][curgroup];//the next state the ith dfa transforms from state curVec[i] through curChar to
 					if(nextId != (STATEID)-1)
 					{
@@ -1288,7 +1297,7 @@ DFANEWSC bool MergeMultipleDfas(std::vector<CDfaNew> &dfas, CDfaNew &lastDfa)
 			}
 		}
 	}
-	lastDfa.Minimize();
+	//lastDfa.Minimize();
 	if(lastDfa.Size() > DFA_SIZE_LIMIT)
 	{
 		//std::cerr << "DFA_SIZE_LIMIT!" << std::endl;

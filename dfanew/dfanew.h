@@ -24,7 +24,7 @@ public:
 	CFinalStates(const CFinalStates &other);
 	CFinalStates& operator=(const CFinalStates &other);
 
-	STATEID operator[](size_t nStateId) const;
+	STATEID operator[](size_t nIdx) const;
 
 	size_t Size() const;
 	void Clear();
