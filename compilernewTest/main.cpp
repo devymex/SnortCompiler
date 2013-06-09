@@ -12,7 +12,7 @@ void main()
 	CTimer t;
 	CResNew result;
 	compilenew(_T("../../input/allrules.rule"), result);
-	result.WriteToFile(_T("../../output/result.cdt"));
+	result.WriteToFile(_T("../../output/result_tmp.cdt"));
 	//result.ReadFromFile(_T("..\\..\\output\\result.cdt"));
 	//result.WriteToFile(_T("..\\..\\output\\result1.cdt"));
 	//size_t success_cNt = 0;
