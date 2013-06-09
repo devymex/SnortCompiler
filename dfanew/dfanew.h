@@ -11,7 +11,7 @@
 
 //#define SC_STATELIMIT 255
 //#define SC_STATELIMIT ((1 << (sizeof(STATEID) * 8)) - 1)
-#define SC_STATELIMIT 1000
+#define SC_STATELIMIT 500
 #define DFA_SIZE_LIMIT 255
 
 #define EMPTY 256
