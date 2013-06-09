@@ -64,11 +64,6 @@ DFANEWSC void CFinalStates::PushBack(STATEID nStaId, size_t nDfaId)
 	}
 	else
 	{
-		if (iter->second.count(nDfaId))
-		{
-			std::cout << "error" << std::endl;
-			system("pause");
-		}
 		iter->second.insert(nDfaId);
 	}
 }
