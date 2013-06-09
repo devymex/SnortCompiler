@@ -596,15 +596,16 @@ DFANEWSC void CDfaNew::Load(BYTE *beg, size_t len)
 	ReadNum(beg, m_nStartId, sizeof(BYTE));
 	
 	//read the relationship between dfa's terminal state and dfa id
-	size_t TermSetSize;
-	ReadNum(beg, TermSetSize);
-	//m_pTermSet->resize(TermSetSize);
-	//for (size_t i = 0; i < TermSetSize; ++i)
-	//{
-	//	(*m_pTermSet)[i].dfaSta = 0;
-	//	ReadNum(beg, (*m_pTermSet)[i].dfaSta, sizeof(BYTE));
-	//	ReadNum(beg, (*m_pTermSet)[i].dfaId);
-	//}
+	size_t nFinStasSize;
+	ReadNum(beg, nFinStasSize);
+	for (size_t i = 0; i < nFinStasSize; ++i)
+	{
+		STATEID nStaId = 0;
+		size_t nDfaId;
+		ReadNum(beg, nStaId, sizeof(BYTE));
+		ReadNum(beg, nDfaId);
+		m_FinStas.PushBack(nStaId, nDfaId);
+	}
 }
 
 DFANEWSC void CDfaNew::Dump(const char *pFile)
