@@ -7,7 +7,6 @@
 #include "../dfanew/dfanew.h"
 #include "../rule2nfa/rule2nfa.h"
 #include "../pcre2nfa/pcre2nfa.h"
-#include "../mergedfanew/MergeDfanew.h"
 
 #include <fstream>
 #include <iostream>

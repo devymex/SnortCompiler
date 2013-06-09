@@ -15,7 +15,6 @@
 #include "stdafx.h"
 #include "grouping.h"
 #include "../compilernew/compilernew.h"
-#include "../mergedfanew/MergeDfanew.h"
 
 GROUPINGSC CGROUPS::CGROUPS()
 {
@@ -903,47 +902,6 @@ void outPutGroups(CGROUPRes &groupRes, const char* fileName)
 		for(size_t j = 0; j < groupRes.GetGroups()[i].DfaIds.Size(); ++j)
 		{
 			fout << groupRes.GetGroups()[i].DfaIds[j] << std::endl << "\t" << "\t";
-		}
-		fout << std::endl;
-	}
-	fout.close();
-}
-
-void outPutResult(CGROUPRes &groupRes, const char* fileName)
-{
-	std::ofstream fout(fileName);
-	if(!fout)
-	{
-		std::cerr << "open file failure!" << std::endl;
-		return;
-	}
-	fout << "MergeId\t" << "ColumCnt\t" << "Size\t" << "TermSetSize" << std::endl;
-	for(size_t i = 0; i < groupRes.GetDfaTable().Size(); ++i)
-	{
-		fout << groupRes.GetDfaTable()[i].GetId() << "\t";
-		fout << groupRes.GetDfaTable()[i].GetGroupCount() << "\t";
-		fout << groupRes.GetDfaTable()[i].Size() << "\t";
-		fout << groupRes.GetDfaTable()[i].GetTermCnt() << std::endl;
-	}
-	fout.close();
-}
-
-void outPutTermSet(CGROUPRes &groupRes, const char* fileName)
-{
-	std::ofstream fout(fileName);
-	if(!fout)
-	{
-		std::cerr << "open file failure!" << std::endl;
-		return;
-	}
-	fout << "MergeId\t" << "dfaSta\t" << "origdfaId" << std::endl;
-	for(size_t i = 0; i < groupRes.GetDfaTable().Size(); ++i)
-	{
-		fout << groupRes.GetDfaTable()[i].GetId() << "\t";
-		for(size_t j = 0; j < groupRes.GetDfaTable()[i].GetTermCnt(); ++j)
-		{
-			fout << groupRes.GetDfaTable()[i].GetTerm(j).dfaSta << "\t";
-			fout << groupRes.GetDfaTable()[i].GetTerm(j).dfaId << std::endl << "\t";
 		}
 		fout << std::endl;
 	}

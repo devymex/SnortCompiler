@@ -6,7 +6,6 @@
 #include "../dfanew/dfanew.h"
 #include "../grouping/grouping.h"
 #include "../compilernew/compilernew.h"
-#include "../mergedfanew/MergeDfanew.h"
 
 int main()
 {

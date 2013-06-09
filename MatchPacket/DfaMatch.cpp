@@ -5,54 +5,48 @@
 
 static size_t dpktnum = 0;
 
-void MatchOnedfa(const u_char * &data, size_t len, CDfaNew &dfa, std::vector<size_t> &matchedDids)
+void MatchOnedfa(const u_char * &data, size_t len, CDfaNew &dfa,
+				 std::vector<size_t> &matchedDids)
 {
 	if(dpktnum == 77)
 	{
-	std::unordered_map<size_t, std::vector<size_t>> dfaids;
-	for (size_t i = 0; i < dfa.GetTermCnt(); ++i)
-	{
-		TERMSET &term = dfa.GetTerm(i);
-		if (dfaids.count(term.dfaSta))
+		std::unordered_map<size_t, std::set<size_t>> dfaids;
+		const CFinalStates &finStas = dfa.GetFinalState();
+		for (size_t i = 0; i < finStas.Size(); ++i)
 		{
-			dfaids[term.dfaSta].push_back(term.dfaId);
+			STATEID nStaId = finStas[i];
+			dfaids[nStaId] = finStas.GetDfaIds(nStaId);
 		}
-		else
-		{
-			dfaids[term.dfaSta].reserve(10);
-			dfaids[term.dfaSta].push_back(term.dfaId);
-		}
-	}
 
-	STATEID curSta = dfa.GetStartId();
-	for (size_t edgeiter = 0; edgeiter != len; ++edgeiter)
-	{
-		BYTE group = dfa.GetGroup(data[edgeiter]);
-
-		if (0 == (dfa[curSta].GetFlag() & CDfaRow::TERMINAL))
+		STATEID curSta = dfa.GetStartId();
+		for (size_t edgeiter = 0; edgeiter != len; ++edgeiter)
 		{
-			if (dfa[curSta][group] != (STATEID)-1)
+			BYTE group = dfa.GetGroup(data[edgeiter]);
+
+			if (0 == (dfa[curSta].GetFlag() & CDfaRow::TERMINAL))
 			{
-				curSta = dfa[curSta][group];
+				if (dfa[curSta][group] != (STATEID)-1)
+				{
+					curSta = dfa[curSta][group];
+				}
+				else
+				{
+					return;
+				}
 			}
 			else
 			{
-				return;
+				matchedDids.insert(matchedDids.end(), dfaids[curSta].begin(), dfaids[curSta].end());
+				if(dfa[curSta][group] != (STATEID)-1)
+				{
+					curSta = dfa[curSta][group];
+				}
+				else 
+				{
+					return;
+				}
 			}
 		}
-		else
-		{
-			matchedDids.insert(matchedDids.end(), dfaids[curSta].begin(), dfaids[curSta].end());
-			if(dfa[curSta][group] != (STATEID)-1)
-			{
-				curSta = dfa[curSta][group];
-			}
-			else 
-			{
-				return;
-			}
-		}
-	}
 	}
 }
 
@@ -64,8 +58,6 @@ void MchDfaHdler(u_char *param, const struct pcap_pkthdr *header, const u_char *
 	PACKETPARAM *pParam = (PACKETPARAM*)param;
 	pParam->pFunc(ih, pkt_data, pParam->pUser);
 }
-
-
 
 void GetMchDfas(const u_char *data, size_t len, HASHRES &hashtable, std::vector<size_t> &matchdfas)
 {
