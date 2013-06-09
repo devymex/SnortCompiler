@@ -307,22 +307,22 @@ these bits, just add new ones on the end, in order to remain compatible. */
 
 /* Types */
 
-struct real_pcre;                 /* declaration; the definition is private  */
+struct real_pcre;                 /* declaration; the definition is protected  */
 typedef struct real_pcre pcre;
 
-struct real_pcre16;               /* declaration; the definition is private  */
+struct real_pcre16;               /* declaration; the definition is protected  */
 typedef struct real_pcre16 pcre16;
 
-struct real_pcre32;               /* declaration; the definition is private  */
+struct real_pcre32;               /* declaration; the definition is protected  */
 typedef struct real_pcre32 pcre32;
 
-struct real_pcre_jit_stack;       /* declaration; the definition is private  */
+struct real_pcre_jit_stack;       /* declaration; the definition is protected  */
 typedef struct real_pcre_jit_stack pcre_jit_stack;
 
-struct real_pcre16_jit_stack;     /* declaration; the definition is private  */
+struct real_pcre16_jit_stack;     /* declaration; the definition is protected  */
 typedef struct real_pcre16_jit_stack pcre16_jit_stack;
 
-struct real_pcre32_jit_stack;     /* declaration; the definition is private  */
+struct real_pcre32_jit_stack;     /* declaration; the definition is protected  */
 typedef struct real_pcre32_jit_stack pcre32_jit_stack;
 
 /* If PCRE is compiled with 16 bit character support, PCRE_UCHAR16 must contain

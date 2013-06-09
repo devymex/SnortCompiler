@@ -1,9 +1,8 @@
 #include "stdafx.h"
-#include "compilernew.h"
 #include "../common/common.h"
-#include "../rule2nfa/rule2nfa.h"
 #include "../pcre2nfa/pcre2nfa.h"
 #include "../dfanew/dfanew.h"
+#include "compilernew.h"
 
 COMPILERNEW CDfaTblNew::CDfaTblNew()
 {
@@ -314,13 +313,13 @@ COMPILERNEW size_t CResNew::WriteToFile(LPCTSTR filename)
 		for (size_t j = 0; j < m_RegexTbl[i].Size(); ++j)
 		{
 			WriteNum(fout, m_RegexTbl[i][j].Size());
-			const char *pString = m_RegexTbl[i][j].C_Str();
+			const char *pString = m_RegexTbl[i][j].GetStr();
 			fout.write(pString, strlen(pString));
 		}
-		WriteNum(fout, m_RegexTbl[i].GetSigCnt());
-		for (size_t j = 0; j < m_RegexTbl[i].GetSigCnt(); ++j)
+		WriteNum(fout, m_RegexTbl[i].GetSigs().Size());
+		for (size_t j = 0; j < m_RegexTbl[i].GetSigs().Size(); ++j)
 		{
-			WriteNum(fout, m_RegexTbl[i].GetSig(j));
+			WriteNum(fout, m_RegexTbl[i].GetSigs()[j]);
 		}
 	}
 	//填写文件尺寸
@@ -431,7 +430,7 @@ COMPILERNEW size_t CResNew::ReadFromFile(LPCTSTR filename)
 		{
 			SIGNATURE Sig;
 			fin.read((char*)&Sig, 4);
-			m_RegexTbl[i].PushBackSig(Sig);
+			m_RegexTbl[i].GetSigs().PushBack(Sig);
 		}
 	}
 	fin.close();
@@ -445,11 +444,12 @@ void AssignSig(CResNew &result, size_t BegIdx, size_t EndIdx)
 	std::vector<SIGNATURE> vecRuleSigs; //本条规则的所有Signatrue
 	for (size_t i = BegIdx; i < EndIdx; ++i)
 	{
-		for (size_t j = 0; j < result.GetRegexTbl()[i].GetSigCnt(); ++j)
+		for (size_t j = 0; j < result.GetRegexTbl()[i].GetSigs().Size(); ++j)
 		{
-			if (std::find(vecRuleSigs.begin(), vecRuleSigs.end(), result.GetRegexTbl()[i].GetSig(j)) == vecRuleSigs.end())
+			if (std::find(vecRuleSigs.begin(), vecRuleSigs.end(),
+				result.GetRegexTbl()[i].GetSigs()[j]) == vecRuleSigs.end())
 			{
-				vecRuleSigs.push_back(result.GetRegexTbl()[i].GetSig(j));
+				vecRuleSigs.push_back(result.GetRegexTbl()[i].GetSigs()[j]);
 			}
 		}
 	}
@@ -462,10 +462,10 @@ void AssignSig(CResNew &result, size_t BegIdx, size_t EndIdx)
 		//		result.GetRegexTbl()[i].PushBackSig(vecRuleSigs[j]);
 		//	}
 		//}
-		result.GetRegexTbl()[i].ClearSigList();
+		result.GetRegexTbl()[i].GetSigs().Clear();
 		for (size_t j = 0; j < vecRuleSigs.size(); ++j)
 		{
-			result.GetRegexTbl()[i].PushBackSig(vecRuleSigs[j]);
+			result.GetRegexTbl()[i].GetSigs().PushBack(vecRuleSigs[j]);
 		}
 	}
 }
@@ -511,7 +511,7 @@ void Rule2Dfas(const CSnortRule &rule, CResNew &result, COMPILEDRULENEW &ruleRes
 			size_t nToNFAFlag = CRegChainToNFA(regrule[i], nfa);
 			pcre2nfatime += ctime.Reset();//用于测试
 
-			if (regrule[i].GetSigCnt() > 0)
+			if (regrule[i].GetSigs().Size() > 0)
 			{
 				bHasSigs = true;
 			}
@@ -540,7 +540,7 @@ void Rule2Dfas(const CSnortRule &rule, CResNew &result, COMPILEDRULENEW &ruleRes
 				size_t nToDFAFlag = dfa.FromNFA(nfa);
 				//				std::cout << "  "<< dfa.LinkSize() << ", " << dfa.GetGroupCount() * dfa.Size() << std::endl;
 				nfa2dfatime += ctime.Reset();//用于测试
-				//outPutDfa(dfa, "..//..//output//test.txt");
+				//PrintDfaToText(dfa, "..//..//output//test.txt");
 
 				if (nToDFAFlag == -1)
 				{

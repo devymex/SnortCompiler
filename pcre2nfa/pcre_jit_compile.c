@@ -137,7 +137,7 @@ The generated code will be the following:
 /*
 Saved stack frames:
 
-Atomic blocks and asserts require reloading the values of private data
+Atomic blocks and asserts require reloading the values of protected data
 when the backtrack mechanism performed. Because of OP_RECURSE, the data
 are not necessarly known in compile time, thus we need a dynamic restore
 mechanism.
@@ -145,7 +145,7 @@ mechanism.
 The stack frames are stored in a chain list, and have the following format:
 ([ capturing bracket offset ][ start value ][ end value ])+ ... [ 0 ] [ previous head ]
 
-Thus we can restore the private data to a particular point in the stack.
+Thus we can restore the protected data to a particular point in the stack.
 */
 
 typedef struct jit_arguments {
@@ -211,7 +211,7 @@ typedef struct assert_backtrack {
   jump_list *condfailed;
   /* Less than 0 (-1) if a frame is not needed. */
   int framesize;
-  /* Points to our private memory word on the stack. */
+  /* Points to our protected memory word on the stack. */
   int private_data_ptr;
   /* For iterators. */
   struct sljit_label *matchingpath;
@@ -233,13 +233,13 @@ typedef struct bracket_backtrack {
     /* For OP_ONCE. -1 if not needed. */
     int framesize;
   } u;
-  /* Points to our private memory word on the stack. */
+  /* Points to our protected memory word on the stack. */
   int private_data_ptr;
 } bracket_backtrack;
 
 typedef struct bracketpos_backtrack {
   backtrack_common common;
-  /* Points to our private memory word on the stack. */
+  /* Points to our protected memory word on the stack. */
   int private_data_ptr;
   /* Reverting stack is needed. */
   int framesize;
@@ -278,11 +278,11 @@ typedef struct compiler_common {
   struct sljit_compiler *compiler;
   pcre_uchar *start;
 
-  /* Maps private data offset to each opcode. */
+  /* Maps protected data offset to each opcode. */
   int *private_data_ptrs;
   /* Tells whether the capturing bracket is optimized. */
   pcre_uint8 *optimized_cbracket;
-  /* Starting offset of private data for capturing brackets. */
+  /* Starting offset of protected data for capturing brackets. */
   int cbraptr;
   /* OVector starting point. Must be divisible by 2. */
   int ovector_start;
@@ -1277,7 +1277,7 @@ static SLJIT_INLINE int get_private_data_length_for_copy(compiler_common *common
 int private_data_length = 2;
 int size;
 pcre_uchar *alternative;
-/* Calculate the sum of the private machine words. */
+/* Calculate the sum of the protected machine words. */
 while (cc < ccend)
   {
   size = 0;

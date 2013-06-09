@@ -301,7 +301,7 @@ public:
 	void output();
 
 	void nfa2CNfa(CNfa &cnfa);
-private:
+protected:
 	
 	/* returns the set of identifiers corresponding to the given set of NFA states
 	 * (convenient method used during subset construction) */

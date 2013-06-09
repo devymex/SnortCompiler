@@ -146,7 +146,7 @@ class PCRECPP_EXP_DEFN Scanner {
   // interleaving scanning with parsing.
   void GetNextComments(std::vector<StringPiece> *ranges);
 
- private:
+ protected:
   std::string   data_;          // All the input data
   StringPiece   input_;         // Unprocessed input
   RE*           skip_;          // If non-NULL, RE for skipping input

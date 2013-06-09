@@ -21,10 +21,7 @@
     <ClInclude Include="dfanew.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GetDfaSig.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="NCreDfa.h">
+    <ClInclude Include="dfaalgo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -35,10 +32,7 @@
     <ClCompile Include="dfanew.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GetDfaSig.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="NCreDfa.cpp">
+    <ClCompile Include="dfaalgo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

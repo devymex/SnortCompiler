@@ -4,7 +4,7 @@
 #include "../grouping/grouping.h"
 
 static size_t dpktnum = 0;
-//���� 0 ��ʾû��ƥ���ϣ����� 1 ��ʾƥ����
+
 void MatchOnedfa(const u_char * &data, size_t len, CDfaNew &dfa, std::vector<size_t> &matchedDids)
 {
 	if(dpktnum == 77)
@@ -27,7 +27,7 @@ void MatchOnedfa(const u_char * &data, size_t len, CDfaNew &dfa, std::vector<siz
 	STATEID curSta = dfa.GetStartId();
 	for (size_t edgeiter = 0; edgeiter != len; ++edgeiter)
 	{
-		BYTE group = dfa.GetOneGroup(data[edgeiter]);
+		BYTE group = dfa.GetGroup(data[edgeiter]);
 
 		if (0 == (dfa[curSta].GetFlag() & CDfaRow::TERMINAL))
 		{
@@ -141,9 +141,9 @@ MATCHPKT void DfaMatchPkt(const u_char *data, size_t len, DFAMCH dfamch)
 	if (!matcheddfaids.empty())
 	{
 		std::unordered_map<size_t, size_t> &dId_sId = dfamch.dIdSId.dId_sId;
-		std::unordered_map<size_t, CVectorNumber> &sId_dIdVec = dfamch.dIdSId.sId_dIdVec;
+		std::unordered_map<size_t, CVectorUnsigned> &sId_dIdVec = dfamch.dIdSId.sId_dIdVec;
 
-		std::unordered_map<size_t, CVectorNumber> resultmap;
+		std::unordered_map<size_t, CVectorUnsigned> resultmap;
 		for(std::vector<size_t>::iterator iter = matcheddfaids.begin(); iter != matcheddfaids.end(); ++iter)
 		{
 			std::size_t &csid = dId_sId[*iter];
@@ -158,7 +158,7 @@ MATCHPKT void DfaMatchPkt(const u_char *data, size_t len, DFAMCH dfamch)
 			}
 		}
 
-		for(std::unordered_map<size_t, CVectorNumber>::iterator iter = resultmap.begin(); iter != resultmap.end(); ++iter)
+		for(std::unordered_map<size_t, CVectorUnsigned>::iterator iter = resultmap.begin(); iter != resultmap.end(); ++iter)
 		{
 			if(iter->second.Size() == sId_dIdVec[iter->first].Size())
 			{

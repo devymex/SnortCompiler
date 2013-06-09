@@ -324,7 +324,7 @@ actually used in this definition. */
 #else
 
 
-/* These versions of the macros manage a private stack on the heap. Note that
+/* These versions of the macros manage a protected stack on the heap. Note that
 the "rd" argument of RMATCH isn't actually used in this definition. It's the md
 argument of match(), which never changes. */
 
@@ -368,7 +368,7 @@ argument of match(), which never changes. */
   }
 
 
-/* Structure for remembering the local variables in a private frame */
+/* Structure for remembering the local variables in a protected frame */
 
 typedef struct heapframe {
   struct heapframe *Xprevframe;

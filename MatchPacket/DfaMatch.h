@@ -8,7 +8,7 @@
 struct DFASIDMAPPING
 {
 	std::unordered_map<size_t, size_t> dId_sId;
-	std::unordered_map<size_t, CVectorNumber> sId_dIdVec;
+	std::unordered_map<size_t, CVectorUnsigned> sId_dIdVec;
 };
 
 struct DFAMCH
