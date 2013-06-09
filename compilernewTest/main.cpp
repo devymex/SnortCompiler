@@ -14,9 +14,9 @@ void main()
 {
 	CTimer t;
 	CResNew result;
-	//compilenew(_T("../../input/allrules.rule"), result);
-	//result.WriteToFile(_T("../../output/result.cdt"));
-	result.ReadFromFile(_T("..\\..\\output\\result.cdt"));
+	compilenew(_T("..\\allrules.rule"), result);
+	result.WriteToFile(_T("..\\result.cdt"));
+	//result.ReadFromFile(_T("..\\..\\output\\result.cdt"));
 	//result.WriteToFile(_T("..\\..\\output\\result1.cdt"));
 
 	//std::ifstream fin("../../input/allrules.rule");

@@ -1287,7 +1287,7 @@ DFANEWSC bool MergeMultipleDfas(std::vector<CDfaNew> &dfas, CDfaNew &lastDfa)
 			}
 		}
 	}
-	lastDfa.Minimize();
+	//lastDfa.Minimize();
 	if(lastDfa.Size() > DFA_SIZE_LIMIT)
 	{
 		//std::cerr << "DFA_SIZE_LIMIT!" << std::endl;
