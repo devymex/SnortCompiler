@@ -1,3 +1,0 @@
-LIBRARY mergedfanew
-EXPORTS
-MergeMultipleDfas @1

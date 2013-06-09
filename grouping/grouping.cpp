@@ -1,3 +1,17 @@
+/**
+**  @file        grouping.cpp
+**
+**  @author      Lab 435, Xidian University
+**
+**  @brief       Support functions for grouping dfa
+**
+**  This implements grouping dfa algorithm, the algorithm has four steps
+**  in general. At first, it groups dfa which has only one signature. Then, 
+**  push the remain dfa into the group. Thirdly, it groups dfa with the same 
+**  signatures. Finally, it merges two groups.
+**
+*/
+
 #include "stdafx.h"
 #include "grouping.h"
 #include "../compilernew/compilernew.h"
@@ -101,7 +115,7 @@ void WriteNum(std::ofstream &fout, _Ty _num, size_t nBytes = sizeof(_Ty))
 	fout.write((char*)&_num, nBytes);
 }
 
-/* Write the relationship between sid and dfa id, dfa table and result of grouping
+/* Write the relationship between sid and dfa ids, dfa table and result of grouping
 to file
 
 Arguments:
@@ -145,7 +159,7 @@ GROUPINGSC size_t CGROUPRes::WriteToFile(LPCTSTR filename)
 	std::streamoff groupOffsetPos = fout.tellp();
 	fout.seekp(4, std::ios_base::cur);
 
-	//write the offset of group
+	//write the offset of rule
 	std::streamoff endPos = fout.tellp();
 	fout.seekp(ruleOffsetPos, std::ios_base::beg);
 	WriteNum(fout, endPos, 4);
@@ -207,6 +221,7 @@ GROUPINGSC size_t CGROUPRes::WriteToFile(LPCTSTR filename)
 		WriteNum(fout, m_groups[i].currSig);
 		WriteNum(fout, m_groups[i].mergeDfaId);
 	}
+
 	//write the file size
 	endPos = fout.tellp();
 	fout.seekp(fileSizePos, std::ios_base::beg);
@@ -218,7 +233,7 @@ GROUPINGSC size_t CGROUPRes::WriteToFile(LPCTSTR filename)
 	return 0;
 }
 
-/* Read the relationship between sid and dfa id, dfa table and result of grouping
+/* Read the relationship between sid and dfa ids, dfa table and result of grouping
 from file
 
 Arguments:
@@ -262,7 +277,7 @@ GROUPINGSC size_t CGROUPRes::ReadFromFile(LPCTSTR filename)
 	//skip the offset of group
 	fin.seekg(4, std::ios_base::cur);
 
-	//start to read the relationship between sid and dfa id
+	//start to read the relationship between sid and dfa ids
 	m_sidDfaIds.Resize(ruleNum);
 	size_t SidDfaNum;
 	for (size_t i = 0; i < ruleNum; ++i)
@@ -794,7 +809,7 @@ void AddNewGroups(CGROUPS &newGroups, CGROUPS &groups)
 Arguments:
   res               the compile result and its dfa table contains the merged dfas
   groups            the group result
-  groupRes          the relationship between sid and dfa id, dfa table and result of grouping
+  groupRes          the relationship between sid and dfa ids, dfa table and result of grouping
 
 Returns:            nothing
 
@@ -898,7 +913,7 @@ void outPutGroups(CGROUPRes &groupRes, const char* fileName)
 
 Arguments:
   res               the compile result
-  groupRes          the relationship between sid and dfa id, dfa table and result of grouping
+  groupRes          the relationship between sid and dfa ids, dfa table and result of grouping
 
 Returns:            nothing
 
@@ -956,10 +971,6 @@ GROUPINGSC void grouping(CResNew &res, CGROUPRes &groupRes)
 	std::cout << "Clear up the result..." << std::endl;
 	ClearUpRes(res, groups, groupRes);
 
-
-	//outPutGroups(groupRes, "F:\\cppProject\\huawei\\PreciseMatch\\testMerg\\groupRes_4.txt");
-	//outPutResult(groupRes, "F:\\cppProject\\huawei\\PreciseMatch\\testMerg\\result_4.txt");
-	//outPutTermSet(groupRes, "F:\\cppProject\\huawei\\PreciseMatch\\testMerg\\termset_4.txt");
 	std::cout << "Completed in " << t1.Reset() << " Sec." << std::endl << std::endl;
 
 	std::cout << groupRes.GetGroups().Size() << std::endl;

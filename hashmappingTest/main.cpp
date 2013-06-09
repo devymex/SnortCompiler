@@ -9,18 +9,18 @@
 
 void main()
 {
-	CGROUPRes groupRes;
-	HASHRES HashResMap;
+	//CGROUPRes groupRes;
+	//HASHRES HashResMap;
 	//groupRes.ReadFromFile(_T("..\\..\\output\\GroupResut.cdt"));
 	//HashMapping(groupRes, HashResMap);
 	//groupRes.WriteToFile(_T("..\\..\\output\\FinalResut.cdt"));
 
-	groupRes.ReadFromFile(_T("..\\..\\output\\FinalResut.cdt"));
-	for (size_t i = 0; i < groupRes.GetGroups().Size(); ++i)
-	{
-		ONEGROUP &group = groupRes.GetGroups()[i];
-		HashResMap[hash(group.currSig)].push_back(HASHNODE(group.currSig, group.mergeDfaId));
-	}
+	//groupRes.ReadFromFile(_T("..\\..\\output\\FinalResut.cdt"));
+	//for (size_t i = 0; i < groupRes.GetGroups().Size(); ++i)
+	//{
+	//	ONEGROUP &group = groupRes.GetGroups()[i];
+	//	HashResMap[hash(group.currSig)].push_back(HASHNODE(group.currSig, group.mergeDfaId));
+	//}
 	
 	//std::ofstream fout("..//..//output//test.txt");
 	//for (size_t i = 0; i < groupRes.GetGroups().Size(); ++i)
@@ -34,14 +34,19 @@ void main()
 	//fout.clear();
 	//fout.close();
 
-	//CTimer ctime;
-	//CResNew result;
-	//compilenew(_T("..\\..\\input\\allrules.rule"), result);
-	//CGROUPRes groupRes;
-	//grouping(result, groupRes);
-	//HASHRES HashResMap;
-	//HashMapping(groupRes, HashResMap);
-	//std::cout << "总时间： " << ctime.Reset() << std::endl;
+	CTimer ctime;
+	CResNew result;
+	compilenew(_T("..\\..\\input\\allrules.rule"), result);
+	result.WriteToFile(_T("..\\..\\output\\result.cdt"));
+	CGROUPRes groupRes;
+	grouping(result, groupRes);
+	groupRes.WriteToFile(_T("..\\..\\output\\GroupResut.cdt"));
+	HASHRES HashResMap;
+	HashMapping(groupRes, HashResMap);
+	groupRes.WriteToFile(_T("..\\..\\output\\FinalResut.cdt"));
+	std::cout << "总时间： " << ctime.Reset() << std::endl;
+	std::cout << groupRes.GetGroups().Size() << std::endl;
+	std::cout << HashResMap.size() << std::endl;
 
 	system("pause");
 }
