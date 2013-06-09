@@ -221,13 +221,14 @@ DFANEWSC TERMSET& CDfaNew::BackTermSet()
 
 DFANEWSC void CDfaNew::Init(BYTE *pGroup)
 {
-	//Clear();
+	//1 if the group is used, 0 otherwise
 	BYTE occurred[DFACOLSIZE] = {0};
 	for (size_t i = 0; i < DFACOLSIZE; ++i) 
 	{
 		occurred[pGroup[i]] = 1;
 	}
-	bool flag = true;
+
+	//number of groups
 	WORD nZeroBegPos = 0;
 	for (; nZeroBegPos < DFACOLSIZE; ++nZeroBegPos)
 	{
@@ -236,6 +237,10 @@ DFANEWSC void CDfaNew::Init(BYTE *pGroup)
 			break;
 		}
 	}
+
+	//flag is true if 1 does not occur after nZeroBegPos, false otherwise
+	//flag is true indicates that the group is reasonable
+	bool flag = true;
 	for (size_t i = nZeroBegPos + 1; i < DFACOLSIZE; ++i)
 	{
 		if (occurred[i] == 1)
@@ -244,6 +249,8 @@ DFANEWSC void CDfaNew::Init(BYTE *pGroup)
 			break;
 		}
 	}
+
+	//the group is reasonable, and nZeroBegPos is the number of groups
 	if (flag)
 	{
 		m_nColNum = nZeroBegPos;
