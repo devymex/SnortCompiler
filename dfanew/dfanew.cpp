@@ -43,6 +43,16 @@ DFANEWSC void CFinalStates::Clear()
 	m_pStates->clear();
 }
 
+DFANEWSC void CFinalStates::PushBack(STATEID nStaId)
+{
+	FINSTAMAP_ITER iter = m_pDfaIds->find(nStaId);
+	if (iter == m_pDfaIds->end())
+	{
+		(*m_pDfaIds)[nStaId];
+		(*m_pStates).push_back(nStaId);
+	}
+}
+
 DFANEWSC void CFinalStates::PushBack(STATEID nStaId, size_t nDfaId)
 {
 	FINSTAMAP_ITER iter = m_pDfaIds->find(nStaId);

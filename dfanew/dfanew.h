@@ -28,6 +28,7 @@ public:
 
 	size_t Size() const;
 	void Clear();
+	void PushBack(STATEID nStaId);
 	void PushBack(STATEID nStaId, size_t nDfaId);
 	size_t GetDfaIdCount(STATEID nStaId) const;
 	size_t GetAllDfaIdCount() const;
