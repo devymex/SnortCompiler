@@ -17,6 +17,7 @@ class DFANEWSC CFinalStates
 {
 	typedef std::unordered_map<STATEID, std::set<size_t>> FINSTAMAP;
 	typedef FINSTAMAP::iterator FINSTAMAP_ITER;
+	typedef FINSTAMAP::const_iterator FINSTAMAP_CITER;
 public:
 	CFinalStates();
 	virtual ~CFinalStates();
@@ -29,6 +30,7 @@ public:
 	void Clear();
 	void PushBack(STATEID nStaId, size_t nDfaId);
 	size_t GetDfaIdCount(STATEID nStaId) const;
+	size_t GetAllDfaIdCount() const;
 	void GetDfaIds(STATEID nStaId, CVectorUnsigned &ids) const;
 
 	std::set<size_t>& _GetDfaIds(STATEID nStaId);
