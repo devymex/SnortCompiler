@@ -221,13 +221,14 @@ DFANEWSC TERMSET& CDfaNew::BackTermSet()
 
 DFANEWSC void CDfaNew::Init(BYTE *pGroup)
 {
-	//Clear();
+	//1 if the group is used, 0 otherwise
 	BYTE occurred[DFACOLSIZE] = {0};
 	for (size_t i = 0; i < DFACOLSIZE; ++i) 
 	{
 		occurred[pGroup[i]] = 1;
 	}
-	bool flag = true;
+
+	//number of groups
 	WORD nZeroBegPos = 0;
 	for (; nZeroBegPos < DFACOLSIZE; ++nZeroBegPos)
 	{
@@ -236,6 +237,10 @@ DFANEWSC void CDfaNew::Init(BYTE *pGroup)
 			break;
 		}
 	}
+
+	//flag is true if 1 does not occur after nZeroBegPos, false otherwise
+	//flag is true indicates that the group is reasonable
+	bool flag = true;
 	for (size_t i = nZeroBegPos + 1; i < DFACOLSIZE; ++i)
 	{
 		if (occurred[i] == 1)
@@ -244,6 +249,8 @@ DFANEWSC void CDfaNew::Init(BYTE *pGroup)
 			break;
 		}
 	}
+
+	//the group is reasonable, and nZeroBegPos is the number of groups
 	if (flag)
 	{
 		m_nColNum = nZeroBegPos;
@@ -577,32 +584,37 @@ DFANEWSC void CDfaNew::GetAcceptedId(STATEID id, CVectorUnsigned &dfaIds)
 DFANEWSC size_t CDfaNew::Save(BYTE *beg)
 {
 	BYTE *pOld = beg;
-	//写DFA的Id
+
+	//write dfa id
 	WriteNum(beg, m_nId);
-	//写DFA的状态个数
+
+	//write number of dfa states
 	WriteNum(beg, m_pDfa->size(), sizeof(BYTE));
 	if (m_pDfa->size() == 0)
 	{
 		return beg - pOld;
 	}
-	//写分组
+
+	//write group
 	for (size_t i = 0; i < DFACOLSIZE; ++i)
 	{
 		WriteNum(beg, m_pGroup[i]);
 	}
-	//写DFA跳转表
+
+	//write dfa table
 	for (size_t i = 0; i < m_pDfa->size(); ++i)
 	{
-		//写该状态的Flag(NORMAL、START、TERMINAL)
+		//write the flag of dfa state
 		WriteNum(beg, (*m_pDfa)[i].GetFlag());
 		for (BYTE j = 0; j < m_nColNum; ++j)
 		{
 			WriteNum(beg, (*m_pDfa)[i][j], sizeof(BYTE));
 		}
 	}
-	//写DFA的开始状态编号
+	
+	//write the dfa's start state id
 	WriteNum(beg, m_nStartId, sizeof(BYTE));
-	//写DFA的终态与DFAId的对应关系
+	//write the relationship between dfa's terminal state and dfa id
 	WriteNum(beg, m_pTermSet->size());
 	for (size_t i = 0; i < m_pTermSet->size(); ++i)
 	{
@@ -615,19 +627,20 @@ DFANEWSC size_t CDfaNew::Save(BYTE *beg)
 
 DFANEWSC void CDfaNew::Load(BYTE *beg, size_t len)
 {
-	len = 0;
-	//读DFA的Id
+	//read dfa id
 	size_t dfaId;
 	ReadNum(beg, dfaId);
 	m_nId = dfaId;
-	//读DFA的状态个数
-	BYTE dfaSize;//DFA的状态数
+
+	//read number of dfa states
+	BYTE dfaSize;
 	ReadNum(beg, dfaSize);
 	if (dfaSize == 0)
 	{
 		return;
 	}
-	//读分组
+	
+	//read group
 	BYTE pGroup[DFACOLSIZE];
 	for (size_t i = 0; i < DFACOLSIZE; ++i)
 	{
@@ -635,12 +648,13 @@ DFANEWSC void CDfaNew::Load(BYTE *beg, size_t len)
 	}
 	Init(pGroup);
 	m_nId = dfaId;
-	//读DFA跳转表
+
+	//read dfa table
 	m_pDfa->resize(dfaSize, CDfaRow(m_nColNum));
 	size_t nFlag;
 	for (size_t i = 0; i < m_pDfa->size(); ++i)
 	{
-		//读该状态的Flag(NORMAL、START、TERMINAL)
+		//read the flag of dfa state
 		ReadNum(beg, nFlag);
 		(*m_pDfa)[i].SetFlag(nFlag);
 		for (BYTE j = 0; j < m_nColNum; ++j)
@@ -653,10 +667,12 @@ DFANEWSC void CDfaNew::Load(BYTE *beg, size_t len)
 			}
 		}
 	}
-	//读DFA的开始状态编号
+	
+	//read the dfa's start state id
 	m_nStartId = 0;
 	ReadNum(beg, m_nStartId, sizeof(BYTE));
-	//读DFA的终态与DFAId的对应关系
+	
+	//read the relationship between dfa's terminal state and dfa id
 	size_t TermSetSize;
 	ReadNum(beg, TermSetSize);
 	m_pTermSet->resize(TermSetSize);
