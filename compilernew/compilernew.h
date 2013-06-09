@@ -2,6 +2,7 @@
 
 #include "../common/common.h"
 #include "../dfanew/dfanew.h"
+#include "../rule2nfa/rule2nfa.h"
 
 #include <windows.h>
 

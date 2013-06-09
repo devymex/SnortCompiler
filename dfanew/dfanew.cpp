@@ -54,11 +54,6 @@ DFANEWSC CDfaRow::CDfaRow(size_t col)
 	Fill(STATEID(-1));
 }
 
-DFANEWSC void CDfaRow::Fill(STATEID _Val)
-{
-	std::fill(m_pDest->begin(), m_pDest->end(), _Val);
-}
-
 DFANEWSC CDfaRow::~CDfaRow()
 {
 	delete m_pDest;
@@ -85,6 +80,11 @@ DFANEWSC STATEID& CDfaRow::operator[](BYTE nIdx)
 DFANEWSC const STATEID& CDfaRow::operator[](BYTE nIdx) const
 {
 	return (*m_pDest)[nIdx];
+}
+
+DFANEWSC void CDfaRow::Fill(STATEID _Val)
+{
+	std::fill(m_pDest->begin(), m_pDest->end(), _Val);
 }
 
 DFANEWSC void CDfaRow::SetFlag(size_t nFlag)

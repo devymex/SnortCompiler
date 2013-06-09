@@ -47,6 +47,90 @@ enum CONTYPE
 	CONPCRE
 };
 
+class CRuleOption
+{
+public:
+	CRuleOption();
+	CRuleOption(const CRuleOption &other);
+	const CRuleOption& operator = (const CRuleOption &other);
+	virtual ~CRuleOption();
+
+	void SetPattern(LPCSTR lpStr);
+	size_t GetPattern(LPSTR lpStr, size_t nLen) const;
+
+	size_t GetFlag() const;
+	void SetFlag(size_t nFlag);
+	void AddFlag(size_t nFlag);
+	BOOL TestFlag(size_t nFlag) const;
+
+protected:
+	size_t m_nFlag;
+	std::string *m_pPattern;
+};
+
+CRuleOption::CRuleOption()
+	: m_nFlag(0)
+{
+	m_pPattern = new std::string;
+}
+
+CRuleOption::CRuleOption(const CRuleOption &other)
+{
+	m_pPattern = new std::string;
+	*this = other;
+}
+
+CRuleOption::~CRuleOption()
+{
+	delete m_pPattern;
+}
+
+const CRuleOption& CRuleOption::operator=(const CRuleOption &other)
+{
+	*m_pPattern = *other.m_pPattern;
+	m_nFlag = other.m_nFlag;
+	return *this;
+}
+
+size_t CRuleOption::GetPattern(LPSTR lpStr, size_t nLen) const
+{
+	if (lpStr == NULL || nLen == 0)
+	{
+		return m_pPattern->length();
+	}
+	if (nLen > m_pPattern->length())
+	{
+		nLen = m_pPattern->length();
+	}
+	CopyMemory(lpStr, &(*m_pPattern)[0], nLen);
+	return nLen;
+}
+
+void CRuleOption::SetPattern(LPCSTR lpStr)
+{
+	*m_pPattern = lpStr;
+}
+
+size_t CRuleOption::GetFlag() const
+{
+	return m_nFlag;
+}
+
+void CRuleOption::SetFlag(size_t nFlag)
+{
+	m_nFlag = nFlag;
+}
+
+void CRuleOption::AddFlag(size_t nFlag)
+{
+	m_nFlag |= nFlag;
+}
+
+BOOL CRuleOption::TestFlag(size_t nFlag) const
+{
+	return ((m_nFlag & nFlag) != 0);
+}
+
 struct OPTIONCONTENT : public CRuleOption
 {
 	std::vector<BYTE> vecconts;//content data
@@ -916,6 +1000,77 @@ size_t content2Pcre(OPTIONCONTENT *pContent, CCString &pcreStr)
 **  @retval <>0 fatal error
 */
 
+CRECHANFA CSnortRule::CSnortRule()
+	: m_nSid(0), m_nFlag(0)
+{
+	m_pOptions = new std::vector<CRuleOption*>;
+}
+
+CRECHANFA CSnortRule::CSnortRule(const CSnortRule &other)
+{
+	m_pOptions = new std::vector<CRuleOption*>;
+	*this = other;
+}
+
+CRECHANFA const CSnortRule& CSnortRule::operator = (const CSnortRule &other)
+{
+	m_nSid = other.m_nSid;
+	m_nFlag = other.m_nFlag;
+	*m_pOptions = *other.m_pOptions;
+	return *this;
+}
+
+CRECHANFA CSnortRule::~CSnortRule()
+{
+	std::vector<CRuleOption*> &opts = *m_pOptions;
+	for (std::vector<CRuleOption*>::iterator i = opts.begin(); i != opts.end(); ++i)
+	{
+		delete *i;
+	}
+	opts.clear();
+	delete m_pOptions;
+}
+
+CRECHANFA size_t CSnortRule::Size() const
+{
+	return m_pOptions->size();
+}
+
+CRECHANFA void CSnortRule::SetSid(size_t sid)
+{
+	m_nSid = sid;
+}
+
+CRECHANFA size_t CSnortRule::GetSid() const
+{
+	return m_nSid;
+}
+
+CRECHANFA void CSnortRule::SetFlag(size_t flag)
+{
+	m_nFlag = flag;
+}
+
+CRECHANFA size_t CSnortRule::GetFlag() const
+{
+	return m_nFlag;
+}
+
+CRECHANFA void CSnortRule::PushBack(CRuleOption* ruleoption)
+{
+	m_pOptions->push_back(ruleoption);
+}
+
+CRECHANFA void CSnortRule::PopBack()
+{
+	m_pOptions->pop_back();
+}
+
+CRECHANFA CRuleOption* CSnortRule::operator[](size_t nIdx) const
+{
+	return (*m_pOptions)[nIdx];
+}
+
 CRECHANFA size_t Rule2PcreList(const CSnortRule &rule, CRegRule &regrule)
 {
 	regrule.Reserve(nfaTreeReserve);
@@ -968,7 +1123,7 @@ CRECHANFA size_t Rule2PcreList(const CSnortRule &rule, CRegRule &regrule)
 					sigIt + 3 != contentTmp.end(); ++sigIt)
 				{
 					SIGNATURE sig = *(SIGNATURE*)&(*sigIt);
-					regrule.Back().PushBackSig(sig);
+					regrule.Back().GetSigs().PushBack(sig);
 				}
 			}
 			regrule.Back().PushBack(conPcreStr);
@@ -993,9 +1148,9 @@ CRECHANFA size_t Rule2PcreList(const CSnortRule &rule, CRegRule &regrule)
 	//regrule.Reserve(++regChain_size);
 	for(size_t i = 0; i < regrule.Size(); ++i)
 	{
-		if(regrule[i].GetSigCnt() > 1)
+		if(regrule[i].GetSigs().Size() > 1)
 		{
-			regrule[i].Unique();
+			regrule[i].GetSigs().Unique();
 		}
 	}
 	return 0;
@@ -1026,13 +1181,129 @@ CRECHANFA size_t CRegChainToNFA(CRegChain &regchain, CNfa &nfa)
 	int flag = 0;
 	for(size_t i = 0; i < regchain.Size(); ++i)
 	{
-		flag = PcreToNFA(regchain[i].GetStr(), nfa, regchain);
+		flag = PcreToNFA(regchain[i].GetStr(), nfa, regchain.GetSigs());
 		if(flag != 0)
 		{
 			nfa.Clear();
 			return flag;
 		}
 	}
+	regchain.GetSigs().Unique();
 	return 0;
 }
 
+
+
+CRECHANFA CRegRule::CRegRule()
+{
+	m_pRegVec = new std::vector<CRegChain>;
+}
+
+CRECHANFA CRegRule::~CRegRule()
+{
+	delete m_pRegVec;
+}
+
+CRECHANFA CRegRule::CRegRule(const CRegRule &other)
+{
+	m_pRegVec = new std::vector<CRegChain>;
+	*this = other;
+}
+
+CRECHANFA size_t CRegRule::Size() const
+{
+	return m_pRegVec->size();
+}
+
+CRECHANFA CRegChain& CRegRule::Back() const
+{
+	return m_pRegVec->back();
+}
+
+CRECHANFA void CRegRule::Reserve(size_t nCount)
+{
+	m_pRegVec->reserve(nCount);
+}
+CRECHANFA void CRegRule::Resize(size_t nSize)
+{
+	m_pRegVec->resize(nSize);
+}
+
+CRECHANFA void CRegRule::PushBack(const CRegChain &nRegChain)
+{
+	m_pRegVec->push_back(nRegChain);
+}
+
+CRECHANFA CRegChain& CRegRule::operator[](size_t nIdx)
+{
+	return (*m_pRegVec)[nIdx];
+}
+
+CRECHANFA const CRegChain& CRegRule::operator[](size_t nIdx) const
+{
+	return (*m_pRegVec)[nIdx];
+}
+
+CRECHANFA const CRegRule& CRegRule::operator = (const CRegRule &other)
+{
+	*this->m_pRegVec = *other.m_pRegVec;
+	return *this;
+}
+
+CRECHANFA CRegChain::CRegChain()
+{
+	m_pRegList = new std::vector<CCString>;
+}
+
+CRECHANFA CRegChain::~CRegChain()
+{
+	delete m_pRegList;
+}
+
+CRECHANFA CRegChain::CRegChain(const CRegChain &other)
+{
+	m_pRegList = new std::vector<CCString>;
+	*this = other;
+}
+
+CRECHANFA size_t CRegChain::Size() const
+{
+	return m_pRegList->size();
+}
+
+CRECHANFA CCString& CRegChain::Back() const
+{
+	return m_pRegList->back();
+}
+
+CRECHANFA void CRegChain::PushBack(const CCString &pcreStr)
+{
+	m_pRegList->push_back(pcreStr);
+}
+
+CRECHANFA CCString& CRegChain::operator[](size_t nIdx)
+{
+	return (*m_pRegList)[nIdx];
+}
+
+CRECHANFA const CRegChain& CRegChain::operator = (const CRegChain &other)
+{
+	*this->m_pRegList = *other.m_pRegList;
+	this->m_sigs = other.m_sigs;
+	return *this;
+}
+
+CRECHANFA void CRegChain::Resize(size_t nSize)
+{
+	m_pRegList->resize(nSize);
+}
+
+CRECHANFA CSignatures& CRegChain::GetSigs()
+{
+	return m_sigs;
+}
+
+CRECHANFA const CSignatures& CRegChain::GetSigs() const
+{
+	return m_sigs;
+}
