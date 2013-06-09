@@ -17,56 +17,6 @@
 #include "../compilernew/compilernew.h"
 #include "../mergedfanew/MergeDfanew.h"
 
-GROUPINGSC CSIGNATURES::CSIGNATURES()
-{
-	m_pSigs = new std::vector<SIGNATURE>;
-}
-GROUPINGSC CSIGNATURES::CSIGNATURES(const CSIGNATURES& other)
-{
-	m_pSigs = new std::vector<SIGNATURE>;
-	*this = other;
-}
-GROUPINGSC const CSIGNATURES &CSIGNATURES::operator=(const CSIGNATURES &other)
-{
-	*m_pSigs = *other.m_pSigs;
-	return *this;
-}
-
-GROUPINGSC CSIGNATURES::~CSIGNATURES()
-{
-	delete m_pSigs;
-}
-
-GROUPINGSC const size_t CSIGNATURES::Size() const
-{
-	return m_pSigs->size();
-}
-
-GROUPINGSC void CSIGNATURES::Resize(size_t nSize)
-{
-	m_pSigs->resize(nSize);
-}
-
-GROUPINGSC void CSIGNATURES::PushBack(SIGNATURE Sig)
-{
-	m_pSigs->push_back(Sig);
-}
-
-GROUPINGSC SIGNATURE &CSIGNATURES::operator[](size_t nIdx)
-{
-	return (*m_pSigs)[nIdx];
-}
-
-GROUPINGSC const SIGNATURE &CSIGNATURES::operator[](size_t nIdx) const
-{
-	return (*m_pSigs)[nIdx];
-}
-
-GROUPINGSC void CSIGNATURES::Clear()
-{
-	m_pSigs->clear();
-}
-
 GROUPINGSC CGROUPS::CGROUPS()
 {
 	m_pGroups = new std::vector<ONEGROUP>;
@@ -403,9 +353,9 @@ void ExtractDfaInfo(const CResNew &res, std::vector<DFAINFO> &vecDfaInfo, std::v
 	for (size_t i = 0; i < nSize; ++i)
 	{
 		vecWaitForGroup.push_back(i);
-		for (size_t j = 0; j < res.GetRegexTbl()[i].GetSigCnt(); ++j)
+		for (size_t j = 0; j < res.GetRegexTbl()[i].GetSigs().Size(); ++j)
 		{
-			vecDfaInfo[i].Sigs.push_back(res.GetRegexTbl()[i].GetSig(j));
+			vecDfaInfo[i].Sigs.push_back(res.GetRegexTbl()[i].GetSigs()[j]);
 		}
 	}
 }

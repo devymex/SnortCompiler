@@ -419,7 +419,7 @@ size_t CompareWithPcre(const char *pPcre)
 
 	CNfa nfa1;
 	CRegChain regChain;
-	if (SC_SUCCESS != PcreToNFA(oPcre, nfa1, regChain))
+	if (SC_SUCCESS != PcreToNFA(oPcre, nfa1, regChain.GetSigs()))
 	{
 		return 2;
 	}

@@ -4,7 +4,7 @@
 #include "../grouping/grouping.h"
 
 static size_t dpktnum = 0;
-//���� 0 ��ʾû��ƥ���ϣ����� 1 ��ʾƥ����
+
 void MatchOnedfa(const u_char * &data, size_t len, CDfaNew &dfa, std::vector<size_t> &matchedDids)
 {
 	if(dpktnum == 77)

@@ -21,16 +21,14 @@
 #define COMMONSC __declspec(dllexport)
 #endif
 
-#define SC_STATELIMIT 500
-#define DFA_SIZE_LIMIT 255
-#define DFACOLSIZE 256
-#define CHARSETSIZE 260
+/* compile configurations */
+#define SC_STATELIMIT	500
+#define DFA_SIZE_LIMIT	255
+#define DFACOLSIZE		256
+#define CHARSETSIZE		260
 
 
-/*
-* Common type define
-*/
-//typedef unsigned char STATEID;
+/* Common type defination */
 typedef unsigned short			STATEID;
 typedef unsigned long			SIGNATURE;
 typedef std::list<STATEID>		STATELIST;
@@ -39,9 +37,7 @@ typedef STATELIST::iterator		STATELIST_ITER;
 typedef STATEVEC::iterator		STATEVEC_ITER;
 typedef class CVectorUnsigned	CStateSet;
 
-/*
-* Capsulate the std::vector<size_t> for dll using.
-*/
+/* Capsulate the std::vector<size_t> for dll using. */
 class COMMONSC CVectorUnsigned
 {
 public:
@@ -74,9 +70,25 @@ protected:
 	std::vector<size_t> *m_pSet;
 };
 
-/*
-* Capsulate the std::string for dll using.
-*/
+class COMMONSC CSignatures
+{
+public:
+	CSignatures();
+	CSignatures(const CSignatures& other);
+	const CSignatures &operator=(const CSignatures &other);
+	~CSignatures();
+	const size_t Size() const;
+	void Resize(size_t nSize);
+	void PushBack(SIGNATURE Sig);
+	SIGNATURE &operator[](size_t nIdx);
+	const SIGNATURE &operator[](size_t nIdx) const;
+	void Clear();
+	void Unique();
+protected:
+	std::vector<SIGNATURE> *m_pSigs;
+};
+
+/* Capsulate the std::string for dll using. */
 class COMMONSC CCString
 {
 public:
@@ -131,15 +143,10 @@ protected:
 	std::vector<size_t> *m_pDestSet;
 };
 
+/* Store one nfa in table format. Each row of the table is a CNfaRow */
 class COMMONSC CNfa
 {
 public:
-	struct DFATERMS
-	{
-		size_t nfaSta;
-		size_t dfaId;
-	};
-
 	CNfa();
 	~CNfa();
 	CNfa(const CNfa &other);
@@ -148,125 +155,22 @@ public:
 	CNfaRow &operator[](size_t index);
 	const CNfaRow &operator[](size_t index) const;
 
-	void Clear();
-	void SortAll();
-	void Reserve(size_t _Count);
-	void Resize(size_t _Newsize);
-	void Shrink();
 	size_t Size() const;
+	void Clear();
+	void Resize(size_t _Newsize);
+	void Reserve(size_t _Count);
+	void Shrink();
+
 	CNfaRow &Back();
 	void PushBack(const CNfaRow &row);
 	void PopBack();
 
-	void SetPcre(const char* lpPcre);
-	const char* GetPcre() const;
-
-	void PushDfaTerms(DFATERMS dfaTerms);
-	size_t GetDfaTermsNum() const;
-	DFATERMS GetDfaTerms(size_t num) const;
+	void SortAll();
 
 	void Dump(const char *pFile) const;
 
 protected:
 	std::vector<CNfaRow> *m_pNfa;
-	std::string *m_pPcre;
-	//如果该nfa是由dfa合并过程中生成的，该成员用于记录哪个状态能够识别哪个dfa终态
-	std::vector<DFATERMS> *m_DfaTerms;
-};
-
-class COMMONSC CRegChain
-{
-public:
-	CRegChain();
-	~CRegChain();
-	CRegChain(const CRegChain &other);
-	const CRegChain& operator = (const CRegChain &other);
-
-	CCString& operator[](size_t nIdx);
-
-	size_t Size() const;
-	CCString& Back() const;
-	void PushBack(const CCString &pcreStr);
-	void Resize(size_t nSize);
-
-	size_t GetSigCnt() const;
-	void PushBackSig(const SIGNATURE &signature);
-	SIGNATURE& GetSig(size_t nIdx) const;
-
-	void Unique();
-	void ClearSigList();
-
-protected:
-	std::vector<CCString> *m_pRegList;
-	std::vector<SIGNATURE> *m_pSigList;
-};
-
-class COMMONSC CRegRule
-{
-public:
-	CRegRule();
-	~CRegRule();
-	CRegRule(const CRegRule &other);
-	const CRegRule& operator = (const CRegRule &other);
-
-	CRegChain& operator[](size_t nIdx);
-	const CRegChain& operator[](size_t nIdx) const;
-
-	size_t Size() const;
-	CRegChain& Back() const;
-	void Reserve(size_t nCount);
-	void Resize(size_t nSize);
-	void PushBack(CRegChain &nRegChain);
-
-protected:
-	std::vector<CRegChain> *m_pRegVec;
-};
-
-class COMMONSC CRuleOption
-{
-public:
-	CRuleOption();
-	CRuleOption(const CRuleOption &other);
-	const CRuleOption& operator = (const CRuleOption &other);
-	virtual ~CRuleOption();
-
-	void SetPattern(LPCSTR lpStr);
-	size_t GetPattern(LPSTR lpStr, size_t nLen) const;
-
-	size_t GetFlag() const;
-	void SetFlag(size_t nFlag);
-	void AddFlag(size_t nFlag);
-	BOOL TestFlag(size_t nFlag) const;
-
-protected:
-	size_t m_nFlag;
-	std::string *m_pPattern;
-};
-
-class COMMONSC CSnortRule
-{
-public:
-	enum {RULE_HASBYTE = 0x0001, RULE_HASNOT = 0x0002, RULE_HASNOSIG = 0x0004};
-
-	CSnortRule();
-	CSnortRule(const CSnortRule &other);
-	const CSnortRule& operator = (const CSnortRule &other);
-	~CSnortRule();
-
-	CRuleOption* operator[](size_t nIdx) const;
-
-	void SetSid(size_t sid);
-	size_t GetSid() const;
-	void SetFlag(size_t flag);
-	size_t GetFlag() const;
-	void PushBack(CRuleOption* ruleoption);
-	void PopBack();
-	size_t Size() const;
-
-protected:
-	size_t m_nSid;
-	size_t m_nFlag;
-	std::vector<CRuleOption*> *m_pOptions;
 };
 
 class CTimer

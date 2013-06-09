@@ -51,6 +51,9 @@
     <ClInclude Include="match.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="getsig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pcre_byte_order.c">
@@ -128,10 +131,10 @@
     <ClCompile Include="pcre2nfa.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GetSignature.cpp">
+    <ClCompile Include="match.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="match.cpp">
+    <ClCompile Include="getsig.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
