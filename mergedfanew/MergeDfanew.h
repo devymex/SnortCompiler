@@ -7,5 +7,3 @@
 #define MERDFANEW __declspec(dllexport)
 #endif
 
-MERDFANEW bool MergeMultipleDfas(std::vector<CDfaNew> &dfas, CDfaNew &lastDfa);
-

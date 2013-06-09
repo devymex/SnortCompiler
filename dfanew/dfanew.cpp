@@ -2,48 +2,79 @@
 #include "dfanew.h"
 #include "dfaalgo.h"
 
-DFANEWSC void PrintDfaToGv(CDfaNew &newdfa, const char* fileName)
+DFANEWSC CFinalStates::CFinalStates()
 {
-	std::ofstream fout(fileName);
-	fout << "digraph G {" << std::endl;
-	fout << "S -> " << (size_t)newdfa.GetStartId() << std::endl;
+	m_pStates = new std::vector<STATEID>;
+	m_pDfaIds = new std::unordered_map<STATEID, std::set<size_t>>;
+}
 
-	for(STATEID i = 0; i != newdfa.Size(); ++i)
+DFANEWSC CFinalStates::~CFinalStates()
+{
+	delete m_pStates;
+	delete m_pDfaIds;
+}
+
+DFANEWSC CFinalStates::CFinalStates(const CFinalStates &other)
+{
+	m_pStates = new std::vector<STATEID>;
+	m_pDfaIds = new std::unordered_map<STATEID, std::set<size_t>>;
+	*this = other;
+}
+
+DFANEWSC CFinalStates& CFinalStates::operator=(const CFinalStates &other)
+{
+	*m_pStates = *other.m_pStates;
+	*m_pDfaIds = *other.m_pDfaIds;
+	return *this;
+}
+
+DFANEWSC STATEID CFinalStates::operator[](size_t nStateId) const
+{
+	return (*m_pStates)[nStateId];
+}
+
+DFANEWSC size_t CFinalStates::Size() const
+{
+	return m_pStates->size();
+}
+
+DFANEWSC void CFinalStates::Clear()
+{
+	m_pStates->clear();
+}
+
+DFANEWSC void CFinalStates::PushBack(STATEID nStaId, size_t nDfaId)
+{
+	FINSTAMAP_ITER iter = m_pDfaIds->find(nStaId);
+	if (iter == m_pDfaIds->end())
 	{
-		std::map<STATEID, size_t> rowStateCnt;
-		for(BYTE j = 0; j != newdfa.GetGroupCount(); ++j)
-		{
-			rowStateCnt[newdfa[i][j]]++;
-		}
-		STATEID maxId = 0;
-		for (std::map<STATEID, size_t>::iterator j = rowStateCnt.begin(); j != rowStateCnt.end(); ++j)
-		{
-			if (j->second > rowStateCnt[maxId])
-			{
-				maxId = j->first;
-			}
-		}
-		for(BYTE j = 0; j != newdfa.GetGroupCount(); ++j)
-		{
-			if (newdfa[i][j] != maxId)
-			{
-				fout << i << " -> " << (size_t)newdfa[i][j] << " [label=\"" << j << "\"];" << std::endl;
-			}
-			else if (maxId != (STATEID)-1)
-			{
-				fout << i << " -> "  << (size_t)maxId << " [label=\"" << j << "\"];" << std::endl;
-			}
-		}
+		(*m_pDfaIds)[nStaId].insert(nDfaId);
+		(*m_pStates).push_back(nStaId);
 	}
-	for (STATEID i = 0; i < newdfa.Size(); ++i)
+	else
 	{
-		if (newdfa[i].GetFlag() & CDfaRow::TERMINAL)
-		{
-			fout << (size_t)i << " [peripheries=2];" << std::endl;
-		}
+		iter->second.insert(nDfaId);
 	}
-	fout << "}" << std::endl;
-	fout.close();
+}
+
+DFANEWSC std::set<size_t>& CFinalStates::GetDfaIds(STATEID nStaId)
+{
+	FINSTAMAP_ITER iter = m_pDfaIds->find(nStaId);
+	if (iter == m_pDfaIds->end())
+	{
+		throw 0;
+	}
+	return iter->second;
+}
+
+DFANEWSC const std::set<size_t>& CFinalStates::GetDfaIds(STATEID nStaId) const
+{
+	FINSTAMAP_ITER iter = m_pDfaIds->find(nStaId);
+	if (iter == m_pDfaIds->end())
+	{
+		throw 0;
+	}
+	return iter->second;
 }
 
 DFANEWSC CDfaRow::CDfaRow(size_t col)
@@ -107,19 +138,16 @@ DFANEWSC CDfaNew::CDfaNew()
 {
 	std::fill(m_pGroup, m_pGroup + DFACOLSIZE, BYTE(-1));
 	m_pDfa = new std::vector<CDfaRow>;
-	m_pTermSet = new std::vector<TERMSET>;
 }
 
 DFANEWSC CDfaNew::~CDfaNew()
 {
 	delete m_pDfa;
-	delete m_pTermSet;
 }
 
 DFANEWSC CDfaNew::CDfaNew(const CDfaNew &other)
 {
 	m_pDfa = new std::vector<CDfaRow>;
-	m_pTermSet = new std::vector<TERMSET>;
 	*this = other;
 }
 
@@ -131,7 +159,6 @@ DFANEWSC CDfaNew& CDfaNew::operator=(const CDfaNew &other)
 	m_nStartId = other.m_nStartId;
 	CopyMemory(m_pGroup, other.m_pGroup, DFACOLSIZE * sizeof(BYTE));
 	*m_pDfa = *other.m_pDfa;
-	*m_pTermSet = *other.m_pTermSet;
 	return *this;
 }
 
@@ -168,55 +195,6 @@ DFANEWSC const CDfaRow& CDfaNew::operator[](STATEID index) const
 DFANEWSC void CDfaNew::PushBack(CDfaRow &sta)
 {
 	m_pDfa->push_back(sta);
-}
-
-DFANEWSC void CDfaNew::PushBackTermSet(TERMSET &term)
-{
-	m_pTermSet->push_back(term);
-}
-
-DFANEWSC void CDfaNew::UniqueTermSet()
-{
-	struct EQUAL
-	{
-		bool operator()(TERMSET &t1, TERMSET &t2)
-		{
-			if((t1.dfaId == t2.dfaId) && (t1.dfaSta == t2.dfaSta))
-			{
-				return true;
-			}
-			return false;
-		}
-	};
-	struct LESS
-	{
-		bool operator()(TERMSET &t1, TERMSET &t2)
-		{
-			if((t1.dfaSta < t2.dfaSta) || ((t1.dfaSta == t2.dfaSta) && (t1.dfaId < t2.dfaId)))
-			{
-				return true;
-			}
-			return false;
-		}
-	};
-	std::sort(m_pTermSet->begin(), m_pTermSet->end(), LESS());
-	m_pTermSet->erase(std::unique(m_pTermSet->begin(), m_pTermSet->end(),
-		EQUAL()), m_pTermSet->end());
-}
-
-DFANEWSC TERMSET& CDfaNew::GetTerm(size_t nIdx) const
-{
-	return (*m_pTermSet)[nIdx];
-}
-
-DFANEWSC size_t CDfaNew::GetTermCnt() const
-{
-	return m_pTermSet->size();
-}
-
-DFANEWSC TERMSET& CDfaNew::BackTermSet()
-{
-	return m_pTermSet->back();
 }
 
 DFANEWSC void CDfaNew::Init(BYTE *pGroup)
@@ -262,7 +240,6 @@ DFANEWSC void CDfaNew::Clear()
 	m_nStartId = STATEID(0);
 	memset(m_pGroup, 0xFF, DFACOLSIZE);
 	m_pDfa->clear();
-	m_pTermSet->clear();
 }
 
 DFANEWSC size_t CDfaNew::FromNFA(const CNfa &nfa)
@@ -303,10 +280,6 @@ DFANEWSC size_t CDfaNew::FromNFA(const CNfa &nfa)
 	nextNfaVec.clear();
 	BYTE compuFlag[CHARSETSIZE];
 
-	size_t nTotalSize = m_pTermSet->size() * sizeof(TERMSET) +
-				sizeof(m_pGroup) + sizeof(m_nStartId) + sizeof(m_nId) +
-				m_pDfa->size() * m_nColNum;
-
 	for (; nfaStasStack.size() > 0; )
 	{
 		curNfaVec = nfaStasStack.top();
@@ -329,7 +302,7 @@ DFANEWSC size_t CDfaNew::FromNFA(const CNfa &nfa)
 				if(ssh.count(nextNfaVec) == 0)
 				{
 					m_pDfa->push_back(CDfaRow(m_nColNum));
-					if (m_pDfa->size() > SC_STATELIMIT)// || nTotalSize >= 2048
+					if (m_pDfa->size() > SC_STATELIMIT)
 					{
 
 						//std::cout << "SC_STATELIMIT!" << std::endl;
@@ -338,7 +311,6 @@ DFANEWSC size_t CDfaNew::FromNFA(const CNfa &nfa)
 					STATEID nextSta = (STATEID)ssh.size();
 					ssh[nextNfaVec] = nextSta;
 
-					nTotalSize += m_nColNum;
 					(*m_pDfa)[ssh[curNfaVec]][curGroup] = nextSta;
 
 					// is final state
@@ -346,10 +318,7 @@ DFANEWSC size_t CDfaNew::FromNFA(const CNfa &nfa)
 					{
 						CDfaRow &lastRow = m_pDfa->back();
 						lastRow.SetFlag(lastRow.GetFlag() | lastRow.TERMINAL);
-						m_pTermSet->push_back(TERMSET());
-						m_pTermSet->back().dfaSta = nextSta;
-						m_pTermSet->back().dfaId = m_nId;
-						nTotalSize += sizeof(TERMSET);
+						m_FinStas.PushBack(nextSta, m_nId);
 					}
 					nfaStasStack.push(nextNfaVec);
 				}
@@ -363,14 +332,6 @@ DFANEWSC size_t CDfaNew::FromNFA(const CNfa &nfa)
 
 	m_pDfa->shrink_to_fit();
 	return 0;
-}
-
-DFANEWSC void CDfaNew::printTerms()
-{
-	for(std::vector<TERMSET>::iterator iter = m_pTermSet->begin(); iter != m_pTermSet->end(); ++iter)
-	{
-		std::cout << (size_t)iter->dfaSta <<"  :  " << "dfa " << iter->dfaId << std::endl;
-	}
 }
 
 DFANEWSC size_t CDfaNew::Minimize()
@@ -536,44 +497,6 @@ DFANEWSC size_t CDfaNew::Process(BYTE *ByteStream, size_t len, CStateSet &StaSet
 	return nPos;
 }
 
-DFANEWSC void CDfaNew::GetAcceptedId(STATEID id, CVectorUnsigned &dfaIds)
-{
-	struct COMPFORSORT
-	{
-		bool operator()(const TERMSET &t1, const TERMSET &t2)
-		{
-			if (t1.dfaSta < t2.dfaSta || (t1.dfaSta == t2.dfaSta && t1.dfaId < t2.dfaId))
-			{
-				return true;
-			}
-			return false;
-		}
-	};
-
-	struct TERMSETCMP
-	{
-		bool operator()(const TERMSET &t1, const TERMSET &t2)
-		{
-			if (t1.dfaSta < t2.dfaSta)
-			{
-				return true;
-			}
-			return false;
-		}
-	};
-
-	std::sort(m_pTermSet->begin(), m_pTermSet->end(), COMPFORSORT());
-	std::vector<TERMSET>::iterator Beg = std::lower_bound(m_pTermSet->begin(),
-		m_pTermSet->end(), TERMSET(id, 0), TERMSETCMP());
-	std::vector<TERMSET>::iterator End = std::upper_bound(m_pTermSet->begin(),
-		m_pTermSet->end(), TERMSET(id, 0), TERMSETCMP());
-	for (std::vector<TERMSET>::iterator i = Beg; i != End; ++i)
-	{
-		dfaIds.PushBack(i->dfaId);
-	}
-	dfaIds.Unique();
-}
-
 DFANEWSC size_t CDfaNew::Save(BYTE *beg)
 {
 	BYTE *pOld = beg;
@@ -603,12 +526,12 @@ DFANEWSC size_t CDfaNew::Save(BYTE *beg)
 	//写DFA的开始状态编号
 	WriteNum(beg, m_nStartId, sizeof(BYTE));
 	//写DFA的终态与DFAId的对应关系
-	WriteNum(beg, m_pTermSet->size());
-	for (size_t i = 0; i < m_pTermSet->size(); ++i)
-	{
-		WriteNum(beg, (*m_pTermSet)[i].dfaSta, sizeof(BYTE));
-		WriteNum(beg, (*m_pTermSet)[i].dfaId);
-	}
+	//WriteNum(beg, m_pTermSet->size());
+	//for (size_t i = 0; i < m_pTermSet->size(); ++i)
+	//{
+	//	WriteNum(beg, (*m_pTermSet)[i].dfaSta, sizeof(BYTE));
+	//	WriteNum(beg, (*m_pTermSet)[i].dfaId);
+	//}
 
 	return beg - pOld;
 }
@@ -659,13 +582,13 @@ DFANEWSC void CDfaNew::Load(BYTE *beg, size_t len)
 	//读DFA的终态与DFAId的对应关系
 	size_t TermSetSize;
 	ReadNum(beg, TermSetSize);
-	m_pTermSet->resize(TermSetSize);
-	for (size_t i = 0; i < TermSetSize; ++i)
-	{
-		(*m_pTermSet)[i].dfaSta = 0;
-		ReadNum(beg, (*m_pTermSet)[i].dfaSta, sizeof(BYTE));
-		ReadNum(beg, (*m_pTermSet)[i].dfaId);
-	}
+	//m_pTermSet->resize(TermSetSize);
+	//for (size_t i = 0; i < TermSetSize; ++i)
+	//{
+	//	(*m_pTermSet)[i].dfaSta = 0;
+	//	ReadNum(beg, (*m_pTermSet)[i].dfaSta, sizeof(BYTE));
+	//	ReadNum(beg, (*m_pTermSet)[i].dfaId);
+	//}
 }
 
 DFANEWSC void CDfaNew::Dump(const char *pFile)
@@ -706,12 +629,6 @@ DFANEWSC void CDfaNew::Dump(const char *pFile)
 		fout << std::endl;
 	}
 	fout << std::endl;
-	fout << "dfa state" << "\t" << "dfaId" << std::endl;
-	for(size_t i = 0; i < m_pTermSet->size(); ++i)
-	{
-		fout << (size_t)(*m_pTermSet)[i].dfaSta << "\t" <<
-			(*m_pTermSet)[i].dfaId << std::endl;
-	}
 	fout.close();
 }
 
@@ -721,13 +638,13 @@ void CDfaNew::MergeReachable(STATEVEC &reachable)
 {
 	size_t nDfaSize = m_pDfa->size();
 	//标记终态的dfaId，以保证终态编号更改后，其对应的dfaId保持不变
-	std::vector<size_t> termFlag(nDfaSize, size_t(-1));
-	for (size_t i = 0; i < m_pTermSet->size(); ++i)
-	{
-		TERMSET &curSet = (*m_pTermSet)[i];
-		termFlag[curSet.dfaSta] = curSet.dfaId;
-	}
-	m_pTermSet->clear();
+	std::vector<size_t> finFlag(nDfaSize, size_t(-1));
+	//for (size_t i = 0; i < m_FinStas.Size(); ++i)
+	//{
+	//	TERMSET &curSet = (*m_pTermSet)[i];
+	//	termFlag[curSet.dfaSta] = curSet.dfaId;
+	//}
+	//m_pTermSet->clear();
 	
 	//统计可达状态的数目
 	size_t nRcbCnt = reachable.size();
@@ -754,8 +671,8 @@ void CDfaNew::MergeReachable(STATEVEC &reachable)
 		{
 			TERMSET tmpSta;
 			tmpSta.dfaSta = nNewId;
-			tmpSta.dfaId = termFlag[nOldId];
-			m_pTermSet->push_back(tmpSta);
+			//tmpSta.dfaId = termFlag[nOldId];
+			//m_pTermSet->push_back(tmpSta);
 		}
 	}
 
@@ -788,10 +705,10 @@ void CDfaNew::InitPartSet(std::vector<PARTSET> &partSet) const
 	//用于区分属于不同DFA的终态集合
 	std::set<size_t> *pTerm2Dfa = new std::set<size_t>[nStaNum];
 
-	for (STATEID i = 0; i < m_pTermSet->size(); ++i)
+	for (size_t i = 0; i < m_FinStas.Size(); ++i)
 	{
-		TERMSET &ts = (*m_pTermSet)[i];
-		pTerm2Dfa[ts.dfaSta].insert(ts.dfaId);
+		STATEID nFinStaId = m_FinStas[i];
+		pTerm2Dfa[nFinStaId] = m_FinStas.GetDfaIds(nFinStaId);
 	}
 
 	//区别终态集合和非终态集合，map的first为空，则表示对应的PARTSET为非终态集合，反之，为终态集合
@@ -1008,12 +925,14 @@ void CDfaNew::MergeNonDisStates(std::vector<PARTSET> &partSet)
 	STATEID nCol = (STATEID)GetGroupCount();
 
 	//标记终态的dfaId，以保证终态编号更改后，其对应的dfaId保持不变
-	std::vector<size_t> *termFlag = new std::vector<size_t>[m_pDfa->size()];
-	for (size_t i = 0; i < m_pTermSet->size(); ++i)
+	std::set<size_t> *finFlag = new std::set<size_t>[m_pDfa->size()];
+	for (size_t i = 0; i < m_FinStas.Size(); ++i)
 	{
-		termFlag[(*m_pTermSet)[i].dfaSta].push_back((*m_pTermSet)[i].dfaId);
+		STATEID nFinStaId = m_FinStas[i];
+		finFlag[nFinStaId] = m_FinStas.GetDfaIds(nFinStaId);
 	}
-	m_pTermSet->clear();
+
+	m_FinStas.Clear();
 
 	//定义一个同CDfaNew中成员变量m_pDfa类型相同的变量，用于存储合并后的DFA跳转表
 	std::vector<CDfaRow> *pNewDfa = new std::vector<CDfaRow>(
@@ -1039,20 +958,17 @@ void CDfaNew::MergeNonDisStates(std::vector<PARTSET> &partSet)
 			//存入新的终态编号
 			if (curRow.GetFlag() & CDfaRow::TERMINAL)
 			{
-				TERMSET tmpSta;
-				tmpSta.dfaSta = nSetIdx;
-				for (std::vector<size_t>::iterator i = termFlag[*iSta].begin(); i != termFlag[*iSta].end(); ++i)
+				for (std::set<size_t>::iterator i = finFlag[*iSta].begin();
+					i != finFlag[*iSta].end(); ++i)
 				{
-					tmpSta.dfaId = *i;
-					m_pTermSet->push_back(tmpSta);
+					m_FinStas.PushBack(nSetIdx, *i);
 				}
 			}
 		}
 		++nSetIdx;
 	}
 
-	delete []termFlag;
-	UniqueTermSet();
+	delete []finFlag;
 
 	//set new DFA and modify new number
 	nSetIdx = 0;
@@ -1079,5 +995,258 @@ void CDfaNew::MergeNonDisStates(std::vector<PARTSET> &partSet)
 	//替换m_pDfa
 	swap(m_pDfa, pNewDfa);
 	delete pNewDfa;
+}
+
+CFinalStates& CDfaNew::GetFinalState()
+{
+	return m_FinStas;
+}
+
+const CFinalStates& CDfaNew::GetFinalState() const
+{
+	return m_FinStas;
+}
+
+
+/*
+**  NAME
+**    MergeMultipleDfas::
+*/
+/**
+**  This function merges mutiple dfas into one dfa. And mark the terminal states to 
+**	distinguish which dfas the terminal state belongs to.
+**
+**	In order to speed up, we need one support function:DfaColGroup to group
+**	the lastDfa's columns.
+**
+**  @param dfas      a vector contains mutiple CDfaNew
+**  @param lastDfa   the merged dfa
+**
+**  @return bool
+**
+**  @retval true function successful
+**  @retval fasle fatal error
+*/
+
+DFANEWSC void PrintDfaToGv(CDfaNew &newdfa, const char* fileName)
+{
+	std::ofstream fout(fileName);
+	fout << "digraph G {" << std::endl;
+	fout << "S -> " << (size_t)newdfa.GetStartId() << std::endl;
+
+	for(STATEID i = 0; i != newdfa.Size(); ++i)
+	{
+		std::map<STATEID, size_t> rowStateCnt;
+		for(BYTE j = 0; j != newdfa.GetGroupCount(); ++j)
+		{
+			rowStateCnt[newdfa[i][j]]++;
+		}
+		STATEID maxId = 0;
+		for (std::map<STATEID, size_t>::iterator j = rowStateCnt.begin(); j != rowStateCnt.end(); ++j)
+		{
+			if (j->second > rowStateCnt[maxId])
+			{
+				maxId = j->first;
+			}
+		}
+		for(BYTE j = 0; j != newdfa.GetGroupCount(); ++j)
+		{
+			if (newdfa[i][j] != maxId)
+			{
+				fout << i << " -> " << (size_t)newdfa[i][j] << " [label=\"" << j << "\"];" << std::endl;
+			}
+			else if (maxId != (STATEID)-1)
+			{
+				fout << i << " -> "  << (size_t)maxId << " [label=\"" << j << "\"];" << std::endl;
+			}
+		}
+	}
+	for (STATEID i = 0; i < newdfa.Size(); ++i)
+	{
+		if (newdfa[i].GetFlag() & CDfaRow::TERMINAL)
+		{
+			fout << (size_t)i << " [peripheries=2];" << std::endl;
+		}
+	}
+	fout << "}" << std::endl;
+	fout.close();
+}
+
+DFANEWSC bool MergeMultipleDfas(std::vector<CDfaNew> &dfas, CDfaNew &lastDfa)
+{
+	size_t dfaId = lastDfa.GetId();
+	lastDfa.Clear();
+	lastDfa.SetId(dfaId);
+#undef max
+
+	size_t dfasSize = dfas.size();
+	STATEID nTermSta = 1;//nTermSta: terminal flag. 1: terminal, -1: non-terminal
+
+	//group the lastDfa's columns
+	BYTE groups[DFACOLSIZE];
+	DfaColGroup(dfas, groups);
+	lastDfa.Init(groups);
+
+	size_t colCnt = lastDfa.GetGroupCount();
+
+	typedef std::unordered_map<std::vector<STATEID>, STATEID, TODFA_HASH> STATESETHASH;
+	STATESETHASH statehash;
+
+	size_t finFlag = 0;//terminal state flag, 1: terminal state, 0: normal state
+	std::stack<std::vector<STATEID>> statesStack;
+
+	/*
+	**	use a size of (dfas.size() + 2) vector to represent a state of the merged dfa.
+	**	element 0 represents the state of dfas[0], ..., element n represents the state of dfas[n].
+	**	element n + 1 and element n + 2 are flags which show that whether this state is a start state or terminal state.
+	*/
+	std::vector<STATEID> startVec(dfasSize + 2);
+	
+	lastDfa.Reserve(CHARSETSIZE);
+	lastDfa.Resize(lastDfa.Size() + 1, colCnt);
+
+	for(size_t i = 0; i < dfasSize; ++i)
+	{
+		STATEID nSta = dfas[i].GetStartId();
+		if((dfas[i][nSta].GetFlag() & CDfaRow::TERMINAL) != 0)
+		{
+			//this is a terminal state
+			finFlag = 1;
+			AddTermIntoDFA(nSta, dfas[i], 0, lastDfa);
+		}
+		startVec[i] = nSta;
+	}
+	startVec[dfasSize] = 0;//this is start state
+	if(finFlag)
+	{
+		startVec[dfasSize + 1] = nTermSta;
+		lastDfa[0].SetFlag(lastDfa[0].GetFlag() | CDfaRow::START | CDfaRow::TERMINAL);
+	}
+	else
+	{
+		startVec[dfasSize + 1] = (STATEID)-1;
+		lastDfa[0].SetFlag(lastDfa[0].GetFlag() | CDfaRow::START);
+	}
+	
+	statehash[startVec] = 0;
+
+	statesStack.push(startVec);
+
+	std::vector<STATEID> NextVec;
+	NextVec.resize(dfasSize + 2);
+	BYTE computFlag[CHARSETSIZE];
+
+	while(!statesStack.empty())
+	{
+		std::vector<STATEID> curVec = statesStack.top();//current state, size is:dfasSize + 2
+		statesStack.pop();
+		
+		STATESETHASH::iterator ir = statehash.find(curVec);
+		if (ir == statehash.end())
+		{
+			std::cout << "hash Error!" << std::endl;
+			return false;
+		}
+		STATEID curStaNum = ir->second;
+		ZeroMemory(computFlag, sizeof(computFlag));
+
+		//get next states
+		for(BYTE curChar = 0; curChar < DFACOLSIZE; ++curChar)
+		{
+			finFlag = 0;
+			ZeroMemory(NextVec.data(), NextVec.size() * sizeof(size_t));
+			BYTE lastDfaGroup = groups[curChar];
+			if(computFlag[lastDfaGroup] == 1)
+			{
+				continue;
+			}
+			computFlag[lastDfaGroup] = 1;
+
+			size_t flag = 0;//flag = 0: empty next state
+			for(size_t i = 0; i < dfasSize; ++i)
+			{
+				STATEID sta = curVec[i];
+				
+				if(sta != (STATEID)-1)
+				{
+					BYTE curgroup = dfas[i].Char2Group(curChar);
+					STATEID nextId = dfas[i][sta][curgroup];//the next state the ith dfa transforms from state curVec[i] through curChar to
+					if(nextId != (STATEID)-1)
+					{
+						flag = 1;
+						if((dfas[i][nextId].GetFlag() & CDfaRow::TERMINAL) != 0)
+						{
+							finFlag = 1;
+						}
+					}
+					NextVec[i] = nextId; 
+				}
+				else
+				{
+					NextVec[i] = (STATEID)-1;
+				}
+			}
+			NextVec[dfasSize] = (STATEID)-1;
+			if(finFlag)
+			{
+				NextVec[dfasSize + 1] = nTermSta;
+			}
+			else
+			{
+				NextVec[dfasSize + 1] = (STATEID)-1;
+			}
+
+			if(flag)
+			{
+				STATESETHASH::iterator nextIt = statehash.find(NextVec);
+				if(nextIt == statehash.end())
+				{
+#undef max 
+					lastDfa.Resize(lastDfa.Size() + 1, colCnt);
+					if(lastDfa.Size() > SC_STATELIMIT)
+					{
+						//std::cerr << "SC_STATELIMIT!" << std::endl;
+						return false;
+					}
+					STATEID nextSta = (STATEID)statehash.size();
+					statehash[NextVec] = nextSta;
+					lastDfa[curStaNum][lastDfaGroup] = nextSta;
+
+					if(finFlag)
+					{
+						for(STATEID k = 0; k < dfasSize; ++k)
+						{
+							if(NextVec[k] != (STATEID)-1)
+							{
+								if((dfas[k][NextVec[k]].GetFlag() & CDfaRow::TERMINAL) != 0)
+								{
+									AddTermIntoDFA(NextVec[k], dfas[k], nextSta, lastDfa);
+								}
+							}
+						}
+						lastDfa[nextSta].SetFlag(lastDfa[nextSta].GetFlag() | CDfaRow::TERMINAL);
+					}
+				
+					statesStack.push(NextVec);
+				}
+				else
+				{
+					lastDfa[curStaNum][lastDfaGroup] = nextIt->second;
+				}
+			}
+			else
+			{
+				lastDfa[curStaNum][lastDfaGroup] = (STATEID)-1;
+			}
+		}
+	}
+	lastDfa.Minimize();
+	if(lastDfa.Size() > DFA_SIZE_LIMIT)
+	{
+		//std::cerr << "DFA_SIZE_LIMIT!" << std::endl;
+		return false;
+	}
+
+	return true;
 }
 

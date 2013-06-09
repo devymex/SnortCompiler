@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "dfanew.h"
 #include "dfaalgo.h"
 
 typedef std::vector<size_t> STATESET;
@@ -251,4 +252,84 @@ void CalcAbleTo(STATEVEC *pRevTbl, size_t nGrpNum, size_t nStaNum, PARTSET &ps)
 			}
 		}
 	}
+}
+/*
+**	This function groups the merged dfa's columns on the ground of
+**	the column groups of dfas to be merged.
+**
+**	We use a hash function to group.
+**	
+**	First of all, merge the dfas's column groups into a table of n*256, n means the size of dfas
+**	Then hash the table columns to get the merged dfa's colums group.
+*/
+void DfaColGroup(std::vector<CDfaNew> &dfas, BYTE* groups)
+{
+	struct GROUPKEYHASH
+	{
+		__forceinline size_t operator ()(const GROUPKEY &column)
+		{
+			return column.hash;
+		}
+	};
+
+	const size_t _FNV_offset_basis = 2166136261U;
+	const size_t _FNV_prime = 16777619U;
+
+	GROUPKEY colum[CHARSETSIZE];
+	typedef std::unordered_map<GROUPKEY, BYTE, GROUPKEYHASH> GROUPMAP;;
+	GROUPMAP groupMap;
+
+	for(size_t c = 0; c < DFACOLSIZE; ++c)
+	{
+		colum[c].key.clear();
+		colum[c].hash = _FNV_offset_basis;
+	}
+
+	for(size_t i = 0; i < dfas.size(); ++i)
+	{
+		for(size_t c = 0; c < DFACOLSIZE; ++c)
+		{
+			size_t group = dfas[i].Char2Group(BYTE(c));
+			colum[c].key.push_back(group);
+			colum[c].hash ^= group;
+			colum[c].hash *= _FNV_prime;
+		}
+	}
+
+	for(size_t c = 0; c < DFACOLSIZE; ++c)
+	{
+		GROUPKEY &curCol = colum[c];
+		GROUPMAP::iterator it = groupMap.find(curCol);
+		if(it == groupMap.end())
+		{
+			size_t curId = groupMap.size();
+			groups[c] = BYTE(curId);
+			groupMap[curCol] = BYTE(curId);
+		}
+		else
+		{
+			groups[c] = it->second;
+		}
+	}
+}
+
+/*
+**	this function marks the lastDfa's terminal states.
+**	
+**  @param otherSta	   the state to be found in other
+**  @param other       one dfa to be merged
+**	@param lastSta     the state to be marked
+**	@param lastDfa     the merged dfa
+**
+**  @return a integer
+**
+**  @retval 0 function successful
+**  @retval -1 fatal error
+*/
+void AddTermIntoDFA(STATEID otherSta, const CDfaNew &other,
+					STATEID lastSta, CDfaNew &lastDfa)
+{
+	const CFinalStates &orgFinStas = other.GetFinalState();
+	CFinalStates &newFinStas = lastDfa.GetFinalState();
+	newFinStas.GetDfaIds(lastSta) = orgFinStas.GetDfaIds(otherSta);
 }

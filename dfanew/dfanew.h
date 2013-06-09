@@ -3,6 +3,8 @@
 #include <windows.h>
 #include <vector>
 #include <map>
+#include <set>
+#include <unordered_map>
 #include "../common/common.h"
 
 #ifndef DFANEW_H_
@@ -17,6 +19,29 @@ struct DFANEWSC TERMSET
 		: dfaSta(dfaStateId), dfaId(nDfaId) {}
 	STATEID dfaSta;
 	size_t dfaId;
+};
+
+class DFANEWSC CFinalStates
+{
+	typedef std::unordered_map<STATEID, std::set<size_t>> FINSTAMAP;
+	typedef FINSTAMAP::iterator FINSTAMAP_ITER;
+public:
+	CFinalStates();
+	virtual ~CFinalStates();
+	CFinalStates(const CFinalStates &other);
+	CFinalStates& operator=(const CFinalStates &other);
+
+	STATEID operator[](size_t nStateId) const;
+
+	size_t Size() const;
+	void Clear();
+	void PushBack(STATEID nStaId, size_t nDfaId);
+	std::set<size_t>& GetDfaIds(STATEID nStaId);
+	const std::set<size_t>& GetDfaIds(STATEID nStaId) const;
+
+protected:
+	std::vector<STATEID> *m_pStates;
+	FINSTAMAP *m_pDfaIds;
 };
 
 /*
@@ -49,6 +74,7 @@ protected:
 	STATEVEC *m_pDest;
 };
 
+
 class DFANEWSC CDfaNew
 {
 public:
@@ -73,12 +99,8 @@ public:
 	WORD GetGroupCount() const;
 	const BYTE GetGroup(STATEID charNum) const;
 
-	size_t GetTermCnt() const;
-	void PushBackTermSet(TERMSET &term);
-	void UniqueTermSet();
-	TERMSET& BackTermSet();
-	TERMSET& GetTerm(size_t nIdx) const;//取出第nIdx个TERMSET
-	void GetAcceptedId(STATEID id, CVectorUnsigned &dfaIds);
+	CFinalStates& GetFinalState();
+	const CFinalStates& GetFinalState() const;
 
 	size_t FromNFA(const CNfa &nfa);
 	size_t Minimize();
@@ -91,7 +113,6 @@ public:
 	size_t Save(BYTE *beg);
 	void Load(BYTE *beg, size_t len);
 
-	void printTerms();
 	void Dump(const char *pFile);
 
 protected:
@@ -99,9 +120,9 @@ protected:
 	WORD m_nColNum;
 	STATEID m_nStartId;
 	BYTE m_pGroup[DFACOLSIZE];
+
 	std::vector<class CDfaRow> *m_pDfa;
-	//pair.first 用来存放dfa的某一终态, pair.second 用来存放该终态对应哪一个dfaid
-	std::vector<TERMSET> *m_pTermSet;
+	CFinalStates m_FinStas;
 
 	void InitPartSet(std::vector<struct PARTSET> &partSet) const;
 	void RemoveUnreachable(const STATEVEC *Tab, const STATELIST &begs, 
@@ -132,6 +153,8 @@ struct NSTATESET_HASH
 		return nr;
 	}
 };
+
+DFANEWSC bool MergeMultipleDfas(std::vector<CDfaNew> &dfas, CDfaNew &lastDfa);
 
 DFANEWSC void PrintDfaToGv(CDfaNew &newdfa, const char* fileName);
 

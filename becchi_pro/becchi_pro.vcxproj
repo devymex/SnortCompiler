@@ -45,11 +45,15 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <BrowseInformation>true</BrowseInformation>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>$(SolutionDir)$(Configuration)\rule2nfa.lib;$(SolutionDir)$(Configuration)\common.lib;$(SolutionDir)$(Configuration)\dfanew.lib;$(SolutionDir)$(Configuration)\compilernew.lib;$(SolutionDir)$(Configuration)\pcre2nfa.lib;$(SolutionDir)$(Configuration)\MergeDfanew.lib</AdditionalDependencies>
     </Link>
+    <Bscmake>
+      <PreserveSbr>true</PreserveSbr>
+    </Bscmake>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>

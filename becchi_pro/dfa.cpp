@@ -3430,10 +3430,7 @@ void DFA::Dfa2CDfaNew(CDfaNew &curDFA)
 			if (!accepted_rules[s]->empty())
 			{
 				linked_set *l = accepted_rules[s];
-				TERMSET tmpSta;
-				tmpSta.dfaSta = s;
-				tmpSta.dfaId = l->value();
-				curDFA.PushBackTermSet(tmpSta);
+				curDFA.GetFinalState().PushBack(s, l->value());
 				while (l != NULL)
 				{ 
 					l = l->succ();
