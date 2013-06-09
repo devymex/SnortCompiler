@@ -278,6 +278,7 @@ DFANEWSC void CDfaNew::Clear()
 	m_nStartId = STATEID(0);
 	memset(m_pGroup, 0xFF, DFACOLSIZE);
 	m_pDfa->clear();
+	m_FinStas.Clear();
 }
 
 DFANEWSC size_t CDfaNew::FromNFA(const CNfa &nfa)
