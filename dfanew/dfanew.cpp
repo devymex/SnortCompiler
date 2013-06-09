@@ -64,6 +64,11 @@ DFANEWSC void CFinalStates::PushBack(STATEID nStaId, size_t nDfaId)
 	}
 	else
 	{
+		if (iter->second.count(nDfaId))
+		{
+			std::cout << "error" << std::endl;
+			system("pause");
+		}
 		iter->second.insert(nDfaId);
 	}
 }
@@ -1126,11 +1131,11 @@ DFANEWSC void PrintDfaToGv(CDfaNew &newdfa, const char* fileName)
 		{
 			if (newdfa[i][j] != maxId)
 			{
-				fout << i << " -> " << (size_t)newdfa[i][j] << " [label=\"" << j << "\"];" << std::endl;
+				fout << i << " -> " << (size_t)newdfa[i][j] << " [label=\"" << (size_t)j << "\"];" << std::endl;
 			}
 			else if (maxId != (STATEID)-1)
 			{
-				fout << i << " -> "  << (size_t)maxId << " [label=\"" << j << "\"];" << std::endl;
+				fout << i << " -> "  << (size_t)maxId << " [label=\"" << (size_t)j << "\"];" << std::endl;
 			}
 		}
 	}
@@ -1227,7 +1232,7 @@ DFANEWSC bool MergeMultipleDfas(std::vector<CDfaNew> &dfas, CDfaNew &lastDfa)
 		for(size_t curChar = 0; curChar < DFACOLSIZE; ++curChar)
 		{
 			finFlag = 0;
-			ZeroMemory(NextVec.data(), NextVec.size() * sizeof(size_t));
+			ZeroMemory(NextVec.data(), NextVec.size() * sizeof(NextVec[0]));
 			BYTE lastDfaGroup = groups[curChar];
 			if(computFlag[lastDfaGroup] == 1)
 			{

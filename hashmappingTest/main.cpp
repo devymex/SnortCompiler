@@ -36,18 +36,54 @@ void main()
 
 	CTimer ctime;
 	CResNew result;
-	compilenew(_T("..\\..\\input\\testrules.rule"), result);
+	compilenew(_T("..\\..\\input\\allrules.rule"), result);
 	result.WriteToFile(_T("..\\..\\output\\result.cdt"));
 	//result.ReadFromFile(_T("..\\..\\output\\result.cdt"));
-	//CGROUPRes groupRes;
-	//grouping(result, groupRes);
-	//groupRes.WriteToFile(_T("..\\..\\output\\GroupResut.cdt"));
-	//HASHRES HashResMap;
-	//HashMapping(groupRes, HashResMap);
-	//groupRes.WriteToFile(_T("..\\..\\output\\FinalResut.cdt"));
-	//std::cout << "总时间： " << ctime.Reset() << std::endl;
-	//std::cout << groupRes.GetGroups().Size() << std::endl;
-	//std::cout << HashResMap.size() << std::endl;
+	CGROUPRes groupRes;
+	grouping(result, groupRes);
+	groupRes.WriteToFile(_T("..\\..\\output\\GroupResut.cdt"));
+	HASHRES HashResMap;
+	HashMapping(groupRes, HashResMap);
+	groupRes.WriteToFile(_T("..\\..\\output\\FinalResut.cdt"));
+	std::cout << "总时间： " << ctime.Reset() << std::endl;
+	std::cout << groupRes.GetGroups().Size() << std::endl;
+	std::cout << HashResMap.size() << std::endl;
+
+	//CGROUPRes oldres;
+	//CGROUPRes newres;
+	//oldres.ReadFromFile(_T("..\\..\\output\\GroupResut1.cdt"));
+	//newres.ReadFromFile(_T("..\\..\\output\\GroupResut.cdt"));
+	//for (size_t i = 0; i < oldres.GetDfaTable().Size(); ++i)
+	//{
+	//	if (oldres.GetDfaTable()[i].GetFinalState().GetAllDfaIdCount() != newres.GetDfaTable()[i].GetFinalState().GetAllDfaIdCount())
+	//	{
+	//		CDfaNew olddfa = oldres.GetDfaTable()[i];
+	//		CDfaNew newdfa = newres.GetDfaTable()[i];
+	//		for (size_t j = 0; j < oldres.GetDfaTable()[i].GetFinalState().GetAllDfaIdCount(); ++j)
+	//		{
+	//			STATEID nStaId = oldres.GetDfaTable()[i].GetFinalState()[j];
+	//			CVectorUnsigned ids;
+	//			oldres.GetDfaTable()[i].GetFinalState().GetDfaIds(nStaId, ids);
+	//			for (size_t k = 0; k < ids.Size(); ++k)
+	//			{
+	//				std::cout << (size_t)nStaId << " " << ids[k] << std::endl;
+	//			}
+	//		}
+	//		std::cout << std::endl;
+	//		for (size_t j = 0; j < newres.GetDfaTable()[i].GetFinalState().GetAllDfaIdCount(); ++j)
+	//		{
+	//			STATEID nStaId = newres.GetDfaTable()[i].GetFinalState()[j];
+	//			CVectorUnsigned ids;
+	//			newres.GetDfaTable()[i].GetFinalState().GetDfaIds(nStaId, ids);
+	//			for (size_t k = 0; k < ids.Size(); ++k)
+	//			{
+	//				std::cout << (size_t)nStaId << " " << ids[k] << std::endl;
+	//			}
+	//		}
+	//		std::cout << "error" << std::endl;
+	//		break;
+	//	}
+	//}
 
 	system("pause");
 }
