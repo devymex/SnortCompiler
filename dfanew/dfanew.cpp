@@ -63,10 +63,6 @@ DFANEWSC void CFinalStates::PushBack(STATEID nStaId, size_t nDfaId)
 	}
 	else
 	{
-		if (iter->second.count(nDfaId) != 0)
-		{
-			system("pause");
-		}
 		iter->second.insert(nDfaId);
 	}
 }
