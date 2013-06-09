@@ -43,6 +43,16 @@ DFANEWSC void CFinalStates::Clear()
 	m_pStates->clear();
 }
 
+DFANEWSC void CFinalStates::PushBack(STATEID nStaId)
+{
+	FINSTAMAP_ITER iter = m_pDfaIds->find(nStaId);
+	if (iter == m_pDfaIds->end())
+	{
+		(*m_pDfaIds)[nStaId];
+		(*m_pStates).push_back(nStaId);
+	}
+}
+
 DFANEWSC void CFinalStates::PushBack(STATEID nStaId, size_t nDfaId)
 {
 	FINSTAMAP_ITER iter = m_pDfaIds->find(nStaId);
@@ -53,6 +63,10 @@ DFANEWSC void CFinalStates::PushBack(STATEID nStaId, size_t nDfaId)
 	}
 	else
 	{
+		if (iter->second.count(nDfaId) != 0)
+		{
+			system("pause");
+		}
 		iter->second.insert(nDfaId);
 	}
 }
@@ -278,6 +292,7 @@ DFANEWSC void CDfaNew::Clear()
 	m_nStartId = STATEID(0);
 	memset(m_pGroup, 0xFF, DFACOLSIZE);
 	m_pDfa->clear();
+	m_FinStas.Clear();
 }
 
 DFANEWSC size_t CDfaNew::FromNFA(const CNfa &nfa)
