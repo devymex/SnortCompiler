@@ -63,9 +63,13 @@ DFANEWSC void CFinalStates::PushBack(STATEID nStaId, size_t nDfaId)
 	}
 	else
 	{
-		if (iter->second.count(nDfaId) != 0)
+		if (nDfaId > 10000)
 		{
 			system("pause");
+		}
+		if (iter->second.count(nDfaId) != 0)
+		{
+			//system("pause");
 		}
 		iter->second.insert(nDfaId);
 	}
@@ -82,6 +86,10 @@ DFANEWSC void CFinalStates::GetDfaIds(STATEID nStaId, CVectorUnsigned &ids) cons
 	for (std::set<size_t>::const_iterator i = curSet.begin();
 		i != curSet.end(); ++i)
 	{
+		if (*i > 10000)
+		{
+			system("pause");
+		}
 		ids.PushBack(*i);
 	}
 }
