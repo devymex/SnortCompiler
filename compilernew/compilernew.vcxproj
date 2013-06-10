@@ -13,6 +13,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{F6606B01-EE46-44B3-B199-A8A58B004BD9}</ProjectGuid>
     <RootNamespace>compilernew</RootNamespace>
+    <ProjectName>compiler</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -38,7 +39,16 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
+    <LibraryPath>$(SolutionDir)bin\$(Configuration)\;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)include\;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
+    <LibraryPath>$(SolutionDir)bin\$(Configuration)\;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)include\;$(IncludePath)</IncludePath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
@@ -48,8 +58,8 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ModuleDefinitionFile>compilernew.def</ModuleDefinitionFile>
-      <AdditionalDependencies>$(SolutionDir)$(Configuration)\common.lib;$(SolutionDir)$(Configuration)\pcre2nfa.lib;$(SolutionDir)$(Configuration)\rule2nfa.lib;$(SolutionDir)$(Configuration)\dfanew.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ModuleDefinitionFile>compiler.def</ModuleDefinitionFile>
+      <AdditionalDependencies>common.lib;pcre2nfa.lib;automaton.lib</AdditionalDependencies>
     </Link>
     <Bscmake>
       <PreserveSbr>true</PreserveSbr>
@@ -63,31 +73,48 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <BrowseInformation>true</BrowseInformation>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <ModuleDefinitionFile>compilernew.def</ModuleDefinitionFile>
-      <AdditionalDependencies>$(SolutionDir)$(Configuration)\common.lib;$(SolutionDir)$(Configuration)\pcre2nfa.lib;$(SolutionDir)$(Configuration)\rule2nfa.lib;$(SolutionDir)$(Configuration)\dfanew.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ModuleDefinitionFile>compiler.def</ModuleDefinitionFile>
+      <AdditionalDependencies>common.lib;pcre2nfa.lib;automaton.lib</AdditionalDependencies>
     </Link>
     <Bscmake>
       <PreserveSbr>true</PreserveSbr>
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="compilernew.h" />
+    <ClInclude Include="..\include\hwprj\compiler.h" />
+    <ClInclude Include="..\include\hwprj\dfaarray.h" />
+    <ClInclude Include="..\include\hwprj\compres.h" />
+    <ClInclude Include="..\include\hwprj\regchain.h" />
+    <ClInclude Include="..\include\hwprj\regrule.h" />
+    <ClInclude Include="..\include\hwprj\rule2nfa.h" />
+    <ClInclude Include="..\include\hwprj\siddfaids.h" />
+    <ClInclude Include="..\include\hwprj\snortrule.h" />
+    <ClInclude Include="ruleoption.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="compilernew.cpp" />
+    <ClCompile Include="compiler.cpp" />
+    <ClCompile Include="dfaarray.cpp" />
+    <ClCompile Include="compres.cpp" />
+    <ClCompile Include="regchain.cpp" />
+    <ClCompile Include="regrule.cpp" />
+    <ClCompile Include="rule2nfa.cpp" />
+    <ClCompile Include="ruleoption.cpp" />
+    <ClCompile Include="siddfaids.cpp" />
+    <ClCompile Include="snortrule.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="compilernew.def" />
+    <None Include="compiler.def" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
