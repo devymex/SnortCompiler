@@ -5,4 +5,7 @@
 #include <iostream>
 #include <iterator>
 #include <fstream>
-#define COMMON_H_
+
+#define UNSARYHDR_DS
+#define SIGHDR_DS
+#define DLLSTRHDR_DS
