@@ -8,4 +8,4 @@
 #include <string>
 #include <algorithm>
 
-#define HASHMAPPING_H_
+#define HASHMAPHDR_DS

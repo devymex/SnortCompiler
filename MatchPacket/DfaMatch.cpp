@@ -1,25 +1,25 @@
 ﻿#include "stdafx.h"
-#include "../compilernew/compilernew.h"
+#include <hwprj\compiler.h>
+#include <hwprj\grouping.h>
 #include "DfaMatch.h"
-#include "../grouping/grouping.h"
 
-static size_t dpktnum = 0;
+static ULONG dpktnum = 0;
 
-void MatchOnedfa(const u_char * &data, size_t len, CDfaNew &dfa,
-				 std::vector<size_t> &matchedDids)
+void MatchOnedfa(const u_char * &data, ULONG len, CDfa &dfa,
+				 std::vector<ULONG> &matchedDids)
 {
 	if(dpktnum == 77)
 	{
-		std::unordered_map<size_t, std::set<size_t>> dfaids;
+		std::unordered_map<ULONG, std::set<ULONG>> dfaids;
 		const CFinalStates &finStas = dfa.GetFinalState();
-		for (size_t i = 0; i < finStas.Size(); ++i)
+		for (ULONG i = 0; i < finStas.Size(); ++i)
 		{
 			STATEID nStaId = finStas[i];
 			dfaids[nStaId] = finStas._GetDfaIds(nStaId);
 		}
 
 		STATEID curSta = dfa.GetStartId();
-		for (size_t edgeiter = 0; edgeiter != len; ++edgeiter)
+		for (ULONG edgeiter = 0; edgeiter != len; ++edgeiter)
 		{
 			BYTE group = dfa.GetGroup(data[edgeiter]);
 
@@ -59,17 +59,17 @@ void MchDfaHdler(u_char *param, const struct pcap_pkthdr *header, const u_char *
 	pParam->pFunc(ih, pkt_data, pParam->pUser);
 }
 
-void GetMchDfas(const u_char *data, size_t len, HASHRES &hashtable, std::vector<size_t> &matchdfas)
+void GetMchDfas(const u_char *data, ULONG len, HASHRES &hashtable, std::vector<ULONG> &matchdfas)
 {
 	if (len > 3)
 	{
 		SIGNATURE sig;
 		u_char csig[4];
-		size_t flag = 0;
+		ULONG flag = 0;
 
 		for (const u_char* iter = data; iter != &data[len - 4]; ++iter)
 		{
-			for (size_t i = 0; i < 4; ++i)
+			for (ULONG i = 0; i < 4; ++i)
 			{
 				csig[i] = tolower(*(iter + i));
 			}
@@ -77,7 +77,7 @@ void GetMchDfas(const u_char *data, size_t len, HASHRES &hashtable, std::vector<
 
 			if(sig == 0)
 			{
-				size_t hashsig = hash(sig);
+				ULONG hashsig = hash(sig);
 				if (hashtable.count(hashsig))
 				{
 					for (std::vector<HASHNODE>::iterator iter = hashtable[hashsig].begin(); iter != hashtable[hashsig].end(); ++iter)
@@ -94,7 +94,7 @@ void GetMchDfas(const u_char *data, size_t len, HASHRES &hashtable, std::vector<
 
 			if(flag == 0)
 			{
-				size_t hashsig = hash(sig);
+				ULONG hashsig = hash(sig);
 				if (hashtable.count(hashsig))
 				{
 					for (std::vector<HASHNODE>::iterator iter = hashtable[hashsig].begin(); iter != hashtable[hashsig].end(); ++iter)
@@ -113,15 +113,15 @@ void GetMchDfas(const u_char *data, size_t len, HASHRES &hashtable, std::vector<
 	}
 }
 
-MATCHPKT void DfaMatchPkt(const u_char *data, size_t len, DFAMCH dfamch)
+MATCHPKT void DfaMatchPkt(const u_char *data, ULONG len, DFAMCH dfamch)
 {
 	std::ofstream matchresult(dfamch.resultPath, std::ofstream::app);
 	matchresult << dpktnum << ":  ";
-	std::vector<size_t> matchdfas;
-	std::vector<size_t> matcheddfaids;
+	std::vector<ULONG> matchdfas;
+	std::vector<ULONG> matcheddfaids;
 	GetMchDfas(data, len, dfamch.hashtable, matchdfas);
 
-	for (std::vector<size_t>::iterator iter = matchdfas.begin(); iter != matchdfas.end(); ++iter)
+	for (std::vector<ULONG>::iterator iter = matchdfas.begin(); iter != matchdfas.end(); ++iter)
 	{
 		MatchOnedfa(data, len, dfamch.mergedDfas.GetDfaTable()[*iter], matcheddfaids);
 	}
@@ -132,13 +132,13 @@ MATCHPKT void DfaMatchPkt(const u_char *data, size_t len, DFAMCH dfamch)
 
 	if (!matcheddfaids.empty())
 	{
-		std::unordered_map<size_t, size_t> &dId_sId = dfamch.dIdSId.dId_sId;
-		std::unordered_map<size_t, CVectorUnsigned> &sId_dIdVec = dfamch.dIdSId.sId_dIdVec;
+		std::unordered_map<ULONG, ULONG> &dId_sId = dfamch.dIdSId.dId_sId;
+		std::unordered_map<ULONG, CDllArray> &sId_dIdVec = dfamch.dIdSId.sId_dIdVec;
 
-		std::unordered_map<size_t, CVectorUnsigned> resultmap;
-		for(std::vector<size_t>::iterator iter = matcheddfaids.begin(); iter != matcheddfaids.end(); ++iter)
+		std::unordered_map<ULONG, CDllArray> resultmap;
+		for(std::vector<ULONG>::iterator iter = matcheddfaids.begin(); iter != matcheddfaids.end(); ++iter)
 		{
-			std::size_t &csid = dId_sId[*iter];
+			ULONG &csid = dId_sId[*iter];
 			if (resultmap.count(csid) == 0)
 			{
 				resultmap[csid].Reserve(20);
@@ -150,7 +150,7 @@ MATCHPKT void DfaMatchPkt(const u_char *data, size_t len, DFAMCH dfamch)
 			}
 		}
 
-		for(std::unordered_map<size_t, CVectorUnsigned>::iterator iter = resultmap.begin(); iter != resultmap.end(); ++iter)
+		for(std::unordered_map<ULONG, CDllArray>::iterator iter = resultmap.begin(); iter != resultmap.end(); ++iter)
 		{
 			if(iter->second.Size() == sId_dIdVec[iter->first].Size())
 			{
@@ -196,7 +196,7 @@ void CALLBACK DPktParam(const ip_header *ih, const BYTE *data, void* user)
 			{
 				std::cout <<std::endl;
 			}
-			size_t tcpdatalen = _tlen - _ihl - tcpHdrLen;
+			ULONG tcpdatalen = _tlen - _ihl - tcpHdrLen;
 			if(tcpdatalen > 0)
 			{
 				DfaMatchPkt(data, tcpdatalen, dfamch);
@@ -214,7 +214,7 @@ void CALLBACK DPktParam(const ip_header *ih, const BYTE *data, void* user)
 			{
 				std::cout <<std::endl;
 			}
-			size_t udpdatalen = _tlen - _ihl - UDPHDRLEN;
+			ULONG udpdatalen = _tlen - _ihl - UDPHDRLEN;
 			if(udpdatalen > 0)
 			{
 				DfaMatchPkt(data, udpdatalen, dfamch);
@@ -289,9 +289,9 @@ MATCHPKT void DHandleAllFile(const std::string &path, void* user)
 
 MATCHPKT void DfaidSidMap(CGROUPRes &mergedDfas, DFASIDMAPPING &didSid)
 {
-	CSidDfaIdsNew &sd = mergedDfas.GetSidDfaIds();
+	CSidDfaIds &sd = mergedDfas.GetSidDfaIds();
 
-	for(size_t i = 0; i < sd.Size(); ++i)
+	for(ULONG i = 0; i < sd.Size(); ++i)
 	{
 		COMPILEDRULENEW &onemap = sd[i];
 
@@ -299,7 +299,7 @@ MATCHPKT void DfaidSidMap(CGROUPRes &mergedDfas, DFASIDMAPPING &didSid)
 		didSid.sId_dIdVec[onemap.m_nSid].Resize(20);
 		didSid.sId_dIdVec[onemap.m_nSid] = sd[i].m_dfaIds;
 
-		for(size_t j = 0; j < onemap.m_dfaIds.Size(); ++j)
+		for(ULONG j = 0; j < onemap.m_dfaIds.Size(); ++j)
 		{
 			didSid.dId_sId[onemap.m_dfaIds[j]] = onemap.m_nSid;
 		}

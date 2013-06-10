@@ -48,6 +48,8 @@
 #include <iostream>
 //#include <sys/time.h>
 
+#include <hwprj\dfa.h>
+
 using namespace std;
 
 #define MAX_DFA_SIZE_INCREMENT 50
@@ -3410,7 +3412,7 @@ void DFA::output()
 	std::cout << std::endl;
 }
 
-void DFA::Dfa2CDfaNew(CDfaNew &curDFA)
+void DFA::Dfa2CDfaNew(CDfa &curDFA)
 {
 	BYTE group[CSIZE];
 	for (int i = 0; i < CSIZE; ++i)

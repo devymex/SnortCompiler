@@ -13,8 +13,7 @@
 */
 
 #include "stdafx.h"
-#include "grouping.h"
-#include "../compilernew/compilernew.h"
+#include <hwprj\grouping.h>
 
 GROUPINGSC CGROUPS::CGROUPS()
 {
@@ -38,22 +37,22 @@ GROUPINGSC CGROUPS::~CGROUPS()
 	delete m_pGroups;
 }
 
-GROUPINGSC const size_t CGROUPS::Size() const
+GROUPINGSC const ULONG CGROUPS::Size() const
 {
 	return m_pGroups->size();
 }
 
-GROUPINGSC void CGROUPS::Resize(size_t nSize)
+GROUPINGSC void CGROUPS::Resize(ULONG nSize)
 {
 	m_pGroups->resize(nSize);
 }
 
-GROUPINGSC ONEGROUP &CGROUPS::operator[](size_t nIdx)
+GROUPINGSC ONEGROUP &CGROUPS::operator[](ULONG nIdx)
 {
 	return (*m_pGroups)[nIdx];
 }
 
-GROUPINGSC const ONEGROUP &CGROUPS::operator[](size_t nIdx) const
+GROUPINGSC const ONEGROUP &CGROUPS::operator[](ULONG nIdx) const
 {
 	return (*m_pGroups)[nIdx];
 }
@@ -73,17 +72,17 @@ GROUPINGSC void CGROUPS::Clear()
 	m_pGroups->clear();
 }
 
-GROUPINGSC void CGROUPS::Erase(size_t nIdx)
+GROUPINGSC void CGROUPS::Erase(ULONG nIdx)
 {
 	m_pGroups->erase(m_pGroups->begin() + nIdx);
 }
 
-GROUPINGSC CDfaTblNew &CGROUPRes::GetDfaTable()
+GROUPINGSC CDfaArray &CGROUPRes::GetDfaTable()
 {
 	return m_dfaTbl;
 }
 
-GROUPINGSC CSidDfaIdsNew &CGROUPRes::GetSidDfaIds()
+GROUPINGSC CSidDfaIds &CGROUPRes::GetSidDfaIds()
 {
 	return m_sidDfaIds;
 }
@@ -93,12 +92,12 @@ GROUPINGSC CGROUPS &CGROUPRes::GetGroups()
 	return m_groups;
 }
 
-GROUPINGSC const CDfaTblNew &CGROUPRes::GetDfaTable() const
+GROUPINGSC const CDfaArray &CGROUPRes::GetDfaTable() const
 {
 	return m_dfaTbl;
 }
 
-GROUPINGSC const CSidDfaIdsNew &CGROUPRes::GetSidDfaIds() const
+GROUPINGSC const CSidDfaIds &CGROUPRes::GetSidDfaIds() const
 {
 	return m_sidDfaIds;
 }
@@ -109,7 +108,7 @@ GROUPINGSC const CGROUPS &CGROUPRes::GetGroups() const
 }
 
 template<typename _Ty>
-void WriteNum(std::ofstream &fout, _Ty _num, size_t nBytes = sizeof(_Ty))
+void WriteNum(std::ofstream &fout, _Ty _num, ULONG nBytes = sizeof(_Ty))
 {
 	fout.write((char*)&_num, nBytes);
 }
@@ -124,13 +123,13 @@ Returns:      0 success
               -1 error occurred
 */
 
-GROUPINGSC size_t CGROUPRes::WriteToFile(LPCTSTR filename)
+GROUPINGSC ULONG CGROUPRes::WriteToFile(LPCTSTR filename)
 {
 	std::ofstream fout(filename, std::ios::binary);
 	if (!fout)
 	{
 		std::cerr << "Open file Failed!" << std::endl;
-		return (size_t)-1;
+		return (ULONG)-1;
 	}
 
 	//mark the position used for file size
@@ -167,13 +166,13 @@ GROUPINGSC size_t CGROUPRes::WriteToFile(LPCTSTR filename)
 	fout.seekp(endPos, std::ios_base::beg);
 
 	//start to write the relationship between sid and dfa id
-	for (size_t i = 0; i < m_sidDfaIds.Size(); ++i)
+	for (ULONG i = 0; i < m_sidDfaIds.Size(); ++i)
 	{
 		COMPILEDRULENEW &ruleResult = m_sidDfaIds[i];
 		WriteNum(fout, ruleResult.m_nSid, 4);
 		WriteNum(fout, ruleResult.m_nResult, 4);
 		WriteNum(fout, ruleResult.m_dfaIds.Size(), 4);
-		for (size_t j = 0; j < ruleResult.m_dfaIds.Size(); ++j)
+		for (ULONG j = 0; j < ruleResult.m_dfaIds.Size(); ++j)
 		{
 			WriteNum(fout, ruleResult.m_dfaIds[j], 4);
 		}
@@ -189,9 +188,9 @@ GROUPINGSC size_t CGROUPRes::WriteToFile(LPCTSTR filename)
 
 	//start to write dfas
 	BYTE dfaDetails[100000];
-	for (size_t i = 0; i < m_dfaTbl.Size(); ++i)
+	for (ULONG i = 0; i < m_dfaTbl.Size(); ++i)
 	{
-		size_t len = m_dfaTbl[i].Save(dfaDetails);
+		ULONG len = m_dfaTbl[i].Save(dfaDetails);
 		WriteNum(fout, len);
 		fout.write((char*)dfaDetails, len * sizeof(BYTE));
 	}
@@ -205,15 +204,15 @@ GROUPINGSC size_t CGROUPRes::WriteToFile(LPCTSTR filename)
 	fout.seekp(0, std::ios_base::end);
 
 	//start to write groups
-	for (size_t i = 0; i < m_groups.Size(); ++i)
+	for (ULONG i = 0; i < m_groups.Size(); ++i)
 	{
 		WriteNum(fout, m_groups[i].DfaIds.Size());
-		for (size_t j = 0; j < m_groups[i].DfaIds.Size(); ++j)
+		for (ULONG j = 0; j < m_groups[i].DfaIds.Size(); ++j)
 		{
 			WriteNum(fout, m_groups[i].DfaIds[j]);
 		}
 		WriteNum(fout, m_groups[i].ComSigs.Size());
-		for (size_t j = 0; j < m_groups[i].ComSigs.Size(); ++j)
+		for (ULONG j = 0; j < m_groups[i].ComSigs.Size(); ++j)
 		{
 			WriteNum(fout, m_groups[i].ComSigs[j]);
 		}
@@ -242,35 +241,35 @@ Returns:      0 success
               -1 error occurred
 */
 
-GROUPINGSC size_t CGROUPRes::ReadFromFile(LPCTSTR filename)
+GROUPINGSC ULONG CGROUPRes::ReadFromFile(LPCTSTR filename)
 {
 	std::ifstream fin(filename, std::ios::binary);
 	if (!fin)
 	{
 		std::cerr << "Open file Failed!" << std::endl;
-		return (size_t)-1;
+		return (ULONG)-1;
 	}
 
 	//read the file size
-	size_t fileSize;
+	ULONG fileSize;
 	fin.read((char*)&fileSize, 4);
 
 	//read the number of rules
-	size_t ruleNum;
+	ULONG ruleNum;
 	fin.read((char*)&ruleNum, 4);
 
 	//skip the offset of rule
 	fin.seekg(4, std::ios_base::cur);
 
 	//read the number of dfas
-	size_t dfaNum;
+	ULONG dfaNum;
 	fin.read((char*)&dfaNum, 4);
 
 	//skip the offset of dfa
 	fin.seekg(4, std::ios_base::cur);
 
 	//read the number of groups
-	size_t groupNum;
+	ULONG groupNum;
 	fin.read((char*)&groupNum, 4);
 
 	//skip the offset of group
@@ -278,15 +277,15 @@ GROUPINGSC size_t CGROUPRes::ReadFromFile(LPCTSTR filename)
 
 	//start to read the relationship between sid and dfa ids
 	m_sidDfaIds.Resize(ruleNum);
-	size_t SidDfaNum;
-	for (size_t i = 0; i < ruleNum; ++i)
+	ULONG SidDfaNum;
+	for (ULONG i = 0; i < ruleNum; ++i)
 	{
 		COMPILEDRULENEW &ruleResult = m_sidDfaIds[i];
 		fin.read((char*)&ruleResult.m_nSid, 4);
 		fin.read((char*)&ruleResult.m_nResult, 4);
 		fin.read((char*)&SidDfaNum, 4);
 		ruleResult.m_dfaIds.Resize(SidDfaNum);
-		for (size_t j = 0; j < SidDfaNum; ++j)
+		for (ULONG j = 0; j < SidDfaNum; ++j)
 		{
 			fin.read((char*)&(ruleResult.m_dfaIds[j]), 4);
 		}
@@ -295,10 +294,10 @@ GROUPINGSC size_t CGROUPRes::ReadFromFile(LPCTSTR filename)
 	//start to read dfas
 	m_dfaTbl.Resize(dfaNum);
 	BYTE dfaDetails[100000];
-	for (size_t i = 0; i < dfaNum; ++i)
+	for (ULONG i = 0; i < dfaNum; ++i)
 	{
-		CDfaNew &dfa = m_dfaTbl[i];
-		size_t len;
+		CDfa &dfa = m_dfaTbl[i];
+		ULONG len;
 		fin.read((char*)&len, 4);
 		fin.read((char*)dfaDetails, len * sizeof(BYTE));
 		dfa.Load(dfaDetails, len);
@@ -306,21 +305,21 @@ GROUPINGSC size_t CGROUPRes::ReadFromFile(LPCTSTR filename)
 
 	//start to read groups
 	m_groups.Resize(groupNum);
-	size_t nDfaIdNum;
-	size_t nSigNum;
-	for (size_t i = 0; i < groupNum; ++i)
+	ULONG nDfaIdNum;
+	ULONG nSigNum;
+	for (ULONG i = 0; i < groupNum; ++i)
 	{
 		ONEGROUP &oneGroup = m_groups[i];
 		fin.read((char*)&nDfaIdNum, 4);
 		oneGroup.DfaIds.Resize(nDfaIdNum);
-		for (size_t j = 0; j < nDfaIdNum; ++j)
+		for (ULONG j = 0; j < nDfaIdNum; ++j)
 		{
-			size_t &nDfaId = oneGroup.DfaIds[j];
+			ULONG &nDfaId = oneGroup.DfaIds[j];
 			fin.read((char*)&nDfaId, 4);
 		}
 		fin.read((char*)&nSigNum, 4);
 		oneGroup.ComSigs.Resize(nSigNum);
-		for (size_t j = 0; j < nSigNum; ++j)
+		for (ULONG j = 0; j < nSigNum; ++j)
 		{
 			SIGNATURE &oneSig = oneGroup.ComSigs[j];
 			fin.read((char*)&oneSig, sizeof(SIGNATURE));
@@ -345,14 +344,14 @@ Returns:            nothing
 
 */
 
-void ExtractDfaInfo(const CResNew &res, std::vector<DFAINFO> &vecDfaInfo, std::vector<size_t> &vecWaitForGroup)
+void ExtractDfaInfo(const CCompileResults &res, std::vector<DFAINFO> &vecDfaInfo, std::vector<ULONG> &vecWaitForGroup)
 {
-	std::size_t nSize = res.GetRegexTbl().Size();
+	ULONG nSize = res.GetRegexTbl().Size();
 	vecDfaInfo.resize(nSize);
-	for (size_t i = 0; i < nSize; ++i)
+	for (ULONG i = 0; i < nSize; ++i)
 	{
 		vecWaitForGroup.push_back(i);
-		for (size_t j = 0; j < res.GetRegexTbl()[i].GetSigs().Size(); ++j)
+		for (ULONG j = 0; j < res.GetRegexTbl()[i].GetSigs().Size(); ++j)
 		{
 			vecDfaInfo[i].Sigs.push_back(res.GetRegexTbl()[i].GetSigs()[j]);
 		}
@@ -370,10 +369,10 @@ Returns:            nothing
 
 */
 
-void GroupOnlyOneSig(const std::vector<DFAINFO> &vecDfaInfo, std::vector<size_t> &vecWaitForGroup, CGROUPS &groups)
+void GroupOnlyOneSig(const std::vector<DFAINFO> &vecDfaInfo, std::vector<ULONG> &vecWaitForGroup, CGROUPS &groups)
 {
-	std::map<SIGNATURE, CVectorUnsigned> sigToIdsMap;
-	for (std::vector<size_t>::iterator i = vecWaitForGroup.begin(); i != vecWaitForGroup.end();)
+	std::map<SIGNATURE, CDllArray> sigToIdsMap;
+	for (std::vector<ULONG>::iterator i = vecWaitForGroup.begin(); i != vecWaitForGroup.end();)
 	{
 		if (vecDfaInfo[*i].Sigs.size() == 1)
 		{
@@ -389,12 +388,12 @@ void GroupOnlyOneSig(const std::vector<DFAINFO> &vecDfaInfo, std::vector<size_t>
 	}
 
 	groups.Resize(sigToIdsMap.size());
-	std::size_t idx = 0;
-	for (std::map<SIGNATURE, CVectorUnsigned>::iterator i = sigToIdsMap.begin(); i != sigToIdsMap.end(); ++i, ++idx)
+	ULONG idx = 0;
+	for (std::map<SIGNATURE, CDllArray>::iterator i = sigToIdsMap.begin(); i != sigToIdsMap.end(); ++i, ++idx)
 	{
 		groups[idx].ComSigs.PushBack(i->first);
 		groups[idx].DfaIds = i->second;
-		groups[idx].mergeDfaId = -1;
+		groups[idx].mergeDfaId = ULONG(-1);
 	}
 }
 
@@ -408,9 +407,9 @@ Returns:            nothing
 
 */
 
-void Merge(CResNew &res, CGROUPS &groups)
+void Merge(CCompileResults &res, CGROUPS &groups)
 {
-	for (size_t i = 0; i < groups.Size(); ++i)
+	for (ULONG i = 0; i < groups.Size(); ++i)
 	{
 		std::cout << "Merge " << std::endl;
 		std::cout << "NO: " << i << std::endl;
@@ -422,14 +421,14 @@ void Merge(CResNew &res, CGROUPS &groups)
 		{
 			continue;
 		}
-		std::vector<CDfaNew> vecDfas(2);
-		CDfaNew MergeDfa;
+		std::vector<CDfa> vecDfas(2);
+		CDfa MergeDfa;
 		MergeDfa.SetId(res.GetDfaTable().Size());
 		vecDfas[0] = res.GetDfaTable()[groups[i].DfaIds[0]];
 		
 		//flag if all dfas in the group can merge together
 		bool mergeFlag = true;
-		for (size_t j = 1; j < groups[i].DfaIds.Size(); ++j)
+		for (ULONG j = 1; j < groups[i].DfaIds.Size(); ++j)
 		{
 			vecDfas[1] = res.GetDfaTable()[groups[i].DfaIds[j]];
 			if (!MergeMultipleDfas(vecDfas, MergeDfa))
@@ -443,15 +442,15 @@ void Merge(CResNew &res, CGROUPS &groups)
 					groups[i].mergeDfaId = res.GetDfaTable().Size() - 1;
 				}
 				groups.PushBack(ONEGROUP());
-				for (size_t k = j; k < groups[i].DfaIds.Size(); ++k)
+				for (ULONG k = j; k < groups[i].DfaIds.Size(); ++k)
 				{
 					groups.Back().DfaIds.PushBack(groups[i].DfaIds[k]);
 				}
-				groups.Back().mergeDfaId = -1;
+				groups.Back().mergeDfaId = ULONG(-1);
 				groups.Back().ComSigs = groups[i].ComSigs;
-				CVectorUnsigned tmp(groups[i].DfaIds);
+				CDllArray tmp(groups[i].DfaIds);
 				groups[i].DfaIds.Clear();
-				for (size_t k = 0; k < j; ++k)
+				for (ULONG k = 0; k < j; ++k)
 				{
 					groups[i].DfaIds.PushBack(tmp[k]);
 				}
@@ -485,26 +484,26 @@ Returns:            nothing
 
 */
 
-void PutInBySig(const std::vector<DFAINFO> &vecDfaInfo, CResNew &res, CGROUPS &groups, std::vector<size_t> &vecWaitForGroup)
+void PutInBySig(const std::vector<DFAINFO> &vecDfaInfo, CCompileResults &res, CGROUPS &groups, std::vector<ULONG> &vecWaitForGroup)
 {
-	std::map<SIGNATURE, std::vector<size_t>> sigToGroupsMap;
-	size_t idx = 0;
-	for (size_t i = 0; i < groups.Size(); ++i, ++idx)
+	std::map<SIGNATURE, std::vector<ULONG>> sigToGroupsMap;
+	ULONG idx = 0;
+	for (ULONG i = 0; i < groups.Size(); ++i, ++idx)
 	{
 		sigToGroupsMap[groups[i].ComSigs[0]].push_back(idx);
 	}
 
 	idx = 0;
-	for (std::map<SIGNATURE, std::vector<size_t>>::iterator i = sigToGroupsMap.begin(); i != sigToGroupsMap.end(); ++i, ++idx)
+	for (std::map<SIGNATURE, std::vector<ULONG>>::iterator i = sigToGroupsMap.begin(); i != sigToGroupsMap.end(); ++i, ++idx)
 	{
 		std::cout << "PutInBySig " << std::endl;
 		std::cout << "NO: " << idx << std::endl;
 		std::cout << "Total: " << sigToGroupsMap.size() << std::endl << std::endl;
-		for (std::vector<size_t>::iterator j = i->second.begin(); j != i->second.end(); ++j)
+		for (std::vector<ULONG>::iterator j = i->second.begin(); j != i->second.end(); ++j)
 		{
-			std::vector<CDfaNew> vecDfas(2);
+			std::vector<CDfa> vecDfas(2);
 			vecDfas[0] = res.GetDfaTable()[groups[*j].mergeDfaId];
-			for (std::vector<size_t>::iterator k = vecWaitForGroup.begin(); k != vecWaitForGroup.end(); )
+			for (std::vector<ULONG>::iterator k = vecWaitForGroup.begin(); k != vecWaitForGroup.end(); )
 			{
 
 				//the dfa doesn't have the group's signature
@@ -514,7 +513,7 @@ void PutInBySig(const std::vector<DFAINFO> &vecDfaInfo, CResNew &res, CGROUPS &g
 					continue;
 				}
 				vecDfas[1] = res.GetDfaTable()[*k];
-				CDfaNew MergeDfa;
+				CDfa MergeDfa;
 				if (MergeMultipleDfas(vecDfas, MergeDfa))
 				{
 					res.GetDfaTable().PushBack(MergeDfa);
@@ -545,25 +544,25 @@ Returns:            nothing
 
 */
 
-void BuildGroupBySig(const std::vector<DFAINFO> &vecDfaInfo, CGROUPS &newGroups, std::vector<size_t> &vecWaitForGroup)
+void BuildGroupBySig(const std::vector<DFAINFO> &vecDfaInfo, CGROUPS &newGroups, std::vector<ULONG> &vecWaitForGroup)
 {
-	std::map<std::vector<SIGNATURE>, CVectorUnsigned> sigsToIdsMap;
-	for (size_t i = 0; i < vecWaitForGroup.size(); ++i)
+	std::map<std::vector<SIGNATURE>, CDllArray> sigsToIdsMap;
+	for (ULONG i = 0; i < vecWaitForGroup.size(); ++i)
 	{
 		sigsToIdsMap[vecDfaInfo[vecWaitForGroup[i]].Sigs].PushBack(vecWaitForGroup[i]);
 	}
 	vecWaitForGroup.clear();
 
 	newGroups.Resize(sigsToIdsMap.size());
-	size_t idx = 0;
-	for (std::map<std::vector<SIGNATURE>, CVectorUnsigned>::iterator i = sigsToIdsMap.begin(); i != sigsToIdsMap.end(); ++i, ++idx)
+	ULONG idx = 0;
+	for (std::map<std::vector<SIGNATURE>, CDllArray>::iterator i = sigsToIdsMap.begin(); i != sigsToIdsMap.end(); ++i, ++idx)
 	{
-		for (size_t j = 0; j < i->first.size(); ++j)
+		for (ULONG j = 0; j < i->first.size(); ++j)
 		{
 			newGroups[idx].ComSigs.PushBack(i->first[j]);
 		}
 		newGroups[idx].DfaIds = i->second;
-		newGroups[idx].mergeDfaId = -1;
+		newGroups[idx].mergeDfaId = ULONG(-1);
 	}
 }
 
@@ -579,7 +578,7 @@ Returns:            nothing
 
 void ExtractUsedSigs(const CGROUPS &groups, std::vector<SIGNATURE> &vecUsed)
 {
-	for (size_t i = 0; i < groups.Size(); ++i)
+	for (ULONG i = 0; i < groups.Size(); ++i)
 	{
 		vecUsed.push_back(groups[i].ComSigs[0]);
 	}
@@ -601,17 +600,17 @@ Returns:            nothing
 
 void ExtractComSigs(const ONEGROUP &g1, const ONEGROUP &g2, const std::vector<SIGNATURE> &vecUsed, std::vector<SIGNATURE> &vecComSigs)
 {
-	std::map<SIGNATURE, size_t> sigToNumMap;
-	for (size_t i = 0; i < g1.ComSigs.Size(); ++i)
+	std::map<SIGNATURE, ULONG> sigToNumMap;
+	for (ULONG i = 0; i < g1.ComSigs.Size(); ++i)
 	{
 		++sigToNumMap[g1.ComSigs[i]];
 	}
-	for (size_t i = 0; i < g2.ComSigs.Size(); ++i)
+	for (ULONG i = 0; i < g2.ComSigs.Size(); ++i)
 	{
 		++sigToNumMap[g2.ComSigs[i]];
 	}
 
-	for (std::map<SIGNATURE, size_t>::iterator i = sigToNumMap.begin(); i != sigToNumMap.end(); ++i)
+	for (std::map<SIGNATURE, ULONG>::iterator i = sigToNumMap.begin(); i != sigToNumMap.end(); ++i)
 	{
 
 		//the two group both have the signature and the signature is not contained in vecUsed
@@ -631,7 +630,7 @@ Returns:            the used upper limit of the signatures
 
 */
 
-size_t AvailableNum(const std::vector<SIGNATURE> &vecSigs)
+ULONG AvailableNum(const std::vector<SIGNATURE> &vecSigs)
 {
 	if (vecSigs.size() <= 1)
 	{
@@ -655,13 +654,13 @@ Returns:            nothing
 
 */
 
-void MergeGroup(CResNew &res, std::vector<SIGNATURE> &vecUsed, CGROUPS &newGroups)
+void MergeGroup(CCompileResults &res, std::vector<SIGNATURE> &vecUsed, CGROUPS &newGroups)
 {
-	std::map<std::vector<SIGNATURE>, size_t> SigsToNumMap;
-	for (size_t i = 0; i < newGroups.Size(); ++i)
+	std::map<std::vector<SIGNATURE>, ULONG> SigsToNumMap;
+	for (ULONG i = 0; i < newGroups.Size(); ++i)
 	{
 		std::vector<SIGNATURE> vecSigs;
-		for (size_t j = 0; j < newGroups[i].ComSigs.Size(); ++j)
+		for (ULONG j = 0; j < newGroups[i].ComSigs.Size(); ++j)
 		{
 			if (std::find(vecUsed.begin(), vecUsed.end(), newGroups[i].ComSigs[j]) == vecUsed.end())
 			{
@@ -677,13 +676,13 @@ void MergeGroup(CResNew &res, std::vector<SIGNATURE> &vecUsed, CGROUPS &newGroup
 			++SigsToNumMap[vecSigs];
 		}
 	}
-	for (size_t i = 0; i < newGroups.Size(); ++i)
+	for (ULONG i = 0; i < newGroups.Size(); ++i)
 	{
 		std::cout << "MergeGroup " << std::endl;
 		std::cout << "NO: " << i << std::endl;
 		std::cout << "Total: " << newGroups.Size() << std::endl << std::endl;
 		std::vector<SIGNATURE> vecSigs;
-		for (size_t j = 0; j < newGroups[i].ComSigs.Size(); ++j)
+		for (ULONG j = 0; j < newGroups[i].ComSigs.Size(); ++j)
 		{
 			if (std::find(vecUsed.begin(), vecUsed.end(), newGroups[i].ComSigs[j]) == vecUsed.end())
 			{
@@ -691,14 +690,14 @@ void MergeGroup(CResNew &res, std::vector<SIGNATURE> &vecUsed, CGROUPS &newGroup
 			}
 		}
 		//++SigsToNumMap[vecSigs];
-		std::vector<CDfaNew> vecDfas(2);
+		std::vector<CDfa> vecDfas(2);
 		vecDfas[0] = res.GetDfaTable()[newGroups[i].mergeDfaId];
-		while (true)
+		for (; ;)
 		{
-			size_t idx = 0;
+			ULONG idx = 0;
 #undef min
 			int nMax = std::numeric_limits<int>::min();
-			for (size_t j = i + 1; j < newGroups.Size(); ++j)
+			for (ULONG j = i + 1; j < newGroups.Size(); ++j)
 			{
 				std::vector<SIGNATURE> vecComSigs;
 				ExtractComSigs(newGroups[i], newGroups[j], vecUsed, vecComSigs);
@@ -709,7 +708,7 @@ void MergeGroup(CResNew &res, std::vector<SIGNATURE> &vecUsed, CGROUPS &newGroup
 				if (vecComSigs.size() > 1)
 				{
 					vecDfas[1] = res.GetDfaTable()[newGroups[j].mergeDfaId];
-					CDfaNew MergeDfa;
+					CDfa MergeDfa;
 					if (MergeMultipleDfas(vecDfas, MergeDfa))
 					{
 
@@ -734,14 +733,14 @@ void MergeGroup(CResNew &res, std::vector<SIGNATURE> &vecUsed, CGROUPS &newGroup
 				std::vector<SIGNATURE> vecComSigs;
 				ExtractComSigs(newGroups[i], newGroups[idx], vecUsed, vecComSigs);
 				vecDfas[1] = res.GetDfaTable()[newGroups[idx].mergeDfaId];
-				CDfaNew MergeDfa;
+				CDfa MergeDfa;
 				if (MergeMultipleDfas(vecDfas, MergeDfa))
 				{
 					if (SigsToNumMap[vecSigs] > 0)
 					{
 						if (SigsToNumMap[vecSigs] == AvailableNum(vecSigs))
 						{
-							for (size_t k = 0; k < vecSigs.size(); ++k)
+							for (ULONG k = 0; k < vecSigs.size(); ++k)
 							{
 								std::vector<SIGNATURE>::iterator iter = std::find(vecUsed.begin(), vecUsed.end(), vecSigs[k]);
 								if (iter != vecUsed.end())
@@ -759,12 +758,12 @@ void MergeGroup(CResNew &res, std::vector<SIGNATURE> &vecUsed, CGROUPS &newGroup
 						std::sort(vecUsed.begin(), vecUsed.end());
 						vecUsed.erase(std::unique(vecUsed.begin(), vecUsed.end()), vecUsed.end());
 					}
-					for (size_t k = 0; k < newGroups[idx].DfaIds.Size(); ++k)
+					for (ULONG k = 0; k < newGroups[idx].DfaIds.Size(); ++k)
 					{
 						newGroups[i].DfaIds.PushBack(newGroups[idx].DfaIds[k]);
 					}
 					newGroups[i].ComSigs.Clear();
-					for (size_t k = 0; k < vecComSigs.size(); ++k)
+					for (ULONG k = 0; k < vecComSigs.size(); ++k)
 					{
 						newGroups[i].ComSigs.PushBack(vecComSigs[k]);
 					}
@@ -796,7 +795,7 @@ Returns:            nothing
 
 void AddNewGroups(CGROUPS &newGroups, CGROUPS &groups)
 {
-	for (size_t i = 0; i < newGroups.Size(); ++i)
+	for (ULONG i = 0; i < newGroups.Size(); ++i)
 	{
 		groups.PushBack(newGroups[i]);
 	}
@@ -814,18 +813,18 @@ Returns:            nothing
 
 */
 
-void ClearUpRes(CResNew &res, const CGROUPS &groups, CGROUPRes &groupRes)
+void ClearUpRes(CCompileResults &res, const CGROUPS &groups, CGROUPRes &groupRes)
 {
 	groupRes.GetSidDfaIds() = res.GetSidDfaIds();
-	std::vector<size_t> occurred(res.GetDfaTable().Size(), 0);
-	for (size_t i = 0; i < groups.Size(); ++i)
+	std::vector<ULONG> occurred(res.GetDfaTable().Size(), 0);
+	for (ULONG i = 0; i < groups.Size(); ++i)
 	{
 		occurred[groups[i].mergeDfaId] = 1;
 	}
-	std::map<size_t, size_t> oldToNewMap;
-	size_t count = 0;
-	size_t idx = 0;
-	for (std::vector<size_t>::iterator i = occurred.begin(); i != occurred.end(); ++i, ++idx)
+	std::map<ULONG, ULONG> oldToNewMap;
+	ULONG count = 0;
+	ULONG idx = 0;
+	for (std::vector<ULONG>::iterator i = occurred.begin(); i != occurred.end(); ++i, ++idx)
 	{
 		if (*i == 1)
 		{
@@ -839,7 +838,7 @@ void ClearUpRes(CResNew &res, const CGROUPS &groups, CGROUPRes &groupRes)
 		}
 	}
 	groupRes.GetGroups().Resize(groups.Size());
-	for (size_t i = 0; i < groups.Size(); ++i)
+	for (ULONG i = 0; i < groups.Size(); ++i)
 	{
 		groupRes.GetGroups()[i].DfaIds = groups[i].DfaIds;
 		groupRes.GetGroups()[i].ComSigs = groups[i].ComSigs;
@@ -847,19 +846,19 @@ void ClearUpRes(CResNew &res, const CGROUPS &groups, CGROUPRes &groupRes)
 	}
 
 	std::vector<SIGNATURE> vecSpecialSigs;
-	for (size_t i = 0; i < groupRes.GetGroups().Size(); ++i)
+	for (ULONG i = 0; i < groupRes.GetGroups().Size(); ++i)
 	{
 		if (groupRes.GetGroups()[i].ComSigs.Size() == 1)
 		{
 			vecSpecialSigs.push_back(groupRes.GetGroups()[i].ComSigs[0]);
 		}
 	}
-	for (size_t i = 0; i < groupRes.GetGroups().Size(); ++i)
+	for (ULONG i = 0; i < groupRes.GetGroups().Size(); ++i)
 	{
 		if (groupRes.GetGroups()[i].ComSigs.Size() >= 2)
 		{
 			std::vector<SIGNATURE> vecSigs;
-			for (size_t j = 0; j < groupRes.GetGroups()[i].ComSigs.Size(); ++j)
+			for (ULONG j = 0; j < groupRes.GetGroups()[i].ComSigs.Size(); ++j)
 			{
 				vecSigs.push_back(groupRes.GetGroups()[i].ComSigs[j]);
 			}
@@ -895,11 +894,11 @@ void outPutGroups(CGROUPRes &groupRes, const char* fileName)
 		return;
 	}
 	fout << "groupNumber\t" << "MergeId\t" << "origDfaId" << std::endl; 
-	for(size_t i = 0; i < groupRes.GetGroups().Size(); ++i)
+	for(ULONG i = 0; i < groupRes.GetGroups().Size(); ++i)
 	{
 		fout << i << "\t";
 		fout << groupRes.GetGroups()[i].mergeDfaId << "\t";
-		for(size_t j = 0; j < groupRes.GetGroups()[i].DfaIds.Size(); ++j)
+		for(ULONG j = 0; j < groupRes.GetGroups()[i].DfaIds.Size(); ++j)
 		{
 			fout << groupRes.GetGroups()[i].DfaIds[j] << std::endl << "\t" << "\t";
 		}
@@ -918,13 +917,13 @@ Returns:            nothing
 
 */
 
-GROUPINGSC void grouping(CResNew &res, CGROUPRes &groupRes)
+GROUPINGSC void Grouping(CCompileResults &res, CGROUPRes &groupRes)
 {
 	CTimer t1, tAll;
 
 	std::cout << "Extract Dfa's information..." << std::endl;
 	std::vector<DFAINFO> vecDfaInfo;
-	std::vector<size_t> vecWaitForGroup;
+	std::vector<ULONG> vecWaitForGroup;
 	ExtractDfaInfo(res, vecDfaInfo, vecWaitForGroup);
 	std::cout << "Completed in " << t1.Reset() << " Sec." << std::endl << std::endl;
 

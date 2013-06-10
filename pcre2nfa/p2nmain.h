@@ -1,8 +1,8 @@
 #pragma once
 
 #define ONEPCRETONFA_H_
-#include "pcre2nfa.h"
-#include "../common/common.h"
+#include <hwprj/pcre2nfa.h>
+#include <hwprj/common.h>
 
 #define SC_LIMIT 200
 
@@ -346,118 +346,118 @@ bool CanProcess(std::vector<unsigned char>::iterator &Beg, const std::vector<uns
 
 void NextForCLASS(std::vector<unsigned char>::iterator &Beg);
 
-size_t ProcessPcre(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa);
+ULONG ProcessPcre(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa);
 
-size_t Process(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, std::vector<size_t> &PreStates, size_t ALTPreBeg, bool &ALTBeg, size_t ALTBeginState, bool bCBRA, bool bALT, bool bBRAZERO, std::vector<PCRESIGN> &vecPath);
+ULONG Process(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, std::vector<ULONG> &PreStates, ULONG ALTPreBeg, bool &ALTBeg, ULONG ALTBeginState, bool bCBRA, bool bALT, bool bBRAZERO, std::vector<PCRESIGN> &vecPath);
 
-void ProcessALT(CNfa &nfa, size_t PreState, bool &ALTBegin, size_t ALTBegState);
+void ProcessALT(CNfa &nfa, ULONG PreState, bool &ALTBegin, ULONG ALTBegState);
 
-size_t OP_COMMON_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, size_t PreState, bool &ALTBegin, size_t ALTBegState);
+ULONG OP_COMMON_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState);
 
-void OP_CIRCM_FUNC(CNfa &nfa, size_t &CurState);
+void OP_CIRCM_FUNC(CNfa &nfa, ULONG &CurState);
 
-size_t OP_CHAR_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, size_t PreState, bool &ALTBegin, size_t ALTBegState);
+ULONG OP_CHAR_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState);
 
-size_t OP_CHARI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, size_t PreState, bool &ALTBegin, size_t ALTBegState);
+ULONG OP_CHARI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState);
 
-size_t OP_NOT_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, size_t PreState, bool &ALTBegin, size_t ALTBegState);
+ULONG OP_NOT_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState);
 
-size_t OP_NOTI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, size_t PreState, bool &ALTBegin, size_t ALTBegState);
+ULONG OP_NOTI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState);
 
-size_t OP_STAR_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, size_t PreState, bool &ALTBegin, size_t ALTBegState);
+ULONG OP_STAR_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState);
 
-size_t OP_PLUS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, size_t PreState, bool &ALTBegin, size_t ALTBegState);
+ULONG OP_PLUS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState);
 
-size_t OP_QUERY_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, size_t PreState, bool &ALTBegin, size_t ALTBegState);
+ULONG OP_QUERY_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState);
 
-size_t OP_UPTO_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, size_t PreState, bool &ALTBegin, size_t ALTBegState);
+ULONG OP_UPTO_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState);
 
-size_t OP_EXACT_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, size_t PreState, bool &ALTBegin, size_t ALTBegState);
+ULONG OP_EXACT_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState);
 
-size_t OP_STARI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, size_t PreState, bool &ALTBegin, size_t ALTBegState);
+ULONG OP_STARI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState);
 
-size_t OP_PLUSI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, size_t PreState, bool &ALTBegin, size_t ALTBegState);
+ULONG OP_PLUSI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState);
 
-size_t OP_QUERYI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, size_t PreState, bool &ALTBegin, size_t ALTBegState);
+ULONG OP_QUERYI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState);
 
-size_t OP_UPTOI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, size_t PreState, bool &ALTBegin, size_t ALTBegState);
+ULONG OP_UPTOI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState);
 
-size_t OP_EXACTI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, size_t PreState, bool &ALTBegin, size_t ALTBegState);
+ULONG OP_EXACTI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState);
 
-size_t OP_NOTSTAR_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, size_t PreState, bool &ALTBegin, size_t ALTBegState);
+ULONG OP_NOTSTAR_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState);
 
-size_t OP_NOTPLUS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, size_t PreState, bool &ALTBegin, size_t ALTBegState);
+ULONG OP_NOTPLUS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState);
 
-size_t OP_NOTQUERY_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, size_t PreState, bool &ALTBegin, size_t ALTBegState);
+ULONG OP_NOTQUERY_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState);
 
-size_t OP_NOTUPTO_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, size_t PreState, bool &ALTBegin, size_t ALTBegState);
+ULONG OP_NOTUPTO_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState);
 
-size_t OP_NOTEXACT_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, size_t PreState, bool &ALTBegin, size_t ALTBegState);
+ULONG OP_NOTEXACT_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState);
 
-size_t OP_NOTSTARI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, size_t PreState, bool &ALTBegin, size_t ALTBegState);
+ULONG OP_NOTSTARI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState);
 
-size_t OP_NOTPLUSI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, size_t PreState, bool &ALTBegin, size_t ALTBegState);
+ULONG OP_NOTPLUSI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState);
 
-size_t OP_NOTQUERYI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, size_t PreState, bool &ALTBegin, size_t ALTBegState);
+ULONG OP_NOTQUERYI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState);
 
-size_t OP_NOTUPTOI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, size_t PreState, bool &ALTBegin, size_t ALTBegState);
+ULONG OP_NOTUPTOI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState);
 
-size_t OP_NOTEXACTI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, size_t PreState, bool &ALTBegin, size_t ALTBegState);
+ULONG OP_NOTEXACTI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState);
 
-size_t OP_TYPESTAR_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, size_t PreState, bool &ALTBegin, size_t ALTBegState);
+ULONG OP_TYPESTAR_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState);
 
-size_t OP_TYPEPLUS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, size_t PreState, bool &ALTBegin, size_t ALTBegState);
+ULONG OP_TYPEPLUS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState);
 
-size_t OP_TYPEQUERY_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, size_t PreState, bool &ALTBegin, size_t ALTBegState);
+ULONG OP_TYPEQUERY_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState);
 
-size_t OP_TYPEUPTO_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, size_t PreState, bool &ALTBegin, size_t ALTBegState);
+ULONG OP_TYPEUPTO_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState);
 
-size_t OP_TYPEEXACT_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, size_t PreState, bool &ALTBegin, size_t ALTBegState);
+ULONG OP_TYPEEXACT_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState);
 
-size_t OP_CLASS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, size_t PreState, bool &ALTBegin, size_t ALTBegState);
+ULONG OP_CLASS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState);
 
-size_t OP_NCLASS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, size_t PreState, bool &ALTBegin, size_t ALTBegState);
+ULONG OP_NCLASS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState);
 
-void OP_ALT_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t PreState, size_t &CurState);
+void OP_ALT_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG PreState, ULONG &CurState);
 
-void OP_KET_FUNC(CNfa &nfa, size_t PreState, size_t &CurState, bool IsALT, bool IsBRAZERO);
+void OP_KET_FUNC(CNfa &nfa, ULONG PreState, ULONG &CurState, bool IsALT, bool IsBRAZERO);
 
-void OP_KETRMAX_FUNC(CNfa &nfa, size_t PreState, size_t &CurState, bool IsBRAZERO, bool IsALT);
+void OP_KETRMAX_FUNC(CNfa &nfa, ULONG PreState, ULONG &CurState, bool IsBRAZERO, bool IsALT);
 
-size_t OP_BRA_CBRA_SCBRA_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState);
+ULONG OP_BRA_CBRA_SCBRA_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState);
 
-size_t OP_BRA_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState);
+ULONG OP_BRA_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState);
 
-size_t OP_CBRA_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState);
+ULONG OP_CBRA_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState);
 
-size_t OP_SCBRA_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState);
+ULONG OP_SCBRA_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState);
 
-void Copy(CNfaRow &NewRow, CNfaRow &Row, size_t increment);
+void Copy(CNfaRow &NewRow, CNfaRow &Row, ULONG increment);
 
-void AddEMPTY(CNfa &nfa, size_t &CurState);
+void AddEMPTY(CNfa &nfa, ULONG &CurState);
 
-void OutPut(std::vector<PCRE>::iterator &Pcre, CNfa &nfa, size_t count);
+void OutPut(std::vector<PCRE>::iterator &Pcre, CNfa &nfa, ULONG count);
 
-typedef size_t (*Fn)(std::vector<unsigned char>::iterator&, const std::vector<unsigned char>::iterator&, CNfa&, size_t&, size_t, bool&, size_t);
+typedef ULONG (*Fn)(std::vector<unsigned char>::iterator&, const std::vector<unsigned char>::iterator&, CNfa&, ULONG&, ULONG, bool&, ULONG);
 
 extern Fn FUNC[156];
 
-extern size_t OP_NOT_DIGIT_ELEMS[];
+extern ULONG OP_NOT_DIGIT_ELEMS[];
 
-extern size_t OP_DIGIT_ELEMS[];
+extern ULONG OP_DIGIT_ELEMS[];
 
-extern size_t OP_NOT_WHITESPACE_ELEMS[];
+extern ULONG OP_NOT_WHITESPACE_ELEMS[];
 
-extern size_t OP_WHITESPACE_ELEMS[];
+extern ULONG OP_WHITESPACE_ELEMS[];
 
-extern size_t OP_NOT_WORDCHAR_ELEMS[];
+extern ULONG OP_NOT_WORDCHAR_ELEMS[];
 
-extern size_t OP_WORDCHAR_ELEMS[];
+extern ULONG OP_WORDCHAR_ELEMS[];
 
-extern size_t OP_ANY_ELEMS[];
+extern ULONG OP_ANY_ELEMS[];
 
-extern size_t OP_ALLANY_ELEMS[];
+extern ULONG OP_ALLANY_ELEMS[];
 
-extern size_t* ptr[];
+extern ULONG* ptr[];
 
-extern size_t NUMS[];
+extern ULONG NUMS[];

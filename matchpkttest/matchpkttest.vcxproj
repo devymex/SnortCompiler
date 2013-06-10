@@ -39,23 +39,25 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\Program Files (x86)\wpdpack\Include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Program Files (x86)\wpdpack\Lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)include\;C:\Program Files (x86)\wpdpack\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)bin\$(Configuration)\;C:\Program Files (x86)\wpdpack\Lib;$(LibraryPath)</LibraryPath>
+    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>C:\Program Files (x86)\wpdpack\Include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Program Files (x86)\wpdpack\Lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)include\;C:\Program Files (x86)\wpdpack\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)bin\$(Configuration)\;C:\Program Files (x86)\wpdpack\Lib;$(LibraryPath)</LibraryPath>
+    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_UNICODE;UNICODE;%(PreprocessorDefinitions);_WINSOCKAPI_</PreprocessorDefinitions>
       <BrowseInformation>true</BrowseInformation>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(SolutionDir)$(Configuration)\MatchPacket.lib;$(SolutionDir)$(Configuration)\common.lib;$(SolutionDir)$(Configuration)\hashmapping.lib;$(SolutionDir)$(Configuration)\grouping.lib;$(SolutionDir)$(Configuration)\compilernew.lib;$(SolutionDir)$(Configuration)\rule2nfa.lib</AdditionalDependencies>
+      <AdditionalDependencies>MatchPacket.lib;common.lib;hashmapping.lib;grouping.lib;compiler.lib</AdditionalDependencies>
     </Link>
     <Bscmake>
       <PreserveSbr>true</PreserveSbr>
@@ -63,7 +65,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -74,7 +76,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>$(SolutionDir)$(Configuration)\MatchPacket.lib;$(SolutionDir)$(Configuration)\common.lib;$(SolutionDir)$(Configuration)\hashmapping.lib;$(SolutionDir)$(Configuration)\grouping.lib;$(SolutionDir)$(Configuration)\compilernew.lib;$(SolutionDir)$(Configuration)\rule2nfa.lib</AdditionalDependencies>
+      <AdditionalDependencies>MatchPacket.lib;common.lib;hashmapping.lib;grouping.lib;compiler.lib</AdditionalDependencies>
     </Link>
     <Bscmake>
       <PreserveSbr>true</PreserveSbr>

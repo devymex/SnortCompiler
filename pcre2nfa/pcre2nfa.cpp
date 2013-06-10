@@ -1,17 +1,17 @@
 #include "stdafx.h"
 #include "p2nmain.h"
 #include "pcre.h"
-#include "pcre2nfa.h"
 #include "getsig.h"
+#include <hwprj/pcre2nfa.h>
 
 #define OVECCOUNT 30 /* should be a multiple of 3 */
 #define EBUFLEN 128
 #define BUFLEN 1024
 
 //使用Pcre8.32库解析单个pcre
-size_t PcreToCode(const std::string &OnePcre, std::vector<unsigned char> &code)
+ULONG PcreToCode(const std::string &OnePcre, std::vector<unsigned char> &code)
 {
-	size_t nFromBeg = 0;
+	ULONG nFromBeg = 0;
 	std::string Pcre;//pcre的具体内容
 	std::string attribute;//pcre之后的修饰
 
@@ -26,11 +26,11 @@ size_t PcreToCode(const std::string &OnePcre, std::vector<unsigned char> &code)
 	else
 	{
 		std::cout << "Input Pcre Error!" << std::endl;
-		return size_t(-2);
+		return ULONG(-2);
 	}
 	if (!Pcre.empty() && Pcre[0] != '^')
 	{
-		nFromBeg = size_t(-1);
+		nFromBeg = ULONG(-1);
 		Pcre = "(" + Pcre + ")";
 	}
 	//至此pcre的具体内容已存放至变量Pcre中
@@ -64,7 +64,7 @@ size_t PcreToCode(const std::string &OnePcre, std::vector<unsigned char> &code)
 	{
 		std::cout << pattern << std::endl;
 		printf("PCRE compilation failed at offset %d: %s\n", erroffset, error);
-		return size_t(-2);
+		return ULONG(-2);
 	}
 
 	unsigned int size;
@@ -73,7 +73,7 @@ size_t PcreToCode(const std::string &OnePcre, std::vector<unsigned char> &code)
 	size = *((unsigned int*)re + 1);
 	name_table_offset = *((unsigned short*)re + 12);
 
-	for (size_t i = 0; i < size - name_table_offset; ++i)
+	for (ULONG i = 0; i < size - name_table_offset; ++i)
 	{
 		code.push_back((unsigned char)*((unsigned char*)re + name_table_offset + i));
 	}
@@ -83,19 +83,19 @@ size_t PcreToCode(const std::string &OnePcre, std::vector<unsigned char> &code)
 
 bool ExceedLimit(const std::string &OnePcre)
 {
-	size_t CurPos = OnePcre.find('{', 0);
-	size_t EndPos;
+	ULONG CurPos = OnePcre.find('{', 0);
+	ULONG EndPos;
 	while (CurPos != std::string::npos)
 	{
 		if (OnePcre[CurPos - 1] != '\\')
 		{
 			EndPos = OnePcre.find('}', CurPos + 1);
 			std::string StrInBrace = OnePcre.substr(CurPos + 1, EndPos - CurPos - 1);
-			size_t commaPos = StrInBrace.find(',', 0);
+			ULONG commaPos = StrInBrace.find(',', 0);
 			if (commaPos == std::string::npos)
 			{
 				std::stringstream ss(StrInBrace);
-				size_t count = 0;
+				ULONG count = 0;
 				ss >> count;
 				if (count > SC_LIMIT)
 				{
@@ -106,8 +106,8 @@ bool ExceedLimit(const std::string &OnePcre)
 			{
 				std::string minstr = StrInBrace.substr(0, commaPos);
 				std::string maxstr = StrInBrace.substr(commaPos + 1, StrInBrace.size() - commaPos);
-				size_t min = 0;
-				size_t max = 0;
+				ULONG min = 0;
+				ULONG max = 0;
 				std::stringstream ss;
 				ss << minstr;
 				ss >> min;
@@ -127,17 +127,17 @@ bool ExceedLimit(const std::string &OnePcre)
 }
 
 //把单个pcre转化为NFA
-PCRETONFA size_t PcreToNFA(const char *pPcre, CNfa &nfa, CSignatures &sigs)
+PCRE2NFA ULONG PcreToNFA(const char *pPcre, CNfa &nfa, CSignatures &sigs)
 {
 	std::vector<unsigned char> code;
 	std::string strPcre(pPcre);
-	size_t nFromBeg = PcreToCode(strPcre, code);
+	ULONG nFromBeg = PcreToCode(strPcre, code);
 	std::vector<unsigned char>::iterator Beg, End;
 	Beg = code.begin();
 	End = code.end();
 	if (!CanProcess(Beg, End))
 	{
-		return size_t(SC_ERROR);
+		return ULONG(SC_ERROR);
 	}
 	Beg = code.begin();
 	End = code.end();
@@ -153,7 +153,7 @@ PCRETONFA size_t PcreToNFA(const char *pPcre, CNfa &nfa, CSignatures &sigs)
 
 		if (strs.size() > 0)
 		{
-			for (size_t i = 0; i < strs.size(); ++i)
+			for (ULONG i = 0; i < strs.size(); ++i)
 			{
 				for(std::vector<unsigned char>::iterator iter = strs[i].begin(); iter != strs[i].end(); ++iter)
 				{
@@ -164,7 +164,7 @@ PCRETONFA size_t PcreToNFA(const char *pPcre, CNfa &nfa, CSignatures &sigs)
 				}
 			}
 
-			for (size_t i = 0; i < strs.size(); ++i)
+			for (ULONG i = 0; i < strs.size(); ++i)
 			{
 				for (std::vector<unsigned char>::iterator iter = strs[i].begin(); iter + 3 != strs[i].end(); ++iter)
 				{
@@ -175,17 +175,93 @@ PCRETONFA size_t PcreToNFA(const char *pPcre, CNfa &nfa, CSignatures &sigs)
 		}
 	}
 
-	if (nFromBeg == size_t(-1))
+	if (nFromBeg == ULONG(-1))
 	{
-		size_t nCurSize = nfa.Size();
+		ULONG nCurSize = nfa.Size();
 		nfa.Resize(nCurSize + 1);
 		CNfaRow &row = nfa.Back();
-		for (size_t i = 0; i < EMPTY; ++i)
+		for (ULONG i = 0; i < EMPTY; ++i)
 		{
 			row.AddDest(i, nCurSize);
 		}
 		row.AddDest(EMPTY, nCurSize + 1);
 	}
-	size_t nr = ProcessPcre(Beg, End, nfa);
+	ULONG nr = ProcessPcre(Beg, End, nfa);
 	return nr;
+}
+
+
+PCRE2NFA bool match(const char* src, int length, std::string Regex, int &Pos)
+{
+	pcre *re;
+	const char *error;
+	int erroffset;
+	int ovector[OVECCOUNT];
+	int rc, i;
+
+	int iBegPos;
+	int iEndPos;
+	std::string Pcre;
+	std::string Behind;
+
+	iBegPos = Regex.find("/", 0);
+	iEndPos = Regex.find_last_of("/");
+	Pcre = Regex.substr(iBegPos + 1, iEndPos - iBegPos - 1);
+	Behind = Regex.substr(iEndPos + 1, Regex.find_last_of("\"") - iEndPos - 1);
+
+	int options = 0;
+	if (Behind.find("s", 0) != -1)
+	{
+		options |= PCRE_DOTALL;
+	}
+	if (Behind.find("m", 0) != -1)
+	{
+		options |= PCRE_MULTILINE;
+	}
+	if (Behind.find("i", 0) != -1)
+	{
+		options |= PCRE_CASELESS;
+	}
+
+	const char* pattern = Pcre.c_str();
+
+	//printf("string : %s\n", src);
+	//printf("pattern: \"%s\"\n", pattern);
+
+	re = pcre_compile(pattern, options, &error, &erroffset, NULL);
+
+	if (re == NULL)
+	{
+		//printf("pcre compilation failed at offset %d: %s\n", erroffset, error);
+		return false;
+	}
+
+	int wscount = 100;
+	int *workspace = new int[wscount];
+
+	//rc = pcre_exec(re, NULL, src, length, 0, 0, ovector, OVECCOUNT);
+	rc = pcre_dfa_exec(re, NULL,src, length, 0, 0, ovector, OVECCOUNT, workspace, wscount);
+	delete workspace;
+	if (rc < 0)
+	{
+		//if (rc == PCRE_ERROR_NOMATCH) printf("Sorry, no match ...\n");
+		//else printf("Matching error %d\n", rc);
+		free(re);
+		//system("pause");
+		return false;
+	}
+
+	//printf("\nOK, has matched ...\n\n");
+
+	for (i = 0; i < rc; i++)
+	{
+		//char *substring_start = src + ovector[2*i];
+		//int substring_length = ovector[2*i+1] - ovector[2*i];
+		//printf("%2d: %.*s\n", i, substring_length, substring_start);
+		Pos = ovector[2*i+1];
+	}
+
+	free(re);
+
+	return true;
 }

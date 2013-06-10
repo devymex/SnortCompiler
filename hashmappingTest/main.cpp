@@ -1,11 +1,8 @@
 #include <iostream>
 #include <fstream>
 #include <tchar.h>
-#include "../common/common.h"
-#include "../dfanew/dfanew.h"
-#include "../compilernew/compilernew.h"
-#include "../hashmapping/hashmapping.h"
-#include "../grouping/grouping.h"
+#include <hwprj\common.h>
+#include <hwprj\hashmapping.h>
 
 void main()
 {
@@ -16,16 +13,16 @@ void main()
 	//groupRes.WriteToFile(_T("..\\..\\output\\FinalResut.cdt"));
 
 	//groupRes.ReadFromFile(_T("..\\..\\output\\FinalResut.cdt"));
-	//for (size_t i = 0; i < groupRes.GetGroups().Size(); ++i)
+	//for (ULONG i = 0; i < groupRes.GetGroups().Size(); ++i)
 	//{
 	//	ONEGROUP &group = groupRes.GetGroups()[i];
 	//	HashResMap[hash(group.currSig)].push_back(HASHNODE(group.currSig, group.mergeDfaId));
 	//}
 	
 	//std::ofstream fout("..//..//output//test.txt");
-	//for (size_t i = 0; i < groupRes.GetGroups().Size(); ++i)
+	//for (ULONG i = 0; i < groupRes.GetGroups().Size(); ++i)
 	//{
-	//	for (size_t j = 0; j < groupRes.GetGroups()[i].DfaIds.Size(); ++j)
+	//	for (ULONG j = 0; j < groupRes.GetGroups()[i].DfaIds.Size(); ++j)
 	//	{
 	//		fout << groupRes.GetGroups()[i].DfaIds[j] << " ";
 	//	}
@@ -35,12 +32,12 @@ void main()
 	//fout.close();
 
 	CTimer ctime;
-	CResNew result;
-	compilenew(_T("..\\..\\input\\allrules.rule"), result);
-	result.WriteToFile(_T("..\\..\\output\\result.cdt"));
-	//result.ReadFromFile(_T("..\\..\\output\\result.cdt"));
+	CCompileResults result;
+	//compilenew(_T("..\\..\\input\\allrules.rule"), result);
+	//result.WriteToFile(_T("..\\..\\output\\result.cdt"));
+	result.ReadFromFile(_T("..\\..\\output\\result.cdt"));
 	CGROUPRes groupRes;
-	grouping(result, groupRes);
+	Grouping(result, groupRes);
 	groupRes.WriteToFile(_T("..\\..\\output\\GroupResut.cdt"));
 	HASHRES HashResMap;
 	HashMapping(groupRes, HashResMap);

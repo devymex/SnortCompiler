@@ -1,17 +1,17 @@
 #include "stdafx.h"
 #include "p2nmain.h"
 #include "pcre.h"
-#include "pcre2nfa.h"
 #include "getsig.h"
+#include <hwprj\pcre2nfa.h>
 
 #define MYGET(cur) \
 	((code[cur + 1] << 8) | code[cur + 2])
 
 void GetSignature(std::vector<unsigned char> &code, std::vector<std::vector<unsigned char>> &strs)
 {
-	size_t cur = 0;
-	size_t bra = 0;
-	size_t times = 0;
+	ULONG cur = 0;
+	ULONG bra = 0;
+	ULONG times = 0;
 	unsigned char temp = 0;
 	unsigned char curCode = code[0];
 	std::vector<unsigned char> str;
@@ -93,7 +93,7 @@ void GetSignature(std::vector<unsigned char> &code, std::vector<std::vector<unsi
 		case OP_EXACTI:         /* 54 */
 
 			times = MYGET(cur);
-			for(size_t i = 0; i < times; ++i)
+			for(ULONG i = 0; i < times; ++i)
 			{
 				str.resize(str.size() + 1);
 				str.back() = code[cur + 3];
@@ -107,7 +107,7 @@ void GetSignature(std::vector<unsigned char> &code, std::vector<std::vector<unsi
 					strs.back() = str;
 				}
 				str.clear();
-				for(size_t i = 0; i < times; ++i)
+				for(ULONG i = 0; i < times; ++i)
 				{
 					str.resize(str.size() + 1);
 					str.back() = code[cur + 3];

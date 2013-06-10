@@ -9,10 +9,6 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="config.h">
@@ -42,16 +38,13 @@
     <ClInclude Include="p2nmain.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="pcre2nfa.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\common\snortcom.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="match.h">
+    <ClInclude Include="getsig.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="getsig.h">
+    <ClInclude Include="..\include\hwprj\pcre2nfa.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -129,9 +122,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="pcre2nfa.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="match.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="getsig.cpp">

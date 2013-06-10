@@ -2,10 +2,10 @@
 #include <fstream>
 #include <algorithm>
 #include <tchar.h>
-#include "../common/common.h"
-#include "../dfanew/dfanew.h"
-#include "../grouping/grouping.h"
-#include "../compilernew/compilernew.h"
+
+#include <hwprj\compres.h>
+#include <hwprj\compiler.h>
+#include <hwprj\grouping.h>
 
 int main()
 {
@@ -15,7 +15,7 @@ int main()
 	//BYTE *p2 = new BYTE[10000000];
 	//f1.read((char*)p1, 7953451);
 	//f2.read((char*)p2, 7953451);
-	//for (size_t i = 0; i < 7953451; ++i)
+	//for (ULONG i = 0; i < 7953451; ++i)
 	//{
 	//	if (p1[i] != p2[i])
 	//	{
@@ -23,12 +23,12 @@ int main()
 	//	}
 	//}
 
-	CResNew result;
-	compilenew(_T("..\\..\\input\\allrules.rule"), result);
+	CCompileResults result;
+	CompileRuleSet(_T("..\\..\\input\\allrules.rule"), result);
 	result.WriteToFile(_T("..\\..\\output\\result.cdt"));
 	//result.ReadFromFile(_T("..\\..\\output\\result.cdt"));
 
-	//for (size_t i = 0; i < result.GetSidDfaIds().Size(); ++i)
+	//for (ULONG i = 0; i < result.GetSidDfaIds().Size(); ++i)
 	//{
 	//	if (result.GetSidDfaIds()[i].m_dfaIds.Size() > 0 && result.GetSidDfaIds()[i].m_dfaIds[0] == 1244)
 	//	{
@@ -39,7 +39,7 @@ int main()
 	CGROUPRes groupRes;
 
 	CTimer ctime;
-	grouping(result, groupRes);
+	Grouping(result, groupRes);
 	std::cout << "分组时间： " << ctime.Reset() << std::endl;
 
 	groupRes.WriteToFile(_T("..\\..\\output\\GroupResut.cdt"));
@@ -48,8 +48,8 @@ int main()
 	//groupRes.WriteToFile(_T("..\\..\\output\\GroupResut1.cdt"));
 
 	//std::ifstream fin("..\\..\\output\\Ids.txt");
-	//std::vector<size_t> vecIds;
-	//size_t tmp;
+	//std::vector<ULONG> vecIds;
+	//ULONG tmp;
 	//while (fin >> tmp)
 	//{
 	//	vecIds.push_back(tmp);
@@ -57,10 +57,10 @@ int main()
 
 	//SIGNATURE Sig = vecIds.back();
 	//vecIds.pop_back();
-	//for (size_t i = 0; i < vecIds.size(); ++i)
+	//for (ULONG i = 0; i < vecIds.size(); ++i)
 	//{
 	//	bool flag = false;
-	//	for (size_t j = 0; j < result.GetRegexTbl()[vecIds[i]].GetSigCnt(); ++j)
+	//	for (ULONG j = 0; j < result.GetRegexTbl()[vecIds[i]].GetSigCnt(); ++j)
 	//	{
 	//		if (result.GetRegexTbl()[vecIds[i]].GetSig(j) == Sig)
 	//		{
@@ -74,10 +74,10 @@ int main()
 	//	}
 	//}
 
-	//std::vector<CDfaNew> vecDfas(2);
-	//CDfaNew MergeDfa;
+	//std::vector<CDfa> vecDfas(2);
+	//CDfa MergeDfa;
 	//vecDfas[0] = result.GetDfaTable()[vecIds[0]];
-	//for (size_t i = 1; i < vecIds.size(); ++i)
+	//for (ULONG i = 1; i < vecIds.size(); ++i)
 	//{
 	//	vecDfas[1] = result.GetDfaTable()[vecIds[i]];
 	//	if (MergeMultipleDfas(vecDfas, MergeDfa))

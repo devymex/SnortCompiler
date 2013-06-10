@@ -1,50 +1,45 @@
 #include <iostream>
 #include <tchar.h>
 #include <windows.h>
-#include <fstream>
-#include <string>
-#include <algorithm>
-#include <sstream>
-#include "../common/common.h"
-#include "../dfanew/dfanew.h"
-#include "../compilernew/compilernew.h"
-#include "../pcre2nfa/pcre2nfa.h"
+
+
+#include <hwprj\compiler.h>
 
 
 
-size_t StatisticsSigToFile(LPCTSTR filename, CResNew &result)
-{
-	std::ofstream fout(filename);
-	if (!fout)
-	{
-		std::cerr << "Open file Failed!" << std::endl;
-		return (size_t)-1;
-	}
-
-	CSidDfaIdsNew &sdi = result.GetSidDfaIds();
-	CRegRule &rg = result.GetRegexTbl();
-
-	for (size_t i = 0; i < sdi.Size(); ++i)
-	{
-		COMPILEDRULENEW &tmpRes = sdi[i];
-		if (tmpRes.m_nResult == COMPILEDRULENEW::RES_SUCCESS)
-		{
-			if (tmpRes.m_dfaIds.Size() > 0)
-			{
-				//fout << tmpRes.m_nSid << "\t" << rg[tmpRes.m_dfaIds[0]].GetSigs.GetSigCnt() << std::endl;
-			}
-		}
-	}
-
-	fout.close();
-}
-
+//size_t StatisticsSigToFile(LPCTSTR filename, CResNew &result)
+//{
+//	std::ofstream fout(filename);
+//	if (!fout)
+//	{
+//		std::cerr << "Open file Failed!" << std::endl;
+//		return (size_t)-1;
+//	}
+//
+//	CSidDfaIdsNew &sdi = result.GetSidDfaIds();
+//	CRegRule &rg = result.GetRegexTbl();
+//
+//	for (size_t i = 0; i < sdi.Size(); ++i)
+//	{
+//		COMPILEDRULENEW &tmpRes = sdi[i];
+//		if (tmpRes.m_nResult == COMPILEDRULENEW::RES_SUCCESS)
+//		{
+//			if (tmpRes.m_dfaIds.Size() > 0)
+//			{
+//				//fout << tmpRes.m_nSid << "\t" << rg[tmpRes.m_dfaIds[0]].GetSigs.GetSigCnt() << std::endl;
+//			}
+//		}
+//	}
+//
+//	fout.close();
+//}
+//
 
 void main()
 {
 	CTimer t;
-	CResNew result;
-	compilenew(_T("..\\allrules.rule"), result);
+	CCompileResults result;
+	CompileRuleSet(_T("..\\allrules.rule"), result);
 	result.WriteToFile(_T("..\\result.cdt"));
 	//StatisticsSigToFile(_T("..\\contentSig.txt"), result);
 	//StatisticsSigToFile(_T("..\\allSig.txt"), result);
@@ -62,7 +57,7 @@ void main()
 	//fin.close();
 
 	//std::ofstream fout("../../input/ProcessRules.rule");
-	//for (size_t i = 0; i < result.GetSidDfaIds().Size(); ++i)
+	//for (ULONG i = 0; i < result.GetSidDfaIds().Size(); ++i)
 	//{
 	//	if (result.GetSidDfaIds()[i].m_nResult == COMPILEDRULENEW::RES_SUCCESS)
 	//	{
@@ -83,15 +78,15 @@ void main()
 	//fout.clear();
 	//fout.close();
 
-	//size_t success_cNt = 0;
-	//size_t error_cNt = 0;
-	//size_t exceed_cNt = 0;
-	//size_t hasbyte_cNt = 0;
-	//size_t hasnot_cNt = 0;
-	//size_t empty_cNt = 0;
-	//size_t hasnosig_cNt = 0;
-	//size_t exceedlimit_cNt = 0;
-	//for (size_t i = 0; i < result.GetSidDfaIds().Size(); ++i)
+	//ULONG success_cNt = 0;
+	//ULONG error_cNt = 0;
+	//ULONG exceed_cNt = 0;
+	//ULONG hasbyte_cNt = 0;
+	//ULONG hasnot_cNt = 0;
+	//ULONG empty_cNt = 0;
+	//ULONG hasnosig_cNt = 0;
+	//ULONG exceedlimit_cNt = 0;
+	//for (ULONG i = 0; i < result.GetSidDfaIds().Size(); ++i)
 	//{
 	//	if (result.GetSidDfaIds()[i].m_nResult == COMPILEDRULENEW::RES_SUCCESS)
 	//	{
