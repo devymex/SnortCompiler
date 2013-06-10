@@ -23,7 +23,7 @@
 *.obj
 *.pdb
 *.pch
-#*.user
+*.user
 *.suo
 *.sdf
 *.ilk
