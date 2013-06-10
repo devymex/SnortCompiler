@@ -16,7 +16,7 @@
 */
 
 #include "stdafx.h"
-#include <hwprj\hashmapping.h>
+#include <hwprj\buildhash.h>
 
 /* hash function, correspond to a hash slot for a given signature
 

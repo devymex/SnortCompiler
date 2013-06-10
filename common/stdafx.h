@@ -7,5 +7,4 @@
 #include <fstream>
 
 #define UNSARYHDR_DS
-#define SIGHDR_DS
 #define DLLSTRHDR_DS

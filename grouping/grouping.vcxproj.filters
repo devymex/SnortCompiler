@@ -17,12 +17,18 @@
     <ClCompile Include="grouping.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="buildhash.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\include\hwprj\grouping.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\hwprj\buildhash.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

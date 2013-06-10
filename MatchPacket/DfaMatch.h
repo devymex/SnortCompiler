@@ -3,7 +3,7 @@
 #include <fstream>
 #include <string>
 #include <unordered_map>
-#include <hwprj\hashmapping.h>
+#include <hwprj\buildhash.h>
 
 struct DFASIDMAPPING
 {

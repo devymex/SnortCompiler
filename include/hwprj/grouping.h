@@ -1,11 +1,14 @@
 #pragma once
 
-#include <hwprj\compiler.h>
+#include <hwprj\dllarray.h>
+#include <hwprj\dfaarray.h>
+#include <hwprj\signatures.h>
+#include <hwprj\siddfaids.h>
 
-#ifndef GROUPING_H_
-#define GROUPINGSC __declspec(dllimport)
+#ifndef GROUPHDR_DS
+#define GROUPHDR __declspec(dllimport)
 #else
-#define GROUPINGSC __declspec(dllexport)
+#define GROUPHDR __declspec(dllexport)
 #endif
 
 struct DFAINFO
@@ -21,7 +24,7 @@ struct ONEGROUP
 	ULONG mergeDfaId;
 };
 
-class GROUPINGSC CGROUPS
+class GROUPHDR CGROUPS
 {
 public:
 	CGROUPS();
@@ -40,7 +43,7 @@ protected:
 	std::vector<ONEGROUP> *m_pGroups;
 };
 
-class GROUPINGSC CGROUPRes
+class GROUPHDR CGROUPRes
 {
 protected:
 	CDfaArray m_dfaTbl;
@@ -57,4 +60,4 @@ public:
 	ULONG ReadFromFile(LPCTSTR filename);
 };
 
-GROUPINGSC void Grouping(CCompileResults &res, CGROUPRes &groupRes);
+GROUPHDR void Grouping(class CCompileResults &res, CGROUPRes &groupRes);

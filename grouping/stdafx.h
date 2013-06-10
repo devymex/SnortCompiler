@@ -8,4 +8,6 @@
 #include <string>
 #include <sstream>
 
-#define GROUPING_H_
+#define GROUPHDR_DS
+
+#define HASHMAPHDR_DS

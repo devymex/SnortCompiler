@@ -3,9 +3,8 @@
 #include <algorithm>
 #include <tchar.h>
 
-#include <hwprj\compres.h>
 #include <hwprj\compiler.h>
-#include <hwprj\grouping.h>
+#include <hwprj\buildhash.h>
 
 int main()
 {
@@ -23,26 +22,26 @@ int main()
 	//	}
 	//}
 
-	CCompileResults result;
-	CompileRuleSet(_T("..\\..\\input\\allrules.rule"), result);
-	result.WriteToFile(_T("..\\..\\output\\result.cdt"));
-	//result.ReadFromFile(_T("..\\..\\output\\result.cdt"));
+	//CCompileResults result;
+	//CompileRuleSet(_T("..\\..\\input\\allrules.rule"), result);
+	//result.WriteToFile(_T("..\\..\\output\\result.cdt"));
+	////result.ReadFromFile(_T("..\\..\\output\\result.cdt"));
 
-	//for (ULONG i = 0; i < result.GetSidDfaIds().Size(); ++i)
-	//{
-	//	if (result.GetSidDfaIds()[i].m_dfaIds.Size() > 0 && result.GetSidDfaIds()[i].m_dfaIds[0] == 1244)
-	//	{
-	//		std::cout << result.GetSidDfaIds()[i].m_nSid << std::endl;
-	//		break;
-	//	}
-	//}
-	CGROUPRes groupRes;
+	////for (ULONG i = 0; i < result.GetSidDfaIds().Size(); ++i)
+	////{
+	////	if (result.GetSidDfaIds()[i].m_dfaIds.Size() > 0 && result.GetSidDfaIds()[i].m_dfaIds[0] == 1244)
+	////	{
+	////		std::cout << result.GetSidDfaIds()[i].m_nSid << std::endl;
+	////		break;
+	////	}
+	////}
+	//CGROUPRes groupRes;
 
-	CTimer ctime;
-	Grouping(result, groupRes);
-	std::cout << "分组时间： " << ctime.Reset() << std::endl;
+	//CTimer ctime;
+	//Grouping(result, groupRes);
+	//std::cout << "分组时间： " << ctime.Reset() << std::endl;
 
-	groupRes.WriteToFile(_T("..\\..\\output\\GroupResut.cdt"));
+	//groupRes.WriteToFile(_T("..\\..\\output\\GroupResut.cdt"));
 
 	//groupRes.ReadFromFile(_T("..\\..\\output\\GroupResut.cdt"));
 	//groupRes.WriteToFile(_T("..\\..\\output\\GroupResut1.cdt"));
@@ -91,6 +90,21 @@ int main()
 	//	}
 	//}
 	//std::cout << vecDfas[0].Size() << std::endl;
+
+	CTimer ctime;
+	CCompileResults result;
+	//compilenew(_T("..\\..\\input\\allrules.rule"), result);
+	//result.WriteToFile(_T("..\\..\\output\\result.cdt"));
+	result.ReadFromFile(_T("..\\..\\output\\result.cdt"));
+	CGROUPRes groupRes;
+	Grouping(result, groupRes);
+	groupRes.WriteToFile(_T("..\\..\\output\\GroupResut.cdt"));
+	HASHRES HashResMap;
+	HashMapping(groupRes, HashResMap);
+	groupRes.WriteToFile(_T("..\\..\\output\\FinalResut.cdt"));
+	std::cout << "总时间： " << ctime.Reset() << std::endl;
+	std::cout << groupRes.GetGroups().Size() << std::endl;
+	std::cout << HashResMap.size() << std::endl;
 
 	system("pause");
 	return 0;

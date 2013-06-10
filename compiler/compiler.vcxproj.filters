@@ -74,6 +74,9 @@
     <ClInclude Include="p2nmain.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\hwprj\signatures.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -179,6 +182,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="p2nmain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="signatures.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -2,7 +2,7 @@
 #include <fstream>
 #include <tchar.h>
 #include <hwprj\common.h>
-#include <hwprj\hashmapping.h>
+#include <hwprj\buildhash.h>
 
 void main()
 {
@@ -31,20 +31,6 @@ void main()
 	//fout.clear();
 	//fout.close();
 
-	CTimer ctime;
-	CCompileResults result;
-	//compilenew(_T("..\\..\\input\\allrules.rule"), result);
-	//result.WriteToFile(_T("..\\..\\output\\result.cdt"));
-	result.ReadFromFile(_T("..\\..\\output\\result.cdt"));
-	CGROUPRes groupRes;
-	Grouping(result, groupRes);
-	groupRes.WriteToFile(_T("..\\..\\output\\GroupResut.cdt"));
-	HASHRES HashResMap;
-	HashMapping(groupRes, HashResMap);
-	groupRes.WriteToFile(_T("..\\..\\output\\FinalResut.cdt"));
-	std::cout << "×ÜÊ±¼ä£º " << ctime.Reset() << std::endl;
-	std::cout << groupRes.GetGroups().Size() << std::endl;
-	std::cout << HashResMap.size() << std::endl;
 
 	system("pause");
 }

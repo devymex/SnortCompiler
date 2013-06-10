@@ -13,96 +13,97 @@
 */
 
 #include "stdafx.h"
+#include <hwprj\compres.h>
 #include <hwprj\grouping.h>
 
-GROUPINGSC CGROUPS::CGROUPS()
+GROUPHDR CGROUPS::CGROUPS()
 {
 	m_pGroups = new std::vector<ONEGROUP>;
 }
 
-GROUPINGSC CGROUPS::CGROUPS(const CGROUPS& other)
+GROUPHDR CGROUPS::CGROUPS(const CGROUPS& other)
 {
 	m_pGroups = new std::vector<ONEGROUP>;
 	*this = other;
 }
 
-GROUPINGSC const CGROUPS &CGROUPS::operator=(const CGROUPS &other)
+GROUPHDR const CGROUPS &CGROUPS::operator=(const CGROUPS &other)
 {
 	*m_pGroups = *other.m_pGroups;
 	return *this;
 }
 
-GROUPINGSC CGROUPS::~CGROUPS()
+GROUPHDR CGROUPS::~CGROUPS()
 {
 	delete m_pGroups;
 }
 
-GROUPINGSC const ULONG CGROUPS::Size() const
+GROUPHDR const ULONG CGROUPS::Size() const
 {
 	return m_pGroups->size();
 }
 
-GROUPINGSC void CGROUPS::Resize(ULONG nSize)
+GROUPHDR void CGROUPS::Resize(ULONG nSize)
 {
 	m_pGroups->resize(nSize);
 }
 
-GROUPINGSC ONEGROUP &CGROUPS::operator[](ULONG nIdx)
+GROUPHDR ONEGROUP &CGROUPS::operator[](ULONG nIdx)
 {
 	return (*m_pGroups)[nIdx];
 }
 
-GROUPINGSC const ONEGROUP &CGROUPS::operator[](ULONG nIdx) const
+GROUPHDR const ONEGROUP &CGROUPS::operator[](ULONG nIdx) const
 {
 	return (*m_pGroups)[nIdx];
 }
 
-GROUPINGSC void CGROUPS::PushBack(ONEGROUP oneGroup)
+GROUPHDR void CGROUPS::PushBack(ONEGROUP oneGroup)
 {
 	m_pGroups->push_back(oneGroup);
 }
 
-GROUPINGSC ONEGROUP& CGROUPS::Back()
+GROUPHDR ONEGROUP& CGROUPS::Back()
 {
 	return m_pGroups->back();
 }
 
-GROUPINGSC void CGROUPS::Clear()
+GROUPHDR void CGROUPS::Clear()
 {
 	m_pGroups->clear();
 }
 
-GROUPINGSC void CGROUPS::Erase(ULONG nIdx)
+GROUPHDR void CGROUPS::Erase(ULONG nIdx)
 {
 	m_pGroups->erase(m_pGroups->begin() + nIdx);
 }
 
-GROUPINGSC CDfaArray &CGROUPRes::GetDfaTable()
+GROUPHDR CDfaArray &CGROUPRes::GetDfaTable()
 {
 	return m_dfaTbl;
 }
 
-GROUPINGSC CSidDfaIds &CGROUPRes::GetSidDfaIds()
+GROUPHDR CSidDfaIds &CGROUPRes::GetSidDfaIds()
 {
 	return m_sidDfaIds;
 }
 
-GROUPINGSC CGROUPS &CGROUPRes::GetGroups()
+GROUPHDR CGROUPS &CGROUPRes::GetGroups()
 {
 	return m_groups;
 }
 
-GROUPINGSC const CDfaArray &CGROUPRes::GetDfaTable() const
+GROUPHDR const CDfaArray &CGROUPRes::GetDfaTable() const
 {
 	return m_dfaTbl;
 }
 
-GROUPINGSC const CSidDfaIds &CGROUPRes::GetSidDfaIds() const
+GROUPHDR const CSidDfaIds &CGROUPRes::GetSidDfaIds() const
 {
 	return m_sidDfaIds;
 }
 
-GROUPINGSC const CGROUPS &CGROUPRes::GetGroups() const
+GROUPHDR const CGROUPS &CGROUPRes::GetGroups() const
 {
 	return m_groups;
 }
@@ -123,7 +124,7 @@ Returns:      0 success
               -1 error occurred
 */
 
-GROUPINGSC ULONG CGROUPRes::WriteToFile(LPCTSTR filename)
+GROUPHDR ULONG CGROUPRes::WriteToFile(LPCTSTR filename)
 {
 	std::ofstream fout(filename, std::ios::binary);
 	if (!fout)
@@ -242,7 +243,7 @@ Returns:      0 success
               -1 error occurred
 */
 
-GROUPINGSC ULONG CGROUPRes::ReadFromFile(LPCTSTR filename)
+GROUPHDR ULONG CGROUPRes::ReadFromFile(LPCTSTR filename)
 {
 	std::ifstream fin(filename, std::ios::binary);
 	if (!fin)
@@ -919,7 +920,7 @@ Returns:            nothing
 
 */
 
-GROUPINGSC void Grouping(CCompileResults &res, CGROUPRes &groupRes)
+GROUPHDR void Grouping(CCompileResults &res, CGROUPRes &groupRes)
 {
 	CTimer t1, tAll;
 
