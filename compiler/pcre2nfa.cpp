@@ -1,8 +1,9 @@
 #include "stdafx.h"
-#include "p2nmain.h"
-#include "pcre.h"
+#include <hwprj\pcre2nfa.h>
+#include "pcre\pcre.h"
 #include "getsig.h"
-#include <hwprj/pcre2nfa.h>
+
+#include "p2nmain.h"
 
 #define OVECCOUNT 30 /* should be a multiple of 3 */
 #define EBUFLEN 128
@@ -241,7 +242,7 @@ PCRE2NFA bool match(const char* src, int length, std::string Regex, int &Pos)
 
 	//rc = pcre_exec(re, NULL, src, length, 0, 0, ovector, OVECCOUNT);
 	rc = pcre_dfa_exec(re, NULL,src, length, 0, 0, ovector, OVECCOUNT, workspace, wscount);
-	delete workspace;
+	delete []workspace;
 	if (rc < 0)
 	{
 		//if (rc == PCRE_ERROR_NOMATCH) printf("Sorry, no match ...\n");

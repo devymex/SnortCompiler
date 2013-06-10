@@ -187,7 +187,7 @@ GROUPINGSC ULONG CGROUPRes::WriteToFile(LPCTSTR filename)
 	fout.seekp(0, std::ios_base::end);
 
 	//start to write dfas
-	BYTE dfaDetails[100000];
+	BYTE *dfaDetails = new BYTE[100000];
 	for (ULONG i = 0; i < m_dfaTbl.Size(); ++i)
 	{
 		ULONG len = m_dfaTbl[i].Save(dfaDetails);
@@ -228,6 +228,7 @@ GROUPINGSC ULONG CGROUPRes::WriteToFile(LPCTSTR filename)
 	fout.close();
 	fout.clear();
 
+	delete []dfaDetails;
 	return 0;
 }
 
@@ -293,7 +294,7 @@ GROUPINGSC ULONG CGROUPRes::ReadFromFile(LPCTSTR filename)
 
 	//start to read dfas
 	m_dfaTbl.Resize(dfaNum);
-	BYTE dfaDetails[100000];
+	BYTE *dfaDetails = new BYTE[100000];
 	for (ULONG i = 0; i < dfaNum; ++i)
 	{
 		CDfa &dfa = m_dfaTbl[i];
@@ -330,6 +331,7 @@ GROUPINGSC ULONG CGROUPRes::ReadFromFile(LPCTSTR filename)
 	fin.close();
 	fin.clear();
 
+	delete []dfaDetails;
 	return 0;
 }
 

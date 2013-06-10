@@ -119,7 +119,7 @@ COMPRESHDR ULONG CCompileResults::WriteToFile(LPCTSTR filename)
 	fout.seekp(0, std::ios_base::end);
 
 	//start to write dfas
-	BYTE dfaDetails[100000];
+	BYTE *dfaDetails = new BYTE[100000];
 	for (ULONG i = 0; i < m_dfaTbl.Size(); ++i)
 	{
 		ULONG len = m_dfaTbl[i].Save(dfaDetails);
@@ -160,6 +160,7 @@ COMPRESHDR ULONG CCompileResults::WriteToFile(LPCTSTR filename)
 	fout.close();
 	fout.clear();
 
+	delete []dfaDetails;
 	return 0;
 }
 
@@ -238,7 +239,7 @@ COMPRESHDR ULONG CCompileResults::ReadFromFile(LPCTSTR filename)
 
 	//start to read dfas
 	m_dfaTbl.Resize(dfaNum);
-	BYTE dfaDetails[100000];
+	BYTE *dfaDetails = new BYTE[100000];
 	for (ULONG i = 0; i < dfaNum; ++i)
 	{
 		CDfa &dfa = m_dfaTbl[i];
@@ -275,5 +276,6 @@ COMPRESHDR ULONG CCompileResults::ReadFromFile(LPCTSTR filename)
 	fin.close();
 	fin.clear();
 
+	delete []dfaDetails;
 	return 0;
 }

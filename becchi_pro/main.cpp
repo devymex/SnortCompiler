@@ -453,11 +453,15 @@ ULONG CompareWithPcre(const char *pPcre)
 	if (BeDfa != NULL)
 	{
 		BeDfa->minimize();
+		CDfa newBeDfa;
+		BeDfa->Dfa2CDfaNew(newBeDfa);
+		if (CompDfa(OwnDfa, newBeDfa))
+		{
+			Result = 1;
+		}
 	}
 	//BeDfa->dump();
 	//std::cout << BeDfa->size() << std::endl;
-	CDfa newBeDfa;
-	BeDfa->Dfa2CDfaNew(newBeDfa);
 	//PrintDfaToGv(newBeDfa, "..\\result2.txt");
 	//std::cout << (ULONG)newBeDfa.Size() << std::endl;
 	//newBeDfa.Process((BYTE* )str, strlen(str), tmp);
@@ -465,10 +469,6 @@ ULONG CompareWithPcre(const char *pPcre)
 	//std::cout << std::endl;
 	//display(newBeDfa);
 
-	if (CompDfa(OwnDfa, newBeDfa))
-	{
-		Result = 1;
-	}
 
 	return Result;
 }

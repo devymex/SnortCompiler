@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include <hwprj/finalstates.h>
+#include <hwprj\finalstates.h>
 
 FINSTAHDR_DS CFinalStates::CFinalStates()
 {

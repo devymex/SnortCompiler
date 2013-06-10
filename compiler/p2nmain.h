@@ -1,8 +1,8 @@
 #pragma once
 
 #define ONEPCRETONFA_H_
-#include <hwprj/pcre2nfa.h>
-#include <hwprj/common.h>
+#include <hwprj\pcre2nfa.h>
+#include <hwprj\common.h>
 
 #define SC_LIMIT 200
 

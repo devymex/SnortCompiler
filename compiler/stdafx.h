@@ -25,3 +25,6 @@
 #define SIDDFAHDR_DS
 #define COMPRESHDR_DS
 #define RULE2NFAHDR_DS
+
+#define PCRE2NFA_DS
+#define MATCHHDR_DS

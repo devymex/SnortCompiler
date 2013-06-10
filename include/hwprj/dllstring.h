@@ -12,7 +12,7 @@
 #pragma once
 
 #include <string>
-#include <hwprj/common.h>
+#include <hwprj\common.h>
 
 #ifndef DLLSTRHDR_DS
 #define DLLSTRHDR __declspec(dllimport)

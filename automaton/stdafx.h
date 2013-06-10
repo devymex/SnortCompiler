@@ -17,6 +17,7 @@
 #include <windows.h>
 #include <xmmintrin.h>
 #include <deque>
+#include <exception>
 
 #undef max
 #define FINSTAHDR_DS

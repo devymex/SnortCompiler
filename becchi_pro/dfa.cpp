@@ -3411,7 +3411,7 @@ void DFA::output()
 	}
 	std::cout << std::endl;
 }
-
+#include <exception>
 void DFA::Dfa2CDfaNew(CDfa &curDFA)
 {
 	BYTE group[CSIZE];
@@ -3464,6 +3464,10 @@ void DFA::Dfa2CDfaNew(CDfa &curDFA)
 				STATEID nCur = curRow[c];
 				if (nCur != this->dead_state)
 				{
+					if (nCur >= _size)
+					{
+						throw exception("Error");
+					}
 					nDest = old2new[nCur];
 				}
 				curRow[c] = nDest;

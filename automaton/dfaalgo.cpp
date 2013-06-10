@@ -49,6 +49,10 @@ void NfaEClosure(const CNfa &nfa, std::vector<STATESET> &eClosure)
 		nMatWidth = (nMatWidth / 16) * 16 + 16;
 	}
 	BYTE *pMat = (BYTE*)_aligned_malloc(nMatWidth * nMatHeight, 128);
+	if (pMat == NULL)
+	{
+		throw std::exception("Fatal Error");
+	}
 	memset(pMat, 0, nMatWidth * nMatHeight);
 
 	for (ULONG i = 0; i < nNfaSize; ++i)

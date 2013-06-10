@@ -1,8 +1,8 @@
 #include "stdafx.h"
-#include "p2nmain.h"
-#include "pcre.h"
-#include "getsig.h"
 #include <hwprj\pcre2nfa.h>
+#include "pcre\pcre.h"
+#include "p2nmain.h"
+#include "getsig.h"
 
 #define MYGET(cur) \
 	((code[cur + 1] << 8) | code[cur + 2])

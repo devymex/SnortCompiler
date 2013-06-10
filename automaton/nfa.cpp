@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include <hwprj/nfa.h>
+#include <hwprj\nfa.h>
 
 NFAHDR CNfa::CNfa()
 {

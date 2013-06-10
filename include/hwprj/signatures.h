@@ -12,7 +12,7 @@
 #pragma once
 
 #include <vector>
-#include <hwprj/common.h>
+#include <hwprj\common.h>
 
 #ifndef SIGHDR_DS
 #define SIGHDR __declspec(dllimport)
