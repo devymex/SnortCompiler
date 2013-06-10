@@ -1504,7 +1504,7 @@ ULONG OP_CLASS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector
 	switch (*Beg)
 	{
 	case OP_CRSTAR:
-		for (ULONG i = 0; i < CHARSETSIZE; ++i)
+		for (ULONG i = 0; i < SC_CHARSETSIZE; ++i)
 		{
 			for (ULONG j = 0; j < nfa.Back().DestCnt(i); ++j)
 			{
@@ -1519,7 +1519,7 @@ ULONG OP_CLASS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector
 		Beg += Steps[OP_CRSTAR];
 		break;
 	case OP_CRMINSTAR:
-		for (ULONG i = 0; i < CHARSETSIZE; ++i)
+		for (ULONG i = 0; i < SC_CHARSETSIZE; ++i)
 		{
 			for (ULONG j = 0; j < nfa.Back().DestCnt(i); ++j)
 			{
@@ -1571,7 +1571,7 @@ ULONG OP_CLASS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector
 		if (max == 0)
 		{
 			nfa.Resize(nCursize + min + 1);
-			for (ULONG i = 0; i < CHARSETSIZE; ++i)
+			for (ULONG i = 0; i < SC_CHARSETSIZE; ++i)
 			{
 				if (Row.DestCnt(i) == 1)
 				{
@@ -1626,7 +1626,7 @@ ULONG OP_NCLASS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vecto
 	switch (*Beg)
 	{
 	case OP_CRSTAR:
-		for (ULONG i = 0; i < CHARSETSIZE; ++i)
+		for (ULONG i = 0; i < SC_CHARSETSIZE; ++i)
 		{
 			ULONG nCnt = nfa.Back().DestCnt(i);
 			for (ULONG j = 0; j < nCnt; ++j)
@@ -1643,7 +1643,7 @@ ULONG OP_NCLASS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vecto
 		Beg += Steps[OP_CRSTAR];
 		break;
 	case OP_CRMINSTAR:
-		for (ULONG i = 0; i < CHARSETSIZE; ++i)
+		for (ULONG i = 0; i < SC_CHARSETSIZE; ++i)
 		{
 			ULONG nCnt = nfa.Back().DestCnt(i);
 			for (ULONG j = 0; j < nCnt; ++j)
@@ -1697,7 +1697,7 @@ ULONG OP_NCLASS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vecto
 		if (max == 0)
 		{
 			nfa.Resize(nCursize + min + 1);
-			for (ULONG i = 0; i < CHARSETSIZE; ++i)
+			for (ULONG i = 0; i < SC_CHARSETSIZE; ++i)
 			{
 				if (Row.DestCnt(i) == 1)
 				{
@@ -1733,7 +1733,7 @@ void OP_ALT_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<un
 	for (ULONG i = PreState; i < nfa.Size(); ++i)
 	{
 		CNfaRow &row = nfa[i];
-		for (ULONG j = 0; j < CHARSETSIZE; ++j)
+		for (ULONG j = 0; j < SC_CHARSETSIZE; ++j)
 		{
 			ULONG nCnt = row.DestCnt(j);
 			for (ULONG k = 0; k < nCnt; ++k)
@@ -1763,7 +1763,7 @@ void OP_KET_FUNC(CNfa &nfa, ULONG PreState, ULONG &CurState, bool IsALT, bool Is
 		for (ULONG i = PreState; i < nfa.Size(); ++i)
 		{
 			CNfaRow &row = nfa[i];
-			for (ULONG j = 0; j < CHARSETSIZE; ++j)
+			for (ULONG j = 0; j < SC_CHARSETSIZE; ++j)
 			{
 				ULONG nCnt = row.DestCnt(j);
 				for (ULONG k = 0; k < nCnt; ++k)
@@ -1786,7 +1786,7 @@ void OP_KETRMAX_FUNC(CNfa &nfa, ULONG PreState, ULONG &CurState, bool IsBRAZERO,
 		for (ULONG i = PreState; i < nfa.Size(); ++i)
 		{
 			CNfaRow &row = nfa[i];
-			for (ULONG j = 0; j < CHARSETSIZE; ++j)
+			for (ULONG j = 0; j < SC_CHARSETSIZE; ++j)
 			{
 				ULONG nCnt = row.DestCnt(j);
 				for (ULONG k = 0; k < nCnt; ++k)
@@ -1805,7 +1805,7 @@ void OP_KETRMAX_FUNC(CNfa &nfa, ULONG PreState, ULONG &CurState, bool IsBRAZERO,
 		for (ULONG i = PreState; i < nfa.Size(); ++i)
 		{
 			CNfaRow &row = nfa[i];
-			for (ULONG j = 0; j < CHARSETSIZE; ++j)
+			for (ULONG j = 0; j < SC_CHARSETSIZE; ++j)
 			{
 				ULONG nCnt = row.DestCnt(j);
 				for (ULONG k = 0; k < nCnt; ++k)
@@ -1829,7 +1829,7 @@ void OP_KETRMAX_FUNC(CNfa &nfa, ULONG PreState, ULONG &CurState, bool IsBRAZERO,
 		for (ULONG i = PreState; i < nCursize; ++i)
 		{
 			CNfaRow &row = nfa[i];
-			for (ULONG j = 0; j < CHARSETSIZE; ++j)
+			for (ULONG j = 0; j < SC_CHARSETSIZE; ++j)
 			{
 				ULONG nCnt = row.DestCnt(j);
 				for (ULONG k = 0; k < nCnt; ++k)
@@ -1842,7 +1842,7 @@ void OP_KETRMAX_FUNC(CNfa &nfa, ULONG PreState, ULONG &CurState, bool IsBRAZERO,
 		for (ULONG i = StartState; i < nfa.Size(); ++i)
 		{
 			CNfaRow &row = nfa[i];
-			for (ULONG j = 0; j < CHARSETSIZE; ++j)
+			for (ULONG j = 0; j < SC_CHARSETSIZE; ++j)
 			{
 				ULONG nCnt = row.DestCnt(j);
 				for (ULONG k = 0; k < nCnt; ++k)
@@ -1889,7 +1889,7 @@ ULONG OP_SCBRA_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector
 
 void Copy(CNfaRow &NewRow, CNfaRow &Row, ULONG increment)
 {
-	for (ULONG i = 0; i < CHARSETSIZE; ++i)
+	for (ULONG i = 0; i < SC_CHARSETSIZE; ++i)
 	{
 		ULONG nDestCnt = Row.DestCnt(i);
 		for (ULONG j = 0; j < nDestCnt; ++j)
@@ -1932,7 +1932,7 @@ void OutPut(std::vector<PCRE>::iterator &Pcre, CNfa &nfa, ULONG count)
 	for (ULONG i = 0; i < Cnt; ++i)
 	{
 		CNfaRow &row = nfa[i];
-		for (ULONG j = 0; j < CHARSETSIZE; ++j)
+		for (ULONG j = 0; j < SC_CHARSETSIZE; ++j)
 		{
 			num = row.DestCnt(j);
 			fout.write((char*)&num, 4);
