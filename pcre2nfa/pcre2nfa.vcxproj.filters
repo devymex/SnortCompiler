@@ -42,9 +42,6 @@
     <ClInclude Include="p2nmain.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="pcre2nfa.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\common\snortcom.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -52,6 +49,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="getsig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\hwprj\pcre2nfa.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,12 +1,12 @@
 #include "stdafx.h"
 #include "p2nmain.h"
-#include "pcre2nfa.h"
+#include <hwprj\pcre2nfa.h>
 
 #pragma warning (push)
 #pragma warning (disable : 4100)
 const unsigned char Steps[] = { OP_LENGTHS };
 
-size_t OP_NOT_DIGIT_ELEMS[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 
+ULONG OP_NOT_DIGIT_ELEMS[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 
 	21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 
 	47, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 
 	84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108,
@@ -18,9 +18,9 @@ size_t OP_NOT_DIGIT_ELEMS[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14,
 	219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 
 	241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255};
 
-size_t OP_DIGIT_ELEMS[] = {48, 49, 50, 51, 52, 53, 54, 55, 56, 57};
+ULONG OP_DIGIT_ELEMS[] = {48, 49, 50, 51, 52, 53, 54, 55, 56, 57};
 
-size_t OP_NOT_WHITESPACE_ELEMS[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 11, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 
+ULONG OP_NOT_WHITESPACE_ELEMS[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 11, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 
 	26, 27, 28, 29, 30, 31, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54,
 	55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82,
 	83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 
@@ -32,9 +32,9 @@ size_t OP_NOT_WHITESPACE_ELEMS[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 11, 14, 15, 16, 1
 	224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, 243, 244, 245, 246, 
 	247, 248, 249, 250, 251, 252, 253, 254, 255};
 
-size_t OP_WHITESPACE_ELEMS[] = {9, 10, 12, 13, 32};
+ULONG OP_WHITESPACE_ELEMS[] = {9, 10, 12, 13, 32};
 
-size_t OP_NOT_WORDCHAR_ELEMS[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 
+ULONG OP_NOT_WORDCHAR_ELEMS[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 
 	24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 58, 59, 60, 61, 62,
 	63, 64, 91, 92, 93, 94, 96, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140,
 	141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164,
@@ -43,11 +43,11 @@ size_t OP_NOT_WORDCHAR_ELEMS[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 
 	213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 
 	237, 238, 239, 240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255};
 
-size_t OP_WORDCHAR_ELEMS[] = {48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 
+ULONG OP_WORDCHAR_ELEMS[] = {48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 
 	79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 95, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 
 	112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122};
 
-size_t OP_ANY_ELEMS[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
+ULONG OP_ANY_ELEMS[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
 	31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61,
 	62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92,
 	93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118,
@@ -58,7 +58,7 @@ size_t OP_ANY_ELEMS[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16, 1
 	219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, 243,
 	244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255};
 
-size_t OP_ALLANY_ELEMS[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 
+ULONG OP_ALLANY_ELEMS[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 
 	28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59,
 	60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 
 	91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117,
@@ -69,7 +69,7 @@ size_t OP_ALLANY_ELEMS[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 	218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, 
 	243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255};
 
-size_t* ptr[] = {
+ULONG* ptr[] = {
 	NULL,
 	NULL,
 	NULL,
@@ -86,21 +86,21 @@ size_t* ptr[] = {
 	OP_ALLANY_ELEMS
 };
 
-size_t NUMS[] = {
+ULONG NUMS[] = {
 	0,
 	0,
 	0,
 	0,
 	0,
 	0,
-	sizeof(OP_NOT_DIGIT_ELEMS) / sizeof(size_t),
-	sizeof(OP_DIGIT_ELEMS) / sizeof(size_t),
-	sizeof(OP_NOT_WHITESPACE_ELEMS) / sizeof(size_t),
-	sizeof(OP_WHITESPACE_ELEMS) / sizeof(size_t),
-	sizeof(OP_NOT_WORDCHAR_ELEMS) / sizeof(size_t),
-	sizeof(OP_WORDCHAR_ELEMS) / sizeof(size_t),
-	sizeof(OP_ANY_ELEMS) / sizeof(size_t),
-	sizeof(OP_ALLANY_ELEMS) / sizeof(size_t),
+	sizeof(OP_NOT_DIGIT_ELEMS) / sizeof(ULONG),
+	sizeof(OP_DIGIT_ELEMS) / sizeof(ULONG),
+	sizeof(OP_NOT_WHITESPACE_ELEMS) / sizeof(ULONG),
+	sizeof(OP_WHITESPACE_ELEMS) / sizeof(ULONG),
+	sizeof(OP_NOT_WORDCHAR_ELEMS) / sizeof(ULONG),
+	sizeof(OP_WORDCHAR_ELEMS) / sizeof(ULONG),
+	sizeof(OP_ANY_ELEMS) / sizeof(ULONG),
+	sizeof(OP_ALLANY_ELEMS) / sizeof(ULONG),
 };
 
 Fn FUNC[156] = 
@@ -352,8 +352,8 @@ enum PCRESIGN
 
 //void GenerateNFA(std::vector<PCRE> &vecPcres)
 //{
-//	size_t count = 0;
-//	size_t NotProcess = 0;
+//	ULONG count = 0;
+//	ULONG NotProcess = 0;
 //	for (std::vector<PCRE>::iterator i = vecPcres.begin(); i != vecPcres.end(); ++i)
 //	{
 //		std::cout << ++count << std::endl;
@@ -509,34 +509,34 @@ void NextForCLASS(std::vector<unsigned char>::iterator &Beg)
 	}
 }
 
-size_t ProcessPcre(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa)
+ULONG ProcessPcre(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa)
 {
-	size_t CurState = nfa.Size();
+	ULONG CurState = nfa.Size();
 	bool ALTBeg = false;
 	std::vector<PCRESIGN> vecPath;
-	std::vector<size_t> PreStates;
-	size_t ALTPreBeg = CurState;
-	return Process(Beg, End, nfa, CurState, PreStates, ALTPreBeg, ALTBeg, size_t(-1), false, false, false, vecPath);
+	std::vector<ULONG> PreStates;
+	ULONG ALTPreBeg = CurState;
+	return Process(Beg, End, nfa, CurState, PreStates, ALTPreBeg, ALTBeg, ULONG(-1), false, false, false, vecPath);
 }
 
-size_t Process(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, std::vector<size_t> &PreStates, size_t ALTPreBeg, bool &ALTBeg, size_t ALTBeginState, bool bCBRA, bool bALT, bool bBRAZERO, std::vector<PCRESIGN> &vecPath)
+ULONG Process(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, std::vector<ULONG> &PreStates, ULONG ALTPreBeg, bool &ALTBeg, ULONG ALTBeginState, bool bCBRA, bool bALT, bool bBRAZERO, std::vector<PCRESIGN> &vecPath)
 {
 	std::vector<unsigned char>::iterator start, end;
-	size_t CurPreState;
+	ULONG CurPreState;
 	if (PreStates.size() > 0)
 	{
 		CurPreState = PreStates.back();
 	}
 	else
 	{
-		CurPreState = size_t(-1);
+		CurPreState = ULONG(-1);
 	}
-	size_t ALTPreState = ALTPreBeg;
+	ULONG ALTPreState = ALTPreBeg;
 	bool IsCBRA = bCBRA;
 	bool IsALT = bALT;
 	bool IsBRAZERO = bBRAZERO;
-	size_t ALTBegState = ALTBeginState;
-	size_t flag = SC_SUCCESS;
+	ULONG ALTBegState = ALTBeginState;
+	ULONG flag = SC_SUCCESS;
 	for (;Beg != End;)
 	{
 		if (FUNC[*Beg] != NULL)
@@ -787,7 +787,7 @@ size_t Process(std::vector<unsigned char>::iterator &Beg, const std::vector<unsi
 	return SC_SUCCESS;
 }
 
-void ProcessALT(CNfa &nfa, size_t PreState, bool &ALTBegin, size_t ALTBegState)
+void ProcessALT(CNfa &nfa, ULONG PreState, bool &ALTBegin, ULONG ALTBegState)
 {
 	if (ALTBegin)
 	{
@@ -796,16 +796,16 @@ void ProcessALT(CNfa &nfa, size_t PreState, bool &ALTBegin, size_t ALTBegState)
 	}
 }
 
-size_t OP_COMMON_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, size_t PreState, bool &ALTBegin, size_t ALTBegState)
+ULONG OP_COMMON_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
-	size_t nCursize = nfa.Size();
+	ULONG nCursize = nfa.Size();
 	nfa.Resize(nCursize + 1);
 	++CurState;
-	size_t* tmp = ptr[*Beg];
+	ULONG* tmp = ptr[*Beg];
 
-	//std::cout << size_t(*Beg) << " " << NUMS[*Beg] << std::endl;
-	for (size_t i = 0; i < NUMS[*Beg]; ++i)
+	//std::cout << ULONG(*Beg) << " " << NUMS[*Beg] << std::endl;
+	for (ULONG i = 0; i < NUMS[*Beg]; ++i)
 	{
 		nfa.Back().AddDest(tmp[i], CurState);
 	}
@@ -813,20 +813,20 @@ size_t OP_COMMON_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vect
 	return SC_SUCCESS;
 }
 
-void OP_CIRCM_FUNC(CNfa &nfa, size_t &CurState)
+void OP_CIRCM_FUNC(CNfa &nfa, ULONG &CurState)
 {
-	size_t nCursize = nfa.Size();
+	ULONG nCursize = nfa.Size();
 	nfa.Resize(nCursize + 3);
 	nfa[nCursize].AddDest(EMPTY, CurState + 1);
 	nfa[nCursize].AddDest(EMPTY, CurState + 3);
 	++CurState;
 
 	++nCursize;
-	for (size_t i = 0; i < 256; ++i)
+	for (ULONG i = 0; i < 256; ++i)
 	{
 		nfa[nCursize].AddDest(i, CurState);
 	}
-	//for (size_t i = 0; i < 10; ++i)
+	//for (ULONG i = 0; i < 10; ++i)
 	//{
 	//	nfa[nCursize].AddDest(i, CurState);
 	//}
@@ -835,21 +835,21 @@ void OP_CIRCM_FUNC(CNfa &nfa, size_t &CurState)
 	nfa[nCursize].AddDest('\r', CurState + 2);
 	//nfa[nCursize].AddDest(11, CurState);
 	//nfa[nCursize].AddDest(12, CurState);
-	//for (size_t i = 14; i < 256; ++i)
+	//for (ULONG i = 14; i < 256; ++i)
 	//{
 	//	nfa[nCursize].AddDest(i, CurState);
 	//}
 	CurState += 2;
 	nfa[nCursize + 1].AddDest('\r', CurState);
 
-//	size_t nCursize = nfa.Size();
+//	ULONG nCursize = nfa.Size();
 //	nfa.Resize(nCursize + 3);
 //	nfa[nCursize].AddDest(EMPTY, CurState + 1);
 //	nfa[nCursize].AddDest(EMPTY, CurState + 3);
 //	++CurState;
 //
 //	++nCursize;
-//	for (size_t i = 0; i < 10; ++i)
+//	for (ULONG i = 0; i < 10; ++i)
 //	{
 //		nfa[nCursize].AddDest(i, CurState);
 //	}
@@ -858,7 +858,7 @@ void OP_CIRCM_FUNC(CNfa &nfa, size_t &CurState)
 //	nfa[nCursize].AddDest('\r', CurState + 2);
 //	nfa[nCursize].AddDest(11, CurState);
 //	nfa[nCursize].AddDest(12, CurState);
-//	for (size_t i = 14; i < 256; ++i)
+//	for (ULONG i = 14; i < 256; ++i)
 //	{
 //		nfa[nCursize].AddDest(i, CurState);
 //	}
@@ -867,21 +867,21 @@ void OP_CIRCM_FUNC(CNfa &nfa, size_t &CurState)
 }
 
 
-size_t OP_CHAR_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, size_t PreState, bool &ALTBegin, size_t ALTBegState)
+ULONG OP_CHAR_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
 	++CurState;
-	size_t nCursize = nfa.Size();
+	ULONG nCursize = nfa.Size();
 	nfa.Resize(nCursize + 1);
 	nfa.Back().AddDest(*(Beg + 1), CurState);
 
 	return SC_SUCCESS;
 }
 
-size_t OP_CHARI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, size_t PreState, bool &ALTBegin, size_t ALTBegState)
+ULONG OP_CHARI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
-	size_t nCursize = nfa.Size();
+	ULONG nCursize = nfa.Size();
 	nfa.Resize(nCursize + 1);
 	++CurState;
 	unsigned char c = *(Beg + 1);
@@ -898,14 +898,14 @@ size_t OP_CHARI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vecto
 	return SC_SUCCESS;
 }
 
-size_t OP_NOT_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, size_t PreState, bool &ALTBegin, size_t ALTBegState)
+ULONG OP_NOT_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
-	size_t nCursize = nfa.Size();
+	ULONG nCursize = nfa.Size();
 	nfa.Resize(nCursize + 1);
 	++CurState;
 	unsigned char c = *(Beg + 1);
-	for (size_t j = 0; j < 256; ++j)
+	for (ULONG j = 0; j < 256; ++j)
 	{
 		if (j != c)
 		{
@@ -916,16 +916,16 @@ size_t OP_NOT_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<
 	return SC_SUCCESS;
 }
 
-size_t OP_NOTI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, size_t PreState, bool &ALTBegin, size_t ALTBegState)
+ULONG OP_NOTI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
-	size_t nCursize = nfa.Size();
+	ULONG nCursize = nfa.Size();
 	nfa.Resize(nCursize + 1);
 	++CurState;
 	unsigned char c = *(Beg + 1);
-	for (size_t j = 0; j < 256; ++j)
+	for (ULONG j = 0; j < 256; ++j)
 	{
-		if (j != (size_t)tolower(c) && j != (size_t)toupper(c))
+		if (j != (ULONG)tolower(c) && j != (ULONG)toupper(c))
 		{
 			nfa.Back().AddDest(j, CurState);
 		}
@@ -934,10 +934,10 @@ size_t OP_NOTI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector
 	return SC_SUCCESS;
 }
 
-size_t OP_STAR_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, size_t PreState, bool &ALTBegin, size_t ALTBegState)
+ULONG OP_STAR_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
-	size_t nCursize = nfa.Size();
+	ULONG nCursize = nfa.Size();
 	nfa.Resize(nCursize + 1);
 	nfa.Back().AddDest(*(Beg + 1), CurState);
 	++CurState;
@@ -946,10 +946,10 @@ size_t OP_STAR_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector
 	return SC_SUCCESS;
 }
 
-size_t OP_PLUS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, size_t PreState, bool &ALTBegin, size_t ALTBegState)
+ULONG OP_PLUS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
-	size_t nCursize = nfa.Size();
+	ULONG nCursize = nfa.Size();
 	nfa.Resize(nCursize + 2);
 	++CurState;
 	nfa[nCursize].AddDest(*(Beg + 1), CurState);
@@ -960,10 +960,10 @@ size_t OP_PLUS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector
 	return SC_SUCCESS;
 }
 
-size_t OP_QUERY_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, size_t PreState, bool &ALTBegin, size_t ALTBegState)
+ULONG OP_QUERY_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
-	size_t nCursize = nfa.Size();
+	ULONG nCursize = nfa.Size();
 	nfa.Resize(nCursize + 1);
 	++CurState;
 	nfa.Back().AddDest(*(Beg + 1), CurState);
@@ -972,19 +972,19 @@ size_t OP_QUERY_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vecto
 	return SC_SUCCESS;
 }
 
-size_t OP_UPTO_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, size_t PreState, bool &ALTBegin, size_t ALTBegState)
+ULONG OP_UPTO_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
 
-	size_t count = GET(Beg + 1);
+	ULONG count = GET(Beg + 1);
 	if (count > SC_LIMIT)
 	{
 		return SC_EXCEED;
 	}
-	size_t nCursize = nfa.Size();
+	ULONG nCursize = nfa.Size();
 	nfa.Resize(nCursize + count);
 	unsigned char c = *(Beg + 3);
-	for (size_t i = 0; i < count; ++i)
+	for (ULONG i = 0; i < count; ++i)
 	{
 		nfa[nCursize + i].AddDest(EMPTY, CurState - i + count);
 		++CurState;
@@ -994,18 +994,18 @@ size_t OP_UPTO_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector
 	return SC_SUCCESS;
 }
 
-size_t OP_EXACT_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, size_t PreState, bool &ALTBegin, size_t ALTBegState)
+ULONG OP_EXACT_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
-	size_t count = GET(Beg + 1);
+	ULONG count = GET(Beg + 1);
 	if (count > SC_LIMIT)
 	{
 		return SC_EXCEED;
 	}
-	size_t nCursize = nfa.Size();
+	ULONG nCursize = nfa.Size();
 	nfa.Resize(nCursize + count);
 	unsigned char c = *(Beg + 3);
-	for (size_t i = 0; i < count; ++i)
+	for (ULONG i = 0; i < count; ++i)
 	{
 		++CurState;
 		nfa[nCursize + i].AddDest(c, CurState);
@@ -1014,10 +1014,10 @@ size_t OP_EXACT_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vecto
 	return SC_SUCCESS;
 }
 
-size_t OP_STARI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, size_t PreState, bool &ALTBegin, size_t ALTBegState)
+ULONG OP_STARI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
-	size_t nCursize = nfa.Size();
+	ULONG nCursize = nfa.Size();
 	nfa.Resize(nCursize + 1);
 	unsigned char c = *(Beg + 1);
 	if (isalpha(c))
@@ -1035,10 +1035,10 @@ size_t OP_STARI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vecto
 	return SC_SUCCESS;
 }
 
-size_t OP_PLUSI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, size_t PreState, bool &ALTBegin, size_t ALTBegState)
+ULONG OP_PLUSI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
-	size_t nCursize = nfa.Size();
+	ULONG nCursize = nfa.Size();
 	nfa.Resize(nCursize + 2);
 	unsigned char c = *(Beg + 1);
 	++CurState;
@@ -1066,10 +1066,10 @@ size_t OP_PLUSI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vecto
 	return SC_SUCCESS;
 }
 
-size_t OP_QUERYI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, size_t PreState, bool &ALTBegin, size_t ALTBegState)
+ULONG OP_QUERYI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
-	size_t nCursize = nfa.Size();
+	ULONG nCursize = nfa.Size();
 	nfa.Resize(nCursize + 1);
 	unsigned char c = *(Beg + 1);
 	++CurState;
@@ -1087,19 +1087,19 @@ size_t OP_QUERYI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vect
 	return SC_SUCCESS;
 }
 
-size_t OP_UPTOI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, size_t PreState, bool &ALTBegin, size_t ALTBegState)
+ULONG OP_UPTOI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
 
-	size_t count = GET(Beg + 1);
+	ULONG count = GET(Beg + 1);
 	if (count > SC_LIMIT)
 	{
 		return SC_EXCEED;
 	}
-	size_t nCursize = nfa.Size();
+	ULONG nCursize = nfa.Size();
 	nfa.Resize(nCursize + count);
 	unsigned char c = *(Beg + 3);
-	for (size_t i = 0; i < count; ++i)
+	for (ULONG i = 0; i < count; ++i)
 	{
 		nfa[nCursize + i].AddDest(EMPTY, CurState - i + count);
 		++CurState;
@@ -1117,18 +1117,18 @@ size_t OP_UPTOI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vecto
 	return SC_SUCCESS;
 }
 
-size_t OP_EXACTI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, size_t PreState, bool &ALTBegin, size_t ALTBegState)
+ULONG OP_EXACTI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
-	size_t count = GET(Beg + 1);
+	ULONG count = GET(Beg + 1);
 	if (count > SC_LIMIT)
 	{
 		return SC_EXCEED;
 	}
-	size_t nCursize = nfa.Size();
+	ULONG nCursize = nfa.Size();
 	nfa.Resize(nCursize + count);
 	unsigned char c = *(Beg + 3);
-	for (size_t i = 0; i < count; ++i)
+	for (ULONG i = 0; i < count; ++i)
 	{
 		++CurState;
 		if (isalpha(c))
@@ -1145,13 +1145,13 @@ size_t OP_EXACTI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vect
 	return SC_SUCCESS;
 }
 
-size_t OP_NOTSTAR_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, size_t PreState, bool &ALTBegin, size_t ALTBegState)
+ULONG OP_NOTSTAR_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
-	size_t nCursize = nfa.Size();
+	ULONG nCursize = nfa.Size();
 	nfa.Resize(nCursize + 1);
 	unsigned char c = *(Beg + 1);
-	for (size_t i = 0; i < 256; ++i)
+	for (ULONG i = 0; i < 256; ++i)
 	{
 		if (i != c)
 		{
@@ -1164,14 +1164,14 @@ size_t OP_NOTSTAR_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vec
 	return SC_SUCCESS;
 }
 
-size_t OP_NOTPLUS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, size_t PreState, bool &ALTBegin, size_t ALTBegState)
+ULONG OP_NOTPLUS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
-	size_t nCursize = nfa.Size();
+	ULONG nCursize = nfa.Size();
 	nfa.Resize(nCursize + 2);
 	unsigned char c = *(Beg + 1);
 	++CurState;
-	for (size_t i = 0; i < 256; ++i)
+	for (ULONG i = 0; i < 256; ++i)
 	{
 		if (i != c)
 		{
@@ -1185,14 +1185,14 @@ size_t OP_NOTPLUS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vec
 	return SC_SUCCESS;
 }
 
-size_t OP_NOTQUERY_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, size_t PreState, bool &ALTBegin, size_t ALTBegState)
+ULONG OP_NOTQUERY_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
-	size_t nCursize = nfa.Size();
+	ULONG nCursize = nfa.Size();
 	nfa.Resize(nCursize + 1);
 	unsigned char c = *(Beg + 1);
 	++CurState;
-	for (size_t i = 0; i < 256; ++i)
+	for (ULONG i = 0; i < 256; ++i)
 	{
 		if (i != c)
 		{
@@ -1204,22 +1204,22 @@ size_t OP_NOTQUERY_FUNC(std::vector<unsigned char>::iterator &Beg, const std::ve
 	return SC_SUCCESS;
 }
 
-size_t OP_NOTUPTO_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, size_t PreState, bool &ALTBegin, size_t ALTBegState)
+ULONG OP_NOTUPTO_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
-	size_t count = GET(Beg + 1);
+	ULONG count = GET(Beg + 1);
 	if (count > SC_LIMIT)
 	{
 		return SC_EXCEED;
 	}
-	size_t nCursize = nfa.Size();
+	ULONG nCursize = nfa.Size();
 	nfa.Resize(nCursize + count);
 	unsigned char c = *(Beg + 3);
-	for (size_t i = 0; i < count; ++i)
+	for (ULONG i = 0; i < count; ++i)
 	{
 		nfa[nCursize + i].AddDest(EMPTY, CurState - i + count);
 		++CurState;
-		for (size_t j = 0; j < 256; ++j)
+		for (ULONG j = 0; j < 256; ++j)
 		{
 			if (j != c)
 			{
@@ -1231,21 +1231,21 @@ size_t OP_NOTUPTO_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vec
 	return SC_SUCCESS;
 }
 
-size_t OP_NOTEXACT_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, size_t PreState, bool &ALTBegin, size_t ALTBegState)
+ULONG OP_NOTEXACT_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
-	size_t count = GET(Beg + 1);
+	ULONG count = GET(Beg + 1);
 	if (count > SC_LIMIT)
 	{
 		return SC_EXCEED;
 	}
-	size_t nCursize = nfa.Size();
+	ULONG nCursize = nfa.Size();
 	nfa.Resize(nCursize + count);
 	unsigned char c = *(Beg + 3);
-	for (size_t i = 0; i < count; ++i)
+	for (ULONG i = 0; i < count; ++i)
 	{
 		++CurState;
-		for (size_t j = 0; j < 256; ++j)
+		for (ULONG j = 0; j < 256; ++j)
 		{
 			if (j != c)
 			{
@@ -1257,15 +1257,15 @@ size_t OP_NOTEXACT_FUNC(std::vector<unsigned char>::iterator &Beg, const std::ve
 	return SC_SUCCESS;
 }
 
-size_t OP_NOTSTARI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, size_t PreState, bool &ALTBegin, size_t ALTBegState)
+ULONG OP_NOTSTARI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
-	size_t nCursize = nfa.Size();
+	ULONG nCursize = nfa.Size();
 	nfa.Resize(nCursize + 1);
 	unsigned char c = *(Beg + 1);
-	for (size_t i = 0; i < 256; ++i)
+	for (ULONG i = 0; i < 256; ++i)
 	{
-		if (i != (size_t)tolower(c) && i != (size_t)toupper(c))
+		if (i != (ULONG)tolower(c) && i != (ULONG)toupper(c))
 		{
 			nfa.Back().AddDest(i, CurState);
 		}
@@ -1276,16 +1276,16 @@ size_t OP_NOTSTARI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::ve
 	return SC_SUCCESS;
 }
 
-size_t OP_NOTPLUSI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, size_t PreState, bool &ALTBegin, size_t ALTBegState)
+ULONG OP_NOTPLUSI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
-	size_t nCursize = nfa.Size();
+	ULONG nCursize = nfa.Size();
 	nfa.Resize(nCursize + 2);
 	++CurState;
 	unsigned char c = *(Beg + 1);
-	for (size_t i = 0; i < 256; ++i)
+	for (ULONG i = 0; i < 256; ++i)
 	{
-		if (i != (size_t)tolower(c) && i != (size_t)toupper(c))
+		if (i != (ULONG)tolower(c) && i != (ULONG)toupper(c))
 		{
 			nfa[nCursize].AddDest(i, CurState);
 			nfa.Back().AddDest(i, CurState);
@@ -1297,16 +1297,16 @@ size_t OP_NOTPLUSI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::ve
 	return SC_SUCCESS;
 }
 
-size_t OP_NOTQUERYI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, size_t PreState, bool &ALTBegin, size_t ALTBegState)
+ULONG OP_NOTQUERYI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
-	size_t nCursize = nfa.Size();
+	ULONG nCursize = nfa.Size();
 	nfa.Resize(nCursize + 1);
 	++CurState;
 	unsigned char c = *(Beg + 1);
-	for (size_t i = 0; i < 256; ++i)
+	for (ULONG i = 0; i < 256; ++i)
 	{
-		if (i != (size_t)tolower(c) && i != (size_t)toupper(c))
+		if (i != (ULONG)tolower(c) && i != (ULONG)toupper(c))
 		{
 			nfa.Back().AddDest(i, CurState);
 		}
@@ -1316,24 +1316,24 @@ size_t OP_NOTQUERYI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::v
 	return SC_SUCCESS;
 }
 
-size_t OP_NOTUPTOI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, size_t PreState, bool &ALTBegin, size_t ALTBegState)
+ULONG OP_NOTUPTOI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
-	size_t count = GET(Beg + 1);
+	ULONG count = GET(Beg + 1);
 	if (count > SC_LIMIT)
 	{
 		return SC_EXCEED;
 	}
-	size_t nCursize = nfa.Size();
+	ULONG nCursize = nfa.Size();
 	nfa.Resize(nCursize + count);
 	unsigned char c = *(Beg + 3);
-	for (size_t i = 0; i < count; ++i)
+	for (ULONG i = 0; i < count; ++i)
 	{
 		nfa[nCursize + i].AddDest(EMPTY, CurState - i + count);
 		++CurState;
-		for (size_t j = 0; j < 256; ++j)
+		for (ULONG j = 0; j < 256; ++j)
 		{
-			if (j != (size_t)tolower(c) && j != (size_t)toupper(c))
+			if (j != (ULONG)tolower(c) && j != (ULONG)toupper(c))
 			{
 				nfa[nCursize + i].AddDest(j, CurState);
 			}
@@ -1343,23 +1343,23 @@ size_t OP_NOTUPTOI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::ve
 	return SC_SUCCESS;
 }
 
-size_t OP_NOTEXACTI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, size_t PreState, bool &ALTBegin, size_t ALTBegState)
+ULONG OP_NOTEXACTI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
-	size_t count = GET(Beg + 1);
+	ULONG count = GET(Beg + 1);
 	if (count > SC_LIMIT)
 	{
 		return SC_EXCEED;
 	}
-	size_t nCursize = nfa.Size();
+	ULONG nCursize = nfa.Size();
 	nfa.Resize(nCursize + count);
 	unsigned char c = *(Beg + 3);
-	for (size_t i = 0; i < count; ++i)
+	for (ULONG i = 0; i < count; ++i)
 	{
 		++CurState;
-		for (size_t j = 0; j < 256; ++j)
+		for (ULONG j = 0; j < 256; ++j)
 		{
-			if (j != (size_t)tolower(c) && j != (size_t)toupper(c))
+			if (j != (ULONG)tolower(c) && j != (ULONG)toupper(c))
 			{
 				nfa[nCursize + i].AddDest(j, CurState);
 			}
@@ -1369,17 +1369,17 @@ size_t OP_NOTEXACTI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::v
 	return SC_SUCCESS;
 }
 
-size_t OP_TYPESTAR_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, size_t PreState, bool &ALTBegin, size_t ALTBegState)
+ULONG OP_TYPESTAR_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
 	unsigned char c = *(Beg + 1);
-	if (c < sizeof(NUMS) / sizeof(size_t) && ptr[c] != NULL)
+	if (c < sizeof(NUMS) / sizeof(ULONG) && ptr[c] != NULL)
 	{
-		size_t nCursize = nfa.Size();
+		ULONG nCursize = nfa.Size();
 		nfa.Resize(nCursize + 1);
-		size_t Cnt = NUMS[c];
-		size_t* tmp = ptr[c];
-		for (size_t i = 0; i < Cnt; ++i)
+		ULONG Cnt = NUMS[c];
+		ULONG* tmp = ptr[c];
+		for (ULONG i = 0; i < Cnt; ++i)
 		{
 			nfa.Back().AddDest(*(tmp + i), CurState);
 		}
@@ -1390,18 +1390,18 @@ size_t OP_TYPESTAR_FUNC(std::vector<unsigned char>::iterator &Beg, const std::ve
 	return SC_SUCCESS;
 }
 
-size_t OP_TYPEPLUS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, size_t PreState, bool &ALTBegin, size_t ALTBegState)
+ULONG OP_TYPEPLUS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
 	unsigned char c = *(Beg + 1);
-	if (c < sizeof(NUMS) / sizeof(size_t) && ptr[c] != NULL)
+	if (c < sizeof(NUMS) / sizeof(ULONG) && ptr[c] != NULL)
 	{
-		size_t nCursize = nfa.Size();
+		ULONG nCursize = nfa.Size();
 		nfa.Resize(nCursize + 2);
 		++CurState;
-		size_t Cnt = NUMS[c];
-		size_t* tmp = ptr[c];
-		for (size_t i = 0; i < Cnt; ++i)
+		ULONG Cnt = NUMS[c];
+		ULONG* tmp = ptr[c];
+		for (ULONG i = 0; i < Cnt; ++i)
 		{
 			nfa[nCursize].AddDest(*(tmp + i), CurState);
 			nfa.Back().AddDest(*(tmp + i), CurState);
@@ -1413,18 +1413,18 @@ size_t OP_TYPEPLUS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::ve
 	return SC_SUCCESS;
 }
 
-size_t OP_TYPEQUERY_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, size_t PreState, bool &ALTBegin, size_t ALTBegState)
+ULONG OP_TYPEQUERY_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
 	unsigned char c = *(Beg + 1);
-	if (c < sizeof(NUMS) / sizeof(size_t) && ptr[c] != NULL)
+	if (c < sizeof(NUMS) / sizeof(ULONG) && ptr[c] != NULL)
 	{
-		size_t nCursize = nfa.Size();
+		ULONG nCursize = nfa.Size();
 		nfa.Resize(nCursize + 1);
 		++CurState;
-		size_t Cnt = NUMS[c];
-		size_t* tmp = ptr[c];
-		for (size_t i = 0; i < Cnt; ++i)
+		ULONG Cnt = NUMS[c];
+		ULONG* tmp = ptr[c];
+		for (ULONG i = 0; i < Cnt; ++i)
 		{
 			nfa.Back().AddDest(*(tmp + i), CurState);
 		}
@@ -1434,10 +1434,10 @@ size_t OP_TYPEQUERY_FUNC(std::vector<unsigned char>::iterator &Beg, const std::v
 	return SC_SUCCESS;
 }
 
-size_t OP_TYPEUPTO_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, size_t PreState, bool &ALTBegin, size_t ALTBegState)
+ULONG OP_TYPEUPTO_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
-	size_t count = GET(Beg + 1);
+	ULONG count = GET(Beg + 1);
 	if (count > SC_LIMIT)
 	{
 		return SC_EXCEED;
@@ -1447,7 +1447,7 @@ size_t OP_TYPEUPTO_FUNC(std::vector<unsigned char>::iterator &Beg, const std::ve
 	if (c >=OP_NOT_DIGIT && c <= OP_ALLANY  && FUNC[c] != NULL)
 	{
 		std::vector<unsigned char>::iterator tmpBeg = Beg + 3;
-		for (size_t i = 0; i < count; ++i)
+		for (ULONG i = 0; i < count; ++i)
 		{
 			FUNC[c](tmpBeg, End, nfa, CurState, PreState, ALTBeg, ALTBegState);
 			nfa.Back().AddDest(EMPTY, CurState - 1 + count - i);
@@ -1457,10 +1457,10 @@ size_t OP_TYPEUPTO_FUNC(std::vector<unsigned char>::iterator &Beg, const std::ve
 	return SC_SUCCESS;
 }
 
-size_t OP_TYPEEXACT_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, size_t PreState, bool &ALTBegin, size_t ALTBegState)
+ULONG OP_TYPEEXACT_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
-	size_t count = GET(Beg + 1);
+	ULONG count = GET(Beg + 1);
 	if (count > SC_LIMIT)
 	{
 		return SC_EXCEED;
@@ -1471,7 +1471,7 @@ size_t OP_TYPEEXACT_FUNC(std::vector<unsigned char>::iterator &Beg, const std::v
 	{
 		std::vector<unsigned char>::iterator tmpBeg = Beg + 3;
 
-		for (size_t i = 0; i < count; ++i)
+		for (ULONG i = 0; i < count; ++i)
 		{
 			FUNC[c](tmpBeg, End, nfa, CurState, PreState, ALTBeg, ALTBegState);
 		}
@@ -1480,16 +1480,16 @@ size_t OP_TYPEEXACT_FUNC(std::vector<unsigned char>::iterator &Beg, const std::v
 	return SC_SUCCESS;
 }
 
-size_t OP_CLASS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, size_t PreState, bool &ALTBegin, size_t ALTBegState)
+ULONG OP_CLASS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
-	size_t nCursize = nfa.Size();
+	ULONG nCursize = nfa.Size();
 	nfa.Resize(nCursize + 1);
 	CNfaRow Row;
-	size_t tmp = CurState + 1;
-	for (size_t i = 0; i < 32; ++i)
+	ULONG tmp = CurState + 1;
+	for (ULONG i = 0; i < 32; ++i)
 	{
-		for (size_t j = 0; j < 8; ++j)
+		for (ULONG j = 0; j < 8; ++j)
 		{
 			if (*(Beg + i + 1) & 1 << j)
 			{
@@ -1499,14 +1499,14 @@ size_t OP_CLASS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vecto
 		}
 	}
 	Beg += Steps[OP_CLASS];
-	size_t min, max;
+	ULONG min, max;
 
 	switch (*Beg)
 	{
 	case OP_CRSTAR:
-		for (size_t i = 0; i < CHARSETSIZE; ++i)
+		for (ULONG i = 0; i < CHARSETSIZE; ++i)
 		{
-			for (size_t j = 0; j < nfa.Back().DestCnt(i); ++j)
+			for (ULONG j = 0; j < nfa.Back().DestCnt(i); ++j)
 			{
 				if (nfa.Back().GetDest(i, j) == CurState + 1)
 				{
@@ -1519,9 +1519,9 @@ size_t OP_CLASS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vecto
 		Beg += Steps[OP_CRSTAR];
 		break;
 	case OP_CRMINSTAR:
-		for (size_t i = 0; i < CHARSETSIZE; ++i)
+		for (ULONG i = 0; i < CHARSETSIZE; ++i)
 		{
-			for (size_t j = 0; j < nfa.Back().DestCnt(i); ++j)
+			for (ULONG j = 0; j < nfa.Back().DestCnt(i); ++j)
 			{
 				if (nfa.Back().GetDest(i, j) == CurState + 1)
 				{
@@ -1563,7 +1563,7 @@ size_t OP_CLASS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vecto
 		}
 		nfa.PopBack();
 		nfa.Resize(nCursize + min);
-		for (size_t i = 0; i < min; ++i)
+		for (ULONG i = 0; i < min; ++i)
 		{
 			Copy(nfa[nCursize + i], Row, i);
 			++CurState;
@@ -1571,7 +1571,7 @@ size_t OP_CLASS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vecto
 		if (max == 0)
 		{
 			nfa.Resize(nCursize + min + 1);
-			for (size_t i = 0; i < CHARSETSIZE; ++i)
+			for (ULONG i = 0; i < CHARSETSIZE; ++i)
 			{
 				if (Row.DestCnt(i) == 1)
 				{
@@ -1584,8 +1584,8 @@ size_t OP_CLASS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vecto
 		else
 		{
 			nfa.Resize(nCursize + max);
-			size_t nDiff = max - min, nBeg = nCursize + min;
-			for (size_t i = 0; i < nDiff; ++i)
+			ULONG nDiff = max - min, nBeg = nCursize + min;
+			for (ULONG i = 0; i < nDiff; ++i)
 			{
 				Copy(nfa[nBeg + i], Row, min + i);
 				nfa[nBeg + i].AddDest(EMPTY, CurState - i + nDiff);
@@ -1602,36 +1602,36 @@ size_t OP_CLASS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vecto
 	return SC_SUCCESS;
 }
 
-size_t OP_NCLASS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState, size_t PreState, bool &ALTBegin, size_t ALTBegState)
+ULONG OP_NCLASS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
-	size_t nCursize = nfa.Size();
+	ULONG nCursize = nfa.Size();
 	nfa.Resize(nCursize + 1);
 	CNfaRow Row;
-	size_t tmp = CurState + 1;
-	for (size_t i = 0; i < 32; ++i)
+	ULONG tmp = CurState + 1;
+	for (ULONG i = 0; i < 32; ++i)
 	{
-		for (size_t j = 0; j < 8; ++j)
+		for (ULONG j = 0; j < 8; ++j)
 		{
 			if (*(Beg + i + 1) & 1 << j)
 			{
-				size_t nCol = i * 8 + j;
+				ULONG nCol = i * 8 + j;
 				nfa.Back().AddDest(nCol, tmp);
 				Row.AddDest(nCol, tmp);
 			}
 		}
 	}
 	Beg += Steps[OP_CLASS];
-	size_t min, max;
+	ULONG min, max;
 	switch (*Beg)
 	{
 	case OP_CRSTAR:
-		for (size_t i = 0; i < CHARSETSIZE; ++i)
+		for (ULONG i = 0; i < CHARSETSIZE; ++i)
 		{
-			size_t nCnt = nfa.Back().DestCnt(i);
-			for (size_t j = 0; j < nCnt; ++j)
+			ULONG nCnt = nfa.Back().DestCnt(i);
+			for (ULONG j = 0; j < nCnt; ++j)
 			{
-				size_t &nSta = nfa.Back().GetDest(i, j);
+				ULONG &nSta = nfa.Back().GetDest(i, j);
 				if (nSta == CurState + 1)
 				{
 					nSta = CurState;
@@ -1643,12 +1643,12 @@ size_t OP_NCLASS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vect
 		Beg += Steps[OP_CRSTAR];
 		break;
 	case OP_CRMINSTAR:
-		for (size_t i = 0; i < CHARSETSIZE; ++i)
+		for (ULONG i = 0; i < CHARSETSIZE; ++i)
 		{
-			size_t nCnt = nfa.Back().DestCnt(i);
-			for (size_t j = 0; j < nCnt; ++j)
+			ULONG nCnt = nfa.Back().DestCnt(i);
+			for (ULONG j = 0; j < nCnt; ++j)
 			{
-				size_t &nSta = nfa.Back().GetDest(i, j);
+				ULONG &nSta = nfa.Back().GetDest(i, j);
 				if (nSta == CurState + 1)
 				{
 					nSta = CurState;
@@ -1689,7 +1689,7 @@ size_t OP_NCLASS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vect
 		}
 		nfa.PopBack();
 		nfa.Resize(nCursize + min);
-		for (size_t i = 0; i < min; ++i)
+		for (ULONG i = 0; i < min; ++i)
 		{
 			Copy(nfa[nCursize + i], Row, i);
 			++CurState;
@@ -1697,7 +1697,7 @@ size_t OP_NCLASS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vect
 		if (max == 0)
 		{
 			nfa.Resize(nCursize + min + 1);
-			for (size_t i = 0; i < CHARSETSIZE; ++i)
+			for (ULONG i = 0; i < CHARSETSIZE; ++i)
 			{
 				if (Row.DestCnt(i) == 1)
 				{
@@ -1710,9 +1710,9 @@ size_t OP_NCLASS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vect
 		else
 		{
 			nfa.Resize(nCursize + max);
-			for (size_t i = 0; i < max - min; ++i)
+			for (ULONG i = 0; i < max - min; ++i)
 			{
-				size_t nCnt = min + i;
+				ULONG nCnt = min + i;
 				Copy(nfa[nCursize + nCnt], Row, nCnt);
 				nfa[nCursize + nCnt].AddDest(EMPTY, CurState + max - nCnt);
 				++CurState;
@@ -1728,17 +1728,17 @@ size_t OP_NCLASS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vect
 	return SC_SUCCESS;
 }
 
-void OP_ALT_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t PreState, size_t &CurState)
+void OP_ALT_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG PreState, ULONG &CurState)
 {
-	for (size_t i = PreState; i < nfa.Size(); ++i)
+	for (ULONG i = PreState; i < nfa.Size(); ++i)
 	{
 		CNfaRow &row = nfa[i];
-		for (size_t j = 0; j < CHARSETSIZE; ++j)
+		for (ULONG j = 0; j < CHARSETSIZE; ++j)
 		{
-			size_t nCnt = row.DestCnt(j);
-			for (size_t k = 0; k < nCnt; ++k)
+			ULONG nCnt = row.DestCnt(j);
+			for (ULONG k = 0; k < nCnt; ++k)
 			{
-				size_t &nSta = row.GetDest(j, k);
+				ULONG &nSta = row.GetDest(j, k);
 				if (nSta == CurState)
 				{
 					nSta = MAX;
@@ -1752,7 +1752,7 @@ void OP_ALT_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<un
 	}
 }
 
-void OP_KET_FUNC(CNfa &nfa, size_t PreState, size_t &CurState, bool IsALT, bool IsBRAZERO)
+void OP_KET_FUNC(CNfa &nfa, ULONG PreState, ULONG &CurState, bool IsALT, bool IsBRAZERO)
 {
 	if (IsBRAZERO)
 	{
@@ -1760,15 +1760,15 @@ void OP_KET_FUNC(CNfa &nfa, size_t PreState, size_t &CurState, bool IsALT, bool 
 	}
 	if (IsALT)
 	{
-		for (size_t i = PreState; i < nfa.Size(); ++i)
+		for (ULONG i = PreState; i < nfa.Size(); ++i)
 		{
 			CNfaRow &row = nfa[i];
-			for (size_t j = 0; j < CHARSETSIZE; ++j)
+			for (ULONG j = 0; j < CHARSETSIZE; ++j)
 			{
-				size_t nCnt = row.DestCnt(j);
-				for (size_t k = 0; k < nCnt; ++k)
+				ULONG nCnt = row.DestCnt(j);
+				for (ULONG k = 0; k < nCnt; ++k)
 				{
-					size_t &nSta = row.GetDest(j, k);
+					ULONG &nSta = row.GetDest(j, k);
 					if (nSta == MAX)
 					{
 						nSta = CurState;
@@ -1779,19 +1779,19 @@ void OP_KET_FUNC(CNfa &nfa, size_t PreState, size_t &CurState, bool IsALT, bool 
 	}
 }
 
-void OP_KETRMAX_FUNC(CNfa &nfa, size_t PreState, size_t &CurState, bool IsBRAZERO, bool IsALT)
+void OP_KETRMAX_FUNC(CNfa &nfa, ULONG PreState, ULONG &CurState, bool IsBRAZERO, bool IsALT)
 {
 	if (IsALT)
 	{
-		for (size_t i = PreState; i < nfa.Size(); ++i)
+		for (ULONG i = PreState; i < nfa.Size(); ++i)
 		{
 			CNfaRow &row = nfa[i];
-			for (size_t j = 0; j < CHARSETSIZE; ++j)
+			for (ULONG j = 0; j < CHARSETSIZE; ++j)
 			{
-				size_t nCnt = row.DestCnt(j);
-				for (size_t k = 0; k < nCnt; ++k)
+				ULONG nCnt = row.DestCnt(j);
+				for (ULONG k = 0; k < nCnt; ++k)
 				{
-					size_t &nSta = row.GetDest(j, k);
+					ULONG &nSta = row.GetDest(j, k);
 					if (nSta == MAX)
 					{
 						nSta = CurState;
@@ -1802,15 +1802,15 @@ void OP_KETRMAX_FUNC(CNfa &nfa, size_t PreState, size_t &CurState, bool IsBRAZER
 	}
 	if (IsBRAZERO)
 	{
-		for (size_t i = PreState; i < nfa.Size(); ++i)
+		for (ULONG i = PreState; i < nfa.Size(); ++i)
 		{
 			CNfaRow &row = nfa[i];
-			for (size_t j = 0; j < CHARSETSIZE; ++j)
+			for (ULONG j = 0; j < CHARSETSIZE; ++j)
 			{
-				size_t nCnt = row.DestCnt(j);
-				for (size_t k = 0; k < nCnt; ++k)
+				ULONG nCnt = row.DestCnt(j);
+				for (ULONG k = 0; k < nCnt; ++k)
 				{
-					size_t &nSta = row.GetDest(j, k);
+					ULONG &nSta = row.GetDest(j, k);
 					if (nSta == CurState)
 					{
 						nSta = PreState;
@@ -1823,31 +1823,31 @@ void OP_KETRMAX_FUNC(CNfa &nfa, size_t PreState, size_t &CurState, bool IsBRAZER
 	}
 	else
 	{
-		size_t nCursize = nfa.Size();
+		ULONG nCursize = nfa.Size();
 		nfa.Resize(nCursize + nCursize - PreState);
-		size_t StartState = CurState;
-		for (size_t i = PreState; i < nCursize; ++i)
+		ULONG StartState = CurState;
+		for (ULONG i = PreState; i < nCursize; ++i)
 		{
 			CNfaRow &row = nfa[i];
-			for (size_t j = 0; j < CHARSETSIZE; ++j)
+			for (ULONG j = 0; j < CHARSETSIZE; ++j)
 			{
-				size_t nCnt = row.DestCnt(j);
-				for (size_t k = 0; k < nCnt; ++k)
+				ULONG nCnt = row.DestCnt(j);
+				for (ULONG k = 0; k < nCnt; ++k)
 				{
 					nfa[nCursize + i - PreState].AddDest(j, CurState + row.GetDest(j, k) - i);
 				}
 			}
 			++CurState;
 		}
-		for (size_t i = StartState; i < nfa.Size(); ++i)
+		for (ULONG i = StartState; i < nfa.Size(); ++i)
 		{
 			CNfaRow &row = nfa[i];
-			for (size_t j = 0; j < CHARSETSIZE; ++j)
+			for (ULONG j = 0; j < CHARSETSIZE; ++j)
 			{
-				size_t nCnt = row.DestCnt(j);
-				for (size_t k = 0; k < nCnt; ++k)
+				ULONG nCnt = row.DestCnt(j);
+				for (ULONG k = 0; k < nCnt; ++k)
 				{
-					size_t &nSta = row.GetDest(j, k);
+					ULONG &nSta = row.GetDest(j, k);
 					if (nSta == CurState)
 					{
 						nSta = StartState;
@@ -1859,11 +1859,11 @@ void OP_KETRMAX_FUNC(CNfa &nfa, size_t PreState, size_t &CurState, bool IsBRAZER
 	}
 }
 
-size_t OP_BRA_CBRA_SCBRA_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState)
+ULONG OP_BRA_CBRA_SCBRA_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState)
 {
 	if (Beg == End)
 	{
-		size_t nCursize = nfa.Size();
+		ULONG nCursize = nfa.Size();
 		nfa.Resize(nCursize + 1);
 		nfa.Back().AddDest(EMPTY, MAX);
 		++CurState;
@@ -1872,42 +1872,42 @@ size_t OP_BRA_CBRA_SCBRA_FUNC(std::vector<unsigned char>::iterator &Beg, const s
 	return SC_SUCCESS;
 }
 
-size_t OP_BRA_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState)
+ULONG OP_BRA_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState)
 {
 	return OP_BRA_CBRA_SCBRA_FUNC(Beg, End, nfa, CurState);
 }
 
-size_t OP_CBRA_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState)
+ULONG OP_CBRA_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState)
 {
 	return OP_BRA_CBRA_SCBRA_FUNC(Beg, End, nfa, CurState);
 }
 
-size_t OP_SCBRA_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, size_t &CurState)
+ULONG OP_SCBRA_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState)
 {
 	return OP_BRA_CBRA_SCBRA_FUNC(Beg, End, nfa, CurState);
 }
 
-void Copy(CNfaRow &NewRow, CNfaRow &Row, size_t increment)
+void Copy(CNfaRow &NewRow, CNfaRow &Row, ULONG increment)
 {
-	for (size_t i = 0; i < CHARSETSIZE; ++i)
+	for (ULONG i = 0; i < CHARSETSIZE; ++i)
 	{
-		size_t nDestCnt = Row.DestCnt(i);
-		for (size_t j = 0; j < nDestCnt; ++j)
+		ULONG nDestCnt = Row.DestCnt(i);
+		for (ULONG j = 0; j < nDestCnt; ++j)
 		{
 			NewRow.AddDest(i, Row.GetDest(i, j) + increment);
 		}
 	}
 }
 
-void AddEMPTY(CNfa &nfa, size_t &CurState)
+void AddEMPTY(CNfa &nfa, ULONG &CurState)
 {
-	size_t nCursize = nfa.Size();
+	ULONG nCursize = nfa.Size();
 	nfa.Resize(nCursize + 1);
 	++CurState;
 	nfa.Back().AddDest(EMPTY, CurState);
 }
 
-void OutPut(std::vector<PCRE>::iterator &Pcre, CNfa &nfa, size_t count)
+void OutPut(std::vector<PCRE>::iterator &Pcre, CNfa &nfa, ULONG count)
 {
 	std::stringstream ss;
 	std::string filename;
@@ -1917,26 +1917,26 @@ void OutPut(std::vector<PCRE>::iterator &Pcre, CNfa &nfa, size_t count)
 	filename += ".txt";
 	std::ofstream fout(filename.c_str(), std::ios::binary);
 
-	size_t Cnt;
+	ULONG Cnt;
 	unsigned char c;
 	Cnt = Pcre->PcreStr.length();
 	fout.write((char*)&Cnt, 4);
-	for (size_t i = 0; i < Cnt; ++i)
+	for (ULONG i = 0; i < Cnt; ++i)
 	{
 		c = Pcre->PcreStr[i];
 		fout.write((char*)&c, 1);
 	}
 	Cnt = nfa.Size();
 	fout.write((char*)&Cnt, 4);
-	size_t num;
-	for (size_t i = 0; i < Cnt; ++i)
+	ULONG num;
+	for (ULONG i = 0; i < Cnt; ++i)
 	{
 		CNfaRow &row = nfa[i];
-		for (size_t j = 0; j < CHARSETSIZE; ++j)
+		for (ULONG j = 0; j < CHARSETSIZE; ++j)
 		{
 			num = row.DestCnt(j);
 			fout.write((char*)&num, 4);
-			for (size_t k = 0; k < num; ++k)
+			for (ULONG k = 0; k < num; ++k)
 			{
 				fout.write((char*)&(row.GetDest(j, k)), 4);
 			}

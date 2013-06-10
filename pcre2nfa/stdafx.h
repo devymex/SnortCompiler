@@ -18,4 +18,5 @@
 #include <algorithm>
 #include <stdio.h>
 
-#define MATCH_H_
+#define PCRE2NFA_DS
+#define MATCHHDR_DS

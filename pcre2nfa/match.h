@@ -1,13 +1,13 @@
 #include "pcre.h"
 
-#ifndef MATCH_H_
-#define MATCHSC __declspec(dllimport)
+#ifndef MATCHHDR_DS
+#define MATCHHDR __declspec(dllimport)
 #else
-#define MATCHSC __declspec(dllexport)
+#define MATCHHDR __declspec(dllexport)
 #endif
 
 #define OVECCOUNT 30 /* should be a multiple of 3 */
 #define EBUFLEN 128
 #define BUFLEN 1024
 
-MATCHSC bool match(const char* src, int length, std::string Regex, int &Pos);
+MATCHHDR bool match(const char* src, int length, std::string Regex, int &Pos);
