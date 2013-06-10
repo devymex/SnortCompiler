@@ -1,11 +1,24 @@
+/**
+**  @file        rule2nfa.cpp
+**
+**  @author      Lab 435, Xidian University
+**
+**  @brief       Support functions for transforming a rule to a nfa tree
+**
+**  This nfa tree processing for rule options.
+**
+*/
+
 #include "stdafx.h"
 #include "rule2nfa.h"
-#include "CombineTree.h"
 #include "stdafx.h"
 
 #define nfaTreeReserve 100
 #define nfaReserve 10000
 
+/*
+**	some special symbols to be considered when construct "content" to "pcre"
+*/
 #define ANY '.'
 #define ESCAPE '\\'
 #define STAR '*'
@@ -23,22 +36,111 @@
 #define MINUS_RANGE '-'  
 
 
+/*
+**	content type
+**	CONBYTE: transform content to vector<BYTE>
+**	CONPCRE: transform content to string
+*/
 enum CONTYPE
 {
 	CONBYTE,
 	CONPCRE
 };
 
-struct OPTIONCONTENT : public RULEOPTION
+class CRuleOption
 {
-	std::vector<BYTE> vecconts;
-	int nOffset;
-	int nDepth;
-	int nDistance;
-	int nWithin;
+public:
+	CRuleOption();
+	CRuleOption(const CRuleOption &other);
+	const CRuleOption& operator = (const CRuleOption &other);
+	virtual ~CRuleOption();
+
+	void SetPattern(LPCSTR lpStr);
+	size_t GetPattern(LPSTR lpStr, size_t nLen) const;
+
+	size_t GetFlag() const;
+	void SetFlag(size_t nFlag);
+	void AddFlag(size_t nFlag);
+	BOOL TestFlag(size_t nFlag) const;
+
+protected:
+	size_t m_nFlag;
+	std::string *m_pPattern;
 };
 
-struct OPTIONPCRE : public RULEOPTION
+CRuleOption::CRuleOption()
+	: m_nFlag(0)
+{
+	m_pPattern = new std::string;
+}
+
+CRuleOption::CRuleOption(const CRuleOption &other)
+{
+	m_pPattern = new std::string;
+	*this = other;
+}
+
+CRuleOption::~CRuleOption()
+{
+	delete m_pPattern;
+}
+
+const CRuleOption& CRuleOption::operator=(const CRuleOption &other)
+{
+	*m_pPattern = *other.m_pPattern;
+	m_nFlag = other.m_nFlag;
+	return *this;
+}
+
+size_t CRuleOption::GetPattern(LPSTR lpStr, size_t nLen) const
+{
+	if (lpStr == NULL || nLen == 0)
+	{
+		return m_pPattern->length();
+	}
+	if (nLen > m_pPattern->length())
+	{
+		nLen = m_pPattern->length();
+	}
+	CopyMemory(lpStr, &(*m_pPattern)[0], nLen);
+	return nLen;
+}
+
+void CRuleOption::SetPattern(LPCSTR lpStr)
+{
+	*m_pPattern = lpStr;
+}
+
+size_t CRuleOption::GetFlag() const
+{
+	return m_nFlag;
+}
+
+void CRuleOption::SetFlag(size_t nFlag)
+{
+	m_nFlag = nFlag;
+}
+
+void CRuleOption::AddFlag(size_t nFlag)
+{
+	m_nFlag |= nFlag;
+}
+
+BOOL CRuleOption::TestFlag(size_t nFlag) const
+{
+	return ((m_nFlag & nFlag) != 0);
+}
+
+struct OPTIONCONTENT : public CRuleOption
+{
+	std::vector<BYTE> vecconts;//content data
+	int nOffset;// offset constraint in snort rule
+	int nDepth;//depth constraint in snort rule
+	int nDistance;//distance constraint in snort rule
+	int nWithin;//within constraint in snort rule
+};
+
+struct OPTIONPCRE : public CRuleOption
 {
 };
 
@@ -95,7 +197,7 @@ struct ISSPACE
 	{
 		return g_map[c] == 1;
 	}
-private:
+protected:
 	char g_map[256];
 };
 
@@ -205,7 +307,7 @@ bool QuotedContext(_Iter &beg, _Iter &end)
 template<typename _Iter>
 size_t FormatPcre (_Iter pBeg, _Iter pEnd, OPTIONPCRE &pcre)
 {
-	pcre.nFlags = 0;
+	pcre.SetFlag(0);
 
 	if (*std::find_if_not(pBeg, pEnd, ISSPACE()) == '!')
 	{
@@ -236,67 +338,67 @@ size_t FormatPcre (_Iter pBeg, _Iter pEnd, OPTIONPCRE &pcre)
 		switch (*j)
 		{
 		case 'i':
-			pcre.nFlags |= PF_i;
+			pcre.AddFlag(PF_i);
 			continue;
 		case 's':
-			pcre.nFlags |= PF_s;
+			pcre.AddFlag(PF_s);
 			continue;
 		case 'm':
-			pcre.nFlags |= PF_m;
+			pcre.AddFlag(PF_m);
 			continue;
 		case 'x':
-			pcre.nFlags |= PF_x;
+			pcre.AddFlag(PF_x);
 			continue;
 		case 'A':
-			pcre.nFlags |= PF_A;
+			pcre.AddFlag(PF_A);
 			continue;
 		case 'E':
-			pcre.nFlags |= PF_E;
+			pcre.AddFlag(PF_E);
 			continue;
 		case 'G':
-			pcre.nFlags |= PF_G;
+			pcre.AddFlag(PF_G);
 			continue;
 		case 'R':
-			pcre.nFlags |= PF_R;
+			pcre.AddFlag(PF_R);
 			continue;
 		case 'U':
-			pcre.nFlags |= PF_U;
+			pcre.AddFlag(PF_U);
 			continue;
 		case 'B':
-			pcre.nFlags |= PF_B;
+			pcre.AddFlag(PF_B);
 			continue;
 		case 'P':
-			pcre.nFlags |= PF_P;
+			pcre.AddFlag(PF_P);
 			continue;
 		case 'H':
-			pcre.nFlags |= PF_H;
+			pcre.AddFlag(PF_H);
 			continue;
 		case 'M':
-			pcre.nFlags |= PF_M;
+			pcre.AddFlag(PF_M);
 			continue;
 		case 'C':
-			pcre.nFlags |= PF_C;
+			pcre.AddFlag(PF_C);
 			continue;
 		case 'O':
-			pcre.nFlags |= PF_O;
+			pcre.AddFlag(PF_O);
 			continue;
 		case 'I':
-			pcre.nFlags |= PF_I;
+			pcre.AddFlag(PF_I);
 			continue;
 		case 'D':
-			pcre.nFlags |= PF_D;
+			pcre.AddFlag(PF_D);
 			continue;
 		case 'K':
-			pcre.nFlags |= PF_K;
+			pcre.AddFlag(PF_K);
 			continue;
 		case 'S':
-			pcre.nFlags |= PF_S;
+			pcre.AddFlag(PF_S);
 			continue;
 		case 'Y':
-			pcre.nFlags |= PF_Y;
+			pcre.AddFlag(PF_Y);
 			continue;			
 		default:
-			pcre.nFlags |= 0;
+			pcre.AddFlag(0);
 		}
 	}
 	return 0;
@@ -445,7 +547,7 @@ size_t ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
 			0 == stricmp("uricontent", iOp->name.c_str()))
 		{
 			OPTIONCONTENT *pContent = new OPTIONCONTENT;
-			pContent->nFlags = 0;
+			pContent->SetFlag(0);
 			pContent->nOffset = 0;
 			pContent->nDepth =0;
 			pContent->nDistance = 0;
@@ -484,67 +586,67 @@ size_t ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
 			}
 			else
 			{
-				temp->nFlags |= CF_NOCASE;
+				temp->AddFlag(CF_NOCASE);
 			}
 		}
 		else if (0 == stricmp("offset", iOp->name.c_str()))
 		{
 			size_t last = snortRule.Size() - 1;
-			OPTIONCONTENT * temp = dynamic_cast<OPTIONCONTENT *>(snortRule[last]);
-			if (NULL == temp)
+			OPTIONCONTENT *pTemp = dynamic_cast<OPTIONCONTENT*>(snortRule[last]);
+			if (NULL == pTemp)
 			{
 				nResult = size_t(-1);
 				break;
 			}
 			else
 			{
-				temp->nOffset = atoi(&*opValueBeg);
-				temp->nFlags |= CF_OFFSET;
+				pTemp->nOffset = atoi(&*opValueBeg);
+				pTemp->AddFlag(CF_OFFSET);
 			}
 		}
 		else if (0 == stricmp("depth", iOp->name.c_str()))
 		{
 			size_t last = snortRule.Size() - 1;
-			OPTIONCONTENT * temp = dynamic_cast<OPTIONCONTENT *>(snortRule[last]);
-			if (NULL == temp)
+			OPTIONCONTENT *pTemp = dynamic_cast<OPTIONCONTENT *>(snortRule[last]);
+			if (NULL == pTemp)
 			{
 				nResult = size_t(-1);
 				break;
 			}
 			else
 			{
-				temp->nDepth = atoi(&*opValueBeg);
-				temp->nFlags |= CF_DEPTH;
+				pTemp->nDepth = atoi(&*opValueBeg);
+				pTemp->AddFlag(CF_DEPTH);
 			}
 		}
 		else if (0 == stricmp("distance", iOp->name.c_str()))
 		{
 			size_t last = snortRule.Size() - 1;
-			OPTIONCONTENT * temp = dynamic_cast<OPTIONCONTENT *>(snortRule[last]);
-			if (NULL == temp)
+			OPTIONCONTENT *pTemp = dynamic_cast<OPTIONCONTENT *>(snortRule[last]);
+			if (NULL == pTemp)
 			{
 				nResult = size_t(-1);
 				break;
 			}
 			else
 			{
-				temp->nDistance = atoi(&*opValueBeg);
-				temp->nFlags |= CF_DISTANCE;
+				pTemp->nDistance = atoi(&*opValueBeg);
+				pTemp->AddFlag(CF_DISTANCE);
 			}
 		}
 		else if (0 == stricmp("within", iOp->name.c_str()))
 		{
 			size_t last = snortRule.Size() - 1;
-			OPTIONCONTENT * temp = dynamic_cast<OPTIONCONTENT *>(snortRule[last]);
-			if (NULL == temp)
+			OPTIONCONTENT *pTemp = dynamic_cast<OPTIONCONTENT *>(snortRule[last]);
+			if (NULL == pTemp)
 			{
 				nResult = size_t(-1);
 				break;
 			}
 			else
 			{
-				temp->nWithin = atoi(&*opValueBeg);
-				temp->nFlags |= CF_WITHIN;
+				pTemp->nWithin = atoi(&*opValueBeg);
+				pTemp->AddFlag(CF_WITHIN);
 			}
 		}
 	}
@@ -606,22 +708,22 @@ CRECHANFA size_t CompileRuleSet(LPCTSTR fileName, RECIEVER recv, LPVOID lpUser)
 * content has depth or within constraint
 * construct it to linear NFA
 */
-void contentToLinearNFA(OPTIONCONTENT *content, CNfa &nfa)
+void contentToLinearNFA(OPTIONCONTENT *pContent, CNfa &nfa)
 {
 	nfa.Reserve(nfaReserve);
 	size_t state_size = 0;
 
-	size_t patternLen = content->vecconts.size();
+	size_t patternLen = pContent->vecconts.size();
 	size_t mustCnt = 0, maxCnt = 0;//mustCnt和maxCnt分别代表经过任意字符跳转出现的最少和最多次数
-	if((content->nFlags & CF_DEPTH))
+	if(pContent->TestFlag(CF_DEPTH))
 	{
-		mustCnt = content->nOffset;//必须跳转mustCnt次
-		maxCnt = content->nDepth - patternLen;//跳转了mustCnt次后，还需跳0-maxCnt次
+		mustCnt = pContent->nOffset;//必须跳转mustCnt次
+		maxCnt = pContent->nDepth - patternLen;//跳转了mustCnt次后，还需跳0-maxCnt次
 	}
-	else if((content->nFlags & CF_WITHIN))
+	else if(pContent->TestFlag(CF_WITHIN))
 	{
-		mustCnt = content->nDistance;
-		maxCnt = content->nWithin - patternLen;
+		mustCnt = pContent->nDistance;
+		maxCnt = pContent->nWithin - patternLen;
 	}
 
 	//共offset + depth + 1或者distance + within + 1个状态，有一个初始状态
@@ -640,19 +742,19 @@ void contentToLinearNFA(OPTIONCONTENT *content, CNfa &nfa)
 		}
 		if(i >= mustCnt)
 		{
-			row.AddDest(EMPTYEDGE, stateID);
+			row.AddDest(DFACOLSIZE, stateID);
 		}
 	}
 
 	++stateID;
-	for(std::vector<BYTE>::const_iterator iter = content->vecconts.begin();
-		iter != content->vecconts.end(); ++iter)
+	for(std::vector<BYTE>::const_iterator iter = pContent->vecconts.begin();
+		iter != pContent->vecconts.end(); ++iter)
 	{
 		nfa.Resize(++state_size);
 		//nfa.PushBack(CNfaRow());
 		CNfaRow &row = nfa.Back();
 
-		if((content->nFlags & CF_NOCASE) && isalpha(*iter))
+		if(pContent->TestFlag(CF_NOCASE) && isalpha(*iter))
 		{
 			row.AddDest(toupper(*iter), stateID);
 			row.AddDest(tolower(*iter), stateID);
@@ -669,20 +771,20 @@ void contentToLinearNFA(OPTIONCONTENT *content, CNfa &nfa)
 }
 
 //没有depth或者within标记的
-void contentToDefaultNFA(OPTIONCONTENT *content, CNfa &nfa)
+void contentToDefaultNFA(OPTIONCONTENT *pContent, CNfa &nfa)
 {
 	nfa.Reserve(nfaReserve);
 	size_t state_size = 0;
 
 	size_t mustCnt = 0;//经过的偏移字符个数
-	if((content->nFlags & CF_OFFSET))
+	if((pContent->GetFlag() & CF_OFFSET))
 	{
-		mustCnt = content->nOffset;
+		mustCnt = pContent->nOffset;
 
 	}
-	else if((content->nFlags & CF_DISTANCE))
+	else if((pContent->GetFlag() & CF_DISTANCE))
 	{
-		mustCnt = content->nDistance;
+		mustCnt = pContent->nDistance;
 	}
 
 	for(size_t i = 0; i < mustCnt; ++i)
@@ -699,12 +801,12 @@ void contentToDefaultNFA(OPTIONCONTENT *content, CNfa &nfa)
 	}
 
 	size_t stateID = mustCnt;//从stateID开始进行content.vecconts的匹配
-	size_t patternLen = content->vecconts.size(); 
+	size_t patternLen = pContent->vecconts.size(); 
 	std::vector<BYTE> pattern;
-	for(std::vector<BYTE>::const_iterator iter = content->vecconts.begin();
-		iter != content->vecconts.end(); ++iter)
+	for(std::vector<BYTE>::const_iterator iter = pContent->vecconts.begin();
+		iter != pContent->vecconts.end(); ++iter)
 	{
-		BYTE c = BYTE((content->nFlags & CF_NOCASE) ? tolower(*iter) : *iter);
+		BYTE c = BYTE((pContent->GetFlag() & CF_NOCASE) ? tolower(*iter) : *iter);
 		pattern.push_back(c);//如果content有nocase标记，则把模式串用字符的小写形式表示
 	}
 
@@ -721,7 +823,7 @@ void contentToDefaultNFA(OPTIONCONTENT *content, CNfa &nfa)
 			{
 				row.AddDest(c, stateID);
 			}
-			BYTE character = BYTE((content->nFlags & CF_NOCASE) ? tolower(c) : c);
+			BYTE character = BYTE((pContent->GetFlag() & CF_NOCASE) ? tolower(c) : c);
 			if(character == pattern[i])
 			{
 				row.AddDest(c, id);
@@ -731,23 +833,23 @@ void contentToDefaultNFA(OPTIONCONTENT *content, CNfa &nfa)
 	nfa.Reserve(++state_size);
 }
 
-void content2Nfa(OPTIONCONTENT *content, CNfa &nfa)
+void content2Nfa(OPTIONCONTENT *pContent, CNfa &nfa)
 {
 	/*
 	如果有depth或者within，则构造成线性的FA; 否则，构造成默认FA
 	*/
-	if((content->nFlags & CF_DEPTH) || (content->nFlags & CF_WITHIN))
+	if((pContent->GetFlag() & CF_DEPTH) || (pContent->GetFlag() & CF_WITHIN))
 	{
-		contentToLinearNFA(content, nfa);
+		contentToLinearNFA(pContent, nfa);
 	}
 	else
 	{
-		contentToDefaultNFA(content, nfa);
+		contentToDefaultNFA(pContent, nfa);
 	}
 }
 
-//测试函数:输出一个nfa
-void outPut(CNfa &nfa, std::string &fileName)
+//test function: output a nfa
+void PrintDfaToText(CNfa &nfa, std::string &fileName)
 {
 	size_t stateNum = nfa.Size();
 	std::ofstream fout(fileName);
@@ -782,11 +884,22 @@ void outPut(CNfa &nfa, std::string &fileName)
 	fout.close();
 }
 
+/*
+**	this function transforms content to pcre
+**	based on the content constraints: distance, within, offset, depth, nocase
+**
+**	@param pContent    pointer to the original content option
+**	@param pcreStr	   the transformed pcre
+**
+**	@return
+**  @retval  0 function successful
+**  @retval -1 fatal error
+*/
 size_t content2Pcre(OPTIONCONTENT *pContent, CCString &pcreStr)
 {
 	std::stringstream ss;
 	pcreStr = CCString("/^");
-	if((pContent->nFlags & CF_OFFSET) && pContent->nOffset > 0)
+	if(pContent->TestFlag(CF_OFFSET) && pContent->nOffset > 0)
 	{
 		ss.str("");
 		ss << pContent->nOffset;
@@ -794,7 +907,7 @@ size_t content2Pcre(OPTIONCONTENT *pContent, CCString &pcreStr)
 		pcreStr.Append(ss.str().c_str());
 		pcreStr.Append("}");
 	}
-	if((pContent->nFlags & CF_DISTANCE) && pContent->nDistance > 0)
+	if(pContent->TestFlag(CF_DISTANCE) && pContent->nDistance > 0)
 	{
 		ss.str("");
 		ss << pContent->nDistance;
@@ -802,14 +915,14 @@ size_t content2Pcre(OPTIONCONTENT *pContent, CCString &pcreStr)
 		pcreStr.Append(ss.str().c_str());
 		pcreStr.Append("}");
 	}
-	if(!((pContent->nFlags & CF_DEPTH) || pContent->nFlags & CF_WITHIN))
+	if(!(pContent->TestFlag(CF_DEPTH) || pContent->TestFlag(CF_WITHIN)))
 	{
-		//既没有depth也没有within
-		if(!((pContent->nFlags & CF_OFFSET) || (pContent->nFlags & CF_DISTANCE))
-			|| ((pContent->nFlags & CF_OFFSET) && pContent->nOffset == 0)
-			|| ((pContent->nFlags & CF_DISTANCE) && pContent->nDistance == 0))
+		//without depth and without within
+		if(!(pContent->TestFlag(CF_OFFSET) || pContent->TestFlag(CF_DISTANCE))
+			|| (pContent->TestFlag(CF_OFFSET) && pContent->nOffset == 0)
+			|| (pContent->TestFlag(CF_DISTANCE) && pContent->nDistance == 0))
 		{
-			//既没有offset约束也没有distance约束
+			//without offset and without distance
 			pcreStr = CCString("/");
 		}
 		else
@@ -820,11 +933,11 @@ size_t content2Pcre(OPTIONCONTENT *pContent, CCString &pcreStr)
 	else
 	{
 		int n = 0;
-		if((pContent->nFlags & CF_DEPTH))
+		if(pContent->TestFlag(CF_DEPTH))
 		{
 			n = pContent->nDepth - pContent->vecconts.size();
 		}
-		else if((pContent->nFlags & CF_WITHIN))
+		else if(pContent->TestFlag(CF_WITHIN))
 		{
 			n = pContent->nWithin - pContent->vecconts.size();
 		}
@@ -842,17 +955,19 @@ size_t content2Pcre(OPTIONCONTENT *pContent, CCString &pcreStr)
 		}
 	}
 
-	//需处理管道
+	//handle the data in content pipe
 	std::string con;
 	con.resize(pContent->GetPattern(NULL, 0));
 	pContent->GetPattern(&con[0], con.size());
 	std::string::iterator  opValueBeg= con.begin(), opValueEnd = con.end();
 	std::vector<BYTE> conVec;
+
+	//transform the pipe data into a special string
 	FormatOptionContent(opValueBeg, opValueEnd, conVec, CONPCRE);
 	const char* str = (char*)&conVec[0];
 	pcreStr.Append(str);
 
-	if(pContent->nFlags & CF_NOCASE)
+	if(pContent->TestFlag(CF_NOCASE))
 	{
 		pcreStr.Append("/si");
 	}
@@ -863,7 +978,99 @@ size_t content2Pcre(OPTIONCONTENT *pContent, CCString &pcreStr)
 	return 0;
 }
 
-//convert rule to pcre list
+/*
+**  NAME
+**    Rule2PcreList::
+*/
+/**
+**  This function converts a CSnortRule to a CRegRule and extract signatures from content option
+**
+**	According to the constraints of rule options, we split a snort rule into some option chains.
+**	For every option chain, the datapacket matchs from the first byte.
+**	Then we transfrom every option into pcre.
+**
+**  @param rule       a CSnortRule object which contains the original information
+**					  of a snort rule. 
+**  @param regrule    the transformed CRegRule object which makes up of a number of pcre lists
+**                    and the signatures in every pcre list.
+**
+**  @return integer
+**
+**  @retval  0 function successful
+**  @retval <>0 fatal error
+*/
+
+CRECHANFA CSnortRule::CSnortRule()
+	: m_nSid(0), m_nFlag(0)
+{
+	m_pOptions = new std::vector<CRuleOption*>;
+}
+
+CRECHANFA CSnortRule::CSnortRule(const CSnortRule &other)
+{
+	m_pOptions = new std::vector<CRuleOption*>;
+	*this = other;
+}
+
+CRECHANFA const CSnortRule& CSnortRule::operator = (const CSnortRule &other)
+{
+	m_nSid = other.m_nSid;
+	m_nFlag = other.m_nFlag;
+	*m_pOptions = *other.m_pOptions;
+	return *this;
+}
+
+CRECHANFA CSnortRule::~CSnortRule()
+{
+	std::vector<CRuleOption*> &opts = *m_pOptions;
+	for (std::vector<CRuleOption*>::iterator i = opts.begin(); i != opts.end(); ++i)
+	{
+		delete *i;
+	}
+	opts.clear();
+	delete m_pOptions;
+}
+
+CRECHANFA size_t CSnortRule::Size() const
+{
+	return m_pOptions->size();
+}
+
+CRECHANFA void CSnortRule::SetSid(size_t sid)
+{
+	m_nSid = sid;
+}
+
+CRECHANFA size_t CSnortRule::GetSid() const
+{
+	return m_nSid;
+}
+
+CRECHANFA void CSnortRule::SetFlag(size_t flag)
+{
+	m_nFlag = flag;
+}
+
+CRECHANFA size_t CSnortRule::GetFlag() const
+{
+	return m_nFlag;
+}
+
+CRECHANFA void CSnortRule::PushBack(CRuleOption* ruleoption)
+{
+	m_pOptions->push_back(ruleoption);
+}
+
+CRECHANFA void CSnortRule::PopBack()
+{
+	m_pOptions->pop_back();
+}
+
+CRECHANFA CRuleOption* CSnortRule::operator[](size_t nIdx) const
+{
+	return (*m_pOptions)[nIdx];
+}
+
 CRECHANFA size_t Rule2PcreList(const CSnortRule &rule, CRegRule &regrule)
 {
 	regrule.Reserve(nfaTreeReserve);
@@ -878,7 +1085,7 @@ CRECHANFA size_t Rule2PcreList(const CSnortRule &rule, CRegRule &regrule)
 		
 		if(pContent != NULL)
 		{
-			if(!((pContent->nFlags & CF_DISTANCE) || (pContent->nFlags& CF_WITHIN)))
+			if(!(pContent->TestFlag(CF_DISTANCE) || pContent->TestFlag(CF_WITHIN)))
 			{
 				if(regrule.Back().Size() != 0)
 				{
@@ -886,14 +1093,16 @@ CRECHANFA size_t Rule2PcreList(const CSnortRule &rule, CRegRule &regrule)
 				}
 			}
 			CCString conPcreStr;
+
+			//transfrom content to pcre
 			cFlag = content2Pcre(pContent, conPcreStr);
 			if(cFlag != 0)
 			{
 				return cFlag;
 			}
-			//提取content中的signature
 			if(pContent->vecconts.size() >= 4)
 			{
+				//extract signatures
 				std::vector<BYTE> contentTmp;
 				contentTmp.reserve(pContent->vecconts.size());
 				for(std::vector<BYTE>::iterator itTmp = pContent->vecconts.begin();
@@ -914,17 +1123,14 @@ CRECHANFA size_t Rule2PcreList(const CSnortRule &rule, CRegRule &regrule)
 					sigIt + 3 != contentTmp.end(); ++sigIt)
 				{
 					SIGNATURE sig = *(SIGNATURE*)&(*sigIt);
-
-					//BYTE *p = (BYTE*)&sig;
-					//std::cout << *p << *(p + 1) << *(p + 2) << *(p + 3) << std::endl;
-					regrule.Back().PushBackSig(sig);
+					regrule.Back().GetSigs().PushBack(sig);
 				}
 			}
 			regrule.Back().PushBack(conPcreStr);
 		}
 		else if(pPcre != NULL)
 		{
-			if(!(pPcre->nFlags & PF_R))
+			if(!(pPcre->GetFlag() & PF_R))
 			{
 				if(regrule.Back().Size() != 0)
 				{
@@ -939,25 +1145,35 @@ CRECHANFA size_t Rule2PcreList(const CSnortRule &rule, CRegRule &regrule)
 		}
 	}
 
-	regrule.Reserve(++regChain_size);
+	//regrule.Reserve(++regChain_size);
 	for(size_t i = 0; i < regrule.Size(); ++i)
 	{
-		if(regrule[i].GetSigCnt() > 1)
+		if(regrule[i].GetSigs().Size() > 1)
 		{
-			regrule[i].Unique();
+			regrule[i].GetSigs().Unique();
 		}
 	}
-	//for(size_t i = 0; i < regrule.Size(); ++i)
-	//{
-	//	for(size_t j = 0; j < regrule[i].GetSigCnt(); ++j)
-	//	{
-	//		BYTE *p  = (BYTE*)&regrule[i].GetSig(j);
-	//		std::cout << *p << *(p + 1) << *(p + 2) << *(p + 3) << "  ";
-	//	}
-	//	std::cout << std::endl;
-	//}
 	return 0;
 }
+
+
+/*
+**  NAME
+**    CRegChainToNFA::
+*/
+/**
+**  This function converts a CRegChain to a CNfa
+**
+**	use pcre library to construct a nfa from a pcre
+**	
+**  @param regchain   a CRegChain object which contains a pcre list
+**  @param nfa        the transformed CNfa object 
+**
+**  @return integer
+**
+**  @retval  0 function successful
+**  @retval <>0 fatal error
+*/
 
 CRECHANFA size_t CRegChainToNFA(CRegChain &regchain, CNfa &nfa)
 {
@@ -965,189 +1181,129 @@ CRECHANFA size_t CRegChainToNFA(CRegChain &regchain, CNfa &nfa)
 	int flag = 0;
 	for(size_t i = 0; i < regchain.Size(); ++i)
 	{
-		flag = PcreToNFA(regchain[i].C_Str(), nfa, regchain);
+		flag = PcreToNFA(regchain[i].GetStr(), nfa, regchain.GetSigs());
 		if(flag != 0)
 		{
 			nfa.Clear();
 			return flag;
 		}
 	}
-	//nfa.Reserve(nfa.Size() + 1);
+	regchain.GetSigs().Unique();
 	return 0;
 }
 
-//原始程序
-//CRECHANFA size_t InterpretRule(const CSnortRule &rule, CNfaTree &outTree)
-//{
-//	outTree.Reserve(nfaTreeReserve);
-//
-//	size_t flag = 0;
-//	//outTree.PushBack(CNfaChain());
-//	size_t nfaChain_size = 0;
-//	outTree.Resize(++nfaChain_size);
-//	size_t nfa_size = 0;
-//
-//	for(size_t i = 0; i < rule.Size(); ++i)
-//	{
-//		OPTIONCONTENT *pContent = dynamic_cast<OPTIONCONTENT*>(rule[i]);
-//		OPTIONPCRE *pPcre = dynamic_cast<OPTIONPCRE*>(rule[i]);
-//		if(pContent != NULL)
-//		{
-//			if(!((pContent->nFlags & CF_DISTANCE) || (pContent->nFlags& CF_WITHIN)))
-//			{
-//				if(outTree.Back().Size() != 0)
-//				{
-//					//outTree.PushBack(CNfaChain());
-//					outTree.Resize(++nfaChain_size);
-//					nfa_size = 0;
-//				}
-//			}
-//			//outTree.Back().PushBack(CNfa());
-//			outTree.Back().Resize(++nfa_size);
-//			content2Nfa(pContent, outTree.Back().Back());
-//		}
-//		else if(pPcre != NULL)
-//		{
-//
-//			if(!(pPcre->nFlags & PF_R))
-//			{
-//				if(outTree.Back().Size() != 0)
-//				{
-//					//outTree.PushBack(CNfaChain());
-//					outTree.Resize(++nfaChain_size);
-//					nfa_size = 0;
-//				}
-//			}
-//			//outTree.Back().PushBack(CNfa());
-//			outTree.Back().Resize(++nfa_size);
-//			std::string strPattern;
-//			strPattern.resize(pPcre->GetPattern(NULL, 0));
-//			pPcre->GetPattern(&strPattern[0], strPattern.size());
-//
-//			//std::cout << "pcre:" << strPattern << "; ";//测试输出
-//
-//			flag = PcreToNFA(strPattern.c_str(), outTree.Back().Back());
-//
-//			if(flag != 0)
-//			{
-//				return flag;
-//			}
-//		}
-//	}
-//
-//	outTree.Reserve(++nfaChain_size);
-//	return 0;
-//}
 
 
-//CRECHANFA size_t InterpretRule(const CSnortRule &rule, CNfaTree &outTree)
-//{
-//	outTree.Reserve(nfaTreeReserve);
-//
-//	size_t flag = 0;
-//	size_t cFlag = 0;
-//	size_t nfaChain_size = 0;
-//	outTree.Resize(++nfaChain_size);
-//	outTree.Back().Reserve(nfaReserve);
-//	std::string str = "";
-//
-//	for(size_t i = 0; i < rule.Size(); ++i)
-//	{
-//		OPTIONCONTENT *pContent = dynamic_cast<OPTIONCONTENT*>(rule[i]);
-//		OPTIONPCRE *pPcre = dynamic_cast<OPTIONPCRE*>(rule[i]);
-//		std::string pcreStr = "";
-//		if(pContent != NULL)
-//		{
-//			if(!((pContent->nFlags & CF_DISTANCE) || (pContent->nFlags& CF_WITHIN)))
-//			{
-//				if(outTree.Back().Size() != 0)
-//				{
-//					outTree.Back().Reserve(outTree.Back().Size() + 1);
-//					outTree.Back().SetPcre(str.c_str());
-//					str = "";
-//					outTree.Resize(++nfaChain_size);
-//					outTree.Back().Reserve(nfaReserve);
-//				}
-//			}
-//
-//			cFlag = content2Pcre(pContent, pcreStr);
-//			if(cFlag != 0)
-//			{
-//				return cFlag;
-//			}
-//		}
-//		else if(pPcre != NULL)
-//		{
-//
-//			if(!(pPcre->nFlags & PF_R))
-//			{
-//				if(outTree.Back().Size() != 0)
-//				{
-//					outTree.Back().Reserve(outTree.Back().Size() + 1);
-//					outTree.Back().SetPcre(str.c_str());
-//					str = "";
-//					outTree.Resize(++nfaChain_size);
-//					outTree.Back().Reserve(nfaReserve);
-//				}
-//			}
-//			pcreStr.resize(pPcre->GetPattern(NULL, 0));
-//			pPcre->GetPattern(&pcreStr[0], pcreStr.size());
-//		}
-//		flag = PcreToNFA(pcreStr.c_str(), outTree.Back());
-//		if(flag != 0)
-//		{
-//			return flag;
-//		}
-//
-//		//std::string str = outTree.Back().GetPcre();
-//
-//		//erase header and tail of a pcre 
-//		std::string::iterator it1 = std::find(pcreStr.begin(), pcreStr.end(), '/');
-//		if(*(++it1) == '^')
-//		{
-//			pcreStr.erase(pcreStr.begin(), ++it1);
-//		}
-//		else
-//		{
-//			pcreStr.erase(pcreStr.begin(), it1);
-//			std::string tmp = ".*";
-//			pcreStr.insert(pcreStr.begin(), tmp.begin(), tmp.end());
-//		}
-//		pcreStr.erase(std::find(pcreStr.rbegin(), pcreStr.rend(), '/').base() - 1, pcreStr.end());
-//
-//		str += pcreStr;
-//	}
-//
-//	outTree.Reserve(++nfaChain_size);
-//	outTree.Back().SetPcre(str.c_str());
-//
-//	return 0;
-//}
+CRECHANFA CRegRule::CRegRule()
+{
+	m_pRegVec = new std::vector<CRegChain>;
+}
 
+CRECHANFA CRegRule::~CRegRule()
+{
+	delete m_pRegVec;
+}
 
-//CRECHANFA void SerializeNfa(CNfaChain &nfaChain, CNfa &seriaNfa)
-//{
-//	CNfaRow oneSta;
-//
-//	for(size_t n = 0; n < nfaChain.Size(); ++n)
-//	{
-//		size_t temp = seriaNfa.Size();
-//		if(n != 0)
-//		{
-//			IncreNfaStaNum(seriaNfa.Size(), nfaChain[n]);
-//		}
-//		seriaNfa.Resize(temp + nfaChain[n].Size());
-//		for (size_t i = 0; i < nfaChain[n].Size(); ++i)
-//		{
-//			seriaNfa[temp + i] = nfaChain[n][i];
-//		}
-//
-//		if(n != nfaChain.Size() - 1)
-//		{
-//			seriaNfa.Back()[EMPTYEDGE].PushBack(seriaNfa.Size());
-//			seriaNfa.Resize(seriaNfa.Size() + 1);
-//			seriaNfa.Back()[EMPTYEDGE].PushBack(seriaNfa.Size());
-//		}		
-//	}
-//}
+CRECHANFA CRegRule::CRegRule(const CRegRule &other)
+{
+	m_pRegVec = new std::vector<CRegChain>;
+	*this = other;
+}
 
+CRECHANFA size_t CRegRule::Size() const
+{
+	return m_pRegVec->size();
+}
+
+CRECHANFA CRegChain& CRegRule::Back() const
+{
+	return m_pRegVec->back();
+}
+
+CRECHANFA void CRegRule::Reserve(size_t nCount)
+{
+	m_pRegVec->reserve(nCount);
+}
+CRECHANFA void CRegRule::Resize(size_t nSize)
+{
+	m_pRegVec->resize(nSize);
+}
+
+CRECHANFA void CRegRule::PushBack(const CRegChain &nRegChain)
+{
+	m_pRegVec->push_back(nRegChain);
+}
+
+CRECHANFA CRegChain& CRegRule::operator[](size_t nIdx)
+{
+	return (*m_pRegVec)[nIdx];
+}
+
+CRECHANFA const CRegChain& CRegRule::operator[](size_t nIdx) const
+{
+	return (*m_pRegVec)[nIdx];
+}
+
+CRECHANFA const CRegRule& CRegRule::operator = (const CRegRule &other)
+{
+	*this->m_pRegVec = *other.m_pRegVec;
+	return *this;
+}
+
+CRECHANFA CRegChain::CRegChain()
+{
+	m_pRegList = new std::vector<CCString>;
+}
+
+CRECHANFA CRegChain::~CRegChain()
+{
+	delete m_pRegList;
+}
+
+CRECHANFA CRegChain::CRegChain(const CRegChain &other)
+{
+	m_pRegList = new std::vector<CCString>;
+	*this = other;
+}
+
+CRECHANFA size_t CRegChain::Size() const
+{
+	return m_pRegList->size();
+}
+
+CRECHANFA CCString& CRegChain::Back() const
+{
+	return m_pRegList->back();
+}
+
+CRECHANFA void CRegChain::PushBack(const CCString &pcreStr)
+{
+	m_pRegList->push_back(pcreStr);
+}
+
+CRECHANFA CCString& CRegChain::operator[](size_t nIdx)
+{
+	return (*m_pRegList)[nIdx];
+}
+
+CRECHANFA const CRegChain& CRegChain::operator = (const CRegChain &other)
+{
+	*this->m_pRegList = *other.m_pRegList;
+	this->m_sigs = other.m_sigs;
+	return *this;
+}
+
+CRECHANFA void CRegChain::Resize(size_t nSize)
+{
+	m_pRegList->resize(nSize);
+}
+
+CRECHANFA CSignatures& CRegChain::GetSigs()
+{
+	return m_sigs;
+}
+
+CRECHANFA const CSignatures& CRegChain::GetSigs() const
+{
+	return m_sigs;
+}

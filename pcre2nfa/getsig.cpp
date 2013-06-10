@@ -2,11 +2,12 @@
 #include "p2nmain.h"
 #include "pcre.h"
 #include "pcre2nfa.h"
+#include "getsig.h"
 
 #define MYGET(cur) \
 	((code[cur + 1] << 8) | code[cur + 2])
 
-PCRETONFA void GetSignature(std::vector<unsigned char> &code, std::vector<std::vector<unsigned char>> &strs)
+void GetSignature(std::vector<unsigned char> &code, std::vector<std::vector<unsigned char>> &strs)
 {
 	size_t cur = 0;
 	size_t bra = 0;

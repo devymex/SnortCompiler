@@ -42,16 +42,16 @@ MATCHPKT void MchCompile(LPCTSTR filename, LPVOID lpVoid)
 		for (size_t chainsize = 0; chainsize < iter->regrule.Size(); ++chainsize)
 		{
 			SIGNATURE sig;
-			size_t sigcnt = (iter->regrule)[chainsize].GetSigCnt();
+			size_t sigcnt = (iter->regrule)[chainsize].GetSigs().Size();
 			if (sigcnt > 0)
 			{
 				flag |= (1 << 1);
 				size_t random = rand() % sigcnt;
-				tempsig = (iter->regrule)[chainsize].GetSig(random);
+				tempsig = (iter->regrule)[chainsize].GetSigs()[random];
 
 				for (size_t cursig = 0; cursig < sigcnt; ++cursig)
 				{
-					sig = (iter->regrule)[chainsize].GetSig(cursig);
+					sig = (iter->regrule)[chainsize].GetSigs()[cursig];
 
 					if (rulesmap.sigmap.count(sig) != 0)
 					{

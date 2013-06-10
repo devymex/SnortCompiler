@@ -2,6 +2,8 @@
 
 #include "../common/common.h"
 #include "../dfanew/dfanew.h"
+#include "../rule2nfa/rule2nfa.h"
+
 #include <windows.h>
 
 #ifndef COMPILERNEW_H_
@@ -25,7 +27,7 @@ struct COMPILERNEW COMPILEDRULENEW
 	};
 	size_t m_nSid;
 	size_t m_nResult;
-	CVectorNumber m_dfaIds;
+	CVectorUnsigned m_dfaIds;
 };
 
 class COMPILERNEW CDfaTblNew
@@ -42,7 +44,7 @@ public:
 	const size_t Size() const;
 	void PushBack(const CDfaNew &dfa);
 	void Clear();
-private:
+protected:
 	std::vector<CDfaNew> *m_pdfaTbl;
 };
 
@@ -60,49 +62,22 @@ public:
 	const size_t Size() const;
 	void PushBack(const COMPILEDRULENEW &sidDfaIds);
 	COMPILEDRULENEW& Back();
-private:
+protected:
 	std::vector<COMPILEDRULENEW> *m_ruleResult;
 };
-//ÆúÓÃ
-//struct DFAINFO
-//{
-//	size_t dfaId;
-//	size_t chainId;
-//};
-//
-//class COMPILERNEW CDFASINFO
-//{
-//public:
-//	CDFASINFO();
-//	CDFASINFO(const CDFASINFO& other);
-//	const CDFASINFO &operator=(const CDFASINFO &other);
-//	~CDFASINFO();
-//	DFAINFO& operator[](size_t index);
-//	const DFAINFO& operator[](size_t index) const;
-//	void Reserve(size_t nCount);
-//	void Resize(size_t nSize);
-//	const size_t Size() const;
-//	void PushBack(const DFAINFO &dfaDetail);
-//	DFAINFO& Back();
-//private:
-//	std::vector<DFAINFO> *m_pDfas;
-//};
 
 class COMPILERNEW CResNew
 {
-private:
+protected:
 	CDfaTblNew m_dfaTbl;
 	CSidDfaIdsNew m_sidDfaIds;
-	//CDFASINFO m_DfasInfo;
 	CRegRule m_RegexTbl;
 public:
 	CDfaTblNew& GetDfaTable();
 	CSidDfaIdsNew& GetSidDfaIds();
-	//CDFASINFO &GetDfasInfo();
 	CRegRule &GetRegexTbl();
 	const CDfaTblNew& GetDfaTable() const;
 	const CSidDfaIdsNew& GetSidDfaIds() const;
-	//const CDFASINFO &GetDfasInfo() const;
 	const CRegRule &GetRegexTbl() const;
 	size_t WriteToFile(LPCTSTR filename);
 	size_t ReadFromFile(LPCTSTR filename);

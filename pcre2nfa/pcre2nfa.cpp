@@ -2,6 +2,7 @@
 #include "p2nmain.h"
 #include "pcre.h"
 #include "pcre2nfa.h"
+#include "getsig.h"
 
 #define OVECCOUNT 30 /* should be a multiple of 3 */
 #define EBUFLEN 128
@@ -126,7 +127,7 @@ bool ExceedLimit(const std::string &OnePcre)
 }
 
 //把单个pcre转化为NFA
-PCRETONFA size_t PcreToNFA(const char *pPcre, CNfa &nfa, CRegChain &regchain)
+PCRETONFA size_t PcreToNFA(const char *pPcre, CNfa &nfa, CSignatures &sigs)
 {
 	std::vector<unsigned char> code;
 	std::string strPcre(pPcre);
@@ -168,10 +169,9 @@ PCRETONFA size_t PcreToNFA(const char *pPcre, CNfa &nfa, CRegChain &regchain)
 				for (std::vector<unsigned char>::iterator iter = strs[i].begin(); iter + 3 != strs[i].end(); ++iter)
 				{
 					SIGNATURE sig = *(SIGNATURE*)&(*iter);
-					regchain.PushBackSig(sig);
+					sigs.PushBack(sig);
 				}
 			}
-			regchain.Unique();
 		}
 	}
 

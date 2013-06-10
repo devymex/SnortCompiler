@@ -8,9 +8,11 @@ void GetMchRule(const u_char *data, size_t len, void* user, std::vector<size_t> 
 	if(len > 3)
 	{
 		REGRULESMAP &rulesmap = *(REGRULESMAP *)user;
-		SIGSMAP sigmap = rulesmap.sigmap;
+		SIGSMAP &sigmap = rulesmap.sigmap;
 		SIGNATURE sig;
 		u_char csig[4];
+		size_t flag = 0;
+
 		for(const u_char* iter = data; iter != &data[len - 4]; ++iter)
 		{
 			for(size_t i = 0; i < 4; ++i)
@@ -20,8 +22,18 @@ void GetMchRule(const u_char *data, size_t len, void* user, std::vector<size_t> 
 			sig = *(SIGNATURE *)csig;
 			if(sigmap.count(sig))
 			{
-				size_t size = sigmap[sig].size();
-				rules.insert(rules.end(), sigmap[sig].begin(), sigmap[sig].end());
+				if(sig == 0)
+				{
+					flag = 1;
+					size_t size = sigmap[sig].size();
+					rules.insert(rules.end(), sigmap[sig].begin(), sigmap[sig].end());
+				}
+
+				if(flag == 0)
+				{
+					size_t size = sigmap[sig].size();
+					rules.insert(rules.end(), sigmap[sig].begin(), sigmap[sig].end());
+				}
 			}
 		}
 	}
@@ -30,7 +42,7 @@ void GetMchRule(const u_char *data, size_t len, void* user, std::vector<size_t> 
 }
 
 //调用pcre库进行数据包匹配
-bool TradithinalMatch(const u_char *data, size_t len, CRegRule &regRule)
+bool PcreMatch(const u_char *data, size_t len, CRegRule &regRule)
 {
 	for(size_t i = 0; i < regRule.Size(); ++i)
 	{
@@ -41,7 +53,8 @@ bool TradithinalMatch(const u_char *data, size_t len, CRegRule &regRule)
 		{
 			//对规则选项进行匹配
 			int Pos = -1;
-			bool flag = match((const char*)pData, dataSize, regRule[i][j].GetString(), Pos);
+
+			bool flag = match((const char*)pData, dataSize, regRule[i][j].GetStr(), Pos);
 			if(!flag)
 			{
 				return false;
@@ -73,7 +86,7 @@ void HdlOnePkt(const u_char *data, size_t len, void*user)
 	rulesmap.mchresult << pktnum << " : ";
 	for(size_t i = 0; i < rules.size(); ++i)
 	{
-		bool flag = TradithinalMatch(data, len, rulesmap.result[rules[i]].regrule);
+		bool flag = PcreMatch(data, len, rulesmap.result[rules[i]].regrule);
 		if(flag)
 		{
 			//matchSid.push_back(rulesmap.result[rules[i]].m_nSid);
@@ -109,10 +122,17 @@ MATCHPKT void HandleAllFile(const std::string &path, void* user)
 		{
 			std::string &temp = str + std::string(wfda.cFileName);
 			std::string &ext1 = temp.substr(temp.size() - 4, 4);
+
 			if(ext1 == ".cap")
 			{
+				std::string str = rulesmap.resultpath + "\\" +std::string(wfda.cFileName) +".txt";
+				rulesmap.mchresult.open(rulesmap.resultpath + "\\" +std::string(wfda.cFileName) +".txt");	
+				rulesmap.mchresult << "-----------------------" << temp << "-----------------------" << std::endl;
 				LoadCapFile(temp.c_str(), &rulesmap);
+				rulesmap.mchresult.close();
 			}
+
+			pktnum = 0;
 		}
 	}
 }
@@ -123,6 +143,7 @@ void packet_handler(u_char *param, const struct pcap_pkthdr *header, const u_cha
 	ih = (ip_header *)(pkt_data + ETHDRLEN);
 	pkt_data = pkt_data + ETHDRLEN;
 	PACKETPARAM *pParam = (PACKETPARAM*)param;
+
 	pParam->pFunc(ih, pkt_data, pParam->pUser);
 }
 
@@ -148,10 +169,6 @@ void CALLBACK PktParam(const ip_header *ih, const BYTE *data, void* user)
 			u_short tcpHdrLen = ((ptcp->lenres & 0xf0) >> 4) * 4;
 			data += _ihl + tcpHdrLen;
 
-			if(*data == 227)
-			{
-				std::cout <<std::endl;
-			}
 			size_t tcpdatalen = _tlen - _ihl - tcpHdrLen;
 			if(tcpdatalen > 0)
 			{
@@ -166,10 +183,6 @@ void CALLBACK PktParam(const ip_header *ih, const BYTE *data, void* user)
 			pudp = (udp_header*)((BYTE*) pudp + _ihl);
 			data += _ihl + UDPHDRLEN;
 
-			if(*data == 227)
-			{
-				std::cout <<std::endl;
-			}
 			size_t udpdatalen = _tlen - _ihl - UDPHDRLEN;
 			if(udpdatalen > 0)
 			{
@@ -183,13 +196,15 @@ void CALLBACK PktParam(const ip_header *ih, const BYTE *data, void* user)
 
 bool MyLoadCapFile(const char* pFile, PACKETRECV cv, void* pUser)
 {
-	char* ebuff = new char;
-	pcap_t *mypcap = pcap_open_offline(pFile, ebuff);
+	//char* ebuff = new char;
+	pcap_t *mypcap = pcap_open_offline(pFile, NULL);
 	PACKETPARAM pp;
 	pp.pUser = pUser;
 	pp.pFunc = cv;
-	pcap_loop(mypcap, 0, packet_handler, (BYTE*)&pp);
 
+	pcap_loop(mypcap, 0, packet_handler, (BYTE*)&pp);
+	pcap_close(mypcap);
+	//delete(ebuff);
 	return true;
 }
 

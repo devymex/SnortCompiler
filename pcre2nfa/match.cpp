@@ -51,6 +51,7 @@ MATCHSC bool match(const char* src, int length, std::string Regex, int &Pos)
 
 	//rc = pcre_exec(re, NULL, src, length, 0, 0, ovector, OVECCOUNT);
 	rc = pcre_dfa_exec(re, NULL,src, length, 0, 0, ovector, OVECCOUNT, workspace, wscount);
+	delete workspace;
 	if (rc < 0)
 	{
 		//if (rc == PCRE_ERROR_NOMATCH) printf("Sorry, no match ...\n");

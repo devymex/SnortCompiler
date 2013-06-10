@@ -1,9 +1,19 @@
+/**
+**  @file        compilernew.cpp
+**
+**  @author      Lab 435, Xidian University
+**
+**  @brief       Support functions for compile rule to dfa
+**
+**  This implements compile rule to dfa algorithm
+**
+*/
+
 #include "stdafx.h"
-#include "compilernew.h"
 #include "../common/common.h"
-#include "../rule2nfa/rule2nfa.h"
 #include "../pcre2nfa/pcre2nfa.h"
 #include "../dfanew/dfanew.h"
+#include "compilernew.h"
 
 COMPILERNEW CDfaTblNew::CDfaTblNew()
 {
@@ -118,63 +128,6 @@ COMPILERNEW COMPILEDRULENEW& CSidDfaIdsNew::Back()
 	return m_ruleResult->back();
 }
 
-//COMPILERNEW CDFASINFO::CDFASINFO()
-//{
-//	m_pDfas = new std::vector<DFAINFO>;
-//}
-//
-//COMPILERNEW CDFASINFO::CDFASINFO(const CDFASINFO& other)
-//{
-//	m_pDfas = new std::vector<DFAINFO>;
-//	*this = other;
-//}
-//
-//COMPILERNEW const CDFASINFO &CDFASINFO::operator=(const CDFASINFO &other)
-//{
-//	*m_pDfas = *other.m_pDfas;
-//	return *this;
-//}
-//
-//COMPILERNEW CDFASINFO::~CDFASINFO()
-//{
-//	delete m_pDfas;
-//}
-//
-//COMPILERNEW DFAINFO& CDFASINFO::operator[](size_t index)
-//{
-//	return (*m_pDfas)[index];
-//}
-//
-//COMPILERNEW const DFAINFO& CDFASINFO::operator[](size_t index) const
-//{
-//	return (*m_pDfas)[index];
-//}
-//
-//COMPILERNEW void CDFASINFO::Reserve(size_t nCount)
-//{
-//	m_pDfas->reserve(nCount);
-//}
-//
-//COMPILERNEW void CDFASINFO::Resize(size_t nSize)
-//{
-//	m_pDfas->resize(nSize);
-//}
-//
-//COMPILERNEW const size_t CDFASINFO::Size() const
-//{
-//	return m_pDfas->size();
-//}
-//
-//COMPILERNEW void CDFASINFO::PushBack(const DFAINFO &dfaDetail)
-//{
-//	m_pDfas->push_back(dfaDetail);
-//}
-//
-//COMPILERNEW DFAINFO& CDFASINFO::Back()
-//{
-//	return m_pDfas->back();
-//}
-
 COMPILERNEW CDfaTblNew& CResNew::GetDfaTable()
 {
 	return m_dfaTbl;
@@ -184,11 +137,6 @@ COMPILERNEW CSidDfaIdsNew& CResNew::GetSidDfaIds()
 {
 	return m_sidDfaIds;
 }
-
-//COMPILERNEW CDFASINFO &CResNew::GetDfasInfo()
-//{
-//	return m_DfasInfo;
-//}
 
 COMPILERNEW CRegRule &CResNew::GetRegexTbl()
 {
@@ -205,11 +153,6 @@ COMPILERNEW const CSidDfaIdsNew& CResNew::GetSidDfaIds() const
 	return m_sidDfaIds;
 }
 
-//COMPILERNEW const CDFASINFO &CResNew::GetDfasInfo() const
-//{
-//	return m_DfasInfo;
-//}
-
 COMPILERNEW const CRegRule &CResNew::GetRegexTbl() const
 {
 	return m_RegexTbl;
@@ -221,6 +164,16 @@ void WriteNum(std::ofstream &fout, _Ty _num, size_t nBytes = sizeof(_Ty))
 	fout.write((char*)&_num, nBytes);
 }
 
+/* Write the relationship between sid and dfa ids, dfa table and option list
+table to file
+
+Arguments:
+  filename    path of the file waiting for written
+
+Returns:      0 success
+              -1 error occurred
+*/
+
 COMPILERNEW size_t CResNew::WriteToFile(LPCTSTR filename)
 {
 	std::ofstream fout(filename, std::ios::binary);
@@ -229,42 +182,48 @@ COMPILERNEW size_t CResNew::WriteToFile(LPCTSTR filename)
 		std::cerr << "Open file Failed!" << std::endl;
 		return (size_t)-1;
 	}
-	//标志记为DFAS
+
+	//file label DFAS
 	std::string symbolStr = "DFAS";
 	for (std::string::iterator i = symbolStr.begin(); i != symbolStr.end(); ++i)
 	{
 		WriteNum(fout, *i);
 	}
-	//记录文件尺寸填写位置
+
+	//mark the position used for file size
 	std::streamoff fileSizePos = fout.tellp();
 	fout.seekp(4, std::ios_base::cur);
-	//规则数量
+
+	//write the number of rules
 	WriteNum(fout, m_sidDfaIds.Size());
-	//记录规则偏移填写位置
+
+	//mark the position used for the offset of rule
 	std::streamoff ruleOffsetPos = fout.tellp();
 	fout.seekp(4, std::ios_base::cur);
-	//DFAs数量
+
+	//write the number of dfas
 	WriteNum(fout, m_dfaTbl.Size());
-	//记录DFAs偏移填写位置
+
+	//mark the position used for the offset of dfa
 	std::streamoff dfaOffsetPos = fout.tellp();
 	fout.seekp(4, std::ios_base::cur);
-	////DfasInfo大小
-	//WriteNum(fout, m_DfasInfo.Size());
-	////记录DfasInfo偏移填写位置
-	//std::streamoff dfasInfoOffsetPos = fout.tellp();
-	//fout.seekp(4, std::ios_base::cur);
-	//RegexTbl大小
+
+	//write the number of regexes
 	WriteNum(fout, m_RegexTbl.Size());
-	//记录RegexTbl偏移填写位置
+
+	//mark the position used for the offset of regex
 	std::streamoff RegexTblOffsetPos = fout.tellp();
 	fout.seekp(4, std::ios_base::cur);
-	//填写规则偏移
+
+	//write the offset of rule
 	std::streamoff endPos = fout.tellp();
 	fout.seekp(ruleOffsetPos, std::ios_base::beg);
 	WriteNum(fout, endPos, 4);
-	//定位文件到末尾
+
+	//location to the end of the file
 	fout.seekp(endPos, std::ios_base::beg);
-	//开始写规则表
+
+	//start to write the relationship between sid and dfa ids
 	for (size_t i = 0; i < m_sidDfaIds.Size(); ++i)
 	{
 		COMPILEDRULENEW &ruleResult = m_sidDfaIds[i];
@@ -276,13 +235,16 @@ COMPILERNEW size_t CResNew::WriteToFile(LPCTSTR filename)
 			WriteNum(fout, ruleResult.m_dfaIds[j]);
 		}
 	}
-	//填写DFAs偏移
+
+	//write the offset of dfa
 	endPos = fout.tellp();
 	fout.seekp(dfaOffsetPos, std::ios_base::beg);
 	WriteNum(fout, endPos, 4);
-	//定位文件到末尾
+
+	//location to the end of the file
 	fout.seekp(0, std::ios_base::end);
-	//开始写DFAs
+
+	//start to write dfas
 	BYTE dfaDetails[100000];
 	for (size_t i = 0; i < m_dfaTbl.Size(); ++i)
 	{
@@ -290,40 +252,33 @@ COMPILERNEW size_t CResNew::WriteToFile(LPCTSTR filename)
 		WriteNum(fout, len);
 		fout.write((char*)dfaDetails, len * sizeof(BYTE));
 	}
-	////填写DfasInfo偏移
-	//endPos = fout.tellp();
-	//fout.seekp(dfasInfoOffsetPos, std::ios_base::beg);
-	//WriteNum(fout, endPos, 4);
-	////定位文件到末尾
-	//fout.seekp(0, std::ios_base::end);
-	//for (size_t i = 0; i < m_DfasInfo.Size(); ++i)
-	//{
-	//	WriteNum(fout, m_DfasInfo[i].dfaId);
-	//	WriteNum(fout, m_DfasInfo[i].chainId);
-	//}
-	//填写RegexTbl偏移
+
+	//write the offset of regex
 	endPos = fout.tellp();
 	fout.seekp(RegexTblOffsetPos, std::ios_base::beg);
 	WriteNum(fout, endPos, 4);
-	//定位文件到末尾
+
+	//location to the end of the file
 	fout.seekp(0, std::ios_base::end);
-	//写RegexTbl
+
+	//start to write regexes
 	for (size_t i = 0; i < m_RegexTbl.Size(); ++i)
 	{
 		WriteNum(fout, m_RegexTbl[i].Size());
 		for (size_t j = 0; j < m_RegexTbl[i].Size(); ++j)
 		{
 			WriteNum(fout, m_RegexTbl[i][j].Size());
-			const char *pString = m_RegexTbl[i][j].C_Str();
+			const char *pString = m_RegexTbl[i][j].GetStr();
 			fout.write(pString, strlen(pString));
 		}
-		WriteNum(fout, m_RegexTbl[i].GetSigCnt());
-		for (size_t j = 0; j < m_RegexTbl[i].GetSigCnt(); ++j)
+		WriteNum(fout, m_RegexTbl[i].GetSigs().Size());
+		for (size_t j = 0; j < m_RegexTbl[i].GetSigs().Size(); ++j)
 		{
-			WriteNum(fout, m_RegexTbl[i].GetSig(j));
+			WriteNum(fout, m_RegexTbl[i].GetSigs()[j]);
 		}
 	}
-	//填写文件尺寸
+
+	//write the file size
 	endPos = fout.tellp();
 	fout.seekp(fileSizePos, std::ios_base::beg);
 	WriteNum(fout, endPos, 4);
@@ -334,6 +289,16 @@ COMPILERNEW size_t CResNew::WriteToFile(LPCTSTR filename)
 	return 0;
 }
 
+/* read the relationship between sid and dfa ids, dfa table and option list
+table from file
+
+Arguments:
+  filename    path of the file waiting for written
+
+Returns:      0 success
+              -1 error occurred
+*/
+
 COMPILERNEW size_t CResNew::ReadFromFile(LPCTSTR filename)
 {
 	std::ifstream fin(filename, std::ios::binary);
@@ -342,7 +307,8 @@ COMPILERNEW size_t CResNew::ReadFromFile(LPCTSTR filename)
 		std::cerr << "Open file Failed!" << std::endl;
 		return (size_t)-1;
 	}
-	//查看标志记是否为DFAS
+
+	//check file label
 	std::string symbolStr = "DFAS";
 	unsigned char c;
 	for (std::string::iterator i = symbolStr.begin(); i != symbolStr.end(); ++i)
@@ -354,30 +320,33 @@ COMPILERNEW size_t CResNew::ReadFromFile(LPCTSTR filename)
 			return (size_t)-1;
 		}
 	}
-	//读取文件尺寸
+
+	//read the file size
 	size_t fileSize;
 	fin.read((char*)&fileSize, 4);
-	//读取规则数量
+
+	//read the number of rules
 	size_t ruleNum;
 	fin.read((char*)&ruleNum, 4);
-	//跳过规则偏移
+
+	//skip the offset of rule
 	fin.seekg(4, std::ios_base::cur);
-	//DFAs数量
+
+	//read the number of dfas
 	size_t dfaNum;
 	fin.read((char*)&dfaNum, 4);
-	//跳过DFAs偏移
+
+	//skip the offset of dfa
 	fin.seekg(4, std::ios_base::cur);
-	////读DfasInfo大小
-	//size_t dfasInfoSize;
-	//fin.read((char*)&dfasInfoSize, 4);
-	////跳过DfasInfo偏移
-	//fin.seekg(4, std::ios_base::cur);
-	//RegexTbl大小
+
+	//read the number of regexes
 	size_t RegexTblSize;
 	fin.read((char*)&RegexTblSize, 4);
-	//跳过RegexTbl偏移
+
+	//skip the offset of regex
 	fin.seekg(4, std::ios_base::cur);
-	//开始读规则表
+
+	//start to read the relationship between sid and dfa ids
 	m_sidDfaIds.Resize(ruleNum);
 	size_t SidDfaNum;
 	for (size_t i = 0; i < ruleNum; ++i)
@@ -392,7 +361,8 @@ COMPILERNEW size_t CResNew::ReadFromFile(LPCTSTR filename)
 			fin.read((char*)&(ruleResult.m_dfaIds[j]), 4);
 		}
 	}
-	//开始读DFAs
+
+	//start to read dfas
 	m_dfaTbl.Resize(dfaNum);
 	BYTE dfaDetails[100000];
 	for (size_t i = 0; i < dfaNum; ++i)
@@ -403,14 +373,8 @@ COMPILERNEW size_t CResNew::ReadFromFile(LPCTSTR filename)
 		fin.read((char*)dfaDetails, len * sizeof(BYTE));
 		dfa.Load(dfaDetails, len);
 	}
-	////开始读DfasInfo
-	//m_DfasInfo.Resize(dfasInfoSize);
-	//for (size_t i = 0; i < dfasInfoSize; ++i)
-	//{
-	//	fin.read((char*)&m_DfasInfo[i].dfaId, 4);
-	//	fin.read((char*)&m_DfasInfo[i].chainId, 4);
-	//}
-	//写RegexTbl
+
+	//start to read regexes
 	m_RegexTbl.Resize(RegexTblSize);
 	size_t ChainSize;
 	size_t RegSize;
@@ -431,7 +395,7 @@ COMPILERNEW size_t CResNew::ReadFromFile(LPCTSTR filename)
 		{
 			SIGNATURE Sig;
 			fin.read((char*)&Sig, 4);
-			m_RegexTbl[i].PushBackSig(Sig);
+			m_RegexTbl[i].GetSigs().PushBack(Sig);
 		}
 	}
 	fin.close();
@@ -440,32 +404,40 @@ COMPILERNEW size_t CResNew::ReadFromFile(LPCTSTR filename)
 	return 0;
 }
 
+/* assign all the signatures of each rule to all its option list
+
+Arguments:
+  result      the compile result
+  BegIdx      the index of the first regex which belongs to this rule
+  EndIdx      the next index of the last regex which belongs to this rule
+
+Returns:      nothing
+
+*/
+
 void AssignSig(CResNew &result, size_t BegIdx, size_t EndIdx)
 {
-	std::vector<SIGNATURE> vecRuleSigs; //本条规则的所有Signatrue
+	//all the signatures of this rule
+	std::vector<SIGNATURE> vecRuleSigs;
 	for (size_t i = BegIdx; i < EndIdx; ++i)
 	{
-		for (size_t j = 0; j < result.GetRegexTbl()[i].GetSigCnt(); ++j)
+		for (size_t j = 0; j < result.GetRegexTbl()[i].GetSigs().Size(); ++j)
 		{
-			if (std::find(vecRuleSigs.begin(), vecRuleSigs.end(), result.GetRegexTbl()[i].GetSig(j)) == vecRuleSigs.end())
+			if (std::find(vecRuleSigs.begin(), vecRuleSigs.end(),
+				result.GetRegexTbl()[i].GetSigs()[j]) == vecRuleSigs.end())
 			{
-				vecRuleSigs.push_back(result.GetRegexTbl()[i].GetSig(j));
+				vecRuleSigs.push_back(result.GetRegexTbl()[i].GetSigs()[j]);
 			}
 		}
 	}
+
+	//assign all the signatures of each rule to all its option list
 	for (size_t i = BegIdx; i < EndIdx; ++i)
 	{
-		//if (result.GetRegexTbl()[i].GetSigCnt() == 0)
-		//{
-		//	for (size_t j = 0; j < vecRuleSigs.size(); ++j)
-		//	{
-		//		result.GetRegexTbl()[i].PushBackSig(vecRuleSigs[j]);
-		//	}
-		//}
-		result.GetRegexTbl()[i].ClearSigList();
+		result.GetRegexTbl()[i].GetSigs().Clear();
 		for (size_t j = 0; j < vecRuleSigs.size(); ++j)
 		{
-			result.GetRegexTbl()[i].PushBackSig(vecRuleSigs[j]);
+			result.GetRegexTbl()[i].GetSigs().PushBack(vecRuleSigs[j]);
 		}
 	}
 }
@@ -475,14 +447,25 @@ double pcre2nfatime = 0.0;
 double nfa2dfatime = 0.0;
 double dfamintimetime = 0.0;
 
+/* complie one rule to several dfas
+
+Arguments:
+  rule        the snort rule
+  result      the compile result
+  ruleResult  the relationship between sid and dfa ids
+
+Returns:      nothing
+
+*/
+
 void Rule2Dfas(const CSnortRule &rule, CResNew &result, COMPILEDRULENEW &ruleResult)
 {
 	CRegRule regrule;
-	CTimer ctime;//用于测试
-	ctime.Reset();//用于测试
+	CTimer ctime;//for test
+	ctime.Reset();//for test
 
-	size_t flag = Rule2PcreList(rule, regrule);//从content中取出sig了
-	rule2pcretime += ctime.Reset();//用于测试
+	size_t flag = Rule2PcreList(rule, regrule);
+	rule2pcretime += ctime.Reset();//for test
 
 	if (flag == SC_ERROR)
 	{
@@ -495,29 +478,25 @@ void Rule2Dfas(const CSnortRule &rule, CResNew &result, COMPILEDRULENEW &ruleRes
 		const size_t nDfaTblSize = result.GetDfaTable().Size();
 		const size_t nIncrement = regrule.Size();
 		result.GetDfaTable().Resize(nDfaTblSize + nIncrement);
-		//const size_t nDfasInfoSize = result.GetDfasInfo().Size();
-		//result.GetDfasInfo().Resize(nDfasInfoSize + nIncrement);
 		const size_t nRegexTblSize = result.GetRegexTbl().Size();
 		result.GetRegexTbl().Resize(nRegexTblSize + nIncrement);
 		size_t nDfaId;
-		//size_t nDfasInfoId;
 		size_t nChainId;
 		bool bHasSigs = false;
 		for (size_t i = 0; i < nIncrement; ++i)
 		{
 			CNfa nfa;
 
-			ctime.Reset();//用于测试
+			ctime.Reset();//for test
 			size_t nToNFAFlag = CRegChainToNFA(regrule[i], nfa);
-			pcre2nfatime += ctime.Reset();//用于测试
+			pcre2nfatime += ctime.Reset();//for test
 
-			if (regrule[i].GetSigCnt() > 0)
+			if (regrule[i].GetSigs().Size() > 0)
 			{
 				bHasSigs = true;
 			}
 
 			nDfaId = nDfaTblSize + i;
-			//nDfasInfoId = nDfasInfoSize + i;
 			nChainId = nRegexTblSize + i;
 			CDfaNew &dfa = result.GetDfaTable()[nDfaId];
 			if (nToNFAFlag == SC_ERROR)
@@ -525,7 +504,6 @@ void Rule2Dfas(const CSnortRule &rule, CResNew &result, COMPILEDRULENEW &ruleRes
 				ruleResult.m_nResult = COMPILEDRULENEW::RES_ERROR;
 				ruleResult.m_dfaIds.Clear();
 				result.GetDfaTable().Resize(nDfaTblSize);
-				//result.GetDfasInfo().Resize(nDfasInfoSize);
 				result.GetRegexTbl().Resize(nRegexTblSize);
 				return;
 			}
@@ -535,12 +513,10 @@ void Rule2Dfas(const CSnortRule &rule, CResNew &result, COMPILEDRULENEW &ruleRes
 			}
 			else
 			{
-				ctime.Reset();//用于测试
+				ctime.Reset();//for test
 				dfa.SetId(nDfaId);
-				size_t nToDFAFlag = dfa.FromNFA(nfa, NULL, 0);
-				//				std::cout << "  "<< dfa.LinkSize() << ", " << dfa.GetGroupCount() * dfa.Size() << std::endl;
-				nfa2dfatime += ctime.Reset();//用于测试
-				//outPutDfa(dfa, "..//..//output//test.txt");
+				size_t nToDFAFlag = dfa.FromNFA(nfa);
+				nfa2dfatime += ctime.Reset();//for test
 
 				if (nToDFAFlag == -1)
 				{
@@ -549,9 +525,13 @@ void Rule2Dfas(const CSnortRule &rule, CResNew &result, COMPILEDRULENEW &ruleRes
 				}
 				else
 				{
-					ctime.Reset();//用于测试
+					ctime.Reset();//for test
 					size_t nr = dfa.Minimize();
-					dfamintimetime += ctime.Reset();//用于测试
+					if (dfa.GetFinalState().Size() == 0)
+					{
+						system("pause");
+					}
+					dfamintimetime += ctime.Reset();//for test
 					if (0 != nr || dfa.Size() > DFA_SIZE_LIMIT)
 					{
 						ruleResult.m_nResult = COMPILEDRULENEW::RES_EXCEEDLIMIT;
@@ -563,13 +543,10 @@ void Rule2Dfas(const CSnortRule &rule, CResNew &result, COMPILEDRULENEW &ruleRes
 			{
 				ruleResult.m_dfaIds.Clear();
 				result.GetDfaTable().Resize(nDfaTblSize);
-				//result.GetDfasInfo().Resize(nDfasInfoSize);
 				result.GetRegexTbl().Resize(nRegexTblSize);
 				return;
 			}
 			ruleResult.m_dfaIds.PushBack(nDfaId);
-			//result.GetDfasInfo()[nDfasInfoId].dfaId = nDfaId;
-			//result.GetDfasInfo()[nDfasInfoId].chainId = nChainId;
 			result.GetRegexTbl()[nChainId] = regrule[i];
 		}
 
@@ -588,6 +565,16 @@ void Rule2Dfas(const CSnortRule &rule, CResNew &result, COMPILEDRULENEW &ruleRes
 		}
 	}
 }
+
+/* complie one rule
+
+Arguments:
+  rule        the snort rule
+  lpVoid      the compile result
+
+Returns:      nothing
+
+*/
 
 void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 {
@@ -617,6 +604,16 @@ void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 		Rule2Dfas(rule, result, ruleResult);
 	}
 }
+
+/* complie all rules
+
+Arguments:
+  filename    path of the file where all rules are saved in
+  result      the compile result
+
+Returns:      nothing
+
+*/
 
 COMPILERNEW void compilenew(LPCTSTR filename, CResNew &result)
 {

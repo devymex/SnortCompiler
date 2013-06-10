@@ -7,7 +7,6 @@
 #include "../dfanew/dfanew.h"
 #include "../rule2nfa/rule2nfa.h"
 #include "../pcre2nfa/pcre2nfa.h"
-#include "../mergedfanew/MergeDfanew.h"
 
 #include <fstream>
 #include <iostream>
@@ -168,7 +167,7 @@ void display(CDfaNew &newdfa)
 }
 
 //
-//void fdisplay(CDfaNew &newdfa, const char* fileName)
+//void PrintDfaToGv(CDfaNew &newdfa, const char* fileName)
 //{
 //	std::ofstream fout(fileName);
 //	fout << "digraph G {" << std::endl;
@@ -343,11 +342,11 @@ void FoldDFA(CDfaNew &curDfa)
 	}
 
 	foldDfa.Init(group);
-	foldDfa.reserve((STATEID)300);
+	foldDfa.Reserve(300);
 	foldDfa.SetStartId(curDfa.GetStartId());
 	for (size_t i = 0; i < curDfa.Size(); ++i)
 	{
-		foldDfa.PushBackDfa(CDfaRow(CSIZE));
+		foldDfa.PushBack(CDfaRow(CSIZE));
 		for (size_t j = 0; j < CSIZE; ++j)
 		{
 			BYTE z = curDfa.Char2Group((BYTE)j);
@@ -419,22 +418,22 @@ size_t CompareWithPcre(const char *pPcre)
 
 	CNfa nfa1;
 	CRegChain regChain;
-	if (SC_SUCCESS != PcreToNFA(oPcre, nfa1, regChain))
+	if (SC_SUCCESS != PcreToNFA(oPcre, nfa1, regChain.GetSigs()))
 	{
 		return 2;
 	}
 	//std::cout << nfa1.Size() << std::endl;
-	//outPut(nfa1, "..//nfaresult1.txt");
+	//PrintDfaToText(nfa1, "..//nfaresult1.txt");
 	CDfaNew OwnDfa;
-	if (-1 == OwnDfa.FromNFA(nfa1, NULL, 0))
+	if (-1 == OwnDfa.FromNFA(nfa1))
 	{
 		return 3;
 	}
 	//std::cout << OwnDfa.Size() << std::endl;
 	OwnDfa.Minimize();	
-	fdisplay(OwnDfa,"..\\result1.txt");
-	//outPutDfa(OwnDfa,"..\\first.txt");
+	//PrintDfaToText(OwnDfa,"..\\first.txt");
 	FoldDFA(OwnDfa);
+	//PrintDfaToGv(OwnDfa,"..\\result1.txt");
 	//std::cout << (size_t)OwnDfa.Size() << std::endl;
 	//display(OwnDfa);
 	//OwnDfa.Process((BYTE*)str, strlen(str), tmp);
@@ -448,7 +447,7 @@ size_t CompareWithPcre(const char *pPcre)
 	//nfa2->analyze(stdout);
 	//CNfa tmpnfa;
 	//nfa2->nfa2CNfa(tmpnfa);
-	//outPut(tmpnfa, "..\\nfaresult2.txt");
+	//PrintDfaToText(tmpnfa, "..\\nfaresult2.txt");
 	DFA* BeDfa = nfa2->nfa2dfa();
 	delete nfa2;
 	if (BeDfa != NULL)
@@ -459,7 +458,7 @@ size_t CompareWithPcre(const char *pPcre)
 	//std::cout << BeDfa->size() << std::endl;
 	CDfaNew newBeDfa;
 	BeDfa->Dfa2CDfaNew(newBeDfa);
-	//fdisplay(newBeDfa, "..\\result2.txt");
+	//PrintDfaToGv(newBeDfa, "..\\result2.txt");
 	//std::cout << (size_t)newBeDfa.Size() << std::endl;
 	//newBeDfa.Process((BYTE* )str, strlen(str), tmp);
 	//std::cout << tmp.Size() << std::endl;
@@ -501,7 +500,7 @@ void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 		{
 			for (size_t j = 0; j < rr[i].Size(); ++j)
 			{
-				const char *tmp = rr[i][j].C_Str();
+				const char *tmp = rr[i][j].GetStr();
 				if (tmp != NULL && tmp[0] != '\0')
 				{
 					switch(CompareWithPcre(tmp))

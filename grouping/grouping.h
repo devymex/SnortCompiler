@@ -8,33 +8,16 @@
 #define GROUPINGSC __declspec(dllexport)
 #endif
 
-class GROUPINGSC CSIGNATURES
-{
-public:
-	CSIGNATURES();
-	CSIGNATURES(const CSIGNATURES& other);
-	const CSIGNATURES &operator=(const CSIGNATURES &other);
-	~CSIGNATURES();
-	const size_t Size() const;
-	void Resize(size_t nSize);
-	void PushBack(SIGNATURE Sig);
-	SIGNATURE &operator[](size_t nIdx);
-	const SIGNATURE &operator[](size_t nIdx) const;
-	void Clear();
-private:
-	std::vector<SIGNATURE> *m_pSigs;
-};
-
 struct DFAINFO
 {
 	std::vector<SIGNATURE> Sigs;
 };
 
-
 struct ONEGROUP
 {
-	CVectorNumber DfaIds;
-	CSIGNATURES ComSigs;
+	CVectorUnsigned DfaIds;
+	CSignatures ComSigs;
+	SIGNATURE currSig;
 	std::size_t mergeDfaId;
 };
 
@@ -53,13 +36,13 @@ public:
 	const ONEGROUP &operator[](size_t nIdx) const;
 	void Clear();
 	void Erase(size_t nIdx);
-private:
+protected:
 	std::vector<ONEGROUP> *m_pGroups;
 };
 
 class GROUPINGSC CGROUPRes
 {
-private:
+protected:
 	CDfaTblNew m_dfaTbl;
 	CSidDfaIdsNew m_sidDfaIds; 
 	CGROUPS m_groups;

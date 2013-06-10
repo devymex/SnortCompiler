@@ -2,12 +2,12 @@
 #include "OrDfanew.h"
 #include "MergeDfanew.h"
 
-//Ô­Ê¼´úÂë£¬ÓÐÐ¡ÎÊÌâ£¬Âý
+//Ô­Ê¼ï¿½ï¿½ï¿½ë£¬ï¿½ï¿½Ð¡ï¿½ï¿½ï¿½â£¬ï¿½ï¿½
 //MERDFANEW bool NOrMerge(std::vector<CDfaNew> &dfas, CDfaNew &lastDfa)
 //{
-//	CTimer c;//ÓÃÓÚ²âÊÔ
+//	CTimer c;//ï¿½ï¿½ï¿½Ú²ï¿½ï¿½ï¿½
 //#undef max
-//	size_t nTermSta = 0;//ºÏ²¢ºónfa×Ü×´Ì¬Êý
+//	size_t nTermSta = 0;//ï¿½Ï²ï¿½ï¿½ï¿½nfaï¿½ï¿½×´Ì¬ï¿½ï¿½
 //	for(size_t i = 0; i < dfas.size(); ++i)
 //	{
 //		if(dfas[i].Size() > std::numeric_limits<STATEID>::max())
@@ -18,10 +18,10 @@
 //	}
 //	++nTermSta;
 //
-//	NFALOG nfalog[CHARSETSIZE * 2];//nfa×´Ì¬ÓëdfaIDµÄ¶ÔÓ¦£¬ ÕâÑùµÄÊý×éÓÐÎÊÌâ£¡Èç¹ûÊÇÁ½Á½ºÏ²¢£¬ÕâÑùÒ²¿ÉÒÔ
+//	NFALOG nfalog[CHARSETSIZE * 2];//nfa×´Ì¬ï¿½ï¿½dfaIDï¿½Ä¶ï¿½Ó¦ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½â£¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò²ï¿½ï¿½ï¿½ï¿½
 //	size_t count = 0;
 //	
-//	CNfa oneNfa;//ºÏ²¢ºóµÄnfa
+//	CNfa oneNfa;//ï¿½Ï²ï¿½ï¿½ï¿½ï¿½nfa
 //	//oneNfa.Reserve(nTermSta + 1);
 //	oneNfa.Reserve(CHARSETSIZE * 2);
 //	oneNfa.Resize(1);
@@ -44,7 +44,7 @@
 //			std::cerr << "DFA_SIZE_LIMIT" << std::endl;
 //			return false;
 //		}
-//		//std::cout << "·½·¨Ò»lastDfa×îÐ¡»¯ÓÃÊ±: " << c.Reset() << std::endl;
+//		//std::cout << "ï¿½ï¿½ï¿½ï¿½Ò»lastDfaï¿½ï¿½Ð¡ï¿½ï¿½ï¿½ï¿½Ê±: " << c.Reset() << std::endl;
 //
 //		return true;
 //	}
@@ -91,7 +91,7 @@ struct GROUPKEY
 	}
 };
 
-//°´ÕÕÃ¿¸ödfaµÄm_pGroup½øÐÐ·Ö×é
+//ï¿½ï¿½ï¿½ï¿½Ã¿ï¿½ï¿½dfaï¿½ï¿½m_pGroupï¿½ï¿½ï¿½Ð·ï¿½ï¿½ï¿½
 void DfaColGroup(std::vector<CDfaNew> &dfas, BYTE* groups)
 {
 	struct GROUPKEYHASH
@@ -143,7 +143,7 @@ void DfaColGroup(std::vector<CDfaNew> &dfas, BYTE* groups)
 	}
 }
 
-//¸ù¾ÝotherµÄotherSta²éÕÒtermset£¬½«ÕÒµ½µÄTERMSET²åÈëµ½µÄlastDfaµÄm_TermSetÖÐ£¬ÆäÖÐlastDfaµÄ×´Ì¬ÊÇlastStaÖÐ
+//ï¿½ï¿½ï¿½ï¿½otherï¿½ï¿½otherStaï¿½ï¿½ï¿½ï¿½termsetï¿½ï¿½ï¿½ï¿½ï¿½Òµï¿½ï¿½ï¿½TERMSETï¿½ï¿½ï¿½ëµ½ï¿½ï¿½lastDfaï¿½ï¿½m_TermSetï¿½Ð£ï¿½ï¿½ï¿½ï¿½ï¿½lastDfaï¿½ï¿½×´Ì¬ï¿½ï¿½lastStaï¿½ï¿½
 size_t AddTermIntoDFA(STATEID otherSta, CDfaNew &other, STATEID lastSta, CDfaNew &lastDfa)
 {
 	size_t flag = (size_t)-1;
@@ -160,7 +160,7 @@ size_t AddTermIntoDFA(STATEID otherSta, CDfaNew &other, STATEID lastSta, CDfaNew
 	return flag;
 }
 
-//¿ÉÒÔÏÈ¸ù¾ÝÃ¿¸ödfaµÄ·Ö×éÇé¿ö£¬Í¨¹ýhash½«×îÖÕµÄlastDfa½øÐÐ·Ö×é
+//ï¿½ï¿½ï¿½ï¿½ï¿½È¸ï¿½ï¿½ï¿½Ã¿ï¿½ï¿½dfaï¿½Ä·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¨ï¿½ï¿½hashï¿½ï¿½ï¿½ï¿½ï¿½Õµï¿½lastDfaï¿½ï¿½ï¿½Ð·ï¿½ï¿½ï¿½
 MERDFANEW bool NOrMerge(std::vector<CDfaNew> &dfas, CDfaNew &lastDfa)
 {
 	size_t dfaId = lastDfa.GetId();
@@ -169,7 +169,7 @@ MERDFANEW bool NOrMerge(std::vector<CDfaNew> &dfas, CDfaNew &lastDfa)
 #undef max
 
 	size_t dfasSize = dfas.size();
-	size_t nTermSta = 1;//ÖÕÌ¬±ê¼Ç
+	size_t nTermSta = 1;//ï¿½ï¿½Ì¬ï¿½ï¿½ï¿½
 	//for(size_t i = 0; i < dfasSize; ++i)
 	//{
 	//	if(dfas[i].Size() > std::numeric_limits<STATEID>::max())
@@ -180,7 +180,7 @@ MERDFANEW bool NOrMerge(std::vector<CDfaNew> &dfas, CDfaNew &lastDfa)
 	//}
 	//++nTermSta;
 
-	//¶ÔlastDfa·Ö×é
+	//ï¿½ï¿½lastDfaï¿½ï¿½ï¿½ï¿½
 	BYTE groups[DFACOLSIZE];
 	DfaColGroup(dfas, groups);
 	lastDfa.Init(groups);
@@ -190,9 +190,9 @@ MERDFANEW bool NOrMerge(std::vector<CDfaNew> &dfas, CDfaNew &lastDfa)
 	typedef std::unordered_map<std::vector<size_t>, STATEID, TODFA_HASH> STATESETHASH;
 	STATESETHASH statehash;
 
-	size_t finFlag = 0;//ÅÐ¶ÏÊÇ·ñÖÕÌ¬
-	std::stack<std::vector<size_t> > statesStack;//²âÊÔ
-	std::vector<size_t> startVec(dfasSize + 2);//Ê¹ÓÃÒ»¸ö´óÐ¡Îªdfas.size() + 2µÄvector±íÊ¾ºÏ²¢ºóµÄnfaµÄ×´Ì¬£¬ÆäÖÐµÚ0¸öÔªËØ±íÊ¾dfa1µÄ×´Ì¬£¬..., ×îºóÁ½¸öÔªËØ±íÊ¾ÐéÄâµÄ³õÊ¼×´Ì¬0ºÍÖÕÖ¹×´Ì¬nTermSta
+	size_t finFlag = 0;//ï¿½Ð¶ï¿½ï¿½Ç·ï¿½ï¿½ï¿½Ì¬
+	std::stack<std::vector<size_t> > statesStack;//ï¿½ï¿½ï¿½ï¿½
+	std::vector<size_t> startVec(dfasSize + 2);//Ê¹ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½Ð¡Îªdfas.size() + 2ï¿½ï¿½vectorï¿½ï¿½Ê¾ï¿½Ï²ï¿½ï¿½ï¿½ï¿½nfaï¿½ï¿½×´Ì¬ï¿½ï¿½ï¿½ï¿½ï¿½Ðµï¿½0ï¿½ï¿½Ôªï¿½Ø±ï¿½Ê¾dfa1ï¿½ï¿½×´Ì¬ï¿½ï¿½..., ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ôªï¿½Ø±ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½Ä³ï¿½Ê¼×´Ì¬0ï¿½ï¿½ï¿½ï¿½Ö¹×´Ì¬nTermSta
 	
 	lastDfa.ReservRow(CHARSETSIZE);
 	lastDfa.ResizeRow(lastDfa.Size() + 1, colCnt);
@@ -202,9 +202,9 @@ MERDFANEW bool NOrMerge(std::vector<CDfaNew> &dfas, CDfaNew &lastDfa)
 		STATEID nSta = dfas[i].GetStartId();
 		if((dfas[i][nSta].GetFlag() & CDfaRow::TERMINAL) != 0)
 		{
-			//ÊÇÖÕÌ¬
+			//ï¿½ï¿½ï¿½ï¿½Ì¬
 			finFlag = 1;
-			//½«dfas[i]¸ù¾ÝnStaÕÒµ½µÄdfaId²åÈëµ½lastDfaµÄ0×´Ì¬¶ÔÓ¦µÄTERMSETÖÐ
+			//ï¿½ï¿½dfas[i]ï¿½ï¿½ï¿½ï¿½nStaï¿½Òµï¿½ï¿½ï¿½dfaIdï¿½ï¿½ï¿½ëµ½lastDfaï¿½ï¿½0×´Ì¬ï¿½ï¿½Ó¦ï¿½ï¿½TERMSETï¿½ï¿½
 			if(AddTermIntoDFA(nSta, dfas[i], 0, lastDfa) != 0)
 			{
 				std::cout << "Termset Error!" << std::endl;
@@ -213,10 +213,10 @@ MERDFANEW bool NOrMerge(std::vector<CDfaNew> &dfas, CDfaNew &lastDfa)
 		}
 		startVec[i] = nSta;
 	}
-	startVec[dfasSize] = 0;//0ÊÇÌí¼ÓµÄÐéÄâ×´Ì¬
+	startVec[dfasSize] = 0;//0ï¿½ï¿½ï¿½ï¿½Óµï¿½ï¿½ï¿½ï¿½ï¿½×´Ì¬
 	if(finFlag)
 	{
-		//ËµÃ÷ÕâÊÇ¸öÖÕÌ¬
+		//Ëµï¿½ï¿½ï¿½ï¿½ï¿½Ç¸ï¿½ï¿½ï¿½Ì¬
 		startVec[dfasSize + 1] = nTermSta;
 		lastDfa[0].SetFlag(lastDfa[0].GetFlag() | CDfaRow::START | CDfaRow::TERMINAL);
 	}
@@ -236,7 +236,7 @@ MERDFANEW bool NOrMerge(std::vector<CDfaNew> &dfas, CDfaNew &lastDfa)
 
 	while(!statesStack.empty())
 	{
-		std::vector<size_t> curVec = statesStack.top();//µ±Ç°×´Ì¬¼¯ºÏ, curVec¹²ÓÐdfasSize + 2¸ö×´Ì¬
+		std::vector<size_t> curVec = statesStack.top();//ï¿½ï¿½Ç°×´Ì¬ï¿½ï¿½ï¿½ï¿½, curVecï¿½ï¿½ï¿½ï¿½dfasSize + 2ï¿½ï¿½×´Ì¬
 		statesStack.pop();
 		
 		STATESETHASH::iterator ir = statehash.find(curVec);
@@ -248,7 +248,7 @@ MERDFANEW bool NOrMerge(std::vector<CDfaNew> &dfas, CDfaNew &lastDfa)
 		STATEID curStaNum = ir->second;
 		ZeroMemory(computFlag, sizeof(computFlag));
 
-		//ÏÂÒ»×´Ì¬¼¯ºÏ
+		//ï¿½ï¿½Ò»×´Ì¬ï¿½ï¿½ï¿½ï¿½
 		for(size_t curChar = 0; curChar < DFACOLSIZE; ++curChar)
 		{
 			finFlag = 0;
@@ -260,7 +260,7 @@ MERDFANEW bool NOrMerge(std::vector<CDfaNew> &dfas, CDfaNew &lastDfa)
 			}
 			computFlag[lastDfaGroup] = 1;
 
-			size_t flag = 0;//±ê¼ÇÏÂÒ»×´Ì¬¼¯ÊÇ·ñÎª¿Õ
+			size_t flag = 0;//ï¿½ï¿½ï¿½ï¿½ï¿½Ò»×´Ì¬ï¿½ï¿½ï¿½Ç·ï¿½Îªï¿½ï¿½
 			for(size_t i = 0; i < dfasSize; ++i)
 			{
 				STATEID sta = curVec[i];
@@ -268,13 +268,13 @@ MERDFANEW bool NOrMerge(std::vector<CDfaNew> &dfas, CDfaNew &lastDfa)
 				if(sta != (STATEID)-1)
 				{
 					BYTE curgroup = dfas[i].Char2Group(curChar);
-					STATEID nextId = dfas[i][sta][curgroup];//µÚi¸ödfa´ÓcurVec[i]×´Ì¬¾­¹ýcurCharÌø×ªµÄÏÂÒ»×´Ì¬
+					STATEID nextId = dfas[i][sta][curgroup];//ï¿½ï¿½iï¿½ï¿½dfaï¿½ï¿½curVec[i]×´Ì¬ï¿½ï¿½ï¿½ï¿½curCharï¿½ï¿½×ªï¿½ï¿½ï¿½ï¿½Ò»×´Ì¬
 					if(nextId != (STATEID)-1)
 					{
 						flag = 1;
 						if((dfas[i][nextId].GetFlag() & CDfaRow::TERMINAL) != 0)
 						{
-							//ÅÐ¶ÏÊÇ·ñÖÕÌ¬
+							//ï¿½Ð¶ï¿½ï¿½Ç·ï¿½ï¿½ï¿½Ì¬
 							finFlag = 1;
 						}
 					}
@@ -288,7 +288,7 @@ MERDFANEW bool NOrMerge(std::vector<CDfaNew> &dfas, CDfaNew &lastDfa)
 			NextVec[dfasSize] = -1;
 			if(finFlag)
 			{
-				//¸Ã×´Ì¬ÊÇÖÕÌ¬
+				//ï¿½ï¿½×´Ì¬ï¿½ï¿½ï¿½ï¿½Ì¬
 				NextVec[dfasSize + 1] = nTermSta;
 			}
 			else
@@ -346,7 +346,7 @@ MERDFANEW bool NOrMerge(std::vector<CDfaNew> &dfas, CDfaNew &lastDfa)
 	}
 	lastDfa.UniqueTermSet();
 
-	//¶ÔlastDfa½øÐÐ½øÒ»²½°´ÁÐ·Ö×é
+	//ï¿½ï¿½lastDfaï¿½ï¿½ï¿½Ð½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½Ð·ï¿½ï¿½ï¿½
 	//lastDfa.Minimize();
 	//std::cout << lastDfa.Size() << std::endl;
 	//std::cout << lastDfa.Size() << std::endl;

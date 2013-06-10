@@ -1,6 +1,7 @@
 #pragma once
 #include <map>
 #include <vector>
+#include <unordered_map>
 #include "../common/common.h"
 #include "../grouping/grouping.h"
 
@@ -12,7 +13,7 @@
 
 typedef std::map<SIGNATURE, std::vector<size_t>> SIGNATUREMAP;
 typedef std::map<size_t, std::vector<SIGNATURE>> IDMAP;
-typedef std::map<size_t, std::vector<size_t>> RESULTMAP;
+typedef std::unordered_map<size_t, std::vector<size_t>> RESULTMAP;
 
 struct HASHNODE
 {
@@ -28,16 +29,9 @@ struct GROUPHASH
 	std::vector<SIGNATURE> vecSigs;
 	SIGNATURE currSig;
 	std::size_t mergeDfaId;
-};
-
-struct COMP
-{
-	bool operator()(const GROUPHASH &g1, const GROUPHASH &g2)
-	{
-		return g1.vecSigs.size() < g2.vecSigs.size();
-	}
+	std::vector<size_t> vecDfaIds;
 };
 
 HASHMAPPINGSC size_t hash(const SIGNATURE &oneSig);
 
-HASHMAPPINGSC void HashMapping(const CGROUPRes &groupRes, HASHRES &HashResMap);
+HASHMAPPINGSC void HashMapping(CGROUPRes &groupRes, HASHRES &HashResMap);

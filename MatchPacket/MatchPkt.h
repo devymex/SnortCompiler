@@ -1,8 +1,8 @@
-#define NTDDI_VERSION NTDDI_WIN7
-#define _WIN32_WINNT _WIN32_WINNT_WIN7
-#define WINVER _WIN32_WINNT_WIN7
+#pragma once
+//#define NTDDI_VERSION NTDDI_WIN7
+//#define _WIN32_WINNT _WIN32_WINNT_WIN7
+//#define WINVER _WIN32_WINNT_WIN7
 
-#define _WINSOCKAPI_
 #include <Windows.h>
 #include <pcap.h>
 
@@ -154,6 +154,7 @@ struct REGRULESMAP
 	std::vector<REGRULES> result;
 	SIGSMAP sigmap;
 	std::ofstream mchresult;
+	std::string resultpath;
 };
 
 void CALLBACK PktParam(const ip_header *ih, const BYTE *data, void* user);
@@ -168,5 +169,5 @@ MATCHPKT bool TradithinalMatch(std::vector<u_char> &dataSrc, CRegRule &regRule);
 
 void GetMchRule(const u_char *data, size_t len, void* user, std::vector<size_t> &rules);
 void HdlOnePkt(const u_char *data, size_t len, void*user);
-bool TradithinalMatch(const u_char *data, size_t len, CRegRule &regRule);
+bool PcreMatch(const u_char *data, size_t len, CRegRule &regRule);
 MATCHPKT void HandleAllFile(const std::string &path, void* user);

@@ -2,6 +2,9 @@
 #include <tchar.h>
 #include <windows.h>
 #include <fstream>
+#include <string>
+#include <algorithm>
+#include <sstream>
 #include "../common/common.h"
 #include "../dfanew/dfanew.h"
 #include "../compilernew/compilernew.h"
@@ -28,7 +31,7 @@ size_t StatisticsSigToFile(LPCTSTR filename, CResNew &result)
 		{
 			if (tmpRes.m_dfaIds.Size() > 0)
 			{
-				fout << tmpRes.m_nSid << "\t" << rg[tmpRes.m_dfaIds[0]].GetSigCnt() << std::endl;
+				//fout << tmpRes.m_nSid << "\t" << rg[tmpRes.m_dfaIds[0]].GetSigs.GetSigCnt() << std::endl;
 			}
 		}
 	}
@@ -41,12 +44,45 @@ void main()
 {
 	CTimer t;
 	CResNew result;
-	compilenew(_T("../../input/allrules.rule"), result);
-	result.WriteToFile(_T("../../output/result.cdt"));
+	compilenew(_T("..\\allrules.rule"), result);
+	result.WriteToFile(_T("..\\result.cdt"));
 	//StatisticsSigToFile(_T("..\\contentSig.txt"), result);
 	//StatisticsSigToFile(_T("..\\allSig.txt"), result);
 	//result.ReadFromFile(_T("..\\..\\output\\result.cdt"));
 	//result.WriteToFile(_T("..\\..\\output\\result1.cdt"));
+
+	//std::ifstream fin("../../input/allrules.rule");
+	//std::vector<std::string> vecRules;
+	//std::string str;
+	//while (std::getline(fin, str))
+	//{
+	//	vecRules.push_back(str);
+	//}
+	//fin.clear();
+	//fin.close();
+
+	//std::ofstream fout("../../input/ProcessRules.rule");
+	//for (size_t i = 0; i < result.GetSidDfaIds().Size(); ++i)
+	//{
+	//	if (result.GetSidDfaIds()[i].m_nResult == COMPILEDRULENEW::RES_SUCCESS)
+	//	{
+	//		str = "sid:";
+	//		std::stringstream ss;
+	//		ss << result.GetSidDfaIds()[i].m_nSid;
+	//		str += ss.str();
+	//		str += ";";
+	//		for (std::vector<std::string>::iterator j = vecRules.begin(); j != vecRules.end(); ++j)
+	//		{
+	//			if (j->find(str, 0) != std::string::npos)
+	//			{
+	//				fout << *j << std::endl;
+	//			}
+	//		}
+	//	}
+	//}
+	//fout.clear();
+	//fout.close();
+
 	//size_t success_cNt = 0;
 	//size_t error_cNt = 0;
 	//size_t exceed_cNt = 0;

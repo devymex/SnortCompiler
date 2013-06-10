@@ -455,7 +455,7 @@ class PCRECPP_EXP_DEFN RE_Options {
 
   // TODO: add other pcre flags
 
- private:
+ protected:
   int match_limit_;
   int match_limit_recursion_;
   int all_options_;
@@ -655,7 +655,7 @@ class PCRECPP_EXP_DEFN RE {
   // This is a mistake, and will not work.
   static Arg no_arg;
 
- private:
+ protected:
 
   void Init(const string& pattern, const RE_Options* options);
   void Cleanup();
