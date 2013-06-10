@@ -16,10 +16,14 @@
 #include <list>
 
 /* compile configurations */
+#define SC_MAXDFASIZE	255
+#define SC_DFACOLCNT	256
+#define SC_CHARSETSIZE	260
 #define SC_STATELIMIT	500
-#define DFA_SIZE_LIMIT	255
-#define DFACOLSIZE		256
-#define CHARSETSIZE		260
+#define SC_SUCCESS		0
+
+#define SC_ERROR		ULONG(-1)
+#define SC_EXCEED		ULONG(-2)
 
 
 /* Common type defination */
