@@ -3,12 +3,12 @@
 #include <fstream>
 #include <string>
 #include <unordered_map>
-#include "../hashmapping/hashmapping.h"
+#include <hwprj\hashmapping.h>
 
 struct DFASIDMAPPING
 {
-	std::unordered_map<size_t, size_t> dId_sId;
-	std::unordered_map<size_t, CVectorUnsigned> sId_dIdVec;
+	std::unordered_map<ULONG, ULONG> dId_sId;
+	std::unordered_map<ULONG, CDllArray> sId_dIdVec;
 };
 
 struct DFAMCH
@@ -19,10 +19,10 @@ struct DFAMCH
 	DFASIDMAPPING dIdSId;
 };
 
-void MatchOnedfa(const u_char * &data, size_t len, CDfaNew &dfa, std::vector<size_t> &matchedDids);
+void MatchOnedfa(const u_char * &data, ULONG len, CDfa &dfa, std::vector<ULONG> &matchedDids);
 void MchDfaHdler(u_char *param, const struct pcap_pkthdr *header, const u_char *pkt_data);
-void GetMchDfas(const u_char *data, size_t len, HASHRES &hashtable, std::vector<size_t> &matchdfas);
-MATCHPKT void DfaMatchPkt(const u_char *data, size_t len, DFAMCH dfamch);
+void GetMchDfas(const u_char *data, ULONG len, HASHRES &hashtable, std::vector<ULONG> &matchdfas);
+MATCHPKT void DfaMatchPkt(const u_char *data, ULONG len, DFAMCH dfamch);
 void CALLBACK DPktParam(const ip_header *ih, const BYTE *data, void* user);
 bool DMyLoadCapFile(const char* pFile, PACKETRECV cv, void* pUser);
 MATCHPKT bool DLoadCapFile(const char* pFile, void* pUser);

@@ -47,6 +47,8 @@
 
 #include "subset.h"
 
+#include <hwprj\nfa.h>
+
 #define LIMIT 254
 #define UNDEFINED 0xFFFFFFFF
 
@@ -1281,7 +1283,7 @@ void NFA::output()
 		}
 	};
 	std::ofstream fout("..//nfa.txt");
-	size_t idx = 0;
+	ULONG idx = 0;
 	for (nfa_list::iterator iState = queue->begin(); iState != queue->end(); ++iState, ++idx)
 	{
 		pair_set *curState = (*iState)->transitions;

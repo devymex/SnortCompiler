@@ -1,9 +1,9 @@
 #include "stdafx.h"
 #include "MatchPkt.h"
 
-static size_t pktnum = 0;
+static ULONG pktnum = 0;
 
-void GetMchRule(const u_char *data, size_t len, void* user, std::vector<size_t> &rules)
+void GetMchRule(const u_char *data, ULONG len, void* user, std::vector<ULONG> &rules)
 {
 	if(len > 3)
 	{
@@ -11,11 +11,11 @@ void GetMchRule(const u_char *data, size_t len, void* user, std::vector<size_t> 
 		SIGSMAP &sigmap = rulesmap.sigmap;
 		SIGNATURE sig;
 		u_char csig[4];
-		size_t flag = 0;
+		ULONG flag = 0;
 
 		for(const u_char* iter = data; iter != &data[len - 4]; ++iter)
 		{
-			for(size_t i = 0; i < 4; ++i)
+			for(ULONG i = 0; i < 4; ++i)
 			{
 				csig[i] = tolower(*(iter + i));
 			}
@@ -25,13 +25,13 @@ void GetMchRule(const u_char *data, size_t len, void* user, std::vector<size_t> 
 				if(sig == 0)
 				{
 					flag = 1;
-					size_t size = sigmap[sig].size();
+					ULONG size = sigmap[sig].size();
 					rules.insert(rules.end(), sigmap[sig].begin(), sigmap[sig].end());
 				}
 
 				if(flag == 0)
 				{
-					size_t size = sigmap[sig].size();
+					ULONG size = sigmap[sig].size();
 					rules.insert(rules.end(), sigmap[sig].begin(), sigmap[sig].end());
 				}
 			}
@@ -42,14 +42,14 @@ void GetMchRule(const u_char *data, size_t len, void* user, std::vector<size_t> 
 }
 
 //调用pcre库进行数据包匹配
-bool PcreMatch(const u_char *data, size_t len, CRegRule &regRule)
+bool PcreMatch(const u_char *data, ULONG len, CRegRule &regRule)
 {
-	for(size_t i = 0; i < regRule.Size(); ++i)
+	for(ULONG i = 0; i < regRule.Size(); ++i)
 	{
 		//从数据包头开始匹配
 		const u_char *pData = data;
-		size_t dataSize = len;
-		for(size_t j = 0; j < regRule[i].Size(); ++j)
+		ULONG dataSize = len;
+		for(ULONG j = 0; j < regRule[i].Size(); ++j)
 		{
 			//对规则选项进行匹配
 			int Pos = -1;
@@ -74,17 +74,17 @@ bool PcreMatch(const u_char *data, size_t len, CRegRule &regRule)
 	return true;
 }
 
-void HdlOnePkt(const u_char *data, size_t len, void*user)
+void HdlOnePkt(const u_char *data, ULONG len, void*user)
 {
 	//const u_char p[] = {0, 0, 'f', 'g', 0, 'a', 'b', 'C', 'd', 0, 'd', 'e', 235, 0, 42, 'A', 123, 'B', 40, '1', '2', 93, 63, 'a', 'b', 'c', 'd', 'e', 'a'};
 	//data = p;
 	//len = sizeof(p);
 	REGRULESMAP &rulesmap = *(REGRULESMAP *)user;
-	std::vector<size_t> rules;
+	std::vector<ULONG> rules;
 	GetMchRule(data, len, user, rules);
-	//std::vector<size_t> matchSid;
+	//std::vector<ULONG> matchSid;
 	rulesmap.mchresult << pktnum << " : ";
-	for(size_t i = 0; i < rules.size(); ++i)
+	for(ULONG i = 0; i < rules.size(); ++i)
 	{
 		bool flag = PcreMatch(data, len, rulesmap.result[rules[i]].regrule);
 		if(flag)
@@ -169,7 +169,7 @@ void CALLBACK PktParam(const ip_header *ih, const BYTE *data, void* user)
 			u_short tcpHdrLen = ((ptcp->lenres & 0xf0) >> 4) * 4;
 			data += _ihl + tcpHdrLen;
 
-			size_t tcpdatalen = _tlen - _ihl - tcpHdrLen;
+			ULONG tcpdatalen = _tlen - _ihl - tcpHdrLen;
 			if(tcpdatalen > 0)
 			{
 				HdlOnePkt(data, tcpdatalen, user);
@@ -183,7 +183,7 @@ void CALLBACK PktParam(const ip_header *ih, const BYTE *data, void* user)
 			pudp = (udp_header*)((BYTE*) pudp + _ihl);
 			data += _ihl + UDPHDRLEN;
 
-			size_t udpdatalen = _tlen - _ihl - UDPHDRLEN;
+			ULONG udpdatalen = _tlen - _ihl - UDPHDRLEN;
 			if(udpdatalen > 0)
 			{
 				HdlOnePkt(data, udpdatalen, user);

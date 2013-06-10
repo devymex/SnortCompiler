@@ -1,9 +1,11 @@
 #include "stdafx.h"
 #include "MatchPkt.h"
+#include <hwprj\rule2nfa.h>
+
 void CALLBACK MyProcess(const CSnortRule &rule, LPVOID lpVoid)
 {
 	REGRULESMAP &rulesmap = *(REGRULESMAP*)lpVoid;
-	size_t nFlag = rule.GetFlag();
+	ULONG nFlag = rule.GetFlag();
 
 	if (rule.Size() == 0)
 	{
@@ -31,25 +33,25 @@ MATCHPKT void MchCompile(LPCTSTR filename, LPVOID lpVoid)
 	//int sids[4653];
 	//std::memset(sids, 0, sizeof(sids));
 	std::vector<SIGNATURE> sigvec;
-	CompileRuleSet(filename, MyProcess, lpVoid);
+	CompileFile(filename, MyProcess, lpVoid);
 	REGRULESMAP &rulesmap = *(REGRULESMAP*)lpVoid;
 	std::vector<REGRULES>::iterator mapbegin = rulesmap.result.begin();
 	for (std::vector<REGRULES>::iterator iter = mapbegin; iter != rulesmap.result.end(); ++iter)
 	{
 		SIGNATURE tempsig = (SIGNATURE)-1;
-		size_t flag = 0;
-        size_t pos = iter - mapbegin;
-		for (size_t chainsize = 0; chainsize < iter->regrule.Size(); ++chainsize)
+		ULONG flag = 0;
+        ULONG pos = iter - mapbegin;
+		for (ULONG chainsize = 0; chainsize < iter->regrule.Size(); ++chainsize)
 		{
 			SIGNATURE sig;
-			size_t sigcnt = (iter->regrule)[chainsize].GetSigs().Size();
+			ULONG sigcnt = (iter->regrule)[chainsize].GetSigs().Size();
 			if (sigcnt > 0)
 			{
 				flag |= (1 << 1);
-				size_t random = rand() % sigcnt;
+				ULONG random = rand() % sigcnt;
 				tempsig = (iter->regrule)[chainsize].GetSigs()[random];
 
-				for (size_t cursig = 0; cursig < sigcnt; ++cursig)
+				for (ULONG cursig = 0; cursig < sigcnt; ++cursig)
 				{
 					sig = (iter->regrule)[chainsize].GetSigs()[cursig];
 
@@ -83,7 +85,7 @@ END:	if(((flag & 1) == 0) && ((flag & 1 << 1) != 0))
 	//std::sort(sigvec.begin(), sigvec.end());
 	//sigvec.erase(std::unique(sigvec.begin(),sigvec.end()), sigvec.end());
 
-	//std::vector<size_t> sidVec;
+	//std::vector<ULONG> sidVec;
 	//for(int i = 0; i < 4653; ++i)
 	//{
 	//	if(0 == sids[i])
@@ -92,11 +94,11 @@ END:	if(((flag & 1) == 0) && ((flag & 1 << 1) != 0))
 	//		std::cout << rulesmap.result[i].m_nSid << std::endl;
 	//	}
 	//}
-	size_t e0 = 0, e1 = 0, e2 = 0;
+	ULONG e0 = 0, e1 = 0, e2 = 0;
 	SIGSMAP &temp = rulesmap.sigmap;
 	for(SIGSMAP::iterator iter = temp.begin(); iter != temp.end(); ++ iter)
 	{
-		size_t size = iter->second.size();
+		ULONG size = iter->second.size();
 		if (size == 0)
 		{
 			++e0;

@@ -11,15 +11,10 @@
 #include <unordered_map>
 #include <fstream>
 
-#include "../dfanew/dfanew.h"
-#include "../common/common.h"
-#include "../rule2nfa/rule2nfa.h"
-#include "../compilernew/compilernew.h"
-#include "../pcre2nfa/match.h"
-
-#pragma comment(lib, "Ws2_32.lib")
-#pragma comment(lib, "Packet.lib")
-#pragma comment(lib, "wpcap.lib")
+#include <hwprj\dfa.h>
+#include <hwprj\compiler.h>
+#include <hwprj\pcre2nfa.h>
+#include <hwprj\snortrule.h>
 
 #define ETHDRLEN 14 
 #define _TCP 6
@@ -87,15 +82,15 @@ u_short urp;                 //16位紧急数据偏移量
 
 }tcp_header;
 
-inline size_t HashFcn(SIGNATURE sig)
+inline ULONG HashFcn(SIGNATURE sig)
 {
 	u_char *cSig = (u_char *)&sig;
 
-	const size_t _FNV_offset_basis = 2166136261U;
-	const size_t _FNV_prime = 16777619U;
+	const ULONG _FNV_offset_basis = 2166136261U;
+	const ULONG _FNV_prime = 16777619U;
 
-	size_t _Val = _FNV_offset_basis;	
-	for(size_t i = 0; i < 4; ++i)
+	ULONG _Val = _FNV_offset_basis;	
+	for(ULONG i = 0; i < 4; ++i)
 	{
 		_Val ^= cSig[i];
 		_Val *= _FNV_prime;
@@ -113,32 +108,32 @@ struct PACKETPARAM
 
 struct MATCHRESULT
 {
-	size_t pktnum;
-	std::vector<size_t> matchedSids;
+	ULONG pktnum;
+	std::vector<ULONG> matchedSids;
 };
 
 struct SIGSID
 {
-	size_t sid;
+	ULONG sid;
 	SIGNATURE sig;
 };
 
 
 struct REGRULES
 {
-	size_t m_nSid;
+	ULONG m_nSid;
 	CRegRule regrule;
 };
 
 struct SIG_HASH
 {
-	size_t operator()(const SIGNATURE &str)
+	ULONG operator()(const SIGNATURE &str)
 	{
-		const size_t _FNV_offset_basis = 2166136261U;
-		const size_t _FNV_prime = 16777619U;
+		const ULONG _FNV_offset_basis = 2166136261U;
+		const ULONG _FNV_prime = 16777619U;
 
-		size_t _Val = _FNV_offset_basis;	
-		for(size_t i = 0; i < 4; ++i)
+		ULONG _Val = _FNV_offset_basis;	
+		for(ULONG i = 0; i < 4; ++i)
 		{
 			_Val ^= str >> (8 * i);
 			_Val *= _FNV_prime;
@@ -148,7 +143,7 @@ struct SIG_HASH
 	}
 };
 
-typedef std::unordered_map<SIGNATURE, std::vector<size_t>, SIG_HASH> SIGSMAP;
+typedef std::unordered_map<SIGNATURE, std::vector<ULONG>, SIG_HASH> SIGSMAP;
 struct REGRULESMAP
 {
 	std::vector<REGRULES> result;
@@ -167,7 +162,7 @@ void CALLBACK MyProcess(const CSnortRule &rule, LPVOID lpParam);
 MATCHPKT void MchCompile(LPCTSTR filename, LPVOID result);
 MATCHPKT bool TradithinalMatch(std::vector<u_char> &dataSrc, CRegRule &regRule);//调用pcreMATCHPKT 
 
-void GetMchRule(const u_char *data, size_t len, void* user, std::vector<size_t> &rules);
-void HdlOnePkt(const u_char *data, size_t len, void*user);
-bool PcreMatch(const u_char *data, size_t len, CRegRule &regRule);
+void GetMchRule(const u_char *data, ULONG len, void* user, std::vector<ULONG> &rules);
+void HdlOnePkt(const u_char *data, ULONG len, void*user);
+bool PcreMatch(const u_char *data, ULONG len, CRegRule &regRule);
 MATCHPKT void HandleAllFile(const std::string &path, void* user);

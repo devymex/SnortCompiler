@@ -38,16 +38,27 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
+    <IncludePath>$(SolutionDir)include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)bin\$(Configuration)\;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
+    <IncludePath>$(SolutionDir)include\;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)bin\$(Configuration)\;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <BrowseInformation>true</BrowseInformation>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(SolutionDir)$(Configuration)\common.lib;$(SolutionDir)$(Configuration)\dfanew.lib;$(SolutionDir)$(Configuration)\compilernew.lib;$(SolutionDir)$(Configuration)\rule2nfa.lib;$(SolutionDir)$(Configuration)\pcre2nfa.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>common.lib;compiler.lib;automaton.lib;</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
       <ModuleDefinitionFile>grouping.def</ModuleDefinitionFile>
     </Link>
@@ -57,17 +68,19 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <BrowseInformation>true</BrowseInformation>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>$(SolutionDir)$(Configuration)\common.lib;$(SolutionDir)$(Configuration)\dfanew.lib;$(SolutionDir)$(Configuration)\compilernew.lib;$(SolutionDir)$(Configuration)\rule2nfa.lib;$(SolutionDir)$(Configuration)\pcre2nfa.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>common.lib;compiler.lib;automaton.lib;</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
       <ModuleDefinitionFile>grouping.def</ModuleDefinitionFile>
     </Link>
@@ -77,10 +90,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="grouping.cpp" />
-    <ClCompile Include="Stdafx.cpp" />
+    <ClCompile Include="Stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="grouping.h" />
+    <ClInclude Include="..\include\hwprj\grouping.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>

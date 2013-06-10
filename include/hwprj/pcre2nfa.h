@@ -12,3 +12,5 @@
 
 //把单个pcre转化为NFA
 PCRE2NFA ULONG PcreToNFA(const char *pPcre, CNfa &nfa, CSignatures &sigs);
+
+PCRE2NFA bool match(const char* src, int length, std::string Regex, int &Pos);

@@ -91,7 +91,6 @@
     <ClInclude Include="..\include\hwprj\pcre2nfa.h" />
     <ClInclude Include="config.h" />
     <ClInclude Include="getsig.h" />
-    <ClInclude Include="match.h" />
     <ClInclude Include="pcre.h" />
     <ClInclude Include="pcrecpp.h" />
     <ClInclude Include="pcrecpp_internal.h" />
@@ -103,7 +102,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="getsig.cpp" />
-    <ClCompile Include="match.cpp" />
     <ClCompile Include="pcre2nfa.cpp" />
     <ClCompile Include="p2nmain.cpp" />
     <ClCompile Include="pcre_byte_order.c">

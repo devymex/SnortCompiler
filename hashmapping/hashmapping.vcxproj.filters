@@ -18,7 +18,7 @@
     <ClInclude Include="stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="hashmapping.h">
+    <ClInclude Include="..\include\hwprj\hashmapping.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

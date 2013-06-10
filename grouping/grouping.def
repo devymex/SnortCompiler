@@ -1,3 +1,4 @@
-LIBRARY 
+LIBRARY grouping
 EXPORTS
-grouping @ 1
+
+Grouping @ 1
