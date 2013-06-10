@@ -28,7 +28,7 @@
 class NFAHDR CNfaRow
 {
 public:
-	explicit CNfaRow(ULONG nSize = CHARSETSIZE);
+	explicit CNfaRow(ULONG nSize = SC_CHARSETSIZE);
 	~CNfaRow();
 	CNfaRow(const CNfaRow &other);
 	CNfaRow& operator=(const CNfaRow &other);

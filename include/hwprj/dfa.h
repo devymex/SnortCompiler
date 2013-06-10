@@ -66,7 +66,7 @@ protected:
 	ULONG m_nId;
 	WORD m_nColNum;
 	STATEID m_nStartId;
-	BYTE m_pGroup[DFACOLSIZE];
+	BYTE m_pGroup[SC_DFACOLCNT];
 
 	std::vector<class CDfaRow> *m_pDfa;
 	CFinalStates m_FinStas;

@@ -26,7 +26,7 @@ NFAHDR void CNfa::Resize(ULONG _Newsize)
 	m_pNfa->resize(_Newsize);
 	for (std::vector<CNfaRow>::iterator i = m_pNfa->begin(); i != m_pNfa->end(); ++i)
 	{
-		i->Resize(CHARSETSIZE);
+		i->Resize(SC_CHARSETSIZE);
 	}
 }
 

@@ -54,8 +54,8 @@ void NfaEClosure(const CNfa &nfa, std::vector<STATESET> &eClosure)
 	for (ULONG i = 0; i < nNfaSize; ++i)
 	{
 		const CNfaRow &row = nfa[i];
-		ULONG nCnt = row.DestCnt(DFACOLSIZE);
-		const ULONG *pDest = row.GetCol(DFACOLSIZE);
+		ULONG nCnt = row.DestCnt(SC_DFACOLCNT);
+		const ULONG *pDest = row.GetCol(SC_DFACOLCNT);
 		for (ULONG k = 0; k < nCnt; ++k)
 		{
 			pMat[i * nMatWidth + pDest[k]] = 1;
@@ -83,7 +83,7 @@ void NfaEClosure(const CNfa &nfa, std::vector<STATESET> &eClosure)
 void GetNextEClosureSet(const CNfa &nfa, const std::vector<STATESET> &eClosure,
 						const STATESET &curSet, ULONG edge, STATESET &eClosureSet)
 {
-	if (edge >= CHARSETSIZE)
+	if (edge >= SC_CHARSETSIZE)
 	{
 		std::cout << "Fatal Error!" << std::endl;
 		return;
@@ -160,11 +160,11 @@ void NAvaiEdges(const CNfa &nfa, BYTE *group)
 	const ULONG _FNV_offset_basis = 2166136261U;
 	const ULONG _FNV_prime = 16777619U;
 
-	static COLUMNKEY columns[CHARSETSIZE]; //
-	ULONG zeroCnts[CHARSETSIZE] = {0};
+	static COLUMNKEY columns[SC_CHARSETSIZE]; //
+	ULONG zeroCnts[SC_CHARSETSIZE] = {0};
 
 	ULONG nSize = nfa.Size();
-	for (ULONG i = 0; i < CHARSETSIZE; ++i)
+	for (ULONG i = 0; i < SC_CHARSETSIZE; ++i)
 	{
 		columns[i].key.clear();
 		columns[i].hash = _FNV_offset_basis;
@@ -172,7 +172,7 @@ void NAvaiEdges(const CNfa &nfa, BYTE *group)
 	for (ULONG i = 0; i < nSize; ++i)
 	{
 		const CNfaRow &curRow = nfa[i];
-		for (ULONG j = 0; j < CHARSETSIZE; ++j)
+		for (ULONG j = 0; j < SC_CHARSETSIZE; ++j)
 		{
 			std::vector<ULONG> &curCol = columns[j].key;
 			const ULONG *pData = curRow.GetCol(j);
@@ -202,7 +202,7 @@ void NAvaiEdges(const CNfa &nfa, BYTE *group)
 			}
 		}
 	}
-	for (ULONG i = 0; i < CHARSETSIZE; ++i)
+	for (ULONG i = 0; i < SC_CHARSETSIZE; ++i)
 	{
 		std::vector<ULONG> &curCol = columns[i].key;
 		ULONG nCurSize = curCol.size();
@@ -212,7 +212,7 @@ void NAvaiEdges(const CNfa &nfa, BYTE *group)
 
 	static COLUMNHASHMAP colHash; //
 	colHash.clear();
-	for(ULONG i = 0; i < DFACOLSIZE; ++i)
+	for(ULONG i = 0; i < SC_DFACOLCNT; ++i)
 	{
 		COLUMNKEY &curCol = columns[i];
 		COLUMNHASHMAP::iterator same = colHash.find(curCol);
@@ -287,11 +287,11 @@ void DfaColGroup(std::vector<CDfa> &dfas, BYTE* groups)
 	const ULONG _FNV_offset_basis = 2166136261U;
 	const ULONG _FNV_prime = 16777619U;
 
-	GROUPKEY colum[CHARSETSIZE];
+	GROUPKEY colum[SC_CHARSETSIZE];
 	typedef std::unordered_map<GROUPKEY, BYTE, GROUPKEYHASH> GROUPMAP;;
 	GROUPMAP groupMap;
 
-	for(ULONG c = 0; c < DFACOLSIZE; ++c)
+	for(ULONG c = 0; c < SC_DFACOLCNT; ++c)
 	{
 		colum[c].key.clear();
 		colum[c].hash = _FNV_offset_basis;
@@ -299,7 +299,7 @@ void DfaColGroup(std::vector<CDfa> &dfas, BYTE* groups)
 
 	for(ULONG i = 0; i < dfas.size(); ++i)
 	{
-		for(ULONG c = 0; c < DFACOLSIZE; ++c)
+		for(ULONG c = 0; c < SC_DFACOLCNT; ++c)
 		{
 			ULONG group = dfas[i].Char2Group(BYTE(c));
 			colum[c].key.push_back(group);
@@ -308,7 +308,7 @@ void DfaColGroup(std::vector<CDfa> &dfas, BYTE* groups)
 		}
 	}
 
-	for(ULONG c = 0; c < DFACOLSIZE; ++c)
+	for(ULONG c = 0; c < SC_DFACOLCNT; ++c)
 	{
 		GROUPKEY &curCol = colum[c];
 		GROUPMAP::iterator it = groupMap.find(curCol);

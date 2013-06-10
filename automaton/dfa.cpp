@@ -18,7 +18,7 @@
 DFAHDR CDfa::CDfa()
 	: m_nId(ULONG(-1)), m_nColNum(ULONG(0)), m_nStartId(STATEID(0))
 {
-	std::fill(m_pGroup, m_pGroup + DFACOLSIZE, BYTE(-1));
+	std::fill(m_pGroup, m_pGroup + SC_DFACOLCNT, BYTE(-1));
 	m_pDfa = new std::vector<CDfaRow>;
 }
 
@@ -39,7 +39,7 @@ DFAHDR CDfa& CDfa::operator=(const CDfa &other)
 	m_nId = other.m_nId;
 	m_nColNum = other.m_nColNum;
 	m_nStartId = other.m_nStartId;
-	CopyMemory(m_pGroup, other.m_pGroup, DFACOLSIZE * sizeof(BYTE));
+	CopyMemory(m_pGroup, other.m_pGroup, SC_DFACOLCNT * sizeof(BYTE));
 	*m_pDfa = *other.m_pDfa;
 	m_FinStas = other.m_FinStas;
 	return *this;
@@ -83,15 +83,15 @@ DFAHDR void CDfa::PushBack(CDfaRow &sta)
 DFAHDR void CDfa::Init(BYTE *pGroup)
 {
 	//1 if the group is used, 0 otherwise
-	BYTE occurred[DFACOLSIZE] = {0};
-	for (ULONG i = 0; i < DFACOLSIZE; ++i) 
+	BYTE occurred[SC_DFACOLCNT] = {0};
+	for (ULONG i = 0; i < SC_DFACOLCNT; ++i) 
 	{
 		occurred[pGroup[i]] = 1;
 	}
 
 	//number of groups
 	WORD nZeroBegPos = 0;
-	for (; nZeroBegPos < DFACOLSIZE; ++nZeroBegPos)
+	for (; nZeroBegPos < SC_DFACOLCNT; ++nZeroBegPos)
 	{
 		if (occurred[nZeroBegPos] == 0)
 		{
@@ -102,7 +102,7 @@ DFAHDR void CDfa::Init(BYTE *pGroup)
 	//flag is true if 1 does not occur after nZeroBegPos, false otherwise
 	//flag is true indicates that the group is reasonable
 	bool flag = true;
-	for (ULONG i = nZeroBegPos + 1; i < DFACOLSIZE; ++i)
+	for (ULONG i = nZeroBegPos + 1; i < SC_DFACOLCNT; ++i)
 	{
 		if (occurred[i] == 1)
 		{
@@ -115,7 +115,7 @@ DFAHDR void CDfa::Init(BYTE *pGroup)
 	if (flag)
 	{
 		m_nColNum = nZeroBegPos;
-		CopyMemory(m_pGroup, pGroup, DFACOLSIZE * sizeof(BYTE));
+		CopyMemory(m_pGroup, pGroup, SC_DFACOLCNT * sizeof(BYTE));
 	}
 	else
 	{
@@ -128,7 +128,7 @@ DFAHDR void CDfa::Clear()
 	m_nId = ULONG(-1);
 	m_nColNum = ULONG(0);
 	m_nStartId = STATEID(0);
-	memset(m_pGroup, 0xFF, DFACOLSIZE);
+	memset(m_pGroup, 0xFF, SC_DFACOLCNT);
 	m_pDfa->clear();
 	m_FinStas.Clear();
 }
@@ -145,7 +145,7 @@ DFAHDR ULONG CDfa::FromNFA(const CNfa &nfa)
 	std::vector<std::vector<ULONG>> eClosure;
 	NfaEClosure(nfa, eClosure);
 
-	BYTE groups[DFACOLSIZE];
+	BYTE groups[SC_DFACOLCNT];
 	NAvaiEdges(nfa, groups);
 	Init(groups);
 
@@ -170,7 +170,7 @@ DFAHDR ULONG CDfa::FromNFA(const CNfa &nfa)
 	std::vector<ULONG> curNfaVec;
 	static std::vector<ULONG> nextNfaVec; //
 	nextNfaVec.clear();
-	BYTE compuFlag[CHARSETSIZE];
+	BYTE compuFlag[SC_CHARSETSIZE];
 
 	for (; nfaStasStack.size() > 0; )
 	{
@@ -178,7 +178,7 @@ DFAHDR ULONG CDfa::FromNFA(const CNfa &nfa)
 		nfaStasStack.pop();
 
 		memset(compuFlag, 0, sizeof(compuFlag));
-		for (ULONG nCurChar = 0; nCurChar < DFACOLSIZE; ++nCurChar)
+		for (ULONG nCurChar = 0; nCurChar < SC_DFACOLCNT; ++nCurChar)
 		{
 			BYTE curGroup = m_pGroup[nCurChar];
 			if(compuFlag[curGroup] == 1)
@@ -404,7 +404,7 @@ DFAHDR ULONG CDfa::Save(BYTE *beg)
 	}
 
 	//write group
-	for (ULONG i = 0; i < DFACOLSIZE; ++i)
+	for (ULONG i = 0; i < SC_DFACOLCNT; ++i)
 	{
 		WriteNum(beg, m_pGroup[i]);
 	}
@@ -457,8 +457,8 @@ DFAHDR void CDfa::Load(BYTE *beg, ULONG len)
 	}
 	
 	//read group
-	BYTE pGroup[DFACOLSIZE];
-	for (ULONG i = 0; i < DFACOLSIZE; ++i)
+	BYTE pGroup[SC_DFACOLCNT];
+	for (ULONG i = 0; i < SC_DFACOLCNT; ++i)
 	{
 		ReadNum(beg, pGroup[i]);
 	}
@@ -510,7 +510,7 @@ DFAHDR void CDfa::Dump(const char *pFile)
 	}
 
 	fout << "字符和组对应关系：" << std::endl;
-	for(BYTE i = 0; i < DFACOLSIZE - 1; ++i)
+	for(BYTE i = 0; i < SC_DFACOLCNT - 1; ++i)
 	{
 		fout << (ULONG)i << "\t" << (ULONG)m_pGroup[i] << std::endl;
 	}
@@ -993,7 +993,7 @@ DFAHDR bool MergeMultipleDfas(std::vector<CDfa> &dfas, CDfa &lastDfa)
 	STATEID nTermSta = 1;//nTermSta: terminal flag. 1: terminal, -1: non-terminal
 
 	//group the lastDfa's columns
-	BYTE groups[DFACOLSIZE];
+	BYTE groups[SC_DFACOLCNT];
 	DfaColGroup(dfas, groups);
 	lastDfa.Init(groups);
 
@@ -1012,7 +1012,7 @@ DFAHDR bool MergeMultipleDfas(std::vector<CDfa> &dfas, CDfa &lastDfa)
 	*/
 	std::vector<STATEID> startVec(dfasSize + 2);
 	
-	lastDfa.Reserve(CHARSETSIZE);
+	lastDfa.Reserve(SC_CHARSETSIZE);
 	lastDfa.Resize(lastDfa.Size() + 1, colCnt);
 
 	for(ULONG i = 0; i < dfasSize; ++i)
@@ -1044,7 +1044,7 @@ DFAHDR bool MergeMultipleDfas(std::vector<CDfa> &dfas, CDfa &lastDfa)
 
 	std::vector<STATEID> NextVec;
 	NextVec.resize(dfasSize + 2);
-	BYTE computFlag[CHARSETSIZE];
+	BYTE computFlag[SC_CHARSETSIZE];
 
 	while(!statesStack.empty())
 	{
@@ -1061,7 +1061,7 @@ DFAHDR bool MergeMultipleDfas(std::vector<CDfa> &dfas, CDfa &lastDfa)
 		ZeroMemory(computFlag, sizeof(computFlag));
 
 		//get next states
-		for(ULONG curChar = 0; curChar < DFACOLSIZE; ++curChar)
+		for(ULONG curChar = 0; curChar < SC_DFACOLCNT; ++curChar)
 		{
 			finFlag = 0;
 			ZeroMemory(NextVec.data(), NextVec.size() * sizeof(ULONG));
@@ -1151,9 +1151,9 @@ DFAHDR bool MergeMultipleDfas(std::vector<CDfa> &dfas, CDfa &lastDfa)
 		}
 	}
 	//lastDfa.Minimize();
-	if(lastDfa.Size() > DFA_SIZE_LIMIT)
+	if(lastDfa.Size() > SC_MAXDFASIZE)
 	{
-		//std::cerr << "DFA_SIZE_LIMIT!" << std::endl;
+		//std::cerr << "SC_MAXDFASIZE!" << std::endl;
 		return false;
 	}
 
