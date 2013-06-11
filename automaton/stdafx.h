@@ -36,3 +36,4 @@ typedef STATELIST::const_iterator	STATELIST_CITER;
 
 typedef std::vector<class CDfaRow>	DFAROWARY;
 typedef std::vector<class CNfaRow>	NFAROWARY;
+typedef std::vector<ulong>			ULONGVEC;

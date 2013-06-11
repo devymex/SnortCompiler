@@ -268,8 +268,8 @@ void CalcAbleTo(STATEVEC *pRevTbl, ulong nGrpNum, ulong nStaNum, PARTSET &ps)
 		//遍历PARTSET中的每个状态t，若存在δ(-1)(t,j)≠Φ，AbleTo[t]标记为1
 		for (STATELIST_ITER k = ps.StaSet.begin(); k != ps.StaSet.end(); ++k)
 		{
-			BOOL br = !(pRevTbl[*k * nGrpNum + j].empty());
-			if (br == TRUE && pAbleTo[*k] == 0)
+			bool br = !(pRevTbl[*k * nGrpNum + j].empty());
+			if (br == true && pAbleTo[*k] == 0)
 			{
 				pAbleTo[*k] = (byte)br;
 				++ps.Ones[j];

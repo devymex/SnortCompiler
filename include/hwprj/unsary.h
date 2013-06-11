@@ -1,11 +1,9 @@
 /**
-**  @file        common.h
+**  @file        unsary.h
 **
 **  @author      Lab 435, Xidian University
 **
-**  @brief       Common classes declaration
-**
-**  Include CUnsignedArray, CDllString
+**  @brief       Common unsgined long array
 **
 */
 

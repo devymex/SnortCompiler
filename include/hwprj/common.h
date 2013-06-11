@@ -11,9 +11,6 @@
 
 #pragma once
 
-#include <vector>
-#include <list>
-
 /* Common type defination */
 typedef unsigned char			byte;
 typedef unsigned long			ulong;

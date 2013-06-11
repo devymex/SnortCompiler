@@ -1,3 +1,17 @@
+/**
+**  @file		ctimer.h
+**
+**  @author		Devymex, Xidian University
+**
+**  @brief		High performance timer
+**
+**  @email		devymex@gmail.com
+**  
+**  Extreamly easy to use
+**
+*/
+
+#pragma once
 #include "windows.h"
 
 class CTimer

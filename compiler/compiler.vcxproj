@@ -93,6 +93,7 @@
     <ClInclude Include="..\include\hwprj\pcrematch.h" />
     <ClInclude Include="..\include\hwprj\regchain.h" />
     <ClInclude Include="..\include\hwprj\regrule.h" />
+    <ClInclude Include="..\include\hwprj\ruleoption.h" />
     <ClInclude Include="..\include\hwprj\siddfaids.h" />
     <ClInclude Include="..\include\hwprj\signatures.h" />
     <ClInclude Include="..\include\hwprj\snortrule.h" />
@@ -106,7 +107,6 @@
     <ClInclude Include="pcre\pcre_internal.h" />
     <ClInclude Include="pcre\pcre_scanner.h" />
     <ClInclude Include="pcre\ucp.h" />
-    <ClInclude Include="ruleoption.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>

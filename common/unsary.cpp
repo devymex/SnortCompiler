@@ -1,4 +1,14 @@
+/**
+**  @file        unsary.h
+**
+**  @author      Lab 435, Xidian University
+**
+**  @brief       impletation of the CUnsignedArray class
+**
+*/
+
 #include "stdafx.h"
+
 #include <hwprj\unsary.h>
 
 UNSARYHDR CUnsignedArray::CUnsignedArray()

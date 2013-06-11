@@ -2,14 +2,11 @@
 #pragma once
 
 #include <hwprj\common.h>
+#include <hwprj\ruleoption.h>
 
 #ifndef SNORTRULEHDR_DS
-#define SNORTRULEHDR __declspec(dllimport)
-#else
-#define SNORTRULEHDR __declspec(dllexport)
+class OPTIONVEC;
 #endif
-
-class CRuleOption;
 
 class SNORTRULEHDR CSnortRule
 {
@@ -34,5 +31,5 @@ public:
 protected:
 	ulong m_nSid;
 	ulong m_nFlag;
-	std::vector<CRuleOption*> *m_pOptions;
+	OPTIONVEC *m_pOptions;
 };

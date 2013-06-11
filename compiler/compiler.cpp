@@ -11,10 +11,7 @@
 
 #include "stdafx.h"
 #include <hwprj\snortrule.h>
-#include <hwprj\ctimer.h>
-
 #include "comprule.h"
-
 #include <hwprj\compiler.h>
 
 /* complie one rule
@@ -65,7 +62,7 @@ Returns:      nothing
 
 */
 
-COMPILERNEW void CompileRuleSet(const char *filename, CCompileResults &result)
+COMPILERHDR void CompileRuleSet(const char *filename, CCompileResults &result)
 {
 	CompileFile(filename, Process, &result);
 
@@ -80,7 +77,7 @@ COMPILERNEW void CompileRuleSet(const char *filename, CCompileResults &result)
 * then process the rules to CSnortRule
 * callback function RECIEVER to handle CSnortRule
 */
-COMPILERNEW ulong CompileFile(const char *fileName, RECIEVER recv, void *lpUser)
+COMPILERHDR ulong CompileFile(const char *fileName, RECIEVER recv, void *lpUser)
 {
 	if(recv == NULL)
 	{
@@ -114,7 +111,7 @@ Arguments:
 Returns:      nothing
 
 */
-COMPILERNEW void Rule2Dfas(const CSnortRule &rule, CCompileResults &result,
+COMPILERHDR void Rule2Dfas(const CSnortRule &rule, CCompileResults &result,
 						   COMPILEDRULENEW &ruleResult)
 {
 	CRegRule regrule;

@@ -3,9 +3,9 @@
 **
 **  @author      Lab 435, Xidian University
 **
-**  @brief       Common classes declaration
+**  @brief       Deterministic Finite Automaton
 **
-**  Include CUnsignedArray, CDllString
+**  Declaration of the CDfa class
 **
 */
 
@@ -17,6 +17,7 @@
 #include <hwprj\finalstates.h>
 #include <hwprj\unsary.h>
 
+/* Hiding the stl object in member of CDfa*/
 #ifndef DFAHDR_DS
 class DFAROWARY;
 class STATEVEC;
@@ -29,50 +30,49 @@ class DFAHDR CDfa
 {
 public:
 	CDfa();
-	~CDfa();
 	CDfa(const CDfa &other);
-	CDfa& operator=(const CDfa &other);
+	virtual ~CDfa();
 
-	CDfaRow& operator[](STATEID index);
-	const CDfaRow& operator[](STATEID index) const;
+	CDfa&			operator =	(const CDfa &other);
+	CDfaRow&		operator []	(STATEID index);
+	const CDfaRow&	operator []	(STATEID index) const;
 
-	ulong Size() const;
-	CDfaRow& Back();
-	void Reserve(ulong nSize);
-	void Resize(ulong nSize, ulong nCol);
-	void Init(byte *pGroup);
-	void Clear();
-	void PushBack(CDfaRow &sta);
+	ulong		Size() const;
+	CDfaRow&	Back();
+	void		Reserve(ulong nSize);
+	void		Resize(ulong nSize, ulong nCol);
+	void		Init(byte *pGroup);
+	void		Clear();
+	void		PushBack(CDfaRow &sta);
 
-	void SetId(ulong id);
-	ulong GetId();
-	ushort GetGroupCount() const;
-	const byte GetGroup(STATEID charNum) const;
+	void		SetId(ulong id);
+	ulong		GetId();
+	ushort		GetGroupCount() const;
+	const byte	GetGroup(STATEID charNum) const;
 
-	CFinalStates& GetFinalState();
-	const CFinalStates& GetFinalState() const;
+	ulong		FromNFA(const CNfa &nfa);
+	ulong		Minimize();
 
-	ulong FromNFA(const CNfa &nfa);
-	ulong Minimize();
+	byte		Char2Group(byte nIdx);
+	STATEID		GetStartId() const;
+	void		SetStartId(STATEID id);
+	ulong		Process(byte *ByteStream, ulong len, STATEARY &StaSet);
 
-	byte Char2Group(byte nIdx);
-	STATEID GetStartId() const;
-	void SetStartId(STATEID id);
-	ulong Process(byte *ByteStream, ulong len, STATEARY &StaSet);
+	ulong		Save(byte *beg);
+	void		Load(byte *beg, ulong len);
 
-	ulong Save(byte *beg);
-	void Load(byte *beg, ulong len);
+	void		Dump(const char *pFile);
 
-	void Dump(const char *pFile);
+	CFinalStates&		GetFinalState();
+	const CFinalStates&	GetFinalState() const;
 
 protected:
-	ulong m_nId;
-	ushort m_nColNum;
-	STATEID m_nStartId;
-	byte m_pGroup[SC_DFACOLCNT];
-
-	DFAROWARY *m_pDfa;
-	CFinalStates m_FinStas;
+	ulong			m_nId;
+	ushort			m_nColNum;
+	STATEID			m_nStartId;
+	byte			m_pGroup[SC_DFACOLCNT];
+	DFAROWARY		*m_pDfa;
+	CFinalStates	m_FinStas;
 
 	void InitPartSet(std::vector<struct PARTSET> &partSet) const;
 	void RemoveUnreachable(const STATEVEC *Tab, const STATELIST &begs, 

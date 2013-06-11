@@ -38,9 +38,6 @@
     <ClInclude Include="..\include\hwprj\compres.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ruleoption.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\hwprj\siddfaids.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -78,6 +75,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="comprule.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\hwprj\ruleoption.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

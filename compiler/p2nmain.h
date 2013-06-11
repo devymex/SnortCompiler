@@ -9,7 +9,7 @@
 #include <hwprj\nfa.h>
 
 
-#define SC_LIMIT 200
+#define SC_LIMIT 200 // What's this??
 
 #define IMM2_SIZE 2
 #define LINK_SIZE 2

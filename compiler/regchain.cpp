@@ -3,7 +3,7 @@
 
 REGRULEHDR CRegChain::CRegChain()
 {
-	m_pRegList = new std::vector<CDllString>;
+	m_pRegList = new STRINGVEC;
 }
 
 REGRULEHDR CRegChain::~CRegChain()
@@ -13,7 +13,7 @@ REGRULEHDR CRegChain::~CRegChain()
 
 REGRULEHDR CRegChain::CRegChain(const CRegChain &other)
 {
-	m_pRegList = new std::vector<CDllString>;
+	m_pRegList = new STRINGVEC;
 	*this = other;
 }
 

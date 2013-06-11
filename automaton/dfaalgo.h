@@ -1,11 +1,11 @@
 /**
-**  @file        dfa.h
+**  @file        dfaalgo.h
 **
 **  @author      Lab 435, Xidian University
 **
-**  @brief       Common classes declaration
+**  @brief       functions declaration of dfa's algorithms
 **
-**  Include CUnsignedArray, CDllString
+**  Includes empty closure etc.
 **
 */
 
@@ -79,19 +79,6 @@ struct NSTATESET_HASH
 	}
 };
 
-void Warshall(byte *pMat, ulong nWidth, ulong nHeight);
-
-void NfaEClosure(const CNfa &nfa, std::vector<STATEVEC> &eClosure);
-
-void GetNextEClosureSet(const CNfa &nfa, const std::vector<STATEVEC> &eClosure,
-	const STATEVEC &curSet, ulong edge, STATEVEC &eClosureSet);
-
-void NAvaiEdges(const CNfa &nfa, byte *group);
-
-void ReleaseAbleTo(PARTSET &ps);
-
-void CalcAbleTo(STATEVEC *pRevTbl, ulong nGrpNum, ulong nStaNum, PARTSET &ps);
-
 template<typename _Ty>
 void WriteNum(byte*& pBuf, _Ty _num, ulong nBytes = sizeof(_Ty))
 {
@@ -105,6 +92,19 @@ void ReadNum(byte*& pBuf, _Ty &_num, ulong nBytes = sizeof(_Ty))
 	CopyMemory(&_num, pBuf, nBytes);
 	pBuf += nBytes;
 }
+
+void Warshall(byte *pMat, ulong nWidth, ulong nHeight);
+
+void NfaEClosure(const CNfa &nfa, std::vector<STATEVEC> &eClosure);
+
+void GetNextEClosureSet(const CNfa &nfa, const std::vector<STATEVEC> &eClosure,
+	const STATEVEC &curSet, ulong edge, STATEVEC &eClosureSet);
+
+void NAvaiEdges(const CNfa &nfa, byte *group);
+
+void ReleaseAbleTo(PARTSET &ps);
+
+void CalcAbleTo(STATEVEC *pRevTbl, ulong nGrpNum, ulong nStaNum, PARTSET &ps);
 
 /*
 **	This function groups the merged dfa's columns on the ground of

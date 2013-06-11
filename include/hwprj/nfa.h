@@ -25,24 +25,22 @@ public:
 	CNfa();
 	~CNfa();
 	CNfa(const CNfa &other);
-	CNfa& operator=(const CNfa &other);
 
-	CNfaRow &operator[](ulong index);
-	const CNfaRow &operator[](ulong index) const;
+	CNfa&			operator =	(const CNfa &other);
+	CNfaRow&		operator []	(ulong index);
+	const CNfaRow&	operator []	(ulong index) const;
 
-	ulong Size() const;
-	void Clear();
-	void Resize(ulong _Newsize);
-	void Reserve(ulong _Count);
-	void Shrink();
+	ulong		Size() const;
+	CNfaRow&	Back();
+	void		Clear();
+	void		Resize(ulong _Newsize);
+	void		Reserve(ulong _Count);
+	void		Shrink();
+	void		PushBack(const CNfaRow &row);
+	void		PopBack();
+	void		SortAll();
 
-	CNfaRow &Back();
-	void PushBack(const CNfaRow &row);
-	void PopBack();
-
-	void SortAll();
-
-	void Dump(const char *pFile) const;
+	void		Dump(const char *pFile) const;
 
 protected:
 	NFAROWARY *m_pNfa;

@@ -1,15 +1,14 @@
 #include "stdafx.h"
 #include <hwprj\dfaarray.h>
 
-
 DFAARYHDR CDfaArray::CDfaArray()
 {
-	m_pdfaTbl = new std::vector<CDfa>;	
+	m_pdfaTbl = new CDFAVEC;	
 }
 
 DFAARYHDR CDfaArray::CDfaArray(const CDfaArray& other)
 {
-	m_pdfaTbl = new std::vector<CDfa>;
+	m_pdfaTbl = new CDFAVEC;
 	*this = other;
 }
 

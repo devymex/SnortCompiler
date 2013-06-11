@@ -4,6 +4,7 @@
 #include <hwprj\signatures.h>
 
 #ifndef REGRULEHDR_DS
+class STRINGVEC;
 #define REGRULEHDR __declspec(dllimport)
 #else
 #define REGRULEHDR __declspec(dllexport)
@@ -28,6 +29,6 @@ public:
 	const CSignatures& GetSigs() const;
 
 protected:
-	std::vector<CDllString> *m_pRegList;
+	STRINGVEC *m_pRegList;
 	CSignatures m_sigs;
 };

@@ -3,8 +3,8 @@
 
 FINSTAHDR_DS CFinalStates::CFinalStates()
 {
-	m_pStates = new std::vector<STATEID>;
-	m_pDfaIds = new std::unordered_map<STATEID, std::set<ulong>>;
+	m_pStates = new STATEVEC;
+	m_pDfaIds = new FINSTAMAP;
 }
 
 FINSTAHDR_DS CFinalStates::~CFinalStates()
@@ -15,8 +15,8 @@ FINSTAHDR_DS CFinalStates::~CFinalStates()
 
 FINSTAHDR_DS CFinalStates::CFinalStates(const CFinalStates &other)
 {
-	m_pStates = new std::vector<STATEID>;
-	m_pDfaIds = new std::unordered_map<STATEID, std::set<ulong>>;
+	m_pStates = new STATEVEC;
+	m_pDfaIds = new FINSTAMAP;
 	*this = other;
 }
 

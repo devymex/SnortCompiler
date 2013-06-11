@@ -10,9 +10,8 @@
 */
 
 #include "stdafx.h"
-#include "ruleoption.h"
+#include <hwprj\ruleoption.h>
 #include "pcre2nfa.h"
-#include <hwprj\ctimer.h>
 
 #include "comprule.h"
 
@@ -138,6 +137,19 @@ struct CONTENTNUM
 		}
 		return false;
 	}
+};
+
+struct OPTIONCONTENT : public CRuleOption
+{
+	BYTEARY vecconts;//content data
+	int nOffset;// offset constraint in snort rule
+	int nDepth;//depth constraint in snort rule
+	int nDistance;//distance constraint in snort rule
+	int nWithin;//within constraint in snort rule
+};
+
+struct OPTIONPCRE : public CRuleOption
+{
 };
 
 /*

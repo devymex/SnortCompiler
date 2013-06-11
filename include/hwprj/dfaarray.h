@@ -3,6 +3,7 @@
 #include <hwprj\dfa.h>
 
 #ifndef DFAARYHDR_DS
+class CDFAVEC;
 #define DFAARYHDR __declspec(dllimport)
 #else
 #define DFAARYHDR __declspec(dllexport)
@@ -23,5 +24,5 @@ public:
 	void PushBack(const CDfa &dfa);
 	void Clear();
 protected:
-	std::vector<CDfa> *m_pdfaTbl;
+	CDFAVEC *m_pdfaTbl;
 };

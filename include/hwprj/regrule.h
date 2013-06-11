@@ -2,6 +2,10 @@
 
 #include <hwprj\regchain.h>
 
+#ifndef REGRULEHDR_DS
+class CHAINVEC;
+#endif
+
 class REGRULEHDR CRegRule
 {
 public:
@@ -20,5 +24,5 @@ public:
 	void PushBack(const CRegChain &nRegChain);
 
 protected:
-	std::vector<CRegChain> *m_pRegVec;
+	CHAINVEC *m_pRegVec;
 };

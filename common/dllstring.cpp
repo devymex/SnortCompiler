@@ -1,3 +1,12 @@
+/**
+**  @file        unsary.h
+**
+**  @author      Lab 435, Xidian University
+**
+**  @brief       Impletation of the CDllString class
+**
+*/
+
 #include "stdafx.h"
 #include <hwprj\dllstring.h>
 

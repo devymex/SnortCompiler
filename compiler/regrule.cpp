@@ -3,7 +3,7 @@
 
 REGRULEHDR CRegRule::CRegRule()
 {
-	m_pRegVec = new std::vector<CRegChain>;
+	m_pRegVec = new CHAINVEC;
 }
 
 REGRULEHDR CRegRule::~CRegRule()
@@ -13,7 +13,7 @@ REGRULEHDR CRegRule::~CRegRule()
 
 REGRULEHDR CRegRule::CRegRule(const CRegRule &other)
 {
-	m_pRegVec = new std::vector<CRegChain>;
+	m_pRegVec = new CHAINVEC;
 	*this = other;
 }
 

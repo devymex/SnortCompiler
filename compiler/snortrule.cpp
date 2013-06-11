@@ -1,7 +1,6 @@
 #include "stdafx.h"
-#include "ruleoption.h"
-
 #include <hwprj\snortrule.h>
+
 
 SNORTRULEHDR CSnortRule::CSnortRule()
 	: m_nSid(0), m_nFlag(0)
