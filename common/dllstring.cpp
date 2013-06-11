@@ -32,12 +32,12 @@ DLLSTRHDR CDllString& CDllString::operator = (const CDllString &other)
 	*this->m_pString = *other.m_pString;
 	return *this;
 }
-DLLSTRHDR char CDllString::operator[](ULONG nIdx) const
+DLLSTRHDR char CDllString::operator[](ulong nIdx) const
 {
 	return (*m_pString)[nIdx];
 }
 
-DLLSTRHDR const ULONG CDllString::Size() const
+DLLSTRHDR const ulong CDllString::Size() const
 {
 	return m_pString->size();
 }

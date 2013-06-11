@@ -24,27 +24,27 @@ DFAARYHDR CDfaArray::~CDfaArray()
 	delete m_pdfaTbl;
 }
 
-DFAARYHDR CDfa& CDfaArray::operator[](ULONG index)
+DFAARYHDR CDfa& CDfaArray::operator[](ulong index)
 {
 	return (*m_pdfaTbl)[index];
 }
 
-DFAARYHDR const CDfa& CDfaArray::operator[](ULONG index) const
+DFAARYHDR const CDfa& CDfaArray::operator[](ulong index) const
 {
 	return (*m_pdfaTbl)[index];
 }
 
-DFAARYHDR void CDfaArray::Reserve(ULONG nCount)
+DFAARYHDR void CDfaArray::Reserve(ulong nCount)
 {
 	m_pdfaTbl->reserve(nCount);
 }
 
-DFAARYHDR void CDfaArray::Resize(ULONG nSize)
+DFAARYHDR void CDfaArray::Resize(ulong nSize)
 {
 	m_pdfaTbl->resize(nSize);
 }
 
-DFAARYHDR const ULONG CDfaArray::Size() const
+DFAARYHDR const ulong CDfaArray::Size() const
 {
 	return m_pdfaTbl->size();
 }

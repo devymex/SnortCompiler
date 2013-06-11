@@ -5,7 +5,7 @@
 **
 **  @brief       Common classes declaration
 **
-**  Include CDllArray, CDllString
+**  Include CUnsignedArray, CDllString
 **
 */
 
@@ -30,11 +30,11 @@ public:
 	const CSignatures &operator=(const CSignatures &other);
 	~CSignatures();
 
-	const ULONG Size() const;
-	void Resize(ULONG nSize);
+	const ulong Size() const;
+	void Resize(ulong nSize);
 	void PushBack(SIGNATURE Sig);
-	SIGNATURE &operator[](ULONG nIdx);
-	const SIGNATURE &operator[](ULONG nIdx) const;
+	SIGNATURE &operator[](ulong nIdx);
+	const SIGNATURE &operator[](ulong nIdx) const;
 	void Clear();
 	void Unique();
 protected:

@@ -5,7 +5,7 @@
 **
 **  @brief       Common classes declaration
 **
-**  Include CDllArray, CDllString
+**  Include CUnsignedArray, CDllString
 **
 */
 
@@ -13,6 +13,10 @@
 
 #include <hwprj\common.h>
 #include <hwprj\nfarow.h>
+
+#ifndef NFAHDR_DS
+class NFAROWARY;
+#endif
 
 /* Store one nfa in table format. Each row of the table is a CNfaRow */
 class NFAHDR CNfa
@@ -23,13 +27,13 @@ public:
 	CNfa(const CNfa &other);
 	CNfa& operator=(const CNfa &other);
 
-	CNfaRow &operator[](ULONG index);
-	const CNfaRow &operator[](ULONG index) const;
+	CNfaRow &operator[](ulong index);
+	const CNfaRow &operator[](ulong index) const;
 
-	ULONG Size() const;
+	ulong Size() const;
 	void Clear();
-	void Resize(ULONG _Newsize);
-	void Reserve(ULONG _Count);
+	void Resize(ulong _Newsize);
+	void Reserve(ulong _Count);
 	void Shrink();
 
 	CNfaRow &Back();
@@ -41,5 +45,5 @@ public:
 	void Dump(const char *pFile) const;
 
 protected:
-	std::vector<CNfaRow> *m_pNfa;
+	NFAROWARY *m_pNfa;
 };

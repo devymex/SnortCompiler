@@ -1,5 +1,7 @@
 #pragma once
 
+#include <hwprj\common.h>
+
 class CRuleOption
 {
 public:
@@ -9,21 +11,21 @@ public:
 	virtual ~CRuleOption();
 
 	void SetPattern(LPCSTR lpStr);
-	ULONG GetPattern(LPSTR lpStr, ULONG nLen) const;
+	ulong GetPattern(LPSTR lpStr, ulong nLen) const;
 
-	ULONG GetFlag() const;
-	void SetFlag(ULONG nFlag);
-	void AddFlag(ULONG nFlag);
-	BOOL TestFlag(ULONG nFlag) const;
+	ulong GetFlag() const;
+	void SetFlag(ulong nFlag);
+	void AddFlag(ulong nFlag);
+	BOOL TestFlag(ulong nFlag) const;
 
 protected:
-	ULONG m_nFlag;
+	ulong m_nFlag;
 	std::string *m_pPattern;
 };
 
 struct OPTIONCONTENT : public CRuleOption
 {
-	std::vector<BYTE> vecconts;//content data
+	BYTEARY vecconts;//content data
 	int nOffset;// offset constraint in snort rule
 	int nDepth;//depth constraint in snort rule
 	int nDistance;//distance constraint in snort rule

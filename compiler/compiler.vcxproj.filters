@@ -44,9 +44,6 @@
     <ClInclude Include="..\include\hwprj\siddfaids.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\hwprj\rule2nfa.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="pcre\config.h">
       <Filter>Header Files\pcre</Filter>
     </ClInclude>
@@ -68,13 +65,19 @@
     <ClInclude Include="pcre\ucp.h">
       <Filter>Header Files\pcre</Filter>
     </ClInclude>
-    <ClInclude Include="getsig.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="p2nmain.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\include\hwprj\signatures.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\hwprj\pcrematch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="pcre2nfa.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="comprule.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -95,9 +98,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ruleoption.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="rule2nfa.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="dfaarray.cpp">
@@ -178,13 +178,16 @@
     <ClCompile Include="pcre2nfa.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="getsig.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="p2nmain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="signatures.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="pcrematch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="comprule.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

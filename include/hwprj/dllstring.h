@@ -5,7 +5,7 @@
 **
 **  @brief       Common classes declaration
 **
-**  Include CDllArray, CDllString
+**  Include CUnsignedArray, CDllString
 **
 */
 
@@ -32,9 +32,9 @@ public:
 	CDllString& operator = (const CDllString &other);
 
 	// Overided operators
-	char operator[](ULONG nIdx) const;
+	char operator[](ulong nIdx) const;
 
-	const ULONG Size() const;
+	const ulong Size() const;
 	bool Empty();
 	void Clear();
 	void Append(const char* pChar);

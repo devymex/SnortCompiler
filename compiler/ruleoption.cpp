@@ -25,7 +25,7 @@ const CRuleOption& CRuleOption::operator=(const CRuleOption &other)
 	return *this;
 }
 
-ULONG CRuleOption::GetPattern(LPSTR lpStr, ULONG nLen) const
+ulong CRuleOption::GetPattern(LPSTR lpStr, ulong nLen) const
 {
 	if (lpStr == NULL || nLen == 0)
 	{
@@ -44,22 +44,22 @@ void CRuleOption::SetPattern(LPCSTR lpStr)
 	*m_pPattern = lpStr;
 }
 
-ULONG CRuleOption::GetFlag() const
+ulong CRuleOption::GetFlag() const
 {
 	return m_nFlag;
 }
 
-void CRuleOption::SetFlag(ULONG nFlag)
+void CRuleOption::SetFlag(ulong nFlag)
 {
 	m_nFlag = nFlag;
 }
 
-void CRuleOption::AddFlag(ULONG nFlag)
+void CRuleOption::AddFlag(ulong nFlag)
 {
 	m_nFlag |= nFlag;
 }
 
-BOOL CRuleOption::TestFlag(ULONG nFlag) const
+BOOL CRuleOption::TestFlag(ulong nFlag) const
 {
 	return ((m_nFlag & nFlag) != 0);
 }

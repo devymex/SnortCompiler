@@ -1,6 +1,6 @@
 #pragma once
 
-#include <hwprj\dllarray.h>
+#include <hwprj\unsary.h>
 #include <hwprj\dfaarray.h>
 #include <hwprj\signatures.h>
 #include <hwprj\siddfaids.h>
@@ -18,10 +18,10 @@ struct DFAINFO
 
 struct ONEGROUP
 {
-	CDllArray DfaIds;
+	CUnsignedArray DfaIds;
 	CSignatures ComSigs;
 	SIGNATURE currSig;
-	ULONG mergeDfaId;
+	ulong mergeDfaId;
 };
 
 class GROUPHDR CGROUPS
@@ -31,14 +31,14 @@ public:
 	CGROUPS(const CGROUPS& other);
 	const CGROUPS &operator=(const CGROUPS &other);
 	~CGROUPS();
-	const ULONG Size() const;
-	void Resize(ULONG nSize);
+	const ulong Size() const;
+	void Resize(ulong nSize);
 	void PushBack(ONEGROUP oneGroup);
 	ONEGROUP& Back();
-	ONEGROUP &operator[](ULONG nIdx);
-	const ONEGROUP &operator[](ULONG nIdx) const;
+	ONEGROUP &operator[](ulong nIdx);
+	const ONEGROUP &operator[](ulong nIdx) const;
 	void Clear();
-	void Erase(ULONG nIdx);
+	void Erase(ulong nIdx);
 protected:
 	std::vector<ONEGROUP> *m_pGroups;
 };
@@ -56,8 +56,8 @@ public:
 	const CDfaArray &GetDfaTable() const;
 	const CSidDfaIds &GetSidDfaIds() const;
 	const CGROUPS &GetGroups() const;
-	ULONG WriteToFile(LPCTSTR filename);
-	ULONG ReadFromFile(LPCTSTR filename);
+	ulong WriteToFile(const char *filename);
+	ulong ReadFromFile(const char *filename);
 };
 
 GROUPHDR void Grouping(class CCompileResults &res, CGROUPRes &groupRes);

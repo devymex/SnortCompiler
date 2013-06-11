@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <tchar.h>
 
+#include <hwprj\ctimer.h>
 #include <hwprj\compiler.h>
 #include <hwprj\buildhash.h>
 
@@ -10,11 +11,11 @@ int main()
 {
 	//std::ifstream f1("..\\..\\output\\result.cdt", std::ios::binary);
 	//std::ifstream f2("..\\..\\output\\result1.cdt", std::ios::binary);
-	//BYTE *p1 = new BYTE[10000000];
-	//BYTE *p2 = new BYTE[10000000];
+	//byte *p1 = new byte[10000000];
+	//byte *p2 = new byte[10000000];
 	//f1.read((char*)p1, 7953451);
 	//f2.read((char*)p2, 7953451);
-	//for (ULONG i = 0; i < 7953451; ++i)
+	//for (ulong i = 0; i < 7953451; ++i)
 	//{
 	//	if (p1[i] != p2[i])
 	//	{
@@ -27,7 +28,7 @@ int main()
 	//result.WriteToFile(_T("..\\..\\output\\result.cdt"));
 	////result.ReadFromFile(_T("..\\..\\output\\result.cdt"));
 
-	////for (ULONG i = 0; i < result.GetSidDfaIds().Size(); ++i)
+	////for (ulong i = 0; i < result.GetSidDfaIds().Size(); ++i)
 	////{
 	////	if (result.GetSidDfaIds()[i].m_dfaIds.Size() > 0 && result.GetSidDfaIds()[i].m_dfaIds[0] == 1244)
 	////	{
@@ -47,8 +48,8 @@ int main()
 	//groupRes.WriteToFile(_T("..\\..\\output\\GroupResut1.cdt"));
 
 	//std::ifstream fin("..\\..\\output\\Ids.txt");
-	//std::vector<ULONG> vecIds;
-	//ULONG tmp;
+	//std::vector<ulong> vecIds;
+	//ulong tmp;
 	//while (fin >> tmp)
 	//{
 	//	vecIds.push_back(tmp);
@@ -56,10 +57,10 @@ int main()
 
 	//SIGNATURE Sig = vecIds.back();
 	//vecIds.pop_back();
-	//for (ULONG i = 0; i < vecIds.size(); ++i)
+	//for (ulong i = 0; i < vecIds.size(); ++i)
 	//{
 	//	bool flag = false;
-	//	for (ULONG j = 0; j < result.GetRegexTbl()[vecIds[i]].GetSigCnt(); ++j)
+	//	for (ulong j = 0; j < result.GetRegexTbl()[vecIds[i]].GetSigCnt(); ++j)
 	//	{
 	//		if (result.GetRegexTbl()[vecIds[i]].GetSig(j) == Sig)
 	//		{
@@ -76,7 +77,7 @@ int main()
 	//std::vector<CDfa> vecDfas(2);
 	//CDfa MergeDfa;
 	//vecDfas[0] = result.GetDfaTable()[vecIds[0]];
-	//for (ULONG i = 1; i < vecIds.size(); ++i)
+	//for (ulong i = 1; i < vecIds.size(); ++i)
 	//{
 	//	vecDfas[1] = result.GetDfaTable()[vecIds[i]];
 	//	if (MergeMultipleDfas(vecDfas, MergeDfa))
@@ -95,13 +96,13 @@ int main()
 	CCompileResults result;
 	//compilenew(_T("..\\..\\input\\allrules.rule"), result);
 	//result.WriteToFile(_T("..\\..\\output\\result.cdt"));
-	result.ReadFromFile(_T("..\\..\\output\\result.cdt"));
+	result.ReadFromFile("..\\..\\output\\result.cdt");
 	CGROUPRes groupRes;
 	Grouping(result, groupRes);
-	groupRes.WriteToFile(_T("..\\..\\output\\GroupResut.cdt"));
+	groupRes.WriteToFile("..\\..\\output\\GroupResut.cdt");
 	HASHRES HashResMap;
 	HashMapping(groupRes, HashResMap);
-	groupRes.WriteToFile(_T("..\\..\\output\\FinalResut.cdt"));
+	groupRes.WriteToFile("..\\..\\output\\FinalResut.cdt");
 	std::cout << "×ÜÊ±¼ä£º " << ctime.Reset() << std::endl;
 	std::cout << groupRes.GetGroups().Size() << std::endl;
 	std::cout << HashResMap.size() << std::endl;

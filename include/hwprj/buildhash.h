@@ -10,27 +10,27 @@
 #define HASHMAPHDR __declspec(dllexport)
 #endif
 
-typedef std::map<SIGNATURE, std::vector<ULONG>> SIGNATUREMAP;
-typedef std::map<ULONG, std::vector<SIGNATURE>> IDMAP;
-typedef std::unordered_map<ULONG, std::vector<ULONG>> RESULTMAP;
+typedef std::map<SIGNATURE, std::vector<ulong>> SIGNATUREMAP;
+typedef std::map<ulong, std::vector<SIGNATURE>> IDMAP;
+typedef std::unordered_map<ulong, std::vector<ulong>> RESULTMAP;
 
 struct HASHNODE
 {
-	HASHNODE(const SIGNATURE &sig, const ULONG nDfaId) : m_sig(sig), m_nDfaId(nDfaId) {}
+	HASHNODE(const SIGNATURE &sig, const ulong nDfaId) : m_sig(sig), m_nDfaId(nDfaId) {}
 	SIGNATURE m_sig;
-	ULONG m_nDfaId;
+	ulong m_nDfaId;
 };
 
-typedef std::map<ULONG, std::vector<HASHNODE>> HASHRES;
+typedef std::map<ulong, std::vector<HASHNODE>> HASHRES;
 
 struct GROUPHASH
 {
 	std::vector<SIGNATURE> vecSigs;
 	SIGNATURE currSig;
-	ULONG mergeDfaId;
-	std::vector<ULONG> vecDfaIds;
+	ulong mergeDfaId;
+	std::vector<ulong> vecDfaIds;
 };
 
-HASHMAPHDR ULONG hash(const SIGNATURE &oneSig);
+HASHMAPHDR ulong hash(const SIGNATURE &oneSig);
 
 HASHMAPHDR void HashMapping(CGROUPRes &groupRes, HASHRES &HashResMap);

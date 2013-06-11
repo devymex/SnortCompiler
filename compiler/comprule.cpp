@@ -11,11 +11,17 @@
 
 #include "stdafx.h"
 #include "ruleoption.h"
-#include <hwprj\pcre2nfa.h>
+#include "pcre2nfa.h"
+#include <hwprj\ctimer.h>
 
-#include <hwprj\rule2nfa.h>
+#include "comprule.h"
 
 #pragma warning(disable:4996)
+
+double rule2pcretime = 0.0;
+double pcre2nfatime = 0.0;
+double nfa2dfatime = 0.0;
+double dfamintimetime = 0.0;
 
 #define nfaTreeReserve 100
 #define nfaReserve 10000
@@ -42,7 +48,7 @@
 
 /*
 **	content type
-**	CONBYTE: transform content to vector<BYTE>
+**	CONBYTE: transform content to vector<byte>
 **	CONPCRE: transform content to string
 */
 enum CONTYPE
@@ -137,13 +143,13 @@ struct CONTENTNUM
 /*
 * read rules from a file
 */
-ULONG LoadFile(LPCTSTR fileName, std::vector<std::string> &rules)
+ulong LoadFile(const char *fileName, std::vector<std::string> &rules)
 {
 	std::ifstream fin(fileName);
 	if(!fin)
 	{
 		std::cerr << "Open file Failed!" << std::endl;
-		return (ULONG)-1;
+		return (ulong)-1;
 	}
 	for (std::string strRule; std::getline(fin, strRule);)
 	{
@@ -212,17 +218,17 @@ bool QuotedContext(_Iter &beg, _Iter &end)
 
 //Extract pcre string and mark process mode
 template<typename _Iter>
-ULONG FormatPcre (_Iter pBeg, _Iter pEnd, OPTIONPCRE &pcre)
+ulong FormatPcre (_Iter pBeg, _Iter pEnd, OPTIONPCRE &pcre)
 {
 	pcre.SetFlag(0);
 
 	if (*std::find_if_not(pBeg, pEnd, ISSPACE()) == '!')
 	{
-		return ULONG(-2);
+		return ulong(-2);
 	}
 	if (!QuotedContext(pBeg, pEnd))
 	{
-		return ULONG(-1);
+		return ulong(-1);
 	}
 
 	_Iter iPcreBeg = std::find(pBeg, pEnd, '/');
@@ -231,7 +237,7 @@ ULONG FormatPcre (_Iter pBeg, _Iter pEnd, OPTIONPCRE &pcre)
 
 	if ((iPcreBeg + 1) > iPcreEnd)
 	{
-		return ULONG(-1);
+		return ulong(-1);
 	}
 	else
 	{
@@ -337,14 +343,14 @@ inline char HexBit(char value)
 	return hexbithash.m_CharMap[value];
 }
 
-inline BYTE HexByte(const char *p2Bytes)
+inline byte HexByte(const char *p2Bytes)
 {
 	return (HexBit(p2Bytes[0]) << 4 | HexBit(p2Bytes[1]));
 }
 
-//The string type is converted into unsigned char type
+//The string type is converted into byte type
 template<typename _Iter>
-ULONG FormatOptionContent (_Iter cBeg, _Iter cEnd, std::vector<BYTE> &content, CONTYPE TYPE)
+ulong FormatOptionContent (_Iter cBeg, _Iter cEnd, BYTEARY &content, CONTYPE TYPE)
 {
 
 	//Transform ducted data into hex number
@@ -403,18 +409,18 @@ ULONG FormatOptionContent (_Iter cBeg, _Iter cEnd, std::vector<BYTE> &content, C
 }
 
 
-ULONG ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
+ulong ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
 {
 	std::vector<RULEOPTIONRAW> options;
 	ExtractOption(ruleOptions, options);
 
-	ULONG nCONT = 0;
-	ULONG sum = 0;
+	ulong nCONT = 0;
+	ulong sum = 0;
 	nCONT = std::count_if(options.begin(), options.end(), CONTENTNUM());
 
 	//Mark process mode, "0" is error ,"1" is normal
-	ULONG nResult = 0;
-	ULONG nFlag = 0;
+	ulong nResult = 0;
+	ulong nFlag = 0;
 
 	for(std::vector<RULEOPTIONRAW>::iterator iOp = options.begin(); iOp != options.end(); ++iOp)
 	{
@@ -429,16 +435,16 @@ ULONG ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
 		else if (0 == stricmp("pcre", iOp->name.c_str()))
 		{
 			OPTIONPCRE *pPcre = new OPTIONPCRE;
-			ULONG nr = FormatPcre(opValueBeg, opValueEnd, *pPcre);
+			ulong nr = FormatPcre(opValueBeg, opValueEnd, *pPcre);
 			if (nr != 0)
 			{
-				if (nr == ULONG(-2))
+				if (nr == ulong(-2))
 				{
 					nFlag |= CSnortRule::RULE_HASNOT;
 				}
 				else
 				{
-					nResult = ULONG(-1);
+					nResult = ulong(-1);
 					delete pPcre;
 					break;
 				}
@@ -466,7 +472,7 @@ ULONG ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
 			}
 			else if (!QuotedContext(opValueBeg, opValueEnd))
 			{
-				nResult = ULONG(-1);
+				nResult = ulong(-1);
 				delete pContent;
 				break;
 			}
@@ -484,11 +490,11 @@ ULONG ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
 		}
 		else if (0 == stricmp("nocase", iOp->name.c_str()))
 		{			
-			ULONG last = snortRule.Size() - 1;
+			ulong last = snortRule.Size() - 1;
 			OPTIONCONTENT * temp = dynamic_cast<OPTIONCONTENT *>(snortRule[last]);
 			if (NULL == temp)
 			{
-				nResult = ULONG(-1);
+				nResult = ulong(-1);
 				break;
 			}
 			else
@@ -498,11 +504,11 @@ ULONG ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
 		}
 		else if (0 == stricmp("offset", iOp->name.c_str()))
 		{
-			ULONG last = snortRule.Size() - 1;
+			ulong last = snortRule.Size() - 1;
 			OPTIONCONTENT *pTemp = dynamic_cast<OPTIONCONTENT*>(snortRule[last]);
 			if (NULL == pTemp)
 			{
-				nResult = ULONG(-1);
+				nResult = ulong(-1);
 				break;
 			}
 			else
@@ -513,11 +519,11 @@ ULONG ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
 		}
 		else if (0 == stricmp("depth", iOp->name.c_str()))
 		{
-			ULONG last = snortRule.Size() - 1;
+			ulong last = snortRule.Size() - 1;
 			OPTIONCONTENT *pTemp = dynamic_cast<OPTIONCONTENT *>(snortRule[last]);
 			if (NULL == pTemp)
 			{
-				nResult = ULONG(-1);
+				nResult = ulong(-1);
 				break;
 			}
 			else
@@ -528,11 +534,11 @@ ULONG ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
 		}
 		else if (0 == stricmp("distance", iOp->name.c_str()))
 		{
-			ULONG last = snortRule.Size() - 1;
+			ulong last = snortRule.Size() - 1;
 			OPTIONCONTENT *pTemp = dynamic_cast<OPTIONCONTENT *>(snortRule[last]);
 			if (NULL == pTemp)
 			{
-				nResult = ULONG(-1);
+				nResult = ulong(-1);
 				break;
 			}
 			else
@@ -543,11 +549,11 @@ ULONG ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
 		}
 		else if (0 == stricmp("within", iOp->name.c_str()))
 		{
-			ULONG last = snortRule.Size() - 1;
+			ulong last = snortRule.Size() - 1;
 			OPTIONCONTENT *pTemp = dynamic_cast<OPTIONCONTENT *>(snortRule[last]);
 			if (NULL == pTemp)
 			{
-				nResult = ULONG(-1);
+				nResult = ulong(-1);
 				break;
 			}
 			else
@@ -583,44 +589,16 @@ void CompileRule(LPCSTR rule, RECIEVER recv, LPVOID lpUser)
 }
 
 /*
-* read rules from a file
-* then process the rules to CSnortRule
-* callback function RECIEVER to handle CSnortRule
-*/
-ULONG CompileFile(LPCTSTR fileName, RECIEVER recv, LPVOID lpUser)
-{
-	if(recv == NULL)
-	{
-		return (ULONG)-1;
-	}
-	std::vector<std::string> rules;
-	if(0 == LoadFile(fileName, rules))
-	{
-		if(!rules.empty())
-		{
-			for(std::vector<std::string>::iterator rIt = rules.begin();
-				rIt != rules.end(); ++rIt)
-			{
-				std::cout << rIt - rules.begin() + 1 << std::endl;
-				//std::cout << ": " << g_dTimer << std::endl;
-				CompileRule(rIt->c_str(), recv, lpUser);
-			}
-		}
-	}
-	return 0;
-}
-
-/*
 * content has depth or within constraint
 * construct it to linear NFA
 */
 void contentToLinearNFA(OPTIONCONTENT *pContent, CNfa &nfa)
 {
 	nfa.Reserve(nfaReserve);
-	ULONG state_size = 0;
+	ulong state_size = 0;
 
-	ULONG patternLen = pContent->vecconts.size();
-	ULONG mustCnt = 0, maxCnt = 0;//mustCnt和maxCnt分别代表经过任意字符跳转出现的最少和最多次数
+	ulong patternLen = pContent->vecconts.size();
+	ulong mustCnt = 0, maxCnt = 0;//mustCnt和maxCnt分别代表经过任意字符跳转出现的最少和最多次数
 	if(pContent->TestFlag(CF_DEPTH))
 	{
 		mustCnt = pContent->nOffset;//必须跳转mustCnt次
@@ -633,15 +611,15 @@ void contentToLinearNFA(OPTIONCONTENT *pContent, CNfa &nfa)
 	}
 
 	//共offset + depth + 1或者distance + within + 1个状态，有一个初始状态
-	ULONG stateID = mustCnt + maxCnt;//从stateID开始进行content字符串的跳转
+	ulong stateID = mustCnt + maxCnt;//从stateID开始进行content字符串的跳转
 
 	//mustCnt：0-255任意字符跳转，必须要跳转的状态数
-	for(ULONG i = 0; i < (mustCnt + maxCnt); ++i)
+	for(ulong i = 0; i < (mustCnt + maxCnt); ++i)
 	{
 		nfa.Resize(++state_size);
 		//nfa.PushBack(CNfaRow());
 		CNfaRow &row = nfa.Back();
-		ULONG id = i + 1;
+		ulong id = i + 1;
 		for(int j = 0; j < 256; ++j)
 		{
 			row.AddDest(j, id);
@@ -653,7 +631,7 @@ void contentToLinearNFA(OPTIONCONTENT *pContent, CNfa &nfa)
 	}
 
 	++stateID;
-	for(std::vector<BYTE>::const_iterator iter = pContent->vecconts.begin();
+	for(BYTEARY_CITER iter = pContent->vecconts.begin();
 		iter != pContent->vecconts.end(); ++iter)
 	{
 		nfa.Resize(++state_size);
@@ -680,9 +658,9 @@ void contentToLinearNFA(OPTIONCONTENT *pContent, CNfa &nfa)
 void contentToDefaultNFA(OPTIONCONTENT *pContent, CNfa &nfa)
 {
 	nfa.Reserve(nfaReserve);
-	ULONG state_size = 0;
+	ulong state_size = 0;
 
-	ULONG mustCnt = 0;//经过的偏移字符个数
+	ulong mustCnt = 0;//经过的偏移字符个数
 	if((pContent->GetFlag() & CF_OFFSET))
 	{
 		mustCnt = pContent->nOffset;
@@ -693,43 +671,43 @@ void contentToDefaultNFA(OPTIONCONTENT *pContent, CNfa &nfa)
 		mustCnt = pContent->nDistance;
 	}
 
-	for(ULONG i = 0; i < mustCnt; ++i)
+	for(ulong i = 0; i < mustCnt; ++i)
 	{
 		nfa.Resize(++state_size);
 		//nfa.PushBack(CNfaRow());
 		CNfaRow &row = nfa.Back();
 		
-		ULONG id = i + 1;
-		for(ULONG j = 0; j < 256; ++j)
+		ulong id = i + 1;
+		for(ulong j = 0; j < 256; ++j)
 		{
 			row.AddDest(j, id);
 		}
 	}
 
-	ULONG stateID = mustCnt;//从stateID开始进行content.vecconts的匹配
-	ULONG patternLen = pContent->vecconts.size(); 
-	std::vector<BYTE> pattern;
-	for(std::vector<BYTE>::const_iterator iter = pContent->vecconts.begin();
+	ulong stateID = mustCnt;//从stateID开始进行content.vecconts的匹配
+	ulong patternLen = pContent->vecconts.size(); 
+	BYTEARY pattern;
+	for(BYTEARY_CITER iter = pContent->vecconts.begin();
 		iter != pContent->vecconts.end(); ++iter)
 	{
-		BYTE c = BYTE((pContent->GetFlag() & CF_NOCASE) ? tolower(*iter) : *iter);
+		byte c = byte((pContent->GetFlag() & CF_NOCASE) ? tolower(*iter) : *iter);
 		pattern.push_back(c);//如果content有nocase标记，则把模式串用字符的小写形式表示
 	}
 
 	//在前面加.*
-	for(ULONG i = 0; i < patternLen; ++i)
+	for(ulong i = 0; i < patternLen; ++i)
 	{
 		nfa.Resize(++state_size);
 		//nfa.PushBack(CNfaRow());
 		CNfaRow &row = nfa.Back();
-		ULONG id = stateID + i + 1;
-		for(ULONG c = 0; c < 256; ++c)
+		ulong id = stateID + i + 1;
+		for(ulong c = 0; c < 256; ++c)
 		{
 			if(i == 0)
 			{
 				row.AddDest(c, stateID);
 			}
-			BYTE character = BYTE((pContent->GetFlag() & CF_NOCASE) ? tolower(c) : c);
+			byte character = byte((pContent->GetFlag() & CF_NOCASE) ? tolower(c) : c);
 			if(character == pattern[i])
 			{
 				row.AddDest(c, id);
@@ -757,28 +735,28 @@ void content2Nfa(OPTIONCONTENT *pContent, CNfa &nfa)
 //test function: output a nfa
 void PrintDfaToText(CNfa &nfa, std::string &fileName)
 {
-	ULONG stateNum = nfa.Size();
+	ulong stateNum = nfa.Size();
 	std::ofstream fout(fileName);
 	fout << "\t";
-	for(ULONG t = 0; t < 257; ++t)
+	for(ulong t = 0; t < 257; ++t)
 	{
 		fout << t << "\t";
 	}
 	fout << std::endl;
-	for(ULONG i = 0; i < stateNum; ++i)
+	for(ulong i = 0; i < stateNum; ++i)
 	{
 		const CNfaRow &row = nfa[i];
 		fout << i << "\t";
-		for(ULONG j = 0; j < 257; ++j)
+		for(ulong j = 0; j < 257; ++j)
 		{
-			ULONG nCnt = row.DestCnt(j);
+			ulong nCnt = row.DestCnt(j);
 			if(nCnt == 0)
 			{
 				fout << -1 << "\t";
 			}
 			else
 			{
-				for(ULONG k = 0; k < nCnt; ++k)
+				for(ulong k = 0; k < nCnt; ++k)
 				{
 					fout << row.GetDest(j, k) << ", ";
 				}
@@ -801,7 +779,7 @@ void PrintDfaToText(CNfa &nfa, std::string &fileName)
 **  @retval  0 function successful
 **  @retval -1 fatal error
 */
-ULONG content2Pcre(OPTIONCONTENT *pContent, CDllString &pcreStr)
+ulong content2Pcre(OPTIONCONTENT *pContent, CDllString &pcreStr)
 {
 	std::stringstream ss;
 	pcreStr = CDllString("/^");
@@ -866,7 +844,7 @@ ULONG content2Pcre(OPTIONCONTENT *pContent, CDllString &pcreStr)
 	con.resize(pContent->GetPattern(NULL, 0));
 	pContent->GetPattern(&con[0], con.size());
 	std::string::iterator  opValueBeg= con.begin(), opValueEnd = con.end();
-	std::vector<BYTE> conVec;
+	BYTEARY conVec;
 
 	//transform the pipe data into a special string
 	FormatOptionContent(opValueBeg, opValueEnd, conVec, CONPCRE);
@@ -906,14 +884,14 @@ ULONG content2Pcre(OPTIONCONTENT *pContent, CDllString &pcreStr)
 **  @retval <>0 fatal error
 */
 
-ULONG Rule2PcreList(const CSnortRule &rule, CRegRule &regrule)
+ulong Rule2PcreList(const CSnortRule &rule, CRegRule &regrule)
 {
 	regrule.Reserve(nfaTreeReserve);
-	ULONG regChain_size = 0;
+	ulong regChain_size = 0;
 	regrule.Resize(++regChain_size);
 	int cFlag = 0;
 
-	for(ULONG i = 0; i < rule.Size(); ++i)
+	for(ulong i = 0; i < rule.Size(); ++i)
 	{
 		OPTIONCONTENT *pContent = dynamic_cast<OPTIONCONTENT*>(rule[i]);
 		OPTIONPCRE *pPcre = dynamic_cast<OPTIONPCRE*>(rule[i]);
@@ -938,12 +916,12 @@ ULONG Rule2PcreList(const CSnortRule &rule, CRegRule &regrule)
 			if(pContent->vecconts.size() >= 4)
 			{
 				//extract signatures
-				std::vector<BYTE> contentTmp;
+				BYTEARY contentTmp;
 				contentTmp.reserve(pContent->vecconts.size());
-				for(std::vector<BYTE>::iterator itTmp = pContent->vecconts.begin();
+				for(BYTEARY_ITER itTmp = pContent->vecconts.begin();
 					itTmp != pContent->vecconts.end(); ++itTmp)
 				{
-					BYTE c = *itTmp;
+					byte c = *itTmp;
 					if (c >= 'A' && c <= 'Z')
 					{
 						contentTmp.push_back(c - 'A' + 'a');
@@ -954,7 +932,7 @@ ULONG Rule2PcreList(const CSnortRule &rule, CRegRule &regrule)
 					}
 				}
 
-				for(std::vector<BYTE>::iterator sigIt = contentTmp.begin();
+				for(BYTEARY_ITER sigIt = contentTmp.begin();
 					sigIt + 3 != contentTmp.end(); ++sigIt)
 				{
 					SIGNATURE sig = *(SIGNATURE*)&(*sigIt);
@@ -981,7 +959,7 @@ ULONG Rule2PcreList(const CSnortRule &rule, CRegRule &regrule)
 	}
 
 	//regrule.Reserve(++regChain_size);
-	for(ULONG i = 0; i < regrule.Size(); ++i)
+	for(ulong i = 0; i < regrule.Size(); ++i)
 	{
 		if(regrule[i].GetSigs().Size() > 1)
 		{
@@ -1010,11 +988,11 @@ ULONG Rule2PcreList(const CSnortRule &rule, CRegRule &regrule)
 **  @retval <>0 fatal error
 */
 
-ULONG CRegChainToNFA(CRegChain &regchain, CNfa &nfa)
+ulong CRegChainToNFA(CRegChain &regchain, CNfa &nfa)
 {
 	nfa.Reserve(nfaReserve);
 	int flag = 0;
-	for(ULONG i = 0; i < regchain.Size(); ++i)
+	for(ulong i = 0; i < regchain.Size(); ++i)
 	{
 		flag = PcreToNFA(regchain[i].GetStr(), nfa, regchain.GetSigs());
 		if(flag != 0)
@@ -1025,4 +1003,41 @@ ULONG CRegChainToNFA(CRegChain &regchain, CNfa &nfa)
 	}
 	regchain.GetSigs().Unique();
 	return 0;
+}
+
+/* assign all the signatures of each rule to all its option list
+
+Arguments:
+  result      the compile result
+  BegIdx      the index of the first regex which belongs to this rule
+  EndIdx      the next index of the last regex which belongs to this rule
+
+Returns:      nothing
+
+*/
+void AssignSig(CCompileResults &result, ulong BegIdx, ulong EndIdx)
+{
+	//all the signatures of this rule
+	std::vector<SIGNATURE> vecRuleSigs;
+	for (ulong i = BegIdx; i < EndIdx; ++i)
+	{
+		for (ulong j = 0; j < result.GetRegexTbl()[i].GetSigs().Size(); ++j)
+		{
+			if (std::find(vecRuleSigs.begin(), vecRuleSigs.end(),
+				result.GetRegexTbl()[i].GetSigs()[j]) == vecRuleSigs.end())
+			{
+				vecRuleSigs.push_back(result.GetRegexTbl()[i].GetSigs()[j]);
+			}
+		}
+	}
+
+	//assign all the signatures of each rule to all its option list
+	for (ulong i = BegIdx; i < EndIdx; ++i)
+	{
+		result.GetRegexTbl()[i].GetSigs().Clear();
+		for (ulong j = 0; j < vecRuleSigs.size(); ++j)
+		{
+			result.GetRegexTbl()[i].GetSigs().PushBack(vecRuleSigs[j]);
+		}
+	}
 }

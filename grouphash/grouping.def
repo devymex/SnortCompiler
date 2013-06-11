@@ -1,6 +1,5 @@
-LIBRARY grouphash
+LIBRARY
 EXPORTS
-
 Grouping @ 1
 HashMapping @ 2
 hash @ 3

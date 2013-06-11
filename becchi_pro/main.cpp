@@ -5,9 +5,7 @@
 
 #include <hwprj\compiler.h>
 #include <hwprj\snortrule.h>
-#include <hwprj\rule2nfa.h>
 #include <hwprj\nfa.h>
-#include <hwprj\pcre2nfa.h>
 
 #include <fstream>
 #include <iostream>
@@ -140,27 +138,27 @@ void ReadRegexs(std::string filename, std::vector<std::string> &regset)
 
 void display(CDfa &newdfa)
 {
-	for(ULONG i = 0; i != newdfa.Size(); ++i)
+	for(ulong i = 0; i != newdfa.Size(); ++i)
 	{
-		std::map<STATEID, ULONG> rowStateCnt;
-		for(ULONG j = 0; j != newdfa.GetGroupCount(); ++j)
+		std::map<STATEID, ulong> rowStateCnt;
+		for(ulong j = 0; j != newdfa.GetGroupCount(); ++j)
 		{
 			rowStateCnt[newdfa[i][j]]++;
 		}
 		STATEID maxId = 0;
-		for (std::map<STATEID, ULONG>::iterator j = rowStateCnt.begin(); j != rowStateCnt.end(); ++j)
+		for (std::map<STATEID, ulong>::iterator j = rowStateCnt.begin(); j != rowStateCnt.end(); ++j)
 		{
 			if (j->second > rowStateCnt[maxId])
 			{
 				maxId = j->first;
 			}
 		}
-		std::cout << "state # "<< i << ", maxId: " << (ULONG)maxId << ", ";
-		for(ULONG j = 0; j != newdfa.GetGroupCount(); ++j)
+		std::cout << "state # "<< i << ", maxId: " << (ulong)maxId << ", ";
+		for(ulong j = 0; j != newdfa.GetGroupCount(); ++j)
 		{
 			if (newdfa[i][j] != maxId)
 			{
-				std::cout << "< " << j << "," <<  (ULONG)newdfa[i][j] << " >" ;
+				std::cout << "< " << j << "," <<  (ulong)newdfa[i][j] << " >" ;
 			}
 		}
 		std::cout << std::endl;
@@ -172,50 +170,50 @@ void display(CDfa &newdfa)
 //{
 //	std::ofstream fout(fileName);
 //	fout << "digraph G {" << std::endl;
-//	fout << "S -> " << (ULONG)newdfa.GetStartId() << std::endl;
+//	fout << "S -> " << (ulong)newdfa.GetStartId() << std::endl;
 //
-//	for(ULONG i = 0; i != newdfa.Size(); ++i)
+//	for(ulong i = 0; i != newdfa.Size(); ++i)
 //	{
-//		std::map<STATEID, ULONG> rowStateCnt;
-//		for(ULONG j = 0; j != newdfa.GetGroupCount(); ++j)
+//		std::map<STATEID, ulong> rowStateCnt;
+//		for(ulong j = 0; j != newdfa.GetGroupCount(); ++j)
 //		{
 //			rowStateCnt[newdfa[i][j]]++;
 //		}
 //		STATEID maxId = 0;
-//		for (std::map<STATEID, ULONG>::iterator j = rowStateCnt.begin(); j != rowStateCnt.end(); ++j)
+//		for (std::map<STATEID, ulong>::iterator j = rowStateCnt.begin(); j != rowStateCnt.end(); ++j)
 //		{
 //			if (j->second > rowStateCnt[maxId])
 //			{
 //				maxId = j->first;
 //			}
 //		}
-//		//for(ULONG j = 0; j != newdfa.GetGroupCount(); ++j)
+//		//for(ulong j = 0; j != newdfa.GetGroupCount(); ++j)
 //		//{
 //		//	if (newdfa[i][j] != maxId)
 //		//	{
-//		//		fout << i << " -> " << (ULONG)newdfa[i][j] << " [label=\"" << j << "\"];" << std::endl;
+//		//		fout << i << " -> " << (ulong)newdfa[i][j] << " [label=\"" << j << "\"];" << std::endl;
 //		//	}
 //		//	else if (maxId != (STATEID)-1)
 //		//	{
-//		//		fout << i << " -> "  << (ULONG)maxId << " [label=\"" << j << "\"];" << std::endl;
+//		//		fout << i << " -> "  << (ulong)maxId << " [label=\"" << j << "\"];" << std::endl;
 //		//	}
 //		//}
 //
-//		fout << "s"<< i << ", maxId: " << (ULONG)maxId << ", ";	
-//		for(ULONG j = 0; j != newdfa.GetGroupCount(); ++j)
+//		fout << "s"<< i << ", maxId: " << (ulong)maxId << ", ";	
+//		for(ulong j = 0; j != newdfa.GetGroupCount(); ++j)
 //		{
 //			if (newdfa[i][j] != maxId)
 //			{
-//				fout << "<" << j << "," <<  (ULONG)newdfa[i][j] << "> " ;
+//				fout << "<" << j << "," <<  (ulong)newdfa[i][j] << "> " ;
 //			}
 //		}
 //		fout << std::endl;
 //	}
-//	for (ULONG i = 0; i < newdfa.Size(); ++i)
+//	for (ulong i = 0; i < newdfa.Size(); ++i)
 //	{
 //		if (newdfa[i].GetFlag() & CDfaRow::TERMINAL)
 //		{
-//			fout << (ULONG)i << " [peripheries=2];" << std::endl;
+//			fout << (ulong)i << " [peripheries=2];" << std::endl;
 //		}
 //	}
 //	fout << "}" << std::endl;
@@ -251,7 +249,7 @@ NFA* CreatNFA(const char* re)
 
 struct COMPARECHARGROUP
 {
-	bool operator()(std::vector<BYTE> &x, std::vector<BYTE> &y)
+	bool operator()(std::vector<byte> &x, std::vector<byte> &y)
 	{
 		return (x.front() < y.front());
 	}
@@ -259,35 +257,35 @@ struct COMPARECHARGROUP
 
 struct COMPARESTATOGROUP
 {
-	bool operator()(std::vector<BYTE> &x, std::vector<BYTE> &y)
+	bool operator()(std::vector<byte> &x, std::vector<byte> &y)
 	{
 		return (x == y);
 	}
 };
 
-void GetChargroup(CDfa &dfa, STATEID &sta, std::vector<std::vector<BYTE>> &chargroup)
+void GetChargroup(CDfa &dfa, STATEID &sta, std::vector<std::vector<byte>> &chargroup)
 {
 	CDfaRow &cur = dfa[sta];
 
-	std::map<STATEID, std::vector<BYTE>> sta2charset;
-	for (ULONG col = 0; col < dfa.GetGroupCount(); ++col)
+	std::map<STATEID, std::vector<byte>> sta2charset;
+	for (ulong col = 0; col < dfa.GetGroupCount(); ++col)
 	{
 		sta2charset[cur[col]].push_back(col);
 	}
 
-	for (std::map<STATEID, std::vector<BYTE>>::iterator iMap = sta2charset.begin(); iMap != sta2charset.end(); ++iMap)
+	for (std::map<STATEID, std::vector<byte>>::iterator iMap = sta2charset.begin(); iMap != sta2charset.end(); ++iMap)
 	{
 		chargroup.push_back(iMap->second);
 	}
 }
 
-ULONG EqualDFA(CDfa &dfa1, std::vector<BYTE> &visited1, STATEID sta1, CDfa &dfa2, std::vector<BYTE> &visited2, STATEID sta2)
+ulong EqualDFA(CDfa &dfa1, std::vector<byte> &visited1, STATEID sta1, CDfa &dfa2, std::vector<byte> &visited2, STATEID sta2)
 {
 	visited1[sta1] = 1;
 	visited2[sta2] = 1;
 
-	std::vector<std::vector<BYTE>> sta2chargroup1;
-	std::vector<std::vector<BYTE>> sta2chargroup2;
+	std::vector<std::vector<byte>> sta2chargroup1;
+	std::vector<std::vector<byte>> sta2chargroup2;
 
 	GetChargroup(dfa1, sta1, sta2chargroup1);
 	GetChargroup(dfa2, sta2, sta2chargroup2);
@@ -305,11 +303,11 @@ ULONG EqualDFA(CDfa &dfa1, std::vector<BYTE> &visited1, STATEID sta1, CDfa &dfa2
 
 		if (flag)
 		{
-			for (ULONG i = 0, j = 0; i < sta2chargroup1.size() 
+			for (ulong i = 0, j = 0; i < sta2chargroup1.size() 
 				&& j < sta2chargroup2.size(); ++i, ++j)
 			{
-				BYTE char1 = sta2chargroup1[i].front();
-				BYTE char2 = sta2chargroup2[j].front();	
+				byte char1 = sta2chargroup1[i].front();
+				byte char2 = sta2chargroup2[j].front();	
 				STATEID cur1 = dfa1[sta1][char1];
 				STATEID cur2 = dfa2[sta2][char2];
 				if ((cur1 != (STATEID)-1 && visited1[cur1] == 0) 
@@ -336,21 +334,21 @@ ULONG EqualDFA(CDfa &dfa1, std::vector<BYTE> &visited1, STATEID sta1, CDfa &dfa2
 void FoldDFA(CDfa &curDfa)
 {
 	CDfa foldDfa;
-	BYTE group[CSIZE];
+	byte group[CSIZE];
 	for (int i = 0; i < CSIZE; ++i)
 	{
-		group[i] = (BYTE)i;
+		group[i] = (byte)i;
 	}
 
 	foldDfa.Init(group);
 	foldDfa.Reserve(300);
 	foldDfa.SetStartId(curDfa.GetStartId());
-	for (ULONG i = 0; i < curDfa.Size(); ++i)
+	for (ulong i = 0; i < curDfa.Size(); ++i)
 	{
 		foldDfa.PushBack(CDfaRow(CSIZE));
-		for (ULONG j = 0; j < CSIZE; ++j)
+		for (ulong j = 0; j < CSIZE; ++j)
 		{
-			BYTE z = curDfa.Char2Group((BYTE)j);
+			byte z = curDfa.Char2Group((byte)j);
 			foldDfa[i][j] = curDfa[i][z];
 		}
 	}
@@ -358,12 +356,12 @@ void FoldDFA(CDfa &curDfa)
 	curDfa = foldDfa;
 }
 
-ULONG CompDfa(CDfa &OwnDfa, CDfa &BeDfa)
+ulong CompDfa(CDfa &OwnDfa, CDfa &BeDfa)
 {
-	ULONG Result = 0;
-	std::vector<BYTE> visited1(OwnDfa.Size());
+	ulong Result = 0;
+	std::vector<byte> visited1(OwnDfa.Size());
 	std::fill(visited1.begin(), visited1.end(), 0);
-	std::vector<BYTE> visited2(BeDfa.Size());
+	std::vector<byte> visited2(BeDfa.Size());
 	std::fill(visited2.begin(), visited2.end(), 0);
 	if (OwnDfa.Size() == BeDfa.Size())
 	{
@@ -374,7 +372,7 @@ ULONG CompDfa(CDfa &OwnDfa, CDfa &BeDfa)
 	}
 	//else
 	//{
-	//	std::cout << (ULONG)OwnDfa.Size() << ", " << (ULONG)BeDfa.Size() << std::endl;
+	//	std::cout << (ulong)OwnDfa.Size() << ", " << (ulong)BeDfa.Size() << std::endl;
 	//}
 	return Result;
 }
@@ -403,7 +401,7 @@ void FormatPcre (_Iter pBeg, _Iter pEnd, std::string &bPcre, std::string &oPcre)
 		//std::cout << oPcre << std::endl;
 }
 
-ULONG CompareWithPcre(const char *pPcre)
+ulong CompareWithPcre(const char *pPcre)
 {
 	std::string Pcre1;
 	std::string Pcre2;
@@ -412,8 +410,8 @@ ULONG CompareWithPcre(const char *pPcre)
 	const char* bPcre = Pcre1.c_str();
 	const char* oPcre = Pcre2.c_str();
 
-	ULONG Result = 0;
-	//CStateSet tmp;
+	ulong Result = 0;
+	//STATEARY tmp;
 	//char* str = ":IP ConaaX-Mailer:EBT ReporterbbbSubjecwq:Vic";
 
 	CNfa nfa1;
@@ -434,9 +432,9 @@ ULONG CompareWithPcre(const char *pPcre)
 	//PrintDfaToText(OwnDfa,"..\\first.txt");
 	FoldDFA(OwnDfa);
 	//PrintDfaToGv(OwnDfa,"..\\result1.txt");
-	//std::cout << (ULONG)OwnDfa.Size() << std::endl;
+	//std::cout << (ulong)OwnDfa.Size() << std::endl;
 	//display(OwnDfa);
-	//OwnDfa.Process((BYTE*)str, strlen(str), tmp);
+	//OwnDfa.Process((byte*)str, strlen(str), tmp);
 	//std::cout << tmp.Size() << std::endl;
 	//std::cout << std::endl;
 
@@ -463,8 +461,8 @@ ULONG CompareWithPcre(const char *pPcre)
 	//BeDfa->dump();
 	//std::cout << BeDfa->size() << std::endl;
 	//PrintDfaToGv(newBeDfa, "..\\result2.txt");
-	//std::cout << (ULONG)newBeDfa.Size() << std::endl;
-	//newBeDfa.Process((BYTE* )str, strlen(str), tmp);
+	//std::cout << (ulong)newBeDfa.Size() << std::endl;
+	//newBeDfa.Process((byte* )str, strlen(str), tmp);
 	//std::cout << tmp.Size() << std::endl;
 	//std::cout << std::endl;
 	//display(newBeDfa);
@@ -473,11 +471,11 @@ ULONG CompareWithPcre(const char *pPcre)
 	return Result;
 }
 
-void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
+void __stdcall Process(const CSnortRule &rule, LPVOID lpVoid)
 {
 	CCompileResults &result = *(CCompileResults*)lpVoid;
-	std::vector<ULONG> NoMatchSids;
-	ULONG nFlag = rule.GetFlag();
+	std::vector<ulong> NoMatchSids;
+	ulong nFlag = rule.GetFlag();
 	if (rule.Size() == 0)
 	{
 		return;
@@ -494,11 +492,11 @@ void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 	{
 		CRegRule rr;
 		Rule2PcreList(rule, rr);
-		static ULONG num = 0;
+		static ulong num = 0;
 		std::cout << ++num << std::endl;
-		for (ULONG i = 0; i < rr.Size(); ++i)
+		for (ulong i = 0; i < rr.Size(); ++i)
 		{
-			for (ULONG j = 0; j < rr[i].Size(); ++j)
+			for (ulong j = 0; j < rr[i].Size(); ++j)
 			{
 				const char *tmp = rr[i][j].GetStr();
 				if (tmp != NULL && tmp[0] != '\0')
@@ -524,7 +522,7 @@ void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
 		}
 	}
 	//std::ofstream fout("..\\NoMatchSids.txt", ios::app);
-	//for (std::vector<ULONG>::iterator i = NoMatchSids.begin(); i != NoMatchSids.end(); ++i)
+	//for (std::vector<ulong>::iterator i = NoMatchSids.begin(); i != NoMatchSids.end(); ++i)
 	//{
 	//	fout << "sid: " << *i << std::endl;
 	//}
@@ -556,7 +554,7 @@ int main(int argc, char **argv)
 	parser=new regex_parser(false,false);
 
 	CCompileResults result;
-	CompileFile(_T("..\\allrules.rule"), Process, &result);
+	CompileFile("..\\allrules.rule", Process, &result);
 
 	//std::vector<std::string> regset;
 	//ReadRegexs(argv[3], regset);
@@ -589,9 +587,9 @@ int main(int argc, char **argv)
 
 	//for (std::vector<CDfa>::iterator iDfa = dfaset.begin() + 1; iDfa != dfaset.end(); ++iDfa)
 	//{
-	//	std::vector<BYTE> visited1((iDfa - 1)->Size());
+	//	std::vector<byte> visited1((iDfa - 1)->Size());
 	//	std::fill(visited1.begin(), visited1.end(), 0);
-	//	std::vector<BYTE> visited2(iDfa->Size());
+	//	std::vector<byte> visited2(iDfa->Size());
 	//	std::fill(visited2.begin(), visited2.end(), 0);
 	//	if ((iDfa - 1)->Size() == iDfa->Size())
 	//	{
@@ -625,7 +623,7 @@ int main(int argc, char **argv)
 	//for (i = 1; i <= REGEXNUM; i++)
 	//{
 	//	setgroup[1]=group[i-1];
-	//	ULONG DFAsize =  parser->parse_regex_group(ruleset, setgroup);
+	//	ulong DFAsize =  parser->parse_regex_group(ruleset, setgroup);
 	//	//printf("%d\n",DFAsize);
 	//}	
 

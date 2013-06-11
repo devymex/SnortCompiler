@@ -2,17 +2,17 @@
 #include <tchar.h>
 #include <windows.h>
 
-
 #include <hwprj\compiler.h>
+#include <hwprj\ctimer.h>
 
 void main()
 {
 	CTimer t;
 	CCompileResults result;
-	CompileRuleSet(_T("..\\allrules.rule"), result);
-	result.WriteToFile(_T("..\\result.cdt"));
-	//result.ReadFromFile(_T("..\\..\\output\\result.cdt"));
-	//result.WriteToFile(_T("..\\..\\output\\result1.cdt"));
+	CompileRuleSet("..\\allrules.rule", result);
+	result.WriteToFile("..\\result.cdt");
+	//result.ReadFromFile("..\\..\\output\\result.cdt");
+	//result.WriteToFile("..\\..\\output\\result1.cdt");
 
 	//std::ifstream fin("../../input/allrules.rule");
 	//std::vector<std::string> vecRules;
@@ -25,7 +25,7 @@ void main()
 	//fin.close();
 
 	//std::ofstream fout("../../input/ProcessRules.rule");
-	//for (ULONG i = 0; i < result.GetSidDfaIds().Size(); ++i)
+	//for (ulong i = 0; i < result.GetSidDfaIds().Size(); ++i)
 	//{
 	//	if (result.GetSidDfaIds()[i].m_nResult == COMPILEDRULENEW::RES_SUCCESS)
 	//	{
@@ -46,15 +46,15 @@ void main()
 	//fout.clear();
 	//fout.close();
 
-	//ULONG success_cNt = 0;
-	//ULONG error_cNt = 0;
-	//ULONG exceed_cNt = 0;
-	//ULONG hasbyte_cNt = 0;
-	//ULONG hasnot_cNt = 0;
-	//ULONG empty_cNt = 0;
-	//ULONG hasnosig_cNt = 0;
-	//ULONG exceedlimit_cNt = 0;
-	//for (ULONG i = 0; i < result.GetSidDfaIds().Size(); ++i)
+	//ulong success_cNt = 0;
+	//ulong error_cNt = 0;
+	//ulong exceed_cNt = 0;
+	//ulong hasbyte_cNt = 0;
+	//ulong hasnot_cNt = 0;
+	//ulong empty_cNt = 0;
+	//ulong hasnosig_cNt = 0;
+	//ulong exceedlimit_cNt = 0;
+	//for (ulong i = 0; i < result.GetSidDfaIds().Size(); ++i)
 	//{
 	//	if (result.GetSidDfaIds()[i].m_nResult == COMPILEDRULENEW::RES_SUCCESS)
 	//	{

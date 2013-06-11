@@ -12,7 +12,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{E6C145F2-A57F-48D4-8B34-EA8166B984F8}</ProjectGuid>
-    <RootNamespace>grouping</RootNamespace>
+    <RootNamespace>grouphash</RootNamespace>
     <ProjectName>grouphash</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />

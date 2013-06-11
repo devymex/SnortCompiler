@@ -17,7 +17,7 @@ REGRULEHDR CRegRule::CRegRule(const CRegRule &other)
 	*this = other;
 }
 
-REGRULEHDR ULONG CRegRule::Size() const
+REGRULEHDR ulong CRegRule::Size() const
 {
 	return m_pRegVec->size();
 }
@@ -27,11 +27,11 @@ REGRULEHDR CRegChain& CRegRule::Back() const
 	return m_pRegVec->back();
 }
 
-REGRULEHDR void CRegRule::Reserve(ULONG nCount)
+REGRULEHDR void CRegRule::Reserve(ulong nCount)
 {
 	m_pRegVec->reserve(nCount);
 }
-REGRULEHDR void CRegRule::Resize(ULONG nSize)
+REGRULEHDR void CRegRule::Resize(ulong nSize)
 {
 	m_pRegVec->resize(nSize);
 }
@@ -41,12 +41,12 @@ REGRULEHDR void CRegRule::PushBack(const CRegChain &nRegChain)
 	m_pRegVec->push_back(nRegChain);
 }
 
-REGRULEHDR CRegChain& CRegRule::operator[](ULONG nIdx)
+REGRULEHDR CRegChain& CRegRule::operator[](ulong nIdx)
 {
 	return (*m_pRegVec)[nIdx];
 }
 
-REGRULEHDR const CRegChain& CRegRule::operator[](ULONG nIdx) const
+REGRULEHDR const CRegChain& CRegRule::operator[](ulong nIdx) const
 {
 	return (*m_pRegVec)[nIdx];
 }

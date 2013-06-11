@@ -23,12 +23,12 @@ SIGHDR CSignatures::~CSignatures()
 	delete m_pSigs;
 }
 
-SIGHDR const ULONG CSignatures::Size() const
+SIGHDR const ulong CSignatures::Size() const
 {
 	return m_pSigs->size();
 }
 
-SIGHDR void CSignatures::Resize(ULONG nSize)
+SIGHDR void CSignatures::Resize(ulong nSize)
 {
 	m_pSigs->resize(nSize);
 }
@@ -38,12 +38,12 @@ SIGHDR void CSignatures::PushBack(SIGNATURE Sig)
 	m_pSigs->push_back(Sig);
 }
 
-SIGHDR SIGNATURE &CSignatures::operator[](ULONG nIdx)
+SIGHDR SIGNATURE &CSignatures::operator[](ulong nIdx)
 {
 	return (*m_pSigs)[nIdx];
 }
 
-SIGHDR const SIGNATURE &CSignatures::operator[](ULONG nIdx) const
+SIGHDR const SIGNATURE &CSignatures::operator[](ulong nIdx) const
 {
 	return (*m_pSigs)[nIdx];
 }

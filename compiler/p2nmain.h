@@ -1,8 +1,13 @@
 #pragma once
 
+#define OVECCOUNT	30	/* should be a multiple of 3 */
+#define EBUFLEN		128
+#define BUFLEN		1024
+
 #define ONEPCRETONFA_H_
-#include <hwprj\pcre2nfa.h>
 #include <hwprj\common.h>
+#include <hwprj\nfa.h>
+
 
 #define SC_LIMIT 200
 
@@ -47,8 +52,8 @@
 	/* Character class & ref repeats                                         */ \
 	1, 1, 1, 1, 1, 1,              /* *, *?, +, +?, ?, ??                    */ \
 	1+2*IMM2_SIZE, 1+2*IMM2_SIZE,  /* CRRANGE, CRMINRANGE                    */ \
-	1+(32/sizeof(unsigned char)),     /* CLASS                                  */ \
-	1+(32/sizeof(unsigned char)),     /* NCLASS                                 */ \
+	1+(32/sizeof(byte)),     /* CLASS                                  */ \
+	1+(32/sizeof(byte)),     /* NCLASS                                 */ \
 	0,                             /* XCLASS - variable length               */ \
 	1+IMM2_SIZE,                   /* REF                                    */ \
 	1+IMM2_SIZE,                   /* REFI                                   */ \
@@ -330,134 +335,134 @@ enum {
 #define GET(Iter) \
 	((*(Iter) << 8) | *(Iter + 1))
 
-extern const unsigned char Steps[];
+extern const byte Steps[];
 
 extern enum PCRESIGN;
 
 struct PCRE
 {
 	std::string PcreStr;//pcre字符串
-	std::vector<unsigned char> PcreCode;//存放经过pcre库解析后的pcre
+	BYTEARY PcreCode;//存放经过pcre库解析后的pcre
 };
 
 //void GenerateNFA(std::vector<PCRE> &vecPcres);
 
-bool CanProcess(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End);
+bool CanProcess(BYTEARY_ITER &Beg, const BYTEARY_ITER &End);
 
-void NextForCLASS(std::vector<unsigned char>::iterator &Beg);
+void NextForCLASS(BYTEARY_ITER &Beg);
 
-ULONG ProcessPcre(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa);
+ulong ProcessPcre(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa);
 
-ULONG Process(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, std::vector<ULONG> &PreStates, ULONG ALTPreBeg, bool &ALTBeg, ULONG ALTBeginState, bool bCBRA, bool bALT, bool bBRAZERO, std::vector<PCRESIGN> &vecPath);
+ulong Process(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, std::vector<ulong> &PreStates, ulong ALTPreBeg, bool &ALTBeg, ulong ALTBeginState, bool bCBRA, bool bALT, bool bBRAZERO, std::vector<PCRESIGN> &vecPath);
 
-void ProcessALT(CNfa &nfa, ULONG PreState, bool &ALTBegin, ULONG ALTBegState);
+void ProcessALT(CNfa &nfa, ulong PreState, bool &ALTBegin, ulong ALTBegState);
 
-ULONG OP_COMMON_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState);
+ulong OP_COMMON_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState);
 
-void OP_CIRCM_FUNC(CNfa &nfa, ULONG &CurState);
+void OP_CIRCM_FUNC(CNfa &nfa, ulong &CurState);
 
-ULONG OP_CHAR_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState);
+ulong OP_CHAR_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState);
 
-ULONG OP_CHARI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState);
+ulong OP_CHARI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState);
 
-ULONG OP_NOT_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState);
+ulong OP_NOT_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState);
 
-ULONG OP_NOTI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState);
+ulong OP_NOTI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState);
 
-ULONG OP_STAR_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState);
+ulong OP_STAR_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState);
 
-ULONG OP_PLUS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState);
+ulong OP_PLUS_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState);
 
-ULONG OP_QUERY_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState);
+ulong OP_QUERY_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState);
 
-ULONG OP_UPTO_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState);
+ulong OP_UPTO_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState);
 
-ULONG OP_EXACT_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState);
+ulong OP_EXACT_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState);
 
-ULONG OP_STARI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState);
+ulong OP_STARI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState);
 
-ULONG OP_PLUSI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState);
+ulong OP_PLUSI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState);
 
-ULONG OP_QUERYI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState);
+ulong OP_QUERYI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState);
 
-ULONG OP_UPTOI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState);
+ulong OP_UPTOI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState);
 
-ULONG OP_EXACTI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState);
+ulong OP_EXACTI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState);
 
-ULONG OP_NOTSTAR_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState);
+ulong OP_NOTSTAR_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState);
 
-ULONG OP_NOTPLUS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState);
+ulong OP_NOTPLUS_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState);
 
-ULONG OP_NOTQUERY_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState);
+ulong OP_NOTQUERY_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState);
 
-ULONG OP_NOTUPTO_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState);
+ulong OP_NOTUPTO_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState);
 
-ULONG OP_NOTEXACT_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState);
+ulong OP_NOTEXACT_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState);
 
-ULONG OP_NOTSTARI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState);
+ulong OP_NOTSTARI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState);
 
-ULONG OP_NOTPLUSI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState);
+ulong OP_NOTPLUSI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState);
 
-ULONG OP_NOTQUERYI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState);
+ulong OP_NOTQUERYI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState);
 
-ULONG OP_NOTUPTOI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState);
+ulong OP_NOTUPTOI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState);
 
-ULONG OP_NOTEXACTI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState);
+ulong OP_NOTEXACTI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState);
 
-ULONG OP_TYPESTAR_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState);
+ulong OP_TYPESTAR_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState);
 
-ULONG OP_TYPEPLUS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState);
+ulong OP_TYPEPLUS_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState);
 
-ULONG OP_TYPEQUERY_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState);
+ulong OP_TYPEQUERY_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState);
 
-ULONG OP_TYPEUPTO_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState);
+ulong OP_TYPEUPTO_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState);
 
-ULONG OP_TYPEEXACT_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState);
+ulong OP_TYPEEXACT_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState);
 
-ULONG OP_CLASS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState);
+ulong OP_CLASS_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState);
 
-ULONG OP_NCLASS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState);
+ulong OP_NCLASS_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState);
 
-void OP_ALT_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG PreState, ULONG &CurState);
+void OP_ALT_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong PreState, ulong &CurState);
 
-void OP_KET_FUNC(CNfa &nfa, ULONG PreState, ULONG &CurState, bool IsALT, bool IsBRAZERO);
+void OP_KET_FUNC(CNfa &nfa, ulong PreState, ulong &CurState, bool IsALT, bool IsBRAZERO);
 
-void OP_KETRMAX_FUNC(CNfa &nfa, ULONG PreState, ULONG &CurState, bool IsBRAZERO, bool IsALT);
+void OP_KETRMAX_FUNC(CNfa &nfa, ulong PreState, ulong &CurState, bool IsBRAZERO, bool IsALT);
 
-ULONG OP_BRA_CBRA_SCBRA_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState);
+ulong OP_BRA_CBRA_SCBRA_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState);
 
-ULONG OP_BRA_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState);
+ulong OP_BRA_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState);
 
-ULONG OP_CBRA_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState);
+ulong OP_CBRA_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState);
 
-ULONG OP_SCBRA_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState);
+ulong OP_SCBRA_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState);
 
-void Copy(CNfaRow &NewRow, CNfaRow &Row, ULONG increment);
+void Copy(CNfaRow &NewRow, CNfaRow &Row, ulong increment);
 
-void AddEMPTY(CNfa &nfa, ULONG &CurState);
+void AddEMPTY(CNfa &nfa, ulong &CurState);
 
-void OutPut(std::vector<PCRE>::iterator &Pcre, CNfa &nfa, ULONG count);
+void OutPut(std::vector<PCRE>::iterator &Pcre, CNfa &nfa, ulong count);
 
-typedef ULONG (*Fn)(std::vector<unsigned char>::iterator&, const std::vector<unsigned char>::iterator&, CNfa&, ULONG&, ULONG, bool&, ULONG);
+typedef ulong (*Fn)(BYTEARY_ITER&, const BYTEARY_ITER&, CNfa&, ulong&, ulong, bool&, ulong);
 
 extern Fn FUNC[156];
 
-extern ULONG OP_NOT_DIGIT_ELEMS[];
+extern ulong OP_NOT_DIGIT_ELEMS[];
 
-extern ULONG OP_DIGIT_ELEMS[];
+extern ulong OP_DIGIT_ELEMS[];
 
-extern ULONG OP_NOT_WHITESPACE_ELEMS[];
+extern ulong OP_NOT_WHITESPACE_ELEMS[];
 
-extern ULONG OP_WHITESPACE_ELEMS[];
+extern ulong OP_WHITESPACE_ELEMS[];
 
-extern ULONG OP_NOT_WORDCHAR_ELEMS[];
+extern ulong OP_NOT_WORDCHAR_ELEMS[];
 
-extern ULONG OP_WORDCHAR_ELEMS[];
+extern ulong OP_WORDCHAR_ELEMS[];
 
-extern ULONG OP_ANY_ELEMS[];
+extern ulong OP_ANY_ELEMS[];
 
-extern ULONG OP_ALLANY_ELEMS[];
+extern ulong OP_ALLANY_ELEMS[];
 
-extern ULONG* ptr[];
+extern ulong* ptr[];
 
-extern ULONG NUMS[];
+extern ulong NUMS[];

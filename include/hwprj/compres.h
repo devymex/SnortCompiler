@@ -19,8 +19,9 @@ public:
 	const CDfaArray& GetDfaTable() const;
 	const CSidDfaIds& GetSidDfaIds() const;
 	const CRegRule &GetRegexTbl() const;
-	ULONG WriteToFile(LPCTSTR filename);
-	ULONG ReadFromFile(LPCTSTR filename);
+	ulong WriteToFile(const char *filename);
+	ulong ReadFromFile(const char *filename);
+
 protected:
 	CDfaArray m_dfaTbl;
 	CSidDfaIds m_sidDfaIds;

@@ -24,7 +24,10 @@
 #define DFAARYHDR_DS
 #define SIDDFAHDR_DS
 #define COMPRESHDR_DS
-#define RULE2NFAHDR_DS
-#define PCRE2NFA_DS
-#define MATCHHDR_DS
+#define COMPRULEHDR_DS
+#define PCREMATCHHDR_DS
 #define SIGHDR_DS
+
+typedef std::vector<byte>			BYTEARY;
+typedef BYTEARY::iterator			BYTEARY_ITER;
+typedef BYTEARY::const_iterator		BYTEARY_CITER;

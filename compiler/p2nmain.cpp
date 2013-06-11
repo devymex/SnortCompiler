@@ -1,12 +1,11 @@
 #include "stdafx.h"
 #include "p2nmain.h"
-#include <hwprj\pcre2nfa.h>
 
 #pragma warning (push)
 #pragma warning (disable : 4100)
-const unsigned char Steps[] = { OP_LENGTHS };
+const byte Steps[] = { OP_LENGTHS };
 
-ULONG OP_NOT_DIGIT_ELEMS[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 
+ulong OP_NOT_DIGIT_ELEMS[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 
 	21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 
 	47, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 
 	84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108,
@@ -18,9 +17,9 @@ ULONG OP_NOT_DIGIT_ELEMS[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 
 	219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 
 	241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255};
 
-ULONG OP_DIGIT_ELEMS[] = {48, 49, 50, 51, 52, 53, 54, 55, 56, 57};
+ulong OP_DIGIT_ELEMS[] = {48, 49, 50, 51, 52, 53, 54, 55, 56, 57};
 
-ULONG OP_NOT_WHITESPACE_ELEMS[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 11, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 
+ulong OP_NOT_WHITESPACE_ELEMS[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 11, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 
 	26, 27, 28, 29, 30, 31, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54,
 	55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82,
 	83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 
@@ -32,9 +31,9 @@ ULONG OP_NOT_WHITESPACE_ELEMS[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 11, 14, 15, 16, 17
 	224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, 243, 244, 245, 246, 
 	247, 248, 249, 250, 251, 252, 253, 254, 255};
 
-ULONG OP_WHITESPACE_ELEMS[] = {9, 10, 12, 13, 32};
+ulong OP_WHITESPACE_ELEMS[] = {9, 10, 12, 13, 32};
 
-ULONG OP_NOT_WORDCHAR_ELEMS[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 
+ulong OP_NOT_WORDCHAR_ELEMS[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 
 	24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 58, 59, 60, 61, 62,
 	63, 64, 91, 92, 93, 94, 96, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140,
 	141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164,
@@ -43,11 +42,11 @@ ULONG OP_NOT_WORDCHAR_ELEMS[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 1
 	213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 
 	237, 238, 239, 240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255};
 
-ULONG OP_WORDCHAR_ELEMS[] = {48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 
+ulong OP_WORDCHAR_ELEMS[] = {48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 
 	79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 95, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 
 	112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122};
 
-ULONG OP_ANY_ELEMS[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
+ulong OP_ANY_ELEMS[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
 	31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61,
 	62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92,
 	93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118,
@@ -58,7 +57,7 @@ ULONG OP_ANY_ELEMS[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16, 17
 	219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, 243,
 	244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255};
 
-ULONG OP_ALLANY_ELEMS[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 
+ulong OP_ALLANY_ELEMS[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 
 	28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59,
 	60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 
 	91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117,
@@ -69,7 +68,7 @@ ULONG OP_ALLANY_ELEMS[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
 	218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, 
 	243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255};
 
-ULONG* ptr[] = {
+ulong* ptr[] = {
 	NULL,
 	NULL,
 	NULL,
@@ -86,21 +85,21 @@ ULONG* ptr[] = {
 	OP_ALLANY_ELEMS
 };
 
-ULONG NUMS[] = {
+ulong NUMS[] = {
 	0,
 	0,
 	0,
 	0,
 	0,
 	0,
-	sizeof(OP_NOT_DIGIT_ELEMS) / sizeof(ULONG),
-	sizeof(OP_DIGIT_ELEMS) / sizeof(ULONG),
-	sizeof(OP_NOT_WHITESPACE_ELEMS) / sizeof(ULONG),
-	sizeof(OP_WHITESPACE_ELEMS) / sizeof(ULONG),
-	sizeof(OP_NOT_WORDCHAR_ELEMS) / sizeof(ULONG),
-	sizeof(OP_WORDCHAR_ELEMS) / sizeof(ULONG),
-	sizeof(OP_ANY_ELEMS) / sizeof(ULONG),
-	sizeof(OP_ALLANY_ELEMS) / sizeof(ULONG),
+	sizeof(OP_NOT_DIGIT_ELEMS) / sizeof(ulong),
+	sizeof(OP_DIGIT_ELEMS) / sizeof(ulong),
+	sizeof(OP_NOT_WHITESPACE_ELEMS) / sizeof(ulong),
+	sizeof(OP_WHITESPACE_ELEMS) / sizeof(ulong),
+	sizeof(OP_NOT_WORDCHAR_ELEMS) / sizeof(ulong),
+	sizeof(OP_WORDCHAR_ELEMS) / sizeof(ulong),
+	sizeof(OP_ANY_ELEMS) / sizeof(ulong),
+	sizeof(OP_ALLANY_ELEMS) / sizeof(ulong),
 };
 
 Fn FUNC[156] = 
@@ -352,13 +351,13 @@ enum PCRESIGN
 
 //void GenerateNFA(std::vector<PCRE> &vecPcres)
 //{
-//	ULONG count = 0;
-//	ULONG NotProcess = 0;
+//	ulong count = 0;
+//	ulong NotProcess = 0;
 //	for (std::vector<PCRE>::iterator i = vecPcres.begin(); i != vecPcres.end(); ++i)
 //	{
 //		std::cout << ++count << std::endl;
 //		CNfa nfa;
-//		std::vector<unsigned char>::iterator Beg, End;
+//		BYTEARY_ITER Beg, End;
 //		Beg = i->PcreCode.begin();
 //		End = i->PcreCode.end();
 //		if (!CanProcess(Beg, End))
@@ -376,9 +375,9 @@ enum PCRESIGN
 //	std::cout << "NotProcess number = " << NotProcess << std::endl;
 //}
 
-bool CanProcess(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End)
+bool CanProcess(BYTEARY_ITER &Beg, const BYTEARY_ITER &End)
 {
-	std::vector<unsigned char>::iterator start, end;
+	BYTEARY_ITER start, end;
 	for (;Beg != End;)
 	{
 		if (FUNC[*Beg] != NULL)
@@ -474,7 +473,7 @@ bool CanProcess(std::vector<unsigned char>::iterator &Beg, const std::vector<uns
 	return true;
 }
 
-void NextForCLASS(std::vector<unsigned char>::iterator &Beg)
+void NextForCLASS(BYTEARY_ITER &Beg)
 {
 	switch (*Beg)
 	{
@@ -509,34 +508,34 @@ void NextForCLASS(std::vector<unsigned char>::iterator &Beg)
 	}
 }
 
-ULONG ProcessPcre(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa)
+ulong ProcessPcre(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa)
 {
-	ULONG CurState = nfa.Size();
+	ulong CurState = nfa.Size();
 	bool ALTBeg = false;
 	std::vector<PCRESIGN> vecPath;
-	std::vector<ULONG> PreStates;
-	ULONG ALTPreBeg = CurState;
-	return Process(Beg, End, nfa, CurState, PreStates, ALTPreBeg, ALTBeg, ULONG(-1), false, false, false, vecPath);
+	std::vector<ulong> PreStates;
+	ulong ALTPreBeg = CurState;
+	return Process(Beg, End, nfa, CurState, PreStates, ALTPreBeg, ALTBeg, ulong(-1), false, false, false, vecPath);
 }
 
-ULONG Process(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, std::vector<ULONG> &PreStates, ULONG ALTPreBeg, bool &ALTBeg, ULONG ALTBeginState, bool bCBRA, bool bALT, bool bBRAZERO, std::vector<PCRESIGN> &vecPath)
+ulong Process(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, std::vector<ulong> &PreStates, ulong ALTPreBeg, bool &ALTBeg, ulong ALTBeginState, bool bCBRA, bool bALT, bool bBRAZERO, std::vector<PCRESIGN> &vecPath)
 {
-	std::vector<unsigned char>::iterator start, end;
-	ULONG CurPreState;
+	BYTEARY_ITER start, end;
+	ulong CurPreState;
 	if (PreStates.size() > 0)
 	{
 		CurPreState = PreStates.back();
 	}
 	else
 	{
-		CurPreState = ULONG(-1);
+		CurPreState = ulong(-1);
 	}
-	ULONG ALTPreState = ALTPreBeg;
+	ulong ALTPreState = ALTPreBeg;
 	bool IsCBRA = bCBRA;
 	bool IsALT = bALT;
 	bool IsBRAZERO = bBRAZERO;
-	ULONG ALTBegState = ALTBeginState;
-	ULONG flag = SC_SUCCESS;
+	ulong ALTBegState = ALTBeginState;
+	ulong flag = SC_SUCCESS;
 	for (;Beg != End;)
 	{
 		if (FUNC[*Beg] != NULL)
@@ -787,7 +786,7 @@ ULONG Process(std::vector<unsigned char>::iterator &Beg, const std::vector<unsig
 	return SC_SUCCESS;
 }
 
-void ProcessALT(CNfa &nfa, ULONG PreState, bool &ALTBegin, ULONG ALTBegState)
+void ProcessALT(CNfa &nfa, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 {
 	if (ALTBegin)
 	{
@@ -796,16 +795,16 @@ void ProcessALT(CNfa &nfa, ULONG PreState, bool &ALTBegin, ULONG ALTBegState)
 	}
 }
 
-ULONG OP_COMMON_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState)
+ulong OP_COMMON_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
-	ULONG nCursize = nfa.Size();
+	ulong nCursize = nfa.Size();
 	nfa.Resize(nCursize + 1);
 	++CurState;
-	ULONG* tmp = ptr[*Beg];
+	ulong* tmp = ptr[*Beg];
 
-	//std::cout << ULONG(*Beg) << " " << NUMS[*Beg] << std::endl;
-	for (ULONG i = 0; i < NUMS[*Beg]; ++i)
+	//std::cout << ulong(*Beg) << " " << NUMS[*Beg] << std::endl;
+	for (ulong i = 0; i < NUMS[*Beg]; ++i)
 	{
 		nfa.Back().AddDest(tmp[i], CurState);
 	}
@@ -813,20 +812,20 @@ ULONG OP_COMMON_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vecto
 	return SC_SUCCESS;
 }
 
-void OP_CIRCM_FUNC(CNfa &nfa, ULONG &CurState)
+void OP_CIRCM_FUNC(CNfa &nfa, ulong &CurState)
 {
-	ULONG nCursize = nfa.Size();
+	ulong nCursize = nfa.Size();
 	nfa.Resize(nCursize + 3);
 	nfa[nCursize].AddDest(EMPTY, CurState + 1);
 	nfa[nCursize].AddDest(EMPTY, CurState + 3);
 	++CurState;
 
 	++nCursize;
-	for (ULONG i = 0; i < 256; ++i)
+	for (ulong i = 0; i < 256; ++i)
 	{
 		nfa[nCursize].AddDest(i, CurState);
 	}
-	//for (ULONG i = 0; i < 10; ++i)
+	//for (ulong i = 0; i < 10; ++i)
 	//{
 	//	nfa[nCursize].AddDest(i, CurState);
 	//}
@@ -835,21 +834,21 @@ void OP_CIRCM_FUNC(CNfa &nfa, ULONG &CurState)
 	nfa[nCursize].AddDest('\r', CurState + 2);
 	//nfa[nCursize].AddDest(11, CurState);
 	//nfa[nCursize].AddDest(12, CurState);
-	//for (ULONG i = 14; i < 256; ++i)
+	//for (ulong i = 14; i < 256; ++i)
 	//{
 	//	nfa[nCursize].AddDest(i, CurState);
 	//}
 	CurState += 2;
 	nfa[nCursize + 1].AddDest('\r', CurState);
 
-//	ULONG nCursize = nfa.Size();
+//	ulong nCursize = nfa.Size();
 //	nfa.Resize(nCursize + 3);
 //	nfa[nCursize].AddDest(EMPTY, CurState + 1);
 //	nfa[nCursize].AddDest(EMPTY, CurState + 3);
 //	++CurState;
 //
 //	++nCursize;
-//	for (ULONG i = 0; i < 10; ++i)
+//	for (ulong i = 0; i < 10; ++i)
 //	{
 //		nfa[nCursize].AddDest(i, CurState);
 //	}
@@ -858,7 +857,7 @@ void OP_CIRCM_FUNC(CNfa &nfa, ULONG &CurState)
 //	nfa[nCursize].AddDest('\r', CurState + 2);
 //	nfa[nCursize].AddDest(11, CurState);
 //	nfa[nCursize].AddDest(12, CurState);
-//	for (ULONG i = 14; i < 256; ++i)
+//	for (ulong i = 14; i < 256; ++i)
 //	{
 //		nfa[nCursize].AddDest(i, CurState);
 //	}
@@ -867,24 +866,24 @@ void OP_CIRCM_FUNC(CNfa &nfa, ULONG &CurState)
 }
 
 
-ULONG OP_CHAR_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState)
+ulong OP_CHAR_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
 	++CurState;
-	ULONG nCursize = nfa.Size();
+	ulong nCursize = nfa.Size();
 	nfa.Resize(nCursize + 1);
 	nfa.Back().AddDest(*(Beg + 1), CurState);
 
 	return SC_SUCCESS;
 }
 
-ULONG OP_CHARI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState)
+ulong OP_CHARI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
-	ULONG nCursize = nfa.Size();
+	ulong nCursize = nfa.Size();
 	nfa.Resize(nCursize + 1);
 	++CurState;
-	unsigned char c = *(Beg + 1);
+	byte c = *(Beg + 1);
 	if (isalpha(c))
 	{
 		nfa.Back().AddDest(tolower(c), CurState);
@@ -898,14 +897,14 @@ ULONG OP_CHARI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector
 	return SC_SUCCESS;
 }
 
-ULONG OP_NOT_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState)
+ulong OP_NOT_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
-	ULONG nCursize = nfa.Size();
+	ulong nCursize = nfa.Size();
 	nfa.Resize(nCursize + 1);
 	++CurState;
-	unsigned char c = *(Beg + 1);
-	for (ULONG j = 0; j < 256; ++j)
+	byte c = *(Beg + 1);
+	for (ulong j = 0; j < 256; ++j)
 	{
 		if (j != c)
 		{
@@ -916,16 +915,16 @@ ULONG OP_NOT_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<u
 	return SC_SUCCESS;
 }
 
-ULONG OP_NOTI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState)
+ulong OP_NOTI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
-	ULONG nCursize = nfa.Size();
+	ulong nCursize = nfa.Size();
 	nfa.Resize(nCursize + 1);
 	++CurState;
-	unsigned char c = *(Beg + 1);
-	for (ULONG j = 0; j < 256; ++j)
+	byte c = *(Beg + 1);
+	for (ulong j = 0; j < 256; ++j)
 	{
-		if (j != (ULONG)tolower(c) && j != (ULONG)toupper(c))
+		if (j != (ulong)tolower(c) && j != (ulong)toupper(c))
 		{
 			nfa.Back().AddDest(j, CurState);
 		}
@@ -934,10 +933,10 @@ ULONG OP_NOTI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<
 	return SC_SUCCESS;
 }
 
-ULONG OP_STAR_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState)
+ulong OP_STAR_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
-	ULONG nCursize = nfa.Size();
+	ulong nCursize = nfa.Size();
 	nfa.Resize(nCursize + 1);
 	nfa.Back().AddDest(*(Beg + 1), CurState);
 	++CurState;
@@ -946,10 +945,10 @@ ULONG OP_STAR_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<
 	return SC_SUCCESS;
 }
 
-ULONG OP_PLUS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState)
+ulong OP_PLUS_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
-	ULONG nCursize = nfa.Size();
+	ulong nCursize = nfa.Size();
 	nfa.Resize(nCursize + 2);
 	++CurState;
 	nfa[nCursize].AddDest(*(Beg + 1), CurState);
@@ -960,10 +959,10 @@ ULONG OP_PLUS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<
 	return SC_SUCCESS;
 }
 
-ULONG OP_QUERY_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState)
+ulong OP_QUERY_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
-	ULONG nCursize = nfa.Size();
+	ulong nCursize = nfa.Size();
 	nfa.Resize(nCursize + 1);
 	++CurState;
 	nfa.Back().AddDest(*(Beg + 1), CurState);
@@ -972,19 +971,19 @@ ULONG OP_QUERY_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector
 	return SC_SUCCESS;
 }
 
-ULONG OP_UPTO_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState)
+ulong OP_UPTO_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
 
-	ULONG count = GET(Beg + 1);
+	ulong count = GET(Beg + 1);
 	if (count > SC_LIMIT)
 	{
 		return SC_EXCEED;
 	}
-	ULONG nCursize = nfa.Size();
+	ulong nCursize = nfa.Size();
 	nfa.Resize(nCursize + count);
-	unsigned char c = *(Beg + 3);
-	for (ULONG i = 0; i < count; ++i)
+	byte c = *(Beg + 3);
+	for (ulong i = 0; i < count; ++i)
 	{
 		nfa[nCursize + i].AddDest(EMPTY, CurState - i + count);
 		++CurState;
@@ -994,18 +993,18 @@ ULONG OP_UPTO_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<
 	return SC_SUCCESS;
 }
 
-ULONG OP_EXACT_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState)
+ulong OP_EXACT_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
-	ULONG count = GET(Beg + 1);
+	ulong count = GET(Beg + 1);
 	if (count > SC_LIMIT)
 	{
 		return SC_EXCEED;
 	}
-	ULONG nCursize = nfa.Size();
+	ulong nCursize = nfa.Size();
 	nfa.Resize(nCursize + count);
-	unsigned char c = *(Beg + 3);
-	for (ULONG i = 0; i < count; ++i)
+	byte c = *(Beg + 3);
+	for (ulong i = 0; i < count; ++i)
 	{
 		++CurState;
 		nfa[nCursize + i].AddDest(c, CurState);
@@ -1014,12 +1013,12 @@ ULONG OP_EXACT_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector
 	return SC_SUCCESS;
 }
 
-ULONG OP_STARI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState)
+ulong OP_STARI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
-	ULONG nCursize = nfa.Size();
+	ulong nCursize = nfa.Size();
 	nfa.Resize(nCursize + 1);
-	unsigned char c = *(Beg + 1);
+	byte c = *(Beg + 1);
 	if (isalpha(c))
 	{
 		nfa.Back().AddDest(tolower(c), CurState);
@@ -1035,12 +1034,12 @@ ULONG OP_STARI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector
 	return SC_SUCCESS;
 }
 
-ULONG OP_PLUSI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState)
+ulong OP_PLUSI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
-	ULONG nCursize = nfa.Size();
+	ulong nCursize = nfa.Size();
 	nfa.Resize(nCursize + 2);
-	unsigned char c = *(Beg + 1);
+	byte c = *(Beg + 1);
 	++CurState;
 	if (isalpha(c))
 	{
@@ -1066,12 +1065,12 @@ ULONG OP_PLUSI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector
 	return SC_SUCCESS;
 }
 
-ULONG OP_QUERYI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState)
+ulong OP_QUERYI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
-	ULONG nCursize = nfa.Size();
+	ulong nCursize = nfa.Size();
 	nfa.Resize(nCursize + 1);
-	unsigned char c = *(Beg + 1);
+	byte c = *(Beg + 1);
 	++CurState;
 	if (isalpha(c))
 	{
@@ -1087,19 +1086,19 @@ ULONG OP_QUERYI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vecto
 	return SC_SUCCESS;
 }
 
-ULONG OP_UPTOI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState)
+ulong OP_UPTOI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
 
-	ULONG count = GET(Beg + 1);
+	ulong count = GET(Beg + 1);
 	if (count > SC_LIMIT)
 	{
 		return SC_EXCEED;
 	}
-	ULONG nCursize = nfa.Size();
+	ulong nCursize = nfa.Size();
 	nfa.Resize(nCursize + count);
-	unsigned char c = *(Beg + 3);
-	for (ULONG i = 0; i < count; ++i)
+	byte c = *(Beg + 3);
+	for (ulong i = 0; i < count; ++i)
 	{
 		nfa[nCursize + i].AddDest(EMPTY, CurState - i + count);
 		++CurState;
@@ -1117,18 +1116,18 @@ ULONG OP_UPTOI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector
 	return SC_SUCCESS;
 }
 
-ULONG OP_EXACTI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState)
+ulong OP_EXACTI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
-	ULONG count = GET(Beg + 1);
+	ulong count = GET(Beg + 1);
 	if (count > SC_LIMIT)
 	{
 		return SC_EXCEED;
 	}
-	ULONG nCursize = nfa.Size();
+	ulong nCursize = nfa.Size();
 	nfa.Resize(nCursize + count);
-	unsigned char c = *(Beg + 3);
-	for (ULONG i = 0; i < count; ++i)
+	byte c = *(Beg + 3);
+	for (ulong i = 0; i < count; ++i)
 	{
 		++CurState;
 		if (isalpha(c))
@@ -1145,13 +1144,13 @@ ULONG OP_EXACTI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vecto
 	return SC_SUCCESS;
 }
 
-ULONG OP_NOTSTAR_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState)
+ulong OP_NOTSTAR_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
-	ULONG nCursize = nfa.Size();
+	ulong nCursize = nfa.Size();
 	nfa.Resize(nCursize + 1);
-	unsigned char c = *(Beg + 1);
-	for (ULONG i = 0; i < 256; ++i)
+	byte c = *(Beg + 1);
+	for (ulong i = 0; i < 256; ++i)
 	{
 		if (i != c)
 		{
@@ -1164,14 +1163,14 @@ ULONG OP_NOTSTAR_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vect
 	return SC_SUCCESS;
 }
 
-ULONG OP_NOTPLUS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState)
+ulong OP_NOTPLUS_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
-	ULONG nCursize = nfa.Size();
+	ulong nCursize = nfa.Size();
 	nfa.Resize(nCursize + 2);
-	unsigned char c = *(Beg + 1);
+	byte c = *(Beg + 1);
 	++CurState;
-	for (ULONG i = 0; i < 256; ++i)
+	for (ulong i = 0; i < 256; ++i)
 	{
 		if (i != c)
 		{
@@ -1185,14 +1184,14 @@ ULONG OP_NOTPLUS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vect
 	return SC_SUCCESS;
 }
 
-ULONG OP_NOTQUERY_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState)
+ulong OP_NOTQUERY_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
-	ULONG nCursize = nfa.Size();
+	ulong nCursize = nfa.Size();
 	nfa.Resize(nCursize + 1);
-	unsigned char c = *(Beg + 1);
+	byte c = *(Beg + 1);
 	++CurState;
-	for (ULONG i = 0; i < 256; ++i)
+	for (ulong i = 0; i < 256; ++i)
 	{
 		if (i != c)
 		{
@@ -1204,22 +1203,22 @@ ULONG OP_NOTQUERY_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vec
 	return SC_SUCCESS;
 }
 
-ULONG OP_NOTUPTO_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState)
+ulong OP_NOTUPTO_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
-	ULONG count = GET(Beg + 1);
+	ulong count = GET(Beg + 1);
 	if (count > SC_LIMIT)
 	{
 		return SC_EXCEED;
 	}
-	ULONG nCursize = nfa.Size();
+	ulong nCursize = nfa.Size();
 	nfa.Resize(nCursize + count);
-	unsigned char c = *(Beg + 3);
-	for (ULONG i = 0; i < count; ++i)
+	byte c = *(Beg + 3);
+	for (ulong i = 0; i < count; ++i)
 	{
 		nfa[nCursize + i].AddDest(EMPTY, CurState - i + count);
 		++CurState;
-		for (ULONG j = 0; j < 256; ++j)
+		for (ulong j = 0; j < 256; ++j)
 		{
 			if (j != c)
 			{
@@ -1231,21 +1230,21 @@ ULONG OP_NOTUPTO_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vect
 	return SC_SUCCESS;
 }
 
-ULONG OP_NOTEXACT_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState)
+ulong OP_NOTEXACT_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
-	ULONG count = GET(Beg + 1);
+	ulong count = GET(Beg + 1);
 	if (count > SC_LIMIT)
 	{
 		return SC_EXCEED;
 	}
-	ULONG nCursize = nfa.Size();
+	ulong nCursize = nfa.Size();
 	nfa.Resize(nCursize + count);
-	unsigned char c = *(Beg + 3);
-	for (ULONG i = 0; i < count; ++i)
+	byte c = *(Beg + 3);
+	for (ulong i = 0; i < count; ++i)
 	{
 		++CurState;
-		for (ULONG j = 0; j < 256; ++j)
+		for (ulong j = 0; j < 256; ++j)
 		{
 			if (j != c)
 			{
@@ -1257,15 +1256,15 @@ ULONG OP_NOTEXACT_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vec
 	return SC_SUCCESS;
 }
 
-ULONG OP_NOTSTARI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState)
+ulong OP_NOTSTARI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
-	ULONG nCursize = nfa.Size();
+	ulong nCursize = nfa.Size();
 	nfa.Resize(nCursize + 1);
-	unsigned char c = *(Beg + 1);
-	for (ULONG i = 0; i < 256; ++i)
+	byte c = *(Beg + 1);
+	for (ulong i = 0; i < 256; ++i)
 	{
-		if (i != (ULONG)tolower(c) && i != (ULONG)toupper(c))
+		if (i != (ulong)tolower(c) && i != (ulong)toupper(c))
 		{
 			nfa.Back().AddDest(i, CurState);
 		}
@@ -1276,16 +1275,16 @@ ULONG OP_NOTSTARI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vec
 	return SC_SUCCESS;
 }
 
-ULONG OP_NOTPLUSI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState)
+ulong OP_NOTPLUSI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
-	ULONG nCursize = nfa.Size();
+	ulong nCursize = nfa.Size();
 	nfa.Resize(nCursize + 2);
 	++CurState;
-	unsigned char c = *(Beg + 1);
-	for (ULONG i = 0; i < 256; ++i)
+	byte c = *(Beg + 1);
+	for (ulong i = 0; i < 256; ++i)
 	{
-		if (i != (ULONG)tolower(c) && i != (ULONG)toupper(c))
+		if (i != (ulong)tolower(c) && i != (ulong)toupper(c))
 		{
 			nfa[nCursize].AddDest(i, CurState);
 			nfa.Back().AddDest(i, CurState);
@@ -1297,16 +1296,16 @@ ULONG OP_NOTPLUSI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vec
 	return SC_SUCCESS;
 }
 
-ULONG OP_NOTQUERYI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState)
+ulong OP_NOTQUERYI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
-	ULONG nCursize = nfa.Size();
+	ulong nCursize = nfa.Size();
 	nfa.Resize(nCursize + 1);
 	++CurState;
-	unsigned char c = *(Beg + 1);
-	for (ULONG i = 0; i < 256; ++i)
+	byte c = *(Beg + 1);
+	for (ulong i = 0; i < 256; ++i)
 	{
-		if (i != (ULONG)tolower(c) && i != (ULONG)toupper(c))
+		if (i != (ulong)tolower(c) && i != (ulong)toupper(c))
 		{
 			nfa.Back().AddDest(i, CurState);
 		}
@@ -1316,24 +1315,24 @@ ULONG OP_NOTQUERYI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::ve
 	return SC_SUCCESS;
 }
 
-ULONG OP_NOTUPTOI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState)
+ulong OP_NOTUPTOI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
-	ULONG count = GET(Beg + 1);
+	ulong count = GET(Beg + 1);
 	if (count > SC_LIMIT)
 	{
 		return SC_EXCEED;
 	}
-	ULONG nCursize = nfa.Size();
+	ulong nCursize = nfa.Size();
 	nfa.Resize(nCursize + count);
-	unsigned char c = *(Beg + 3);
-	for (ULONG i = 0; i < count; ++i)
+	byte c = *(Beg + 3);
+	for (ulong i = 0; i < count; ++i)
 	{
 		nfa[nCursize + i].AddDest(EMPTY, CurState - i + count);
 		++CurState;
-		for (ULONG j = 0; j < 256; ++j)
+		for (ulong j = 0; j < 256; ++j)
 		{
-			if (j != (ULONG)tolower(c) && j != (ULONG)toupper(c))
+			if (j != (ulong)tolower(c) && j != (ulong)toupper(c))
 			{
 				nfa[nCursize + i].AddDest(j, CurState);
 			}
@@ -1343,23 +1342,23 @@ ULONG OP_NOTUPTOI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vec
 	return SC_SUCCESS;
 }
 
-ULONG OP_NOTEXACTI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState)
+ulong OP_NOTEXACTI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
-	ULONG count = GET(Beg + 1);
+	ulong count = GET(Beg + 1);
 	if (count > SC_LIMIT)
 	{
 		return SC_EXCEED;
 	}
-	ULONG nCursize = nfa.Size();
+	ulong nCursize = nfa.Size();
 	nfa.Resize(nCursize + count);
-	unsigned char c = *(Beg + 3);
-	for (ULONG i = 0; i < count; ++i)
+	byte c = *(Beg + 3);
+	for (ulong i = 0; i < count; ++i)
 	{
 		++CurState;
-		for (ULONG j = 0; j < 256; ++j)
+		for (ulong j = 0; j < 256; ++j)
 		{
-			if (j != (ULONG)tolower(c) && j != (ULONG)toupper(c))
+			if (j != (ulong)tolower(c) && j != (ulong)toupper(c))
 			{
 				nfa[nCursize + i].AddDest(j, CurState);
 			}
@@ -1369,17 +1368,17 @@ ULONG OP_NOTEXACTI_FUNC(std::vector<unsigned char>::iterator &Beg, const std::ve
 	return SC_SUCCESS;
 }
 
-ULONG OP_TYPESTAR_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState)
+ulong OP_TYPESTAR_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
-	unsigned char c = *(Beg + 1);
-	if (c < sizeof(NUMS) / sizeof(ULONG) && ptr[c] != NULL)
+	byte c = *(Beg + 1);
+	if (c < sizeof(NUMS) / sizeof(ulong) && ptr[c] != NULL)
 	{
-		ULONG nCursize = nfa.Size();
+		ulong nCursize = nfa.Size();
 		nfa.Resize(nCursize + 1);
-		ULONG Cnt = NUMS[c];
-		ULONG* tmp = ptr[c];
-		for (ULONG i = 0; i < Cnt; ++i)
+		ulong Cnt = NUMS[c];
+		ulong* tmp = ptr[c];
+		for (ulong i = 0; i < Cnt; ++i)
 		{
 			nfa.Back().AddDest(*(tmp + i), CurState);
 		}
@@ -1390,18 +1389,18 @@ ULONG OP_TYPESTAR_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vec
 	return SC_SUCCESS;
 }
 
-ULONG OP_TYPEPLUS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState)
+ulong OP_TYPEPLUS_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
-	unsigned char c = *(Beg + 1);
-	if (c < sizeof(NUMS) / sizeof(ULONG) && ptr[c] != NULL)
+	byte c = *(Beg + 1);
+	if (c < sizeof(NUMS) / sizeof(ulong) && ptr[c] != NULL)
 	{
-		ULONG nCursize = nfa.Size();
+		ulong nCursize = nfa.Size();
 		nfa.Resize(nCursize + 2);
 		++CurState;
-		ULONG Cnt = NUMS[c];
-		ULONG* tmp = ptr[c];
-		for (ULONG i = 0; i < Cnt; ++i)
+		ulong Cnt = NUMS[c];
+		ulong* tmp = ptr[c];
+		for (ulong i = 0; i < Cnt; ++i)
 		{
 			nfa[nCursize].AddDest(*(tmp + i), CurState);
 			nfa.Back().AddDest(*(tmp + i), CurState);
@@ -1413,18 +1412,18 @@ ULONG OP_TYPEPLUS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vec
 	return SC_SUCCESS;
 }
 
-ULONG OP_TYPEQUERY_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState)
+ulong OP_TYPEQUERY_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
-	unsigned char c = *(Beg + 1);
-	if (c < sizeof(NUMS) / sizeof(ULONG) && ptr[c] != NULL)
+	byte c = *(Beg + 1);
+	if (c < sizeof(NUMS) / sizeof(ulong) && ptr[c] != NULL)
 	{
-		ULONG nCursize = nfa.Size();
+		ulong nCursize = nfa.Size();
 		nfa.Resize(nCursize + 1);
 		++CurState;
-		ULONG Cnt = NUMS[c];
-		ULONG* tmp = ptr[c];
-		for (ULONG i = 0; i < Cnt; ++i)
+		ulong Cnt = NUMS[c];
+		ulong* tmp = ptr[c];
+		for (ulong i = 0; i < Cnt; ++i)
 		{
 			nfa.Back().AddDest(*(tmp + i), CurState);
 		}
@@ -1434,20 +1433,20 @@ ULONG OP_TYPEQUERY_FUNC(std::vector<unsigned char>::iterator &Beg, const std::ve
 	return SC_SUCCESS;
 }
 
-ULONG OP_TYPEUPTO_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState)
+ulong OP_TYPEUPTO_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
-	ULONG count = GET(Beg + 1);
+	ulong count = GET(Beg + 1);
 	if (count > SC_LIMIT)
 	{
 		return SC_EXCEED;
 	}
 	bool ALTBeg = ALTBegin;
-	unsigned char c = *(Beg + 3);
+	byte c = *(Beg + 3);
 	if (c >=OP_NOT_DIGIT && c <= OP_ALLANY  && FUNC[c] != NULL)
 	{
-		std::vector<unsigned char>::iterator tmpBeg = Beg + 3;
-		for (ULONG i = 0; i < count; ++i)
+		BYTEARY_ITER tmpBeg = Beg + 3;
+		for (ulong i = 0; i < count; ++i)
 		{
 			FUNC[c](tmpBeg, End, nfa, CurState, PreState, ALTBeg, ALTBegState);
 			nfa.Back().AddDest(EMPTY, CurState - 1 + count - i);
@@ -1457,21 +1456,21 @@ ULONG OP_TYPEUPTO_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vec
 	return SC_SUCCESS;
 }
 
-ULONG OP_TYPEEXACT_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState)
+ulong OP_TYPEEXACT_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
-	ULONG count = GET(Beg + 1);
+	ulong count = GET(Beg + 1);
 	if (count > SC_LIMIT)
 	{
 		return SC_EXCEED;
 	}
 	bool ALTBeg = ALTBegin;
-	unsigned char c = *(Beg + 3);
+	byte c = *(Beg + 3);
 	if (c >=OP_NOT_DIGIT && c <= OP_ALLANY  && FUNC[c] != NULL)
 	{
-		std::vector<unsigned char>::iterator tmpBeg = Beg + 3;
+		BYTEARY_ITER tmpBeg = Beg + 3;
 
-		for (ULONG i = 0; i < count; ++i)
+		for (ulong i = 0; i < count; ++i)
 		{
 			FUNC[c](tmpBeg, End, nfa, CurState, PreState, ALTBeg, ALTBegState);
 		}
@@ -1480,16 +1479,16 @@ ULONG OP_TYPEEXACT_FUNC(std::vector<unsigned char>::iterator &Beg, const std::ve
 	return SC_SUCCESS;
 }
 
-ULONG OP_CLASS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState)
+ulong OP_CLASS_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
-	ULONG nCursize = nfa.Size();
+	ulong nCursize = nfa.Size();
 	nfa.Resize(nCursize + 1);
 	CNfaRow Row;
-	ULONG tmp = CurState + 1;
-	for (ULONG i = 0; i < 32; ++i)
+	ulong tmp = CurState + 1;
+	for (ulong i = 0; i < 32; ++i)
 	{
-		for (ULONG j = 0; j < 8; ++j)
+		for (ulong j = 0; j < 8; ++j)
 		{
 			if (*(Beg + i + 1) & 1 << j)
 			{
@@ -1499,14 +1498,14 @@ ULONG OP_CLASS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector
 		}
 	}
 	Beg += Steps[OP_CLASS];
-	ULONG min, max;
+	ulong min, max;
 
 	switch (*Beg)
 	{
 	case OP_CRSTAR:
-		for (ULONG i = 0; i < SC_CHARSETSIZE; ++i)
+		for (ulong i = 0; i < SC_CHARSETSIZE; ++i)
 		{
-			for (ULONG j = 0; j < nfa.Back().DestCnt(i); ++j)
+			for (ulong j = 0; j < nfa.Back().DestCnt(i); ++j)
 			{
 				if (nfa.Back().GetDest(i, j) == CurState + 1)
 				{
@@ -1519,9 +1518,9 @@ ULONG OP_CLASS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector
 		Beg += Steps[OP_CRSTAR];
 		break;
 	case OP_CRMINSTAR:
-		for (ULONG i = 0; i < SC_CHARSETSIZE; ++i)
+		for (ulong i = 0; i < SC_CHARSETSIZE; ++i)
 		{
-			for (ULONG j = 0; j < nfa.Back().DestCnt(i); ++j)
+			for (ulong j = 0; j < nfa.Back().DestCnt(i); ++j)
 			{
 				if (nfa.Back().GetDest(i, j) == CurState + 1)
 				{
@@ -1563,7 +1562,7 @@ ULONG OP_CLASS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector
 		}
 		nfa.PopBack();
 		nfa.Resize(nCursize + min);
-		for (ULONG i = 0; i < min; ++i)
+		for (ulong i = 0; i < min; ++i)
 		{
 			Copy(nfa[nCursize + i], Row, i);
 			++CurState;
@@ -1571,7 +1570,7 @@ ULONG OP_CLASS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector
 		if (max == 0)
 		{
 			nfa.Resize(nCursize + min + 1);
-			for (ULONG i = 0; i < SC_CHARSETSIZE; ++i)
+			for (ulong i = 0; i < SC_CHARSETSIZE; ++i)
 			{
 				if (Row.DestCnt(i) == 1)
 				{
@@ -1584,8 +1583,8 @@ ULONG OP_CLASS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector
 		else
 		{
 			nfa.Resize(nCursize + max);
-			ULONG nDiff = max - min, nBeg = nCursize + min;
-			for (ULONG i = 0; i < nDiff; ++i)
+			ulong nDiff = max - min, nBeg = nCursize + min;
+			for (ulong i = 0; i < nDiff; ++i)
 			{
 				Copy(nfa[nBeg + i], Row, min + i);
 				nfa[nBeg + i].AddDest(EMPTY, CurState - i + nDiff);
@@ -1602,36 +1601,36 @@ ULONG OP_CLASS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector
 	return SC_SUCCESS;
 }
 
-ULONG OP_NCLASS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState, ULONG PreState, bool &ALTBegin, ULONG ALTBegState)
+ulong OP_NCLASS_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
-	ULONG nCursize = nfa.Size();
+	ulong nCursize = nfa.Size();
 	nfa.Resize(nCursize + 1);
 	CNfaRow Row;
-	ULONG tmp = CurState + 1;
-	for (ULONG i = 0; i < 32; ++i)
+	ulong tmp = CurState + 1;
+	for (ulong i = 0; i < 32; ++i)
 	{
-		for (ULONG j = 0; j < 8; ++j)
+		for (ulong j = 0; j < 8; ++j)
 		{
 			if (*(Beg + i + 1) & 1 << j)
 			{
-				ULONG nCol = i * 8 + j;
+				ulong nCol = i * 8 + j;
 				nfa.Back().AddDest(nCol, tmp);
 				Row.AddDest(nCol, tmp);
 			}
 		}
 	}
 	Beg += Steps[OP_CLASS];
-	ULONG min, max;
+	ulong min, max;
 	switch (*Beg)
 	{
 	case OP_CRSTAR:
-		for (ULONG i = 0; i < SC_CHARSETSIZE; ++i)
+		for (ulong i = 0; i < SC_CHARSETSIZE; ++i)
 		{
-			ULONG nCnt = nfa.Back().DestCnt(i);
-			for (ULONG j = 0; j < nCnt; ++j)
+			ulong nCnt = nfa.Back().DestCnt(i);
+			for (ulong j = 0; j < nCnt; ++j)
 			{
-				ULONG &nSta = nfa.Back().GetDest(i, j);
+				ulong &nSta = nfa.Back().GetDest(i, j);
 				if (nSta == CurState + 1)
 				{
 					nSta = CurState;
@@ -1643,12 +1642,12 @@ ULONG OP_NCLASS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vecto
 		Beg += Steps[OP_CRSTAR];
 		break;
 	case OP_CRMINSTAR:
-		for (ULONG i = 0; i < SC_CHARSETSIZE; ++i)
+		for (ulong i = 0; i < SC_CHARSETSIZE; ++i)
 		{
-			ULONG nCnt = nfa.Back().DestCnt(i);
-			for (ULONG j = 0; j < nCnt; ++j)
+			ulong nCnt = nfa.Back().DestCnt(i);
+			for (ulong j = 0; j < nCnt; ++j)
 			{
-				ULONG &nSta = nfa.Back().GetDest(i, j);
+				ulong &nSta = nfa.Back().GetDest(i, j);
 				if (nSta == CurState + 1)
 				{
 					nSta = CurState;
@@ -1689,7 +1688,7 @@ ULONG OP_NCLASS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vecto
 		}
 		nfa.PopBack();
 		nfa.Resize(nCursize + min);
-		for (ULONG i = 0; i < min; ++i)
+		for (ulong i = 0; i < min; ++i)
 		{
 			Copy(nfa[nCursize + i], Row, i);
 			++CurState;
@@ -1697,7 +1696,7 @@ ULONG OP_NCLASS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vecto
 		if (max == 0)
 		{
 			nfa.Resize(nCursize + min + 1);
-			for (ULONG i = 0; i < SC_CHARSETSIZE; ++i)
+			for (ulong i = 0; i < SC_CHARSETSIZE; ++i)
 			{
 				if (Row.DestCnt(i) == 1)
 				{
@@ -1710,9 +1709,9 @@ ULONG OP_NCLASS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vecto
 		else
 		{
 			nfa.Resize(nCursize + max);
-			for (ULONG i = 0; i < max - min; ++i)
+			for (ulong i = 0; i < max - min; ++i)
 			{
-				ULONG nCnt = min + i;
+				ulong nCnt = min + i;
 				Copy(nfa[nCursize + nCnt], Row, nCnt);
 				nfa[nCursize + nCnt].AddDest(EMPTY, CurState + max - nCnt);
 				++CurState;
@@ -1728,17 +1727,17 @@ ULONG OP_NCLASS_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vecto
 	return SC_SUCCESS;
 }
 
-void OP_ALT_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG PreState, ULONG &CurState)
+void OP_ALT_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong PreState, ulong &CurState)
 {
-	for (ULONG i = PreState; i < nfa.Size(); ++i)
+	for (ulong i = PreState; i < nfa.Size(); ++i)
 	{
 		CNfaRow &row = nfa[i];
-		for (ULONG j = 0; j < SC_CHARSETSIZE; ++j)
+		for (ulong j = 0; j < SC_CHARSETSIZE; ++j)
 		{
-			ULONG nCnt = row.DestCnt(j);
-			for (ULONG k = 0; k < nCnt; ++k)
+			ulong nCnt = row.DestCnt(j);
+			for (ulong k = 0; k < nCnt; ++k)
 			{
-				ULONG &nSta = row.GetDest(j, k);
+				ulong &nSta = row.GetDest(j, k);
 				if (nSta == CurState)
 				{
 					nSta = MAX;
@@ -1752,7 +1751,7 @@ void OP_ALT_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<un
 	}
 }
 
-void OP_KET_FUNC(CNfa &nfa, ULONG PreState, ULONG &CurState, bool IsALT, bool IsBRAZERO)
+void OP_KET_FUNC(CNfa &nfa, ulong PreState, ulong &CurState, bool IsALT, bool IsBRAZERO)
 {
 	if (IsBRAZERO)
 	{
@@ -1760,15 +1759,15 @@ void OP_KET_FUNC(CNfa &nfa, ULONG PreState, ULONG &CurState, bool IsALT, bool Is
 	}
 	if (IsALT)
 	{
-		for (ULONG i = PreState; i < nfa.Size(); ++i)
+		for (ulong i = PreState; i < nfa.Size(); ++i)
 		{
 			CNfaRow &row = nfa[i];
-			for (ULONG j = 0; j < SC_CHARSETSIZE; ++j)
+			for (ulong j = 0; j < SC_CHARSETSIZE; ++j)
 			{
-				ULONG nCnt = row.DestCnt(j);
-				for (ULONG k = 0; k < nCnt; ++k)
+				ulong nCnt = row.DestCnt(j);
+				for (ulong k = 0; k < nCnt; ++k)
 				{
-					ULONG &nSta = row.GetDest(j, k);
+					ulong &nSta = row.GetDest(j, k);
 					if (nSta == MAX)
 					{
 						nSta = CurState;
@@ -1779,19 +1778,19 @@ void OP_KET_FUNC(CNfa &nfa, ULONG PreState, ULONG &CurState, bool IsALT, bool Is
 	}
 }
 
-void OP_KETRMAX_FUNC(CNfa &nfa, ULONG PreState, ULONG &CurState, bool IsBRAZERO, bool IsALT)
+void OP_KETRMAX_FUNC(CNfa &nfa, ulong PreState, ulong &CurState, bool IsBRAZERO, bool IsALT)
 {
 	if (IsALT)
 	{
-		for (ULONG i = PreState; i < nfa.Size(); ++i)
+		for (ulong i = PreState; i < nfa.Size(); ++i)
 		{
 			CNfaRow &row = nfa[i];
-			for (ULONG j = 0; j < SC_CHARSETSIZE; ++j)
+			for (ulong j = 0; j < SC_CHARSETSIZE; ++j)
 			{
-				ULONG nCnt = row.DestCnt(j);
-				for (ULONG k = 0; k < nCnt; ++k)
+				ulong nCnt = row.DestCnt(j);
+				for (ulong k = 0; k < nCnt; ++k)
 				{
-					ULONG &nSta = row.GetDest(j, k);
+					ulong &nSta = row.GetDest(j, k);
 					if (nSta == MAX)
 					{
 						nSta = CurState;
@@ -1802,15 +1801,15 @@ void OP_KETRMAX_FUNC(CNfa &nfa, ULONG PreState, ULONG &CurState, bool IsBRAZERO,
 	}
 	if (IsBRAZERO)
 	{
-		for (ULONG i = PreState; i < nfa.Size(); ++i)
+		for (ulong i = PreState; i < nfa.Size(); ++i)
 		{
 			CNfaRow &row = nfa[i];
-			for (ULONG j = 0; j < SC_CHARSETSIZE; ++j)
+			for (ulong j = 0; j < SC_CHARSETSIZE; ++j)
 			{
-				ULONG nCnt = row.DestCnt(j);
-				for (ULONG k = 0; k < nCnt; ++k)
+				ulong nCnt = row.DestCnt(j);
+				for (ulong k = 0; k < nCnt; ++k)
 				{
-					ULONG &nSta = row.GetDest(j, k);
+					ulong &nSta = row.GetDest(j, k);
 					if (nSta == CurState)
 					{
 						nSta = PreState;
@@ -1823,31 +1822,31 @@ void OP_KETRMAX_FUNC(CNfa &nfa, ULONG PreState, ULONG &CurState, bool IsBRAZERO,
 	}
 	else
 	{
-		ULONG nCursize = nfa.Size();
+		ulong nCursize = nfa.Size();
 		nfa.Resize(nCursize + nCursize - PreState);
-		ULONG StartState = CurState;
-		for (ULONG i = PreState; i < nCursize; ++i)
+		ulong StartState = CurState;
+		for (ulong i = PreState; i < nCursize; ++i)
 		{
 			CNfaRow &row = nfa[i];
-			for (ULONG j = 0; j < SC_CHARSETSIZE; ++j)
+			for (ulong j = 0; j < SC_CHARSETSIZE; ++j)
 			{
-				ULONG nCnt = row.DestCnt(j);
-				for (ULONG k = 0; k < nCnt; ++k)
+				ulong nCnt = row.DestCnt(j);
+				for (ulong k = 0; k < nCnt; ++k)
 				{
 					nfa[nCursize + i - PreState].AddDest(j, CurState + row.GetDest(j, k) - i);
 				}
 			}
 			++CurState;
 		}
-		for (ULONG i = StartState; i < nfa.Size(); ++i)
+		for (ulong i = StartState; i < nfa.Size(); ++i)
 		{
 			CNfaRow &row = nfa[i];
-			for (ULONG j = 0; j < SC_CHARSETSIZE; ++j)
+			for (ulong j = 0; j < SC_CHARSETSIZE; ++j)
 			{
-				ULONG nCnt = row.DestCnt(j);
-				for (ULONG k = 0; k < nCnt; ++k)
+				ulong nCnt = row.DestCnt(j);
+				for (ulong k = 0; k < nCnt; ++k)
 				{
-					ULONG &nSta = row.GetDest(j, k);
+					ulong &nSta = row.GetDest(j, k);
 					if (nSta == CurState)
 					{
 						nSta = StartState;
@@ -1859,11 +1858,11 @@ void OP_KETRMAX_FUNC(CNfa &nfa, ULONG PreState, ULONG &CurState, bool IsBRAZERO,
 	}
 }
 
-ULONG OP_BRA_CBRA_SCBRA_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState)
+ulong OP_BRA_CBRA_SCBRA_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState)
 {
 	if (Beg == End)
 	{
-		ULONG nCursize = nfa.Size();
+		ulong nCursize = nfa.Size();
 		nfa.Resize(nCursize + 1);
 		nfa.Back().AddDest(EMPTY, MAX);
 		++CurState;
@@ -1872,42 +1871,42 @@ ULONG OP_BRA_CBRA_SCBRA_FUNC(std::vector<unsigned char>::iterator &Beg, const st
 	return SC_SUCCESS;
 }
 
-ULONG OP_BRA_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState)
+ulong OP_BRA_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState)
 {
 	return OP_BRA_CBRA_SCBRA_FUNC(Beg, End, nfa, CurState);
 }
 
-ULONG OP_CBRA_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState)
+ulong OP_CBRA_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState)
 {
 	return OP_BRA_CBRA_SCBRA_FUNC(Beg, End, nfa, CurState);
 }
 
-ULONG OP_SCBRA_FUNC(std::vector<unsigned char>::iterator &Beg, const std::vector<unsigned char>::iterator &End, CNfa &nfa, ULONG &CurState)
+ulong OP_SCBRA_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState)
 {
 	return OP_BRA_CBRA_SCBRA_FUNC(Beg, End, nfa, CurState);
 }
 
-void Copy(CNfaRow &NewRow, CNfaRow &Row, ULONG increment)
+void Copy(CNfaRow &NewRow, CNfaRow &Row, ulong increment)
 {
-	for (ULONG i = 0; i < SC_CHARSETSIZE; ++i)
+	for (ulong i = 0; i < SC_CHARSETSIZE; ++i)
 	{
-		ULONG nDestCnt = Row.DestCnt(i);
-		for (ULONG j = 0; j < nDestCnt; ++j)
+		ulong nDestCnt = Row.DestCnt(i);
+		for (ulong j = 0; j < nDestCnt; ++j)
 		{
 			NewRow.AddDest(i, Row.GetDest(i, j) + increment);
 		}
 	}
 }
 
-void AddEMPTY(CNfa &nfa, ULONG &CurState)
+void AddEMPTY(CNfa &nfa, ulong &CurState)
 {
-	ULONG nCursize = nfa.Size();
+	ulong nCursize = nfa.Size();
 	nfa.Resize(nCursize + 1);
 	++CurState;
 	nfa.Back().AddDest(EMPTY, CurState);
 }
 
-void OutPut(std::vector<PCRE>::iterator &Pcre, CNfa &nfa, ULONG count)
+void OutPut(std::vector<PCRE>::iterator &Pcre, CNfa &nfa, ulong count)
 {
 	std::stringstream ss;
 	std::string filename;
@@ -1917,26 +1916,26 @@ void OutPut(std::vector<PCRE>::iterator &Pcre, CNfa &nfa, ULONG count)
 	filename += ".txt";
 	std::ofstream fout(filename.c_str(), std::ios::binary);
 
-	ULONG Cnt;
-	unsigned char c;
+	ulong Cnt;
+	byte c;
 	Cnt = Pcre->PcreStr.length();
 	fout.write((char*)&Cnt, 4);
-	for (ULONG i = 0; i < Cnt; ++i)
+	for (ulong i = 0; i < Cnt; ++i)
 	{
 		c = Pcre->PcreStr[i];
 		fout.write((char*)&c, 1);
 	}
 	Cnt = nfa.Size();
 	fout.write((char*)&Cnt, 4);
-	ULONG num;
-	for (ULONG i = 0; i < Cnt; ++i)
+	ulong num;
+	for (ulong i = 0; i < Cnt; ++i)
 	{
 		CNfaRow &row = nfa[i];
-		for (ULONG j = 0; j < SC_CHARSETSIZE; ++j)
+		for (ulong j = 0; j < SC_CHARSETSIZE; ++j)
 		{
 			num = row.DestCnt(j);
 			fout.write((char*)&num, 4);
-			for (ULONG k = 0; k < num; ++k)
+			for (ulong k = 0; k < num; ++k)
 			{
 				fout.write((char*)&(row.GetDest(j, k)), 4);
 			}

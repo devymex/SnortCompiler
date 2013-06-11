@@ -27,7 +27,7 @@ Returns:            hash slot
 
 */
 
-HASHMAPHDR ULONG hash(const SIGNATURE &oneSig)
+HASHMAPHDR ulong hash(const SIGNATURE &oneSig)
 {
 	return oneSig % 16001;
 }
@@ -35,7 +35,7 @@ HASHMAPHDR ULONG hash(const SIGNATURE &oneSig)
 //one point in the adjust path
 struct STATION
 {
-	ULONG dfaId;
+	ulong dfaId;
 	SIGNATURE sig;
 };
 
@@ -53,7 +53,7 @@ Returns:            true if find a adjust path to reduce conflict
 
 */
 
-bool myFind(std::vector<GROUPHASH> &vecGroups, RESULTMAP &result, SIGNATURE &currSig, std::vector<STATION> &vecPath, ULONG &depth)
+bool myFind(std::vector<GROUPHASH> &vecGroups, RESULTMAP &result, SIGNATURE &currSig, std::vector<STATION> &vecPath, ulong &depth)
 {
 	++depth;
 
@@ -68,7 +68,7 @@ bool myFind(std::vector<GROUPHASH> &vecGroups, RESULTMAP &result, SIGNATURE &cur
 	}
 	else
 	{
-		for (std::vector<ULONG>::iterator i = result[hash(currSig)].begin(); i != result[hash(currSig)].end(); ++i)
+		for (std::vector<ulong>::iterator i = result[hash(currSig)].begin(); i != result[hash(currSig)].end(); ++i)
 		{
 			for (std::vector<SIGNATURE>::iterator j = vecGroups[*i].vecSigs.begin(); j != vecGroups[*i].vecSigs.end(); ++j)
 			{
@@ -111,10 +111,10 @@ void RecursiveAdjust(std::vector<GROUPHASH> &vecGroups, const IDMAP &dmap, RESUL
 			//try to adjust the conflict hash slot
 			if (i->second.size() > 1)
 			{
-				for (std::vector<ULONG>::iterator j = i->second.begin(); j != i->second.end();)
+				for (std::vector<ulong>::iterator j = i->second.begin(); j != i->second.end();)
 				{
 					std::vector<STATION> vecPath;
-					ULONG depth;
+					ulong depth;
 					for (std::vector<SIGNATURE>::iterator k = vecGroups[*j].vecSigs.begin(); k != vecGroups[*j].vecSigs.end(); ++k)
 					{
 						if (*k == vecGroups[*j].currSig)
@@ -127,7 +127,7 @@ void RecursiveAdjust(std::vector<GROUPHASH> &vecGroups, const IDMAP &dmap, RESUL
 						{
 							flag = true;
 							vecGroups[*j].currSig = *k;
-							std::vector<ULONG>::iterator iter = std::find(result[hash(*k)].begin(), result[hash(*k)].end(), *j);
+							std::vector<ulong>::iterator iter = std::find(result[hash(*k)].begin(), result[hash(*k)].end(), *j);
 							if (iter != result[hash(*k)].end())
 							{
 								result[hash(*k)].erase(iter);
@@ -136,7 +136,7 @@ void RecursiveAdjust(std::vector<GROUPHASH> &vecGroups, const IDMAP &dmap, RESUL
 							j = i->second.erase(j);
 							while (!vecPath.empty())
 							{
-								std::vector<ULONG> &Ids = result[hash(vecGroups[vecPath.back().dfaId].currSig)];
+								std::vector<ulong> &Ids = result[hash(vecGroups[vecPath.back().dfaId].currSig)];
 								iter = std::find(Ids.begin(), Ids.end(), vecPath.back().dfaId);
 								if (iter != Ids.end())
 								{
@@ -181,7 +181,7 @@ void Adjust(std::vector<GROUPHASH> &vecGroups, const IDMAP &dmap, RESULTMAP &res
 		//try to adjust the conflict hash slot
 		if (i->second.size() > 1)
 		{
-			for (std::vector<ULONG>::iterator j = i->second.begin(); j != i->second.end();)
+			for (std::vector<ulong>::iterator j = i->second.begin(); j != i->second.end();)
 			{
 				bool flag = false;
 				for (std::vector<SIGNATURE>::iterator k = vecGroups[*j].vecSigs.begin(); k != vecGroups[*j].vecSigs.end(); ++k)
@@ -224,13 +224,13 @@ Returns:            nothing
 
 */
 
-void Optimize(std::vector<GROUPHASH> &vecGroups, const IDMAP &dmap, std::vector<ULONG> &vecIds, RESULTMAP &result)
+void Optimize(std::vector<GROUPHASH> &vecGroups, const IDMAP &dmap, std::vector<ulong> &vecIds, RESULTMAP &result)
 {
 	for (IDMAP::const_iterator i = dmap.begin(); i != dmap.end(); ++i)
 	{
 		if (std::find(vecIds.begin(), vecIds.end(), i->first) == vecIds.end())
 		{
-			ULONG min = dmap.size();
+			ulong min = dmap.size();
 			SIGNATURE sig;
 			for (std::vector<SIGNATURE>::const_iterator j = i->second.begin(); j != i->second.end(); ++j)
 			{
@@ -265,7 +265,7 @@ Returns:            nothing
 
 void Mapping(std::vector<GROUPHASH> &vecGroups, const SIGNATUREMAP &gmap, const IDMAP &dmap, RESULTMAP &result)
 {
-	std::vector<ULONG> vecIds;
+	std::vector<ulong> vecIds;
 	for (IDMAP::const_iterator i = dmap.begin(); i != dmap.end(); ++i)
 	{
 		if (i->second.size() == 1)
@@ -305,17 +305,17 @@ Returns:            nothing
 
 void CommonSigs(const GROUPHASH &g1, const GROUPHASH &g2, std::vector<SIGNATURE> &vecComSigs)
 {
-	std::map<SIGNATURE, ULONG> sigToNumMap;
-	for (ULONG i = 0; i < g1.vecSigs.size(); ++i)
+	std::map<SIGNATURE, ulong> sigToNumMap;
+	for (ulong i = 0; i < g1.vecSigs.size(); ++i)
 	{
 		++sigToNumMap[g1.vecSigs[i]];
 	}
-	for (ULONG i = 0; i < g2.vecSigs.size(); ++i)
+	for (ulong i = 0; i < g2.vecSigs.size(); ++i)
 	{
 		++sigToNumMap[g2.vecSigs[i]];
 	}
 
-	for (std::map<SIGNATURE, ULONG>::iterator i = sigToNumMap.begin(); i != sigToNumMap.end(); ++i)
+	for (std::map<SIGNATURE, ulong>::iterator i = sigToNumMap.begin(); i != sigToNumMap.end(); ++i)
 	{
 		if (i->second == 2)
 		{
@@ -402,11 +402,11 @@ void Combine(CGROUPRes &groupRes, std::vector<GROUPHASH> &vecGroups, RESULTMAP &
 	{
 		if (i->second.size() > 1)
 		{
-			for (std::vector<ULONG>::iterator j = i->second.begin(); j != i->second.end(); ++j)
+			for (std::vector<ulong>::iterator j = i->second.begin(); j != i->second.end(); ++j)
 			{
 				std::vector<CDfa> vecDfas(2);
 				vecDfas[0] = groupRes.GetDfaTable()[vecGroups[*j].mergeDfaId];
-				for (std::vector<ULONG>::iterator k = j + 1; k != i->second.end(); )
+				for (std::vector<ulong>::iterator k = j + 1; k != i->second.end(); )
 				{
 					if (vecGroups[*k].currSig != vecGroups[*j].currSig)
 					{
@@ -417,7 +417,7 @@ void Combine(CGROUPRes &groupRes, std::vector<GROUPHASH> &vecGroups, RESULTMAP &
 					vecDfas[1] = groupRes.GetDfaTable()[vecGroups[*k].mergeDfaId];
 					if (MergeMultipleDfas(vecDfas, MergeDfa))
 					{
-						for (ULONG idx = 0; idx < vecGroups[*k].vecDfaIds.size(); ++idx)
+						for (ulong idx = 0; idx < vecGroups[*k].vecDfaIds.size(); ++idx)
 						{
 							vecGroups[*j].vecDfaIds.push_back(vecGroups[*k].vecDfaIds[idx]);
 						}
@@ -426,7 +426,7 @@ void Combine(CGROUPRes &groupRes, std::vector<GROUPHASH> &vecGroups, RESULTMAP &
 						vecGroups[*j].mergeDfaId = groupRes.GetDfaTable().Size() - 1;
 						vecGroups[*k].vecSigs.clear();
 						vecGroups[*k].vecDfaIds.clear();
-						vecGroups[*k].mergeDfaId = (ULONG)-1;
+						vecGroups[*k].mergeDfaId = (ulong)-1;
 						//groupRes.GetGroups().Erase(*k);
 						k = i->second.erase(k);
 					}
@@ -440,20 +440,20 @@ void Combine(CGROUPRes &groupRes, std::vector<GROUPHASH> &vecGroups, RESULTMAP &
 	}
 
 	//combine groups in two hash slots and both hash slots have only one group
-	std::vector<ULONG> vecKeys;
+	std::vector<ulong> vecKeys;
 	for (RESULTMAP::iterator i = result.begin(); i != result.end(); ++i)
 	{
 		vecKeys.push_back(i->first);
 	}
 
-	for (ULONG i = 0; i < vecKeys.size(); ++i)
+	for (ulong i = 0; i < vecKeys.size(); ++i)
 	{
 		std::cout << "Combine" << std::endl;
 		std::cout << "NO: " << i << std::endl;
 		std::cout << "Total: " << vecKeys.size() << std::endl;
 		if (result[vecKeys[i]].size() == 1)
 		{
-			for (ULONG j = 0; j < vecKeys.size(); ++j)
+			for (ulong j = 0; j < vecKeys.size(); ++j)
 			{
 				if (i == j)
 				{
@@ -472,7 +472,7 @@ void Combine(CGROUPRes &groupRes, std::vector<GROUPHASH> &vecGroups, RESULTMAP &
 						CDfa MergeDfa;
 						if (MergeMultipleDfas(vecDfas, MergeDfa))
 						{
-							for (ULONG idx = 0; idx < g2.vecDfaIds.size(); ++idx)
+							for (ulong idx = 0; idx < g2.vecDfaIds.size(); ++idx)
 							{
 								g1.vecDfaIds.push_back(g2.vecDfaIds[idx]);
 							}
@@ -502,7 +502,7 @@ void Combine(CGROUPRes &groupRes, std::vector<GROUPHASH> &vecGroups, RESULTMAP &
 							g1.currSig = Sig;
 							g2.vecSigs.clear();
 							g2.vecDfaIds.clear();
-							g2.mergeDfaId = (ULONG)-1;
+							g2.mergeDfaId = (ulong)-1;
 						}
 						if (result[vecKeys[i]].size() == 0)
 						{
@@ -537,20 +537,20 @@ Returns:            nothing
 
 void ClearUpHashRes(std::vector<GROUPHASH> &vecGroups, RESULTMAP &result, CGROUPRes &groupRes, HASHRES &HashResMap)
 {
-	ULONG count = 0;
+	ulong count = 0;
 	std::vector<CDfa> vecDfas;
 	groupRes.GetGroups().Clear();
 	for (std::vector<GROUPHASH>::iterator i = vecGroups.begin(); i != vecGroups.end(); ++i)
 	{
-		if (i->mergeDfaId != ULONG(-1))
+		if (i->mergeDfaId != ulong(-1))
 		{
 			groupRes.GetGroups().PushBack(ONEGROUP());
 			ONEGROUP &group = groupRes.GetGroups().Back();
-			for (ULONG j = 0; j < i->vecDfaIds.size(); ++j)
+			for (ulong j = 0; j < i->vecDfaIds.size(); ++j)
 			{
 				group.DfaIds.PushBack(i->vecDfaIds[j]);
 			}
-			for (ULONG j = 0; j < i->vecSigs.size(); ++j)
+			for (ulong j = 0; j < i->vecSigs.size(); ++j)
 			{
 				group.ComSigs.PushBack(i->vecSigs[j]);
 			}
@@ -570,9 +570,9 @@ void ClearUpHashRes(std::vector<GROUPHASH> &vecGroups, RESULTMAP &result, CGROUP
 
 	for (RESULTMAP::iterator i = result.begin(); i != result.end(); ++i)
 	{
-		for (std::vector<ULONG>::iterator j = i->second.begin(); j != i->second.end(); ++j)
+		for (std::vector<ulong>::iterator j = i->second.begin(); j != i->second.end(); ++j)
 		{
-			if (vecGroups[*j].mergeDfaId != ULONG(-1))
+			if (vecGroups[*j].mergeDfaId != ulong(-1))
 			{
 				HashResMap[i->first].push_back(HASHNODE(vecGroups[*j].currSig, vecGroups[*j].mergeDfaId));
 			}
@@ -595,31 +595,31 @@ HASHMAPHDR void HashMapping(CGROUPRes &groupRes, HASHRES &HashResMap)
 {
 	std::vector<GROUPHASH> vecGroups;
 	vecGroups.resize(groupRes.GetGroups().Size());
-	for (ULONG i = 0; i < groupRes.GetGroups().Size(); ++i)
+	for (ulong i = 0; i < groupRes.GetGroups().Size(); ++i)
 	{
-		for (ULONG j = 0; j < groupRes.GetGroups()[i].ComSigs.Size(); ++j)
+		for (ulong j = 0; j < groupRes.GetGroups()[i].ComSigs.Size(); ++j)
 		{
 			vecGroups[i].vecSigs.push_back(groupRes.GetGroups()[i].ComSigs[j]);
 		}
 		vecGroups[i].mergeDfaId = groupRes.GetGroups()[i].mergeDfaId;
-		for (ULONG j = 0; j < groupRes.GetGroups()[i].DfaIds.Size(); ++j)
+		for (ulong j = 0; j < groupRes.GetGroups()[i].DfaIds.Size(); ++j)
 		{
 			vecGroups[i].vecDfaIds.push_back(groupRes.GetGroups()[i].DfaIds[j]);
 		}
 	}
 
 	SIGNATUREMAP gmap;
-	for (ULONG i = 0; i < vecGroups.size(); ++i)
+	for (ulong i = 0; i < vecGroups.size(); ++i)
 	{
-		for (ULONG j = 0; j < vecGroups[i].vecSigs.size(); ++j)
+		for (ulong j = 0; j < vecGroups[i].vecSigs.size(); ++j)
 		{
 			gmap[vecGroups[i].vecSigs[j]].push_back(i);
 		}
 	}
 	IDMAP dmap;
-	for (ULONG i = 0; i < vecGroups.size(); ++i)
+	for (ulong i = 0; i < vecGroups.size(); ++i)
 	{
-		for (ULONG j = 0; j < vecGroups[i].vecSigs.size(); ++j)
+		for (ulong j = 0; j < vecGroups[i].vecSigs.size(); ++j)
 		{
 			dmap[i].push_back(vecGroups[i].vecSigs[j]);
 		}

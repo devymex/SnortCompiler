@@ -5,7 +5,7 @@
 **
 **  @brief       Common classes declaration
 **
-**  Include CDllArray, CDllString
+**  Include CUnsignedArray, CDllString
 **
 */
 
@@ -13,7 +13,7 @@
 
 #include <set>
 #include <unordered_map>
-#include <hwprj\dllarray.h>
+#include <hwprj\unsary.h>
 
 #ifndef FINSTAHDR_DS
 #define FINSTAHDR __declspec(dllimport)
@@ -24,7 +24,7 @@
 
 class FINSTAHDR CFinalStates
 {
-	typedef std::unordered_map<STATEID, std::set<ULONG>> FINSTAMAP;
+	typedef std::unordered_map<STATEID, std::set<ulong>> FINSTAMAP;
 	typedef FINSTAMAP::iterator FINSTAMAP_ITER;
 	typedef FINSTAMAP::const_iterator FINSTAMAP_CITER;
 public:
@@ -33,18 +33,18 @@ public:
 	CFinalStates(const CFinalStates &other);
 	CFinalStates& operator=(const CFinalStates &other);
 
-	STATEID operator[](ULONG nIdx) const;
+	STATEID operator[](ulong nIdx) const;
 
-	ULONG Size() const;
+	ulong Size() const;
 	void Clear();
 	void PushBack(STATEID nStaId);
-	void PushBack(STATEID nStaId, ULONG nDfaId);
-	ULONG GetDfaIdCount(STATEID nStaId) const;
-	ULONG GetAllDfaIdCount() const;
-	void GetDfaIds(STATEID nStaId, CDllArray &ids) const;
+	void PushBack(STATEID nStaId, ulong nDfaId);
+	ulong GetDfaIdCount(STATEID nStaId) const;
+	ulong GetAllDfaIdCount() const;
+	void GetDfaIds(STATEID nStaId, CUnsignedArray &ids) const;
 
-	std::set<ULONG>& _GetDfaIds(STATEID nStaId);
-	const std::set<ULONG>& _GetDfaIds(STATEID nStaId) const;
+	std::set<ulong>& _GetDfaIds(STATEID nStaId);
+	const std::set<ulong>& _GetDfaIds(STATEID nStaId) const;
 
 protected:
 	std::vector<STATEID> *m_pStates;

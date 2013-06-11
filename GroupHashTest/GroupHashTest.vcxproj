@@ -12,7 +12,8 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{4C67E265-13A7-4F96-BBBC-B885E0DE6576}</ProjectGuid>
-    <RootNamespace>groupingTest</RootNamespace>
+    <RootNamespace>GroupHashTest</RootNamespace>
+    <ProjectName>GroupHashTest</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

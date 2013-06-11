@@ -3414,10 +3414,10 @@ void DFA::output()
 #include <exception>
 void DFA::Dfa2CDfaNew(CDfa &curDFA)
 {
-	BYTE group[CSIZE];
+	byte group[CSIZE];
 	for (int i = 0; i < CSIZE; ++i)
 	{
-		group[i] = (BYTE)i;
+		group[i] = (byte)i;
 	}
 	
 	curDFA.Init(group);

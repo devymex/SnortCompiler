@@ -17,12 +17,12 @@ public:
 	CRegChain(const CRegChain &other);
 	const CRegChain& operator = (const CRegChain &other);
 
-	CDllString& operator[](ULONG nIdx);
+	CDllString& operator[](ulong nIdx);
 
-	ULONG Size() const;
+	ulong Size() const;
 	CDllString& Back() const;
 	void PushBack(const CDllString &pcreStr);
-	void Resize(ULONG nSize);
+	void Resize(ulong nSize);
 
 	CSignatures& GetSigs();
 	const CSignatures& GetSigs() const;

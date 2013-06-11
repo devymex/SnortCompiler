@@ -1,6 +1,8 @@
 
 #pragma once
 
+#include <hwprj\common.h>
+
 #ifndef SNORTRULEHDR_DS
 #define SNORTRULEHDR __declspec(dllimport)
 #else
@@ -19,18 +21,18 @@ public:
 	const CSnortRule& operator = (const CSnortRule &other);
 	~CSnortRule();
 
-	CRuleOption* operator[](ULONG nIdx) const;
+	CRuleOption* operator[](ulong nIdx) const;
 
-	ULONG Size() const;
-	ULONG GetSid() const;
-	void SetSid(ULONG sid);
-	ULONG GetFlag() const;
-	void SetFlag(ULONG flag);
+	ulong Size() const;
+	ulong GetSid() const;
+	void SetSid(ulong sid);
+	ulong GetFlag() const;
+	void SetFlag(ulong flag);
 	void PushBack(CRuleOption* ruleoption);
 	void PopBack();
 
 protected:
-	ULONG m_nSid;
-	ULONG m_nFlag;
+	ulong m_nSid;
+	ulong m_nFlag;
 	std::vector<CRuleOption*> *m_pOptions;
 };

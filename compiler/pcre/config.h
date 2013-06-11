@@ -391,4 +391,4 @@ them both to 0; an emulation function will be used. */
 /* #undef int64_t */
 
 /* Define to `unsigned int' if <sys/types.h> does not define. */
-/* #undef ULONG */
+/* #undef size_t */

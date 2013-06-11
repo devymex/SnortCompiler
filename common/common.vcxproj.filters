@@ -20,7 +20,10 @@
     <ClInclude Include="..\include\hwprj\dllstring.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\hwprj\dllarray.h">
+    <ClInclude Include="..\include\hwprj\unsary.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\hwprj\ctimer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -31,7 +34,7 @@
     <ClCompile Include="dllstring.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="dllarray.cpp">
+    <ClCompile Include="unsary.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

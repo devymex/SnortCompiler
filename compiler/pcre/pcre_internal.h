@@ -378,9 +378,9 @@ neither (there some non-Unix environments where this is the case). */
 #define memmove(a, b, c) bcopy(b, a, c)
 #else  /* HAVE_BCOPY */
 static void *
-pcre_memmove(void *d, const void *s, ULONG n)
+pcre_memmove(void *d, const void *s, size_t n)
 {
-ULONG i;
+size_t i;
 unsigned char *dest = (unsigned char *)d;
 const unsigned char *src = (const unsigned char *)s;
 if (dest > src)
@@ -1818,7 +1818,7 @@ only. */
 #endif
 
 /* We can't officially use ESC_t because it is a POSIX reserved identifier
-(presumably because of all the others like ULONG). */
+(presumably because of all the others like size_t). */
 
 #ifndef ESC_tee
 #define ESC_tee CHAR_HT
