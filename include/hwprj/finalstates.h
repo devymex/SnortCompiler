@@ -1,33 +1,30 @@
 /**
-**  @file        finalstates.h
+**	@file		finalstates.h
 **
-**  @author      Lab 435, Xidian University
+**	@author		Lab 435, Xidian University
 **
-**  @brief       Common classes declaration
+**	@brief		Declaration of the CFinalStates class
 **
-**  Include CUnsignedArray, CDllString
+** store the mapping between STATEID and DFAID
 **
 */
 
 #pragma once
 
-#include <set>
-#include <unordered_map>
 #include <hwprj\unsary.h>
+
+#include <set>
 
 #ifndef FINSTAHDR_DS
 #define FINSTAHDR __declspec(dllimport)
 class STATEVEC;
+class FINSTAMAP;
 #else
 #define FINSTAHDR __declspec(dllexport)
 #endif
 
-
 class FINSTAHDR CFinalStates
 {
-	typedef std::unordered_map<STATEID, std::set<ulong>>	FINSTAMAP;
-	typedef FINSTAMAP::iterator								FINSTAMAP_ITER;
-	typedef FINSTAMAP::const_iterator						FINSTAMAP_CITER;
 
 public:
 	CFinalStates();
@@ -40,7 +37,7 @@ public:
 	ulong	Size() const;
 	void	Clear();
 	void	PushBack(STATEID nStaId);
-	void	PushBack(STATEID nStaId, ulong nDfaId);
+	void	PushBack(STATEID nStaId, DFAID nDfaId);
 	ulong	GetDfaIdCount(STATEID nStaId) const;
 	ulong	GetAllDfaIdCount() const;
 	void	GetDfaIds(STATEID nStaId, CUnsignedArray &ids) const;

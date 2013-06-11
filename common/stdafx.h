@@ -1,9 +1,9 @@
 /**
-**  @file        stdafx.h
+**	@file		stdafx.h
 **
-**  @author      Lab 435, Xidian University
+**	@author	  Lab 435, Xidian University
 **
-**  @brief       Precompile header common library
+**	@brief		Precompile header common library
 **
 */
 
@@ -18,4 +18,5 @@
 #define UNSARYHDR_DS
 #define DLLSTRHDR_DS
 
-typedef std::string		DLLSTRING;
+typedef std::string					DLLSTRING;
+typedef std::vector<unsigned long>	DLLULONGVEC;

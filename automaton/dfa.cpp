@@ -1,11 +1,11 @@
 /**
-**  @file        dfa.h
+**	@file		dfa.h
 **
-**  @author      Lab 435, Xidian University
+**	@author		Lab 435, Xidian University
 **
-**  @brief       Common classes declaration
+**	@brief		 Common classes declaration
 **
-**  Include CUnsignedArray, CDllString
+**	Include CUnsignedArray, CDllString
 **
 */
 
@@ -920,23 +920,23 @@ const CFinalStates& CDfa::GetFinalState() const
 
 
 /*
-**  NAME
-**    MergeMultipleDfas::
+**	NAME
+**	 MergeMultipleDfas::
 */
 /**
-**  This function merges mutiple dfas into one dfa. And mark the terminal states to 
+**	This function merges mutiple dfas into one dfa. And mark the terminal states to 
 **	distinguish which dfas the terminal state belongs to.
 **
 **	In order to speed up, we need one support function:DfaColGroup to group
 **	the lastDfa's columns.
 **
-**  @param dfas      a vector contains mutiple CDfa
-**  @param lastDfa   the merged dfa
+**	@param dfas		a vector contains mutiple CDfa
+**	@param lastDfa	the merged dfa
 **
-**  @return bool
+**	@return bool
 **
-**  @retval true function successful
-**  @retval fasle fatal error
+**	@retval true function successful
+**	@retval fasle fatal error
 */
 
 DFAHDR void PrintDfaToGv(CDfa &newdfa, const char* fileName)

@@ -1,27 +1,27 @@
 /*************************************************
-*      Perl-Compatible Regular Expressions       *
+*		Perl-Compatible Regular Expressions		 *
 *************************************************/
 
 /* PCRE is a library of functions to support regular expressions whose syntax
 and semantics are as close as possible to those of the Perl 5 language.
 
-                       Written by Philip Hazel
-           Copyright (c) 1997-2012 University of Cambridge
+							Written by Philip Hazel
+			Copyright (c) 1997-2012 University of Cambridge
 
 -----------------------------------------------------------------------------
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
 
-    * Redistributions of source code must retain the above copyright notice,
-      this list of conditions and the following disclaimer.
+	 * Redistributions of source code must retain the above copyright notice,
+		this list of conditions and the following disclaimer.
 
-    * Redistributions in binary form must reproduce the above copyright
-      notice, this list of conditions and the following disclaimer in the
-      documentation and/or other materials provided with the distribution.
+	 * Redistributions in binary form must reproduce the above copyright
+		notice, this list of conditions and the following disclaimer in the
+		documentation and/or other materials provided with the distribution.
 
-    * Neither the name of the University of Cambridge nor the names of its
-      contributors may be used to endorse or promote products derived from
-      this software without specific prior written permission.
+	 * Neither the name of the University of Cambridge nor the names of its
+		contributors may be used to endorse or promote products derived from
+		this software without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -50,17 +50,17 @@ class. It is used by both pcre_exec() and pcre_def_exec(). */
 
 
 /*************************************************
-*       Match character against an XCLASS        *
+*		 Match character against an XCLASS		*
 *************************************************/
 
 /* This function is called to match a character against an extended class that
 might contain values > 255 and/or Unicode properties.
 
 Arguments:
-  c           the character
-  data        points to the flag byte of the XCLASS data
+  c			the character
+  data		points to the flag byte of the XCLASS data
 
-Returns:      TRUE if character matches, else FALSE
+Returns:		TRUE if character matches, else FALSE
 */
 
 BOOL
@@ -82,8 +82,8 @@ additional data. */
 if (c < 256)
   {
   if ((*data & XCL_MAP) != 0 &&
-    (((pcre_uint8 *)(data + 1))[c/8] & (1 << (c&7))) != 0)
-    return !negated; /* char found */
+	 (((pcre_uint8 *)(data + 1))[c/8] & (1 << (c&7))) != 0)
+	 return !negated; /* char found */
   }
 
 /* First skip the bit map if present. Then match against the list of Unicode
@@ -96,103 +96,103 @@ while ((t = *data++) != XCL_END)
   {
   pcre_uint32 x, y;
   if (t == XCL_SINGLE)
-    {
+	 {
 #ifdef SUPPORT_UTF
-    if (utf)
-      {
-      GETCHARINC(x, data); /* macro generates multiple statements */
-      }
-    else
+	 if (utf)
+		{
+		GETCHARINC(x, data); /* macro generates multiple statements */
+		}
+	 else
 #endif
-      x = *data++;
-    if (c == x) return !negated;
-    }
+		x = *data++;
+	 if (c == x) return !negated;
+	 }
   else if (t == XCL_RANGE)
-    {
+	 {
 #ifdef SUPPORT_UTF
-    if (utf)
-      {
-      GETCHARINC(x, data); /* macro generates multiple statements */
-      GETCHARINC(y, data); /* macro generates multiple statements */
-      }
-    else
+	 if (utf)
+		{
+		GETCHARINC(x, data); /* macro generates multiple statements */
+		GETCHARINC(y, data); /* macro generates multiple statements */
+		}
+	 else
 #endif
-      {
-      x = *data++;
-      y = *data++;
-      }
-    if (c >= x && c <= y) return !negated;
-    }
+		{
+		x = *data++;
+		y = *data++;
+		}
+	 if (c >= x && c <= y) return !negated;
+	 }
 
 #ifdef SUPPORT_UCP
   else  /* XCL_PROP & XCL_NOTPROP */
-    {
-    const ucd_record *prop = GET_UCD(c);
+	 {
+	 const ucd_record *prop = GET_UCD(c);
 
-    switch(*data)
-      {
-      case PT_ANY:
-      if (t == XCL_PROP) return !negated;
-      break;
+	 switch(*data)
+		{
+		case PT_ANY:
+		if (t == XCL_PROP) return !negated;
+		break;
 
-      case PT_LAMP:
-      if ((prop->chartype == ucp_Lu || prop->chartype == ucp_Ll ||
-           prop->chartype == ucp_Lt) == (t == XCL_PROP)) return !negated;
-      break;
+		case PT_LAMP:
+		if ((prop->chartype == ucp_Lu || prop->chartype == ucp_Ll ||
+			prop->chartype == ucp_Lt) == (t == XCL_PROP)) return !negated;
+		break;
 
-      case PT_GC:
-      if ((data[1] == PRIV(ucp_gentype)[prop->chartype]) == (t == XCL_PROP))
-        return !negated;
-      break;
+		case PT_GC:
+		if ((data[1] == PRIV(ucp_gentype)[prop->chartype]) == (t == XCL_PROP))
+		return !negated;
+		break;
 
-      case PT_PC:
-      if ((data[1] == prop->chartype) == (t == XCL_PROP)) return !negated;
-      break;
+		case PT_PC:
+		if ((data[1] == prop->chartype) == (t == XCL_PROP)) return !negated;
+		break;
 
-      case PT_SC:
-      if ((data[1] == prop->script) == (t == XCL_PROP)) return !negated;
-      break;
+		case PT_SC:
+		if ((data[1] == prop->script) == (t == XCL_PROP)) return !negated;
+		break;
 
-      case PT_ALNUM:
-      if ((PRIV(ucp_gentype)[prop->chartype] == ucp_L ||
-           PRIV(ucp_gentype)[prop->chartype] == ucp_N) == (t == XCL_PROP))
-        return !negated;
-      break;
+		case PT_ALNUM:
+		if ((PRIV(ucp_gentype)[prop->chartype] == ucp_L ||
+			PRIV(ucp_gentype)[prop->chartype] == ucp_N) == (t == XCL_PROP))
+		return !negated;
+		break;
 
-      case PT_SPACE:    /* Perl space */
-      if ((PRIV(ucp_gentype)[prop->chartype] == ucp_Z ||
-           c == CHAR_HT || c == CHAR_NL || c == CHAR_FF || c == CHAR_CR)
-             == (t == XCL_PROP))
-        return !negated;
-      break;
+		case PT_SPACE:	 /* Perl space */
+		if ((PRIV(ucp_gentype)[prop->chartype] == ucp_Z ||
+			c == CHAR_HT || c == CHAR_NL || c == CHAR_FF || c == CHAR_CR)
+				 == (t == XCL_PROP))
+		return !negated;
+		break;
 
-      case PT_PXSPACE:  /* POSIX space */
-      if ((PRIV(ucp_gentype)[prop->chartype] == ucp_Z ||
-           c == CHAR_HT || c == CHAR_NL || c == CHAR_VT ||
-           c == CHAR_FF || c == CHAR_CR) == (t == XCL_PROP))
-        return !negated;
-      break;
+		case PT_PXSPACE:  /* POSIX space */
+		if ((PRIV(ucp_gentype)[prop->chartype] == ucp_Z ||
+			c == CHAR_HT || c == CHAR_NL || c == CHAR_VT ||
+			c == CHAR_FF || c == CHAR_CR) == (t == XCL_PROP))
+		return !negated;
+		break;
 
-      case PT_WORD:
-      if ((PRIV(ucp_gentype)[prop->chartype] == ucp_L ||
-           PRIV(ucp_gentype)[prop->chartype] == ucp_N || c == CHAR_UNDERSCORE)
-             == (t == XCL_PROP))
-        return !negated;
-      break;
+		case PT_WORD:
+		if ((PRIV(ucp_gentype)[prop->chartype] == ucp_L ||
+			PRIV(ucp_gentype)[prop->chartype] == ucp_N || c == CHAR_UNDERSCORE)
+				 == (t == XCL_PROP))
+		return !negated;
+		break;
 
-      /* This should never occur, but compilers may mutter if there is no
-      default. */
+		/* This should never occur, but compilers may mutter if there is no
+		default. */
 
-      default:
-      return FALSE;
-      }
+		default:
+		return FALSE;
+		}
 
-    data += 2;
-    }
+	 data += 2;
+	 }
 #endif  /* SUPPORT_UCP */
   }
 
-return negated;   /* char did not match */
+return negated;	/* char did not match */
 }
 
 /* End of pcre_xclass.c */

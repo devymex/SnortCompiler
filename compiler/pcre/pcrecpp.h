@@ -5,13 +5,13 @@
 // modification, are permitted provided that the following conditions are
 // met:
 //
-//     * Redistributions of source code must retain the above copyright
+//	  * Redistributions of source code must retain the above copyright
 // notice, this list of conditions and the following disclaimer.
-//     * Redistributions in binary form must reproduce the above
+//	  * Redistributions in binary form must reproduce the above
 // copyright notice, this list of conditions and the following disclaimer
 // in the documentation and/or other materials provided with the
 // distribution.
-//     * Neither the name of Google Inc. nor the names of its
+//	  * Neither the name of Google Inc. nor the names of its
 // contributors may be used to endorse or promote products derived from
 // this software without specific prior written permission.
 //
@@ -47,12 +47,12 @@
 // with Perl's regular expressions, here are some examples of the most
 // commonly used extensions:
 //
-//   "hello (\\w+) world"  -- \w matches a "word" character
-//   "version (\\d+)"      -- \d matches a digit
-//   "hello\\s+world"      -- \s matches any whitespace character
-//   "\\b(\\w+)\\b"        -- \b matches empty string at a word boundary
-//   "(?i)hello"           -- (?i) turns on case-insensitive matching
-//   "/\\*(.*?)\\*/"       -- .*? matches . minimum no. of times possible
+//	"hello (\\w+) world"  -- \w matches a "word" character
+//	"version (\\d+)"		-- \d matches a digit
+//	"hello\\s+world"		-- \s matches any whitespace character
+//	"\\b(\\w+)\\b"		-- \b matches empty string at a word boundary
+//	"(?i)hello"			-- (?i) turns on case-insensitive matching
+//	"/\\*(.*?)\\*/"		 -- .*? matches . minimum no. of times possible
 //
 // -----------------------------------------------------------------------
 // MATCHING INTERFACE:
@@ -61,15 +61,15 @@
 // supplied pattern exactly.
 //
 // Example: successful match
-//    pcrecpp::RE re("h.*o");
-//    re.FullMatch("hello");
+//	 pcrecpp::RE re("h.*o");
+//	 re.FullMatch("hello");
 //
 // Example: unsuccessful match (requires full match):
-//    pcrecpp::RE re("e");
-//    !re.FullMatch("hello");
+//	 pcrecpp::RE re("e");
+//	 !re.FullMatch("hello");
 //
 // Example: creating a temporary RE object:
-//    pcrecpp::RE("h.*o").FullMatch("hello");
+//	 pcrecpp::RE("h.*o").FullMatch("hello");
 //
 // You can pass in a "const char*" or a "string" for "text".  The
 // examples below tend to use a const char*.
@@ -85,38 +85,38 @@
 // You can supply extra pointer arguments to extract matched subpieces.
 //
 // Example: extracts "ruby" into "s" and 1234 into "i"
-//    int i;
-//    string s;
-//    pcrecpp::RE re("(\\w+):(\\d+)");
-//    re.FullMatch("ruby:1234", &s, &i);
+//	 int i;
+//	 string s;
+//	 pcrecpp::RE re("(\\w+):(\\d+)");
+//	 re.FullMatch("ruby:1234", &s, &i);
 //
 // Example: does not try to extract any extra sub-patterns
-//    re.FullMatch("ruby:1234", &s);
+//	 re.FullMatch("ruby:1234", &s);
 //
 // Example: does not try to extract into NULL
-//    re.FullMatch("ruby:1234", NULL, &i);
+//	 re.FullMatch("ruby:1234", NULL, &i);
 //
 // Example: integer overflow causes failure
-//    !re.FullMatch("ruby:1234567891234", NULL, &i);
+//	 !re.FullMatch("ruby:1234567891234", NULL, &i);
 //
 // Example: fails because there aren't enough sub-patterns:
-//    !pcrecpp::RE("\\w+:\\d+").FullMatch("ruby:1234", &s);
+//	 !pcrecpp::RE("\\w+:\\d+").FullMatch("ruby:1234", &s);
 //
 // Example: fails because string cannot be stored in integer
-//    !pcrecpp::RE("(.*)").FullMatch("ruby", &i);
+//	 !pcrecpp::RE("(.*)").FullMatch("ruby", &i);
 //
 // The provided pointer arguments can be pointers to any scalar numeric
 // type, or one of
-//    string        (matched piece is copied to string)
-//    StringPiece   (StringPiece is mutated to point to matched piece)
-//    T             (where "bool T::ParseFrom(const char*, int)" exists)
-//    NULL          (the corresponding matched sub-pattern is not copied)
+//	 string		(matched piece is copied to string)
+//	 StringPiece	(StringPiece is mutated to point to matched piece)
+//	 T				 (where "bool T::ParseFrom(const char*, int)" exists)
+//	 NULL			 (the corresponding matched sub-pattern is not copied)
 //
 // CAVEAT: An optional sub-pattern that does not exist in the matched
 // string is assigned the empty string.  Therefore, the following will
 // return false (because the empty string is not a valid number):
-//    int number;
-//    pcrecpp::RE::FullMatch("abc", "[a-z]+(\\d+)?", &number);
+//	 int number;
+//	 pcrecpp::RE::FullMatch("abc", "[a-z]+(\\d+)?", &number);
 //
 // -----------------------------------------------------------------------
 // DO_MATCH
@@ -132,13 +132,13 @@
 // to match any substring of the text.
 //
 // Example: simple search for a string:
-//    pcrecpp::RE("ell").PartialMatch("hello");
+//	 pcrecpp::RE("ell").PartialMatch("hello");
 //
 // Example: find first number in a string:
-//    int number;
-//    pcrecpp::RE re("(\\d+)");
-//    re.PartialMatch("x*100 + 20", &number);
-//    assert(number == 100);
+//	 int number;
+//	 pcrecpp::RE re("(\\d+)");
+//	 re.PartialMatch("x*100 + 20", &number);
+//	 assert(number == 100);
 //
 // -----------------------------------------------------------------------
 // UTF-8 AND THE MATCHING INTERFACE:
@@ -153,17 +153,17 @@
 // set may match up to three bytes of a multi-byte character.
 //
 // Example:
-//    pcrecpp::RE_Options options;
-//    options.set_utf8();
-//    pcrecpp::RE re(utf8_pattern, options);
-//    re.FullMatch(utf8_string);
+//	 pcrecpp::RE_Options options;
+//	 options.set_utf8();
+//	 pcrecpp::RE re(utf8_pattern, options);
+//	 re.FullMatch(utf8_string);
 //
 // Example: using the convenience function UTF8():
-//    pcrecpp::RE re(utf8_pattern, pcrecpp::UTF8());
-//    re.FullMatch(utf8_string);
+//	 pcrecpp::RE re(utf8_pattern, pcrecpp::UTF8());
+//	 re.FullMatch(utf8_string);
 //
 // NOTE: The UTF8 option is ignored if pcre was not configured with the
-//       --enable-utf8 flag.
+//		 --enable-utf8 flag.
 //
 // -----------------------------------------------------------------------
 // PASSING MODIFIERS TO THE REGULAR EXPRESSION ENGINE
@@ -175,17 +175,17 @@
 //
 // Currently, the following modifiers are supported
 //
-//    modifier              description               Perl corresponding
+//	 modifier				description					Perl corresponding
 //
-//    PCRE_CASELESS         case insensitive match    /i
-//    PCRE_MULTILINE        multiple lines match      /m
-//    PCRE_DOTALL           dot matches newlines      /s
-//    PCRE_DOLLAR_ENDONLY   $ matches only at end     N/A
-//    PCRE_EXTRA            strict escape parsing     N/A
-//    PCRE_EXTENDED         ignore whitespaces        /x
-//    PCRE_UTF8             handles UTF8 chars        built-in
-//    PCRE_UNGREEDY         reverses * and *?         N/A
-//    PCRE_NO_AUTO_CAPTURE  disables matching parens  N/A (*)
+//	 PCRE_CASELESS			case insensitive match	 /i
+//	 PCRE_MULTILINE		multiple lines match		/m
+//	 PCRE_DOTALL			dot matches newlines		/s
+//	 PCRE_DOLLAR_ENDONLY	$ matches only at end	  N/A
+//	 PCRE_EXTRA				strict escape parsing	  N/A
+//	 PCRE_EXTENDED			ignore whitespaces		/x
+//	 PCRE_UTF8				 handles UTF8 chars		built-in
+//	 PCRE_UNGREEDY			reverses * and *?			N/A
+//	 PCRE_NO_AUTO_CAPTURE  disables matching parens  N/A (*)
 //
 // (For a full account on how each modifier works, please check the
 // PCRE API reference manual).
@@ -197,9 +197,9 @@
 // For each modifier, there are two member functions whose name is made
 // out of the modifier in lowercase, without the "PCRE_" prefix. For
 // instance, PCRE_CASELESS is handled by
-//    bool caseless(),
+//	 bool caseless(),
 // which returns true if the modifier is set, and
-//    RE_Options & set_caseless(bool),
+//	 RE_Options & set_caseless(bool),
 // which sets or unsets the modifier.
 //
 // Moreover, PCRE_EXTRA_MATCH_LIMIT can be accessed through the
@@ -217,21 +217,21 @@
 // a RE_Options object, set the appropriate options, and pass this
 // object to a RE constructor. Example:
 //
-//    RE_options opt;
-//    opt.set_caseless(true);
+//	 RE_options opt;
+//	 opt.set_caseless(true);
 //
-//    if (RE("HELLO", opt).PartialMatch("hello world")) ...
+//	 if (RE("HELLO", opt).PartialMatch("hello world")) ...
 //
 // RE_options has two constructors. The default constructor takes no
 // arguments and creates a set of flags that are off by default.
 //
 // The optional parameter 'option_flags' is to facilitate transfer
 // of legacy code from C programs.  This lets you do
-//    RE(pattern, RE_Options(PCRE_CASELESS|PCRE_MULTILINE)).PartialMatch(str);
+//	 RE(pattern, RE_Options(PCRE_CASELESS|PCRE_MULTILINE)).PartialMatch(str);
 //
 // But new code is better off doing
-//    RE(pattern,
-//      RE_Options().set_caseless(true).set_multiline(true)).PartialMatch(str);
+//	 RE(pattern,
+//		RE_Options().set_caseless(true).set_multiline(true)).PartialMatch(str);
 // (See below)
 //
 // If you are going to pass one of the most used modifiers, there are some
@@ -247,10 +247,10 @@
 // PCRE_CASELESS, PCRE_EXTENDED, and PCRE_MULTILINE to a RE with one
 // statement, you may write
 //
-//    RE(" ^ xyz \\s+ .* blah$", RE_Options()
-//                            .set_caseless(true)
-//                            .set_extended(true)
-//                            .set_multiline(true)).PartialMatch(sometext);
+//	 RE(" ^ xyz \\s+ .* blah$", RE_Options()
+//									 .set_caseless(true)
+//									 .set_extended(true)
+//									 .set_multiline(true)).PartialMatch(sometext);
 //
 // -----------------------------------------------------------------------
 // SCANNING TEXT INCREMENTALLY
@@ -262,15 +262,15 @@
 // is defined in the pcrecpp namespace.
 //
 // Example: read lines of the form "var = value" from a string.
-//    string contents = ...;                 // Fill string somehow
-//    pcrecpp::StringPiece input(contents);  // Wrap in a StringPiece
+//	 string contents = ...;					// Fill string somehow
+//	 pcrecpp::StringPiece input(contents);  // Wrap in a StringPiece
 //
-//    string var;
-//    int value;
-//    pcrecpp::RE re("(\\w+) = (\\d+)\n");
-//    while (re.Consume(&input, &var, &value)) {
-//      ...;
-//    }
+//	 string var;
+//	 int value;
+//	 pcrecpp::RE re("(\\w+) = (\\d+)\n");
+//	 while (re.Consume(&input, &var, &value)) {
+//		...;
+//	 }
 //
 // Each successful call to "Consume" will set "var/value", and also
 // advance "input" so it points past the matched text.
@@ -278,7 +278,7 @@
 // The "FindAndConsume" operation is similar to "Consume" but does not
 // anchor your match at the beginning of the string.  For example, you
 // could extract all words from a string by repeatedly calling
-//     pcrecpp::RE("(\\w+)").FindAndConsume(&input, &word)
+//	  pcrecpp::RE("(\\w+)").FindAndConsume(&input, &word)
 //
 // -----------------------------------------------------------------------
 // PARSING HEX/OCTAL/C-RADIX NUMBERS
@@ -291,11 +291,11 @@
 // prefixes, but defaults to base-10.
 //
 // Example:
-//   int a, b, c, d;
-//   pcrecpp::RE re("(.*) (.*) (.*) (.*)");
-//   re.FullMatch("100 40 0100 0x40",
-//                pcrecpp::Octal(&a), pcrecpp::Hex(&b),
-//                pcrecpp::CRadix(&c), pcrecpp::CRadix(&d));
+//	int a, b, c, d;
+//	pcrecpp::RE re("(.*) (.*) (.*) (.*)");
+//	re.FullMatch("100 40 0100 0x40",
+//					 pcrecpp::Octal(&a), pcrecpp::Hex(&b),
+//					 pcrecpp::CRadix(&c), pcrecpp::CRadix(&d));
 // will leave 64 in a, b, c, and d.
 //
 // -----------------------------------------------------------------------
@@ -307,8 +307,8 @@
 // group from the pattern.  \0 in "rewrite" refers to the entire
 // matching text.  E.g.,
 //
-//   string s = "yabba dabba doo";
-//   pcrecpp::RE("b+").Replace("d", &s);
+//	string s = "yabba dabba doo";
+//	pcrecpp::RE("b+").Replace("d", &s);
 //
 // will leave "s" containing "yada dabba doo".  The result is true if
 // the pattern matches and a replacement occurs, or false otherwise.
@@ -317,8 +317,8 @@
 // occurrences of the pattern in the string with the rewrite.
 // Replacements are not subject to re-matching.  E.g.,
 //
-//   string s = "yabba dabba doo";
-//   pcrecpp::RE("b+").GlobalReplace("d", &s);
+//	string s = "yabba dabba doo";
+//	pcrecpp::RE("b+").GlobalReplace("d", &s);
 //
 // will leave "s" containing "yada dada doo".  It returns the number
 // of replacements made.
@@ -332,7 +332,7 @@
 
 #include <string>
 #include <pcre.h>
-#include <pcrecpparg.h>   // defines the Arg class
+#include <pcrecpparg.h>	// defines the Arg class
 // This isn't technically needed here, but we include it
 // anyway so folks who include pcrecpp.h don't have to.
 #include <pcre_stringpiece.h>
@@ -340,11 +340,11 @@
 namespace pcrecpp {
 
 #define PCRE_SET_OR_CLEAR(b, o) \
-    if (b) all_options_ |= (o); else all_options_ &= ~(o); \
-    return *this
+	 if (b) all_options_ |= (o); else all_options_ &= ~(o); \
+	 return *this
 
 #define PCRE_IS_SET(o)  \
-        (all_options_ & o) == o
+		(all_options_ & o) == o
 
 /***** Compiling regular expressions: the RE class *****/
 
@@ -361,96 +361,96 @@ class PCRECPP_EXP_DEFN RE_Options {
   // To facilitate transfer of legacy code from C programs
   //
   // This lets you do
-  //    RE(pattern, RE_Options(PCRE_CASELESS|PCRE_MULTILINE)).PartialMatch(str);
+  //	 RE(pattern, RE_Options(PCRE_CASELESS|PCRE_MULTILINE)).PartialMatch(str);
   // But new code is better off doing
-  //    RE(pattern,
-  //      RE_Options().set_caseless(true).set_multiline(true)).PartialMatch(str);
+  //	 RE(pattern,
+  //		RE_Options().set_caseless(true).set_multiline(true)).PartialMatch(str);
   RE_Options(int option_flags) : match_limit_(0), match_limit_recursion_(0),
-                                 all_options_(option_flags) {}
+											all_options_(option_flags) {}
   // we're fine with the default destructor, copy constructor, etc.
 
   // accessors and mutators
   int match_limit() const { return match_limit_; };
   RE_Options &set_match_limit(int limit) {
-    match_limit_ = limit;
-    return *this;
+	 match_limit_ = limit;
+	 return *this;
   }
 
   int match_limit_recursion() const { return match_limit_recursion_; };
   RE_Options &set_match_limit_recursion(int limit) {
-    match_limit_recursion_ = limit;
-    return *this;
+	 match_limit_recursion_ = limit;
+	 return *this;
   }
 
   bool caseless() const {
-    return PCRE_IS_SET(PCRE_CASELESS);
+	 return PCRE_IS_SET(PCRE_CASELESS);
   }
   RE_Options &set_caseless(bool x) {
-    PCRE_SET_OR_CLEAR(x, PCRE_CASELESS);
+	 PCRE_SET_OR_CLEAR(x, PCRE_CASELESS);
   }
 
   bool multiline() const {
-    return PCRE_IS_SET(PCRE_MULTILINE);
+	 return PCRE_IS_SET(PCRE_MULTILINE);
   }
   RE_Options &set_multiline(bool x) {
-    PCRE_SET_OR_CLEAR(x, PCRE_MULTILINE);
+	 PCRE_SET_OR_CLEAR(x, PCRE_MULTILINE);
   }
 
   bool dotall() const {
-    return PCRE_IS_SET(PCRE_DOTALL);
+	 return PCRE_IS_SET(PCRE_DOTALL);
   }
   RE_Options &set_dotall(bool x) {
-    PCRE_SET_OR_CLEAR(x, PCRE_DOTALL);
+	 PCRE_SET_OR_CLEAR(x, PCRE_DOTALL);
   }
 
   bool extended() const {
-    return PCRE_IS_SET(PCRE_EXTENDED);
+	 return PCRE_IS_SET(PCRE_EXTENDED);
   }
   RE_Options &set_extended(bool x) {
-    PCRE_SET_OR_CLEAR(x, PCRE_EXTENDED);
+	 PCRE_SET_OR_CLEAR(x, PCRE_EXTENDED);
   }
 
   bool dollar_endonly() const {
-    return PCRE_IS_SET(PCRE_DOLLAR_ENDONLY);
+	 return PCRE_IS_SET(PCRE_DOLLAR_ENDONLY);
   }
   RE_Options &set_dollar_endonly(bool x) {
-    PCRE_SET_OR_CLEAR(x, PCRE_DOLLAR_ENDONLY);
+	 PCRE_SET_OR_CLEAR(x, PCRE_DOLLAR_ENDONLY);
   }
 
   bool extra() const {
-    return PCRE_IS_SET(PCRE_EXTRA);
+	 return PCRE_IS_SET(PCRE_EXTRA);
   }
   RE_Options &set_extra(bool x) {
-    PCRE_SET_OR_CLEAR(x, PCRE_EXTRA);
+	 PCRE_SET_OR_CLEAR(x, PCRE_EXTRA);
   }
 
   bool ungreedy() const {
-    return PCRE_IS_SET(PCRE_UNGREEDY);
+	 return PCRE_IS_SET(PCRE_UNGREEDY);
   }
   RE_Options &set_ungreedy(bool x) {
-    PCRE_SET_OR_CLEAR(x, PCRE_UNGREEDY);
+	 PCRE_SET_OR_CLEAR(x, PCRE_UNGREEDY);
   }
 
   bool utf8() const {
-    return PCRE_IS_SET(PCRE_UTF8);
+	 return PCRE_IS_SET(PCRE_UTF8);
   }
   RE_Options &set_utf8(bool x) {
-    PCRE_SET_OR_CLEAR(x, PCRE_UTF8);
+	 PCRE_SET_OR_CLEAR(x, PCRE_UTF8);
   }
 
   bool no_auto_capture() const {
-    return PCRE_IS_SET(PCRE_NO_AUTO_CAPTURE);
+	 return PCRE_IS_SET(PCRE_NO_AUTO_CAPTURE);
   }
   RE_Options &set_no_auto_capture(bool x) {
-    PCRE_SET_OR_CLEAR(x, PCRE_NO_AUTO_CAPTURE);
+	 PCRE_SET_OR_CLEAR(x, PCRE_NO_AUTO_CAPTURE);
   }
 
   RE_Options &set_all_options(int opt) {
-    all_options_ = opt;
-    return *this;
+	 all_options_ = opt;
+	 return *this;
   }
   int all_options() const {
-    return all_options_ ;
+	 return all_options_ ;
   }
 
   // TODO: add other pcre flags
@@ -493,34 +493,34 @@ class PCRECPP_EXP_DEFN RE {
   RE(const char* pat) { Init(pat, NULL); }
   RE(const char* pat, const RE_Options& option) { Init(pat, &option); }
   RE(const unsigned char* pat) {
-    Init(reinterpret_cast<const char*>(pat), NULL);
+	 Init(reinterpret_cast<const char*>(pat), NULL);
   }
   RE(const unsigned char* pat, const RE_Options& option) {
-    Init(reinterpret_cast<const char*>(pat), &option);
+	 Init(reinterpret_cast<const char*>(pat), &option);
   }
 
   // Copy constructor & assignment - note that these are expensive
   // because they recompile the expression.
   RE(const RE& re) { Init(re.pattern_, &re.options_); }
   const RE& operator=(const RE& re) {
-    if (this != &re) {
-      Cleanup();
+	 if (this != &re) {
+		Cleanup();
 
-      // This is the code that originally came from Google
-      // Init(re.pattern_.c_str(), &re.options_);
+		// This is the code that originally came from Google
+		// Init(re.pattern_.c_str(), &re.options_);
 
-      // This is the replacement from Ari Pollak
-      Init(re.pattern_, &re.options_);
-    }
-    return *this;
+		// This is the replacement from Ari Pollak
+		Init(re.pattern_, &re.options_);
+	 }
+	 return *this;
   }
 
 
   ~RE();
 
   // The string specification for this RE.  E.g.
-  //   RE re("ab*c?d+");
-  //   re.pattern();    // "ab*c?d+"
+  //	RE re("ab*c?d+");
+  //	re.pattern();	 // "ab*c?d+"
   const string& pattern() const { return pattern_; }
 
   // If RE could not be created properly, returns an error string.
@@ -533,93 +533,93 @@ class PCRECPP_EXP_DEFN RE {
   // easily as ReplaceAll(pattern-text, ....)
 
   bool FullMatch(const StringPiece& text,
-                 const Arg& ptr1 = no_arg,
-                 const Arg& ptr2 = no_arg,
-                 const Arg& ptr3 = no_arg,
-                 const Arg& ptr4 = no_arg,
-                 const Arg& ptr5 = no_arg,
-                 const Arg& ptr6 = no_arg,
-                 const Arg& ptr7 = no_arg,
-                 const Arg& ptr8 = no_arg,
-                 const Arg& ptr9 = no_arg,
-                 const Arg& ptr10 = no_arg,
-                 const Arg& ptr11 = no_arg,
-                 const Arg& ptr12 = no_arg,
-                 const Arg& ptr13 = no_arg,
-                 const Arg& ptr14 = no_arg,
-                 const Arg& ptr15 = no_arg,
-                 const Arg& ptr16 = no_arg) const;
+					const Arg& ptr1 = no_arg,
+					const Arg& ptr2 = no_arg,
+					const Arg& ptr3 = no_arg,
+					const Arg& ptr4 = no_arg,
+					const Arg& ptr5 = no_arg,
+					const Arg& ptr6 = no_arg,
+					const Arg& ptr7 = no_arg,
+					const Arg& ptr8 = no_arg,
+					const Arg& ptr9 = no_arg,
+					const Arg& ptr10 = no_arg,
+					const Arg& ptr11 = no_arg,
+					const Arg& ptr12 = no_arg,
+					const Arg& ptr13 = no_arg,
+					const Arg& ptr14 = no_arg,
+					const Arg& ptr15 = no_arg,
+					const Arg& ptr16 = no_arg) const;
 
   bool PartialMatch(const StringPiece& text,
-                    const Arg& ptr1 = no_arg,
-                    const Arg& ptr2 = no_arg,
-                    const Arg& ptr3 = no_arg,
-                    const Arg& ptr4 = no_arg,
-                    const Arg& ptr5 = no_arg,
-                    const Arg& ptr6 = no_arg,
-                    const Arg& ptr7 = no_arg,
-                    const Arg& ptr8 = no_arg,
-                    const Arg& ptr9 = no_arg,
-                    const Arg& ptr10 = no_arg,
-                    const Arg& ptr11 = no_arg,
-                    const Arg& ptr12 = no_arg,
-                    const Arg& ptr13 = no_arg,
-                    const Arg& ptr14 = no_arg,
-                    const Arg& ptr15 = no_arg,
-                    const Arg& ptr16 = no_arg) const;
+						const Arg& ptr1 = no_arg,
+						const Arg& ptr2 = no_arg,
+						const Arg& ptr3 = no_arg,
+						const Arg& ptr4 = no_arg,
+						const Arg& ptr5 = no_arg,
+						const Arg& ptr6 = no_arg,
+						const Arg& ptr7 = no_arg,
+						const Arg& ptr8 = no_arg,
+						const Arg& ptr9 = no_arg,
+						const Arg& ptr10 = no_arg,
+						const Arg& ptr11 = no_arg,
+						const Arg& ptr12 = no_arg,
+						const Arg& ptr13 = no_arg,
+						const Arg& ptr14 = no_arg,
+						const Arg& ptr15 = no_arg,
+						const Arg& ptr16 = no_arg) const;
 
   bool Consume(StringPiece* input,
-               const Arg& ptr1 = no_arg,
-               const Arg& ptr2 = no_arg,
-               const Arg& ptr3 = no_arg,
-               const Arg& ptr4 = no_arg,
-               const Arg& ptr5 = no_arg,
-               const Arg& ptr6 = no_arg,
-               const Arg& ptr7 = no_arg,
-               const Arg& ptr8 = no_arg,
-               const Arg& ptr9 = no_arg,
-               const Arg& ptr10 = no_arg,
-               const Arg& ptr11 = no_arg,
-               const Arg& ptr12 = no_arg,
-               const Arg& ptr13 = no_arg,
-               const Arg& ptr14 = no_arg,
-               const Arg& ptr15 = no_arg,
-               const Arg& ptr16 = no_arg) const;
+					const Arg& ptr1 = no_arg,
+					const Arg& ptr2 = no_arg,
+					const Arg& ptr3 = no_arg,
+					const Arg& ptr4 = no_arg,
+					const Arg& ptr5 = no_arg,
+					const Arg& ptr6 = no_arg,
+					const Arg& ptr7 = no_arg,
+					const Arg& ptr8 = no_arg,
+					const Arg& ptr9 = no_arg,
+					const Arg& ptr10 = no_arg,
+					const Arg& ptr11 = no_arg,
+					const Arg& ptr12 = no_arg,
+					const Arg& ptr13 = no_arg,
+					const Arg& ptr14 = no_arg,
+					const Arg& ptr15 = no_arg,
+					const Arg& ptr16 = no_arg) const;
 
   bool FindAndConsume(StringPiece* input,
-                      const Arg& ptr1 = no_arg,
-                      const Arg& ptr2 = no_arg,
-                      const Arg& ptr3 = no_arg,
-                      const Arg& ptr4 = no_arg,
-                      const Arg& ptr5 = no_arg,
-                      const Arg& ptr6 = no_arg,
-                      const Arg& ptr7 = no_arg,
-                      const Arg& ptr8 = no_arg,
-                      const Arg& ptr9 = no_arg,
-                      const Arg& ptr10 = no_arg,
-                      const Arg& ptr11 = no_arg,
-                      const Arg& ptr12 = no_arg,
-                      const Arg& ptr13 = no_arg,
-                      const Arg& ptr14 = no_arg,
-                      const Arg& ptr15 = no_arg,
-                      const Arg& ptr16 = no_arg) const;
+							 const Arg& ptr1 = no_arg,
+							 const Arg& ptr2 = no_arg,
+							 const Arg& ptr3 = no_arg,
+							 const Arg& ptr4 = no_arg,
+							 const Arg& ptr5 = no_arg,
+							 const Arg& ptr6 = no_arg,
+							 const Arg& ptr7 = no_arg,
+							 const Arg& ptr8 = no_arg,
+							 const Arg& ptr9 = no_arg,
+							 const Arg& ptr10 = no_arg,
+							 const Arg& ptr11 = no_arg,
+							 const Arg& ptr12 = no_arg,
+							 const Arg& ptr13 = no_arg,
+							 const Arg& ptr14 = no_arg,
+							 const Arg& ptr15 = no_arg,
+							 const Arg& ptr16 = no_arg) const;
 
   bool Replace(const StringPiece& rewrite,
-               string *str) const;
+					string *str) const;
 
   int GlobalReplace(const StringPiece& rewrite,
-                    string *str) const;
+						string *str) const;
 
   bool Extract(const StringPiece &rewrite,
-               const StringPiece &text,
-               string *out) const;
+					const StringPiece &text,
+					string *out) const;
 
   // Escapes all potentially meaningful regexp characters in
   // 'unquoted'.  The returned string, used as a regular expression,
   // will exactly match the original string.  For example,
-  //           1.5-2.0?
+  //			1.5-2.0?
   // may become:
-  //           1\.5\-2\.0\?
+  //			1\.5\-2\.0\?
   // Note QuoteMeta behaves the same as perl's QuoteMeta function,
   // *except* that it escapes the NUL character (\0) as backslash + 0,
   // rather than backslash + NUL.
@@ -630,17 +630,17 @@ class PCRECPP_EXP_DEFN RE {
 
   // Type of match (TODO: Should be restructured as part of RE_Options)
   enum Anchor {
-    UNANCHORED,         // No anchoring
-    ANCHOR_START,       // Anchor at start only
-    ANCHOR_BOTH         // Anchor at start and end
+	 UNANCHORED,			// No anchoring
+	 ANCHOR_START,		 // Anchor at start only
+	 ANCHOR_BOTH			// Anchor at start and end
   };
 
   // General matching routine.  Stores the length of the match in
   // "*consumed" if successful.
   bool DoMatch(const StringPiece& text,
-               Anchor anchor,
-               int* consumed,
-               const Arg* const* args, int n) const;
+					Anchor anchor,
+					int* consumed,
+					const Arg* const* args, int n) const;
 
   // Return the number of capturing subpatterns, or -1 if the
   // regexp wasn't valid on construction.
@@ -650,7 +650,7 @@ class PCRECPP_EXP_DEFN RE {
   // list. This must be used only in optional argument defaults. It should NOT
   // be passed explicitly. Some people have tried to use it like this:
   //
-  //   FullMatch(x, y, &z, no_arg, &w);
+  //	FullMatch(x, y, &z, no_arg, &w);
   //
   // This is a mistake, and will not work.
   static Arg no_arg;
@@ -672,39 +672,39 @@ class PCRECPP_EXP_DEFN RE {
   // When matching RE("(foo)|hello") against "hello", it will return 1.
   // But the values for all subpattern are filled in into "vec".
   int TryMatch(const StringPiece& text,
-               int startpos,
-               Anchor anchor,
-               bool empty_ok,
-               int *vec,
-               int vecsize) const;
+					int startpos,
+					Anchor anchor,
+					bool empty_ok,
+					int *vec,
+					int vecsize) const;
 
   // Append the "rewrite" string, with backslash subsitutions from "text"
   // and "vec", to string "out".
   bool Rewrite(string *out,
-               const StringPiece& rewrite,
-               const StringPiece& text,
-               int *vec,
-               int veclen) const;
+					const StringPiece& rewrite,
+					const StringPiece& text,
+					int *vec,
+					int veclen) const;
 
   // internal implementation for DoMatch
   bool DoMatchImpl(const StringPiece& text,
-                   Anchor anchor,
-                   int* consumed,
-                   const Arg* const args[],
-                   int n,
-                   int* vec,
-                   int vecsize) const;
+						 Anchor anchor,
+						 int* consumed,
+						 const Arg* const args[],
+						 int n,
+						 int* vec,
+						 int vecsize) const;
 
   // Compile the regexp for the specified anchoring mode
   pcre* Compile(Anchor anchor);
 
-  string        pattern_;
-  RE_Options    options_;
-  pcre*         re_full_;       // For full matches
-  pcre*         re_partial_;    // For partial matches
-  const string* error_;         // Error indicator (or points to empty string)
+  string		pattern_;
+  RE_Options	 options_;
+  pcre*			re_full_;		 // For full matches
+  pcre*			re_partial_;	 // For partial matches
+  const string* error_;			// Error indicator (or points to empty string)
 };
 
-}   // namespace pcrecpp
+}	// namespace pcrecpp
 
 #endif /* _PCRECPP_H */

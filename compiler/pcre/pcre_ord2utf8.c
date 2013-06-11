@@ -1,27 +1,27 @@
 /*************************************************
-*      Perl-Compatible Regular Expressions       *
+*		Perl-Compatible Regular Expressions		 *
 *************************************************/
 
 /* PCRE is a library of functions to support regular expressions whose syntax
 and semantics are as close as possible to those of the Perl 5 language.
 
-                       Written by Philip Hazel
-           Copyright (c) 1997-2012 University of Cambridge
+							Written by Philip Hazel
+			Copyright (c) 1997-2012 University of Cambridge
 
 -----------------------------------------------------------------------------
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
 
-    * Redistributions of source code must retain the above copyright notice,
-      this list of conditions and the following disclaimer.
+	 * Redistributions of source code must retain the above copyright notice,
+		this list of conditions and the following disclaimer.
 
-    * Redistributions in binary form must reproduce the above copyright
-      notice, this list of conditions and the following disclaimer in the
-      documentation and/or other materials provided with the distribution.
+	 * Redistributions in binary form must reproduce the above copyright
+		notice, this list of conditions and the following disclaimer in the
+		documentation and/or other materials provided with the distribution.
 
-    * Neither the name of the University of Cambridge nor the names of its
-      contributors may be used to endorse or promote products derived from
-      this software without specific prior written permission.
+	 * Neither the name of the University of Cambridge nor the names of its
+		contributors may be used to endorse or promote products derived from
+		this software without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -50,17 +50,17 @@ character value into a UTF8 string. */
 #include "pcre_internal.h"
 
 /*************************************************
-*       Convert character value to UTF-8         *
+*		 Convert character value to UTF-8			*
 *************************************************/
 
 /* This function takes an integer value in the range 0 - 0x10ffff
 and encodes it as a UTF-8 character in 1 to 4 pcre_uchars.
 
 Arguments:
-  cvalue     the character value
-  buffer     pointer to buffer for result - at least 6 pcre_uchars long
+  cvalue	  the character value
+  buffer	  pointer to buffer for result - at least 6 pcre_uchars long
 
-Returns:     number of characters placed in the buffer
+Returns:	  number of characters placed in the buffer
 */
 
 unsigned

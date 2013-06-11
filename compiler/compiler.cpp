@@ -1,11 +1,11 @@
 /**
-**  @file        compilernew.cpp
+**	@file		compilernew.cpp
 **
-**  @author      Lab 435, Xidian University
+**	@author		Lab 435, Xidian University
 **
-**  @brief       Support functions for compile rule to dfa
+**	@brief		Support functions for compile rule to dfa
 **
-**  This implements compile rule to dfa algorithm
+**	This implements compile rule to dfa algorithm
 **
 */
 
@@ -17,10 +17,10 @@
 /* complie one rule
 
 Arguments:
-  rule        the snort rule
-  lpVoid      the compile result
+  rule		the snort rule
+  lpVoid		the compile result
 
-Returns:      nothing
+Returns:		nothing
 
 */
 void __stdcall Process(const CSnortRule &rule, void *lpVoid)
@@ -55,10 +55,10 @@ void __stdcall Process(const CSnortRule &rule, void *lpVoid)
 /* complie all rules
 
 Arguments:
-  filename    path of the file where all rules are saved in
-  result      the compile result
+  filename	 path of the file where all rules are saved in
+  result		the compile result
 
-Returns:      nothing
+Returns:		nothing
 
 */
 
@@ -104,15 +104,15 @@ COMPILERHDR ulong CompileFile(const char *fileName, RECIEVER recv, void *lpUser)
 /* complie one rule to several dfas
 
 Arguments:
-  rule        the snort rule
-  result      the compile result
+  rule		the snort rule
+  result		the compile result
   ruleResult  the relationship between sid and dfa ids
 
-Returns:      nothing
+Returns:		nothing
 
 */
 COMPILERHDR void Rule2Dfas(const CSnortRule &rule, CCompileResults &result,
-						   COMPILEDRULENEW &ruleResult)
+							COMPILEDRULENEW &ruleResult)
 {
 	CRegRule regrule;
 	CTimer ctime;//for test

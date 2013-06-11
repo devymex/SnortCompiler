@@ -1,27 +1,27 @@
 /*************************************************
-*      Perl-Compatible Regular Expressions       *
+*		Perl-Compatible Regular Expressions		 *
 *************************************************/
 
 /* PCRE is a library of functions to support regular expressions whose syntax
 and semantics are as close as possible to those of the Perl 5 language.
 
-                       Written by Philip Hazel
-           Copyright (c) 1997-2012 University of Cambridge
+							Written by Philip Hazel
+			Copyright (c) 1997-2012 University of Cambridge
 
 -----------------------------------------------------------------------------
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
 
-    * Redistributions of source code must retain the above copyright notice,
-      this list of conditions and the following disclaimer.
+	 * Redistributions of source code must retain the above copyright notice,
+		this list of conditions and the following disclaimer.
 
-    * Redistributions in binary form must reproduce the above copyright
-      notice, this list of conditions and the following disclaimer in the
-      documentation and/or other materials provided with the distribution.
+	 * Redistributions in binary form must reproduce the above copyright
+		notice, this list of conditions and the following disclaimer in the
+		documentation and/or other materials provided with the distribution.
 
-    * Neither the name of the University of Cambridge nor the names of its
-      contributors may be used to endorse or promote products derived from
-      this software without specific prior written permission.
+	 * Neither the name of the University of Cambridge nor the names of its
+		contributors may be used to endorse or promote products derived from
+		this software without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -50,19 +50,19 @@ information about a compiled pattern. */
 
 
 /*************************************************
-*        Return info about compiled pattern      *
+*		Return info about compiled pattern		*
 *************************************************/
 
 /* This is a newer "info" function which has an extensible interface so
 that additional items can be added compatibly.
 
 Arguments:
-  argument_re      points to compiled code
-  extra_data       points extra data, or NULL
-  what             what information is required
-  where            where to put the information
+  argument_re		points to compiled code
+  extra_data		 points extra data, or NULL
+  what				 what information is required
+  where				where to put the information
 
-Returns:           0 if data returned, negative on error
+Returns:			0 if data returned, negative on error
 */
 
 #if defined COMPILE_PCRE8
@@ -94,7 +94,7 @@ means that the pattern is likely compiled with different endianness. */
 
 if (re->magic_number != MAGIC_NUMBER)
   return re->magic_number == REVERSED_MAGIC_NUMBER?
-    PCRE_ERROR_BADENDIANNESS:PCRE_ERROR_BADMAGIC;
+	 PCRE_ERROR_BADENDIANNESS:PCRE_ERROR_BADMAGIC;
 
 /* Check that this pattern was compiled in the correct bit mode */
 
@@ -117,10 +117,10 @@ switch (what)
   case PCRE_INFO_JITSIZE:
 #ifdef SUPPORT_JIT
   *((size_t *)where) =
-      (extra_data != NULL &&
-      (extra_data->flags & PCRE_EXTRA_EXECUTABLE_JIT) != 0 &&
-      extra_data->executable_jit != NULL)?
-    PRIV(jit_get_size)(extra_data->executable_jit) : 0;
+		(extra_data != NULL &&
+		(extra_data->flags & PCRE_EXTRA_EXECUTABLE_JIT) != 0 &&
+		extra_data->executable_jit != NULL)?
+	 PRIV(jit_get_size)(extra_data->executable_jit) : 0;
 #else
   *((size_t *)where) = 0;
 #endif
@@ -136,56 +136,56 @@ switch (what)
 
   case PCRE_INFO_FIRSTBYTE:
   *((int *)where) =
-    ((re->flags & PCRE_FIRSTSET) != 0)? (int)re->first_char :
-    ((re->flags & PCRE_STARTLINE) != 0)? -1 : -2;
+	 ((re->flags & PCRE_FIRSTSET) != 0)? (int)re->first_char :
+	 ((re->flags & PCRE_STARTLINE) != 0)? -1 : -2;
   break;
 
   case PCRE_INFO_FIRSTCHARACTER:
-    *((pcre_uint32 *)where) =
-      (re->flags & PCRE_FIRSTSET) != 0 ? re->first_char : 0;
-    break;
+	 *((pcre_uint32 *)where) =
+		(re->flags & PCRE_FIRSTSET) != 0 ? re->first_char : 0;
+	 break;
 
   case PCRE_INFO_FIRSTCHARACTERFLAGS:
-    *((int *)where) =
-      ((re->flags & PCRE_FIRSTSET) != 0) ? 1 :
-      ((re->flags & PCRE_STARTLINE) != 0) ? 2 : 0;
-    break;
+	 *((int *)where) =
+		((re->flags & PCRE_FIRSTSET) != 0) ? 1 :
+		((re->flags & PCRE_STARTLINE) != 0) ? 2 : 0;
+	 break;
 
   /* Make sure we pass back the pointer to the bit vector in the external
   block, not the internal copy (with flipped integer fields). */
 
   case PCRE_INFO_FIRSTTABLE:
   *((const pcre_uint8 **)where) =
-    (study != NULL && (study->flags & PCRE_STUDY_MAPPED) != 0)?
-      ((const pcre_study_data *)extra_data->study_data)->start_bits : NULL;
+	 (study != NULL && (study->flags & PCRE_STUDY_MAPPED) != 0)?
+		((const pcre_study_data *)extra_data->study_data)->start_bits : NULL;
   break;
 
   case PCRE_INFO_MINLENGTH:
   *((int *)where) =
-    (study != NULL && (study->flags & PCRE_STUDY_MINLEN) != 0)?
-      (int)(study->minlength) : -1;
+	 (study != NULL && (study->flags & PCRE_STUDY_MINLEN) != 0)?
+		(int)(study->minlength) : -1;
   break;
 
   case PCRE_INFO_JIT:
   *((int *)where) = extra_data != NULL &&
-                    (extra_data->flags & PCRE_EXTRA_EXECUTABLE_JIT) != 0 &&
-                    extra_data->executable_jit != NULL;
+						(extra_data->flags & PCRE_EXTRA_EXECUTABLE_JIT) != 0 &&
+						extra_data->executable_jit != NULL;
   break;
 
   case PCRE_INFO_LASTLITERAL:
   *((int *)where) =
-    ((re->flags & PCRE_REQCHSET) != 0)? (int)re->req_char : -1;
+	 ((re->flags & PCRE_REQCHSET) != 0)? (int)re->req_char : -1;
   break;
 
   case PCRE_INFO_REQUIREDCHAR:
-    *((pcre_uint32 *)where) =
-      ((re->flags & PCRE_REQCHSET) != 0) ? re->req_char : 0;
-    break;
+	 *((pcre_uint32 *)where) =
+		((re->flags & PCRE_REQCHSET) != 0) ? re->req_char : 0;
+	 break;
 
   case PCRE_INFO_REQUIREDCHARFLAGS:
-    *((int *)where) =
-      ((re->flags & PCRE_REQCHSET) != 0);
-    break;
+	 *((int *)where) =
+		((re->flags & PCRE_REQCHSET) != 0);
+	 break;
 
   case PCRE_INFO_NAMEENTRYSIZE:
   *((int *)where) = re->name_entry_size;

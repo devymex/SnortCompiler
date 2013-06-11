@@ -1,9 +1,9 @@
 /**
-**  @file        dfarow.h
+**	@file		dfarow.h
 **
-**  @author      Lab 435, Xidian University
+**	@author		Lab 435, Xidian University
 **
-**  @brief       Declaration of the CDfaRow class
+**	@brief		Declaration of the CDfaRow class
 **
 ** Store a row for CDfaRow. Array of std::vector<ulong>. Each element of the
 ** array stand by a column that indicates the jumping character.
@@ -33,8 +33,8 @@ class DFAHDR CDfaRow
 public:
 	enum STATEFLAG
 	{
-		NORMAL   = 1 << 0,
-		START    = 1 << 1,
+		NORMAL	= 1 << 0,
+		START	 = 1 << 1,
 		TERMINAL = 1 << 2
 	};
 

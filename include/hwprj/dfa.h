@@ -1,11 +1,11 @@
 /**
-**  @file        dfa.h
+**	@file		dfa.h
 **
-**  @author      Lab 435, Xidian University
+**	@author		Lab 435, Xidian University
 **
-**  @brief       Deterministic Finite Automaton
+**	@brief		Deterministic Finite Automaton
 **
-**  Declaration of the CDfa class
+**	Declaration of the CDfa class
 **
 */
 
@@ -16,6 +16,8 @@
 #include <hwprj\dfarow.h>
 #include <hwprj\finalstates.h>
 #include <hwprj\unsary.h>
+
+#include <vector>
 
 /* Hiding the stl object in member of CDfa*/
 #ifndef DFAHDR_DS

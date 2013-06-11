@@ -1,5 +1,5 @@
 /*************************************************
-*          Unicode Property Table handler        *
+*			 Unicode Property Table handler		*
 *************************************************/
 
 #ifndef _UCP_H
@@ -16,48 +16,48 @@ where the equivalent property descriptive names are listed in vectors. */
 /* These are the general character categories. */
 
 enum {
-  ucp_C,     /* Other */
-  ucp_L,     /* Letter */
-  ucp_M,     /* Mark */
-  ucp_N,     /* Number */
-  ucp_P,     /* Punctuation */
-  ucp_S,     /* Symbol */
-  ucp_Z      /* Separator */
+  ucp_C,	  /* Other */
+  ucp_L,	  /* Letter */
+  ucp_M,	  /* Mark */
+  ucp_N,	  /* Number */
+  ucp_P,	  /* Punctuation */
+  ucp_S,	  /* Symbol */
+  ucp_Z		/* Separator */
 };
 
 /* These are the particular character categories. */
 
 enum {
-  ucp_Cc,    /* Control */
-  ucp_Cf,    /* Format */
-  ucp_Cn,    /* Unassigned */
-  ucp_Co,    /* Private use */
-  ucp_Cs,    /* Surrogate */
-  ucp_Ll,    /* Lower case letter */
-  ucp_Lm,    /* Modifier letter */
-  ucp_Lo,    /* Other letter */
-  ucp_Lt,    /* Title case letter */
-  ucp_Lu,    /* Upper case letter */
-  ucp_Mc,    /* Spacing mark */
-  ucp_Me,    /* Enclosing mark */
-  ucp_Mn,    /* Non-spacing mark */
-  ucp_Nd,    /* Decimal number */
-  ucp_Nl,    /* Letter number */
-  ucp_No,    /* Other number */
-  ucp_Pc,    /* Connector punctuation */
-  ucp_Pd,    /* Dash punctuation */
-  ucp_Pe,    /* Close punctuation */
-  ucp_Pf,    /* Final punctuation */
-  ucp_Pi,    /* Initial punctuation */
-  ucp_Po,    /* Other punctuation */
-  ucp_Ps,    /* Open punctuation */
-  ucp_Sc,    /* Currency symbol */
-  ucp_Sk,    /* Modifier symbol */
-  ucp_Sm,    /* Mathematical symbol */
-  ucp_So,    /* Other symbol */
-  ucp_Zl,    /* Line separator */
-  ucp_Zp,    /* Paragraph separator */
-  ucp_Zs     /* Space separator */
+  ucp_Cc,	 /* Control */
+  ucp_Cf,	 /* Format */
+  ucp_Cn,	 /* Unassigned */
+  ucp_Co,	 /* Private use */
+  ucp_Cs,	 /* Surrogate */
+  ucp_Ll,	 /* Lower case letter */
+  ucp_Lm,	 /* Modifier letter */
+  ucp_Lo,	 /* Other letter */
+  ucp_Lt,	 /* Title case letter */
+  ucp_Lu,	 /* Upper case letter */
+  ucp_Mc,	 /* Spacing mark */
+  ucp_Me,	 /* Enclosing mark */
+  ucp_Mn,	 /* Non-spacing mark */
+  ucp_Nd,	 /* Decimal number */
+  ucp_Nl,	 /* Letter number */
+  ucp_No,	 /* Other number */
+  ucp_Pc,	 /* Connector punctuation */
+  ucp_Pd,	 /* Dash punctuation */
+  ucp_Pe,	 /* Close punctuation */
+  ucp_Pf,	 /* Final punctuation */
+  ucp_Pi,	 /* Initial punctuation */
+  ucp_Po,	 /* Other punctuation */
+  ucp_Ps,	 /* Open punctuation */
+  ucp_Sc,	 /* Currency symbol */
+  ucp_Sk,	 /* Modifier symbol */
+  ucp_Sm,	 /* Mathematical symbol */
+  ucp_So,	 /* Other symbol */
+  ucp_Zl,	 /* Line separator */
+  ucp_Zp,	 /* Paragraph separator */
+  ucp_Zs	  /* Space separator */
 };
 
 /* These are grapheme break properties. Note that the code for processing them
@@ -65,19 +65,19 @@ assumes that the values are less than 16. If more values are added that take
 the number to 16 or more, the code will have to be rewritten. */
 
 enum {
-  ucp_gbCR,                /*  0 */
-  ucp_gbLF,                /*  1 */
-  ucp_gbControl,           /*  2 */
-  ucp_gbExtend,            /*  3 */
-  ucp_gbPrepend,           /*  4 */
-  ucp_gbSpacingMark,       /*  5 */
-  ucp_gbL,                 /*  6 Hangul syllable type L */
-  ucp_gbV,                 /*  7 Hangul syllable type V */
-  ucp_gbT,                 /*  8 Hangul syllable type T */
-  ucp_gbLV,                /*  9 Hangul syllable type LV */
-  ucp_gbLVT,               /* 10 Hangul syllable type LVT */
+  ucp_gbCR,					 /*  0 */
+  ucp_gbLF,					 /*  1 */
+  ucp_gbControl,			/*  2 */
+  ucp_gbExtend,				/*  3 */
+  ucp_gbPrepend,			/*  4 */
+  ucp_gbSpacingMark,		 /*  5 */
+  ucp_gbL,					/*  6 Hangul syllable type L */
+  ucp_gbV,					/*  7 Hangul syllable type V */
+  ucp_gbT,					/*  8 Hangul syllable type T */
+  ucp_gbLV,					 /*  9 Hangul syllable type LV */
+  ucp_gbLVT,					/* 10 Hangul syllable type LVT */
   ucp_gbRegionalIndicator, /* 11 */
-  ucp_gbOther              /* 12 */
+  ucp_gbOther				/* 12 */
 };
 
 /* These are the script identifications. */

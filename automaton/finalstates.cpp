@@ -1,6 +1,9 @@
 #include "stdafx.h"
 #include <hwprj\finalstates.h>
 
+typedef FINSTAMAP::iterator								FINSTAMAP_ITER;
+typedef FINSTAMAP::const_iterator						FINSTAMAP_CITER;
+
 FINSTAHDR_DS CFinalStates::CFinalStates()
 {
 	m_pStates = new STATEVEC;
@@ -53,7 +56,7 @@ FINSTAHDR_DS void CFinalStates::PushBack(STATEID nStaId)
 	}
 }
 
-FINSTAHDR_DS void CFinalStates::PushBack(STATEID nStaId, ulong nDfaId)
+FINSTAHDR_DS void CFinalStates::PushBack(STATEID nStaId, DFAID nDfaId)
 {
 	FINSTAMAP_ITER iter = m_pDfaIds->find(nStaId);
 	if (iter == m_pDfaIds->end())

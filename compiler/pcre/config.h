@@ -21,26 +21,26 @@ HAVE_BCOPY is set to 1. If your system has neither bcopy() nor memmove(), set
 them both to 0; an emulation function will be used. */
 
 /* By default, the \R escape sequence matches any Unicode line ending
-   character or sequence of characters. If BSR_ANYCRLF is defined (to any
-   value), this is changed so that backslash-R matches only CR, LF, or CRLF.
-   The build-time default can be overridden by the user of PCRE at runtime. */
+	character or sequence of characters. If BSR_ANYCRLF is defined (to any
+	value), this is changed so that backslash-R matches only CR, LF, or CRLF.
+	The build-time default can be overridden by the user of PCRE at runtime. */
 /* #undef BSR_ANYCRLF */
 
 /* If you are compiling for a system that uses EBCDIC instead of ASCII
-   character codes, define this macro to any value. You must also edit the
-   NEWLINE macro below to set a suitable EBCDIC newline, commonly 21 (0x15).
-   On systems that can use "configure" or CMake to set EBCDIC, NEWLINE is
-   automatically adjusted. When EBCDIC is set, PCRE assumes that all input
-   strings are in EBCDIC. If you do not define this macro, PCRE will assume
-   input strings are ASCII or UTF-8/16/32 Unicode. It is not possible to build
-   a version of PCRE that supports both EBCDIC and UTF-8/16/32. */
+	character codes, define this macro to any value. You must also edit the
+	NEWLINE macro below to set a suitable EBCDIC newline, commonly 21 (0x15).
+	On systems that can use "configure" or CMake to set EBCDIC, NEWLINE is
+	automatically adjusted. When EBCDIC is set, PCRE assumes that all input
+	strings are in EBCDIC. If you do not define this macro, PCRE will assume
+	input strings are ASCII or UTF-8/16/32 Unicode. It is not possible to build
+	a version of PCRE that supports both EBCDIC and UTF-8/16/32. */
 /* #undef EBCDIC */
 
 /* In an EBCDIC environment, define this macro to any value to arrange for the
-   NL character to be 0x25 instead of the default 0x15. NL plays the role that
-   LF does in an ASCII/Unicode environment. The value must also be set in the
-   NEWLINE macro below. On systems that can use "configure" or CMake to set
-   EBCDIC_NL25, the adjustment of NEWLINE is automatic. */
+	NL character to be 0x25 instead of the default 0x15. NL plays the role that
+	LF does in an ASCII/Unicode environment. The value must also be set in the
+	NEWLINE macro below. On systems that can use "configure" or CMake to set
+	EBCDIC_NL25, the adjustment of NEWLINE is automatic. */
 /* #undef EBCDIC_NL25 */
 
 #pragma warning (disable : 4146 4018 4244)
@@ -176,7 +176,7 @@ them both to 0; an emulation function will be used. */
 #endif
 
 /* Define to 1 or 0, depending whether the compiler supports simple visibility
-   declarations. */
+	declarations. */
 #ifndef HAVE_VISIBILITY
 #define HAVE_VISIBILITY 1
 #endif
@@ -193,64 +193,64 @@ them both to 0; an emulation function will be used. */
 /* #undef HAVE__STRTOI64 */
 
 /* The value of LINK_SIZE determines the number of bytes used to store links
-   as offsets within the compiled regex. The default is 2, which allows for
-   compiled patterns up to 64K long. This covers the vast majority of cases.
-   However, PCRE can also be compiled to use 3 or 4 bytes instead. This allows
-   for longer patterns in extreme cases. */
+	as offsets within the compiled regex. The default is 2, which allows for
+	compiled patterns up to 64K long. This covers the vast majority of cases.
+	However, PCRE can also be compiled to use 3 or 4 bytes instead. This allows
+	for longer patterns in extreme cases. */
 #ifndef LINK_SIZE
 #define LINK_SIZE 2
 #endif
 
 /* Define to the sub-directory in which libtool stores uninstalled libraries.
-   */
+	*/
 #ifndef LT_OBJDIR
 #define LT_OBJDIR ".libs/"
 #endif
 
 /* The value of MATCH_LIMIT determines the default number of times the
-   internal match() function can be called during a single execution of
-   pcre_exec(). There is a runtime interface for setting a different limit.
-   The limit exists in order to catch runaway regular expressions that take
-   for ever to determine that they do not match. The default is set very large
-   so that it does not accidentally catch legitimate cases. */
+	internal match() function can be called during a single execution of
+	pcre_exec(). There is a runtime interface for setting a different limit.
+	The limit exists in order to catch runaway regular expressions that take
+	for ever to determine that they do not match. The default is set very large
+	so that it does not accidentally catch legitimate cases. */
 #ifndef MATCH_LIMIT
 #define MATCH_LIMIT 10000000
 #endif
 
 /* The above limit applies to all calls of match(), whether or not they
-   increase the recursion depth. In some environments it is desirable to limit
-   the depth of recursive calls of match() more strictly, in order to restrict
-   the maximum amount of stack (or heap, if NO_RECURSE is defined) that is
-   used. The value of MATCH_LIMIT_RECURSION applies only to recursive calls of
-   match(). To have any useful effect, it must be less than the value of
-   MATCH_LIMIT. The default is to use the same value as MATCH_LIMIT. There is
-   a runtime method for setting a different limit. */
+	increase the recursion depth. In some environments it is desirable to limit
+	the depth of recursive calls of match() more strictly, in order to restrict
+	the maximum amount of stack (or heap, if NO_RECURSE is defined) that is
+	used. The value of MATCH_LIMIT_RECURSION applies only to recursive calls of
+	match(). To have any useful effect, it must be less than the value of
+	MATCH_LIMIT. The default is to use the same value as MATCH_LIMIT. There is
+	a runtime method for setting a different limit. */
 #ifndef MATCH_LIMIT_RECURSION
 #define MATCH_LIMIT_RECURSION MATCH_LIMIT
 #endif
 
 /* This limit is parameterized just in case anybody ever wants to change it.
-   Care must be taken if it is increased, because it guards against integer
-   overflow caused by enormously large patterns. */
+	Care must be taken if it is increased, because it guards against integer
+	overflow caused by enormously large patterns. */
 #ifndef MAX_NAME_COUNT
 #define MAX_NAME_COUNT 10000
 #endif
 
 /* This limit is parameterized just in case anybody ever wants to change it.
-   Care must be taken if it is increased, because it guards against integer
-   overflow caused by enormously large patterns. */
+	Care must be taken if it is increased, because it guards against integer
+	overflow caused by enormously large patterns. */
 #ifndef MAX_NAME_SIZE
 #define MAX_NAME_SIZE 32
 #endif
 
 /* The value of NEWLINE determines the default newline character sequence.
-   PCRE client programs can override this by selecting other values at run
-   time. In ASCII environments, the value can be 10 (LF), 13 (CR), or 3338
-   (CRLF); in EBCDIC environments the value can be 21 or 37 (LF), 13 (CR), or
-   3349 or 3365 (CRLF) because there are two alternative codepoints (0x15 and
-   0x25) that are used as the NL line terminator that is equivalent to ASCII
-   LF. In both ASCII and EBCDIC environments the value can also be -1 (ANY),
-   or -2 (ANYCRLF). */
+	PCRE client programs can override this by selecting other values at run
+	time. In ASCII environments, the value can be 10 (LF), 13 (CR), or 3338
+	(CRLF); in EBCDIC environments the value can be 21 or 37 (LF), 13 (CR), or
+	3349 or 3365 (CRLF) because there are two alternative codepoints (0x15 and
+	0x25) that are used as the NL line terminator that is equivalent to ASCII
+	LF. In both ASCII and EBCDIC environments the value can also be -1 (ANY),
+	or -2 (ANYCRLF). */
 #ifndef NEWLINE
 #define NEWLINE 10
 #endif
@@ -259,12 +259,12 @@ them both to 0; an emulation function will be used. */
 /* #undef NO_MINUS_C_MINUS_O */
 
 /* PCRE uses recursive function calls to handle backtracking while matching.
-   This can sometimes be a problem on systems that have stacks of limited
-   size. Define NO_RECURSE to any value to get a version that doesn't use
-   recursion in the match() function; instead it creates its own stack by
-   steam using pcre_recurse_malloc() to obtain memory from the heap. For more
-   detail, see the comments and other stuff just above the match() function.
-   */
+	This can sometimes be a problem on systems that have stacks of limited
+	size. Define NO_RECURSE to any value to get a version that doesn't use
+	recursion in the match() function; instead it creates its own stack by
+	steam using pcre_recurse_malloc() to obtain memory from the heap. For more
+	detail, see the comments and other stuff just above the match() function.
+	*/
 /* #undef NO_RECURSE */
 
 /* Name of package */
@@ -289,41 +289,41 @@ them both to 0; an emulation function will be used. */
 #define PACKAGE_VERSION "8.32"
 
 /* The value of PCREGREP_BUFSIZE determines the size of buffer used by
-   pcregrep to hold parts of the file it is searching. This is also the
-   minimum value. The actual amount of memory used by pcregrep is three times
-   this number, because it allows for the buffering of "before" and "after"
-   lines. */
+	pcregrep to hold parts of the file it is searching. This is also the
+	minimum value. The actual amount of memory used by pcregrep is three times
+	this number, because it allows for the buffering of "before" and "after"
+	lines. */
 #ifndef PCREGREP_BUFSIZE
 #define PCREGREP_BUFSIZE 20480
 #endif
 
 /* If you are compiling for a system other than a Unix-like system or
-   Win32, and it needs some magic to be inserted before the definition
-   of a function that is exported by the library, define this macro to
-   contain the relevant magic. If you do not define this macro, a suitable
-    __declspec value is used for Windows systems; in other environments
-   "extern" is used for a C compiler and "extern C" for a C++ compiler.
-   This macro apears at the start of every exported function that is part
-   of the external API. It does not appear on functions that are "external"
-   in the C sense, but which are internal to the library. */
+	Win32, and it needs some magic to be inserted before the definition
+	of a function that is exported by the library, define this macro to
+	contain the relevant magic. If you do not define this macro, a suitable
+	 __declspec value is used for Windows systems; in other environments
+	"extern" is used for a C compiler and "extern C" for a C++ compiler.
+	This macro apears at the start of every exported function that is part
+	of the external API. It does not appear on functions that are "external"
+	in the C sense, but which are internal to the library. */
 /* #undef PCRE_EXP_DEFN */
 
 /* Define to any value if linking statically (TODO: make nice with Libtool) */
 /* #undef PCRE_STATIC */
 
 /* When calling PCRE via the POSIX interface, additional working storage is
-   required for holding the pointers to capturing substrings because PCRE
-   requires three integers per substring, whereas the POSIX interface provides
-   only two. If the number of expected substrings is small, the wrapper
-   function uses space on the stack, because this is faster than using
-   malloc() for each call. The threshold above which the stack is no longer
-   used is defined by POSIX_MALLOC_THRESHOLD. */
+	required for holding the pointers to capturing substrings because PCRE
+	requires three integers per substring, whereas the POSIX interface provides
+	only two. If the number of expected substrings is small, the wrapper
+	function uses space on the stack, because this is faster than using
+	malloc() for each call. The threshold above which the stack is no longer
+	used is defined by POSIX_MALLOC_THRESHOLD. */
 #ifndef POSIX_MALLOC_THRESHOLD
 #define POSIX_MALLOC_THRESHOLD 10
 #endif
 
 /* Define to necessary symbol if this constant uses a non-standard name on
-   your system. */
+	your system. */
 /* #undef PTHREAD_CREATE_JOINABLE */
 
 /* Define to 1 if you have the ANSI C header files. */
@@ -332,14 +332,14 @@ them both to 0; an emulation function will be used. */
 #endif
 
 /* Define to allow pcretest and pcregrep to be linked with gcov, so that they
-   are able to generate code coverage reports. */
+	are able to generate code coverage reports. */
 /* #undef SUPPORT_GCOV */
 
 /* Define to any value to enable support for Just-In-Time compiling. */
 /* #undef SUPPORT_JIT */
 
 /* Define to any value to allow pcregrep to be linked with libbz2, so that it
-   is able to handle .bz2 files. */
+	is able to handle .bz2 files. */
 /* #undef SUPPORT_LIBBZ2 */
 
 /* Define to any value to allow pcretest to be linked with libedit. */
@@ -349,7 +349,7 @@ them both to 0; an emulation function will be used. */
 /* #undef SUPPORT_LIBREADLINE */
 
 /* Define to any value to allow pcregrep to be linked with libz, so that it is
-   able to handle .gz files. */
+	able to handle .gz files. */
 /* #undef SUPPORT_LIBZ */
 
 /* Define to any value to enable the 16 bit PCRE library. */
@@ -370,9 +370,9 @@ them both to 0; an emulation function will be used. */
 /* #undef SUPPORT_UCP */
 
 /* Define to any value to enable support for the UTF-8/16/32 Unicode encoding.
-   This will work even in an EBCDIC environment, but it is incompatible with
-   the EBCDIC macro. That is, PCRE can support *either* EBCDIC code *or*
-   ASCII/UTF-8/16/32, but not both at once. */
+	This will work even in an EBCDIC environment, but it is incompatible with
+	the EBCDIC macro. That is, PCRE can support *either* EBCDIC code *or*
+	ASCII/UTF-8/16/32, but not both at once. */
 /* #undef SUPPORT_UTF */
 
 /* Valgrind support to find invalid memory reads. */
@@ -387,7 +387,7 @@ them both to 0; an emulation function will be used. */
 /* #undef const */
 
 /* Define to the type of a signed integer type of width exactly 64 bits if
-   such a type exists and the standard includes do not define it. */
+	such a type exists and the standard includes do not define it. */
 /* #undef int64_t */
 
 /* Define to `unsigned int' if <sys/types.h> does not define. */

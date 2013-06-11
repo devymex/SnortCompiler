@@ -1,14 +1,14 @@
 /**
-**  @file        grouping.cpp
+**	@file		grouping.cpp
 **
-**  @author      Lab 435, Xidian University
+**	@author		Lab 435, Xidian University
 **
-**  @brief       Support functions for grouping dfa
+**	@brief		Support functions for grouping dfa
 **
-**  This implements grouping dfa algorithm, the algorithm has four steps
-**  in general. At first, it groups dfa which has only one signature. Then, 
-**  push the remain dfa into the group. Thirdly, it groups dfa with the same 
-**  signatures. Finally, it merges two groups.
+**	This implements grouping dfa algorithm, the algorithm has four steps
+**	in general. At first, it groups dfa which has only one signature. Then, 
+**	push the remain dfa into the group. Thirdly, it groups dfa with the same 
+**	signatures. Finally, it merges two groups.
 **
 */
 
@@ -119,10 +119,10 @@ void WriteNum(std::ofstream &fout, _Ty _num, ulong nBytes = sizeof(_Ty))
 to file
 
 Arguments:
-  filename    path of the file waiting for written
+  filename	 path of the file waiting for written
 
-Returns:      0 success
-              -1 error occurred
+Returns:		0 success
+				-1 error occurred
 */
 
 GROUPHDR ulong CGROUPRes::WriteToFile(const char *filename)
@@ -238,10 +238,10 @@ GROUPHDR ulong CGROUPRes::WriteToFile(const char *filename)
 from file
 
 Arguments:
-  filename    path of the file to read from
+  filename	 path of the file to read from
 
-Returns:      0 success
-              -1 error occurred
+Returns:		0 success
+				-1 error occurred
 */
 
 GROUPHDR ulong CGROUPRes::ReadFromFile(const char *filename)
@@ -340,11 +340,11 @@ GROUPHDR ulong CGROUPRes::ReadFromFile(const char *filename)
 /* Extract signatures from res to vecDfaInfo and add all index to vecWaitForGroup
 
 Arguments:
-  res               the compile result
-  vecDfaInfo        signatures correspond to each dfa
-  vecWaitForGroup   the index of dfa waiting for grouping
+  res					the compile result
+  vecDfaInfo		signatures correspond to each dfa
+  vecWaitForGroup	the index of dfa waiting for grouping
 
-Returns:            nothing
+Returns:				nothing
 
 */
 
@@ -365,11 +365,11 @@ void ExtractDfaInfo(const CCompileResults &res, std::vector<DFAINFO> &vecDfaInfo
 /* group dfa which has only one signature by its only signature
 
 Arguments:
-  vecDfaInfo        signatures correspond to each dfa
-  vecWaitForGroup   the index of dfa waiting for grouping
-  groups            the group result
+  vecDfaInfo		signatures correspond to each dfa
+  vecWaitForGroup	the index of dfa waiting for grouping
+  groups				the group result
 
-Returns:            nothing
+Returns:				nothing
 
 */
 
@@ -404,10 +404,10 @@ void GroupOnlyOneSig(const std::vector<DFAINFO> &vecDfaInfo, std::vector<ulong> 
 /* try to merge dfa in one group, merge if success, otherwise seperate the group into two
 
 Arguments:
-  res               the compile result, the merged dfa will be pushed into the res's dfa table
-  groups            the group result
+  res					the compile result, the merged dfa will be pushed into the res's dfa table
+  groups				the group result
 
-Returns:            nothing
+Returns:				nothing
 
 */
 
@@ -479,12 +479,12 @@ void Merge(CCompileResults &res, CGROUPS &groups)
 can merge with the group's dfa merged before
 
 Arguments:
-  vecDfaInfo        signatures correspond to each dfa
-  res               the compile result, the merged dfa will be pushed into the res's dfa table
-  groups            the group result
-  vecWaitForGroup   the index of dfa waiting for grouping
+  vecDfaInfo		signatures correspond to each dfa
+  res					the compile result, the merged dfa will be pushed into the res's dfa table
+  groups				the group result
+  vecWaitForGroup	the index of dfa waiting for grouping
 
-Returns:            nothing
+Returns:				nothing
 
 */
 
@@ -540,11 +540,11 @@ void PutInBySig(const std::vector<DFAINFO> &vecDfaInfo, CCompileResults &res, CG
 /* group dfa which has the same signatures by its signatures
 
 Arguments:
-  vecDfaInfo        signatures correspond to each dfa
-  newGroups         the new group result
-  vecWaitForGroup   the index of dfa waiting for grouping
+  vecDfaInfo		signatures correspond to each dfa
+  newGroups			the new group result
+  vecWaitForGroup	the index of dfa waiting for grouping
 
-Returns:            nothing
+Returns:				nothing
 
 */
 
@@ -573,10 +573,10 @@ void BuildGroupBySig(const std::vector<DFAINFO> &vecDfaInfo, CGROUPS &newGroups,
 /* extract signatures from group with only one signature
 
 Arguments:
-  groups            the group result, each group has only one signature
-  vecUsed           the signatures which are used by group with only one signature
+  groups				the group result, each group has only one signature
+  vecUsed			the signatures which are used by group with only one signature
 
-Returns:            nothing
+Returns:				nothing
 
 */
 
@@ -593,12 +593,12 @@ void ExtractUsedSigs(const CGROUPS &groups, std::vector<SIGNATURE> &vecUsed)
 /* extract common signatures from two groups
 
 Arguments:
-  g1                the first group
-  g2                the second group
-  vecUsed           the signatures which are used by group with only one signature
-  vecComSigs        common signatures of the two groups
+  g1					 the first group
+  g2					 the second group
+  vecUsed			the signatures which are used by group with only one signature
+  vecComSigs		common signatures of the two groups
 
-Returns:            nothing
+Returns:				nothing
 
 */
 
@@ -628,9 +628,9 @@ void ExtractComSigs(const ONEGROUP &g1, const ONEGROUP &g2, const std::vector<SI
 /* the used upper limit of the signatures
 
 Arguments:
-  vecSigs           signatures
+  vecSigs			signatures
 
-Returns:            the used upper limit of the signatures
+Returns:				the used upper limit of the signatures
 
 */
 
@@ -650,11 +650,11 @@ ulong AvailableNum(const std::vector<SIGNATURE> &vecSigs)
 of the common signatures isn't exceed its upper limit and the two groups merged dfa can merge
 
 Arguments:
-  res               the compile result, the merged dfa will be pushed into the res's dfa table
-  vecUsed           the signatures which can not be used
-  newGroups         the new group result
+  res					the compile result, the merged dfa will be pushed into the res's dfa table
+  vecUsed			the signatures which can not be used
+  newGroups			the new group result
 
-Returns:            nothing
+Returns:				nothing
 
 */
 
@@ -790,10 +790,10 @@ void MergeGroup(CCompileResults &res, std::vector<SIGNATURE> &vecUsed, CGROUPS &
 /* add new group result to group result
 
 Arguments:
-  groups            the group result
-  newGroups         the new group result
+  groups				the group result
+  newGroups			the new group result
 
-Returns:            nothing
+Returns:				nothing
 
 */
 
@@ -809,11 +809,11 @@ void AddNewGroups(CGROUPS &newGroups, CGROUPS &groups)
 /* clear up the group result
 
 Arguments:
-  res               the compile result and its dfa table contains the merged dfas
-  groups            the group result
-  groupRes          the relationship between sid and dfa ids, dfa table and result of grouping
+  res					the compile result and its dfa table contains the merged dfas
+  groups				the group result
+  groupRes			 the relationship between sid and dfa ids, dfa table and result of grouping
 
-Returns:            nothing
+Returns:				nothing
 
 */
 
@@ -914,10 +914,10 @@ void outPutGroups(CGROUPRes &groupRes, const char* fileName)
 /* the grouping algorithm
 
 Arguments:
-  res               the compile result
-  groupRes          the relationship between sid and dfa ids, dfa table and result of grouping
+  res					the compile result
+  groupRes			 the relationship between sid and dfa ids, dfa table and result of grouping
 
-Returns:            nothing
+Returns:				nothing
 
 */
 

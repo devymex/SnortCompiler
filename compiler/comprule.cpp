@@ -1,11 +1,11 @@
 /**
-**  @file        rule2nfa.cpp
+**	@file		rule2nfa.cpp
 **
-**  @author      Lab 435, Xidian University
+**	@author		Lab 435, Xidian University
 **
-**  @brief       Support functions for transforming a rule to a nfa tree
+**	@brief		Support functions for transforming a rule to a nfa tree
 **
-**  This nfa tree processing for rule options.
+**	This nfa tree processing for rule options.
 **
 */
 
@@ -784,12 +784,12 @@ void PrintDfaToText(CNfa &nfa, std::string &fileName)
 **	this function transforms content to pcre
 **	based on the content constraints: distance, within, offset, depth, nocase
 **
-**	@param pContent    pointer to the original content option
-**	@param pcreStr	   the transformed pcre
+**	@param pContent	 pointer to the original content option
+**	@param pcreStr		the transformed pcre
 **
 **	@return
-**  @retval  0 function successful
-**  @retval -1 fatal error
+**	@retval  0 function successful
+**	@retval -1 fatal error
 */
 ulong content2Pcre(OPTIONCONTENT *pContent, CDllString &pcreStr)
 {
@@ -875,25 +875,25 @@ ulong content2Pcre(OPTIONCONTENT *pContent, CDllString &pcreStr)
 }
 
 /*
-**  NAME
-**    Rule2PcreList::
+**	NAME
+**	 Rule2PcreList::
 */
 /**
-**  This function converts a CSnortRule to a CRegRule and extract signatures from content option
+**	This function converts a CSnortRule to a CRegRule and extract signatures from content option
 **
 **	According to the constraints of rule options, we split a snort rule into some option chains.
 **	For every option chain, the datapacket matchs from the first byte.
 **	Then we transfrom every option into pcre.
 **
-**  @param rule       a CSnortRule object which contains the original information
-**					  of a snort rule. 
-**  @param regrule    the transformed CRegRule object which makes up of a number of pcre lists
-**                    and the signatures in every pcre list.
+**	@param rule		 a CSnortRule object which contains the original information
+**					of a snort rule. 
+**	@param regrule	 the transformed CRegRule object which makes up of a number of pcre lists
+**						and the signatures in every pcre list.
 **
-**  @return integer
+**	@return integer
 **
-**  @retval  0 function successful
-**  @retval <>0 fatal error
+**	@retval  0 function successful
+**	@retval <>0 fatal error
 */
 
 ulong Rule2PcreList(const CSnortRule &rule, CRegRule &regrule)
@@ -983,21 +983,21 @@ ulong Rule2PcreList(const CSnortRule &rule, CRegRule &regrule)
 
 
 /*
-**  NAME
-**    CRegChainToNFA::
+**	NAME
+**	 CRegChainToNFA::
 */
 /**
-**  This function converts a CRegChain to a CNfa
+**	This function converts a CRegChain to a CNfa
 **
 **	use pcre library to construct a nfa from a pcre
 **	
-**  @param regchain   a CRegChain object which contains a pcre list
-**  @param nfa        the transformed CNfa object 
+**	@param regchain	a CRegChain object which contains a pcre list
+**	@param nfa		the transformed CNfa object 
 **
-**  @return integer
+**	@return integer
 **
-**  @retval  0 function successful
-**  @retval <>0 fatal error
+**	@retval  0 function successful
+**	@retval <>0 fatal error
 */
 
 ulong CRegChainToNFA(CRegChain &regchain, CNfa &nfa)
@@ -1020,11 +1020,11 @@ ulong CRegChainToNFA(CRegChain &regchain, CNfa &nfa)
 /* assign all the signatures of each rule to all its option list
 
 Arguments:
-  result      the compile result
-  BegIdx      the index of the first regex which belongs to this rule
-  EndIdx      the next index of the last regex which belongs to this rule
+  result		the compile result
+  BegIdx		the index of the first regex which belongs to this rule
+  EndIdx		the next index of the last regex which belongs to this rule
 
-Returns:      nothing
+Returns:		nothing
 
 */
 void AssignSig(CCompileResults &result, ulong BegIdx, ulong EndIdx)

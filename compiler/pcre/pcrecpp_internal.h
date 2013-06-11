@@ -1,5 +1,5 @@
 /*************************************************
-*       Perl-Compatible Regular Expressions      *
+*		 Perl-Compatible Regular Expressions		*
 *************************************************/
 
 /*
@@ -10,16 +10,16 @@ All rights reserved.
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
 
-    * Redistributions of source code must retain the above copyright notice,
-      this list of conditions and the following disclaimer.
+	 * Redistributions of source code must retain the above copyright notice,
+		this list of conditions and the following disclaimer.
 
-    * Redistributions in binary form must reproduce the above copyright
-      notice, this list of conditions and the following disclaimer in the
-      documentation and/or other materials provided with the distribution.
+	 * Redistributions in binary form must reproduce the above copyright
+		notice, this list of conditions and the following disclaimer in the
+		documentation and/or other materials provided with the distribution.
 
-    * Neither the name of the University of Cambridge nor the names of its
-      contributors may be used to endorse or promote products derived from
-      this software without specific prior written permission.
+	 * Neither the name of the University of Cambridge nor the names of its
+		contributors may be used to endorse or promote products derived from
+		this software without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -46,23 +46,23 @@ information there, using __declspec(dllexport) without "extern" we have a
 definition; with "extern" we have a declaration. The settings here override the
 setting in pcre.h. We use:
 
-  PCRECPP_EXP_DECL       for declarations
-  PCRECPP_EXP_DEFN       for definitions of exported functions
+  PCRECPP_EXP_DECL		 for declarations
+  PCRECPP_EXP_DEFN		 for definitions of exported functions
 
 */
 
 #ifndef PCRECPP_EXP_DECL
 #  ifdef _WIN32
-#    ifndef PCRE_STATIC
-#      define PCRECPP_EXP_DECL       extern __declspec(dllexport)
-#      define PCRECPP_EXP_DEFN       __declspec(dllexport)
-#    else
-#      define PCRECPP_EXP_DECL       extern
-#      define PCRECPP_EXP_DEFN
-#    endif
+#	 ifndef PCRE_STATIC
+#		define PCRECPP_EXP_DECL		 extern __declspec(dllexport)
+#		define PCRECPP_EXP_DEFN		 __declspec(dllexport)
+#	 else
+#		define PCRECPP_EXP_DECL		 extern
+#		define PCRECPP_EXP_DEFN
+#	 endif
 #  else
-#    define PCRECPP_EXP_DECL         extern
-#    define PCRECPP_EXP_DEFN
+#	 define PCRECPP_EXP_DECL			extern
+#	 define PCRECPP_EXP_DEFN
 #  endif
 #endif
 

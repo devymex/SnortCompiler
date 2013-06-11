@@ -1,11 +1,11 @@
 /**
-**  @file        dfaalgo.h
+**	@file		dfaalgo.h
 **
-**  @author      Lab 435, Xidian University
+**	@author		Lab 435, Xidian University
 **
-**  @brief       Common classes declaration
+**	@brief		Common classes declaration
 **
-**  Include CUnsignedArray, CDllString
+**	Include CUnsignedArray, CDllString
 **
 */
 
@@ -340,15 +340,15 @@ void DfaColGroup(std::vector<CDfa> &dfas, byte* groups)
 /*
 **	this function marks the lastDfa's terminal states.
 **	
-**  @param otherSta	   the state to be found in other
-**  @param other       one dfa to be merged
-**	@param lastSta     the state to be marked
-**	@param lastDfa     the merged dfa
+**	@param otherSta		the state to be found in other
+**	@param other		 one dfa to be merged
+**	@param lastSta	  the state to be marked
+**	@param lastDfa	  the merged dfa
 **
-**  @return a integer
+**	@return a integer
 **
-**  @retval 0 function successful
-**  @retval -1 fatal error
+**	@retval 0 function successful
+**	@retval -1 fatal error
 */
 void AddTermIntoDFA(STATEID otherSta, const CDfa &other,
 					STATEID lastSta, CDfa &lastDfa)

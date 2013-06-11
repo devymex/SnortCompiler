@@ -1,27 +1,27 @@
 /*************************************************
-*      Perl-Compatible Regular Expressions       *
+*		Perl-Compatible Regular Expressions		 *
 *************************************************/
 
 /* PCRE is a library of functions to support regular expressions whose syntax
 and semantics are as close as possible to those of the Perl 5 language.
 
-                       Written by Philip Hazel
-           Copyright (c) 1997-2012 University of Cambridge
+							Written by Philip Hazel
+			Copyright (c) 1997-2012 University of Cambridge
 
 -----------------------------------------------------------------------------
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
 
-    * Redistributions of source code must retain the above copyright notice,
-      this list of conditions and the following disclaimer.
+	 * Redistributions of source code must retain the above copyright notice,
+		this list of conditions and the following disclaimer.
 
-    * Redistributions in binary form must reproduce the above copyright
-      notice, this list of conditions and the following disclaimer in the
-      documentation and/or other materials provided with the distribution.
+	 * Redistributions in binary form must reproduce the above copyright
+		notice, this list of conditions and the following disclaimer in the
+		documentation and/or other materials provided with the distribution.
 
-    * Neither the name of the University of Cambridge nor the names of its
-      contributors may be used to endorse or promote products derived from
-      this software without specific prior written permission.
+	 * Neither the name of the University of Cambridge nor the names of its
+		contributors may be used to endorse or promote products derived from
+		this software without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -52,7 +52,7 @@ shared by different users. */
 
 
 /*************************************************
-*           Maintain reference count             *
+*			Maintain reference count				 *
 *************************************************/
 
 /* The reference count is a 16-bit field, initialized to zero. It is not
@@ -61,11 +61,11 @@ has a different byte order - though I can't see why anyone in their right mind
 would ever want to do that!
 
 Arguments:
-  argument_re   points to compiled code
-  adjust        value to add to the count
+  argument_re	points to compiled code
+  adjust		value to add to the count
 
-Returns:        the (possibly updated) count value (a non-negative number), or
-                a negative error number
+Returns:		the (possibly updated) count value (a non-negative number), or
+					 a negative error number
 */
 
 #if defined COMPILE_PCRE8
@@ -84,8 +84,8 @@ if (re == NULL) return PCRE_ERROR_NULL;
 if (re->magic_number != MAGIC_NUMBER) return PCRE_ERROR_BADMAGIC;
 if ((re->flags & PCRE_MODE) == 0) return PCRE_ERROR_BADMODE;
 re->ref_count = (-adjust > re->ref_count)? 0 :
-                (adjust + re->ref_count > 65535)? 65535 :
-                re->ref_count + adjust;
+					 (adjust + re->ref_count > 65535)? 65535 :
+					 re->ref_count + adjust;
 return re->ref_count;
 }
 

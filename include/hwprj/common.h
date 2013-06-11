@@ -1,11 +1,11 @@
 /**
-**  @file        common.h
+**	@file		common.h
 **
-**  @author      Lab 435, Xidian University
+**	@author	  Lab 435, Xidian University
 **
-**  @brief       Common classes declaration
+**	@brief		Common classes declaration
 **
-**  Common type defination, compile configurations and error codes
+**	Common type defination, compile configurations and error codes
 **
 */
 
@@ -15,7 +15,8 @@
 typedef unsigned char			byte;
 typedef unsigned long			ulong;
 typedef unsigned short			ushort;
-typedef unsigned short			STATEID;
+typedef ushort					STATEID;
+typedef ulong					DFAID;
 
 /* compile configurations */
 #define SC_MAXDFASIZE	255

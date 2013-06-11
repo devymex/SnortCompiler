@@ -1,11 +1,11 @@
 /**
-**  @file        common.h
+**	@file		common.h
 **
-**  @author      Lab 435, Xidian University
+**	@author		Lab 435, Xidian University
 **
-**  @brief       Common classes declaration
+**	@brief		Common classes declaration
 **
-**  Include CUnsignedArray, CDllString
+**	Include CUnsignedArray, CDllString
 **
 */
 

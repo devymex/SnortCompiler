@@ -92,247 +92,247 @@ ulong NUMS[] = {
 	0,
 	0,
 	0,
-	sizeof(OP_NOT_DIGIT_ELEMS) / sizeof(ulong),
-	sizeof(OP_DIGIT_ELEMS) / sizeof(ulong),
-	sizeof(OP_NOT_WHITESPACE_ELEMS) / sizeof(ulong),
-	sizeof(OP_WHITESPACE_ELEMS) / sizeof(ulong),
-	sizeof(OP_NOT_WORDCHAR_ELEMS) / sizeof(ulong),
-	sizeof(OP_WORDCHAR_ELEMS) / sizeof(ulong),
-	sizeof(OP_ANY_ELEMS) / sizeof(ulong),
-	sizeof(OP_ALLANY_ELEMS) / sizeof(ulong),
+	sizeof(OP_NOT_DIGIT_ELEMS)		/ sizeof(ulong),
+	sizeof(OP_DIGIT_ELEMS)			/ sizeof(ulong),
+	sizeof(OP_NOT_WHITESPACE_ELEMS)	/ sizeof(ulong),
+	sizeof(OP_WHITESPACE_ELEMS)		/ sizeof(ulong),
+	sizeof(OP_NOT_WORDCHAR_ELEMS)	/ sizeof(ulong),
+	sizeof(OP_WORDCHAR_ELEMS)		/ sizeof(ulong),
+	sizeof(OP_ANY_ELEMS)			/ sizeof(ulong),
+	sizeof(OP_ALLANY_ELEMS)			/ sizeof(ulong),
 };
 
 Fn FUNC[156] = 
 {
-	NULL,                       /* 0 End of pattern */
+	NULL,						/* 0 End of pattern */
 
 	/* Values corresponding to backslashed metacharacters */
 
-	NULL,                       /* 1 Start of data: \A */
-	NULL,                       /* 2 Start of match (subject + offset): \G */
-	NULL,                       /* 3 Set start of match (\K) */
-	NULL,                       /*  4 \B */
-	NULL,                       /*  5 \b */
-	OP_COMMON_FUNC,          /*  6 \D */
-	OP_COMMON_FUNC,              /*  7 \d */
-	OP_COMMON_FUNC,     /*  8 \S */
-	OP_COMMON_FUNC,         /*  9 \s */
-	OP_COMMON_FUNC,       /* 10 \W */
-	OP_COMMON_FUNC,           /* 11 \w */
+	NULL,						/* 1 Start of data: \A */
+	NULL,						/* 2 Start of match (subject + offset): \G */
+	NULL,						/* 3 Set start of match (\K) */
+	NULL,						/* 4 \B */
+	NULL,						/* 5 \b */
+	OP_COMMON_FUNC,				/* 6 \D */
+	OP_COMMON_FUNC,				/* 7 \d */
+	OP_COMMON_FUNC,				/* 8 \S */
+	OP_COMMON_FUNC,				/* 9 \s */
+	OP_COMMON_FUNC,				/* 10 \W */
+	OP_COMMON_FUNC,				/* 11 \w */
 
-	OP_COMMON_FUNC,                /* 12 Match any character except newline (\N) */
-	OP_COMMON_FUNC,             /* 13 Match any character */
-	NULL,                       /* 14 Match any byte (\C); different to OP_ANY for UTF-8 */
-	NULL,                       /* 15 \P (not Unicode property) */
-	NULL,                       /* 16 \p (Unicode property) */
-	NULL,                       /* 17 \R (any newline sequence) */
-	NULL,                       /* 18 \H (not horizontal whitespace) */
-	NULL,                       /* 19 \h (horizontal whitespace) */
-	NULL,                       /* 20 \V (not vertical whitespace) */
-	NULL,                       /* 21 \v (vertical whitespace) */
-	NULL,                       /* 22 \X (extended Unicode sequence */
-	NULL,                       /* 23 End of data or \n at end of data (\Z) */
-	NULL,                       /* 24 End of data (\z) */
+	OP_COMMON_FUNC,				/* 12 Match any character except newline (\N) */
+	OP_COMMON_FUNC,				/* 13 Match any character */
+	NULL,						/* 14 Match any byte (\C); different to OP_ANY for UTF-8 */
+	NULL,						/* 15 \P (not Unicode property) */
+	NULL,						/* 16 \p (Unicode property) */
+	NULL,						/* 17 \R (any newline sequence) */
+	NULL,						/* 18 \H (not horizontal whitespace) */
+	NULL,						/* 19 \h (horizontal whitespace) */
+	NULL,						/* 20 \V (not vertical whitespace) */
+	NULL,						/* 21 \v (vertical whitespace) */
+	NULL,						/* 22 \X (extended Unicode sequence */
+	NULL,						/* 23 End of data or \n at end of data (\Z) */
+	NULL,						/* 24 End of data (\z) */
 
-	NULL,                       /* 25 Start of line - not multiline */
-	NULL,                       /* 26 Start of line - multiline */
-	NULL,                       /* 27 End of line - not multiline */
-	NULL,                       /* 28 End of line - multiline */
-	OP_CHAR_FUNC,               /* 29 Match one character, casefully */
-	OP_CHARI_FUNC,              /* 30 Match one character, caselessly */
-	OP_NOT_FUNC,                /* 31 Match one character, not the given one, casefully */
-	OP_NOTI_FUNC,               /* 32 Match one character, not the given one, caselessly */
+	NULL,						/* 25 Start of line - not multiline */
+	NULL,						/* 26 Start of line - multiline */
+	NULL,						/* 27 End of line - not multiline */
+	NULL,						/* 28 End of line - multiline */
+	OP_CHAR_FUNC,				/* 29 Match one character, casefully */
+	OP_CHARI_FUNC,				/* 30 Match one character, caselessly */
+	OP_NOT_FUNC,				/* 31 Match one character, not the given one, casefully */
+	OP_NOTI_FUNC,				/* 32 Match one character, not the given one, caselessly */
 
 	/* The following sets of 13 opcodes must always be kept in step because
 	the offset from the first one is used to generate the others. */
 
 	/**** Single characters, caseful, must precede the caseless ones ****/
 
-	OP_STAR_FUNC,               /* 33 The maximizing and minimizing versions of */
-	OP_STAR_FUNC,               /* 34 these six opcodes must come in pairs, with */
-	OP_PLUS_FUNC,               /* 35 the minimizing one second. */
-	OP_PLUS_FUNC,               /* 36 */
-	OP_QUERY_FUNC,              /* 37 */
-	OP_QUERY_FUNC,                       /* 38 */
+	OP_STAR_FUNC,				/* 33 The maximizing and minimizing versions of */
+	OP_STAR_FUNC,				/* 34 these six opcodes must come in pairs, with */
+	OP_PLUS_FUNC,				/* 35 the minimizing one second. */
+	OP_PLUS_FUNC,				/* 36 */
+	OP_QUERY_FUNC,				/* 37 */
+	OP_QUERY_FUNC,				/* 38 */
 
-	OP_UPTO_FUNC,               /* 39 From 0 to n matches of one character, caseful*/
-	OP_UPTO_FUNC,                       /* 40 */
-	OP_EXACT_FUNC,              /* 41 Exactly n matches */
+	OP_UPTO_FUNC,				/* 39 From 0 to n matches of one character, caseful*/
+	OP_UPTO_FUNC,				/* 40 */
+	OP_EXACT_FUNC,				/* 41 Exactly n matches */
 
-	OP_STAR_FUNC,                       /* 42 Possessified star, caseful */
-	OP_PLUS_FUNC,                       /* 43 Possessified plus, caseful */
-	OP_QUERY_FUNC,                       /* 44 Posesssified query, caseful */
-	OP_UPTO_FUNC,                       /* 45 Possessified upto, caseful */
+	OP_STAR_FUNC,				/* 42 Possessified star, caseful */
+	OP_PLUS_FUNC,				/* 43 Possessified plus, caseful */
+	OP_QUERY_FUNC,				/* 44 Posesssified query, caseful */
+	OP_UPTO_FUNC,				/* 45 Possessified upto, caseful */
 
 	/**** Single characters, caseless, must follow the caseful ones */
 
-	OP_STARI_FUNC,              /* 46 */
-	OP_STARI_FUNC,              /* 47 */
-	OP_PLUSI_FUNC,              /* 48 */
-	OP_PLUSI_FUNC,              /* 49 */
-	OP_QUERYI_FUNC,             /* 50 */
-	OP_QUERYI_FUNC,                       /* 51 */
+	OP_STARI_FUNC,				/* 46 */
+	OP_STARI_FUNC,				/* 47 */
+	OP_PLUSI_FUNC,				/* 48 */
+	OP_PLUSI_FUNC,				/* 49 */
+	OP_QUERYI_FUNC,				/* 50 */
+	OP_QUERYI_FUNC,				/* 51 */
 
-	OP_UPTOI_FUNC,              /* 52 From 0 to n matches of one character, caseless */
-	OP_UPTOI_FUNC,                       /* 53 */
-	OP_EXACTI_FUNC,             /* 54 */
+	OP_UPTOI_FUNC,				/* 52 From 0 to n matches of one character, caseless */
+	OP_UPTOI_FUNC,				/* 53 */
+	OP_EXACTI_FUNC,				/* 54 */
 
-	OP_STARI_FUNC,              /* 55 Possessified star, caseless */
-	OP_PLUSI_FUNC,                       /* 56 Possessified plus, caseless */
-	OP_QUERYI_FUNC,                       /* 57 Posesssified query, caseless */
-	OP_UPTOI_FUNC,                       /* 58 Possessified upto, caseless */
+	OP_STARI_FUNC,				/* 55 Possessified star, caseless */
+	OP_PLUSI_FUNC,				/* 56 Possessified plus, caseless */
+	OP_QUERYI_FUNC,				/* 57 Posesssified query, caseless */
+	OP_UPTOI_FUNC,				/* 58 Possessified upto, caseless */
 
 	/**** The negated ones must follow the non-negated ones, and match them ****/
 	/**** Negated single character, caseful; must precede the caseless ones ****/
 
-	OP_NOTSTAR_FUNC,            /* 59 The maximizing and minimizing versions of */
-	OP_NOTSTAR_FUNC,            /* 60 these six opcodes must come in pairs, with */
-	OP_NOTPLUS_FUNC,            /* 61 the minimizing one second. They must be in */
-	OP_NOTPLUS_FUNC,            /* 62 exactly the same order as those above. */
-	OP_NOTQUERY_FUNC,           /* 63 */
-	OP_NOTQUERY_FUNC,                       /* 64 */
+	OP_NOTSTAR_FUNC,			/* 59 The maximizing and minimizing versions of */
+	OP_NOTSTAR_FUNC,			/* 60 these six opcodes must come in pairs, with */
+	OP_NOTPLUS_FUNC,			/* 61 the minimizing one second. They must be in */
+	OP_NOTPLUS_FUNC,			/* 62 exactly the same order as those above. */
+	OP_NOTQUERY_FUNC,			/* 63 */
+	OP_NOTQUERY_FUNC,			/* 64 */
 
-	OP_NOTUPTO_FUNC,        /* 65 From 0 to n matches, caseful */
-	OP_NOTUPTO_FUNC,     /* 66 */
-	OP_NOTEXACT_FUNC,       /* 67 Exactly n matches */
+	OP_NOTUPTO_FUNC,			/* 65 From 0 to n matches, caseful */
+	OP_NOTUPTO_FUNC,			/* 66 */
+	OP_NOTEXACT_FUNC,			/* 67 Exactly n matches */
 
-	OP_NOTSTAR_FUNC,     /* 68 Possessified versions, caseful */
-	OP_NOTPLUS_FUNC,     /* 69 */
-	OP_NOTQUERY_FUNC,    /* 70 */
-	OP_NOTUPTO_FUNC,     /* 71 */
+	OP_NOTSTAR_FUNC,			/* 68 Possessified versions, caseful */
+	OP_NOTPLUS_FUNC,			/* 69 */
+	OP_NOTQUERY_FUNC,			/* 70 */
+	OP_NOTUPTO_FUNC,			/* 71 */
 
 	/**** Negated single character, caseless; must follow the caseful ones ****/
 
-	OP_NOTSTARI_FUNC,       /* 72 */
-	OP_NOTSTARI_FUNC,       /* 73 */
-	OP_NOTPLUSI_FUNC,       /* 74 */
-	OP_NOTPLUSI_FUNC,       /* 75 */
-	OP_NOTQUERYI_FUNC,      /* 76 */
-	OP_NOTQUERYI_FUNC,   /* 77 */
+	OP_NOTSTARI_FUNC,			/* 72 */
+	OP_NOTSTARI_FUNC,			/* 73 */
+	OP_NOTPLUSI_FUNC,			/* 74 */
+	OP_NOTPLUSI_FUNC,			/* 75 */
+	OP_NOTQUERYI_FUNC,			/* 76 */
+	OP_NOTQUERYI_FUNC,			/* 77 */
 
-	OP_NOTUPTOI_FUNC,       /* 78 From 0 to n matches, caseless */
-	OP_NOTUPTOI_FUNC,       /* 79 */
-	OP_NOTEXACTI_FUNC,      /* 80 Exactly n matches */
+	OP_NOTUPTOI_FUNC,			/* 78 From 0 to n matches, caseless */
+	OP_NOTUPTOI_FUNC,			/* 79 */
+	OP_NOTEXACTI_FUNC,			/* 80 Exactly n matches */
 
-	OP_NOTSTARI_FUNC,       /* 81 Possessified versions, caseless */
-	OP_NOTPLUSI_FUNC,       /* 82 */
-	OP_NOTQUERYI_FUNC,      /* 83 */
-	OP_NOTUPTOI_FUNC,       /* 84 */
+	OP_NOTSTARI_FUNC,			/* 81 Possessified versions, caseless */
+	OP_NOTPLUSI_FUNC,			/* 82 */
+	OP_NOTQUERYI_FUNC,			/* 83 */
+	OP_NOTUPTOI_FUNC,			/* 84 */
 
 	/**** Character types ****/
 
-	OP_TYPESTAR_FUNC,       /* 85 The maximizing and minimizing versions of */
-	OP_TYPESTAR_FUNC,       /* 86 these six opcodes must come in pairs, with */
-	OP_TYPEPLUS_FUNC,       /* 87 the minimizing one second. These codes must */
-	OP_TYPEPLUS_FUNC,       /* 88 be in exactly the same order as those above. */
-	OP_TYPEQUERY_FUNC,      /* 89 */
-	OP_TYPEQUERY_FUNC,   /* 90 */
+	OP_TYPESTAR_FUNC,			/* 85 The maximizing and minimizing versions of */
+	OP_TYPESTAR_FUNC,			/* 86 these six opcodes must come in pairs, with */
+	OP_TYPEPLUS_FUNC,			/* 87 the minimizing one second. These codes must */
+	OP_TYPEPLUS_FUNC,			/* 88 be in exactly the same order as those above. */
+	OP_TYPEQUERY_FUNC,			/* 89 */
+	OP_TYPEQUERY_FUNC,			/* 90 */
 
-	OP_TYPEUPTO_FUNC,       /* 91 From 0 to n matches */
-	OP_TYPEUPTO_FUNC,    /* 92 */
-	OP_TYPEEXACT_FUNC,      /* 93 Exactly n matches */
+	OP_TYPEUPTO_FUNC,			/* 91 From 0 to n matches */
+	OP_TYPEUPTO_FUNC,			/* 92 */
+	OP_TYPEEXACT_FUNC,			/* 93 Exactly n matches */
 
-	OP_TYPESTAR_FUNC,       /* 94 Possessified versions */
-	OP_TYPEPLUS_FUNC,       /* 95 */
-	OP_TYPEQUERY_FUNC,                   /* 96 */
-	OP_TYPEUPTO_FUNC,                   /* 97 */
+	OP_TYPESTAR_FUNC,			/* 94 Possessified versions */
+	OP_TYPEPLUS_FUNC,			/* 95 */
+	OP_TYPEQUERY_FUNC,			/* 96 */
+	OP_TYPEUPTO_FUNC,			/* 97 */
 
 	/* These are used for character classes and back references; only the
 	first six are the same as the sets above. */
 
-	NULL,                   /* 98 The maximizing and minimizing versions of */
-	NULL,                   /* 99 all these opcodes must come in pairs, with */
-	NULL,                   /* 100 the minimizing one second. These codes must */
-	NULL,                   /* 101 be in exactly the same order as those above. */
-	NULL,                   /* 102 */
-	NULL,                   /* 103 */
+	NULL,						/* 98 The maximizing and minimizing versions of */
+	NULL,						/* 99 all these opcodes must come in pairs, with */
+	NULL,						/* 100 the minimizing one second. These codes must */
+	NULL,						/* 101 be in exactly the same order as those above. */
+	NULL,						/* 102 */
+	NULL,						/* 103 */
 
-	NULL,                   /* 104 These are different to the three sets above. */
-	NULL,                   /* 105 */
+	NULL,						/* 104 These are different to the three sets above. */
+	NULL,						/* 105 */
 
 	/* End of quantifier opcodes */
 
-	NULL,                   /* 106 Match a character class, chars < 256 only */
-	NULL,                   /* 107 Same, but the bitmap was created from a negative
-							class - the difference is relevant only when a
-							character > 255 is encountered. */
-	NULL,                   /* 108 Extended class for handling > 255 chars within the
-							class. This does both positive and negative. */
-	NULL,                   /* 109 Match a back reference, casefully */
-	NULL,                   /* 110 Match a back reference, caselessly */
-	NULL,                   /* 111 Match a numbered subpattern (possibly recursive) */
-	NULL,                   /* 112 Call out to external function if provided */
+	NULL,						/* 106 Match a character class, chars < 256 only */
+	NULL,						/* 107 Same, but the bitmap was created from a negative
+								class - the difference is relevant only when a
+								character > 255 is encountered. */
+	NULL,						/* 108 Extended class for handling > 255 chars within the
+								class. This does both positive and negative. */
+	NULL,						/* 109 Match a back reference, casefully */
+	NULL,						/* 110 Match a back reference, caselessly */
+	NULL,						/* 111 Match a numbered subpattern (possibly recursive) */
+	NULL,						/* 112 Call out to external function if provided */
 
-	NULL,                   /* 113 Start of alternation */
-	NULL,                   /* 114 End of group that doesn't have an unbounded repeat */
-	NULL,                   /* 115 These two must remain together and in this */
-	NULL,                   /* 116 order. They are for groups the repeat for ever. */
-	NULL,                   /* 117 Possessive unlimited repeat. */
+	NULL,						/* 113 Start of alternation */
+	NULL,						/* 114 End of group that doesn't have an unbounded repeat */
+	NULL,						/* 115 These two must remain together and in this */
+	NULL,						/* 116 order. They are for groups the repeat for ever. */
+	NULL,						/* 117 Possessive unlimited repeat. */
 
-						    /* The assertions must come before BRA, CBRA, ONCE, and COND, and the four
-							asserts must remain in order. */
+								/* The assertions must come before BRA, CBRA, ONCE, and COND, and the four
+								asserts must remain in order. */
 
-	NULL,                   /* 118 Move pointer back - used in lookbehind assertions */
-	NULL,                   /* 119 Positive lookahead */
-	NULL,                   /* 120 Negative lookahead */
-	NULL,                   /* 121 Positive lookbehind */
-	NULL,                   /* 122 Negative lookbehind */
+	NULL,						/* 118 Move pointer back - used in lookbehind assertions */
+	NULL,						/* 119 Positive lookahead */
+	NULL,						/* 120 Negative lookahead */
+	NULL,						/* 121 Positive lookbehind */
+	NULL,						/* 122 Negative lookbehind */
 
 	/* ONCE, ONCE_NC, BRA, BRAPOS, CBRA, CBRAPOS, and COND must come immediately
 	after the assertions, with ONCE first, as there's a test for >= ONCE for a
 	subpattern that isn't an assertion. The POS versions must immediately follow
 	the non-POS versions in each case. */
 
-	NULL,                  /* 123 Atomic group, contains captures */
-	NULL,                  /* 124 Atomic group containing no captures */
-	NULL,                  /* 125 Start of non-capturing bracket */
-	NULL,                  /* 126 Ditto, with unlimited, possessive repeat */
-	NULL,                  /* 127 Start of capturing bracket */
-	NULL,                  /* 128 Ditto, with unlimited, possessive repeat */
-	NULL,                  /* 129 Conditional group */
+	NULL,						/* 123 Atomic group, contains captures */
+	NULL,						/* 124 Atomic group containing no captures */
+	NULL,						/* 125 Start of non-capturing bracket */
+	NULL,						/* 126 Ditto, with unlimited, possessive repeat */
+	NULL,						/* 127 Start of capturing bracket */
+	NULL,						/* 128 Ditto, with unlimited, possessive repeat */
+	NULL,						/* 129 Conditional group */
 
 	/* These five must follow the previous five, in the same order. There's a
 	check for >= SBRA to distinguish the two sets. */
 
-	NULL,                  /* 130 Start of non-capturing bracket, check empty  */
-	NULL,                  /* 131 Ditto, with unlimited, possessive repeat */
-	NULL,                  /* 132 Start of capturing bracket, check empty */
-	NULL,                  /* 133 Ditto, with unlimited, possessive repeat */
-	NULL,                  /* 134 Conditional group, check empty */
+	NULL,						/* 130 Start of non-capturing bracket, check empty */
+	NULL,						/* 131 Ditto, with unlimited, possessive repeat */
+	NULL,						/* 132 Start of capturing bracket, check empty */
+	NULL,						/* 133 Ditto, with unlimited, possessive repeat */
+	NULL,						/* 134 Conditional group, check empty */
 
 	/* The next two pairs must (respectively) be kept together. */
 
-	NULL,                  /* 135 Used to hold a capture number as condition */
-	NULL,                  /* 136 Same, but generated by a name reference*/
-	NULL,                  /* 137 Used to hold a recursion number as condition */
-	NULL,                  /* 138 Same, but generated by a name reference*/
-	NULL,                  /* 139 The DEFINE condition */
+	NULL,						/* 135 Used to hold a capture number as condition */
+	NULL,						/* 136 Same, but generated by a name reference*/
+	NULL,						/* 137 Used to hold a recursion number as condition */
+	NULL,						/* 138 Same, but generated by a name reference*/
+	NULL,						/* 139 The DEFINE condition */
 
-	NULL,                  /* 140 These two must remain together and in this */
-	NULL,                  /* 141 order. */
-	NULL,                  /* 142 */
+	NULL,						/* 140 These two must remain together and in this */
+	NULL,						/* 141 order. */
+	NULL,						/* 142 */
 
 	/* These are backtracking control verbs */
 
-	NULL,                  /* 143 always has an argument */
-	NULL,                  /* 144 */
-	NULL,                  /* 145 same, but with argument */
-	NULL,                  /* 146 */
-	NULL,                  /* 147 same, but with argument */
-	NULL,                  /* 148 */
-	NULL,                  /* 149 same, but with argument */
-	NULL,                  /* 150 */
+	NULL,						/* 143 always has an argument */
+	NULL,						/* 144 */
+	NULL,						/* 145 same, but with argument */
+	NULL,						/* 146 */
+	NULL,						/* 147 same, but with argument */
+	NULL,						/* 148 */
+	NULL,						/* 149 same, but with argument */
+	NULL,						/* 150 */
 
 	/* These are forced failure and success verbs */
 
-	NULL,                  /* 151 */
-	NULL,                  /* 152 */
-	NULL,                  /* 153 Used inside assertions */
-	NULL,                  /* 154 Used before OP_ACCEPT to close open captures */
+	NULL,						/* 151 */
+	NULL,						/* 152 */
+	NULL,						/* 153 Used inside assertions */
+	NULL,						/* 154 Used before OP_ACCEPT to close open captures */
 
 	/* This is used to skip a subpattern with a {0} quantifier */
 
-	NULL                   /* 155 */
+	NULL						/* 155 */
 
 	/* This is not an opcode, but is used to check that tables indexed by opcode
 	are the correct length, in order to catch updating errors - there have been
@@ -1443,7 +1443,7 @@ ulong OP_TYPEUPTO_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ul
 	}
 	bool ALTBeg = ALTBegin;
 	byte c = *(Beg + 3);
-	if (c >=OP_NOT_DIGIT && c <= OP_ALLANY  && FUNC[c] != NULL)
+	if (c >=OP_NOT_DIGIT && c <= OP_ALLANY && FUNC[c] != NULL)
 	{
 		BYTEARY_ITER tmpBeg = Beg + 3;
 		for (ulong i = 0; i < count; ++i)
@@ -1466,7 +1466,7 @@ ulong OP_TYPEEXACT_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, u
 	}
 	bool ALTBeg = ALTBegin;
 	byte c = *(Beg + 3);
-	if (c >=OP_NOT_DIGIT && c <= OP_ALLANY  && FUNC[c] != NULL)
+	if (c >=OP_NOT_DIGIT && c <= OP_ALLANY && FUNC[c] != NULL)
 	{
 		BYTEARY_ITER tmpBeg = Beg + 3;
 

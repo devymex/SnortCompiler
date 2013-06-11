@@ -1,17 +1,17 @@
 /**
-**  @file        hashmapping.cpp
+**	@file		buildhash.cpp
 **
-**  @author      Lab 435, Xidian University
+**	@author		Lab 435, Xidian University
 **
-**  @brief       Support functions for mapping groups into hash table
+**	@brief		Support functions for mapping groups into hash table
 **
-**  This implements mapping groups into hash table algorithm, the algorithm has 
-**  four steps in general. At first, it maps groups which has only one signature. 
-**  Then, it maps groups which has two or more signatures, for one group, select
-**  a signature which corresponds to a hash slot with least groups. Thirdly, 
-**  simple adjust for conflict hash slot. Finally, recursive adjust for conflict 
-**  hash slot. After that, try to combine two groups in a hash slot or two hash 
-**  slots in some situations.
+**	This implements mapping groups into hash table algorithm, the algorithm has 
+**	four steps in general. At first, it maps groups which has only one signature. 
+**	Then, it maps groups which has two or more signatures, for one group, select
+**	a signature which corresponds to a hash slot with least groups. Thirdly, 
+**	simple adjust for conflict hash slot. Finally, recursive adjust for conflict 
+**	hash slot. After that, try to combine two groups in a hash slot or two hash 
+**	slots in some situations.
 **
 */
 
@@ -21,9 +21,9 @@
 /* hash function, correspond to a hash slot for a given signature
 
 Arguments:
-  oneSig            signature
+  oneSig				signature
 
-Returns:            hash slot
+Returns:				hash slot
 
 */
 
@@ -42,14 +42,14 @@ struct STATION
 /* find the adjust path
 
 Arguments:
-  vecGroups         the result of group
-  result            the hash table state
-  currSig           check the hash slot the currSig corresponds to
-  vecPath           record the adjust path
-  depth             the find depth
+  vecGroups			the result of group
+  result				the hash table state
+  currSig			check the hash slot the currSig corresponds to
+  vecPath			record the adjust path
+  depth				 the find depth
 
-Returns:            true if find a adjust path to reduce conflict
-                    false otherwise
+Returns:				true if find a adjust path to reduce conflict
+						false otherwise
 
 */
 
@@ -92,11 +92,11 @@ bool myFind(std::vector<GROUPHASH> &vecGroups, RESULTMAP &result, SIGNATURE &cur
 /* recursive adjust for conflict hash slot.
 
 Arguments:
-  vecGroups         the result of group
-  dmap              the correspondence between dfa and its signatures
-  result            the hash table state
+  vecGroups			the result of group
+  dmap				the correspondence between dfa and its signatures
+  result				the hash table state
 
-Returns:            nothing
+Returns:				nothing
 
 */
 
@@ -166,11 +166,11 @@ void RecursiveAdjust(std::vector<GROUPHASH> &vecGroups, const IDMAP &dmap, RESUL
 /* simple adjust for conflict hash slot.
 
 Arguments:
-  vecGroups         the result of group
-  dmap              the correspondence between dfa and its signatures
-  result            the hash table state
+  vecGroups			the result of group
+  dmap				the correspondence between dfa and its signatures
+  result				the hash table state
 
-Returns:            nothing
+Returns:				nothing
 
 */
 
@@ -215,12 +215,12 @@ void Adjust(std::vector<GROUPHASH> &vecGroups, const IDMAP &dmap, RESULTMAP &res
 a signature which corresponds to a hash slot with least groups
 
 Arguments:
-  vecGroups         the result of group
-  dmap              the correspondence between dfa and its signatures
-  vecIds            the index of group waiting for mapping
-  result            the hash table state
+  vecGroups			the result of group
+  dmap				the correspondence between dfa and its signatures
+  vecIds				the index of group waiting for mapping
+  result				the hash table state
 
-Returns:            nothing
+Returns:				nothing
 
 */
 
@@ -254,12 +254,12 @@ void Optimize(std::vector<GROUPHASH> &vecGroups, const IDMAP &dmap, std::vector<
 /* map groups into hash slot
 
 Arguments:
-  vecGroups         the result of group
-  gmap              the correspondence between signature and dfas
-  dmap              the correspondence between dfa and its signatures
-  result            the hash table state
+  vecGroups			the result of group
+  gmap				the correspondence between signature and dfas
+  dmap				the correspondence between dfa and its signatures
+  result				the hash table state
 
-Returns:            nothing
+Returns:				nothing
 
 */
 
@@ -295,11 +295,11 @@ void Mapping(std::vector<GROUPHASH> &vecGroups, const SIGNATUREMAP &gmap, const 
 /* extract common signatures from two groups
 
 Arguments:
-  g1                the first group
-  g2                the second group
-  vecComSigs        common signatures of the two groups
+  g1					 the first group
+  g2					 the second group
+  vecComSigs		common signatures of the two groups
 
-Returns:            nothing
+Returns:				nothing
 
 */
 
@@ -327,10 +327,10 @@ void CommonSigs(const GROUPHASH &g1, const GROUPHASH &g2, std::vector<SIGNATURE>
 /* update g1's signatures to the common signatures of g1 and g2
 
 Arguments:
-  g1                the first group
-  g2                the second group
+  g1					 the first group
+  g2					 the second group
 
-Returns:            nothing
+Returns:				nothing
 
 */
 
@@ -348,13 +348,13 @@ void UpdateSigs(GROUPHASH &g1, const GROUPHASH &g2)
 /* judge the group g1 and g2 can combine or not
 
 Arguments:
-  g1                the first group
-  g2                the second group
-  result            the hash table state
-  Sig               the signature selected to be used for hash
+  g1					 the first group
+  g2					 the second group
+  result				the hash table state
+  Sig					the signature selected to be used for hash
 
-Returns:            true if there has a signature which can represent group g1 and g2
-                    and the signature corresponds to an empty hash slot or g1 or g2's 
+Returns:				true if there has a signature which can represent group g1 and g2
+						and the signature corresponds to an empty hash slot or g1 or g2's 
 					hash slot
 					false otherwise
 
@@ -387,11 +387,11 @@ bool CanCombine(const GROUPHASH &g1, const GROUPHASH &g2, RESULTMAP &result, SIG
 /* try to combine two groups in a hash slot or two hash slots in some situations.
 
 Arguments:
-  groupRes          the merged dfa will be pushed into the groupRes's dfa table
-  vecGroups         the result of group
-  result            the hash table state
+  groupRes			 the merged dfa will be pushed into the groupRes's dfa table
+  vecGroups			the result of group
+  result				the hash table state
 
-Returns:            nothing
+Returns:				nothing
 
 */
 
@@ -526,12 +526,12 @@ void Combine(CGROUPRes &groupRes, std::vector<GROUPHASH> &vecGroups, RESULTMAP &
 /* clear up the group result and hash table
 
 Arguments:
-  vecGroups         the result of group
-  result            the hash table state
-  groupRes          the relationship between sid and dfa id, dfa table and result of grouping
-  HashResMap        the hash table after clear up
+  vecGroups			the result of group
+  result				the hash table state
+  groupRes			 the relationship between sid and dfa id, dfa table and result of grouping
+  HashResMap		the hash table after clear up
 
-Returns:            nothing
+Returns:				nothing
 
 */
 
@@ -584,10 +584,10 @@ void ClearUpHashRes(std::vector<GROUPHASH> &vecGroups, RESULTMAP &result, CGROUP
 number of groups
 
 Arguments:
-  groupRes          the relationship between sid and dfa id, dfa table and result of grouping
-  HashResMap        the hash table
+  groupRes			 the relationship between sid and dfa id, dfa table and result of grouping
+  HashResMap		the hash table
 
-Returns:            nothing
+Returns:				nothing
 
 */
 

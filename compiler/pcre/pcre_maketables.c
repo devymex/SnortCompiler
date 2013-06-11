@@ -1,27 +1,27 @@
 /*************************************************
-*      Perl-Compatible Regular Expressions       *
+*		Perl-Compatible Regular Expressions		 *
 *************************************************/
 
 /* PCRE is a library of functions to support regular expressions whose syntax
 and semantics are as close as possible to those of the Perl 5 language.
 
-                       Written by Philip Hazel
-           Copyright (c) 1997-2012 University of Cambridge
+							Written by Philip Hazel
+			Copyright (c) 1997-2012 University of Cambridge
 
 -----------------------------------------------------------------------------
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
 
-    * Redistributions of source code must retain the above copyright notice,
-      this list of conditions and the following disclaimer.
+	 * Redistributions of source code must retain the above copyright notice,
+		this list of conditions and the following disclaimer.
 
-    * Redistributions in binary form must reproduce the above copyright
-      notice, this list of conditions and the following disclaimer in the
-      documentation and/or other materials provided with the distribution.
+	 * Redistributions in binary form must reproduce the above copyright
+		notice, this list of conditions and the following disclaimer in the
+		documentation and/or other materials provided with the distribution.
 
-    * Neither the name of the University of Cambridge nor the names of its
-      contributors may be used to endorse or promote products derived from
-      this software without specific prior written permission.
+	 * Neither the name of the University of Cambridge nor the names of its
+		contributors may be used to endorse or promote products derived from
+		this software without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -53,7 +53,7 @@ compilation of dftables.c, in which case the macro DFTABLES is defined. */
 
 
 /*************************************************
-*           Create PCRE character tables         *
+*			Create PCRE character tables			*
 *************************************************/
 
 /* This function builds a set of character tables for use by PCRE and returns
@@ -62,8 +62,8 @@ their contents will depend upon the current locale setting. When compiled as
 part of the library, the store is obtained via PUBL(malloc)(), but when
 compiled inside dftables, use malloc().
 
-Arguments:   none
-Returns:     pointer to the contiguous block of data
+Arguments:	none
+Returns:	  pointer to the contiguous block of data
 */
 
 #if defined COMPILE_PCRE8
@@ -112,8 +112,8 @@ for (i = 0; i < 256; i++)
   if (isdigit(i)) p[cbit_digit  + i/8] |= 1 << (i&7);
   if (isupper(i)) p[cbit_upper  + i/8] |= 1 << (i&7);
   if (islower(i)) p[cbit_lower  + i/8] |= 1 << (i&7);
-  if (isalnum(i)) p[cbit_word   + i/8] |= 1 << (i&7);
-  if (i == '_')   p[cbit_word   + i/8] |= 1 << (i&7);
+  if (isalnum(i)) p[cbit_word	+ i/8] |= 1 << (i&7);
+  if (i == '_')	p[cbit_word	+ i/8] |= 1 << (i&7);
   if (isspace(i)) p[cbit_space  + i/8] |= 1 << (i&7);
   if (isxdigit(i))p[cbit_xdigit + i/8] |= 1 << (i&7);
   if (isgraph(i)) p[cbit_graph  + i/8] |= 1 << (i&7);

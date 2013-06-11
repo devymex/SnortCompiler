@@ -1,9 +1,9 @@
 /**
-**  @file        nfarow.h
+**	@file		nfarow.h
 **
-**  @author      Lab 435, Xidian University
+**	@author		Lab 435, Xidian University
 **
-**  @brief       Declaration of CNfaRow
+**	@brief		Declaration of CNfaRow
 **
 ** Store a row for CNfa. Array of std::vector<ulong>. Each element of the
 ** array stand by a column that indicates the jumping character.

@@ -22,6 +22,7 @@
 #include <hwprj\common.h>
 
 #undef max
+
 #define FINSTAHDR_DS
 #define DFAHDR_DS
 #define NFAHDR_DS
@@ -37,3 +38,5 @@ typedef STATELIST::const_iterator	STATELIST_CITER;
 typedef std::vector<class CDfaRow>	DFAROWARY;
 typedef std::vector<class CNfaRow>	NFAROWARY;
 typedef std::vector<ulong>			ULONGVEC;
+
+typedef std::unordered_map<STATEID, std::set<DFAID>> FINSTAMAP;

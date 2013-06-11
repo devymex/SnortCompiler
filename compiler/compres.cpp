@@ -43,10 +43,10 @@ COMPRESHDR const CRegRule &CCompileResults::GetRegexTbl() const
 table to file
 
 Arguments:
-  filename    path of the file waiting for written
+  filename	 path of the file waiting for written
 
-Returns:      0 success
-              -1 error occurred
+Returns:		0 success
+				-1 error occurred
 */
 COMPRESHDR ulong CCompileResults::WriteToFile(const char *filename)
 {
@@ -168,10 +168,10 @@ COMPRESHDR ulong CCompileResults::WriteToFile(const char *filename)
 table from file
 
 Arguments:
-  filename    path of the file waiting for written
+  filename	 path of the file waiting for written
 
-Returns:      0 success
-              -1 error occurred
+Returns:		0 success
+				-1 error occurred
 */
 
 COMPRESHDR ulong CCompileResults::ReadFromFile(const char *filename)

@@ -1,27 +1,27 @@
 /*************************************************
-*      Perl-Compatible Regular Expressions       *
+*		Perl-Compatible Regular Expressions		 *
 *************************************************/
 
 /* PCRE is a library of functions to support regular expressions whose syntax
 and semantics are as close as possible to those of the Perl 5 language.
 
-                       Written by Philip Hazel
-           Copyright (c) 1997-2012 University of Cambridge
+							Written by Philip Hazel
+			Copyright (c) 1997-2012 University of Cambridge
 
 -----------------------------------------------------------------------------
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
 
-    * Redistributions of source code must retain the above copyright notice,
-      this list of conditions and the following disclaimer.
+	 * Redistributions of source code must retain the above copyright notice,
+		this list of conditions and the following disclaimer.
 
-    * Redistributions in binary form must reproduce the above copyright
-      notice, this list of conditions and the following disclaimer in the
-      documentation and/or other materials provided with the distribution.
+	 * Redistributions in binary form must reproduce the above copyright
+		notice, this list of conditions and the following disclaimer in the
+		documentation and/or other materials provided with the distribution.
 
-    * Neither the name of the University of Cambridge nor the names of its
-      contributors may be used to endorse or promote products derived from
-      this software without specific prior written permission.
+	 * Neither the name of the University of Cambridge nor the names of its
+		contributors may be used to endorse or promote products derived from
+		this software without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -51,25 +51,25 @@ auxiliary local function to flip the appropriate bytes. */
 
 
 /*************************************************
-*             Swap byte functions                *
+*				 Swap byte functions					 *
 *************************************************/
 
 /* The following functions swap the bytes of a pcre_uint16
 and pcre_uint32 value.
 
 Arguments:
-  value        any number
+  value		any number
 
-Returns:       the byte swapped value
+Returns:		 the byte swapped value
 */
 
 static pcre_uint32
 swap_uint32(pcre_uint32 value)
 {
 return ((value & 0x000000ff) << 24) |
-       ((value & 0x0000ff00) <<  8) |
-       ((value & 0x00ff0000) >>  8) |
-       (value >> 24);
+		 ((value & 0x0000ff00) <<  8) |
+		 ((value & 0x00ff0000) >>  8) |
+		 (value >> 24);
 }
 
 static pcre_uint16
@@ -80,7 +80,7 @@ return (value >> 8) | (value << 8);
 
 
 /*************************************************
-*       Test for a byte-flipped compiled regex   *
+*		 Test for a byte-flipped compiled regex	*
 *************************************************/
 
 /* This function swaps the bytes of a compiled pattern usually
@@ -88,11 +88,11 @@ loaded form the disk. It also sets the tables pointer, which
 is likely an invalid pointer after reload.
 
 Arguments:
-  argument_re     points to the compiled expression
-  extra_data      points to extra data or is NULL
-  tables          points to the character tables or NULL
+  argument_re	  points to the compiled expression
+  extra_data		points to extra data or is NULL
+  tables			 points to the character tables or NULL
 
-Returns:          0 if the swap is successful, negative on error
+Returns:			 0 if the swap is successful, negative on error
 */
 
 #if defined COMPILE_PCRE8
@@ -171,24 +171,24 @@ while(TRUE)
   {
   /* Swap previous characters. */
   while (length-- > 0)
-    {
+	 {
 #if defined COMPILE_PCRE16
-    *ptr = swap_uint16(*ptr);
+	 *ptr = swap_uint16(*ptr);
 #elif defined COMPILE_PCRE32
-    *ptr = swap_uint32(*ptr);
+	 *ptr = swap_uint32(*ptr);
 #endif
-    ptr++;
-    }
+	 ptr++;
+	 }
 #if defined SUPPORT_UTF && defined COMPILE_PCRE16
   if (utf16_char)
-    {
-    if (HAS_EXTRALEN(ptr[-1]))
-      {
-      /* We know that there is only one extra character in UTF-16. */
-      *ptr = swap_uint16(*ptr);
-      ptr++;
-      }
-    }
+	 {
+	 if (HAS_EXTRALEN(ptr[-1]))
+		{
+		/* We know that there is only one extra character in UTF-16. */
+		*ptr = swap_uint16(*ptr);
+		ptr++;
+		}
+	 }
   utf16_char = FALSE;
 #endif /* SUPPORT_UTF */
 
@@ -200,113 +200,113 @@ while(TRUE)
   *ptr = swap_uint32(*ptr);
 #endif
   switch (*ptr)
-    {
-    case OP_END:
-    return 0;
+	 {
+	 case OP_END:
+	 return 0;
 
 #if defined SUPPORT_UTF && defined COMPILE_PCRE16
-    case OP_CHAR:
-    case OP_CHARI:
-    case OP_NOT:
-    case OP_NOTI:
-    case OP_STAR:
-    case OP_MINSTAR:
-    case OP_PLUS:
-    case OP_MINPLUS:
-    case OP_QUERY:
-    case OP_MINQUERY:
-    case OP_UPTO:
-    case OP_MINUPTO:
-    case OP_EXACT:
-    case OP_POSSTAR:
-    case OP_POSPLUS:
-    case OP_POSQUERY:
-    case OP_POSUPTO:
-    case OP_STARI:
-    case OP_MINSTARI:
-    case OP_PLUSI:
-    case OP_MINPLUSI:
-    case OP_QUERYI:
-    case OP_MINQUERYI:
-    case OP_UPTOI:
-    case OP_MINUPTOI:
-    case OP_EXACTI:
-    case OP_POSSTARI:
-    case OP_POSPLUSI:
-    case OP_POSQUERYI:
-    case OP_POSUPTOI:
-    case OP_NOTSTAR:
-    case OP_NOTMINSTAR:
-    case OP_NOTPLUS:
-    case OP_NOTMINPLUS:
-    case OP_NOTQUERY:
-    case OP_NOTMINQUERY:
-    case OP_NOTUPTO:
-    case OP_NOTMINUPTO:
-    case OP_NOTEXACT:
-    case OP_NOTPOSSTAR:
-    case OP_NOTPOSPLUS:
-    case OP_NOTPOSQUERY:
-    case OP_NOTPOSUPTO:
-    case OP_NOTSTARI:
-    case OP_NOTMINSTARI:
-    case OP_NOTPLUSI:
-    case OP_NOTMINPLUSI:
-    case OP_NOTQUERYI:
-    case OP_NOTMINQUERYI:
-    case OP_NOTUPTOI:
-    case OP_NOTMINUPTOI:
-    case OP_NOTEXACTI:
-    case OP_NOTPOSSTARI:
-    case OP_NOTPOSPLUSI:
-    case OP_NOTPOSQUERYI:
-    case OP_NOTPOSUPTOI:
-    if (utf) utf16_char = TRUE;
+	 case OP_CHAR:
+	 case OP_CHARI:
+	 case OP_NOT:
+	 case OP_NOTI:
+	 case OP_STAR:
+	 case OP_MINSTAR:
+	 case OP_PLUS:
+	 case OP_MINPLUS:
+	 case OP_QUERY:
+	 case OP_MINQUERY:
+	 case OP_UPTO:
+	 case OP_MINUPTO:
+	 case OP_EXACT:
+	 case OP_POSSTAR:
+	 case OP_POSPLUS:
+	 case OP_POSQUERY:
+	 case OP_POSUPTO:
+	 case OP_STARI:
+	 case OP_MINSTARI:
+	 case OP_PLUSI:
+	 case OP_MINPLUSI:
+	 case OP_QUERYI:
+	 case OP_MINQUERYI:
+	 case OP_UPTOI:
+	 case OP_MINUPTOI:
+	 case OP_EXACTI:
+	 case OP_POSSTARI:
+	 case OP_POSPLUSI:
+	 case OP_POSQUERYI:
+	 case OP_POSUPTOI:
+	 case OP_NOTSTAR:
+	 case OP_NOTMINSTAR:
+	 case OP_NOTPLUS:
+	 case OP_NOTMINPLUS:
+	 case OP_NOTQUERY:
+	 case OP_NOTMINQUERY:
+	 case OP_NOTUPTO:
+	 case OP_NOTMINUPTO:
+	 case OP_NOTEXACT:
+	 case OP_NOTPOSSTAR:
+	 case OP_NOTPOSPLUS:
+	 case OP_NOTPOSQUERY:
+	 case OP_NOTPOSUPTO:
+	 case OP_NOTSTARI:
+	 case OP_NOTMINSTARI:
+	 case OP_NOTPLUSI:
+	 case OP_NOTMINPLUSI:
+	 case OP_NOTQUERYI:
+	 case OP_NOTMINQUERYI:
+	 case OP_NOTUPTOI:
+	 case OP_NOTMINUPTOI:
+	 case OP_NOTEXACTI:
+	 case OP_NOTPOSSTARI:
+	 case OP_NOTPOSPLUSI:
+	 case OP_NOTPOSQUERYI:
+	 case OP_NOTPOSUPTOI:
+	 if (utf) utf16_char = TRUE;
 #endif
-    /* Fall through. */
+	 /* Fall through. */
 
-    default:
-    length = PRIV(OP_lengths)[*ptr] - 1;
-    break;
+	 default:
+	 length = PRIV(OP_lengths)[*ptr] - 1;
+	 break;
 
-    case OP_CLASS:
-    case OP_NCLASS:
-    /* Skip the character bit map. */
-    ptr += 32/sizeof(pcre_uchar);
-    length = 0;
-    break;
+	 case OP_CLASS:
+	 case OP_NCLASS:
+	 /* Skip the character bit map. */
+	 ptr += 32/sizeof(pcre_uchar);
+	 length = 0;
+	 break;
 
-    case OP_XCLASS:
-    /* Reverse the size of the XCLASS instance. */
-    ptr++;
+	 case OP_XCLASS:
+	 /* Reverse the size of the XCLASS instance. */
+	 ptr++;
 #if defined COMPILE_PCRE16
-    *ptr = swap_uint16(*ptr);
+	 *ptr = swap_uint16(*ptr);
 #elif defined COMPILE_PCRE32
-    *ptr = swap_uint32(*ptr);
+	 *ptr = swap_uint32(*ptr);
 #endif
 #ifndef COMPILE_PCRE32
-    if (LINK_SIZE > 1)
-      {
-      /* LINK_SIZE can be 1 or 2 in 16 bit mode. */
-      ptr++;
-      *ptr = swap_uint16(*ptr);
-      }
+	 if (LINK_SIZE > 1)
+		{
+		/* LINK_SIZE can be 1 or 2 in 16 bit mode. */
+		ptr++;
+		*ptr = swap_uint16(*ptr);
+		}
 #endif
-    ptr++;
-    length = (GET(ptr, -LINK_SIZE)) - (1 + LINK_SIZE + 1);
+	 ptr++;
+	 length = (GET(ptr, -LINK_SIZE)) - (1 + LINK_SIZE + 1);
 #if defined COMPILE_PCRE16
-    *ptr = swap_uint16(*ptr);
+	 *ptr = swap_uint16(*ptr);
 #elif defined COMPILE_PCRE32
-    *ptr = swap_uint32(*ptr);
+	 *ptr = swap_uint32(*ptr);
 #endif
-    if ((*ptr & XCL_MAP) != 0)
-      {
-      /* Skip the character bit map. */
-      ptr += 32/sizeof(pcre_uchar);
-      length -= 32/sizeof(pcre_uchar);
-      }
-    break;
-    }
+	 if ((*ptr & XCL_MAP) != 0)
+		{
+		/* Skip the character bit map. */
+		ptr += 32/sizeof(pcre_uchar);
+		length -= 32/sizeof(pcre_uchar);
+		}
+	 break;
+	 }
   ptr++;
   }
 /* Control should never reach here in 16/32 bit mode. */

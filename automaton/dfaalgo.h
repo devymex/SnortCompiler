@@ -1,11 +1,11 @@
 /**
-**  @file        dfaalgo.h
+**	@file		dfaalgo.h
 **
-**  @author      Lab 435, Xidian University
+**	@author		Lab 435, Xidian University
 **
-**  @brief       functions declaration of dfa's algorithms
+**	@brief		Functions declaration of dfa's algorithms
 **
-**  Includes empty closure etc.
+**	Includes empty closure etc.
 **
 */
 

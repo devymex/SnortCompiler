@@ -1,27 +1,27 @@
 /*************************************************
-*      Perl-Compatible Regular Expressions       *
+*		Perl-Compatible Regular Expressions		 *
 *************************************************/
 
 /* PCRE is a library of functions to support regular expressions whose syntax
 and semantics are as close as possible to those of the Perl 5 language.
 
-                       Written by Philip Hazel
-           Copyright (c) 1997-2012 University of Cambridge
+							Written by Philip Hazel
+			Copyright (c) 1997-2012 University of Cambridge
 
 -----------------------------------------------------------------------------
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
 
-    * Redistributions of source code must retain the above copyright notice,
-      this list of conditions and the following disclaimer.
+	 * Redistributions of source code must retain the above copyright notice,
+		this list of conditions and the following disclaimer.
 
-    * Redistributions in binary form must reproduce the above copyright
-      notice, this list of conditions and the following disclaimer in the
-      documentation and/or other materials provided with the distribution.
+	 * Redistributions in binary form must reproduce the above copyright
+		notice, this list of conditions and the following disclaimer in the
+		documentation and/or other materials provided with the distribution.
 
-    * Neither the name of the University of Cambridge nor the names of its
-      contributors may be used to endorse or promote products derived from
-      this software without specific prior written permission.
+	 * Neither the name of the University of Cambridge nor the names of its
+		contributors may be used to endorse or promote products derived from
+		this software without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -67,7 +67,7 @@ const pcre_uint32 PRIV(vspace_list)[] = { VSPACE_LIST };
 
 
 /*************************************************
-*           Tables for UTF-8 support             *
+*			Tables for UTF-8 support				 *
 *************************************************/
 
 /* These are the breakpoints for different numbers of bytes in a UTF-8
@@ -86,7 +86,7 @@ const int PRIV(utf8_table1_size) = sizeof(PRIV(utf8_table1)) / sizeof(int);
 /* These are the indicator bits and the mask for the data bits to set in the
 first byte of a character, indexed by the number of additional bytes. */
 
-const int PRIV(utf8_table2)[] = { 0,    0xc0, 0xe0, 0xf0, 0xf8, 0xfc};
+const int PRIV(utf8_table2)[] = { 0,	 0xc0, 0xe0, 0xf0, 0xf8, 0xfc};
 const int PRIV(utf8_table3)[] = { 0xff, 0x1f, 0x0f, 0x07, 0x03, 0x01};
 
 /* Table of the number of extra bytes, indexed by the first byte masked with
@@ -107,12 +107,12 @@ const pcre_uint8 PRIV(utf8_table4)[] = {
 const pcre_uint32 PRIV(ucp_gentype)[] = {
   ucp_C, ucp_C, ucp_C, ucp_C, ucp_C,  /* Cc, Cf, Cn, Co, Cs */
   ucp_L, ucp_L, ucp_L, ucp_L, ucp_L,  /* Ll, Lu, Lm, Lo, Lt */
-  ucp_M, ucp_M, ucp_M,                /* Mc, Me, Mn */
-  ucp_N, ucp_N, ucp_N,                /* Nd, Nl, No */
+  ucp_M, ucp_M, ucp_M,					 /* Mc, Me, Mn */
+  ucp_N, ucp_N, ucp_N,					 /* Nd, Nl, No */
   ucp_P, ucp_P, ucp_P, ucp_P, ucp_P,  /* Pc, Pd, Pe, Pf, Pi */
-  ucp_P, ucp_P,                       /* Ps, Po */
-  ucp_S, ucp_S, ucp_S, ucp_S,         /* Sc, Sk, Sm, So */
-  ucp_Z, ucp_Z, ucp_Z                 /* Zl, Zp, Zs */
+  ucp_P, ucp_P,							/* Ps, Po */
+  ucp_S, ucp_S, ucp_S, ucp_S,			/* Sc, Sk, Sm, So */
+  ucp_Z, ucp_Z, ucp_Z					/* Zl, Zp, Zs */
 };
 
 /* This table encodes the rules for finding the end of an extended grapheme
@@ -128,14 +128,14 @@ two code points. The breaking rules are as follows:
 
 1. Break at the start and end of text (pretty obviously).
 
-2. Do not break between a CR and LF; otherwise, break before and   after
-   controls.
+2. Do not break between a CR and LF; otherwise, break before and	after
+	controls.
 
 3. Do not break Hangul syllable sequences, the rules for which are:
 
-    L may be followed by L, V, LV or LVT
-    LV or V may be followed by V or T
-    LVT or T may be followed by T
+	 L may be followed by L, V, LV or LVT
+	 LV or V may be followed by V or T
+	 LVT or T may be followed by T
 
 4. Do not break before extending characters.
 
@@ -150,29 +150,29 @@ are implementing).
 */
 
 const pcre_uint32 PRIV(ucp_gbtable[]) = {
-   (1<<ucp_gbLF),                                           /*  0 CR */
-   0,                                                       /*  1 LF */
-   0,                                                       /*  2 Control */
-   (1<<ucp_gbExtend)|(1<<ucp_gbSpacingMark),                /*  3 Extend */
-   (1<<ucp_gbExtend)|(1<<ucp_gbPrepend)|                    /*  4 Prepend */
-     (1<<ucp_gbSpacingMark)|(1<<ucp_gbL)|
-     (1<<ucp_gbV)|(1<<ucp_gbT)|(1<<ucp_gbLV)|
-     (1<<ucp_gbLVT)|(1<<ucp_gbOther),
+	(1<<ucp_gbLF),														 /*  0 CR */
+	0,																		 /*  1 LF */
+	0,																		 /*  2 Control */
+	(1<<ucp_gbExtend)|(1<<ucp_gbSpacingMark),					 /*  3 Extend */
+	(1<<ucp_gbExtend)|(1<<ucp_gbPrepend)|						/*  4 Prepend */
+	  (1<<ucp_gbSpacingMark)|(1<<ucp_gbL)|
+	  (1<<ucp_gbV)|(1<<ucp_gbT)|(1<<ucp_gbLV)|
+	  (1<<ucp_gbLVT)|(1<<ucp_gbOther),
 
-   (1<<ucp_gbExtend)|(1<<ucp_gbSpacingMark),                /*  5 SpacingMark */
-   (1<<ucp_gbExtend)|(1<<ucp_gbSpacingMark)|(1<<ucp_gbL)|   /*  6 L */
-     (1<<ucp_gbL)|(1<<ucp_gbV)|(1<<ucp_gbLV)|(1<<ucp_gbLVT),
+	(1<<ucp_gbExtend)|(1<<ucp_gbSpacingMark),					 /*  5 SpacingMark */
+	(1<<ucp_gbExtend)|(1<<ucp_gbSpacingMark)|(1<<ucp_gbL)|	/*  6 L */
+	  (1<<ucp_gbL)|(1<<ucp_gbV)|(1<<ucp_gbLV)|(1<<ucp_gbLVT),
 
-   (1<<ucp_gbExtend)|(1<<ucp_gbSpacingMark)|(1<<ucp_gbV)|   /*  7 V */
-     (1<<ucp_gbT),
+	(1<<ucp_gbExtend)|(1<<ucp_gbSpacingMark)|(1<<ucp_gbV)|	/*  7 V */
+	  (1<<ucp_gbT),
 
-   (1<<ucp_gbExtend)|(1<<ucp_gbSpacingMark)|(1<<ucp_gbT),   /*  8 T */
-   (1<<ucp_gbExtend)|(1<<ucp_gbSpacingMark)|(1<<ucp_gbV)|   /*  9 LV */
-     (1<<ucp_gbT),
+	(1<<ucp_gbExtend)|(1<<ucp_gbSpacingMark)|(1<<ucp_gbT),	/*  8 T */
+	(1<<ucp_gbExtend)|(1<<ucp_gbSpacingMark)|(1<<ucp_gbV)|	/*  9 LV */
+	  (1<<ucp_gbT),
 
-   (1<<ucp_gbExtend)|(1<<ucp_gbSpacingMark)|(1<<ucp_gbT),   /* 10 LVT */
-   (1<<ucp_gbRegionalIndicator),                            /* 11 RegionalIndicator */
-   (1<<ucp_gbExtend)|(1<<ucp_gbSpacingMark)                 /* 12 Other */
+	(1<<ucp_gbExtend)|(1<<ucp_gbSpacingMark)|(1<<ucp_gbT),	/* 10 LVT */
+	(1<<ucp_gbRegionalIndicator),									 /* 11 RegionalIndicator */
+	(1<<ucp_gbExtend)|(1<<ucp_gbSpacingMark)					/* 12 Other */
 };
 
 #ifdef SUPPORT_JIT
@@ -501,8 +501,8 @@ const char PRIV(utt_names)[] =
   STRING_Zs0;
 
 const ucp_type_table PRIV(utt)[] = {
-  {   0, PT_ANY, 0 },
-  {   4, PT_SC, ucp_Arabic },
+  {	0, PT_ANY, 0 },
+  {	4, PT_SC, ucp_Arabic },
   {  11, PT_SC, ucp_Armenian },
   {  20, PT_SC, ucp_Avestan },
   {  28, PT_SC, ucp_Balinese },
