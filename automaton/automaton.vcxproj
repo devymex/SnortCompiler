@@ -92,6 +92,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\include\hwprj\dfa.h" />
+    <ClInclude Include="..\include\hwprj\dfaidset.h" />
     <ClInclude Include="..\include\hwprj\dfarow.h" />
     <ClInclude Include="..\include\hwprj\finalstates.h" />
     <ClInclude Include="..\include\hwprj\nfa.h" />
@@ -102,6 +103,7 @@
   <ItemGroup>
     <ClCompile Include="dfaalgo.cpp" />
     <ClCompile Include="dfa.cpp" />
+    <ClCompile Include="dfaidset.cpp" />
     <ClCompile Include="dfarow.cpp" />
     <ClCompile Include="finalstates.cpp" />
     <ClCompile Include="nfa.cpp" />

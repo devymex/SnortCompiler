@@ -356,6 +356,5 @@ void AddTermIntoDFA(STATEID otherSta, const CDfa &other,
 	const CFinalStates &orgFinStas = other.GetFinalState();
 	CFinalStates &newFinStas = lastDfa.GetFinalState();
 	newFinStas.PushBack(lastSta);
-	const std::set<ulong> &finSet = orgFinStas._GetDfaIds(otherSta);
-	newFinStas._GetDfaIds(lastSta).insert(finSet.begin(), finSet.end());
+	newFinStas.GetDfaIdSet(lastSta) = orgFinStas.GetDfaIdSet(otherSta);
 }

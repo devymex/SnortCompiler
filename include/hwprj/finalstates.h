@@ -11,21 +11,15 @@
 
 #pragma once
 
-#include <hwprj\unsary.h>
+#include <hwprj\dfaidset.h>
 
-#include <set>
-
-#ifndef FINSTAHDR_DS
-#define FINSTAHDR __declspec(dllimport)
+#ifndef DFAIDSETHDR_DS
 class STATEVEC;
 class FINSTAMAP;
-#else
-#define FINSTAHDR __declspec(dllexport)
 #endif
 
-class FINSTAHDR CFinalStates
+class DFAIDSETHDR CFinalStates
 {
-
 public:
 	CFinalStates();
 	CFinalStates(const CFinalStates &other);
@@ -40,10 +34,10 @@ public:
 	void	PushBack(STATEID nStaId, DFAID nDfaId);
 	ulong	GetDfaIdCount(STATEID nStaId) const;
 	ulong	GetAllDfaIdCount() const;
-	void	GetDfaIds(STATEID nStaId, CUnsignedArray &ids) const;
+	void	Swap(CFinalStates &other);
 
-	std::set<ulong>&		_GetDfaIds(STATEID nStaId);
-	const std::set<ulong>&	_GetDfaIds(STATEID nStaId) const;
+	CDfaIdSet&			GetDfaIdSet(STATEID nStaId);
+	const CDfaIdSet&	GetDfaIdSet(STATEID nStaId) const;
 
 protected:
 	STATEVEC	*m_pStates;
