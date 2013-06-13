@@ -37,13 +37,14 @@ void main()
 	CTimer ctime;
 	CResNew result;
 	compilenew(_T("..\\..\\input\\allrules.rule"), result);
-	result.WriteToFile(_T("..\\..\\output\\result.cdt"));
+	result.WriteToFile(_T("..\\..\\output\\result_new.cdt"));
+	//result.ReadFromFile(_T("..\\..\\output\\result.cdt"));
 	CGROUPRes groupRes;
 	grouping(result, groupRes);
-	groupRes.WriteToFile(_T("..\\..\\output\\GroupResut.cdt"));
+	groupRes.WriteToFile(_T("..\\..\\output\\GroupResut_new.cdt"));
 	HASHRES HashResMap;
 	HashMapping(groupRes, HashResMap);
-	groupRes.WriteToFile(_T("..\\..\\output\\FinalResut.cdt"));
+	groupRes.WriteToFile(_T("..\\..\\output\\FinalResut_new.cdt"));
 	std::cout << "×ÜÊ±¼ä£º " << ctime.Reset() << std::endl;
 	std::cout << groupRes.GetGroups().Size() << std::endl;
 	std::cout << HashResMap.size() << std::endl;
