@@ -94,16 +94,16 @@ int main()
 
 	CTimer ctime;
 	CCompileResults result;
-	//compilenew(_T("..\\..\\input\\allrules.rule"), result);
-	//result.WriteToFile(_T("..\\..\\output\\result.cdt"));
-	result.ReadFromFile("..\\..\\output\\result.cdt");
+	CompileRuleSet("..\\..\\input\\allrules.rule", result);
+	result.WriteToFile("..\\..\\output\\result.cdt");
+	//result.ReadFromFile("..\\..\\output\\result.cdt");
 	CGROUPRes groupRes;
 	Grouping(result, groupRes);
 	groupRes.WriteToFile("..\\..\\output\\GroupResut.cdt");
 	HASHRES HashResMap;
 	HashMapping(groupRes, HashResMap);
 	groupRes.WriteToFile("..\\..\\output\\FinalResut.cdt");
-	std::cout << "×ÜÊ±¼ä£º " << ctime.Reset() << std::endl;
+	std::cout << "Total time: " << ctime.Reset() << std::endl;
 	std::cout << groupRes.GetGroups().Size() << std::endl;
 	std::cout << HashResMap.size() << std::endl;
 

@@ -29,21 +29,21 @@ void __stdcall Process(const CSnortRule &rule, void *lpVoid)
 	ulong nFlag = rule.GetFlag();
 	ulong nNewSize = result.GetSidDfaIds().Size() + 1;
 	result.GetSidDfaIds().Resize(nNewSize);
-	COMPILEDRULENEW &ruleResult = result.GetSidDfaIds().Back();
+	COMPILEDRULE &ruleResult = result.GetSidDfaIds().Back();
 	ruleResult.m_nSid = rule.GetSid();
 	if (rule.Size() == 0)
 	{
-		ruleResult.m_nResult = COMPILEDRULENEW::RES_EMPTY;
+		ruleResult.m_nResult = COMPILEDRULE::RES_EMPTY;
 		return;
 	}
 	else if (nFlag & CSnortRule::RULE_HASNOT)
 	{
-		ruleResult.m_nResult = COMPILEDRULENEW::RES_HASNOT;
+		ruleResult.m_nResult = COMPILEDRULE::RES_HASNOT;
 		return;
 	}
 	else if (nFlag & CSnortRule::RULE_HASBYTE)
 	{
-		ruleResult.m_nResult = COMPILEDRULENEW::RES_HASBYTE;
+		ruleResult.m_nResult = COMPILEDRULE::RES_HASBYTE;
 		return;
 	}
 	else
@@ -112,7 +112,7 @@ Returns:		nothing
 
 */
 COMPILERHDR void Rule2Dfas(const CSnortRule &rule, CCompileResults &result,
-							COMPILEDRULENEW &ruleResult)
+							COMPILEDRULE &ruleResult)
 {
 	CRegRule regrule;
 	CTimer ctime;//for test
@@ -123,12 +123,12 @@ COMPILERHDR void Rule2Dfas(const CSnortRule &rule, CCompileResults &result,
 
 	if (flag == SC_ERROR)
 	{
-		ruleResult.m_nResult = COMPILEDRULENEW::RES_ERROR;
+		ruleResult.m_nResult = COMPILEDRULE::RES_ERROR;
 		return;
 	}
 	else
 	{
-		ruleResult.m_nResult = COMPILEDRULENEW::RES_SUCCESS;
+		ruleResult.m_nResult = COMPILEDRULE::RES_SUCCESS;
 		const ulong nDfaTblSize = result.GetDfaTable().Size();
 		const ulong nIncrement = regrule.Size();
 		result.GetDfaTable().Resize(nDfaTblSize + nIncrement);
@@ -155,15 +155,11 @@ COMPILERHDR void Rule2Dfas(const CSnortRule &rule, CCompileResults &result,
 			CDfa &dfa = result.GetDfaTable()[nDfaId];
 			if (nToNFAFlag == SC_ERROR)
 			{
-				ruleResult.m_nResult = COMPILEDRULENEW::RES_ERROR;
+				ruleResult.m_nResult = COMPILEDRULE::RES_ERROR;
 				ruleResult.m_dfaIds.Clear();
 				result.GetDfaTable().Resize(nDfaTblSize);
 				result.GetRegexTbl().Resize(nRegexTblSize);
 				return;
-			}
-			else if (nToNFAFlag == SC_EXCEED)
-			{
-				ruleResult.m_nResult = COMPILEDRULENEW::RES_EXCEED;
 			}
 			else
 			{
@@ -174,7 +170,7 @@ COMPILERHDR void Rule2Dfas(const CSnortRule &rule, CCompileResults &result,
 
 				if (nToDFAFlag == -1)
 				{
-					ruleResult.m_nResult = COMPILEDRULENEW::RES_EXCEEDLIMIT;
+					ruleResult.m_nResult = COMPILEDRULE::RES_EXCEEDLIMIT;
 					dfa.Clear();
 				}
 				else
@@ -188,7 +184,7 @@ COMPILERHDR void Rule2Dfas(const CSnortRule &rule, CCompileResults &result,
 					dfamintimetime += ctime.Reset();//for test
 					if (0 != nr || dfa.Size() > SC_MAXDFASIZE)
 					{
-						ruleResult.m_nResult = COMPILEDRULENEW::RES_EXCEEDLIMIT;
+						ruleResult.m_nResult = COMPILEDRULE::RES_EXCEEDLIMIT;
 						dfa.Clear();
 					}
 				}
@@ -206,14 +202,14 @@ COMPILERHDR void Rule2Dfas(const CSnortRule &rule, CCompileResults &result,
 
 		if (!bHasSigs)
 		{
-			ruleResult.m_nResult = COMPILEDRULENEW::RES_HASNOSIG;
+			ruleResult.m_nResult = COMPILEDRULE::RES_HASNOSIG;
 			ruleResult.m_dfaIds.Clear();
 			result.GetDfaTable().Resize(nDfaTblSize);
 			result.GetRegexTbl().Resize(nRegexTblSize);
 			return;
 		}
 
-		if (ruleResult.m_nResult != COMPILEDRULENEW::RES_ERROR)
+		if (ruleResult.m_nResult != COMPILEDRULE::RES_ERROR)
 		{
 			AssignSig(result, nRegexTblSize, nRegexTblSize + nIncrement);
 		}

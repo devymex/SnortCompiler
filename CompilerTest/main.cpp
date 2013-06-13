@@ -27,7 +27,7 @@ void main()
 	//std::ofstream fout("../../input/ProcessRules.rule");
 	//for (ulong i = 0; i < result.GetSidDfaIds().Size(); ++i)
 	//{
-	//	if (result.GetSidDfaIds()[i].m_nResult == COMPILEDRULENEW::RES_SUCCESS)
+	//	if (result.GetSidDfaIds()[i].m_nResult == COMPILEDRULE::RES_SUCCESS)
 	//	{
 	//		str = "sid:";
 	//		std::stringstream ss;
@@ -56,35 +56,35 @@ void main()
 	//ulong exceedlimit_cNt = 0;
 	//for (ulong i = 0; i < result.GetSidDfaIds().Size(); ++i)
 	//{
-	//	if (result.GetSidDfaIds()[i].m_nResult == COMPILEDRULENEW::RES_SUCCESS)
+	//	if (result.GetSidDfaIds()[i].m_nResult == COMPILEDRULE::RES_SUCCESS)
 	//	{
 	//		++success_cNt;
 	//	}
-	//	else if (result.GetSidDfaIds()[i].m_nResult == COMPILEDRULENEW::RES_ERROR)
+	//	else if (result.GetSidDfaIds()[i].m_nResult == COMPILEDRULE::RES_ERROR)
 	//	{
 	//		++error_cNt;
 	//	}
-	//	else if (result.GetSidDfaIds()[i].m_nResult == COMPILEDRULENEW::RES_EXCEED)
+	//	else if (result.GetSidDfaIds()[i].m_nResult == COMPILEDRULE::RES_EXCEED)
 	//	{
 	//		++exceed_cNt;
 	//	}
-	//	else if (result.GetSidDfaIds()[i].m_nResult == COMPILEDRULENEW::RES_HASBYTE)
+	//	else if (result.GetSidDfaIds()[i].m_nResult == COMPILEDRULE::RES_HASBYTE)
 	//	{
 	//		++hasbyte_cNt;
 	//	}
-	//	else if (result.GetSidDfaIds()[i].m_nResult == COMPILEDRULENEW::RES_HASNOT)
+	//	else if (result.GetSidDfaIds()[i].m_nResult == COMPILEDRULE::RES_HASNOT)
 	//	{
 	//		++hasnot_cNt;
 	//	}
-	//	else if (result.GetSidDfaIds()[i].m_nResult == COMPILEDRULENEW::RES_EMPTY)
+	//	else if (result.GetSidDfaIds()[i].m_nResult == COMPILEDRULE::RES_EMPTY)
 	//	{
 	//		++empty_cNt;
 	//	}
-	//	else if (result.GetSidDfaIds()[i].m_nResult == COMPILEDRULENEW::RES_HASNOSIG)
+	//	else if (result.GetSidDfaIds()[i].m_nResult == COMPILEDRULE::RES_HASNOSIG)
 	//	{
 	//		++hasnosig_cNt;
 	//	}
-	//	else if (result.GetSidDfaIds()[i].m_nResult == COMPILEDRULENEW::RES_EXCEEDLIMIT)
+	//	else if (result.GetSidDfaIds()[i].m_nResult == COMPILEDRULE::RES_EXCEEDLIMIT)
 	//	{
 	//		++exceedlimit_cNt;
 	//	}
