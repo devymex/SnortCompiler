@@ -976,10 +976,6 @@ ulong OP_UPTO_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong 
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
 
 	ulong count = GET(Beg + 1);
-	if (count > SC_LIMIT)
-	{
-		return SC_EXCEED;
-	}
 	ulong nCursize = nfa.Size();
 	nfa.Resize(nCursize + count);
 	byte c = *(Beg + 3);
@@ -997,10 +993,6 @@ ulong OP_EXACT_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
 	ulong count = GET(Beg + 1);
-	if (count > SC_LIMIT)
-	{
-		return SC_EXCEED;
-	}
 	ulong nCursize = nfa.Size();
 	nfa.Resize(nCursize + count);
 	byte c = *(Beg + 3);
@@ -1091,10 +1083,6 @@ ulong OP_UPTOI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
 
 	ulong count = GET(Beg + 1);
-	if (count > SC_LIMIT)
-	{
-		return SC_EXCEED;
-	}
 	ulong nCursize = nfa.Size();
 	nfa.Resize(nCursize + count);
 	byte c = *(Beg + 3);
@@ -1120,10 +1108,6 @@ ulong OP_EXACTI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulon
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
 	ulong count = GET(Beg + 1);
-	if (count > SC_LIMIT)
-	{
-		return SC_EXCEED;
-	}
 	ulong nCursize = nfa.Size();
 	nfa.Resize(nCursize + count);
 	byte c = *(Beg + 3);
@@ -1207,10 +1191,6 @@ ulong OP_NOTUPTO_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulo
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
 	ulong count = GET(Beg + 1);
-	if (count > SC_LIMIT)
-	{
-		return SC_EXCEED;
-	}
 	ulong nCursize = nfa.Size();
 	nfa.Resize(nCursize + count);
 	byte c = *(Beg + 3);
@@ -1234,10 +1214,6 @@ ulong OP_NOTEXACT_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ul
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
 	ulong count = GET(Beg + 1);
-	if (count > SC_LIMIT)
-	{
-		return SC_EXCEED;
-	}
 	ulong nCursize = nfa.Size();
 	nfa.Resize(nCursize + count);
 	byte c = *(Beg + 3);
@@ -1319,10 +1295,6 @@ ulong OP_NOTUPTOI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ul
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
 	ulong count = GET(Beg + 1);
-	if (count > SC_LIMIT)
-	{
-		return SC_EXCEED;
-	}
 	ulong nCursize = nfa.Size();
 	nfa.Resize(nCursize + count);
 	byte c = *(Beg + 3);
@@ -1346,10 +1318,6 @@ ulong OP_NOTEXACTI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, u
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
 	ulong count = GET(Beg + 1);
-	if (count > SC_LIMIT)
-	{
-		return SC_EXCEED;
-	}
 	ulong nCursize = nfa.Size();
 	nfa.Resize(nCursize + count);
 	byte c = *(Beg + 3);
@@ -1437,10 +1405,6 @@ ulong OP_TYPEUPTO_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ul
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
 	ulong count = GET(Beg + 1);
-	if (count > SC_LIMIT)
-	{
-		return SC_EXCEED;
-	}
 	bool ALTBeg = ALTBegin;
 	byte c = *(Beg + 3);
 	if (c >=OP_NOT_DIGIT && c <= OP_ALLANY && FUNC[c] != NULL)
@@ -1460,10 +1424,6 @@ ulong OP_TYPEEXACT_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, u
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
 	ulong count = GET(Beg + 1);
-	if (count > SC_LIMIT)
-	{
-		return SC_EXCEED;
-	}
 	bool ALTBeg = ALTBegin;
 	byte c = *(Beg + 3);
 	if (c >=OP_NOT_DIGIT && c <= OP_ALLANY && FUNC[c] != NULL)
@@ -1556,10 +1516,6 @@ ulong OP_CLASS_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong
 	case OP_CRRANGE:
 		min = GET(Beg + 1);
 		max = GET(Beg + 3);
-		if (min > SC_LIMIT || max > SC_LIMIT)
-		{
-			return SC_EXCEED;
-		}
 		nfa.PopBack();
 		nfa.Resize(nCursize + min);
 		for (ulong i = 0; i < min; ++i)
@@ -1682,10 +1638,6 @@ ulong OP_NCLASS_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulon
 	case OP_CRRANGE:
 		min = GET(Beg + 1);
 		max = GET(Beg + 3);
-		if (min > SC_LIMIT || max > SC_LIMIT)
-		{
-			return SC_EXCEED;
-		}
 		nfa.PopBack();
 		nfa.Resize(nCursize + min);
 		for (ulong i = 0; i < min; ++i)

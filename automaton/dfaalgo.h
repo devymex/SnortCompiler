@@ -10,9 +10,12 @@
 */
 
 #include <hwprj\common.h>
+#include <hwprj\finalstates.h>
 
 class CDfa;
 class CNfa;
+typedef DFAROWARY::iterator			DFAROWARY_ITER;
+typedef DFAROWARY::const_iterator	DFAROWARY_CITER;
 
 struct PARTSET
 {
@@ -20,6 +23,10 @@ struct PARTSET
 	std::vector<byte*> AbleTo;
 	STATEVEC Ones;
 };
+
+typedef std::vector<PARTSET>		PARTSETVEC;
+typedef PARTSETVEC::iterator		PARTSETVEC_ITER;
+typedef PARTSETVEC::const_iterator	PARTSETVEC_CITER;
 
 struct TODFA_HASH
 {
@@ -115,3 +122,18 @@ void DfaColGroup(std::vector<CDfa> &dfas, byte* groups);
 /*	this function marks the lastDfa's terminal states. */
 void AddTermIntoDFA(STATEID otherSta, const CDfa &other,
 					STATEID lastSta, CDfa &lastDfa);
+
+void SetStateFlags(byte *pFlags, STATEVEC states);
+
+bool SortPartition(const byte *pAbleTo, PARTSET &partSet);
+
+ulong FindNotEmpty(const std::vector<ulong> *pVecAry, ulong nCnt);
+
+void InitPartWait(const std::vector<PARTSET> &partSet,
+				  std::vector<ulong> *pWait, ulong ulGrpNum);
+
+void BuildDfaByPart(const PARTSETVEC &partSets, const DFAROWARY &oldDfa,
+						 DFAROWARY &newDfa);
+
+void InitPartSet(const CFinalStates &finStas, ulong ulStaNum,
+				 std::vector<PARTSET> &partSets);

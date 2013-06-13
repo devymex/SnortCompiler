@@ -46,18 +46,19 @@ public:
 	void		Clear();
 	void		PushBack(CDfaRow &sta);
 
-	void		SetId(ulong id);
 	ulong		GetId();
+	void		SetId(ulong id);
 
-	void		SetGroups(byte *pGroup);
 	ushort		GetGroupCount() const;
+	void		SetGroups(byte *pGroup);
+	byte		Char2Group(byte nIdx);
 
 	ulong		FromNFA(const CNfa &nfa);
 	ulong		Minimize();
 
-	byte		Char2Group(byte nIdx);
-	STATEID		GetStartId() const;
-	void		SetStartId(STATEID id);
+	STATEID		GetStartState() const;
+	void		SetStartState(STATEID id);
+
 	ulong		Process(byte *ByteStream, ulong len, STATEARY &StaSet);
 
 	ulong		Save(byte *beg);
@@ -76,12 +77,7 @@ protected:
 	DFAROWARY		*m_pDfa;
 	CFinalStates	m_FinStas;
 
-	void InitPartSet(std::vector<struct PARTSET> &partSet) const;
-	void RemoveUnreachable(const STATEVEC *Tab, const STATELIST &begs, 
-		const ulong &col, STATEVEC &reachable);
-	void MergeReachable(STATEVEC &reachable);
-
-	ulong PartitionNonDisState(STATEVEC *pRevTbl);
+	ulong PartStates(STATEVEC *pRevTbl);
 
 };
 

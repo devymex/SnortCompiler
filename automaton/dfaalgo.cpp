@@ -358,3 +358,163 @@ void AddTermIntoDFA(STATEID otherSta, const CDfa &other,
 	newFinStas.PushBack(lastSta);
 	newFinStas.GetDfaIdSet(lastSta) = orgFinStas.GetDfaIdSet(otherSta);
 }
+
+void SetStateFlags(byte *pFlags, STATEVEC states)
+{
+	for (STATEVEC_ITER i = states.begin(); i != states.end(); ++i)
+	{
+		pFlags[*i] = 1;
+	}
+}
+
+bool SortPartition(const byte *pAbleTo, PARTSET &partSet)
+{
+	STATELIST_ITER t = partSet.StaSet.begin();
+	//将满足条件的t存在集合j的前段，不满足的存在集合j的后段
+	//满足条件的t标记为1，先滤去pAbleToI中前段为1的值
+	for (; t != partSet.StaSet.end() && pAbleTo[*t] != 0; ++t);
+	bool bHasAble = true;
+	if (t == partSet.StaSet.end())
+	{
+		return false;
+	}
+	if (t == partSet.StaSet.begin())
+	{
+		bHasAble = false;
+	}
+	//将后段中出现的值为1的插入至前段
+	for (; t != partSet.StaSet.end();)
+	{
+		if (pAbleTo[*t] == 1)
+		{
+			partSet.StaSet.insert(partSet.StaSet.begin(), *t);
+			t = partSet.StaSet.erase(t);
+			bHasAble = true;
+		}
+		else
+		{
+			++t;
+		}
+	}
+	return bHasAble;
+}
+
+ulong FindNotEmpty(const std::vector<ulong> *pVecAry, ulong nCnt)
+{
+	ulong ulRes = ulong(-1);
+	for (ulong i = 0; i < nCnt; ++i)
+	{
+		if (pVecAry[i].empty() != true)
+		{
+			ulRes = i;
+			break;
+		}
+	}
+	return ulRes;
+}
+
+void InitPartWait(const std::vector<PARTSET> &partSet,
+				  std::vector<ulong> *pWait, ulong ulGrpNum)
+{
+	typedef std::vector<PARTSET>::const_iterator PARTSETVEC_CITER;
+	for (ulong i = 0; i < ulGrpNum; ++i)
+	{
+		ulong AcpSum = 0, NonAcpSum = 0;
+		PARTSETVEC_CITER lastPart = partSet.cend() - 1;
+		for (PARTSETVEC_CITER j = partSet.cbegin(); j != lastPart; ++j)
+		{
+			AcpSum += j->Ones[i];
+		}
+		NonAcpSum = partSet.back().Ones[i];
+		if (AcpSum != 0 && NonAcpSum == 0)
+		{
+			for (ulong k = 0; k < partSet.size() - 1; ++k)
+			{
+				pWait[i].push_back(k);
+			}
+		}
+		else if (AcpSum == 0 && NonAcpSum != 0)
+		{
+			pWait[i].push_back(partSet.size() - 1);
+		}
+		else if (AcpSum != 0 && NonAcpSum != 0)
+		{
+			if (AcpSum < NonAcpSum)
+			{
+				pWait[i].push_back(partSet.size() - 1);
+			}
+			for (ulong k = 0; k < partSet.size() - 1; ++k)
+			{
+				pWait[i].push_back(k);
+			}
+		}
+	}
+}
+
+void BuildDfaByPart(const PARTSETVEC &partSets, const DFAROWARY &oldDfa,
+						 DFAROWARY &newDfa)
+{
+	STATEVEC old2New(oldDfa.size());
+	for (PARTSETVEC_CITER i = partSets.cbegin(); i != partSets.cend(); ++i)
+	{
+		STATEID nSetIdx = STATEID(i - partSets.cbegin());
+		for (STATELIST_CITER j = i->StaSet.cbegin(); j != i->StaSet.cend(); ++j)
+		{
+			old2New[*j] = nSetIdx;
+		}
+	}
+
+	ulong ulColNum = oldDfa[0].GetColNum();
+	for (PARTSETVEC_CITER i = partSets.begin(); i != partSets.end(); ++i)
+	{
+		CDfaRow &newRow = newDfa[i - partSets.cbegin()];
+		const CDfaRow &oldRow = oldDfa[i->StaSet.front()];
+		for (byte j = 0; j != ulColNum; ++j)
+		{
+			STATEID nCur = oldRow[j], nDest = STATEID(-1);
+			if (nCur != STATEID(-1))
+			{
+				nDest = old2New[nCur];
+			}
+			newRow[j] = nDest;
+		}
+		//set a state attribute
+		newRow.SetFlag(oldRow.GetFlag());
+	}
+}
+
+void InitPartSet(const CFinalStates &finStas, ulong ulStaNum,
+				 std::vector<PARTSET> &partSets)
+{
+	partSets.clear();
+
+	//用于区分属于不同DFA的终态集合
+	CDfaIdSet *pTerm2Dfa = new CDfaIdSet[ulStaNum];
+
+	for (ulong i = 0; i < finStas.Size(); ++i)
+	{
+		STATEID nFinStaId = finStas[i];
+		pTerm2Dfa[nFinStaId] = finStas.GetDfaIdSet(nFinStaId);
+	}
+
+	//区别终态集合和非终态集合，map的first为空，则表示对应的PARTSET为非终态集合，反之，为终态集合
+	//initBSet中集合无序
+	std::map<CDfaIdSet, PARTSET> initBSet;
+	for (STATEID i = 0; i < ulStaNum; ++i)
+	{
+		CDfaIdSet &curDfaSet = pTerm2Dfa[i];
+		initBSet[curDfaSet].StaSet.push_back(i);
+	}
+	delete []pTerm2Dfa;
+
+	//调整终态和非终态集合的顺序，vector中的last为非终态集合
+	for (std::map<CDfaIdSet, PARTSET>::iterator i = initBSet.begin();
+		i != initBSet.end(); ++i)
+	{
+		if (i->first.Size() != 0)
+		{
+			partSets.push_back(i->second);
+		}
+	}
+	partSets.push_back(initBSet[CDfaIdSet()]);
+}

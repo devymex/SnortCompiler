@@ -29,6 +29,6 @@ void CompileRule(LPCSTR rule, RECIEVER recv, LPVOID lpUser);
 
 ulong LoadFile(const char *fileName, std::vector<std::string> &rules);
 
-void Rule2Dfas(const CSnortRule &rule, CCompileResults &result, COMPILEDRULENEW &ruleResult);
+void Rule2Dfas(const CSnortRule &rule, CCompileResults &result, COMPILEDRULE &ruleResult);
 
 void AssignSig(CCompileResults &result, ulong BegIdx, ulong EndIdx);

@@ -93,13 +93,11 @@
   <ItemGroup>
     <ClInclude Include="..\include\hwprj\common.h" />
     <ClInclude Include="..\include\hwprj\ctimer.h" />
+    <ClInclude Include="..\include\hwprj\dllstring.h" />
     <ClInclude Include="..\include\hwprj\unsary.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\include\hwprj\dllstring.h">
-      <FileType>CppCode</FileType>
-    </ClInclude>
     <ClCompile Include="dllstring.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

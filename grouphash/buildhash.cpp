@@ -92,15 +92,14 @@ bool myFind(std::vector<GROUPHASH> &vecGroups, RESULTMAP &result, SIGNATURE &cur
 /* recursive adjust for conflict hash slot.
 
 Arguments:
-  vecGroups			the result of group
-  dmap				the correspondence between dfa and its signatures
+  vecGroups			    the result of group
   result				the hash table state
 
 Returns:				nothing
 
 */
 
-void RecursiveAdjust(std::vector<GROUPHASH> &vecGroups, const IDMAP &dmap, RESULTMAP &result)
+void RecursiveAdjust(std::vector<GROUPHASH> &vecGroups, RESULTMAP &result)
 {
 	bool flag = true;
 	while (flag)
@@ -166,15 +165,14 @@ void RecursiveAdjust(std::vector<GROUPHASH> &vecGroups, const IDMAP &dmap, RESUL
 /* simple adjust for conflict hash slot.
 
 Arguments:
-  vecGroups			the result of group
-  dmap				the correspondence between dfa and its signatures
+  vecGroups			    the result of group
   result				the hash table state
 
 Returns:				nothing
 
 */
 
-void Adjust(std::vector<GROUPHASH> &vecGroups, const IDMAP &dmap, RESULTMAP &result)
+void Adjust(std::vector<GROUPHASH> &vecGroups, RESULTMAP &result)
 {
 	for (RESULTMAP::iterator i = result.begin(); i != result.end(); ++i)
 	{
@@ -287,9 +285,9 @@ void Mapping(std::vector<GROUPHASH> &vecGroups, const SIGNATUREMAP &gmap, const 
 
 	Optimize(vecGroups, dmap, vecIds, result);
 
-	Adjust(vecGroups, dmap, result);
+	Adjust(vecGroups, result);
 
-	RecursiveAdjust(vecGroups, dmap, result);
+	RecursiveAdjust(vecGroups, result);
 }
 
 /* extract common signatures from two groups

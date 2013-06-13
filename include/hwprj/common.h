@@ -27,5 +27,4 @@ typedef ulong					DFAID;
 /* error codes */
 #define SC_SUCCESS		ulong(0)
 #define SC_ERROR		ulong(-1)
-#define SC_EXCEED		ulong(-2)
 
