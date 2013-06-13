@@ -1,9 +1,12 @@
 #include "stdafx.h"
-#include <hwprj/nfa.h>
+#include <hwprj\nfa.h>
+
+typedef NFAROWARY::iterator			NFAROWARY_ITER;
+typedef NFAROWARY::const_iterator	NFAROWARY_CITER;
 
 NFAHDR CNfa::CNfa()
 {
-	m_pNfa = new std::vector<CNfaRow>;
+	m_pNfa = new NFAROWARY;
 }
 
 NFAHDR CNfa::~CNfa()
@@ -11,7 +14,19 @@ NFAHDR CNfa::~CNfa()
 	delete m_pNfa;
 }
 
-NFAHDR void CNfa::Reserve(ULONG _Count)
+NFAHDR CNfa::CNfa(const CNfa &other)
+{
+	m_pNfa = new NFAROWARY;
+	*this = other;
+}
+
+NFAHDR CNfa& CNfa::operator=(const CNfa &other)
+{
+	*this->m_pNfa = *other.m_pNfa;
+	return *this;
+}
+
+NFAHDR void CNfa::Reserve(ulong _Count)
 {
 	m_pNfa->reserve(_Count);
 }
@@ -21,16 +36,16 @@ NFAHDR void CNfa::Shrink()
 	m_pNfa->shrink_to_fit();
 }
 
-NFAHDR void CNfa::Resize(ULONG _Newsize)
+NFAHDR void CNfa::Resize(ulong _Newsize)
 {
 	m_pNfa->resize(_Newsize);
-	for (std::vector<CNfaRow>::iterator i = m_pNfa->begin(); i != m_pNfa->end(); ++i)
+	for (NFAROWARY_ITER i = m_pNfa->begin(); i != m_pNfa->end(); ++i)
 	{
 		i->Resize(SC_CHARSETSIZE);
 	}
 }
 
-NFAHDR ULONG CNfa::Size() const
+NFAHDR ulong CNfa::Size() const
 {
 	return m_pNfa->size();
 }
@@ -45,25 +60,14 @@ NFAHDR CNfaRow& CNfa::Back()
 	return m_pNfa->back();
 }
 
-NFAHDR CNfaRow& CNfa::operator[](ULONG index)
+NFAHDR CNfaRow& CNfa::operator[](ulong index)
 {
 	return (*m_pNfa)[index];
 }
 
-NFAHDR const CNfaRow& CNfa::operator[](ULONG index) const
+NFAHDR const CNfaRow& CNfa::operator[](ulong index) const
 {
 	return (*m_pNfa)[index];
-}
-
-NFAHDR CNfa::CNfa(const CNfa &other)
-{
-	m_pNfa = new std::vector<CNfaRow>;
-	*this = other;
-}
-NFAHDR CNfa& CNfa::operator=(const CNfa &other)
-{
-	*this->m_pNfa = *other.m_pNfa;
-	return *this;
 }
 
 NFAHDR void CNfa::PopBack()
@@ -78,7 +82,7 @@ NFAHDR void CNfa::PushBack(const CNfaRow &row)
 
 NFAHDR void CNfa::SortAll()
 {
-	for(std::vector<CNfaRow>::iterator i = m_pNfa->begin(); i != m_pNfa->end(); ++i)
+	for(NFAROWARY_ITER i = m_pNfa->begin(); i != m_pNfa->end(); ++i)
 	{
 		i->SortAll();
 	}
@@ -86,28 +90,28 @@ NFAHDR void CNfa::SortAll()
 
 NFAHDR void CNfa::Dump(const char *pFile) const
 {
-	ULONG stateNum = m_pNfa->size();
+	ulong stateNum = m_pNfa->size();
 	std::ofstream fout(pFile);
 	fout << "\t";
-	for(ULONG t = 0; t < 257; ++t)
+	for(ulong t = 0; t < 257; ++t)
 	{
 		fout << t << "\t";
 	}
 	fout << std::endl;
-	for(ULONG i = 0; i < stateNum; ++i)
+	for(ulong i = 0; i < stateNum; ++i)
 	{
 		fout << i << "\t";
 		const CNfaRow &row = (*m_pNfa)[i];
-		for(ULONG j = 0; j < 257; ++j)
+		for(ulong j = 0; j < 257; ++j)
 		{
-			ULONG nCnt = row.DestCnt(j);
+			ulong nCnt = row.DestCnt(j);
 			if(nCnt == 0)
 			{
 				fout << -1 << "\t";
 			}
 			else
 			{
-				for(ULONG k = 0; k < nCnt; ++k)
+				for(ulong k = 0; k < nCnt; ++k)
 				{
 					fout << row.GetDest(j, k) << ", ";
 				}

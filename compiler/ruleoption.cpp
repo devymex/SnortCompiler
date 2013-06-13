@@ -1,31 +1,31 @@
 #include "stdafx.h"
-#include "ruleoption.h"
+#include <hwprj\ruleoption.h>
 
-CRuleOption::CRuleOption()
+SNORTRULEHDR CRuleOption::CRuleOption()
 	: m_nFlag(0)
 {
 	m_pPattern = new std::string;
 }
 
-CRuleOption::CRuleOption(const CRuleOption &other)
+SNORTRULEHDR CRuleOption::CRuleOption(const CRuleOption &other)
 {
 	m_pPattern = new std::string;
 	*this = other;
 }
 
-CRuleOption::~CRuleOption()
+SNORTRULEHDR CRuleOption::~CRuleOption()
 {
 	delete m_pPattern;
 }
 
-const CRuleOption& CRuleOption::operator=(const CRuleOption &other)
+SNORTRULEHDR const CRuleOption& CRuleOption::operator=(const CRuleOption &other)
 {
 	*m_pPattern = *other.m_pPattern;
 	m_nFlag = other.m_nFlag;
 	return *this;
 }
 
-ULONG CRuleOption::GetPattern(LPSTR lpStr, ULONG nLen) const
+SNORTRULEHDR ulong CRuleOption::GetPattern(LPSTR lpStr, ulong nLen) const
 {
 	if (lpStr == NULL || nLen == 0)
 	{
@@ -39,27 +39,27 @@ ULONG CRuleOption::GetPattern(LPSTR lpStr, ULONG nLen) const
 	return nLen;
 }
 
-void CRuleOption::SetPattern(LPCSTR lpStr)
+SNORTRULEHDR void CRuleOption::SetPattern(LPCSTR lpStr)
 {
 	*m_pPattern = lpStr;
 }
 
-ULONG CRuleOption::GetFlag() const
+SNORTRULEHDR ulong CRuleOption::GetFlag() const
 {
 	return m_nFlag;
 }
 
-void CRuleOption::SetFlag(ULONG nFlag)
+SNORTRULEHDR void CRuleOption::SetFlag(ulong nFlag)
 {
 	m_nFlag = nFlag;
 }
 
-void CRuleOption::AddFlag(ULONG nFlag)
+SNORTRULEHDR void CRuleOption::AddFlag(ulong nFlag)
 {
 	m_nFlag |= nFlag;
 }
 
-BOOL CRuleOption::TestFlag(ULONG nFlag) const
+SNORTRULEHDR bool CRuleOption::TestFlag(ulong nFlag) const
 {
 	return ((m_nFlag & nFlag) != 0);
 }

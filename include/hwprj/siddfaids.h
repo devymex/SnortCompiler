@@ -1,6 +1,6 @@
 #pragma once
 
-#include <hwprj\dllarray.h>
+#include <hwprj\unsary.h>
 
 #ifndef SIDDFAHDR_DS
 #define SIDDFAHDR __declspec(dllimport)
@@ -21,9 +21,9 @@ struct COMPILEDRULENEW
 		RES_HASNOSIG = 0x0020,
 		RES_EXCEEDLIMIT = 0x0040,
 	};
-	ULONG m_nSid;
-	ULONG m_nResult;
-	CDllArray m_dfaIds;
+	ulong m_nSid;
+	ulong m_nResult;
+	CUnsignedArray m_dfaIds;
 };
 
 class SIDDFAHDR CSidDfaIds
@@ -34,11 +34,11 @@ public:
 	const CSidDfaIds &operator=(const CSidDfaIds &other);
 	~CSidDfaIds();
 
-	COMPILEDRULENEW& operator[](ULONG index);
-	const COMPILEDRULENEW& operator[](ULONG index) const;
-	void Reserve(ULONG nCount);
-	void Resize(ULONG nSize);
-	const ULONG Size() const;
+	COMPILEDRULENEW& operator[](ulong index);
+	const COMPILEDRULENEW& operator[](ulong index) const;
+	void Reserve(ulong nCount);
+	void Resize(ulong nSize);
+	const ulong Size() const;
 	void PushBack(const COMPILEDRULENEW &sidDfaIds);
 	COMPILEDRULENEW& Back();
 protected:

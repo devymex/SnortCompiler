@@ -1,3 +1,14 @@
+/*
+**	@file		compres.h
+**
+**	@author		Lab 435, Xidian University
+**
+**	@brief		Definition of the CCompileResults class
+**
+**	For compiler's result, access member, read and write etc. 
+**
+*/
+
 #pragma once
 
 #include <hwprj\dfaarray.h>
@@ -19,8 +30,9 @@ public:
 	const CDfaArray& GetDfaTable() const;
 	const CSidDfaIds& GetSidDfaIds() const;
 	const CRegRule &GetRegexTbl() const;
-	ULONG WriteToFile(LPCTSTR filename);
-	ULONG ReadFromFile(LPCTSTR filename);
+	ulong WriteToFile(const char *filename);
+	ulong ReadFromFile(const char *filename);
+
 protected:
 	CDfaArray m_dfaTbl;
 	CSidDfaIds m_sidDfaIds;

@@ -92,8 +92,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\include\hwprj\common.h" />
-    <ClInclude Include="..\include\hwprj\signatures.h" />
-    <ClInclude Include="..\include\hwprj\dllarray.h" />
+    <ClInclude Include="..\include\hwprj\ctimer.h" />
+    <ClInclude Include="..\include\hwprj\unsary.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
@@ -101,12 +101,11 @@
       <FileType>CppCode</FileType>
     </ClInclude>
     <ClCompile Include="dllstring.cpp" />
-    <ClCompile Include="signatures.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="dllarray.cpp" />
+    <ClCompile Include="unsary.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="common.def" />

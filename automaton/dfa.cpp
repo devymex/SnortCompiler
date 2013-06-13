@@ -1,24 +1,28 @@
 /**
-**  @file        dfa.h
+**	@file		dfa.cpp
 **
-**  @author      Lab 435, Xidian University
+**	@author		Lab 435, Xidian University
 **
-**  @brief       Common classes declaration
+**	@brief		 Common classes declaration
 **
-**  Include CDllArray, CDllString
+**	Include CUnsignedArray, CDllString
 **
 */
 
 #include "stdafx.h"
 
-#include <hwprj\dfa.h>
-#include <hwprj\nfa.h>
 #include "dfaalgo.h"
+#include <hwprj\dfarow.h>
+#include <hwprj\nfa.h>
+#include <hwprj\dfa.h>
+
+typedef DFAROWARY::iterator			DFAROWARY_ITER;
+typedef DFAROWARY::const_iterator	DFAROWARY_CITER;
 
 DFAHDR CDfa::CDfa()
-	: m_nId(ULONG(-1)), m_nColNum(ULONG(0)), m_nStartId(STATEID(0))
+	: m_nId(ulong(-1)), m_nColNum(ulong(0)), m_nStartId(STATEID(0))
 {
-	std::fill(m_pGroup, m_pGroup + SC_DFACOLCNT, BYTE(-1));
+	std::fill(m_pGroup, m_pGroup + SC_DFACOLCNT, byte(-1));
 	m_pDfa = new std::vector<CDfaRow>;
 }
 
@@ -39,13 +43,13 @@ DFAHDR CDfa& CDfa::operator=(const CDfa &other)
 	m_nId = other.m_nId;
 	m_nColNum = other.m_nColNum;
 	m_nStartId = other.m_nStartId;
-	CopyMemory(m_pGroup, other.m_pGroup, SC_DFACOLCNT * sizeof(BYTE));
+	CopyMemory(m_pGroup, other.m_pGroup, SC_DFACOLCNT * sizeof(byte));
 	*m_pDfa = *other.m_pDfa;
 	m_FinStas = other.m_FinStas;
 	return *this;
 }
 
-DFAHDR ULONG CDfa::Size() const
+DFAHDR ulong CDfa::Size() const
 {
 	return m_pDfa->size();
 }
@@ -55,12 +59,12 @@ DFAHDR CDfaRow& CDfa::Back()
 	return m_pDfa->back();
 }
 
-DFAHDR void CDfa::Reserve(ULONG nSize)
+DFAHDR void CDfa::Reserve(ulong nSize)
 {
 	m_pDfa->reserve(nSize);
 }
 
-DFAHDR void CDfa::Resize(ULONG nSize, ULONG nCol)
+DFAHDR void CDfa::Resize(ulong nSize, ulong nCol)
 {
 	m_pDfa->resize(nSize, CDfaRow(nCol));
 }
@@ -80,17 +84,17 @@ DFAHDR void CDfa::PushBack(CDfaRow &sta)
 	m_pDfa->push_back(sta);
 }
 
-DFAHDR void CDfa::Init(BYTE *pGroup)
+DFAHDR void CDfa::SetGroups(byte *pGroup)
 {
 	//1 if the group is used, 0 otherwise
-	BYTE occurred[SC_DFACOLCNT] = {0};
-	for (ULONG i = 0; i < SC_DFACOLCNT; ++i) 
+	byte occurred[SC_DFACOLCNT] = {0};
+	for (ulong i = 0; i < SC_DFACOLCNT; ++i) 
 	{
 		occurred[pGroup[i]] = 1;
 	}
 
 	//number of groups
-	WORD nZeroBegPos = 0;
+	ushort nZeroBegPos = 0;
 	for (; nZeroBegPos < SC_DFACOLCNT; ++nZeroBegPos)
 	{
 		if (occurred[nZeroBegPos] == 0)
@@ -102,7 +106,7 @@ DFAHDR void CDfa::Init(BYTE *pGroup)
 	//flag is true if 1 does not occur after nZeroBegPos, false otherwise
 	//flag is true indicates that the group is reasonable
 	bool flag = true;
-	for (ULONG i = nZeroBegPos + 1; i < SC_DFACOLCNT; ++i)
+	for (ulong i = nZeroBegPos + 1; i < SC_DFACOLCNT; ++i)
 	{
 		if (occurred[i] == 1)
 		{
@@ -115,42 +119,42 @@ DFAHDR void CDfa::Init(BYTE *pGroup)
 	if (flag)
 	{
 		m_nColNum = nZeroBegPos;
-		CopyMemory(m_pGroup, pGroup, SC_DFACOLCNT * sizeof(BYTE));
+		CopyMemory(m_pGroup, pGroup, SC_DFACOLCNT * sizeof(byte));
 	}
 	else
 	{
-		std::cerr << "Group error!" << std::endl;
+		throw 0;
 	}
 }
 
 DFAHDR void CDfa::Clear()
 {
-	m_nId = ULONG(-1);
-	m_nColNum = ULONG(0);
+	m_nId = ulong(-1);
+	m_nColNum = ulong(0);
 	m_nStartId = STATEID(0);
 	memset(m_pGroup, 0xFF, SC_DFACOLCNT);
 	m_pDfa->clear();
 	m_FinStas.Clear();
 }
 
-DFAHDR ULONG CDfa::FromNFA(const CNfa &nfa)
+DFAHDR ulong CDfa::FromNFA(const CNfa &nfa)
 {
-	typedef std::unordered_map<std::vector<ULONG>, STATEID, NSTATESET_HASH> STATESETHASH;
-	//std::vector<std::pair<std::vector<ULONG>, STATEID>> termStasVec;
+	typedef std::unordered_map<STATEVEC, STATEID, NSTATESET_HASH> STATESETHASH;
+	//std::vector<std::pair<std::vector<ulong>, STATEID>> termStasVec;
 
-	ULONG dfaId = m_nId;
+	ulong dfaId = m_nId;
 	Clear();
 	m_nId = dfaId;
 	
-	std::vector<std::vector<ULONG>> eClosure;
+	std::vector<STATEVEC> eClosure;
 	NfaEClosure(nfa, eClosure);
 
-	BYTE groups[SC_DFACOLCNT];
+	byte groups[SC_DFACOLCNT];
 	NAvaiEdges(nfa, groups);
 	Init(groups);
 
-	std::stack<std::vector<ULONG>> nfaStasStack;
-	std::vector<ULONG> &startEVec = eClosure.front();
+	std::stack<STATEVEC> nfaStasStack;
+	STATEVEC &startEVec = eClosure.front();
 	nfaStasStack.push(startEVec);
 
 	STATESETHASH ssh;
@@ -167,20 +171,19 @@ DFAHDR ULONG CDfa::FromNFA(const CNfa &nfa)
 		m_FinStas.PushBack(0, m_nId);
 	}
 
-	std::vector<ULONG> curNfaVec;
-	static std::vector<ULONG> nextNfaVec; //
+	static STATEVEC nextNfaVec; //
 	nextNfaVec.clear();
-	BYTE compuFlag[SC_CHARSETSIZE];
+	byte compuFlag[SC_CHARSETSIZE];
 
 	for (; nfaStasStack.size() > 0; )
 	{
-		curNfaVec = nfaStasStack.top();
+		STATEVEC curNfaVec = nfaStasStack.top();
 		nfaStasStack.pop();
 
 		memset(compuFlag, 0, sizeof(compuFlag));
-		for (ULONG nCurChar = 0; nCurChar < SC_DFACOLCNT; ++nCurChar)
+		for (ulong nCurChar = 0; nCurChar < SC_DFACOLCNT; ++nCurChar)
 		{
-			BYTE curGroup = m_pGroup[nCurChar];
+			byte curGroup = m_pGroup[nCurChar];
 			if(compuFlag[curGroup] == 1)
 			{
 				continue;
@@ -196,9 +199,7 @@ DFAHDR ULONG CDfa::FromNFA(const CNfa &nfa)
 					m_pDfa->push_back(CDfaRow(m_nColNum));
 					if (m_pDfa->size() > SC_STATELIMIT)
 					{
-
-						//std::cout << "SC_STATELIMIT!" << std::endl;
-						return (ULONG)-1;
+						return (ulong)-1;
 					}
 					STATEID nextSta = (STATEID)ssh.size();
 					ssh[nextNfaVec] = nextSta;
@@ -226,34 +227,34 @@ DFAHDR ULONG CDfa::FromNFA(const CNfa &nfa)
 	return 0;
 }
 
-DFAHDR ULONG CDfa::Minimize()
+DFAHDR ulong CDfa::Minimize()
 {
 	//error: DFA is empty
 
 	//CTimer time1;//用于测试
-	ULONG nSize = m_pDfa->size();
-	ULONG nCols = GetGroupCount();
+	ulong nSize = m_pDfa->size();
+	ulong nCols = GetGroupCount();
 	if (nSize == 0)
 	{
-		return ULONG(-1);
+		return ulong(-1);
 	}
 #ifdef DFA_REMOVE_UNREACHABLE
-	ULONG nMatHeight = nSize + 1;
-	ULONG nMatWidth = nMatHeight;
+	ulong nMatHeight = nSize + 1;
+	ulong nMatWidth = nMatHeight;
 
 	if (nMatWidth % 16 != 0)
 	{
 		nMatWidth = (nMatWidth / 16) * 16 + 16;
 	}
-	BYTE *pMat = NULL;
+	byte *pMat = NULL;
 	STATEVEC reachable;
 
-	pMat = (BYTE*)_aligned_malloc(nMatWidth * nMatHeight, 128);
+	pMat = (byte*)_aligned_malloc(nMatWidth * nMatHeight, 128);
 	memset(pMat, 0, nMatWidth * nMatHeight);
 
-	for (ULONG i = 0; i < nSize; ++i)
+	for (ulong i = 0; i < nSize; ++i)
 	{
-		for (ULONG j = 0; j < nCols; ++j)
+		for (ulong j = 0; j < nCols; ++j)
 		{
 			STATEID nextSta = (STATEID)(*m_pDfa)[i][j];
 			if (nextSta != STATEID(-1))
@@ -271,9 +272,9 @@ DFAHDR ULONG CDfa::Minimize()
 	}
 	Warshall(pMat, nMatWidth, nMatHeight);
 
-	ULONG nStartRow = m_nStartId * nMatWidth;
+	ulong nStartRow = m_nStartId * nMatWidth;
 	pMat[nStartRow + m_nStartId] = 1;
-	for (ULONG i = 0; i < nSize; ++i)
+	for (ulong i = 0; i < nSize; ++i)
 	{
 		if (pMat[nStartRow + i] && pMat[i * nMatWidth + nSize])
 		{
@@ -298,7 +299,7 @@ DFAHDR ULONG CDfa::Minimize()
 	pRevTab = new STATEVEC[nSize * nCols];
 	for (STATEID i = 0; i < nSize; ++i)
 	{
-		for (BYTE j = 0; j < nCols; ++j)
+		for (byte j = 0; j < nCols; ++j)
 		{
 			STATEID nDest = (STATEID)(*m_pDfa)[i][j];
 			if (nDest != STATEID(-1))
@@ -309,36 +310,22 @@ DFAHDR ULONG CDfa::Minimize()
 	}
 
 	std::vector<PARTSET> partSet;
-	ULONG nr = PartitionNonDisState(pRevTab, partSet);
+	ulong nr = PartitionNonDisState(pRevTab);
 	//divide nondistinguishable states
-	if (0 == nr)
-	{
-		if (partSet.size() < nSize)
-		{
-			//DFA minization
-			MergeNonDisStates(partSet);
-			std::cout << "Minimized: " << nSize - partSet.size() << std::endl;
-		}
-	}
 
 	delete []pRevTab;
 
 	return nr;
 }
 
-DFAHDR WORD CDfa::GetGroupCount() const
+DFAHDR ushort CDfa::GetGroupCount() const
 {
 	return m_nColNum;
 }
 
-DFAHDR BYTE CDfa::Char2Group(BYTE nIdx)
+DFAHDR byte CDfa::Char2Group(byte nIdx)
 {
 	return m_pGroup[nIdx];
-}
-
-DFAHDR const BYTE CDfa::GetGroup(STATEID charNum) const
-{
-	return m_pGroup[charNum];
 }
 
 DFAHDR STATEID CDfa::GetStartId() const
@@ -351,21 +338,21 @@ DFAHDR void CDfa::SetStartId(STATEID id)
 	m_nStartId = id;
 }
 
-DFAHDR void CDfa::SetId(ULONG id)
+DFAHDR void CDfa::SetId(ulong id)
 {
 	m_nId = id;
 }
 
-DFAHDR ULONG CDfa::GetId()
+DFAHDR ulong CDfa::GetId()
 {
 	return m_nId;
 }
 
-DFAHDR ULONG CDfa::Process(BYTE *ByteStream, ULONG len, CStateSet &StaSet)
+DFAHDR ulong CDfa::Process(byte *ByteStream, ulong len, STATEARY &StaSet)
 {
 	std::vector<bool> res(m_pDfa->size(), false);
 	STATEID ActiveState = m_nStartId;
-	ULONG nPos = 0;
+	ulong nPos = 0;
 	for (nPos = 0; nPos < len; ++nPos)
 	{
 		if ((*this)[ActiveState].GetFlag() & CDfaRow::TERMINAL)
@@ -378,7 +365,7 @@ DFAHDR ULONG CDfa::Process(BYTE *ByteStream, ULONG len, CStateSet &StaSet)
 			break;
 		}
 	}
-	for (ULONG i = 0; i < res.size(); ++i)
+	for (ulong i = 0; i < res.size(); ++i)
 	{
 		if (res[i])
 		{
@@ -389,50 +376,50 @@ DFAHDR ULONG CDfa::Process(BYTE *ByteStream, ULONG len, CStateSet &StaSet)
 	return nPos;
 }
 
-DFAHDR ULONG CDfa::Save(BYTE *beg)
+DFAHDR ulong CDfa::Save(byte *beg)
 {
-	BYTE *pOld = beg;
+	byte *pOld = beg;
 
 	//write dfa id
 	WriteNum(beg, m_nId);
 
 	//write number of dfa states
-	WriteNum(beg, m_pDfa->size(), sizeof(BYTE));
+	WriteNum(beg, m_pDfa->size(), sizeof(byte));
 	if (m_pDfa->size() == 0)
 	{
 		return beg - pOld;
 	}
 
 	//write group
-	for (ULONG i = 0; i < SC_DFACOLCNT; ++i)
+	for (ulong i = 0; i < SC_DFACOLCNT; ++i)
 	{
 		WriteNum(beg, m_pGroup[i]);
 	}
 
 	//write dfa table
-	for (ULONG i = 0; i < m_pDfa->size(); ++i)
+	for (ulong i = 0; i < m_pDfa->size(); ++i)
 	{
 		//write the flag of dfa state
 		WriteNum(beg, (*m_pDfa)[i].GetFlag());
-		for (BYTE j = 0; j < m_nColNum; ++j)
+		for (byte j = 0; j < m_nColNum; ++j)
 		{
-			WriteNum(beg, (*m_pDfa)[i][j], sizeof(BYTE));
+			WriteNum(beg, (*m_pDfa)[i][j], sizeof(byte));
 		}
 	}
 	
 	//write the dfa's start state id
-	WriteNum(beg, m_nStartId, sizeof(BYTE));
+	WriteNum(beg, m_nStartId, sizeof(byte));
 
 	//write the relationship between dfa's terminal state and dfa id
 	WriteNum(beg, m_FinStas.GetAllDfaIdCount());
-	for (ULONG i = 0; i < m_FinStas.Size(); ++i)
+	for (ulong i = 0; i < m_FinStas.Size(); ++i)
 	{
 		STATEID nStaId = m_FinStas[i];
-		CDllArray ids;
-		m_FinStas.GetDfaIds(nStaId, ids);
-		for (ULONG j = 0; j < ids.Size(); ++j)
+		CUnsignedArray ids;
+		m_FinStas.GetDfaIdSet(nStaId).CopyTo(ids);
+		for (ulong j = 0; j < ids.Size(); ++j)
 		{
-			WriteNum(beg, nStaId, sizeof(BYTE));
+			WriteNum(beg, nStaId, sizeof(byte));
 			WriteNum(beg, ids[j]);
 		}
 	}
@@ -440,16 +427,16 @@ DFAHDR ULONG CDfa::Save(BYTE *beg)
 	return beg - pOld;
 }
 
-DFAHDR void CDfa::Load(BYTE *beg, ULONG len)
+DFAHDR void CDfa::Load(byte *beg, ulong len)
 {
 	len = 0;
 	//read dfa id
-	ULONG dfaId;
+	ulong dfaId;
 	ReadNum(beg, dfaId);
 	m_nId = dfaId;
 
 	//read number of dfa states
-	BYTE dfaSize;
+	byte dfaSize;
 	ReadNum(beg, dfaSize);
 	if (dfaSize == 0)
 	{
@@ -457,8 +444,8 @@ DFAHDR void CDfa::Load(BYTE *beg, ULONG len)
 	}
 	
 	//read group
-	BYTE pGroup[SC_DFACOLCNT];
-	for (ULONG i = 0; i < SC_DFACOLCNT; ++i)
+	byte pGroup[SC_DFACOLCNT];
+	for (ulong i = 0; i < SC_DFACOLCNT; ++i)
 	{
 		ReadNum(beg, pGroup[i]);
 	}
@@ -467,17 +454,17 @@ DFAHDR void CDfa::Load(BYTE *beg, ULONG len)
 
 	//read dfa table
 	m_pDfa->resize(dfaSize, CDfaRow(m_nColNum));
-	ULONG nFlag;
-	for (ULONG i = 0; i < m_pDfa->size(); ++i)
+	ulong nFlag;
+	for (ulong i = 0; i < m_pDfa->size(); ++i)
 	{
 		//read the flag of dfa state
 		ReadNum(beg, nFlag);
 		(*m_pDfa)[i].SetFlag(nFlag);
-		for (BYTE j = 0; j < m_nColNum; ++j)
+		for (byte j = 0; j < m_nColNum; ++j)
 		{
 			(*m_pDfa)[i][j] = 0;
-			ReadNum(beg, (*m_pDfa)[i][j], sizeof(BYTE));
-			if ((*m_pDfa)[i][j] == BYTE(-1))
+			ReadNum(beg, (*m_pDfa)[i][j], sizeof(byte));
+			if ((*m_pDfa)[i][j] == byte(-1))
 			{
 				(*m_pDfa)[i][j] = STATEID(-1);
 			}
@@ -486,16 +473,16 @@ DFAHDR void CDfa::Load(BYTE *beg, ULONG len)
 	
 	//read the dfa's start state id
 	m_nStartId = 0;
-	ReadNum(beg, m_nStartId, sizeof(BYTE));
+	ReadNum(beg, m_nStartId, sizeof(byte));
 	
 	//read the relationship between dfa's terminal state and dfa id
-	ULONG nFinStasSize;
+	ulong nFinStasSize;
 	ReadNum(beg, nFinStasSize);
-	for (ULONG i = 0; i < nFinStasSize; ++i)
+	for (ulong i = 0; i < nFinStasSize; ++i)
 	{
 		STATEID nStaId = 0;
-		ULONG nDfaId;
-		ReadNum(beg, nStaId, sizeof(BYTE));
+		ulong nDfaId;
+		ReadNum(beg, nStaId, sizeof(byte));
 		ReadNum(beg, nDfaId);
 		m_FinStas.PushBack(nStaId, nDfaId);
 	}
@@ -510,19 +497,19 @@ DFAHDR void CDfa::Dump(const char *pFile)
 	}
 
 	fout << "字符和组对应关系：" << std::endl;
-	for(BYTE i = 0; i < SC_DFACOLCNT - 1; ++i)
+	for(byte i = 0; i < SC_DFACOLCNT - 1; ++i)
 	{
-		fout << (ULONG)i << "\t" << (ULONG)m_pGroup[i] << std::endl;
+		fout << (ulong)i << "\t" << (ulong)m_pGroup[i] << std::endl;
 	}
 
-	fout << 255 << "\t" << (ULONG)m_pGroup[255] << std::endl;
+	fout << 255 << "\t" << (ulong)m_pGroup[255] << std::endl;
 	fout << "\t";
-	for(BYTE j = 0; j != m_nColNum; ++j)
+	for(byte j = 0; j != m_nColNum; ++j)
 	{
-		fout << (ULONG)j << "\t";
+		fout << (ulong)j << "\t";
 	}
 	fout << std::endl;
-	for(ULONG i = 0; i != m_pDfa->size(); ++i)
+	for(ulong i = 0; i != m_pDfa->size(); ++i)
 	{
 		if(((*m_pDfa)[i].GetFlag() & CDfaRow::TERMINAL) != 0)
 		{
@@ -532,9 +519,9 @@ DFAHDR void CDfa::Dump(const char *pFile)
 		{
 			fout << i << "\t";
 		}
-		for(BYTE j = 0; j != m_nColNum; ++j)
+		for(byte j = 0; j != m_nColNum; ++j)
 		{
-			fout << (ULONG)(*m_pDfa)[i][j] << "\t";
+			fout << (ulong)(*m_pDfa)[i][j] << "\t";
 		}
 		fout << std::endl;
 	}
@@ -546,10 +533,10 @@ DFAHDR void CDfa::Dump(const char *pFile)
 //0 表示该状态为孤立状态，1 表示该状态为不可达状态或者“死”状态，2 表示该状态为可达状态
 void CDfa::MergeReachable(STATEVEC &reachable)
 {
-	ULONG nDfaSize = m_pDfa->size();
+	ulong nDfaSize = m_pDfa->size();
 	//标记终态的dfaId，以保证终态编号更改后，其对应的dfaId保持不变
-	std::vector<ULONG> finFlag(nDfaSize, ULONG(-1));
-	//for (ULONG i = 0; i < m_FinStas.Size(); ++i)
+	std::vector<ulong> finFlag(nDfaSize, ulong(-1));
+	//for (ulong i = 0; i < m_FinStas.Size(); ++i)
 	//{
 	//	TERMSET &curSet = (*m_pTermSet)[i];
 	//	termFlag[curSet.dfaSta] = curSet.dfaId;
@@ -557,14 +544,14 @@ void CDfa::MergeReachable(STATEVEC &reachable)
 	//m_pTermSet->clear();
 	
 	//统计可达状态的数目
-	ULONG nRcbCnt = reachable.size();
-	ULONG nColNum = GetGroupCount();
+	ulong nRcbCnt = reachable.size();
+	ulong nColNum = GetGroupCount();
 
 	//定义一个同成员变量m_pDfa类型相同的变量，用于存储删除多余状态后的DFA跳转表
 	std::vector<CDfaRow> *pNewDfa = new std::vector<CDfaRow>(nRcbCnt, CDfaRow(nColNum));
 	std::vector<CDfaRow> &tmpDfa = *pNewDfa;
 
-	ULONG nMemSize = nDfaSize * sizeof(STATEID);
+	ulong nMemSize = nDfaSize * sizeof(STATEID);
 	STATEID *pOldToNew = new STATEID[nMemSize];
 	memset(pOldToNew, 0xFF, nMemSize);
 
@@ -590,7 +577,7 @@ void CDfa::MergeReachable(STATEVEC &reachable)
 	for (STATEID i = 0; i < nRcbCnt; ++i)
 	{
 		CDfaRow &curRow = tmpDfa[i];
-		for (BYTE j = 0; j < nColNum; ++j)
+		for (byte j = 0; j < nColNum; ++j)
 		{
 			STATEID &cur = curRow[j];
 			if (cur != STATEID(-1))
@@ -608,74 +595,111 @@ void CDfa::MergeReachable(STATEVEC &reachable)
 
 void CDfa::InitPartSet(std::vector<PARTSET> &partSet) const
 {
-	ULONG nStaNum = m_pDfa->size();
+	ulong nStaNum = m_pDfa->size();
 
 	partSet.clear();
 
 	//用于区分属于不同DFA的终态集合
-	std::set<ULONG> *pTerm2Dfa = new std::set<ULONG>[nStaNum];
+	CDfaIdSet *pTerm2Dfa = new CDfaIdSet[nStaNum];
 
-	for (ULONG i = 0; i < m_FinStas.Size(); ++i)
+	for (ulong i = 0; i < m_FinStas.Size(); ++i)
 	{
 		STATEID nFinStaId = m_FinStas[i];
-		pTerm2Dfa[nFinStaId] = m_FinStas._GetDfaIds(nFinStaId);
+		pTerm2Dfa[nFinStaId] = m_FinStas.GetDfaIdSet(nFinStaId);
 	}
 
 	//区别终态集合和非终态集合，map的first为空，则表示对应的PARTSET为非终态集合，反之，为终态集合
 	//initBSet中集合无序
-	std::map<std::set<ULONG>, PARTSET> initBSet;
+	std::map<CDfaIdSet, PARTSET> initBSet;
 	for (STATEID i = 0; i < nStaNum; ++i)
 	{
-		std::set<ULONG> &curDfaSet = pTerm2Dfa[i];
+		CDfaIdSet &curDfaSet = pTerm2Dfa[i];
 		initBSet[curDfaSet].StaSet.push_back(i);
 	}
 	delete []pTerm2Dfa;
 
 	//调整终态和非终态集合的顺序，vector中的last为非终态集合
-	for (std::map<std::set<ULONG>, PARTSET>::iterator i = initBSet.begin();
+	for (std::map<CDfaIdSet, PARTSET>::iterator i = initBSet.begin();
 		i != initBSet.end(); ++i)
 	{
-		if (i->first.size() != 0)
+		if (i->first.Size() != 0)
 		{
 			partSet.push_back(i->second);
 		}
 	}
-	partSet.push_back(initBSet[std::set<ULONG>()]);
+	partSet.push_back(initBSet[CDfaIdSet()]);
 }
 
-ULONG CDfa::PartitionNonDisState(STATEVEC *pRevTbl,
-									 std::vector<PARTSET> &partSet) const
+void SetStateFlags(byte *pFlags, STATEVEC states)
 {
-	ULONG nGrpNum = GetGroupCount();
-	ULONG nStaNum = m_pDfa->size();
-
-	InitPartSet(partSet);
-
-	for (std::vector<PARTSET>::iterator i = partSet.begin();
-		i != partSet.end(); ++i)
+	for (STATEVEC_ITER i = states.begin(); i != states.end(); ++i)
 	{
-		//对于partSet中每个集合，根据不同的nGrpNum计算不同AbleTo，AbleTo对应论文中的a(i)
-		CalcAbleTo(pRevTbl, nGrpNum, nStaNum, *i);
+		pFlags[*i] = 1;
 	}
+}
 
-	//pWait表示用于切分partSet中每个集合的集合下标，
-	//对于不同的输入字符会保存多个不同集合下标。对应论文中L(a)
-	std::vector<ULONG> pWait[256];
-
-	//初始化pWait，要求若满足0<|ij|<=|ik|，则将j存入pWait，反之，存入k
-	//对应论文中初始化L(a)过程，这里的i对应a
-	for (ULONG i = 0; i < nGrpNum; ++i)
+bool SortPartition(const byte *pAbleTo, PARTSET &partSet)
+{
+	STATELIST_ITER t = partSet.StaSet.begin();
+	//将满足条件的t存在集合j的前段，不满足的存在集合j的后段
+	//满足条件的t标记为1，先滤去pAbleToI中前段为1的值
+	for (; t != partSet.StaSet.end() && pAbleTo[*t] != 0; ++t);
+	bool bHasAble = true;
+	if (t == partSet.StaSet.end())
 	{
-		ULONG AcpSum = 0, NonAcpSum = 0;
-		for (std::vector<PARTSET>::iterator j = partSet.begin();
-			j != partSet.end() - 1; ++j)
+		return false;
+	}
+	if (t == partSet.StaSet.begin())
+	{
+		bHasAble = false;
+	}
+	//将后段中出现的值为1的插入至前段
+	for (; t != partSet.StaSet.end();)
+	{
+		if (pAbleTo[*t] == 1)
+		{
+			partSet.StaSet.insert(partSet.StaSet.begin(), *t);
+			t = partSet.StaSet.erase(t);
+			bHasAble = true;
+		}
+		else
+		{
+			++t;
+		}
+	}
+	return bHasAble;
+}
+
+ulong FindNotEmpty(const std::vector<ulong> *pVecAry, ulong nCnt)
+{
+	ulong ulRes = ulong(-1);
+	for (ulong i = 0; i < nCnt; ++i)
+	{
+		if (pVecAry[i].empty() != true)
+		{
+			ulRes = i;
+			break;
+		}
+	}
+	return ulRes;
+}
+
+void InitPartWait(const std::vector<PARTSET> &partSet,
+				  std::vector<ulong> *pWait, ulong ulGrpNum)
+{
+	typedef std::vector<PARTSET>::const_iterator PARTSETVEC_CITER;
+	for (ulong i = 0; i < ulGrpNum; ++i)
+	{
+		ulong AcpSum = 0, NonAcpSum = 0;
+		PARTSETVEC_CITER lastPart = partSet.cend() - 1;
+		for (PARTSETVEC_CITER j = partSet.cbegin(); j != lastPart; ++j)
 		{
 			AcpSum += j->Ones[i];
 		}
 		NonAcpSum = partSet.back().Ones[i];
 		if (AcpSum != 0 && NonAcpSum == 0)
 		{
-			for (ULONG k = 0; k < partSet.size() - 1; ++k)
+			for (ulong k = 0; k < partSet.size() - 1; ++k)
 			{
 				pWait[i].push_back(k);
 			}
@@ -690,90 +714,76 @@ ULONG CDfa::PartitionNonDisState(STATEVEC *pRevTbl,
 			{
 				pWait[i].push_back(partSet.size() - 1);
 			}
-			for (ULONG k = 0; k < partSet.size() - 1; ++k)
+			for (ulong k = 0; k < partSet.size() - 1; ++k)
 			{
 				pWait[i].push_back(k);
 			}
 		}
 	}
+}
+
+ulong CDfa::PartitionNonDisState(STATEVEC *pRevTbl)
+{
+	ulong nGrpNum = GetGroupCount();
+	ulong nStaNum = m_pDfa->size();
+
+	std::vector<PARTSET> partSet;
+	InitPartSet(partSet);
+
+	for (std::vector<PARTSET>::iterator i = partSet.begin();
+		i != partSet.end(); ++i)
+	{
+		//对于partSet中每个集合，根据不同的nGrpNum计算不同AbleTo，AbleTo对应论文中的a(i)
+		CalcAbleTo(pRevTbl, nGrpNum, nStaNum, *i);
+	}
+
+	//pWait表示用于切分partSet中每个集合的集合下标，
+	//对于不同的输入字符会保存多个不同集合下标。对应论文中L(a)
+	std::vector<ulong> pWait[256];
+
+	//初始化pWait，要求若满足0<|ij|<=|ik|，则将j存入pWait，反之，存入k
+	//对应论文中初始化L(a)过程，这里的i对应a
+	InitPartWait(partSet, pWait, nGrpNum);
 
 	//标记能够经过某一输入字符，能够到达ISet中的状态的状态集合
-	BYTE *pAbleToI = new BYTE[nStaNum];
+	byte *pAbleToI = new byte[nStaNum];
 	partSet.reserve(1000);
-	ULONG nr = 0;
+	ulong nr = 0;
 	for (; nr == 0; )
 	{
-		BYTE byCurGrp = (BYTE)-1;
-		ULONG nCurSet = (ULONG)-1;
+		ulong ulCurGrp = (byte)-1;
+		ulong nCurSet = (ulong)-1;
 		//从pWait中取一个值并remove该值
-		for (ULONG i = 0; i < nGrpNum; ++i)
-		{
-			if (!pWait[i].empty())
-			{
-				byCurGrp = (BYTE)i;
-				nCurSet = pWait[i].back();
-				pWait[i].pop_back();
-				break;
-			}
-		}
+		ulCurGrp = FindNotEmpty(pWait, nGrpNum);
 		//最外层循环的终止条件
-		if (nCurSet == -1)
+		if (ulCurGrp == -1)
 		{
 			break;
 		}
+		nCurSet = pWait[ulCurGrp].back();
+		pWait[ulCurGrp].pop_back();
 
 		PARTSET *pISet = &partSet[nCurSet];
 		ZeroMemory(pAbleToI, nStaNum);
-		ULONG nRevCnt = 0;
+		ulong nRevCnt = 0;
 		//初始化pAbleToI
 		for (STATELIST_ITER iSta = pISet->StaSet.begin();
 			iSta != pISet->StaSet.end(); ++iSta)
 		{
-			ULONG nRevIdx = *iSta * nGrpNum + byCurGrp;
+			ulong nRevIdx = *iSta * nGrpNum + ulCurGrp;
 			STATEVEC &revI = pRevTbl[nRevIdx];
-			for (STATEVEC_ITER iRevSta = revI.begin();
-				iRevSta != revI.end(); ++iRevSta)
-			{
-				pAbleToI[*iRevSta] = 1;
-				++nRevCnt;
-			}
+			SetStateFlags(pAbleToI, revI);
+			nRevCnt += revI.size();
 		}
 
 		if (nRevCnt != 0)
 		{
-			for (ULONG j = 0; j != partSet.size(); ++j)
+			for (ulong j = 0; j != partSet.size(); ++j)
 			{
 				//取partSet中的一个集合j，B(j)中存在t满足条件δ(t,a)∈a(i)，
 				//B’(j)为t的集合，B“(j)为B(j)-B‘(j)
 				PARTSET *pJSet = &partSet[j];
-				STATELIST_ITER t = pJSet->StaSet.begin();
-				//将满足条件的t存在集合j的前段，不满足的存在集合j的后段
-				//满足条件的t标记为1，先滤去pAbleToI中前段为1的值
-				for (; t != pJSet->StaSet.end() && pAbleToI[*t] != 0; ++t);
-				bool bHasAble = true;
-				if (t == pJSet->StaSet.end())
-				{
-					continue;
-				}
-				if (t == pJSet->StaSet.begin())
-				{
-					bHasAble = false;
-				}
-				//将后段中出现的值为1的插入至前段
-				for (; t != pJSet->StaSet.end();)
-				{
-					if (pAbleToI[*t] == 1)
-					{
-						pJSet->StaSet.insert(pJSet->StaSet.begin(), *t);
-						t = pJSet->StaSet.erase(t);
-						bHasAble = true;
-					}
-					else
-					{
-						++t;
-					}
-				}
-				if (bHasAble == false)
+				if (SortPartition(pAbleToI, *pJSet) == false)
 				{
 					continue;
 				}
@@ -787,7 +797,7 @@ ULONG CDfa::PartitionNonDisState(STATEVEC *pRevTbl,
 				for (; part != pJSet->StaSet.end() && pAbleToI[*part] != 0; ++part);
 				if (partSet.size() > 254)
 				{
-					nr = ULONG(-1);
+					nr = ulong(-1);
 					break;
 				}
 				//保存产生的新的划分
@@ -798,12 +808,11 @@ ULONG CDfa::PartitionNonDisState(STATEVEC *pRevTbl,
 				CalcAbleTo(pRevTbl, nGrpNum, nStaNum, *pJSet);
 				CalcAbleTo(pRevTbl, nGrpNum, nStaNum, lastPart);
 
-
 				////更新pWait
-				for (BYTE m = 0; m < nGrpNum; ++m)
+				for (byte m = 0; m < nGrpNum; ++m)
 				{
 					int k = partSet.size() - 1;
-					std::vector<ULONG> &curWait = pWait[m];
+					std::vector<ulong> &curWait = pWait[m];
 					int aj = pJSet->Ones[m];
 					int ak = lastPart.Ones[m];
 					if (aj > 0 && aj <= ak)
@@ -824,87 +833,76 @@ ULONG CDfa::PartitionNonDisState(STATEVEC *pRevTbl,
 	{
 		ReleaseAbleTo(*i);
 	}
-	return nr;
-}
 
-//Partition中的元素为一个状态的集合，集合中元素为多个等价状态，每个集合可以合并为新的DFA中一个状态
-void CDfa::MergeNonDisStates(std::vector<PARTSET> &partSet)
-{
-	STATEVEC sta2Part(m_pDfa->size());
-	
-	STATEID nCol = (STATEID)GetGroupCount();
-
-	//标记终态的dfaId，以保证终态编号更改后，其对应的dfaId保持不变
-	std::set<ULONG> *finFlag = new std::set<ULONG>[m_pDfa->size()];
-	for (ULONG i = 0; i < m_FinStas.Size(); ++i)
+	if (partSet.size() < m_pDfa->size())
 	{
-		STATEID nFinStaId = m_FinStas[i];
-		finFlag[nFinStaId] = m_FinStas._GetDfaIds(nFinStaId);
-	}
+		//Partition中的元素为一个状态的集合，集合中元素为多个等价状态，每个集合可以合并为新的DFA中一个状态
+		STATEVEC sta2Part(m_pDfa->size());
 
-	m_FinStas.Clear();
+		STATEID nCol = (STATEID)GetGroupCount();
 
-	//定义一个同CDfa中成员变量m_pDfa类型相同的变量，用于存储合并后的DFA跳转表
-	std::vector<CDfaRow> *pNewDfa = new std::vector<CDfaRow>(
-		(STATEID)partSet.size(), CDfaRow(nCol));
-	std::vector<CDfaRow> &tmpDfa = *pNewDfa;
+		CFinalStates newFinStas;
+		//定义一个同CDfa中成员变量m_pDfa类型相同的变量，用于存储合并后的DFA跳转表
+		std::vector<CDfaRow> *pNewDfa = new std::vector<CDfaRow>(
+			(STATEID)partSet.size(), CDfaRow(nCol));
+		std::vector<CDfaRow> &tmpDfa = *pNewDfa;
 
-	//等价的状态存于同一个partition中，标记原来的状态存在哪一个新的partition中，并修改新的起始状态编号
-	STATEID nSetIdx = 0;
-	for (std::vector<PARTSET>::iterator iPart = partSet.begin();
-		iPart != partSet.end(); ++iPart)
-	{
-		for (STATELIST_ITER iSta = iPart->StaSet.begin();
-			iSta != iPart->StaSet.end(); ++iSta)
+		//等价的状态存于同一个partition中，标记原来的状态存在哪一个新的partition中，并修改新的起始状态编号
+		STATEID nSetIdx = 0;
+		for (std::vector<PARTSET>::iterator iPart = partSet.begin();
+			iPart != partSet.end(); ++iPart)
 		{
-			CDfaRow &curRow = (*m_pDfa)[*iSta];
-			sta2Part[*iSta] = nSetIdx;
-			//修改新的起始状态
-			if (curRow.GetFlag() & CDfaRow::START)
+			for (STATELIST_ITER iSta = iPart->StaSet.begin();
+				iSta != iPart->StaSet.end(); ++iSta)
 			{
-				m_nStartId = nSetIdx;
-			}
-
-			//存入新的终态编号
-			if (curRow.GetFlag() & CDfaRow::TERMINAL)
-			{
-				for (std::set<ULONG>::iterator i = finFlag[*iSta].begin();
-					i != finFlag[*iSta].end(); ++i)
+				CDfaRow &curRow = (*m_pDfa)[*iSta];
+				sta2Part[*iSta] = nSetIdx;
+				//修改新的起始状态
+				if (curRow.GetFlag() & CDfaRow::START)
 				{
-					m_FinStas.PushBack(nSetIdx, *i);
+					m_nStartId = nSetIdx;
+				}
+
+				//存入新的终态编号
+				if (curRow.GetFlag() & CDfaRow::TERMINAL)
+				{
+					newFinStas.PushBack(nSetIdx);
+					newFinStas.GetDfaIdSet(nSetIdx) =
+						m_FinStas.GetDfaIdSet(*iSta);
 				}
 			}
+			++nSetIdx;
 		}
-		++nSetIdx;
-	}
+		m_FinStas.Swap(newFinStas);
 
-	delete []finFlag;
-
-	//set new DFA and modify new number
-	nSetIdx = 0;
-	for (std::vector<PARTSET>::iterator iPart = partSet.begin(); iPart != partSet.end(); ++iPart)
-	{
-		CDfaRow &curRow = tmpDfa[nSetIdx];
-		CDfaRow &orgRow = (*m_pDfa)[iPart->StaSet.front()];
-		for (BYTE iCol = 0; iCol != nCol; ++iCol)
+		//set new DFA and modify new number
+		nSetIdx = 0;
+		for (std::vector<PARTSET>::iterator iPart = partSet.begin(); iPart != partSet.end(); ++iPart)
 		{
-			STATEID nDest = STATEID(-1);
-			STATEID nCur = orgRow[iCol];
-			if (nCur != STATEID(-1))
+			CDfaRow &curRow = tmpDfa[nSetIdx];
+			CDfaRow &orgRow = (*m_pDfa)[iPart->StaSet.front()];
+			for (byte iCol = 0; iCol != nCol; ++iCol)
 			{
-				nDest = sta2Part[nCur];
+				STATEID nDest = STATEID(-1);
+				STATEID nCur = orgRow[iCol];
+				if (nCur != STATEID(-1))
+				{
+					nDest = sta2Part[nCur];
+				}
+				curRow[iCol] = nDest;
 			}
-			curRow[iCol] = nDest;
+			//set a state attribute
+			curRow.SetFlag(orgRow.GetFlag());
+			++nSetIdx;
 		}
-		//set a state attribute
-		curRow.SetFlag(orgRow.GetFlag());
-		++nSetIdx;
+
+		//替换m_pDfa
+		swap(m_pDfa, pNewDfa);
+		delete pNewDfa;
+		//DFA minization
+		std::cout << "Minimized: " << (nStaNum - m_pDfa->size()) << std::endl;
 	}
-
-
-	//替换m_pDfa
-	swap(m_pDfa, pNewDfa);
-	delete pNewDfa;
+	return nr;
 }
 
 CFinalStates& CDfa::GetFinalState()
@@ -919,55 +917,55 @@ const CFinalStates& CDfa::GetFinalState() const
 
 
 /*
-**  NAME
-**    MergeMultipleDfas::
+**	NAME
+**	 MergeMultipleDfas::
 */
 /**
-**  This function merges mutiple dfas into one dfa. And mark the terminal states to 
+**	This function merges mutiple dfas into one dfa. And mark the terminal states to 
 **	distinguish which dfas the terminal state belongs to.
 **
 **	In order to speed up, we need one support function:DfaColGroup to group
 **	the lastDfa's columns.
 **
-**  @param dfas      a vector contains mutiple CDfa
-**  @param lastDfa   the merged dfa
+**	@param dfas		a vector contains mutiple CDfa
+**	@param lastDfa	the merged dfa
 **
-**  @return bool
+**	@return bool
 **
-**  @retval true function successful
-**  @retval fasle fatal error
+**	@retval true function successful
+**	@retval fasle fatal error
 */
 
 DFAHDR void PrintDfaToGv(CDfa &newdfa, const char* fileName)
 {
 	std::ofstream fout(fileName);
 	fout << "digraph G {" << std::endl;
-	fout << "S -> " << (ULONG)newdfa.GetStartId() << std::endl;
+	fout << "S -> " << (ulong)newdfa.GetStartId() << std::endl;
 
 	for(STATEID i = 0; i != newdfa.Size(); ++i)
 	{
-		std::map<STATEID, ULONG> rowStateCnt;
-		for(BYTE j = 0; j != newdfa.GetGroupCount(); ++j)
+		std::map<STATEID, ulong> rowStateCnt;
+		for(byte j = 0; j != newdfa.GetGroupCount(); ++j)
 		{
 			rowStateCnt[newdfa[i][j]]++;
 		}
 		STATEID maxId = 0;
-		for (std::map<STATEID, ULONG>::iterator j = rowStateCnt.begin(); j != rowStateCnt.end(); ++j)
+		for (std::map<STATEID, ulong>::iterator j = rowStateCnt.begin(); j != rowStateCnt.end(); ++j)
 		{
 			if (j->second > rowStateCnt[maxId])
 			{
 				maxId = j->first;
 			}
 		}
-		for(BYTE j = 0; j != newdfa.GetGroupCount(); ++j)
+		for(byte j = 0; j != newdfa.GetGroupCount(); ++j)
 		{
 			if (newdfa[i][j] != maxId)
 			{
-				fout << i << " -> " << (ULONG)newdfa[i][j] << " [label=\"" << j << "\"];" << std::endl;
+				fout << i << " -> " << (ulong)newdfa[i][j] << " [label=\"" << j << "\"];" << std::endl;
 			}
 			else if (maxId != (STATEID)-1)
 			{
-				fout << i << " -> "  << (ULONG)maxId << " [label=\"" << j << "\"];" << std::endl;
+				fout << i << " -> "  << (ulong)maxId << " [label=\"" << j << "\"];" << std::endl;
 			}
 		}
 	}
@@ -975,7 +973,7 @@ DFAHDR void PrintDfaToGv(CDfa &newdfa, const char* fileName)
 	{
 		if (newdfa[i].GetFlag() & CDfaRow::TERMINAL)
 		{
-			fout << (ULONG)i << " [peripheries=2];" << std::endl;
+			fout << (ulong)i << " [peripheries=2];" << std::endl;
 		}
 	}
 	fout << "}" << std::endl;
@@ -984,25 +982,25 @@ DFAHDR void PrintDfaToGv(CDfa &newdfa, const char* fileName)
 
 DFAHDR bool MergeMultipleDfas(std::vector<CDfa> &dfas, CDfa &lastDfa)
 {
-	ULONG dfaId = lastDfa.GetId();
+	ulong dfaId = lastDfa.GetId();
 	lastDfa.Clear();
 	lastDfa.SetId(dfaId);
 #undef max
 
-	ULONG dfasSize = dfas.size();
+	ulong dfasSize = dfas.size();
 	STATEID nTermSta = 1;//nTermSta: terminal flag. 1: terminal, -1: non-terminal
 
 	//group the lastDfa's columns
-	BYTE groups[SC_DFACOLCNT];
+	byte groups[SC_DFACOLCNT];
 	DfaColGroup(dfas, groups);
 	lastDfa.Init(groups);
 
-	ULONG colCnt = lastDfa.GetGroupCount();
+	ulong colCnt = lastDfa.GetGroupCount();
 
 	typedef std::unordered_map<std::vector<STATEID>, STATEID, TODFA_HASH> STATESETHASH;
 	STATESETHASH statehash;
 
-	ULONG finFlag = 0;//terminal state flag, 1: terminal state, 0: normal state
+	ulong finFlag = 0;//terminal state flag, 1: terminal state, 0: normal state
 	std::stack<std::vector<STATEID>> statesStack;
 
 	/*
@@ -1015,7 +1013,7 @@ DFAHDR bool MergeMultipleDfas(std::vector<CDfa> &dfas, CDfa &lastDfa)
 	lastDfa.Reserve(SC_CHARSETSIZE);
 	lastDfa.Resize(lastDfa.Size() + 1, colCnt);
 
-	for(ULONG i = 0; i < dfasSize; ++i)
+	for(ulong i = 0; i < dfasSize; ++i)
 	{
 		STATEID nSta = dfas[i].GetStartId();
 		if((dfas[i][nSta].GetFlag() & CDfaRow::TERMINAL) != 0)
@@ -1023,6 +1021,11 @@ DFAHDR bool MergeMultipleDfas(std::vector<CDfa> &dfas, CDfa &lastDfa)
 			//this is a terminal state
 			finFlag = 1;
 			AddTermIntoDFA(nSta, dfas[i], 0, lastDfa);
+			CFinalStates &newFinSta = lastDfa.GetFinalState();
+			newFinSta.PushBack(0);
+			newFinSta.GetDfaIdSet(0).Append(
+				dfas[i].GetFinalState().GetDfaIdSet(nSta));
+
 		}
 		startVec[i] = nSta;
 	}
@@ -1044,7 +1047,7 @@ DFAHDR bool MergeMultipleDfas(std::vector<CDfa> &dfas, CDfa &lastDfa)
 
 	std::vector<STATEID> NextVec;
 	NextVec.resize(dfasSize + 2);
-	BYTE computFlag[SC_CHARSETSIZE];
+	byte computFlag[SC_CHARSETSIZE];
 
 	while(!statesStack.empty())
 	{
@@ -1061,25 +1064,25 @@ DFAHDR bool MergeMultipleDfas(std::vector<CDfa> &dfas, CDfa &lastDfa)
 		ZeroMemory(computFlag, sizeof(computFlag));
 
 		//get next states
-		for(ULONG curChar = 0; curChar < SC_DFACOLCNT; ++curChar)
+		for(ulong curChar = 0; curChar < SC_DFACOLCNT; ++curChar)
 		{
 			finFlag = 0;
-			ZeroMemory(NextVec.data(), NextVec.size() * sizeof(ULONG));
-			BYTE lastDfaGroup = groups[curChar];
+			ZeroMemory(NextVec.data(), NextVec.size() * sizeof(ulong));
+			byte lastDfaGroup = groups[curChar];
 			if(computFlag[lastDfaGroup] == 1)
 			{
 				continue;
 			}
 			computFlag[lastDfaGroup] = 1;
 
-			ULONG flag = 0;//flag = 0: empty next state
-			for(ULONG i = 0; i < dfasSize; ++i)
+			ulong flag = 0;//flag = 0: empty next state
+			for(ulong i = 0; i < dfasSize; ++i)
 			{
 				STATEID sta = curVec[i];
 				
 				if(sta != (STATEID)-1)
 				{
-					BYTE curgroup = dfas[i].Char2Group((BYTE)curChar);
+					byte curgroup = dfas[i].Char2Group((byte)curChar);
 					STATEID nextId = dfas[i][sta][curgroup];//the next state the ith dfa transforms from state curVec[i] through curChar to
 					if(nextId != (STATEID)-1)
 					{

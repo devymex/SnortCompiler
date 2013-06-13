@@ -1,35 +1,35 @@
-/**
-**  @file        dfa.h
+/*
+**	@file		dfaalgo.h
 **
-**  @author      Lab 435, Xidian University
+**	@author		Lab 435, Xidian University
 **
-**  @brief       Common classes declaration
+**	@brief		Functions declaration of dfa's algorithms
 **
-**  Include CDllArray, CDllString
+**	Includes empty closure etc.
 **
 */
 
 #include <hwprj\common.h>
 
-typedef std::vector<ULONG> STATESET;
 class CDfa;
+class CNfa;
 
 struct PARTSET
 {
 	STATELIST StaSet;
-	std::vector<BYTE*> AbleTo;
+	std::vector<byte*> AbleTo;
 	STATEVEC Ones;
 };
 
 struct TODFA_HASH
 {
-	ULONG operator()(const std::vector<STATEID> &vec)
+	ulong operator()(const std::vector<STATEID> &vec)
 	{
-		const ULONG _FNV_offset_basis = 2166136261U;
-		const ULONG _FNV_prime = 16777619U;
+		const ulong _FNV_offset_basis = 2166136261U;
+		const ulong _FNV_prime = 16777619U;
 
-		ULONG _Val = _FNV_offset_basis;
-		for (ULONG _Next = 0; _Next < vec.size(); ++_Next)
+		ulong _Val = _FNV_offset_basis;
+		for (ulong _Next = 0; _Next < vec.size(); ++_Next)
 		{	
 			_Val ^= vec[_Next];
 			_Val *= _FNV_prime;
@@ -41,11 +41,11 @@ struct TODFA_HASH
 
 struct GROUPKEY
 {
-	std::vector<ULONG> key;
-	ULONG hash;
+	std::vector<ulong> key;
+	ulong hash;
 	__forceinline bool operator == (const GROUPKEY &other) const
 	{
-		ULONG nSize = key.size();
+		ulong nSize = key.size();
 		if (nSize != other.key.size())
 		{
 			return false;
@@ -54,42 +54,63 @@ struct GROUPKEY
 		{
 			return true;
 		}
-		return (0 == memcmp(key.data(), other.key.data(), nSize * sizeof(ULONG)));
+		return (0 == memcmp(key.data(), other.key.data(), nSize * sizeof(ulong)));
 	}
 };
 
-void Warshall(BYTE *pMat, ULONG nWidth, ULONG nHeight);
+struct NSTATESET_HASH
+{
+	enum {MAX_SIZE = 20000};
+	ulong operator()(const STATEVEC &set)
+	{
+		const ulong _FNV_offset_basis = 2166136261U;
+		const ulong _FNV_prime = 16777619U;
 
-void NfaEClosure(const CNfa &nfa, std::vector<STATESET> &eClosure);
+		const STATEID *pData = set.data();
+		const STATEID *pEnd = pData + set.size();
 
-void GetNextEClosureSet(const CNfa &nfa, const std::vector<STATESET> &eClosure,
-	const STATESET &curSet, ULONG edge, STATESET &eClosureSet);
-
-void NAvaiEdges(const CNfa &nfa, BYTE *group);
-
-void ReleaseAbleTo(PARTSET &ps);
-
-void CalcAbleTo(STATEVEC *pRevTbl, ULONG nGrpNum, ULONG nStaNum, PARTSET &ps);
+		ulong nr = _FNV_offset_basis;
+		for (; pData != pEnd; ++pData)
+		{
+			nr ^= *pData;
+			nr *= _FNV_prime;
+		}
+		return nr;
+	}
+};
 
 template<typename _Ty>
-void WriteNum(BYTE*& pBuf, _Ty _num, ULONG nBytes = sizeof(_Ty))
+void WriteNum(byte*& pBuf, _Ty _num, ulong nBytes = sizeof(_Ty))
 {
 	CopyMemory(pBuf, &_num, nBytes);
 	pBuf += nBytes;
 }
 
 template<typename _Ty>
-void ReadNum(BYTE*& pBuf, _Ty &_num, ULONG nBytes = sizeof(_Ty))
+void ReadNum(byte*& pBuf, _Ty &_num, ulong nBytes = sizeof(_Ty))
 {
 	CopyMemory(&_num, pBuf, nBytes);
 	pBuf += nBytes;
 }
 
+void Warshall(byte *pMat, ulong nWidth, ulong nHeight);
+
+void NfaEClosure(const CNfa &nfa, std::vector<STATEVEC> &eClosure);
+
+void GetNextEClosureSet(const CNfa &nfa, const std::vector<STATEVEC> &eClosure,
+	const STATEVEC &curSet, ulong edge, STATEVEC &eClosureSet);
+
+void NAvaiEdges(const CNfa &nfa, byte *group);
+
+void ReleaseAbleTo(PARTSET &ps);
+
+void CalcAbleTo(STATEVEC *pRevTbl, ulong nGrpNum, ulong nStaNum, PARTSET &ps);
+
 /*
 **	This function groups the merged dfa's columns on the ground of
 **	the column groups of dfas to be merged.
 */
-void DfaColGroup(std::vector<CDfa> &dfas, BYTE* groups);
+void DfaColGroup(std::vector<CDfa> &dfas, byte* groups);
 
 /*	this function marks the lastDfa's terminal states. */
 void AddTermIntoDFA(STATEID otherSta, const CDfa &other,

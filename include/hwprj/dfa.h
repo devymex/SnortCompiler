@@ -1,106 +1,91 @@
-/**
-**  @file        dfa.h
+/*
+**	@file		dfa.h
 **
-**  @author      Lab 435, Xidian University
+**	@author		Lab 435, Xidian University
 **
-**  @brief       Common classes declaration
+**	@brief		Deterministic Finite Automaton
 **
-**  Include CDllArray, CDllString
+**	Declaration of the CDfa class
 **
 */
 
 #pragma once
 
-#include <windows.h>
-#include <vector>
-#include <map>
-
 #include <hwprj\common.h>
+#include <hwprj\nfa.h>
 #include <hwprj\dfarow.h>
 #include <hwprj\finalstates.h>
+#include <hwprj\unsary.h>
 
+#include <vector>
 
-class CNfa;
+/* Hiding the stl object in member of CDfa*/
+#ifndef DFAHDR_DS
+class DFAROWARY;
+class STATEVEC;
+class STATELIST;
+#endif
+
+typedef CUnsignedArray STATEARY;
 
 class DFAHDR CDfa
 {
 public:
 	CDfa();
-	~CDfa();
 	CDfa(const CDfa &other);
-	CDfa& operator=(const CDfa &other);
+	virtual ~CDfa();
 
-	CDfaRow& operator[](STATEID index);
-	const CDfaRow& operator[](STATEID index) const;
+	CDfa&			operator =	(const CDfa &other);
+	CDfaRow&		operator []	(STATEID index);
+	const CDfaRow&	operator []	(STATEID index) const;
 
-	ULONG Size() const;
-	CDfaRow& Back();
-	void Reserve(ULONG nSize);
-	void Resize(ULONG nSize, ULONG nCol);
-	void Init(BYTE *pGroup);
-	void Clear();
-	void PushBack(CDfaRow &sta);
+	ulong		Size() const;
+	CDfaRow&	Back();
+	void		Reserve(ulong nSize);
+	void		Resize(ulong nSize, ulong nCol);
+	void		Clear();
+	void		PushBack(CDfaRow &sta);
 
-	void SetId(ULONG id);
-	ULONG GetId();
-	WORD GetGroupCount() const;
-	const BYTE GetGroup(STATEID charNum) const;
+	void		SetId(ulong id);
+	ulong		GetId();
 
-	CFinalStates& GetFinalState();
-	const CFinalStates& GetFinalState() const;
+	void		SetGroups(byte *pGroup);
+	ushort		GetGroupCount() const;
 
-	ULONG FromNFA(const CNfa &nfa);
-	ULONG Minimize();
+	ulong		FromNFA(const CNfa &nfa);
+	ulong		Minimize();
 
-	BYTE Char2Group(BYTE nIdx);
-	STATEID GetStartId() const;
-	void SetStartId(STATEID id);
-	ULONG Process(BYTE *ByteStream, ULONG len, CStateSet &StaSet);
+	byte		Char2Group(byte nIdx);
+	STATEID		GetStartId() const;
+	void		SetStartId(STATEID id);
+	ulong		Process(byte *ByteStream, ulong len, STATEARY &StaSet);
 
-	ULONG Save(BYTE *beg);
-	void Load(BYTE *beg, ULONG len);
+	ulong		Save(byte *beg);
+	void		Load(byte *beg, ulong len);
 
-	void Dump(const char *pFile);
+	void		Dump(const char *pFile);
+
+	CFinalStates&		GetFinalState();
+	const CFinalStates&	GetFinalState() const;
 
 protected:
-	ULONG m_nId;
-	WORD m_nColNum;
-	STATEID m_nStartId;
-	BYTE m_pGroup[SC_DFACOLCNT];
-
-	std::vector<class CDfaRow> *m_pDfa;
-	CFinalStates m_FinStas;
+	ulong			m_nId;
+	ushort			m_nColNum;
+	STATEID			m_nStartId;
+	byte			m_pGroup[SC_DFACOLCNT];
+	DFAROWARY		*m_pDfa;
+	CFinalStates	m_FinStas;
 
 	void InitPartSet(std::vector<struct PARTSET> &partSet) const;
 	void RemoveUnreachable(const STATEVEC *Tab, const STATELIST &begs, 
-		const ULONG &col, STATEVEC &reachable);
+		const ulong &col, STATEVEC &reachable);
 	void MergeReachable(STATEVEC &reachable);
-	ULONG PartitionNonDisState(STATEVEC *pRevTbl, std::vector<struct PARTSET> &partSet) const;
-	void MergeNonDisStates(std::vector<struct PARTSET> &partSet);
+
+	ulong PartitionNonDisState(STATEVEC *pRevTbl);
 
 };
 
-struct NSTATESET_HASH
-{
-	enum {MAX_SIZE = 20000};
-	ULONG operator()(const std::vector<ULONG> &set)
-	{
-		const ULONG _FNV_offset_basis = 2166136261U;
-		const ULONG _FNV_prime = 16777619U;
-
-		const ULONG *pData = set.data();
-		const ULONG *pEnd = pData + set.size();
-
-		ULONG nr = _FNV_offset_basis;
-		for (; pData != pEnd; ++pData)
-		{
-			nr ^= *pData;
-			nr *= _FNV_prime;
-		}
-		return nr;
-	}
-};
-
+//需要更改接口，参数不能为stl对象！
 DFAHDR bool MergeMultipleDfas(std::vector<CDfa> &dfas, CDfa &lastDfa);
 
 DFAHDR void PrintDfaToGv(CDfa &newdfa, const char* fileName);

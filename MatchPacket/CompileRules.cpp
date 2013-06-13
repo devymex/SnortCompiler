@@ -2,10 +2,10 @@
 #include "MatchPkt.h"
 #include <hwprj\rule2nfa.h>
 
-void CALLBACK MyProcess(const CSnortRule &rule, LPVOID lpVoid)
+void __stdcall MyProcess(const CSnortRule &rule, LPVOID lpVoid)
 {
 	REGRULESMAP &rulesmap = *(REGRULESMAP*)lpVoid;
-	ULONG nFlag = rule.GetFlag();
+	ulong nFlag = rule.GetFlag();
 
 	if (rule.Size() == 0)
 	{
@@ -39,19 +39,19 @@ MATCHPKT void MchCompile(LPCTSTR filename, LPVOID lpVoid)
 	for (std::vector<REGRULES>::iterator iter = mapbegin; iter != rulesmap.result.end(); ++iter)
 	{
 		SIGNATURE tempsig = (SIGNATURE)-1;
-		ULONG flag = 0;
-        ULONG pos = iter - mapbegin;
-		for (ULONG chainsize = 0; chainsize < iter->regrule.Size(); ++chainsize)
+		ulong flag = 0;
+        ulong pos = iter - mapbegin;
+		for (ulong chainsize = 0; chainsize < iter->regrule.Size(); ++chainsize)
 		{
 			SIGNATURE sig;
-			ULONG sigcnt = (iter->regrule)[chainsize].GetSigs().Size();
+			ulong sigcnt = (iter->regrule)[chainsize].GetSigs().Size();
 			if (sigcnt > 0)
 			{
 				flag |= (1 << 1);
-				ULONG random = rand() % sigcnt;
+				ulong random = rand() % sigcnt;
 				tempsig = (iter->regrule)[chainsize].GetSigs()[random];
 
-				for (ULONG cursig = 0; cursig < sigcnt; ++cursig)
+				for (ulong cursig = 0; cursig < sigcnt; ++cursig)
 				{
 					sig = (iter->regrule)[chainsize].GetSigs()[cursig];
 
@@ -85,7 +85,7 @@ END:	if(((flag & 1) == 0) && ((flag & 1 << 1) != 0))
 	//std::sort(sigvec.begin(), sigvec.end());
 	//sigvec.erase(std::unique(sigvec.begin(),sigvec.end()), sigvec.end());
 
-	//std::vector<ULONG> sidVec;
+	//std::vector<ulong> sidVec;
 	//for(int i = 0; i < 4653; ++i)
 	//{
 	//	if(0 == sids[i])
@@ -94,11 +94,11 @@ END:	if(((flag & 1) == 0) && ((flag & 1 << 1) != 0))
 	//		std::cout << rulesmap.result[i].m_nSid << std::endl;
 	//	}
 	//}
-	ULONG e0 = 0, e1 = 0, e2 = 0;
+	ulong e0 = 0, e1 = 0, e2 = 0;
 	SIGSMAP &temp = rulesmap.sigmap;
 	for(SIGSMAP::iterator iter = temp.begin(); iter != temp.end(); ++ iter)
 	{
-		ULONG size = iter->second.size();
+		ulong size = iter->second.size();
 		if (size == 0)
 		{
 			++e0;

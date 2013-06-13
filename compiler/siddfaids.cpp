@@ -22,27 +22,27 @@ SIDDFAHDR CSidDfaIds::~CSidDfaIds()
 	delete m_ruleResult;
 }
 
-SIDDFAHDR COMPILEDRULENEW& CSidDfaIds::operator[](ULONG index)
+SIDDFAHDR COMPILEDRULENEW& CSidDfaIds::operator[](ulong index)
 {
 	return (*m_ruleResult)[index];
 }
 
-SIDDFAHDR const COMPILEDRULENEW& CSidDfaIds::operator[](ULONG index) const
+SIDDFAHDR const COMPILEDRULENEW& CSidDfaIds::operator[](ulong index) const
 {
 	return (*m_ruleResult)[index];
 }
 
-SIDDFAHDR void CSidDfaIds::Reserve(ULONG nCount)
+SIDDFAHDR void CSidDfaIds::Reserve(ulong nCount)
 {
 	m_ruleResult->reserve(nCount);
 }
 
-SIDDFAHDR void CSidDfaIds::Resize(ULONG nSize)
+SIDDFAHDR void CSidDfaIds::Resize(ulong nSize)
 {
 	m_ruleResult->resize(nSize);
 }
 
-SIDDFAHDR const ULONG CSidDfaIds::Size() const
+SIDDFAHDR const ulong CSidDfaIds::Size() const
 {
 	return m_ruleResult->size();
 }

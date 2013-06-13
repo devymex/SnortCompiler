@@ -1,8 +1,20 @@
+/*
+**	@file		dfaarray.h
+**
+**	@author		Lab 435, Xidian University
+**
+**	@brief		Declaration of the CDfaArray class
+**
+**	Store multiple CDfa
+**
+*/
+
 #pragma once
 
 #include <hwprj\dfa.h>
 
 #ifndef DFAARYHDR_DS
+class CDFAVEC;
 #define DFAARYHDR __declspec(dllimport)
 #else
 #define DFAARYHDR __declspec(dllexport)
@@ -15,13 +27,13 @@ public:
 	CDfaArray(const CDfaArray& other);
 	const CDfaArray &operator=(const CDfaArray &other);
 	~CDfaArray();
-	CDfa& operator[](ULONG index);
-	const CDfa& operator[](ULONG index) const;
-	void Reserve(ULONG nCount);
-	void Resize(ULONG nSize);
-	const ULONG Size() const;
+	CDfa& operator[](ulong index);
+	const CDfa& operator[](ulong index) const;
+	void Reserve(ulong nCount);
+	void Resize(ulong nSize);
+	const ulong Size() const;
 	void PushBack(const CDfa &dfa);
 	void Clear();
 protected:
-	std::vector<CDfa> *m_pdfaTbl;
+	CDFAVEC *m_pdfaTbl;
 };
