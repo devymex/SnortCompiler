@@ -1,80 +1,124 @@
 /**
-**  @file        compilernew.cpp
+**	@file		compilernew.cpp
 **
-**  @author      Lab 435, Xidian University
+**	@author		Lab 435, Xidian University
 **
-**  @brief       Support functions for compile rule to dfa
+**	@brief		Support functions for compile rule to dfa
 **
-**  This implements compile rule to dfa algorithm
+**	This implements compile rule to dfa algorithm
 **
 */
 
 #include "stdafx.h"
 #include <hwprj\snortrule.h>
-#include <hwprj\rule2nfa.h>
-
+#include "comprule.h"
 #include <hwprj\compiler.h>
 
-/* assign all the signatures of each rule to all its option list
+/* complie one rule
 
 Arguments:
-  result      the compile result
-  BegIdx      the index of the first regex which belongs to this rule
-  EndIdx      the next index of the last regex which belongs to this rule
+  rule		the snort rule
+  lpVoid		the compile result
 
-Returns:      nothing
+Returns:		nothing
 
 */
-void AssignSig(CCompileResults &result, ULONG BegIdx, ULONG EndIdx)
+void __stdcall Process(const CSnortRule &rule, void *lpVoid)
 {
-	//all the signatures of this rule
-	std::vector<SIGNATURE> vecRuleSigs;
-	for (ULONG i = BegIdx; i < EndIdx; ++i)
+	CCompileResults &result = *(CCompileResults*)lpVoid;
+	ulong nFlag = rule.GetFlag();
+	ulong nNewSize = result.GetSidDfaIds().Size() + 1;
+	result.GetSidDfaIds().Resize(nNewSize);
+	COMPILEDRULENEW &ruleResult = result.GetSidDfaIds().Back();
+	ruleResult.m_nSid = rule.GetSid();
+	if (rule.Size() == 0)
 	{
-		for (ULONG j = 0; j < result.GetRegexTbl()[i].GetSigs().Size(); ++j)
-		{
-			if (std::find(vecRuleSigs.begin(), vecRuleSigs.end(),
-				result.GetRegexTbl()[i].GetSigs()[j]) == vecRuleSigs.end())
-			{
-				vecRuleSigs.push_back(result.GetRegexTbl()[i].GetSigs()[j]);
-			}
-		}
+		ruleResult.m_nResult = COMPILEDRULENEW::RES_EMPTY;
+		return;
 	}
-
-	//assign all the signatures of each rule to all its option list
-	for (ULONG i = BegIdx; i < EndIdx; ++i)
+	else if (nFlag & CSnortRule::RULE_HASNOT)
 	{
-		result.GetRegexTbl()[i].GetSigs().Clear();
-		for (ULONG j = 0; j < vecRuleSigs.size(); ++j)
-		{
-			result.GetRegexTbl()[i].GetSigs().PushBack(vecRuleSigs[j]);
-		}
+		ruleResult.m_nResult = COMPILEDRULENEW::RES_HASNOT;
+		return;
+	}
+	else if (nFlag & CSnortRule::RULE_HASBYTE)
+	{
+		ruleResult.m_nResult = COMPILEDRULENEW::RES_HASBYTE;
+		return;
+	}
+	else
+	{
+		Rule2Dfas(rule, result, ruleResult);
 	}
 }
 
-double rule2pcretime = 0.0;
-double pcre2nfatime = 0.0;
-double nfa2dfatime = 0.0;
-double dfamintimetime = 0.0;
+/* complie all rules
+
+Arguments:
+  filename	 path of the file where all rules are saved in
+  result		the compile result
+
+Returns:		nothing
+
+*/
+
+COMPILERHDR void CompileRuleSet(const char *filename, CCompileResults &result)
+{
+	CompileFile(filename, Process, &result);
+
+	std::cout << "rule2pcretime:" << rule2pcretime << std::endl;
+	std::cout << "pcre2nfatime:" << pcre2nfatime << std::endl;
+	std::cout << "nfa2dfatime:" << nfa2dfatime << std::endl;
+	std::cout << "dfamintimetime:" << dfamintimetime << std::endl;
+}
+
+/*
+* read rules from a file
+* then process the rules to CSnortRule
+* callback function RECIEVER to handle CSnortRule
+*/
+COMPILERHDR ulong CompileFile(const char *fileName, RECIEVER recv, void *lpUser)
+{
+	if(recv == NULL)
+	{
+		return (ulong)-1;
+	}
+	std::vector<std::string> rules;
+	if(0 == LoadFile(fileName, rules))
+	{
+		if(!rules.empty())
+		{
+			for(std::vector<std::string>::iterator rIt = rules.begin();
+				rIt != rules.end(); ++rIt)
+			{
+				std::cout << rIt - rules.begin() + 1 << std::endl;
+				//std::cout << ": " << g_dTimer << std::endl;
+				CompileRule(rIt->c_str(), recv, lpUser);
+			}
+		}
+	}
+	return 0;
+}
+
 
 /* complie one rule to several dfas
 
 Arguments:
-  rule        the snort rule
-  result      the compile result
+  rule		the snort rule
+  result		the compile result
   ruleResult  the relationship between sid and dfa ids
 
-Returns:      nothing
+Returns:		nothing
 
 */
-
-void Rule2Dfas(const CSnortRule &rule, CCompileResults &result, COMPILEDRULENEW &ruleResult)
+COMPILERHDR void Rule2Dfas(const CSnortRule &rule, CCompileResults &result,
+							COMPILEDRULENEW &ruleResult)
 {
 	CRegRule regrule;
 	CTimer ctime;//for test
 	ctime.Reset();//for test
 
-	ULONG flag = Rule2PcreList(rule, regrule);
+	ulong flag = Rule2PcreList(rule, regrule);
 	rule2pcretime += ctime.Reset();//for test
 
 	if (flag == SC_ERROR)
@@ -85,20 +129,20 @@ void Rule2Dfas(const CSnortRule &rule, CCompileResults &result, COMPILEDRULENEW 
 	else
 	{
 		ruleResult.m_nResult = COMPILEDRULENEW::RES_SUCCESS;
-		const ULONG nDfaTblSize = result.GetDfaTable().Size();
-		const ULONG nIncrement = regrule.Size();
+		const ulong nDfaTblSize = result.GetDfaTable().Size();
+		const ulong nIncrement = regrule.Size();
 		result.GetDfaTable().Resize(nDfaTblSize + nIncrement);
-		const ULONG nRegexTblSize = result.GetRegexTbl().Size();
+		const ulong nRegexTblSize = result.GetRegexTbl().Size();
 		result.GetRegexTbl().Resize(nRegexTblSize + nIncrement);
-		ULONG nDfaId;
-		ULONG nChainId;
+		ulong nDfaId;
+		ulong nChainId;
 		bool bHasSigs = false;
-		for (ULONG i = 0; i < nIncrement; ++i)
+		for (ulong i = 0; i < nIncrement; ++i)
 		{
 			CNfa nfa;
 
 			ctime.Reset();//for test
-			ULONG nToNFAFlag = CRegChainToNFA(regrule[i], nfa);
+			ulong nToNFAFlag = CRegChainToNFA(regrule[i], nfa);
 			pcre2nfatime += ctime.Reset();//for test
 
 			if (regrule[i].GetSigs().Size() > 0)
@@ -125,7 +169,7 @@ void Rule2Dfas(const CSnortRule &rule, CCompileResults &result, COMPILEDRULENEW 
 			{
 				ctime.Reset();//for test
 				dfa.SetId(nDfaId);
-				ULONG nToDFAFlag = dfa.FromNFA(nfa);
+				ulong nToDFAFlag = dfa.FromNFA(nfa);
 				nfa2dfatime += ctime.Reset();//for test
 
 				if (nToDFAFlag == -1)
@@ -136,7 +180,7 @@ void Rule2Dfas(const CSnortRule &rule, CCompileResults &result, COMPILEDRULENEW 
 				else
 				{
 					ctime.Reset();//for test
-					ULONG nr = dfa.Minimize();
+					ulong nr = dfa.Minimize();
 					if (dfa.GetFinalState().Size() == 0)
 					{
 						system("pause");
@@ -174,63 +218,4 @@ void Rule2Dfas(const CSnortRule &rule, CCompileResults &result, COMPILEDRULENEW 
 			AssignSig(result, nRegexTblSize, nRegexTblSize + nIncrement);
 		}
 	}
-}
-
-/* complie one rule
-
-Arguments:
-  rule        the snort rule
-  lpVoid      the compile result
-
-Returns:      nothing
-
-*/
-
-void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
-{
-	CCompileResults &result = *(CCompileResults*)lpVoid;
-	ULONG nFlag = rule.GetFlag();
-	ULONG nNewSize = result.GetSidDfaIds().Size() + 1;
-	result.GetSidDfaIds().Resize(nNewSize);
-	COMPILEDRULENEW &ruleResult = result.GetSidDfaIds().Back();
-	ruleResult.m_nSid = rule.GetSid();
-	if (rule.Size() == 0)
-	{
-		ruleResult.m_nResult = COMPILEDRULENEW::RES_EMPTY;
-		return;
-	}
-	else if (nFlag & CSnortRule::RULE_HASNOT)
-	{
-		ruleResult.m_nResult = COMPILEDRULENEW::RES_HASNOT;
-		return;
-	}
-	else if (nFlag & CSnortRule::RULE_HASBYTE)
-	{
-		ruleResult.m_nResult = COMPILEDRULENEW::RES_HASBYTE;
-		return;
-	}
-	else
-	{
-		Rule2Dfas(rule, result, ruleResult);
-	}
-}
-
-/* complie all rules
-
-Arguments:
-  filename    path of the file where all rules are saved in
-  result      the compile result
-
-Returns:      nothing
-
-*/
-
-COMPILERNEW void CompileRuleSet(LPCTSTR filename, CCompileResults &result)
-{
-	CompileFile(filename, Process, &result);
-
-	std::cout << "rule2pcretime:" << rule2pcretime << std::endl;
-	std::cout << "pcre2nfatime:" << pcre2nfatime << std::endl;
-	std::cout << "nfa2dfatime:" << nfa2dfatime << std::endl;
-	std::cout << "dfamintimetime:" << dfamintimetime << std::endl;
 }

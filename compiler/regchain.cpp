@@ -3,7 +3,7 @@
 
 REGRULEHDR CRegChain::CRegChain()
 {
-	m_pRegList = new std::vector<CDllString>;
+	m_pRegList = new STRINGVEC;
 }
 
 REGRULEHDR CRegChain::~CRegChain()
@@ -13,11 +13,11 @@ REGRULEHDR CRegChain::~CRegChain()
 
 REGRULEHDR CRegChain::CRegChain(const CRegChain &other)
 {
-	m_pRegList = new std::vector<CDllString>;
+	m_pRegList = new STRINGVEC;
 	*this = other;
 }
 
-REGRULEHDR ULONG CRegChain::Size() const
+REGRULEHDR ulong CRegChain::Size() const
 {
 	return m_pRegList->size();
 }
@@ -32,7 +32,7 @@ REGRULEHDR void CRegChain::PushBack(const CDllString &pcreStr)
 	m_pRegList->push_back(pcreStr);
 }
 
-REGRULEHDR CDllString& CRegChain::operator[](ULONG nIdx)
+REGRULEHDR CDllString& CRegChain::operator[](ulong nIdx)
 {
 	return (*m_pRegList)[nIdx];
 }
@@ -44,7 +44,7 @@ REGRULEHDR const CRegChain& CRegChain::operator = (const CRegChain &other)
 	return *this;
 }
 
-REGRULEHDR void CRegChain::Resize(ULONG nSize)
+REGRULEHDR void CRegChain::Resize(ulong nSize)
 {
 	m_pRegList->resize(nSize);
 }

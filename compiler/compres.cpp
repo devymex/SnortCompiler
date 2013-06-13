@@ -3,7 +3,7 @@
 
 
 template<typename _Ty>
-void WriteNum(std::ofstream &fout, _Ty _num, ULONG nBytes = sizeof(_Ty))
+void WriteNum(std::ofstream &fout, _Ty _num, ulong nBytes = sizeof(_Ty))
 {
 	fout.write((char*)&_num, nBytes);
 }
@@ -43,18 +43,18 @@ COMPRESHDR const CRegRule &CCompileResults::GetRegexTbl() const
 table to file
 
 Arguments:
-  filename    path of the file waiting for written
+  filename	 path of the file waiting for written
 
-Returns:      0 success
-              -1 error occurred
+Returns:		0 success
+				-1 error occurred
 */
-COMPRESHDR ULONG CCompileResults::WriteToFile(LPCTSTR filename)
+COMPRESHDR ulong CCompileResults::WriteToFile(const char *filename)
 {
 	std::ofstream fout(filename, std::ios::binary);
 	if (!fout)
 	{
 		std::cerr << "Open file Failed!" << std::endl;
-		return (ULONG)-1;
+		return (ulong)-1;
 	}
 
 	//file label DFAS
@@ -98,13 +98,13 @@ COMPRESHDR ULONG CCompileResults::WriteToFile(LPCTSTR filename)
 	fout.seekp(endPos, std::ios_base::beg);
 
 	//start to write the relationship between sid and dfa ids
-	for (ULONG i = 0; i < m_sidDfaIds.Size(); ++i)
+	for (ulong i = 0; i < m_sidDfaIds.Size(); ++i)
 	{
 		COMPILEDRULENEW &ruleResult = m_sidDfaIds[i];
 		WriteNum(fout, ruleResult.m_nSid);
 		WriteNum(fout, ruleResult.m_nResult);
 		WriteNum(fout, ruleResult.m_dfaIds.Size());
-		for (ULONG j = 0; j < ruleResult.m_dfaIds.Size(); ++j)
+		for (ulong j = 0; j < ruleResult.m_dfaIds.Size(); ++j)
 		{
 			WriteNum(fout, ruleResult.m_dfaIds[j]);
 		}
@@ -119,12 +119,12 @@ COMPRESHDR ULONG CCompileResults::WriteToFile(LPCTSTR filename)
 	fout.seekp(0, std::ios_base::end);
 
 	//start to write dfas
-	BYTE dfaDetails[100000];
-	for (ULONG i = 0; i < m_dfaTbl.Size(); ++i)
+	byte *dfaDetails = new byte[100000];
+	for (ulong i = 0; i < m_dfaTbl.Size(); ++i)
 	{
-		ULONG len = m_dfaTbl[i].Save(dfaDetails);
+		ulong len = m_dfaTbl[i].Save(dfaDetails);
 		WriteNum(fout, len);
-		fout.write((char*)dfaDetails, len * sizeof(BYTE));
+		fout.write((char*)dfaDetails, len * sizeof(byte));
 	}
 
 	//write the offset of regex
@@ -136,17 +136,17 @@ COMPRESHDR ULONG CCompileResults::WriteToFile(LPCTSTR filename)
 	fout.seekp(0, std::ios_base::end);
 
 	//start to write regexes
-	for (ULONG i = 0; i < m_RegexTbl.Size(); ++i)
+	for (ulong i = 0; i < m_RegexTbl.Size(); ++i)
 	{
 		WriteNum(fout, m_RegexTbl[i].Size());
-		for (ULONG j = 0; j < m_RegexTbl[i].Size(); ++j)
+		for (ulong j = 0; j < m_RegexTbl[i].Size(); ++j)
 		{
 			WriteNum(fout, m_RegexTbl[i][j].Size());
 			const char *pString = m_RegexTbl[i][j].GetStr();
 			fout.write(pString, strlen(pString));
 		}
 		WriteNum(fout, m_RegexTbl[i].GetSigs().Size());
-		for (ULONG j = 0; j < m_RegexTbl[i].GetSigs().Size(); ++j)
+		for (ulong j = 0; j < m_RegexTbl[i].GetSigs().Size(); ++j)
 		{
 			WriteNum(fout, m_RegexTbl[i].GetSigs()[j]);
 		}
@@ -160,6 +160,7 @@ COMPRESHDR ULONG CCompileResults::WriteToFile(LPCTSTR filename)
 	fout.close();
 	fout.clear();
 
+	delete []dfaDetails;
 	return 0;
 }
 
@@ -167,19 +168,19 @@ COMPRESHDR ULONG CCompileResults::WriteToFile(LPCTSTR filename)
 table from file
 
 Arguments:
-  filename    path of the file waiting for written
+  filename	 path of the file waiting for written
 
-Returns:      0 success
-              -1 error occurred
+Returns:		0 success
+				-1 error occurred
 */
 
-COMPRESHDR ULONG CCompileResults::ReadFromFile(LPCTSTR filename)
+COMPRESHDR ulong CCompileResults::ReadFromFile(const char *filename)
 {
 	std::ifstream fin(filename, std::ios::binary);
 	if (!fin)
 	{
 		std::cerr << "Open file Failed!" << std::endl;
-		return (ULONG)-1;
+		return (ulong)-1;
 	}
 
 	//check file label
@@ -191,30 +192,30 @@ COMPRESHDR ULONG CCompileResults::ReadFromFile(LPCTSTR filename)
 		if (c != *i)
 		{
 			std::cerr << "File format error!" << std::endl;
-			return (ULONG)-1;
+			return (ulong)-1;
 		}
 	}
 
 	//read the file size
-	ULONG fileSize;
+	ulong fileSize;
 	fin.read((char*)&fileSize, 4);
 
 	//read the number of rules
-	ULONG ruleNum;
+	ulong ruleNum;
 	fin.read((char*)&ruleNum, 4);
 
 	//skip the offset of rule
 	fin.seekg(4, std::ios_base::cur);
 
 	//read the number of dfas
-	ULONG dfaNum;
+	ulong dfaNum;
 	fin.read((char*)&dfaNum, 4);
 
 	//skip the offset of dfa
 	fin.seekg(4, std::ios_base::cur);
 
 	//read the number of regexes
-	ULONG RegexTblSize;
+	ulong RegexTblSize;
 	fin.read((char*)&RegexTblSize, 4);
 
 	//skip the offset of regex
@@ -222,15 +223,15 @@ COMPRESHDR ULONG CCompileResults::ReadFromFile(LPCTSTR filename)
 
 	//start to read the relationship between sid and dfa ids
 	m_sidDfaIds.Resize(ruleNum);
-	ULONG SidDfaNum;
-	for (ULONG i = 0; i < ruleNum; ++i)
+	ulong SidDfaNum;
+	for (ulong i = 0; i < ruleNum; ++i)
 	{
 		COMPILEDRULENEW &ruleResult = m_sidDfaIds[i];
 		fin.read((char*)&ruleResult.m_nSid, 4);
 		fin.read((char*)&ruleResult.m_nResult, 4);
 		fin.read((char*)&SidDfaNum, 4);
 		ruleResult.m_dfaIds.Resize(SidDfaNum);
-		for (ULONG j = 0; j < SidDfaNum; ++j)
+		for (ulong j = 0; j < SidDfaNum; ++j)
 		{
 			fin.read((char*)&(ruleResult.m_dfaIds[j]), 4);
 		}
@@ -238,25 +239,25 @@ COMPRESHDR ULONG CCompileResults::ReadFromFile(LPCTSTR filename)
 
 	//start to read dfas
 	m_dfaTbl.Resize(dfaNum);
-	BYTE dfaDetails[100000];
-	for (ULONG i = 0; i < dfaNum; ++i)
+	byte *dfaDetails = new byte[100000];
+	for (ulong i = 0; i < dfaNum; ++i)
 	{
 		CDfa &dfa = m_dfaTbl[i];
-		ULONG len;
+		ulong len;
 		fin.read((char*)&len, 4);
-		fin.read((char*)dfaDetails, len * sizeof(BYTE));
+		fin.read((char*)dfaDetails, len * sizeof(byte));
 		dfa.Load(dfaDetails, len);
 	}
 
 	//start to read regexes
 	m_RegexTbl.Resize(RegexTblSize);
-	ULONG ChainSize;
-	ULONG RegSize;
-	ULONG SigSize;
-	for (ULONG i = 0; i < RegexTblSize; ++i)
+	ulong ChainSize;
+	ulong RegSize;
+	ulong SigSize;
+	for (ulong i = 0; i < RegexTblSize; ++i)
 	{
 		fin.read((char*)&ChainSize, 4);
-		for (ULONG j = 0; j < ChainSize; ++j)
+		for (ulong j = 0; j < ChainSize; ++j)
 		{
 			fin.read((char*)&RegSize, 4);
 			char *pString = new char[RegSize + 1];
@@ -265,7 +266,7 @@ COMPRESHDR ULONG CCompileResults::ReadFromFile(LPCTSTR filename)
 			m_RegexTbl[i].PushBack(CDllString(pString));
 		}
 		fin.read((char*)&SigSize, 4);
-		for (ULONG j = 0; j < SigSize; ++j)
+		for (ulong j = 0; j < SigSize; ++j)
 		{
 			SIGNATURE Sig;
 			fin.read((char*)&Sig, 4);
@@ -275,5 +276,6 @@ COMPRESHDR ULONG CCompileResults::ReadFromFile(LPCTSTR filename)
 	fin.close();
 	fin.clear();
 
+	delete []dfaDetails;
 	return 0;
 }

@@ -22,11 +22,11 @@
 //
 //	
 //		std::cout << "µÚ " << 817 << " ×é£º";
-//		for(ULONG i = 0; i < groupRes.GetGroups().Size(); ++i)
+//		for(ulong i = 0; i < groupRes.GetGroups().Size(); ++i)
 //		{
 //			if(groupRes.GetGroups()[i].mergeDfaId == 817)
 //			{
-//				for(ULONG j = 0; j < groupRes.GetGroups()[i].DfaIds.Size(); ++j)
+//				for(ulong j = 0; j < groupRes.GetGroups()[i].DfaIds.Size(); ++j)
 //				{
 //					std::cout << groupRes.GetGroups()[i].DfaIds[j] << "  ";
 //				}

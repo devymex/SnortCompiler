@@ -1,11 +1,14 @@
 #pragma once
 
-#include <hwprj\compiler.h>
+#include <hwprj\unsary.h>
+#include <hwprj\dfaarray.h>
+#include <hwprj\signatures.h>
+#include <hwprj\siddfaids.h>
 
-#ifndef GROUPING_H_
-#define GROUPINGSC __declspec(dllimport)
+#ifndef GROUPHDR_DS
+#define GROUPHDR __declspec(dllimport)
 #else
-#define GROUPINGSC __declspec(dllexport)
+#define GROUPHDR __declspec(dllexport)
 #endif
 
 struct DFAINFO
@@ -15,32 +18,32 @@ struct DFAINFO
 
 struct ONEGROUP
 {
-	CDllArray DfaIds;
+	CUnsignedArray DfaIds;
 	CSignatures ComSigs;
 	SIGNATURE currSig;
-	ULONG mergeDfaId;
+	ulong mergeDfaId;
 };
 
-class GROUPINGSC CGROUPS
+class GROUPHDR CGROUPS
 {
 public:
 	CGROUPS();
 	CGROUPS(const CGROUPS& other);
 	const CGROUPS &operator=(const CGROUPS &other);
 	~CGROUPS();
-	const ULONG Size() const;
-	void Resize(ULONG nSize);
+	const ulong Size() const;
+	void Resize(ulong nSize);
 	void PushBack(ONEGROUP oneGroup);
 	ONEGROUP& Back();
-	ONEGROUP &operator[](ULONG nIdx);
-	const ONEGROUP &operator[](ULONG nIdx) const;
+	ONEGROUP &operator[](ulong nIdx);
+	const ONEGROUP &operator[](ulong nIdx) const;
 	void Clear();
-	void Erase(ULONG nIdx);
+	void Erase(ulong nIdx);
 protected:
 	std::vector<ONEGROUP> *m_pGroups;
 };
 
-class GROUPINGSC CGROUPRes
+class GROUPHDR CGROUPRes
 {
 protected:
 	CDfaArray m_dfaTbl;
@@ -53,8 +56,8 @@ public:
 	const CDfaArray &GetDfaTable() const;
 	const CSidDfaIds &GetSidDfaIds() const;
 	const CGROUPS &GetGroups() const;
-	ULONG WriteToFile(LPCTSTR filename);
-	ULONG ReadFromFile(LPCTSTR filename);
+	ulong WriteToFile(const char *filename);
+	ulong ReadFromFile(const char *filename);
 };
 
-GROUPINGSC void Grouping(CCompileResults &res, CGROUPRes &groupRes);
+GROUPHDR void Grouping(class CCompileResults &res, CGROUPRes &groupRes);

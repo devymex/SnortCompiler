@@ -1,11 +1,13 @@
 /**
-**  @file        common.h
+**	@file		dfarow.h
 **
-**  @author      Lab 435, Xidian University
+**	@author		Lab 435, Xidian University
 **
-**  @brief       Common classes declaration
+**	@brief		Declaration of the CDfaRow class
 **
-**  Include CDllArray, CDllString
+** Store a row for CDfaRow. Array of std::vector<ulong>. Each element of the
+** array stand by a column that indicates the jumping character.
+** Each number in vector is the next state would be jump to by the character.
 **
 */
 
@@ -13,39 +15,40 @@
 
 #include <hwprj\common.h>
 
+
 #ifndef DFAHDR_DS
+class STATEVEC;
 #define DFAHDR __declspec(dllimport)
 #else
 #define DFAHDR __declspec(dllexport)
 #endif
 
-/*
-* Store a row for CDfaRow. Array of std::vector<ULONG>. Each element of the
-* array stand by a column that indicates the jumping character.
-* Each number in vector is the next state would be jump to by the character.
-*/
 class DFAHDR CDfaRow
 {
 public:
 	enum STATEFLAG
 	{
-		NORMAL   = 1 << 0,
-		START    = 1 << 1,
+		NORMAL	= 1 << 0,
+		START	 = 1 << 1,
 		TERMINAL = 1 << 2
 	};
-	explicit CDfaRow(ULONG col);
-	void Fill(STATEID _Val);
+
+	explicit CDfaRow(ulong col);
 	~CDfaRow();
 	CDfaRow(const CDfaRow &other);
 	CDfaRow& operator=(const CDfaRow &other);
-	STATEID& operator[](BYTE nIdx);
-	const STATEID& operator[](BYTE nIdx) const;
-	void SetFlag(ULONG nFlag);
-	ULONG GetFlag() const;
-	ULONG GetColNum() const;
+
+	STATEID& operator[](byte nIdx);
+	const STATEID& operator[](byte nIdx) const;
+
+	void SetFlag(ulong nFlag);
+	ulong GetFlag() const;
+	ulong GetColNum() const;
+	void Fill(STATEID _Val);
+
 protected:
-	ULONG m_nFlag;//标记该状态/行的属性：NORMAL、START、TERMINAL
-	ULONG m_nColNum;
+	ulong m_nFlag;//标记该状态/行的属性：NORMAL、START、TERMINAL
+	ulong m_nColNum;
 	STATEVEC *m_pDest;
 };
 

@@ -1,4 +1,4 @@
-LIBRARY automaton
+LIBRARY
 EXPORTS
 MergeMultipleDfas @ 1
 PrintDfaToGv @ 2

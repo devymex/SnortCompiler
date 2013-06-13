@@ -1,9 +1,6 @@
-LIBRARY compiler
+LIBRARY
 EXPORTS
-CompileRuleSet @ 1
-
-CompileFile @ 2
-CompileRule @ 3
-Rule2PcreList @ 4
-CRegChainToNFA @ 5
-
+CompileRuleSet	@ 1
+CompileFile		@ 2
+Rule2Dfas		@ 3
+PcreMatch		@ 4

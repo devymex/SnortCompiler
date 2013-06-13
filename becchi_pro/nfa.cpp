@@ -1283,7 +1283,7 @@ void NFA::output()
 		}
 	};
 	std::ofstream fout("..//nfa.txt");
-	ULONG idx = 0;
+	ulong idx = 0;
 	for (nfa_list::iterator iState = queue->begin(); iState != queue->end(); ++iState, ++idx)
 	{
 		pair_set *curState = (*iState)->transitions;

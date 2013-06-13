@@ -82,15 +82,15 @@ u_short urp;                 //16位紧急数据偏移量
 
 }tcp_header;
 
-inline ULONG HashFcn(SIGNATURE sig)
+inline ulong HashFcn(SIGNATURE sig)
 {
 	u_char *cSig = (u_char *)&sig;
 
-	const ULONG _FNV_offset_basis = 2166136261U;
-	const ULONG _FNV_prime = 16777619U;
+	const ulong _FNV_offset_basis = 2166136261U;
+	const ulong _FNV_prime = 16777619U;
 
-	ULONG _Val = _FNV_offset_basis;	
-	for(ULONG i = 0; i < 4; ++i)
+	ulong _Val = _FNV_offset_basis;	
+	for(ulong i = 0; i < 4; ++i)
 	{
 		_Val ^= cSig[i];
 		_Val *= _FNV_prime;
@@ -98,7 +98,7 @@ inline ULONG HashFcn(SIGNATURE sig)
 
 	return (_Val);
 }
-typedef void (CALLBACK*PACKETRECV) (const ip_header *ih, const BYTE *data, void* pParam);
+typedef void (__stdcall*PACKETRECV) (const ip_header *ih, const byte *data, void* pParam);
 
 struct PACKETPARAM
 {
@@ -108,32 +108,32 @@ struct PACKETPARAM
 
 struct MATCHRESULT
 {
-	ULONG pktnum;
-	std::vector<ULONG> matchedSids;
+	ulong pktnum;
+	std::vector<ulong> matchedSids;
 };
 
 struct SIGSID
 {
-	ULONG sid;
+	ulong sid;
 	SIGNATURE sig;
 };
 
 
 struct REGRULES
 {
-	ULONG m_nSid;
+	ulong m_nSid;
 	CRegRule regrule;
 };
 
 struct SIG_HASH
 {
-	ULONG operator()(const SIGNATURE &str)
+	ulong operator()(const SIGNATURE &str)
 	{
-		const ULONG _FNV_offset_basis = 2166136261U;
-		const ULONG _FNV_prime = 16777619U;
+		const ulong _FNV_offset_basis = 2166136261U;
+		const ulong _FNV_prime = 16777619U;
 
-		ULONG _Val = _FNV_offset_basis;	
-		for(ULONG i = 0; i < 4; ++i)
+		ulong _Val = _FNV_offset_basis;	
+		for(ulong i = 0; i < 4; ++i)
 		{
 			_Val ^= str >> (8 * i);
 			_Val *= _FNV_prime;
@@ -143,7 +143,7 @@ struct SIG_HASH
 	}
 };
 
-typedef std::unordered_map<SIGNATURE, std::vector<ULONG>, SIG_HASH> SIGSMAP;
+typedef std::unordered_map<SIGNATURE, std::vector<ulong>, SIG_HASH> SIGSMAP;
 struct REGRULESMAP
 {
 	std::vector<REGRULES> result;
@@ -152,17 +152,17 @@ struct REGRULESMAP
 	std::string resultpath;
 };
 
-void CALLBACK PktParam(const ip_header *ih, const BYTE *data, void* user);
+void __stdcall PktParam(const ip_header *ih, const byte *data, void* user);
 
 void packet_handler(u_char *param, const struct pcap_pkthdr *header, const u_char *pkt_data);
 bool MyLoadCapFile(const char* pFile, PACKETRECV cv, void* pUser);
 MATCHPKT bool LoadCapFile(const char* pFile, void* pUser);
 
-void CALLBACK MyProcess(const CSnortRule &rule, LPVOID lpParam);
+void __stdcall MyProcess(const CSnortRule &rule, LPVOID lpParam);
 MATCHPKT void MchCompile(LPCTSTR filename, LPVOID result);
 MATCHPKT bool TradithinalMatch(std::vector<u_char> &dataSrc, CRegRule &regRule);//调用pcreMATCHPKT 
 
-void GetMchRule(const u_char *data, ULONG len, void* user, std::vector<ULONG> &rules);
-void HdlOnePkt(const u_char *data, ULONG len, void*user);
-bool PcreMatch(const u_char *data, ULONG len, CRegRule &regRule);
+void GetMchRule(const u_char *data, ulong len, void* user, std::vector<ulong> &rules);
+void HdlOnePkt(const u_char *data, ulong len, void*user);
+bool PcreMatch(const u_char *data, ulong len, CRegRule &regRule);
 MATCHPKT void HandleAllFile(const std::string &path, void* user);

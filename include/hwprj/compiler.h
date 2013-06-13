@@ -1,11 +1,19 @@
 #pragma once
 
 #include <hwprj\compres.h>
+#include <hwprj\snortrule.h>
 
-#ifndef COMPILERNEW_H_
-#define COMPILERNEW __declspec(dllimport)
+#ifndef COMPILERHDR_DS
+#define COMPILERHDR __declspec(dllimport)
 #else
-#define COMPILERNEW __declspec(dllexport)
+#define COMPILERHDR __declspec(dllexport)
 #endif
 
-COMPILERNEW void CompileRuleSet(LPCTSTR filename, CCompileResults &result);
+typedef void (__stdcall *RECIEVER)(const CSnortRule &rule, void *lpParam);
+
+COMPILERHDR void CompileRuleSet(const char *filename, CCompileResults &result);
+
+COMPILERHDR ulong CompileFile(const char *fileName, RECIEVER recv, void *lpUser);
+
+COMPILERHDR void Rule2Dfas(const CSnortRule &rule, CCompileResults &result,
+							COMPILEDRULENEW &ruleResult);

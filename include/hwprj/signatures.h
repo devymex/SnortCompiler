@@ -1,18 +1,18 @@
 /**
-**  @file        common.h
+**	@file		signatures.h
 **
-**  @author      Lab 435, Xidian University
+**	@author		Lab 435, Xidian University
 **
-**  @brief       Common classes declaration
+**	@brief		Common classes declaration
 **
-**  Include CDllArray, CDllString
+**	Include CUnsignedArray, CDllString
 **
 */
 
 #pragma once
 
 #include <vector>
-#include <hwprj/common.h>
+#include <hwprj\common.h>
 
 #ifndef SIGHDR_DS
 #define SIGHDR __declspec(dllimport)
@@ -30,11 +30,11 @@ public:
 	const CSignatures &operator=(const CSignatures &other);
 	~CSignatures();
 
-	const ULONG Size() const;
-	void Resize(ULONG nSize);
+	const ulong Size() const;
+	void Resize(ulong nSize);
 	void PushBack(SIGNATURE Sig);
-	SIGNATURE &operator[](ULONG nIdx);
-	const SIGNATURE &operator[](ULONG nIdx) const;
+	SIGNATURE &operator[](ulong nIdx);
+	const SIGNATURE &operator[](ulong nIdx) const;
 	void Clear();
 	void Unique();
 protected:

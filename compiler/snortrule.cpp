@@ -1,7 +1,6 @@
 #include "stdafx.h"
-#include "ruleoption.h"
-
 #include <hwprj\snortrule.h>
+
 
 SNORTRULEHDR CSnortRule::CSnortRule()
 	: m_nSid(0), m_nFlag(0)
@@ -34,27 +33,27 @@ SNORTRULEHDR CSnortRule::~CSnortRule()
 	delete m_pOptions;
 }
 
-SNORTRULEHDR ULONG CSnortRule::Size() const
+SNORTRULEHDR ulong CSnortRule::Size() const
 {
 	return m_pOptions->size();
 }
 
-SNORTRULEHDR void CSnortRule::SetSid(ULONG sid)
+SNORTRULEHDR void CSnortRule::SetSid(ulong sid)
 {
 	m_nSid = sid;
 }
 
-SNORTRULEHDR ULONG CSnortRule::GetSid() const
+SNORTRULEHDR ulong CSnortRule::GetSid() const
 {
 	return m_nSid;
 }
 
-SNORTRULEHDR void CSnortRule::SetFlag(ULONG flag)
+SNORTRULEHDR void CSnortRule::SetFlag(ulong flag)
 {
 	m_nFlag = flag;
 }
 
-SNORTRULEHDR ULONG CSnortRule::GetFlag() const
+SNORTRULEHDR ulong CSnortRule::GetFlag() const
 {
 	return m_nFlag;
 }
@@ -69,7 +68,7 @@ SNORTRULEHDR void CSnortRule::PopBack()
 	m_pOptions->pop_back();
 }
 
-SNORTRULEHDR CRuleOption* CSnortRule::operator[](ULONG nIdx) const
+SNORTRULEHDR CRuleOption* CSnortRule::operator[](ulong nIdx) const
 {
 	return (*m_pOptions)[nIdx];
 }
