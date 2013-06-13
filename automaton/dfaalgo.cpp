@@ -276,6 +276,7 @@ void CalcAbleTo(STATEVEC *pRevTbl, ulong nGrpNum, ulong nStaNum, PARTSET &ps)
 			}
 		}
 	}
+	delete []pBuf;
 }
 /*
 **	This function groups the merged dfa's columns on the ground of
