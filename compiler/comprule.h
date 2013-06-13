@@ -12,7 +12,7 @@ extern double dfamintimetime;
 
 ulong Rule2PcreList(const CSnortRule &rule, CRegRule &regrule);
 
-ulong CRegChainToNFA(CRegChain &regchain, CNfa &nfa);
+ulong Chain2NFA(const CRegChain &regchain, CNfa &nfa, CSignatures &sigs);
 
 void CompileRule(LPCSTR rule, RECIEVER recv, LPVOID lpUser);
 
@@ -21,3 +21,8 @@ ulong LoadFile(const char *fileName, std::vector<std::string> &rules);
 void Rule2Dfas(const CSnortRule &rule, CCompileResults &result, COMPILEDRULE &ruleResult);
 
 void AssignSig(CCompileResults &result, ulong BegIdx, ulong EndIdx);
+
+ulong ProcessOption(std::string &ruleOptions, CSnortRule &snortRule);
+
+void Rule2Dfas(const CRegRule &rule, CCompileResults &result,
+			   COMPILEDRULE &ruleResult);

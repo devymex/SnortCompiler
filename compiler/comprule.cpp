@@ -584,23 +584,6 @@ ulong ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
 }
 
 /*
-* process one rule
-*/
-void CompileRule(LPCSTR rule, RECIEVER recv, LPVOID lpUser)
-{
-	//Delete the rule header, reserve the rule options
-	std::string strRule(rule);
-	strRule.erase(strRule.begin(), find(strRule.begin(), strRule.end(), '(') + 1);
-	strRule.erase(find(strRule.rbegin(), strRule.rend(), ')').base() - 1, strRule.end());
-
-	CSnortRule snortRule;
-	if (0 == ProcessOption(strRule, snortRule))
-	{
-		recv(snortRule, lpUser);
-	}
-}
-
-/*
 * content has depth or within constraint
 * construct it to linear NFA
 */
@@ -1000,20 +983,20 @@ ulong Rule2PcreList(const CSnortRule &rule, CRegRule &regrule)
 **	@retval <>0 fatal error
 */
 
-ulong CRegChainToNFA(CRegChain &regchain, CNfa &nfa)
+ulong Chain2NFA(const CRegChain &regchain, CNfa &nfa, CSignatures &sigs)
 {
 	nfa.Reserve(nfaReserve);
 	int flag = 0;
 	for(ulong i = 0; i < regchain.Size(); ++i)
 	{
-		flag = PcreToNFA(regchain[i].GetStr(), nfa, regchain.GetSigs());
+		flag = PcreToNFA(regchain[i].GetStr(), nfa, sigs);
 		if(flag != 0)
 		{
 			nfa.Clear();
 			return flag;
 		}
 	}
-	regchain.GetSigs().Unique();
+	sigs.Unique();
 	return 0;
 }
 
@@ -1051,5 +1034,109 @@ void AssignSig(CCompileResults &result, ulong BegIdx, ulong EndIdx)
 		{
 			result.GetRegexTbl()[i].GetSigs().PushBack(vecRuleSigs[j]);
 		}
+	}
+}
+
+/* complie one rule to several dfas
+
+Arguments:
+  rule		the snort rule
+  result		the compile result
+  ruleResult  the relationship between sid and dfa ids
+
+Returns:		nothing
+
+*/
+void Rule2Dfas(const CRegRule &rule, CCompileResults &result,
+			   COMPILEDRULE &ruleResult)
+{
+	CTimer ctime;//for test
+	ctime.Reset();//for test
+	rule2pcretime += ctime.Reset();//for test
+
+	CRegRule regRule = rule;
+	ruleResult.m_nResult = COMPILEDRULE::RES_SUCCESS;
+	const ulong nDfaTblSize = result.GetDfaTable().Size();
+	const ulong nIncrement = rule.Size();
+	result.GetDfaTable().Resize(nDfaTblSize + nIncrement);
+	const ulong nRegexTblSize = result.GetRegexTbl().Size();
+	result.GetRegexTbl().Resize(nRegexTblSize + nIncrement);
+	ulong nDfaId;
+	ulong nChainId;
+	bool bHasSigs = false;
+	for (ulong i = 0; i < nIncrement; ++i)
+	{
+		CNfa nfa;
+
+		ulong nToNFAFlag = Chain2NFA(regRule[i], nfa, regRule[i].GetSigs());
+		pcre2nfatime += ctime.Reset();//for test
+
+		if (rule[i].GetSigs().Size() > 0)
+		{
+			bHasSigs = true;
+		}
+
+		nDfaId = nDfaTblSize + i;
+		nChainId = nRegexTblSize + i;
+		CDfa &dfa = result.GetDfaTable()[nDfaId];
+		if (nToNFAFlag == SC_ERROR)
+		{
+			ruleResult.m_nResult = COMPILEDRULE::RES_ERROR;
+			ruleResult.m_dfaIds.Clear();
+			result.GetDfaTable().Resize(nDfaTblSize);
+			result.GetRegexTbl().Resize(nRegexTblSize);
+			return;
+		}
+		else
+		{
+			ctime.Reset();//for test
+			dfa.SetId(nDfaId);
+			ulong nToDFAFlag = dfa.FromNFA(nfa);
+			nfa2dfatime += ctime.Reset();//for test
+
+			if (nToDFAFlag == -1)
+			{
+				ruleResult.m_nResult = COMPILEDRULE::RES_EXCEEDLIMIT;
+				dfa.Clear();
+			}
+			else
+			{
+				ctime.Reset();//for test
+				ulong nr = dfa.Minimize();
+				if (dfa.GetFinalState().Size() == 0)
+				{
+					system("pause");
+				}
+				dfamintimetime += ctime.Reset();//for test
+				if (0 != nr || dfa.Size() > SC_MAXDFASIZE)
+				{
+					ruleResult.m_nResult = COMPILEDRULE::RES_EXCEEDLIMIT;
+					dfa.Clear();
+				}
+			}
+		}
+		if (dfa.Size() == 0)
+		{
+			ruleResult.m_dfaIds.Clear();
+			result.GetDfaTable().Resize(nDfaTblSize);
+			result.GetRegexTbl().Resize(nRegexTblSize);
+			return;
+		}
+		ruleResult.m_dfaIds.PushBack(nDfaId);
+		result.GetRegexTbl()[nChainId] = regRule[i];
+	}
+
+	if (!bHasSigs)
+	{
+		ruleResult.m_nResult = COMPILEDRULE::RES_HASNOSIG;
+		ruleResult.m_dfaIds.Clear();
+		result.GetDfaTable().Resize(nDfaTblSize);
+		result.GetRegexTbl().Resize(nRegexTblSize);
+		return;
+	}
+
+	if (ruleResult.m_nResult != COMPILEDRULE::RES_ERROR)
+	{
+		AssignSig(result, nRegexTblSize, nRegexTblSize + nIncrement);
 	}
 }

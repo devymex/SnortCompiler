@@ -19,6 +19,7 @@ public:
 	const CRegChain& operator = (const CRegChain &other);
 
 	CDllString& operator[](ulong nIdx);
+	const CDllString& operator[](ulong nIdx) const;
 
 	ulong Size() const;
 	CDllString& Back() const;

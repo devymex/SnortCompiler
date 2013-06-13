@@ -42,7 +42,7 @@ public:
 	void			Append(const char* pChar);
 	char			Back() const;
 	void			PushBack(const char nChar);
-	const char*		GetStr();
+	const char*		GetStr() const;
 
 protected:
 	DLLSTRING *m_pString;

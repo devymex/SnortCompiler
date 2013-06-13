@@ -94,7 +94,7 @@ int main()
 
 	CTimer ctime;
 	CCompileResults result;
-	CompileRuleSet("..\\allrules.rule", result);
+	ParseRuleFile("..\\allrules.rule", CompileResult, &result);
 	result.WriteToFile("..\\result.cdt");
 	//result.ReadFromFile("..\\result.cdt");
 	CGROUPRes groupRes;

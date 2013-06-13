@@ -9,11 +9,16 @@
 #define COMPILERHDR __declspec(dllexport)
 #endif
 
-typedef void (__stdcall *RECIEVER)(const CSnortRule &rule, void *lpParam);
+struct PARSERESULT
+{
+	CRegRule	regRule;
+	ulong		ulFlags;
+	ulong		ulSid;
+	ulong		ulRet;
+};
 
-COMPILERHDR void CompileRuleSet(const char *filename, CCompileResults &result);
+typedef void (__stdcall *RECIEVER)(const PARSERESULT &parseRes, void *lpParam);
 
-COMPILERHDR ulong CompileFile(const char *fileName, RECIEVER recv, void *lpUser);
+COMPILERHDR void __stdcall CompileResult(const PARSERESULT &parseRes, void *lpVoid);
 
-COMPILERHDR void Rule2Dfas(const CSnortRule &rule, CCompileResults &result,
-							COMPILEDRULE &ruleResult);
+COMPILERHDR ulong ParseRuleFile(const char *pFileName, RECIEVER recv, void *lpUser);
