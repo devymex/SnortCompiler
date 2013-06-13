@@ -17,13 +17,13 @@
     <ClInclude Include="..\include\hwprj\common.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\hwprj\dllstring.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\hwprj\unsary.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\include\hwprj\ctimer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\hwprj\dllstring.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
