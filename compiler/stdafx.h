@@ -5,7 +5,6 @@
 **
 **	@brief		Precompile header common library
 **
-**
 */
 
 #pragma once

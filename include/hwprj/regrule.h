@@ -1,3 +1,14 @@
+/*
+**	@file		regrule.h
+**
+**	@author		Lab 435, Xidian University
+**
+**	@brief		Declaration of the CRegRule class
+**
+**	A rule includes multiple CRegChain, all store in CRegRule
+**
+*/
+
 #pragma once
 
 #include <hwprj\regchain.h>
