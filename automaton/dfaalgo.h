@@ -115,3 +115,12 @@ void DfaColGroup(std::vector<CDfa> &dfas, byte* groups);
 /*	this function marks the lastDfa's terminal states. */
 void AddTermIntoDFA(STATEID otherSta, const CDfa &other,
 					STATEID lastSta, CDfa &lastDfa);
+
+void SetStateFlags(byte *pFlags, STATEVEC states);
+
+bool SortPartition(const byte *pAbleTo, PARTSET &partSet);
+
+ulong FindNotEmpty(const std::vector<ulong> *pVecAry, ulong nCnt);
+
+void InitPartWait(const std::vector<PARTSET> &partSet,
+				  std::vector<ulong> *pWait, ulong ulGrpNum);
