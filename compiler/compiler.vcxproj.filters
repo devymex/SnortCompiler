@@ -187,5 +187,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="compiler.def" />
+    <None Include="ClassDiagram.cd" />
   </ItemGroup>
 </Project>

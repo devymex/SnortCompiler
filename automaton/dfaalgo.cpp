@@ -471,12 +471,12 @@ void BuildDfaByPart(const PARTSETVEC &partSets, const DFAROWARY &oldDfa,
 		const CDfaRow &oldRow = oldDfa[i->StaSet.front()];
 		for (ulong j = 0; j != ulColNum; ++j)
 		{
-			STATEID nCur = oldRow[j], nDest = STATEID(-1);
+			STATEID nCur = oldRow[byte(j)], nDest = STATEID(-1);
 			if (nCur != STATEID(-1))
 			{
 				nDest = old2New[nCur];
 			}
-			newRow[j] = nDest;
+			newRow[byte(j)] = nDest;
 		}
 		//set a state attribute
 		newRow.SetFlag(oldRow.GetFlag());
