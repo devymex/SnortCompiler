@@ -151,7 +151,7 @@ DFAHDR ulong CDfa::FromNFA(const CNfa &nfa)
 
 	byte groups[SC_DFACOLCNT];
 	NAvaiEdges(nfa, groups);
-	Init(groups);
+	SetGroups(groups);
 
 	std::stack<STATEVEC> nfaStasStack;
 	STATEVEC &startEVec = eClosure.front();
@@ -449,7 +449,7 @@ DFAHDR void CDfa::Load(byte *beg, ulong len)
 	{
 		ReadNum(beg, pGroup[i]);
 	}
-	Init(pGroup);
+	SetGroups(pGroup);
 	m_nId = dfaId;
 
 	//read dfa table
@@ -993,7 +993,7 @@ DFAHDR bool MergeMultipleDfas(std::vector<CDfa> &dfas, CDfa &lastDfa)
 	//group the lastDfa's columns
 	byte groups[SC_DFACOLCNT];
 	DfaColGroup(dfas, groups);
-	lastDfa.Init(groups);
+	lastDfa.SetGroups(groups);
 
 	ulong colCnt = lastDfa.GetGroupCount();
 
