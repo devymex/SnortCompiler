@@ -567,7 +567,6 @@ ulong CDfa::PartStates(STATEVEC *pRevTbl)
 				PARTSET &lastPart = partSets.back();
 				lastPart.StaSet.splice(lastPart.StaSet.begin(),
 					pJSet->StaSet, part, pJSet->StaSet.end());
-
 				CalcAbleTo(pRevTbl, nGrpNum, ulStaNum, *pJSet);
 				CalcAbleTo(pRevTbl, nGrpNum, ulStaNum, lastPart);
 
@@ -592,12 +591,8 @@ ulong CDfa::PartStates(STATEVEC *pRevTbl)
 	}
 	delete []pAbleToI;
 
-	for (PARTSETVEC_ITER i = partSets.begin(); i != partSets.end(); ++i)
-	{
-		ReleaseAbleTo(*i);
-	}
 
-	if (partSets.size() < m_pDfa->size())
+	if (nr != ulong(-1) && partSets.size() < m_pDfa->size())
 	{
 		STATEVEC sta2Part(m_pDfa->size());
 		STATEID nCol = (STATEID)GetGroupCount();
@@ -635,6 +630,11 @@ ulong CDfa::PartStates(STATEVEC *pRevTbl)
 		delete pNewDfa;
 
 		std::cout << "Minimized: " << (ulStaNum - m_pDfa->size()) << std::endl;
+	}
+
+	for (PARTSETVEC_ITER i = partSets.begin(); i != partSets.end(); ++i)
+	{
+		ReleaseAbleTo(*i);
 	}
 	return nr;
 }
