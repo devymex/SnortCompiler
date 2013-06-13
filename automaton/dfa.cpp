@@ -543,9 +543,7 @@ ulong CDfa::PartStates(STATEVEC *pRevTbl)
 		{
 			for (ulong j = 0; j != partSets.size(); ++j)
 			{
-				//choose partSet[j]£¬for a symbol,
-				//partSet1[j] = {state|state belong to parSet[j] && pAbleTo[j][symbol] == 1}
-				//partSet2[j] = partSet[j] - partSet1[j]
+				/*choose partSet[j] and divide partSet[j] for a jump character*/
 				PARTSET *pJSet = &partSets[j];
 				if (SortPartition(pAbleToI, *pJSet) == false)
 				{
@@ -563,7 +561,7 @@ ulong CDfa::PartStates(STATEVEC *pRevTbl)
 					nr = ulong(-1);
 					break;
 				}
-				//Replace partSet[j] by partSet1[j] and construct new partSet = partSet[j]
+
 				PARTSET &lastPart = partSets.back();
 				lastPart.StaSet.splice(lastPart.StaSet.begin(),
 					pJSet->StaSet, part, pJSet->StaSet.end());
