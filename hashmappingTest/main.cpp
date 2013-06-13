@@ -45,7 +45,7 @@ void main()
 	HASHRES HashResMap;
 	HashMapping(groupRes, HashResMap);
 	groupRes.WriteToFile(_T("..\\..\\output\\FinalResut.cdt"));
-	std::cout << "总时间： " << ctime.Reset() << std::endl;
+	std::cout << "锟斤拷时锟戒： " << ctime.Reset() << std::endl;
 	std::cout << groupRes.GetGroups().Size() << std::endl;
 	std::cout << HashResMap.size() << std::endl;
 

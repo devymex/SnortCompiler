@@ -22,11 +22,11 @@
 //
 //	
 //		std::cout << "µÚ " << 817 << " ×é£º";
-//		for(size_t i = 0; i < groupRes.GetGroups().Size(); ++i)
+//		for(ulong i = 0; i < groupRes.GetGroups().Size(); ++i)
 //		{
 //			if(groupRes.GetGroups()[i].mergeDfaId == 817)
 //			{
-//				for(size_t j = 0; j < groupRes.GetGroups()[i].DfaIds.Size(); ++j)
+//				for(ulong j = 0; j < groupRes.GetGroups()[i].DfaIds.Size(); ++j)
 //				{
 //					std::cout << groupRes.GetGroups()[i].DfaIds[j] << "  ";
 //				}
@@ -43,7 +43,7 @@
 //}
 
 #include "../MatchPacket/MatchPkt.h"
-#include "../common/common.h"
+#include <hwprj\common.h>
 #include <fstream>
 #include <tchar.h>
 
