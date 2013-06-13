@@ -397,8 +397,8 @@ void FormatPcre (_Iter pBeg, _Iter pEnd, std::string &bPcre, std::string &oPcre)
 		}
 		oPcre.push_back('s');
 
-		//std::cout << bPcre << std::endl;
-		//std::cout << oPcre << std::endl;
+		std::cout << bPcre << std::endl;
+		std::cout << oPcre << std::endl;
 }
 
 ulong CompareWithPcre(const char *pPcre)
