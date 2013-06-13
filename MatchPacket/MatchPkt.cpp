@@ -22,18 +22,7 @@ void GetMchRule(const u_char *data, size_t len, void* user, std::vector<size_t> 
 			sig = *(SIGNATURE *)csig;
 			if(sigmap.count(sig))
 			{
-				if(sig == 0)
-				{
-					flag = 1;
-					size_t size = sigmap[sig].size();
-					rules.insert(rules.end(), sigmap[sig].begin(), sigmap[sig].end());
-				}
-
-				if(flag == 0)
-				{
-					size_t size = sigmap[sig].size();
-					rules.insert(rules.end(), sigmap[sig].begin(), sigmap[sig].end());
-				}
+				rules.insert(rules.end(), sigmap[sig].begin(), sigmap[sig].end());
 			}
 		}
 	}
@@ -82,16 +71,21 @@ void HdlOnePkt(const u_char *data, size_t len, void*user)
 	REGRULESMAP &rulesmap = *(REGRULESMAP *)user;
 	std::vector<size_t> rules;
 	GetMchRule(data, len, user, rules);
-	//std::vector<size_t> matchSid;
+	std::vector<size_t> matchvec;
 	rulesmap.mchresult << pktnum << " : ";
 	for(size_t i = 0; i < rules.size(); ++i)
 	{
 		bool flag = PcreMatch(data, len, rulesmap.result[rules[i]].regrule);
 		if(flag)
 		{
-			//matchSid.push_back(rulesmap.result[rules[i]].m_nSid);
-			rulesmap.mchresult << rulesmap.result[rules[i]].m_nSid << "  ";
+			matchvec.push_back(rulesmap.result[rules[i]].m_nSid);
+			//rulesmap.mchresult << rulesmap.result[rules[i]].m_nSid << "  ";
 		}
+	}
+	std::sort(matchvec.begin(), matchvec.end());
+	for(std::vector<size_t>::iterator iter = matchvec.begin(); iter != matchvec.end(); ++iter)
+	{
+		rulesmap.mchresult << *iter << "  ";
 	}
 	rulesmap.mchresult << std::endl;
 }

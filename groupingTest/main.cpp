@@ -25,9 +25,10 @@ int main()
 	//}
 
 	CResNew result;
+	compilenew(_T("../../input/test.rule"), result);
 	//compilenew(_T("..\\..\\input\\allrules.rule"), result);
 	//result.WriteToFile(_T("..\\..\\output\\result.cdt"));
-	result.ReadFromFile(_T("..\\..\\output\\result.cdt"));
+	//result.ReadFromFile(_T("..\\..\\output\\result.cdt"));
 
 	//for (size_t i = 0; i < result.GetSidDfaIds().Size(); ++i)
 	//{
@@ -41,6 +42,8 @@ int main()
 
 	CTimer ctime;
 	grouping(result, groupRes);
+
+	size_t dfasize = groupRes.GetDfaTable().Size();
 	std::cout << "分组时间： " << ctime.Reset() << std::endl;
 
 	groupRes.WriteToFile(_T("..\\..\\output\\GroupResut.cdt"));

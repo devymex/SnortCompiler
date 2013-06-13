@@ -52,6 +52,7 @@ MATCHPKT void MchCompile(LPCTSTR filename, LPVOID lpVoid)
 				for (size_t cursig = 0; cursig < sigcnt; ++cursig)
 				{
 					sig = (iter->regrule)[chainsize].GetSig(cursig);
+					char *c = (char*)(&sig);
 
 					if (rulesmap.sigmap.count(sig) != 0)
 					{
@@ -70,6 +71,7 @@ MATCHPKT void MchCompile(LPCTSTR filename, LPVOID lpVoid)
 				}
 			}
 		}
+		
 END:	if(((flag & 1) == 0) && ((flag & 1 << 1) != 0))
 		{
 			SIGSMAP &temp = rulesmap.sigmap;
