@@ -1067,7 +1067,7 @@ DFAHDR bool MergeMultipleDfas(std::vector<CDfa> &dfas, CDfa &lastDfa)
 		for(ulong curChar = 0; curChar < SC_DFACOLCNT; ++curChar)
 		{
 			finFlag = 0;
-			ZeroMemory(NextVec.data(), NextVec.size() * sizeof(ulong));
+			//ZeroMemory(NextVec.data(), NextVec.size() * sizeof(NextVec.front()));
 			byte lastDfaGroup = groups[curChar];
 			if(computFlag[lastDfaGroup] == 1)
 			{
