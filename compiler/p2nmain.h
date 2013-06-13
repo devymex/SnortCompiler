@@ -8,9 +8,6 @@
 #include <hwprj\common.h>
 #include <hwprj\nfa.h>
 
-
-#define SC_LIMIT 200 // What's this??
-
 #define IMM2_SIZE 2
 #define LINK_SIZE 2
 #define OP_LENGTHS \

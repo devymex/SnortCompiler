@@ -458,51 +458,6 @@ ulong PcreToCode(const std::string &OnePcre, BYTEARY &code)
 	return nFromBeg;
 }
 
-bool ExceedLimit(const std::string &OnePcre)
-{
-	ulong CurPos = OnePcre.find('{', 0);
-	ulong EndPos;
-	while (CurPos != std::string::npos)
-	{
-		if (OnePcre[CurPos - 1] != '\\')
-		{
-			EndPos = OnePcre.find('}', CurPos + 1);
-			std::string StrInBrace = OnePcre.substr(CurPos + 1, EndPos - CurPos - 1);
-			ulong commaPos = StrInBrace.find(',', 0);
-			if (commaPos == std::string::npos)
-			{
-				std::stringstream ss(StrInBrace);
-				ulong count = 0;
-				ss >> count;
-				if (count > SC_LIMIT)
-				{
-					return true;
-				}
-			}
-			else
-			{
-				std::string minstr = StrInBrace.substr(0, commaPos);
-				std::string maxstr = StrInBrace.substr(commaPos + 1, StrInBrace.size() - commaPos);
-				ulong min = 0;
-				ulong max = 0;
-				std::stringstream ss;
-				ss << minstr;
-				ss >> min;
-				ss.clear();
-				ss << maxstr;
-				ss >> max;
-				if (min > SC_LIMIT || max > SC_LIMIT)
-				{
-					return true;
-				}
-			}
-		}
-		CurPos = OnePcre.find('{', CurPos + 1);
-	}
-
-	return false;
-}
-
 //把单个pcre转化为NFA
 ulong PcreToNFA(const char *pPcre, CNfa &nfa, CSignatures &sigs)
 {
@@ -518,10 +473,6 @@ ulong PcreToNFA(const char *pPcre, CNfa &nfa, CSignatures &sigs)
 	}
 	Beg = code.begin();
 	End = code.end();
-	if (ExceedLimit(strPcre))
-	{
-		return SC_EXCEED;
-	}
 
 	if (code.size() > 0)
 	{
