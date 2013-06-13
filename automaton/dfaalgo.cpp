@@ -469,7 +469,7 @@ void BuildDfaByPart(const PARTSETVEC &partSets, const DFAROWARY &oldDfa,
 	{
 		CDfaRow &newRow = newDfa[i - partSets.cbegin()];
 		const CDfaRow &oldRow = oldDfa[i->StaSet.front()];
-		for (byte j = 0; j != ulColNum; ++j)
+		for (ulong j = 0; j != ulColNum; ++j)
 		{
 			STATEID nCur = oldRow[j], nDest = STATEID(-1);
 			if (nCur != STATEID(-1))
