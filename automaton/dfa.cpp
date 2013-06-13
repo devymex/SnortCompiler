@@ -562,7 +562,6 @@ ulong CDfa::PartStates(STATEVEC *pRevTbl)
 				PARTSET &lastPart = partSets.back();
 				lastPart.StaSet.splice(lastPart.StaSet.begin(),
 					pJSet->StaSet, part, pJSet->StaSet.end());
-
 				CalcAbleTo(pRevTbl, nGrpNum, ulStaNum, *pJSet);
 				CalcAbleTo(pRevTbl, nGrpNum, ulStaNum, lastPart);
 
@@ -587,12 +586,8 @@ ulong CDfa::PartStates(STATEVEC *pRevTbl)
 	}
 	delete []pAbleToI;
 
-	for (PARTSETVEC_ITER i = partSets.begin(); i != partSets.end(); ++i)
-	{
-		ReleaseAbleTo(*i);
-	}
 
-	if (partSets.size() < m_pDfa->size())
+	if (nr != ulong(-1) && partSets.size() < m_pDfa->size())
 	{
 		//Partition中的元素为一个状态的集合，集合中元素为多个等价状态，每个集合可以合并为新的DFA中一个状态
 		STATEVEC sta2Part(m_pDfa->size());
@@ -632,6 +627,11 @@ ulong CDfa::PartStates(STATEVEC *pRevTbl)
 		delete pNewDfa;
 		//DFA minization
 		std::cout << "Minimized: " << (ulStaNum - m_pDfa->size()) << std::endl;
+	}
+
+	for (PARTSETVEC_ITER i = partSets.begin(); i != partSets.end(); ++i)
+	{
+		ReleaseAbleTo(*i);
 	}
 	return nr;
 }
@@ -788,7 +788,6 @@ DFAHDR bool MergeMultipleDfas(std::vector<CDfa> &dfas, CDfa &lastDfa)
 		for(ulong curChar = 0; curChar < SC_DFACOLCNT; ++curChar)
 		{
 			finFlag = 0;
-			ZeroMemory(NextVec.data(), NextVec.size() * sizeof(NextVec[0]));
 			byte lastDfaGroup = groups[curChar];
 			if(computFlag[lastDfaGroup] == 1)
 			{
