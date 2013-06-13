@@ -1,0 +1,6 @@
+LIBRARY
+EXPORTS
+CompileRuleSet	@ 1
+CompileFile		@ 2
+Rule2Dfas		@ 3
+PcreMatch		@ 4

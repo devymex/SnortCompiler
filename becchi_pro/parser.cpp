@@ -40,7 +40,6 @@
  */
 
 #include "parser.h"
-#include "../dfanew/dfanew.h"
 //#include <sys/time.h>
 
 regex_parser::regex_parser(bool i_mod, bool m_mod){
@@ -318,7 +317,7 @@ unsigned long regex_parser::parse_regex_group(FILE *file, int group[]){
 			dfa->minimize();
 		}
 		//dfa->dump();
-		//CDfaNew newdfa;
+		//CDfa newdfa;
 		//dfa->Dfa2CDfaNew(newdfa);
 		size = dfa->size();
 		delete dfa;

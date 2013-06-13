@@ -74,7 +74,7 @@
 using namespace std;
 
 class NFA;
-
+class CNfa;
 /* redefinitions used for convenience */
 
 typedef set<NFA*> nfa_set; 				//set of NFA states
