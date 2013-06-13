@@ -1,3 +1,14 @@
+/*
+**	@file		siddfas.h
+**
+**	@author		Lab 435, Xidian University
+**
+**	@brief		Declaration of the CSidDfaIds class
+**
+**	Store the mapping between SID and DFAID
+**
+*/
+
 #pragma once
 
 #include <hwprj\unsary.h>

@@ -1,5 +1,5 @@
 /**
-**	@file		dfa.h
+**	@file		dfa.cpp
 **
 **	@author		Lab 435, Xidian University
 **
@@ -247,7 +247,6 @@ DFAHDR ulong CDfa::FromNFA(const CNfa &nfa)
 
 DFAHDR ulong CDfa::Minimize()
 {
-	//CTimer time1;//用于测试
 	ulong nSize = m_pDfa->size();
 	ulong nCols = GetGroupCount();
 	if (nSize == 0 || nSize == 0)
@@ -255,7 +254,7 @@ DFAHDR ulong CDfa::Minimize()
 		return ulong(-1);
 	}
 
-	////计算逆向状态查找表
+	//Indicate current state would be jump to the next state set through the character.
 	nSize = m_pDfa->size();
 	STATEVEC *pRevTab = NULL;
 	pRevTab = new STATEVEC[nSize * nCols];
@@ -271,9 +270,7 @@ DFAHDR ulong CDfa::Minimize()
 		}
 	}
 
-	std::vector<PARTSET> partSets;
 	ulong nr = PartStates(pRevTab);
-	//divide nondistinguishable states
 
 	delete []pRevTab;
 
@@ -481,6 +478,15 @@ DFAHDR void CDfa::Dump(const char *pFile)
 	fout.close();
 }
 
+/* 	Divide nondistinguishable states and merge equivalent states
+
+Arguments:
+  inverse table
+
+Returns:		0 success
+				-1 error 
+*/
+
 ulong CDfa::PartStates(STATEVEC *pRevTbl)
 {
 	ulong nGrpNum = GetGroupCount();
@@ -491,19 +497,19 @@ ulong CDfa::PartStates(STATEVEC *pRevTbl)
 
 	for (PARTSETVEC_ITER i = partSets.begin(); i != partSets.end(); ++i)
 	{
-		//对于partSets中每个集合，根据不同的nGrpNum计算不同AbleTo，AbleTo对应论文中的a(i)
+		//AbleTo[j] = {state|state belong to parSet && pRevTbl[state][j] is not null}
+		//0 <= j <= nGrpNum
 		CalcAbleTo(pRevTbl, nGrpNum, ulStaNum, *i);
 	}
 
-	//pWait表示用于切分partSets中每个集合的集合下标，
-	//对于不同的输入字符会保存多个不同集合下标。对应论文中L(a)
+	//divide partSet using pWait in a loop
+	//store index of partSet into pWait for different symbol 
 	std::vector<ulong> pWait[256];
 
-	//初始化pWait，要求若满足0<|ij|<=|ik|，则将j存入pWait，反之，存入k
-	//对应论文中初始化L(a)过程，这里的i对应a
+	//inital pWait; for same symbol, if |partSet[j]|<=|partSet[k]|，
+	//then insert j into pWait, otherwise，insert k	
 	InitPartWait(partSets, pWait, nGrpNum);
 
-	//标记能够经过某一输入字符，能够到达ISet中的状态的状态集合
 	byte *pAbleToI = new byte[ulStaNum];
 	partSets.reserve(1000);
 	ulong nr = 0;
@@ -511,9 +517,9 @@ ulong CDfa::PartStates(STATEVEC *pRevTbl)
 	{
 		ulong ulCurGrp = (byte)-1;
 		ulong nCurSet = (ulong)-1;
-		//从pWait中取一个值并remove该值
+		//choose and remove one set's index in pWait
 		ulCurGrp = FindNotEmpty(pWait, nGrpNum);
-		//最外层循环的终止条件
+		//finish the outer loop
 		if (ulCurGrp == -1)
 		{
 			break;
@@ -524,7 +530,6 @@ ulong CDfa::PartStates(STATEVEC *pRevTbl)
 		PARTSET *pISet = &partSets[nCurSet];
 		ZeroMemory(pAbleToI, ulStaNum);
 		ulong nRevCnt = 0;
-		//初始化pAbleToI
 		for (STATELIST_ITER iSta = pISet->StaSet.begin();
 			iSta != pISet->StaSet.end(); ++iSta)
 		{
@@ -538,8 +543,7 @@ ulong CDfa::PartStates(STATEVEC *pRevTbl)
 		{
 			for (ulong j = 0; j != partSets.size(); ++j)
 			{
-				//取partSets中的一个集合j，B(j)中存在t满足条件δ(t,a)∈a(i)，
-				//B’(j)为t的集合，B“(j)为B(j)-B‘(j)
+				/*choose partSet[j] and divide partSet[j] for a jump character*/
 				PARTSET *pJSet = &partSets[j];
 				if (SortPartition(pAbleToI, *pJSet) == false)
 				{
@@ -551,21 +555,20 @@ ulong CDfa::PartStates(STATEVEC *pRevTbl)
 				pISet = &partSets[nCurSet];
 
 				STATELIST_ITER part = pJSet->StaSet.begin();
-				//查找产生0,1分段的切分点，记为part
 				for (; part != pJSet->StaSet.end() && pAbleToI[*part] != 0; ++part);
 				if (partSets.size() > 254)
 				{
 					nr = ulong(-1);
 					break;
 				}
-				//保存产生的新的划分
+
 				PARTSET &lastPart = partSets.back();
 				lastPart.StaSet.splice(lastPart.StaSet.begin(),
 					pJSet->StaSet, part, pJSet->StaSet.end());
 				CalcAbleTo(pRevTbl, nGrpNum, ulStaNum, *pJSet);
 				CalcAbleTo(pRevTbl, nGrpNum, ulStaNum, lastPart);
 
-				////更新pWait
+				//modify pWait
 				for (byte m = 0; m < nGrpNum; ++m)
 				{
 					int k = partSets.size() - 1;
@@ -589,30 +592,28 @@ ulong CDfa::PartStates(STATEVEC *pRevTbl)
 
 	if (nr != ulong(-1) && partSets.size() < m_pDfa->size())
 	{
-		//Partition中的元素为一个状态的集合，集合中元素为多个等价状态，每个集合可以合并为新的DFA中一个状态
 		STATEVEC sta2Part(m_pDfa->size());
-
 		STATEID nCol = (STATEID)GetGroupCount();
 
 		CFinalStates newFinStas;
-		//定义一个同CDfa中成员变量m_pDfa类型相同的变量，用于存储合并后的DFA跳转表
-		DFAROWARY *pNewDfa = new DFAROWARY((STATEID)partSets.size(), CDfaRow(nCol));
 
-		//等价的状态存于同一个partition中，标记原来的状态存在哪一个新的partition中，并修改新的起始状态编号
+		DFAROWARY *pNewDfa = new DFAROWARY((STATEID)partSets.size(), CDfaRow(nCol));
+		
+		//renumber DFA state
 		BuildDfaByPart(partSets, *m_pDfa, *pNewDfa);
+
+		//remark new start state and final states
 		for (PARTSETVEC_ITER i = partSets.begin(); i != partSets.end(); ++i)
 		{
 			STATEID nIdx = STATEID(i - partSets.begin());
 			for (STATELIST_ITER j = i->StaSet.begin(); j != i->StaSet.end(); ++j)
 			{
 				CDfaRow &curRow = (*m_pDfa)[*j];
-				//修改新的起始状态
 				if (curRow.GetFlag() & CDfaRow::START)
 				{
 					m_nStartId = nIdx;
 				}
 
-				//存入新的终态编号
 				if (curRow.GetFlag() & CDfaRow::TERMINAL)
 				{
 					newFinStas.PushBack(nIdx);
@@ -622,10 +623,10 @@ ulong CDfa::PartStates(STATEVEC *pRevTbl)
 		}
 		m_FinStas.Swap(newFinStas);
 
-		//替换m_pDfa
+		//replace m_pDfa
 		swap(m_pDfa, pNewDfa);
 		delete pNewDfa;
-		//DFA minization
+
 		std::cout << "Minimized: " << (ulStaNum - m_pDfa->size()) << std::endl;
 	}
 
@@ -701,14 +702,15 @@ DFAHDR void PrintDfaToGv(CDfa &newdfa, const char* fileName)
 	fout.close();
 }
 
-DFAHDR bool MergeMultipleDfas(std::vector<CDfa> &dfas, CDfa &lastDfa)
+
+DFAHDR bool MergeMultipleDfas(CDfaArray &dfas, CDfa &lastDfa)
 {
 	ulong dfaId = lastDfa.GetId();
 	lastDfa.Clear();
 	lastDfa.SetId(dfaId);
 #undef max
 
-	ulong dfasSize = dfas.size();
+	ulong dfasSize = dfas.Size();
 	STATEID nTermSta = 1;//nTermSta: terminal flag. 1: terminal, -1: non-terminal
 
 	//group the lastDfa's columns

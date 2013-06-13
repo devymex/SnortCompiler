@@ -1,11 +1,11 @@
-/**
-**	@file		common.h
+/*
+**	@file		nfa.h
 **
 **	@author		Lab 435, Xidian University
 **
-**	@brief		Common classes declaration
+**	@brief		Declaration of the CNfa class		
 **
-**	Include CUnsignedArray, CDllString
+**	Functions declaration of nfa's essential algorithm
 **
 */
 

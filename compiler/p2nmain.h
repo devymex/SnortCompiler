@@ -1,3 +1,14 @@
+/*
+**	@file		p2nmain.h
+**
+**	@author		Lab 435, Xidian University
+**
+**	@brief		Process pcre in snort rules
+**
+**	Includes parse pcre etc.
+**
+*/
+
 #pragma once
 
 #define OVECCOUNT	30	/* should be a multiple of 3 */

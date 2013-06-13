@@ -1,3 +1,13 @@
+/*
+**	@file		snortrule.h
+**
+**	@author		Lab 435, Xidian University
+**
+**	@brief		Declaration of the CSnortRule class
+**
+**	Parse snort rules
+**
+*/
 
 #pragma once
 

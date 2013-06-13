@@ -286,7 +286,7 @@ void CalcAbleTo(STATEVEC *pRevTbl, ulong nGrpNum, ulong nStaNum, PARTSET &ps)
 **	First of all, merge the dfas's column groups into a table of n*256, n means the size of dfas
 **	Then hash the table columns to get the merged dfa's colums group.
 */
-void DfaColGroup(std::vector<CDfa> &dfas, byte* groups)
+void DfaColGroup(CDfaArray &dfas, byte* groups)
 {
 	struct GROUPKEYHASH
 	{
@@ -309,7 +309,7 @@ void DfaColGroup(std::vector<CDfa> &dfas, byte* groups)
 		colum[c].hash = _FNV_offset_basis;
 	}
 
-	for(ulong i = 0; i < dfas.size(); ++i)
+	for(ulong i = 0; i < dfas.Size(); ++i)
 	{
 		for(ulong c = 0; c < SC_DFACOLCNT; ++c)
 		{
@@ -471,12 +471,12 @@ void BuildDfaByPart(const PARTSETVEC &partSets, const DFAROWARY &oldDfa,
 		const CDfaRow &oldRow = oldDfa[i->StaSet.front()];
 		for (ulong j = 0; j != ulColNum; ++j)
 		{
-			STATEID nCur = oldRow[j], nDest = STATEID(-1);
+			STATEID nCur = oldRow[byte(j)], nDest = STATEID(-1);
 			if (nCur != STATEID(-1))
 			{
 				nDest = old2New[nCur];
 			}
-			newRow[j] = nDest;
+			newRow[byte(j)] = nDest;
 		}
 		//set a state attribute
 		newRow.SetFlag(oldRow.GetFlag());
@@ -488,7 +488,7 @@ void InitPartSet(const CFinalStates &finStas, ulong ulStaNum,
 {
 	partSets.clear();
 
-	//用于区分属于不同DFA的终态集合
+	//distinguish final state belonging to different DFA
 	CDfaIdSet *pTerm2Dfa = new CDfaIdSet[ulStaNum];
 
 	for (ulong i = 0; i < finStas.Size(); ++i)
@@ -497,8 +497,9 @@ void InitPartSet(const CFinalStates &finStas, ulong ulStaNum,
 		pTerm2Dfa[nFinStaId] = finStas.GetDfaIdSet(nFinStaId);
 	}
 
-	//区别终态集合和非终态集合，map的first为空，则表示对应的PARTSET为非终态集合，反之，为终态集合
-	//initBSet中集合无序
+	/*distinguish between final states and normal states，if map's first is null，
+	then the PARTSET is the set of normal states,otherwise, it is final states.
+	initBSet is unordered*/
 	std::map<CDfaIdSet, PARTSET> initBSet;
 	for (STATEID i = 0; i < ulStaNum; ++i)
 	{
@@ -507,7 +508,7 @@ void InitPartSet(const CFinalStates &finStas, ulong ulStaNum,
 	}
 	delete []pTerm2Dfa;
 
-	//调整终态和非终态集合的顺序，vector中的last为非终态集合
+	//set initBSet orderly and store in vector, among them, the last is normal states
 	for (std::map<CDfaIdSet, PARTSET>::iterator i = initBSet.begin();
 		i != initBSet.end(); ++i)
 	{

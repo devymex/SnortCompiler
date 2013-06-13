@@ -1,3 +1,14 @@
+/*
+**	@file		regchain.h
+**
+**	@author		Lab 435, Xidian University
+**
+**	@brief		Construct regex chain with attribute of snort rules
+**
+**	Declaration of the CRegChain class
+**
+*/
+
 #pragma once
 
 #include <hwprj\dllstring.h>

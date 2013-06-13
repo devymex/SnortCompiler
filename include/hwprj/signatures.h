@@ -3,9 +3,10 @@
 **
 **	@author		Lab 435, Xidian University
 **
-**	@brief		Common classes declaration
+**	@brief		Declaration of CSignatures class
 **
-**	Include CUnsignedArray, CDllString
+**	Extract signature from "content" and "pcre"
+**	Store mapping between signature and rule
 **
 */
 

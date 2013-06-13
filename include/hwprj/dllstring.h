@@ -1,11 +1,11 @@
-/**
+/*
 **	@file		dllstring.h
 **
 **	@author		Lab 435, Xidian University
 **
 **	@brief		Common string class
 **
-**	Definiation of the CDllString class
+**	Definition of the CDllString class
 **
 */
 

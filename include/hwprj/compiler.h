@@ -1,3 +1,14 @@
+/*
+**	@file		compiler.h
+**
+**	@author		Lab 435, Xidian University
+**
+**	@brief		Primary file of compiler
+**
+**	Functions declaration of access enter
+**
+*/
+
 #pragma once
 
 #include <hwprj\compres.h>

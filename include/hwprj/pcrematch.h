@@ -1,3 +1,12 @@
+/*
+**	@file		pcrematch.h
+**
+**	@author		Lab 435, Xidian University
+**
+**	@brief		Match the packet and pcre library
+**
+*/
+
 #pragma once
 
 #ifndef PCREMATCHHDR_DS
