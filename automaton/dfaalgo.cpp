@@ -286,7 +286,7 @@ void CalcAbleTo(STATEVEC *pRevTbl, ulong nGrpNum, ulong nStaNum, PARTSET &ps)
 **	First of all, merge the dfas's column groups into a table of n*256, n means the size of dfas
 **	Then hash the table columns to get the merged dfa's colums group.
 */
-void DfaColGroup(std::vector<CDfa> &dfas, byte* groups)
+void DfaColGroup(CDfaArray &dfas, byte* groups)
 {
 	struct GROUPKEYHASH
 	{
@@ -309,7 +309,7 @@ void DfaColGroup(std::vector<CDfa> &dfas, byte* groups)
 		colum[c].hash = _FNV_offset_basis;
 	}
 
-	for(ulong i = 0; i < dfas.size(); ++i)
+	for(ulong i = 0; i < dfas.Size(); ++i)
 	{
 		for(ulong c = 0; c < SC_DFACOLCNT; ++c)
 		{
@@ -471,12 +471,12 @@ void BuildDfaByPart(const PARTSETVEC &partSets, const DFAROWARY &oldDfa,
 		const CDfaRow &oldRow = oldDfa[i->StaSet.front()];
 		for (ulong j = 0; j != ulColNum; ++j)
 		{
-			STATEID nCur = oldRow[j], nDest = STATEID(-1);
+			STATEID nCur = oldRow[byte(j)], nDest = STATEID(-1);
 			if (nCur != STATEID(-1))
 			{
 				nDest = old2New[nCur];
 			}
-			newRow[j] = nDest;
+			newRow[byte(j)] = nDest;
 		}
 		//set a state attribute
 		newRow.SetFlag(oldRow.GetFlag());

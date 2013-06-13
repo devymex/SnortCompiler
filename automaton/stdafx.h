@@ -36,6 +36,7 @@
 #define FINSTAHDR_DS
 #define DFAHDR_DS
 #define NFAHDR_DS
+#define DFAARYHDR_DS
 
 typedef std::vector<STATEID>		STATEVEC;
 typedef STATEVEC::iterator			STATEVEC_ITER;
@@ -50,5 +51,6 @@ typedef std::vector<class CNfaRow>	NFAROWARY;
 typedef std::vector<ulong>			ULONGVEC;
 
 typedef std::set<DFAID>				DFAIDSET;
+typedef std::vector<class CDfa>		CDFAVEC;
 
 typedef std::unordered_map<STATEID, class CDfaIdSet> FINSTAMAP;

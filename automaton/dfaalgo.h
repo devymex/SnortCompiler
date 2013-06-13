@@ -11,6 +11,7 @@
 
 #include <hwprj\common.h>
 #include <hwprj\finalstates.h>
+#include <hwprj\dfaarray.h>
 
 class CDfa;
 class CNfa;
@@ -117,7 +118,8 @@ void CalcAbleTo(STATEVEC *pRevTbl, ulong nGrpNum, ulong nStaNum, PARTSET &ps);
 **	This function groups the merged dfa's columns on the ground of
 **	the column groups of dfas to be merged.
 */
-void DfaColGroup(std::vector<CDfa> &dfas, byte* groups);
+//void DfaColGroup(std::vector<CDfa> &dfas, byte* groups);
+void DfaColGroup(CDfaArray &dfas, byte* groups);
 
 /*	this function marks the lastDfa's terminal states. */
 void AddTermIntoDFA(STATEID otherSta, const CDfa &other,

@@ -702,14 +702,15 @@ DFAHDR void PrintDfaToGv(CDfa &newdfa, const char* fileName)
 	fout.close();
 }
 
-DFAHDR bool MergeMultipleDfas(std::vector<CDfa> &dfas, CDfa &lastDfa)
+
+DFAHDR bool MergeMultipleDfas(CDfaArray &dfas, CDfa &lastDfa)
 {
 	ulong dfaId = lastDfa.GetId();
 	lastDfa.Clear();
 	lastDfa.SetId(dfaId);
 #undef max
 
-	ulong dfasSize = dfas.size();
+	ulong dfasSize = dfas.Size();
 	STATEID nTermSta = 1;//nTermSta: terminal flag. 1: terminal, -1: non-terminal
 
 	//group the lastDfa's columns
