@@ -43,14 +43,14 @@ public:
 	CDfaRow&	Back();
 	void		Reserve(ulong nSize);
 	void		Resize(ulong nSize, ulong nCol);
-	void		Init(byte *pGroup);
 	void		Clear();
 	void		PushBack(CDfaRow &sta);
 
 	void		SetId(ulong id);
 	ulong		GetId();
+
+	void		SetGroups(byte *pGroup);
 	ushort		GetGroupCount() const;
-	const byte	GetGroup(STATEID charNum) const;
 
 	ulong		FromNFA(const CNfa &nfa);
 	ulong		Minimize();
@@ -80,8 +80,8 @@ protected:
 	void RemoveUnreachable(const STATEVEC *Tab, const STATELIST &begs, 
 		const ulong &col, STATEVEC &reachable);
 	void MergeReachable(STATEVEC &reachable);
-	ulong PartitionNonDisState(STATEVEC *pRevTbl, std::vector<struct PARTSET> &partSet) const;
-	void MergeNonDisStates(std::vector<struct PARTSET> &partSet);
+
+	ulong PartitionNonDisState(STATEVEC *pRevTbl);
 
 };
 

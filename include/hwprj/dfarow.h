@@ -17,15 +17,10 @@
 
 
 #ifndef DFAHDR_DS
-
 class STATEVEC;
-
 #define DFAHDR __declspec(dllimport)
-
 #else
-
 #define DFAHDR __declspec(dllexport)
-
 #endif
 
 class DFAHDR CDfaRow

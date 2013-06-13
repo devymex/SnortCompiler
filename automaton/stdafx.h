@@ -23,6 +23,7 @@
 
 #undef max
 
+#define DFAIDSETHDR_DS
 #define FINSTAHDR_DS
 #define DFAHDR_DS
 #define NFAHDR_DS
@@ -39,4 +40,6 @@ typedef std::vector<class CDfaRow>	DFAROWARY;
 typedef std::vector<class CNfaRow>	NFAROWARY;
 typedef std::vector<ulong>			ULONGVEC;
 
-typedef std::unordered_map<STATEID, std::set<DFAID>> FINSTAMAP;
+typedef std::set<DFAID>				DFAIDSET;
+
+typedef std::unordered_map<STATEID, class CDfaIdSet> FINSTAMAP;
