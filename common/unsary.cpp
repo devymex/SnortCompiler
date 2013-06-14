@@ -14,8 +14,14 @@
 
 UNSARYHDR CUnsignedArray::CUnsignedArray()
 {
-	m_pSet = new std::vector<ulong>;
-	CHECKALLOC(m_pSet);
+	try
+	{
+		m_pSet = new std::vector<ulong>;
+	}
+	catch (std::exception &e)
+	{
+		throw CTrace(__FILE__, __LINE__, e.what());
+	}
 }
 
 UNSARYHDR CUnsignedArray::~CUnsignedArray()
@@ -25,14 +31,27 @@ UNSARYHDR CUnsignedArray::~CUnsignedArray()
 
 UNSARYHDR CUnsignedArray::CUnsignedArray(const CUnsignedArray &other)
 {
-	m_pSet = new std::vector<ulong>;
-	CHECKALLOC(m_pSet);
+	try
+	{
+		m_pSet = new std::vector<ulong>;
+	}
+	catch (std::exception &e)
+	{
+		throw CTrace(__FILE__, __LINE__, e.what());
+	}
 	*this = other;
 }
 
 UNSARYHDR const CUnsignedArray& CUnsignedArray::operator = (const CUnsignedArray &other)
 {
-	*m_pSet = *other.m_pSet;
+	try
+	{
+		*m_pSet = *other.m_pSet;
+	}
+	catch (std::exception &e)
+	{
+		throw CTrace(__FILE__, __LINE__, e.what());
+	}
 	return *this;
 }
 
@@ -63,17 +82,38 @@ UNSARYHDR void CUnsignedArray::PopBack()
 
 UNSARYHDR void CUnsignedArray::PushBack(ulong nState)
 {
-	m_pSet->push_back(nState);
+	try
+	{
+		m_pSet->push_back(nState);
+	}
+	catch (std::exception &e)
+	{
+		throw CTrace(__FILE__, __LINE__, e.what());
+	}
 }
 
 UNSARYHDR void CUnsignedArray::Reserve(ulong nCount)
 {
-	m_pSet->reserve(nCount);
+	try
+	{
+		m_pSet->reserve(nCount);
+	}
+	catch (std::exception &e)
+	{
+		throw CTrace(__FILE__, __LINE__, e.what());
+	}
 }
 
 UNSARYHDR void CUnsignedArray::Resize(ulong nSize)
 {
-	m_pSet->resize(nSize);
+	try
+	{
+		m_pSet->resize(nSize);
+	}
+	catch (std::exception &e)
+	{
+		throw CTrace(__FILE__, __LINE__, e.what());
+	}
 }
 
 UNSARYHDR ulong& CUnsignedArray::Back()

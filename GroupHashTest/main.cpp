@@ -13,8 +13,25 @@
 #include <hwprj\buildhash.h>
 #include <hwprj\trace.h>
 
+#include <exception>
 int main()
 {
+	//std::vector<int> a;
+	//for (int i = 0; i < 100; ++i)
+	//{
+	//	std::vector<int> a(10);
+	//}
+	//for (int i = 0; i < 100; ++i)
+	//{
+	//	try
+	//	{
+	//		std::vector<int> a(10);
+	//	}
+	//	catch (std::exception &e)
+	//	{
+	//		std::cout << e.what() << std::endl;
+	//	}
+	//}
 	CTimer ctime;
 	CCompileResults result;
 	CompileRuleFile("..\\allrules.rule", result);

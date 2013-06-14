@@ -34,5 +34,10 @@ protected:
 	ulong m_ulLine;
 };
 
-#define CHECKALLOC(p) \
-	if (p == 0) throw CTrace(__FILE__, __LINE__, CTrace::TI_BADALLOC);
+#ifdef _DEBUG
+#define SCASSERT(s)	if (!(s)) throw CTrace(__FILE__, __LINE__, "!("#s")");
+#define SCVERIFY(s)	if (!(s)) throw CTrace(__FILE__, __LINE__, "!("#s")");
+#else
+#define SCASSERT(s)	;
+#define SCVERIFY(s)	(s);
+#endif

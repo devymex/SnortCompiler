@@ -3,20 +3,39 @@
 
 SIDDFAHDR CSidDfaIds::CSidDfaIds()
 {
-	m_ruleResult = new std::vector<COMPILEDINFO>;
-	CHECKALLOC(m_ruleResult);
+	try
+	{
+		m_ruleResult = new std::vector<COMPILEDINFO>;
+	}
+	catch (std::exception &e)
+	{
+		throw CTrace(__FILE__, __LINE__, e.what());
+	}
 }
 
 SIDDFAHDR CSidDfaIds::CSidDfaIds(const CSidDfaIds& other)
 {
-	m_ruleResult = new std::vector<COMPILEDINFO>;
-	CHECKALLOC(m_ruleResult);
+	try
+	{
+		m_ruleResult = new std::vector<COMPILEDINFO>;
+	}
+	catch (std::exception &e)
+	{
+		throw CTrace(__FILE__, __LINE__, e.what());
+	}
 	*this = other;
 }
 
 SIDDFAHDR const CSidDfaIds &CSidDfaIds::operator=(const CSidDfaIds &other)
 {
-	*m_ruleResult = *other.m_ruleResult;
+	try
+	{
+		*m_ruleResult = *other.m_ruleResult;
+	}
+	catch (std::exception &e)
+	{
+		throw CTrace(__FILE__, __LINE__, e.what());
+	}
 	return *this;
 }
 SIDDFAHDR CSidDfaIds::~CSidDfaIds()
@@ -36,12 +55,26 @@ SIDDFAHDR const COMPILEDINFO& CSidDfaIds::operator[](ulong index) const
 
 SIDDFAHDR void CSidDfaIds::Reserve(ulong nCount)
 {
-	m_ruleResult->reserve(nCount);
+	try
+	{
+		m_ruleResult->reserve(nCount);
+	}
+	catch (std::exception &e)
+	{
+		throw CTrace(__FILE__, __LINE__, e.what());
+	}
 }
 
 SIDDFAHDR void CSidDfaIds::Resize(ulong nSize)
 {
-	m_ruleResult->resize(nSize);
+	try
+	{
+		m_ruleResult->resize(nSize);
+	}
+	catch (std::exception &e)
+	{
+		throw CTrace(__FILE__, __LINE__, e.what());
+	}
 }
 
 SIDDFAHDR const ulong CSidDfaIds::Size() const
@@ -51,7 +84,14 @@ SIDDFAHDR const ulong CSidDfaIds::Size() const
 
 SIDDFAHDR void CSidDfaIds::PushBack(const COMPILEDINFO &ruleResult)
 {
-	m_ruleResult->push_back(ruleResult);
+	try
+	{
+		m_ruleResult->push_back(ruleResult);
+	}
+	catch (std::exception &e)
+	{
+		throw CTrace(__FILE__, __LINE__, e.what());
+	}
 }
 
 SIDDFAHDR COMPILEDINFO& CSidDfaIds::Back()

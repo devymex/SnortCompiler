@@ -3,8 +3,14 @@
 
 REGRULEHDR CRegRule::CRegRule()
 {
-	m_pRegVec = new CHAINVEC;
-	CHECKALLOC(m_pRegVec);
+	try
+	{
+		m_pRegVec = new CHAINVEC;
+	}
+	catch (std::exception &e)
+	{
+		throw CTrace(__FILE__, __LINE__, e.what());
+	}
 }
 
 REGRULEHDR CRegRule::~CRegRule()
@@ -14,8 +20,14 @@ REGRULEHDR CRegRule::~CRegRule()
 
 REGRULEHDR CRegRule::CRegRule(const CRegRule &other)
 {
-	m_pRegVec = new CHAINVEC;
-	CHECKALLOC(m_pRegVec);
+	try
+	{
+		m_pRegVec = new CHAINVEC;
+	}
+	catch (std::exception &e)
+	{
+		throw CTrace(__FILE__, __LINE__, e.what());
+	}
 	*this = other;
 }
 
@@ -31,16 +43,38 @@ REGRULEHDR CRegChain& CRegRule::Back() const
 
 REGRULEHDR void CRegRule::Reserve(ulong nCount)
 {
-	m_pRegVec->reserve(nCount);
+	try
+	{
+		m_pRegVec->reserve(nCount);
+	}
+	catch (std::exception &e)
+	{
+		throw CTrace(__FILE__, __LINE__, e.what());
+	}
 }
+
 REGRULEHDR void CRegRule::Resize(ulong nSize)
 {
-	m_pRegVec->resize(nSize);
+	try
+	{
+		m_pRegVec->resize(nSize);
+	}
+	catch (std::exception &e)
+	{
+		throw CTrace(__FILE__, __LINE__, e.what());
+	}
 }
 
 REGRULEHDR void CRegRule::PushBack(const CRegChain &nRegChain)
 {
-	m_pRegVec->push_back(nRegChain);
+	try
+	{
+		m_pRegVec->push_back(nRegChain);
+	}
+	catch (std::exception &e)
+	{
+		throw CTrace(__FILE__, __LINE__, e.what());
+	}
 }
 
 REGRULEHDR CRegChain& CRegRule::operator[](ulong nIdx)
@@ -55,6 +89,13 @@ REGRULEHDR const CRegChain& CRegRule::operator[](ulong nIdx) const
 
 REGRULEHDR const CRegRule& CRegRule::operator = (const CRegRule &other)
 {
-	*this->m_pRegVec = *other.m_pRegVec;
+	try
+	{
+		*this->m_pRegVec = *other.m_pRegVec;
+	}
+	catch (std::exception &e)
+	{
+		throw CTrace(__FILE__, __LINE__, e.what());
+	}
 	return *this;
 }

@@ -4,9 +4,15 @@
 DFAHDR CDfaRow::CDfaRow(ulong col)
 	: m_nFlag(NORMAL), m_nColNum(col)
 {
-	m_pDest = new STATEVEC;
-	CHECKALLOC(m_pDest);
-	m_pDest->resize(m_nColNum);
+	try
+	{
+		m_pDest = new STATEVEC;
+		m_pDest->resize(m_nColNum);
+	}
+	catch (std::exception &e)
+	{
+		throw CTrace(__FILE__, __LINE__, e.what());
+	}
 	memset(m_pDest->data(), -1, m_pDest->size() * sizeof(m_pDest->front()));
 }
 
@@ -17,8 +23,14 @@ DFAHDR CDfaRow::~CDfaRow()
 
 DFAHDR CDfaRow::CDfaRow(const CDfaRow &other)
 {
-	m_pDest = new STATEVEC;
-	CHECKALLOC(m_pDest);
+	try
+	{
+		m_pDest = new STATEVEC;
+	}
+	catch (std::exception &e)
+	{
+		throw CTrace(__FILE__, __LINE__, e.what());
+	}
 	*this = other;
 }
 
@@ -26,7 +38,14 @@ DFAHDR CDfaRow& CDfaRow::operator=(const CDfaRow &other)
 {
 	m_nFlag = other.m_nFlag;
 	m_nColNum = other.m_nColNum;
-	*m_pDest = *other.m_pDest;
+	try
+	{
+		*m_pDest = *other.m_pDest;
+	}
+	catch (std::exception &e)
+	{
+		throw CTrace(__FILE__, __LINE__, e.what());
+	}
 	return *this;
 }
 

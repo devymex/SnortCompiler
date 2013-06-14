@@ -488,8 +488,15 @@ ulong ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
 		}
 		else if (0 == stricmp("pcre", iOp->name.c_str()))
 		{
-			OPTIONPCRE *pPcre = new OPTIONPCRE;
-			CHECKALLOC(pPcre);
+			OPTIONPCRE *pPcre = NULL;
+			try
+			{
+				pPcre = new OPTIONPCRE;
+			}
+			catch (std::exception &e)
+			{
+				throw CTrace(__FILE__, __LINE__, e.what());
+			}
 			ulong nr = FormatPcre(opValueBeg, opValueEnd, *pPcre);
 			if (nr != 0)
 			{
@@ -514,8 +521,15 @@ ulong ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
 		else if (0 == stricmp("content", iOp->name.c_str()) ||
 			0 == stricmp("uricontent", iOp->name.c_str()))
 		{
-			OPTIONCONTENT *pContent = new OPTIONCONTENT;
-			CHECKALLOC(pContent);
+			OPTIONCONTENT *pContent = NULL;
+			try
+			{
+				pContent = new OPTIONCONTENT;
+			}
+			catch (std::exception &e)
+			{
+				throw CTrace(__FILE__, __LINE__, e.what());
+			}
 			pContent->SetFlag(0);
 			pContent->nOffset = 0;
 			pContent->nDepth =0;

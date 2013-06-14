@@ -3,26 +3,52 @@
 
 SIGHDR CSignatures::CSignatures()
 {
-	m_pSigs = new SIGNATUREVEC;
-	CHECKALLOC(m_pSigs);
+	try
+	{
+		m_pSigs = new SIGNATUREVEC;
+	}
+	catch (std::exception &e)
+	{
+		throw CTrace(__FILE__, __LINE__, e.what());
+	}
 }
 
 SIGHDR CSignatures::CSignatures(const CSignatures& other)
 {
-	m_pSigs = new SIGNATUREVEC;
-	CHECKALLOC(m_pSigs);
+	try
+	{
+		m_pSigs = new SIGNATUREVEC;
+	}
+	catch (std::exception &e)
+	{
+		throw CTrace(__FILE__, __LINE__, e.what());
+	}
 	*this = other;
 }
 
 SIGHDR const CSignatures &CSignatures::operator=(const CSignatures &other)
 {
-	*m_pSigs = *other.m_pSigs;
+	try
+	{
+		*m_pSigs = *other.m_pSigs;
+	}
+	catch (std::exception &e)
+	{
+		throw CTrace(__FILE__, __LINE__, e.what());
+	}
 	return *this;
 }
 
 SIGHDR bool CSignatures::operator == (const CSignatures &other) const
 {
-	return *m_pSigs == *other.m_pSigs;
+	try
+	{
+		return *m_pSigs == *other.m_pSigs;
+	}
+	catch (std::exception &e)
+	{
+		throw CTrace(__FILE__, __LINE__, e.what());
+	}
 }
 
 SIGHDR bool CSignatures::operator <	(const CSignatures &other) const
@@ -42,12 +68,26 @@ SIGHDR const ulong CSignatures::Size() const
 
 SIGHDR void CSignatures::Resize(ulong nSize)
 {
-	m_pSigs->resize(nSize);
+	try
+	{
+		m_pSigs->resize(nSize);
+	}
+	catch (std::exception &e)
+	{
+		throw CTrace(__FILE__, __LINE__, e.what());
+	}
 }
 
 SIGHDR void CSignatures::PushBack(SIGNATURE Sig)
 {
-	m_pSigs->push_back(Sig);
+	try
+	{
+		m_pSigs->push_back(Sig);
+	}
+	catch (std::exception &e)
+	{
+		throw CTrace(__FILE__, __LINE__, e.what());
+	}
 }
 
 SIGHDR SIGNATURE &CSignatures::operator[](ulong nIdx)

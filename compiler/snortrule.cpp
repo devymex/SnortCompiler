@@ -5,14 +5,26 @@
 SNORTRULEHDR CSnortRule::CSnortRule()
 	: m_nSid(0), m_nFlag(0)
 {
-	m_pOptions = new std::vector<CRuleOption*>;
-	CHECKALLOC(m_pOptions);
+	try
+	{
+		m_pOptions = new std::vector<CRuleOption*>;
+	}
+	catch (std::exception &e)
+	{
+		throw CTrace(__FILE__, __LINE__, e.what());
+	}
 }
 
 SNORTRULEHDR CSnortRule::CSnortRule(const CSnortRule &other)
 {
-	m_pOptions = new std::vector<CRuleOption*>;
-	CHECKALLOC(m_pOptions);
+	try
+	{
+		m_pOptions = new std::vector<CRuleOption*>;
+	}
+	catch (std::exception &e)
+	{
+		throw CTrace(__FILE__, __LINE__, e.what());
+	}
 	*this = other;
 }
 
@@ -20,7 +32,14 @@ SNORTRULEHDR const CSnortRule& CSnortRule::operator = (const CSnortRule &other)
 {
 	m_nSid = other.m_nSid;
 	m_nFlag = other.m_nFlag;
-	*m_pOptions = *other.m_pOptions;
+	try
+	{
+		*m_pOptions = *other.m_pOptions;
+	}
+	catch (std::exception &e)
+	{
+		throw CTrace(__FILE__, __LINE__, e.what());
+	}
 	return *this;
 }
 
@@ -62,7 +81,14 @@ SNORTRULEHDR CSnortRule::PARSE_INFO CSnortRule::GetFlag() const
 
 SNORTRULEHDR void CSnortRule::PushBack(CRuleOption* ruleoption)
 {
-	m_pOptions->push_back(ruleoption);
+	try
+	{
+		m_pOptions->push_back(ruleoption);
+	}
+	catch (std::exception &e)
+	{
+		throw CTrace(__FILE__, __LINE__, e.what());
+	}
 }
 
 SNORTRULEHDR void CSnortRule::PopBack()

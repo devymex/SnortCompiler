@@ -13,14 +13,26 @@
 
 DLLSTRHDR CDllString::CDllString()
 {
-	m_pString = new std::string;
-	CHECKALLOC(m_pString);
+	try
+	{
+		m_pString = new std::string;
+	}
+	catch (std::exception &e)
+	{
+		throw CTrace(__FILE__, __LINE__, e.what());
+	}
 }
 
 DLLSTRHDR CDllString::CDllString(const char *pStr)
 {
-	m_pString = new std::string(pStr);
-	CHECKALLOC(m_pString);
+	try
+	{
+		m_pString = new std::string(pStr);
+	}
+	catch (std::exception &e)
+	{
+		throw CTrace(__FILE__, __LINE__, e.what());
+	}
 }
 
 DLLSTRHDR void CDllString::Append(const char* pChar)
@@ -35,16 +47,30 @@ DLLSTRHDR CDllString::~CDllString()
 
 DLLSTRHDR CDllString::CDllString(const CDllString &other)
 {
-	m_pString = new std::string;
-	CHECKALLOC(m_pString);
+	try
+	{
+		m_pString = new std::string;
+	}
+	catch (std::exception &e)
+	{
+		throw CTrace(__FILE__, __LINE__, e.what());
+	}
 	*this = other;
 }
 
 DLLSTRHDR CDllString& CDllString::operator = (const CDllString &other)
 {
-	*this->m_pString = *other.m_pString;
+	try
+	{
+		*this->m_pString = *other.m_pString;
+	}
+	catch (std::exception &e)
+	{
+		throw CTrace(__FILE__, __LINE__, e.what());
+	}
 	return *this;
 }
+
 DLLSTRHDR char CDllString::operator[](ulong nIdx) const
 {
 	return (*m_pString)[nIdx];
@@ -57,7 +83,14 @@ DLLSTRHDR ulong CDllString::Size() const
 
 DLLSTRHDR void CDllString::PushBack(const char nChar)
 {
-	m_pString->push_back(nChar);
+	try
+	{
+		m_pString->push_back(nChar);
+	}
+	catch (std::exception &e)
+	{
+		throw CTrace(__FILE__, __LINE__, e.what());
+	}
 }
 
 DLLSTRHDR char CDllString::Back() const
