@@ -16,6 +16,7 @@
 */
 
 #include "stdafx.h"
+#include "hash.h"
 #include <hwprj\buildhash.h>
 
 /* hash function, correspond to a hash slot for a given signature
@@ -582,7 +583,10 @@ void ClearUpHashRes(std::vector<GROUPHASH> &vecGroups, RESULTMAP &result, CGroup
 		{
 			if (vecGroups[*j].mergeDfaId != ulong(-1))
 			{
-				HashResMap[i->first].push_back(HASHNODE(vecGroups[*j].currSig, vecGroups[*j].mergeDfaId));
+				HASHNODE node;
+				node.m_sig = vecGroups[*j].currSig;
+				node.m_nDfaId = vecGroups[*j].mergeDfaId;
+				HashResMap[i->first].push_back(node);
 			}
 		}
 	}
