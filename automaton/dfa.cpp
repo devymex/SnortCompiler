@@ -315,10 +315,41 @@ DFAHDR ulong CDfa::Process(byte *ByteStream, ulong len, STATEARY &StaSet)
 	return nPos;
 }
 
-DFAHDR ulong CDfa::Save(byte *beg)
+DFAHDR ulong CDfa::MemSpace() const
 {
-	byte *pOld = beg;
+	ulong nSize = 0;
 
+	//m_nId
+	nSize += sizeof(m_nId);
+
+	//m_pDfa->size()
+	nSize += sizeof(byte);
+
+	if (m_pDfa->size() == 0)
+	{
+		return nSize;
+	}
+
+	//group
+	nSize += SC_DFACOLCNT * sizeof(byte);
+
+	//dfa
+	nSize += m_pDfa->size() * (sizeof(ulong) + m_nColNum);
+
+	//m_nStartId
+	nSize += sizeof(byte);
+
+	//m_FinStas.GetAllDfaIdCount()
+	nSize += sizeof(ulong);
+
+	//the relationship of final state and dfa id
+	nSize += m_FinStas.GetAllDfaIdCount() * (sizeof(byte) + sizeof(ulong));
+
+	return nSize;
+}
+
+DFAHDR void CDfa::Save(byte *beg)
+{
 	//write dfa id
 	WriteNum(beg, m_nId);
 
@@ -326,7 +357,7 @@ DFAHDR ulong CDfa::Save(byte *beg)
 	WriteNum(beg, m_pDfa->size(), sizeof(byte));
 	if (m_pDfa->size() == 0)
 	{
-		return beg - pOld;
+		return;
 	}
 
 	//write group
@@ -362,13 +393,10 @@ DFAHDR ulong CDfa::Save(byte *beg)
 			WriteNum(beg, ids[j]);
 		}
 	}
-
-	return beg - pOld;
 }
 
-DFAHDR void CDfa::Load(byte *beg, ulong len)
+DFAHDR void CDfa::Load(byte *beg)
 {
-	len = 0;
 	//read dfa id
 	ulong dfaId;
 	ReadNum(beg, dfaId);

@@ -61,8 +61,9 @@ public:
 
 	ulong		Process(byte *ByteStream, ulong len, STATEARY &StaSet);
 
-	ulong		Save(byte *beg);
-	void		Load(byte *beg, ulong len);
+	ulong		MemSpace() const;
+	void		Save(byte *beg);
+	void		Load(byte *beg);
 
 	void		Dump(const char *pFile);
 
