@@ -4,11 +4,13 @@
 DFAARYHDR CDfaArray::CDfaArray()
 {
 	m_pdfaTbl = new CDFAVEC;	
+	CHECKALLOC(m_pdfaTbl);
 }
 
 DFAARYHDR CDfaArray::CDfaArray(const CDfaArray& other)
 {
 	m_pdfaTbl = new CDFAVEC;
+	CHECKALLOC(m_pdfaTbl);
 	*this = other;
 }
 

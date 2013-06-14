@@ -6,11 +6,13 @@ SNORTRULEHDR CSnortRule::CSnortRule()
 	: m_nSid(0), m_nFlag(0)
 {
 	m_pOptions = new std::vector<CRuleOption*>;
+	CHECKALLOC(m_pOptions);
 }
 
 SNORTRULEHDR CSnortRule::CSnortRule(const CSnortRule &other)
 {
 	m_pOptions = new std::vector<CRuleOption*>;
+	CHECKALLOC(m_pOptions);
 	*this = other;
 }
 

@@ -10,10 +10,12 @@
 #include "stdafx.h"
 
 #include <hwprj\unsary.h>
+#include <hwprj\trace.h>
 
 UNSARYHDR CUnsignedArray::CUnsignedArray()
 {
 	m_pSet = new std::vector<ulong>;
+	CHECKALLOC(m_pSet);
 }
 
 UNSARYHDR CUnsignedArray::~CUnsignedArray()
@@ -24,6 +26,7 @@ UNSARYHDR CUnsignedArray::~CUnsignedArray()
 UNSARYHDR CUnsignedArray::CUnsignedArray(const CUnsignedArray &other)
 {
 	m_pSet = new std::vector<ulong>;
+	CHECKALLOC(m_pSet);
 	*this = other;
 }
 

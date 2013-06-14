@@ -15,6 +15,8 @@
 typedef unsigned char			byte;
 typedef unsigned long			ulong;
 typedef unsigned short			ushort;
+typedef char*					pstr;
+typedef const char*				pcstr;
 typedef ushort					STATEID;
 typedef ulong					DFAID;
 typedef ulong					SIGNATURE;

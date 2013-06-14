@@ -7,6 +7,7 @@ typedef NFAROWARY::const_iterator	NFAROWARY_CITER;
 NFAHDR CNfa::CNfa()
 {
 	m_pNfa = new NFAROWARY;
+	CHECKALLOC(m_pNfa);
 }
 
 NFAHDR CNfa::~CNfa()
@@ -17,6 +18,7 @@ NFAHDR CNfa::~CNfa()
 NFAHDR CNfa::CNfa(const CNfa &other)
 {
 	m_pNfa = new NFAROWARY;
+	CHECKALLOC(m_pNfa);
 	*this = other;
 }
 

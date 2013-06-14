@@ -50,6 +50,7 @@ PCREMATCHHDR bool PcreMatch(const char* src, int length, std::string Regex, int 
 
 	int wscount = 100;
 	int *workspace = new int[wscount];
+	CHECKALLOC(workspace);
 
 	//rc = pcre_exec(re, NULL, src, length, 0, 0, ovector, OVECCOUNT);
 	rc = pcre_dfa_exec(re, NULL,src, length, 0, 0, ovector, OVECCOUNT, workspace, wscount);

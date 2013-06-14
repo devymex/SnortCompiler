@@ -4,6 +4,7 @@
 REGRULEHDR CRegChain::CRegChain()
 {
 	m_pRegList = new STRINGVEC;
+	CHECKALLOC(m_pRegList);
 }
 
 REGRULEHDR CRegChain::~CRegChain()
@@ -14,6 +15,7 @@ REGRULEHDR CRegChain::~CRegChain()
 REGRULEHDR CRegChain::CRegChain(const CRegChain &other)
 {
 	m_pRegList = new STRINGVEC;
+	CHECKALLOC(m_pRegList);
 	*this = other;
 }
 

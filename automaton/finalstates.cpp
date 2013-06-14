@@ -7,7 +7,9 @@ typedef FINSTAMAP::const_iterator						FINSTAMAP_CITER;
 DFAIDSETHDR CFinalStates::CFinalStates()
 {
 	m_pStates = new STATEVEC;
+	CHECKALLOC(m_pStates);
 	m_pDfaIds = new FINSTAMAP;
+	CHECKALLOC(m_pDfaIds);
 }
 
 DFAIDSETHDR CFinalStates::~CFinalStates()
@@ -19,7 +21,9 @@ DFAIDSETHDR CFinalStates::~CFinalStates()
 DFAIDSETHDR CFinalStates::CFinalStates(const CFinalStates &other)
 {
 	m_pStates = new STATEVEC;
+	CHECKALLOC(m_pStates);
 	m_pDfaIds = new FINSTAMAP;
+	CHECKALLOC(m_pDfaIds);
 	*this = other;
 }
 

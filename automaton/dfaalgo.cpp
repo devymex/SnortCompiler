@@ -10,7 +10,6 @@
 */
 
 #include "stdafx.h"
-#include <hwprj\common.h>
 #include <hwprj\dfa.h>
 #include <hwprj\nfa.h>
 #include "dfaalgo.h"
@@ -257,6 +256,8 @@ void CalcAbleTo(STATEVEC *pRevTbl, ulong nGrpNum, ulong nStaNum, PARTSET &ps)
 	ReleaseAbleTo(ps);
 
 	byte *pBuf = new byte[nStaNum * nGrpNum];
+	CHECKALLOC(pBuf);
+
 	ZeroMemory(pBuf, nStaNum * nGrpNum);
 	ps.AbleTo.resize(nGrpNum, 0);
 	ps.Ones.resize(nGrpNum, 0);
@@ -490,6 +491,7 @@ void InitPartSet(const CFinalStates &finStas, ulong ulStaNum,
 
 	//distinguish final state belonging to different DFA
 	CDfaIdSet *pTerm2Dfa = new CDfaIdSet[ulStaNum];
+	CHECKALLOC(pTerm2Dfa);
 
 	for (ulong i = 0; i < finStas.Size(); ++i)
 	{

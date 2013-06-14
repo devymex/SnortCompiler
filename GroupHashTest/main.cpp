@@ -11,6 +11,7 @@
 #include <hwprj\groupres.h>
 #include <hwprj\grouping.h>
 #include <hwprj\buildhash.h>
+#include <hwprj\trace.h>
 
 int main()
 {

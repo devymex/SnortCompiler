@@ -17,6 +17,7 @@
 
 #define UNSARYHDR_DS
 #define DLLSTRHDR_DS
+#define TRACEHDR_DS
 
 typedef std::string					DLLSTRING;
 typedef std::vector<unsigned long>	DLLULONGVEC;

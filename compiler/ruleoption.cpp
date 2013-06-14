@@ -5,11 +5,13 @@ SNORTRULEHDR CRuleOption::CRuleOption()
 	: m_nFlag(0)
 {
 	m_pPattern = new std::string;
+	CHECKALLOC(m_pPattern);
 }
 
 SNORTRULEHDR CRuleOption::CRuleOption(const CRuleOption &other)
 {
 	m_pPattern = new std::string;
+	CHECKALLOC(m_pPattern);
 	*this = other;
 }
 

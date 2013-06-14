@@ -489,6 +489,7 @@ ulong ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
 		else if (0 == stricmp("pcre", iOp->name.c_str()))
 		{
 			OPTIONPCRE *pPcre = new OPTIONPCRE;
+			CHECKALLOC(pPcre);
 			ulong nr = FormatPcre(opValueBeg, opValueEnd, *pPcre);
 			if (nr != 0)
 			{
@@ -514,6 +515,7 @@ ulong ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
 			0 == stricmp("uricontent", iOp->name.c_str()))
 		{
 			OPTIONCONTENT *pContent = new OPTIONCONTENT;
+			CHECKALLOC(pContent);
 			pContent->SetFlag(0);
 			pContent->nOffset = 0;
 			pContent->nDepth =0;

@@ -13,11 +13,6 @@
 */
 
 #include "stdafx.h"
-#include <hwprj\ctimer.h>
-#include <hwprj\signatures.h>
-#include <hwprj\dfa.h>
-#include <hwprj\dfaarray.h>
-#include <hwprj\compres.h>
 #include <hwprj\groups.h>
 #include <hwprj\groupres.h>
 #include <hwprj\grouping.h>
