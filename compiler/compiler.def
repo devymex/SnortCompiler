@@ -1,4 +1,4 @@
 LIBRARY
 EXPORTS
-CompileResult	@ 1
-ParseRuleFile	@ 2
+CompileRuleFile		@ 1
+ParseRuleFile		@ 2

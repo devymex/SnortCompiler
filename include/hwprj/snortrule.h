@@ -21,7 +21,9 @@ class OPTIONVEC;
 class SNORTRULEHDR CSnortRule
 {
 public:
-	enum {RULE_HASBYTE = 0x0001, RULE_HASNOT = 0x0002, RULE_HASNOSIG = 0x0004};
+	typedef ulong PARSE_INFO;
+	static const PARSE_INFO RULE_HASBYTE	= 0x0001;
+	static const PARSE_INFO RULE_HASNOT		= 0x0002;
 
 	CSnortRule();
 	CSnortRule(const CSnortRule &other);
@@ -33,13 +35,13 @@ public:
 	ulong Size() const;
 	ulong GetSid() const;
 	void SetSid(ulong sid);
-	ulong GetFlag() const;
-	void SetFlag(ulong flag);
+	PARSE_INFO GetFlag() const;
+	void SetFlag(PARSE_INFO flag);
 	void PushBack(CRuleOption* ruleoption);
 	void PopBack();
 
 protected:
 	ulong m_nSid;
-	ulong m_nFlag;
+	PARSE_INFO m_nFlag;
 	OPTIONVEC *m_pOptions;
 };

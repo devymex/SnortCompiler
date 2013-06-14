@@ -14,57 +14,18 @@
 #include "comprule.h"
 #include <hwprj\compiler.h>
 
-/* complie one rule
-
-Arguments:
-  rule		the snort rule
-  lpVoid		the compile result
-
-Returns:		nothing
-
-*/
-void __stdcall CompileResult(const PARSERESULT &parseRes, void *lpVoid)
-{
-	CCompileResults &result = *(CCompileResults*)lpVoid;
-	ulong nFlag = parseRes.ulFlags;
-	ulong nNewSize = result.GetSidDfaIds().Size() + 1;
-	result.GetSidDfaIds().Resize(nNewSize);
-	COMPILEDRULE &ruleResult = result.GetSidDfaIds().Back();
-	ruleResult.m_nSid = parseRes.ulSid;
-	if (parseRes.ulRet == SC_ERROR)
-	{
-		ruleResult.m_nResult = COMPILEDRULE::RES_ERROR;
-	}
-	else if (parseRes.regRule.Size() == 0)
-	{
-		ruleResult.m_nResult = COMPILEDRULE::RES_EMPTY;
-	}
-	else if (nFlag & CSnortRule::RULE_HASNOT)
-	{
-		ruleResult.m_nResult = COMPILEDRULE::RES_HASNOT;
-	}
-	else if (nFlag & CSnortRule::RULE_HASBYTE)
-	{
-		ruleResult.m_nResult = COMPILEDRULE::RES_HASBYTE;
-	}
-	else
-	{
-		Rule2Dfas(parseRes.regRule, result, ruleResult);
-	}
-}
-
 /*
 * read rules from a file
 * then process the rules to CSnortRule
 * callback function RECIEVER to handle CSnortRule
 */
-COMPILERHDR ulong ParseRuleFile(const char *pFileName, RECIEVER recv, void *lpUser)
+COMPILERHDR void ParseRuleFile(const char *pFileName, RECIEVER recv, void *lpUser)
 {
 	typedef std::vector<std::string>	STRINGVEC;
 	typedef STRINGVEC::iterator			STRINGVEC_ITER;
 	if(recv == NULL)
 	{
-		return (ulong)-1;
+		throw 0;
 	}
 	STRINGVEC rules;
 	if(0 == LoadFile(pFileName, rules))
@@ -82,14 +43,24 @@ COMPILERHDR ulong ParseRuleFile(const char *pFileName, RECIEVER recv, void *lpUs
 				if (0 == ProcessOption(*i, snortRule))
 				{
 					PARSERESULT pr;
-					pr.ulRet = Rule2PcreList(snortRule, pr.regRule);
-					pr.ulFlags = snortRule.GetFlag();
 					pr.ulSid = snortRule.GetSid();
+					pr.ulFlag = PARSEFLAG::PARSE_DEFAULT;
+					if (SC_ERROR == Rule2PcreList(snortRule, pr.regRule))
+					{
+						pr.ulFlag |= PARSEFLAG::PARSE_ERROR;
+					}
+					else
+					{
+						pr.ulFlag |= snortRule.GetFlag();
+					}
 					recv(pr, lpUser);
 				}
 			}
 		}
 	}
-	return 0;
 }
 
+COMPILERHDR void CompileRuleFile(const char *pFileName, CCompileResults &compRes)
+{
+	ParseRuleFile(pFileName, CompileCallback, &compRes);
+}

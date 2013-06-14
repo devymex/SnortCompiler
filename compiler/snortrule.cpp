@@ -48,12 +48,12 @@ SNORTRULEHDR ulong CSnortRule::GetSid() const
 	return m_nSid;
 }
 
-SNORTRULEHDR void CSnortRule::SetFlag(ulong flag)
+SNORTRULEHDR void CSnortRule::SetFlag(PARSE_INFO flag)
 {
 	m_nFlag = flag;
 }
 
-SNORTRULEHDR ulong CSnortRule::GetFlag() const
+SNORTRULEHDR CSnortRule::PARSE_INFO CSnortRule::GetFlag() const
 {
 	return m_nFlag;
 }
