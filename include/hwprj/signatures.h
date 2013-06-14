@@ -11,7 +11,6 @@
 
 #pragma once
 
-#include <vector>
 #include <hwprj\common.h>
 
 #ifndef SIGHDR_DS
@@ -20,7 +19,9 @@
 #define SIGHDR __declspec(dllexport)
 #endif
 
-typedef unsigned long SIGNATURE;
+#ifndef SIGHDR_DS
+class SIGNATUREVEC;
+#endif
 
 class SIGHDR CSignatures
 {
@@ -28,6 +29,10 @@ public:
 	CSignatures();
 	CSignatures(const CSignatures& other);
 	const CSignatures &operator=(const CSignatures &other);
+
+	bool operator == (const CSignatures &other) const;
+	bool operator <	(const CSignatures &other) const;
+
 	~CSignatures();
 
 	const ulong Size() const;
@@ -37,6 +42,7 @@ public:
 	const SIGNATURE &operator[](ulong nIdx) const;
 	void Clear();
 	void Unique();
+	ulong Find(SIGNATURE Sig) const;
 protected:
-	std::vector<SIGNATURE> *m_pSigs;
+	SIGNATUREVEC *m_pSigs;
 };

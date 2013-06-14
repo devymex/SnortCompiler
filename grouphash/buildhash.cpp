@@ -114,6 +114,7 @@ void RecursiveAdjust(std::vector<GROUPHASH> &vecGroups, RESULTMAP &result)
 				{
 					std::vector<STATION> vecPath;
 					ulong depth;
+					bool change = false;
 					for (std::vector<SIGNATURE>::iterator k = vecGroups[*j].vecSigs.begin(); k != vecGroups[*j].vecSigs.end(); ++k)
 					{
 						if (*k == vecGroups[*j].currSig)
@@ -125,6 +126,7 @@ void RecursiveAdjust(std::vector<GROUPHASH> &vecGroups, RESULTMAP &result)
 						if (myFind(vecGroups, result, *k, vecPath, depth))
 						{
 							flag = true;
+							change = true;
 							vecGroups[*j].currSig = *k;
 							std::vector<ulong>::iterator iter = std::find(result[hash(*k)].begin(), result[hash(*k)].end(), *j);
 							if (iter != result[hash(*k)].end())
@@ -148,9 +150,12 @@ void RecursiveAdjust(std::vector<GROUPHASH> &vecGroups, RESULTMAP &result)
 							break;
 						}
 					}
-					if (i->second.size() == 1)
+					if (change)
 					{
-						break;
+						if (i->second.size() == 1)
+						{
+							break;
+						}
 					}
 					else
 					{
@@ -171,6 +176,7 @@ Arguments:
 Returns:				nothing
 
 */
+//This function is abandoned, because it is contained by the function RecursiveAdjust.
 
 void Adjust(std::vector<GROUPHASH> &vecGroups, RESULTMAP &result)
 {
@@ -285,7 +291,7 @@ void Mapping(std::vector<GROUPHASH> &vecGroups, const SIGNATUREMAP &gmap, const 
 
 	Optimize(vecGroups, dmap, vecIds, result);
 
-	Adjust(vecGroups, result);
+	//Adjust(vecGroups, result);
 
 	RecursiveAdjust(vecGroups, result);
 }
@@ -393,7 +399,7 @@ Returns:				nothing
 
 */
 
-void Combine(CGROUPRes &groupRes, std::vector<GROUPHASH> &vecGroups, RESULTMAP &result)
+void Combine(CGroupRes &groupRes, std::vector<GROUPHASH> &vecGroups, RESULTMAP &result)
 {
 	//combine groups in one hash slot
 	for (RESULTMAP::iterator i = result.begin(); i != result.end(); ++i)
@@ -533,7 +539,7 @@ Returns:				nothing
 
 */
 
-void ClearUpHashRes(std::vector<GROUPHASH> &vecGroups, RESULTMAP &result, CGROUPRes &groupRes, HASHRES &HashResMap)
+void ClearUpHashRes(std::vector<GROUPHASH> &vecGroups, RESULTMAP &result, CGroupRes &groupRes, HASHRES &HashResMap)
 {
 	ulong count = 0;
 	std::vector<CDfa> vecDfas;
@@ -589,7 +595,7 @@ Returns:				nothing
 
 */
 
-HASHMAPHDR void HashMapping(CGROUPRes &groupRes, HASHRES &HashResMap)
+HASHMAPHDR void HashMapping(CGroupRes &groupRes, HASHRES &HashResMap)
 {
 	std::vector<GROUPHASH> vecGroups;
 	vecGroups.resize(groupRes.GetGroups().Size());

@@ -20,6 +20,12 @@
     <ClCompile Include="buildhash.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="groups.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="groupres.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -29,6 +35,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\include\hwprj\buildhash.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\hwprj\groups.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\hwprj\groupres.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

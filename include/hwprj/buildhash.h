@@ -1,8 +1,10 @@
 #pragma once
-#include <map>
+
 #include <vector>
+#include <map>
 #include <unordered_map>
-#include <hwprj\grouping.h>
+#include <hwprj\common.h>
+#include <hwprj\groupres.h>
 
 #ifndef HASHMAPHDR_DS
 #define HASHMAPHDR __declspec(dllimport)
@@ -33,4 +35,4 @@ struct GROUPHASH
 
 HASHMAPHDR ulong hash(const SIGNATURE &oneSig);
 
-HASHMAPHDR void HashMapping(CGROUPRes &groupRes, HASHRES &HashResMap);
+HASHMAPHDR void HashMapping(CGroupRes &groupRes, HASHRES &HashResMap);

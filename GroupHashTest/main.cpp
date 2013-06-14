@@ -5,6 +5,9 @@
 
 #include <hwprj\ctimer.h>
 #include <hwprj\compiler.h>
+#include <hwprj\compres.h>
+#include <hwprj\groupres.h>
+#include <hwprj\grouping.h>
 #include <hwprj\buildhash.h>
 
 int main()
@@ -97,9 +100,10 @@ int main()
 	CompileRuleSet("..\\allrules.rule", result);
 	result.WriteToFile("..\\result.cdt");
 	//result.ReadFromFile("..\\result.cdt");
-	CGROUPRes groupRes;
+	CGroupRes groupRes;
 	Grouping(result, groupRes);
 	groupRes.WriteToFile("..\\GroupResut.cdt");
+	//groupRes.ReadFromFile("..\\GroupResut.cdt");
 	HASHRES HashResMap;
 	HashMapping(groupRes, HashResMap);
 	groupRes.WriteToFile("..\\FinalResut.cdt");

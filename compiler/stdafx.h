@@ -17,6 +17,7 @@
 #include <map>
 #include <set>
 
+#include <hwprj\common.h>
 #include <hwprj\dfa.h>
 #include <hwprj\dllstring.h>
 #include <hwprj\ctimer.h>
@@ -39,3 +40,5 @@ typedef std::vector<CDllString>				STRINGVEC;
 typedef std::string							STRING;
 typedef std::vector<class CRuleOption*>		OPTIONVEC;
 typedef std::vector<class CRegChain>		CHAINVEC;
+typedef std::vector<SIGNATURE>              SIGNATUREVEC;
+typedef SIGNATUREVEC::iterator              SIGVEC_ITER;
