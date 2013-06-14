@@ -8,16 +8,19 @@
 */
 
 #include "stdafx.h"
+#include <hwprj\trace.h>
 #include <hwprj\dllstring.h>
 
 DLLSTRHDR CDllString::CDllString()
 {
 	m_pString = new std::string;
+	CHECKALLOC(m_pString);
 }
 
 DLLSTRHDR CDllString::CDllString(const char *pStr)
 {
 	m_pString = new std::string(pStr);
+	CHECKALLOC(m_pString);
 }
 
 DLLSTRHDR void CDllString::Append(const char* pChar)
@@ -33,6 +36,7 @@ DLLSTRHDR CDllString::~CDllString()
 DLLSTRHDR CDllString::CDllString(const CDllString &other)
 {
 	m_pString = new std::string;
+	CHECKALLOC(m_pString);
 	*this = other;
 }
 
@@ -46,7 +50,7 @@ DLLSTRHDR char CDllString::operator[](ulong nIdx) const
 	return (*m_pString)[nIdx];
 }
 
-DLLSTRHDR const ulong CDllString::Size() const
+DLLSTRHDR ulong CDllString::Size() const
 {
 	return m_pString->size();
 }
@@ -70,7 +74,8 @@ DLLSTRHDR void CDllString::Clear()
 {
 	m_pString->clear();
 }
-DLLSTRHDR bool CDllString::Empty()
+
+DLLSTRHDR bool CDllString::Empty() const
 {
 	return m_pString->empty();
 }

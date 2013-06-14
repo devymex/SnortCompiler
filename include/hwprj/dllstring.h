@@ -28,7 +28,7 @@ public:
 	// CDCA
 	CDllString();
 	CDllString(const CDllString &other);
-	explicit CDllString(const char *pStr);
+	explicit CDllString(pcstr pStr);
 	virtual ~CDllString();
 
 	CDllString&		operator =	(const CDllString &other);
@@ -36,13 +36,13 @@ public:
 
 	// Overided operators
 
-	const ulong		Size() const;
-	bool			Empty();
-	void			Clear();
-	void			Append(const char* pChar);
-	char			Back() const;
-	void			PushBack(const char nChar);
-	const char*		GetStr() const;
+	ulong	Size() const;
+	bool	Empty() const;
+	void	Clear();
+	void	Append(const char* pChar);
+	char	Back() const;
+	void	PushBack(const char nChar);
+	pcstr	GetStr() const;
 
 protected:
 	DLLSTRING *m_pString;

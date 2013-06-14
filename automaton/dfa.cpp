@@ -12,8 +12,7 @@
 #include "stdafx.h"
 
 #include "dfaalgo.h"
-#include <hwprj\dfarow.h>
-#include <hwprj\nfa.h>
+
 #include <hwprj\dfa.h>
 
 
@@ -22,11 +21,13 @@ DFAHDR CDfa::CDfa()
 {
 	std::fill(m_pGroup, m_pGroup + SC_DFACOLCNT, byte(-1));
 	m_pDfa = new std::vector<CDfaRow>;
+	CHECKALLOC(m_pDfa);
 }
 
 DFAHDR CDfa::CDfa(const CDfa &other)
 {
 	m_pDfa = new std::vector<CDfaRow>;
+	CHECKALLOC(m_pDfa);
 	*this = other;
 }
 
@@ -258,6 +259,7 @@ DFAHDR ulong CDfa::Minimize()
 	nSize = m_pDfa->size();
 	STATEVEC *pRevTab = NULL;
 	pRevTab = new STATEVEC[nSize * nCols];
+	CHECKALLOC(pRevTab);
 	for (STATEID i = 0; i < nSize; ++i)
 	{
 		for (byte j = 0; j < nCols; ++j)
@@ -511,6 +513,7 @@ ulong CDfa::PartStates(STATEVEC *pRevTbl)
 	InitPartWait(partSets, pWait, nGrpNum);
 
 	byte *pAbleToI = new byte[ulStaNum];
+	CHECKALLOC(pAbleToI);
 	partSets.reserve(1000);
 	ulong nr = 0;
 	for (; nr == 0; )
@@ -598,6 +601,7 @@ ulong CDfa::PartStates(STATEVEC *pRevTbl)
 		CFinalStates newFinStas;
 
 		DFAROWARY *pNewDfa = new DFAROWARY((STATEID)partSets.size(), CDfaRow(nCol));
+		CHECKALLOC(pNewDfa);
 		
 		//renumber DFA state
 		BuildDfaByPart(partSets, *m_pDfa, *pNewDfa);

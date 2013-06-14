@@ -16,6 +16,7 @@
 #include <numeric>
 #include <string>
 #include <sstream>
+#include <hwprj\trace.h>
 
 #define GROUPHDR_DS
 

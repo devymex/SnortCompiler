@@ -6,6 +6,7 @@ NFAHDR CNfaRow::CNfaRow(ulong nSize)
 	: m_nSize(nSize)
 {
 	m_pDestSet = new std::vector<ulong>[m_nSize];
+	CHECKALLOC(m_pDestSet);
 }
 
 NFAHDR CNfaRow::~CNfaRow()
@@ -24,6 +25,7 @@ NFAHDR void CNfaRow::Resize(ulong nSize)
 	{
 		delete []m_pDestSet;
 		m_pDestSet = new std::vector<ulong>[nSize];
+		CHECKALLOC(m_pDestSet);
 		m_nSize = nSize;
 	}
 }

@@ -20,11 +20,13 @@
 GROUPHDR CGROUPS::CGROUPS()
 {
 	m_pGroups = new std::vector<ONEGROUP>;
+	CHECKALLOC(m_pGroups);
 }
 
 GROUPHDR CGROUPS::CGROUPS(const CGROUPS& other)
 {
 	m_pGroups = new std::vector<ONEGROUP>;
+	CHECKALLOC(m_pGroups);
 	*this = other;
 }
 
@@ -190,6 +192,7 @@ GROUPHDR ulong CGROUPRes::WriteToFile(const char *filename)
 
 	//start to write dfas
 	byte *dfaDetails = new byte[100000];
+	CHECKALLOC(dfaDetails);
 	for (ulong i = 0; i < m_dfaTbl.Size(); ++i)
 	{
 		ulong len = m_dfaTbl[i].Save(dfaDetails);
@@ -297,6 +300,7 @@ GROUPHDR ulong CGROUPRes::ReadFromFile(const char *filename)
 	//start to read dfas
 	m_dfaTbl.Resize(dfaNum);
 	byte *dfaDetails = new byte[100000];
+	CHECKALLOC(dfaDetails);
 	for (ulong i = 0; i < dfaNum; ++i)
 	{
 		CDfa &dfa = m_dfaTbl[i];

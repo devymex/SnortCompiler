@@ -4,11 +4,13 @@
 SIGHDR CSignatures::CSignatures()
 {
 	m_pSigs = new std::vector<SIGNATURE>;
+	CHECKALLOC(m_pSigs);
 }
 
 SIGHDR CSignatures::CSignatures(const CSignatures& other)
 {
 	m_pSigs = new std::vector<SIGNATURE>;
+	CHECKALLOC(m_pSigs);
 	*this = other;
 }
 

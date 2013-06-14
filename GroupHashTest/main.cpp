@@ -6,6 +6,7 @@
 #include <hwprj\ctimer.h>
 #include <hwprj\compiler.h>
 #include <hwprj\buildhash.h>
+#include <hwprj\trace.h>
 
 int main()
 {

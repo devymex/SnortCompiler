@@ -4,6 +4,7 @@
 REGRULEHDR CRegRule::CRegRule()
 {
 	m_pRegVec = new CHAINVEC;
+	CHECKALLOC(m_pRegVec);
 }
 
 REGRULEHDR CRegRule::~CRegRule()
@@ -14,6 +15,7 @@ REGRULEHDR CRegRule::~CRegRule()
 REGRULEHDR CRegRule::CRegRule(const CRegRule &other)
 {
 	m_pRegVec = new CHAINVEC;
+	CHECKALLOC(m_pRegVec);
 	*this = other;
 }
 

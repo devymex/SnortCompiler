@@ -4,11 +4,13 @@
 SIDDFAHDR CSidDfaIds::CSidDfaIds()
 {
 	m_ruleResult = new std::vector<COMPILEDINFO>;
+	CHECKALLOC(m_ruleResult);
 }
 
 SIDDFAHDR CSidDfaIds::CSidDfaIds(const CSidDfaIds& other)
 {
 	m_ruleResult = new std::vector<COMPILEDINFO>;
+	CHECKALLOC(m_ruleResult);
 	*this = other;
 }
 
