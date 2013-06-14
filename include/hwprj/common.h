@@ -17,6 +17,7 @@ typedef unsigned long			ulong;
 typedef unsigned short			ushort;
 typedef ushort					STATEID;
 typedef ulong					DFAID;
+typedef ulong					SIGNATURE;
 
 /* compile configurations */
 #define SC_MAXDFASIZE	255

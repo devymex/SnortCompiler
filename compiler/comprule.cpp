@@ -968,7 +968,7 @@ void Rule2Dfas(const CRegRule &rule, CCompileResults &result)
 		ulong nToNFAFlag = Chain2NFA(regRule[i], nfa, regRule[i].GetSigs());
 		pcre2nfatime += ctime.Reset();//for test
 
-		if (rule[i].GetSigs().Size() > 0)
+		if (regRule[i].GetSigs().Size() > 0)
 		{
 			bHasSigs = true;
 		}
