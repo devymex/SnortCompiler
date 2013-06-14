@@ -5,6 +5,7 @@
 #include <tchar.h>
 
 #include <hwprj\ctimer.h>
+#include <hwprj\unsary.h>
 #include <hwprj\compiler.h>
 #include <hwprj\compres.h>
 #include <hwprj\groupres.h>
@@ -21,13 +22,36 @@ int main()
 	CGroupRes groupRes;
 	Grouping(result, groupRes);
 	groupRes.WriteToFile("..\\GroupResult.cdt");
-	//groupRes.ReadFromFile("..\\GroupResut.cdt");
+	//groupRes.ReadFromFile("..\\GroupResult.cdt");
 	HASHRES HashResMap;
 	HashMapping(groupRes, HashResMap);
 	groupRes.WriteToFile("..\\FinalResult.cdt");
 	std::cout << "Total time: " << ctime.Reset() << std::endl;
 	std::cout << groupRes.GetGroups().Size() << std::endl;
 	std::cout << HashResMap.size() << std::endl;
+
+	//std::ifstream fin("..\\Ids.txt");
+	//std::vector<size_t> vecIds;
+	//size_t id;
+	//while (fin >> id)
+	//{
+	//	vecIds.push_back(id);
+	//}
+
+	//CCompileResults result;
+	//result.ReadFromFile("..\\result.cdt");
+
+	//CDfaArray vecDfas;
+	//vecDfas.Resize(2);
+	//vecDfas[0] = result.GetDfaTable()[vecIds[0]];
+	//for (ulong i = 1; i < vecIds.size(); ++i)
+	//{
+	//	vecDfas[1] = result.GetDfaTable()[vecIds[i]];
+	//	CDfa MergeDfa;
+	//	MergeMultipleDfas(vecDfas, MergeDfa);
+	//	vecDfas[0] = MergeDfa;
+	//}
+	//CFinalStates finalState = vecDfas[0].GetFinalState();
 
 	//std::ifstream fin("..\\allrules.rule");
 	//std::vector<std::string> vecRules;
