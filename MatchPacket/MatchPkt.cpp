@@ -31,7 +31,7 @@ void GetMchRule(const u_char *data, size_t len, void* user, std::vector<size_t> 
 }
 
 //调用pcre库进行数据包匹配
-bool PcreMatch(const u_char *data, size_t len, CRegRule &regRule)
+bool MyPcreMatch(const u_char *data, size_t len, CRegRule &regRule)
 {
 	for(size_t i = 0; i < regRule.Size(); ++i)
 	{
@@ -43,7 +43,7 @@ bool PcreMatch(const u_char *data, size_t len, CRegRule &regRule)
 			//对规则选项进行匹配
 			int Pos = -1;
 
-			bool flag = match((const char*)pData, dataSize, regRule[i][j].GetString(), Pos);
+			bool flag = PcreMatch((const char*)pData, dataSize, regRule[i][j].GetStr(), Pos);
 			if(!flag)
 			{
 				return false;
@@ -75,7 +75,7 @@ void HdlOnePkt(const u_char *data, size_t len, void*user)
 	rulesmap.mchresult << pktnum << " : ";
 	for(size_t i = 0; i < rules.size(); ++i)
 	{
-		bool flag = PcreMatch(data, len, rulesmap.result[rules[i]].regrule);
+		bool flag = MyPcreMatch(data, len, rulesmap.result[rules[i]].regrule);
 		if(flag)
 		{
 			matchvec.push_back(rulesmap.result[rules[i]].m_nSid);

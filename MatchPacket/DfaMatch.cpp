@@ -9,50 +9,74 @@ static ulong dpktnum = 0;
 void MatchOnedfa(const unsigned char * &data, ulong len, CDfa &dfa,
 				 std::vector<ulong> &matchedDids)
 {
-	if(dpktnum == 77)
+	size_t flags[260];
+	size_t size = sizeof(flags);
+	std::memset(flags, 0, sizeof(flags));
+
+
+	std::unordered_map<ulong, CUnsignedArray> dfaids;
+	const CFinalStates &finStas = dfa.GetFinalState();
+	for (ulong i = 0; i < finStas.Size(); ++i)
 	{
-		std::unordered_map<ulong, CUnsignedArray> dfaids;
-		const CFinalStates &finStas = dfa.GetFinalState();
-		for (ulong i = 0; i < finStas.Size(); ++i)
+		STATEID nStaId = finStas[i];
+
+		finStas.GetDfaIdSet(nStaId).CopyTo(dfaids[nStaId]);
+	}
+
+	STATEID curSta = dfa.GetStartState();
+	for (size_t edgeiter = 0; edgeiter != len; ++edgeiter)
+	{
+		BYTE group = dfa.Char2Group(data[edgeiter]);
+
+		if (0 == (dfa[curSta].GetFlag() & CDfaRow::TERMINAL))
 		{
-			STATEID nStaId = finStas[i];
-
-			finStas.GetDfaIdSet(nStaId).CopyTo(dfaids[nStaId]);
-		}
-
-		STATEID curSta = dfa.GetStartState();
-		for (ulong edgeiter = 0; edgeiter != len; ++edgeiter)
-		{
-			byte group = dfa.Char2Group(data[edgeiter]);
-
-			if (0 == (dfa[curSta].GetFlag() & CDfaRow::TERMINAL))
+			if (dfa[curSta][group] != (STATEID)-1)
 			{
-				if (dfa[curSta][group] != (STATEID)-1)
-				{
-					curSta = dfa[curSta][group];
-				}
-				else
-				{
-					return;
-				}
+				curSta = dfa[curSta][group];
 			}
 			else
 			{
-				for(size_t i = 0; i < dfaids[curSta].Size(); ++i)
+				return;
+			}
+		}
+		else
+		{
+			if (0 == flags[curSta])
+			{
+				for(size_t i = 0 ; i < dfaids[curSta].Size(); ++i)
 				{
-					matchedDids.push_back(dfaids[curSta][curSta]);
-				}
-				if(dfa[curSta][group] != (STATEID)-1)
-				{
-					curSta = dfa[curSta][group];
-				}
-				else 
-				{
-					return;
-				}
+					matchedDids.push_back(dfaids[curSta][i]);
+				}	
+
+				flags[curSta] = 1;
+			}
+
+			if(dfa[curSta][group] != (STATEID)-1)
+			{
+				curSta = dfa[curSta][group];
+			}
+			else 
+			{
+				return;
 			}
 		}
 	}
+
+	if((dfa[curSta].GetFlag() & CDfaRow::TERMINAL) != 0)
+	{
+		if(0 == flags[curSta])
+		{
+			for(size_t i = 0 ; i < dfaids[curSta].Size(); ++i)
+			{
+				matchedDids.push_back(dfaids[curSta][i]);
+			}
+			flags[curSta] = 1;
+		}
+	}
+
+	std::sort(matchedDids.begin(), matchedDids.end());
+	matchedDids.erase(std::unique(matchedDids.begin(), matchedDids.end()), matchedDids.end());
+
 }
 
 void MchDfaHdler(u_char *param, const struct pcap_pkthdr *header, const u_char *pkt_data)
@@ -68,59 +92,57 @@ void GetMchDfas(const u_char *data, ulong len, HASHRES &hashtable, std::vector<u
 {
 	if (len > 3)
 	{
+		std::ofstream sigfile;
+		sigfile.open("..\\..\\output\\sigfile.txt");
 		SIGNATURE sig;
 		u_char csig[4];
-		ulong flag = 0;
+		char flags[3000];
+		std::memset(flags, 0, sizeof(flags));
 
 		for (const u_char* iter = data; iter != &data[len - 4]; ++iter)
 		{
-			for (ulong i = 0; i < 4; ++i)
+			for (size_t i = 0; i < 4; ++i)
 			{
 				csig[i] = tolower(*(iter + i));
 			}
 			sig = *(SIGNATURE *)csig;
 
-			if(sig == 0)
-			{
-				ulong hashsig = hash(sig);
-				if (hashtable.count(hashsig))
-				{
-					for (std::vector<HASHNODE>::iterator iter = hashtable[hashsig].begin(); iter != hashtable[hashsig].end(); ++iter)
-					{
-						if (sig == iter->m_sig)
-						{
-							matchdfas.push_back(iter->m_nDfaId);
-						}
-					}
-				}
 
-				flag = 1;
-			}
-
-			if(flag == 0)
+			size_t hashsig = hash(sig);
+			if (hashtable.count(hashsig))
 			{
-				ulong hashsig = hash(sig);
-				if (hashtable.count(hashsig))
+				for (std::vector<HASHNODE>::iterator iter = hashtable[hashsig].begin(); iter != hashtable[hashsig].end(); ++iter)
 				{
-					for (std::vector<HASHNODE>::iterator iter = hashtable[hashsig].begin(); iter != hashtable[hashsig].end(); ++iter)
+					if ((sig == iter->m_sig) && (flags[iter->m_nDfaId] == 0))
 					{
-						if (sig == iter->m_sig)
-						{
-							matchdfas.push_back(iter->m_nDfaId);
-						}
+						matchdfas.push_back(iter->m_nDfaId);
+						flags[iter->m_nDfaId] = 1;
 					}
 				}
 			}
-
 		}
-		std::sort(matchdfas.begin(), matchdfas.end());
-		matchdfas.erase(std::unique(matchdfas.begin(), matchdfas.end()), matchdfas.end());
+		if (matchdfas.size() > 8)
+		{
+			sigfile << dpktnum << "  ";
+		}
+		//std::sort(matchdfas.begin(), matchdfas.end());
+		//matchdfas.erase(std::unique(matchdfas.begin(), matchdfas.end()), matchdfas.end());
 	}
 }
 
-MATCHPKT void DfaMatchPkt(const u_char *data, ulong len, DFAMCH dfamch)
+MATCHPKT void DfaMatchPkt(const u_char *data, ulong len, DFAMCH &dfamch)
 {
-	std::ofstream matchresult(dfamch.resultPath, std::ofstream::app);
+	std::ofstream matchresult;
+	if (dpktnum == 1)
+	{
+		matchresult.open(dfamch.resultPath);
+		matchresult << "-----------------------" << dfamch.resultPath << "-----------------------" << std::endl;
+	}
+	else
+	{
+		matchresult.open(dfamch.resultPath, std::ofstream::app);
+	}
+
 	matchresult << dpktnum << ":  ";
 	std::vector<ulong> matchdfas;
 	std::vector<ulong> matcheddfaids;
@@ -130,10 +152,6 @@ MATCHPKT void DfaMatchPkt(const u_char *data, ulong len, DFAMCH dfamch)
 	{
 		MatchOnedfa(data, len, dfamch.mergedDfas.GetDfaTable()[*iter], matcheddfaids);
 	}
-
-	std::sort(matcheddfaids.begin(), matcheddfaids.end());
-	matcheddfaids.erase(std::unique(matcheddfaids.begin(), matcheddfaids.end()), matcheddfaids.end());
-
 
 	if (!matcheddfaids.empty())
 	{
@@ -155,18 +173,22 @@ MATCHPKT void DfaMatchPkt(const u_char *data, ulong len, DFAMCH dfamch)
 			}
 		}
 
+		std::vector<ulong> matchvec;
 		for(std::unordered_map<ulong, CUnsignedArray>::iterator iter = resultmap.begin(); iter != resultmap.end(); ++iter)
 		{
 			if(iter->second.Size() == sId_dIdVec[iter->first].Size())
 			{
-
-				std::cout << iter->second[0] << " " << sId_dIdVec[iter->first][0] ;
-
-				matchresult << iter->first << "  ";
+				matchvec.push_back(iter->first);
 			}
 		}
 
+		std::sort(matchvec.begin(), matchvec.end());
+		for(std::vector<ulong>::iterator iter = matchvec.begin(); iter != matchvec.end(); ++iter)
+		{
+			matchresult << *iter << "  ";
+		}
 	}
+
 	matchresult << std::endl;
 	matchresult.close();
 }
@@ -176,8 +198,7 @@ MATCHPKT void DfaMatchPkt(const u_char *data, ulong len, DFAMCH dfamch)
 void __stdcall DPktParam(const ip_header *ih, const byte *data, void* user)
 {
 	++dpktnum;
-	if(dpktnum == 77)
-	{
+	
 	DFAMCH &dfamch = *(DFAMCH *)user;
 	u_short  _ihl = (ih->ver_ihl & 0x0f) * 4;
 	
@@ -197,10 +218,6 @@ void __stdcall DPktParam(const ip_header *ih, const byte *data, void* user)
 			u_short tcpHdrLen = ((ptcp->lenres & 0xf0) >> 4) * 4;
 			data += _ihl + tcpHdrLen;
 
-			if(*data == 227)
-			{
-				std::cout <<std::endl;
-			}
 			ulong tcpdatalen = _tlen - _ihl - tcpHdrLen;
 			if(tcpdatalen > 0)
 			{
@@ -215,10 +232,7 @@ void __stdcall DPktParam(const ip_header *ih, const byte *data, void* user)
 			pudp = (udp_header*)((byte*) pudp + _ihl);
 			data += _ihl + UDPHDRLEN;
 
-			if(*data == 227)
-			{
-				std::cout <<std::endl;
-			}
+
 			ulong udpdatalen = _tlen - _ihl - UDPHDRLEN;
 			if(udpdatalen > 0)
 			{
@@ -228,7 +242,7 @@ void __stdcall DPktParam(const ip_header *ih, const byte *data, void* user)
 			break;
 		}
 	}
-	}
+	
 	std::cout << dpktnum << std::endl;
 }
 
@@ -252,9 +266,7 @@ MATCHPKT bool DLoadCapFile(const char* pFile, void* pUser)
 MATCHPKT void DHandleAllFile(const std::string &path, void* user)
 {
 	DFAMCH &dfamch = *(DFAMCH *)user;
-	std::ofstream matchresult(dfamch.resultPath, std::ofstream::trunc);
-	matchresult.close();
-	matchresult.open(dfamch.resultPath, std::ofstream::app);
+	std::string dfapath = dfamch.resultPath;
 
 	WIN32_FIND_DATAA wfda;
 	const std::string ext = "*.*";
@@ -277,18 +289,17 @@ MATCHPKT void DHandleAllFile(const std::string &path, void* user)
 		}
 		else
 		{
-
 			std::string &temp = str + std::string(wfda.cFileName);
 			std::string &ext1 = temp.substr(temp.size() - 4, 4);
-			matchresult << "-----------------------" << temp << "-----------------------" << std::endl;
 			if(ext1 == ".cap")
 			{
+				dfamch.resultPath = dfapath + "\\" + std::string(wfda.cFileName) + ".txt";
+
 				DLoadCapFile(temp.c_str(), &dfamch);
 			}
 			dpktnum = 0;
 		}
 	}
-	matchresult.close();
 }
 
 

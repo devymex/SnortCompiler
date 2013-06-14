@@ -14,6 +14,8 @@
 #include <hwprj\dfa.h>
 #include <hwprj\compiler.h>
 #include <hwprj\snortrule.h>
+#include <hwprj\pcrematch.h>
+#include <hwprj\buildhash.h>
 
 #define ETHDRLEN 14 
 #define _TCP 6
@@ -163,5 +165,5 @@ MATCHPKT bool TradithinalMatch(std::vector<u_char> &dataSrc, CRegRule &regRule);
 
 void GetMchRule(const u_char *data, ulong len, void* user, std::vector<ulong> &rules);
 void HdlOnePkt(const u_char *data, ulong len, void*user);
-bool PcreMatch(const u_char *data, ulong len, CRegRule &regRule);
+bool MyPcreMatch(const u_char *data, ulong len, CRegRule &regRule);
 MATCHPKT void HandleAllFile(const std::string &path, void* user);

@@ -1,10 +1,11 @@
 #pragma once
-#include "MatchPkt.h"
 #include <fstream>
 #include <string>
 #include <unordered_map>
 #include <hwprj\buildhash.h>
 #include <hwprj\unsary.h>
+#include <hwprj\siddfaids.h>
+#include "MatchPkt.h"
 
 struct DFASIDMAPPING
 {
@@ -26,7 +27,7 @@ void MchDfaHdler(u_char *param, const struct pcap_pkthdr *header, const u_char *
 
 void GetMchDfas(const u_char *data, size_t len, HASHRES &hashtable, std::vector<size_t> &matchdfas);
 
-MATCHPKT void DfaMatchPkt(const u_char *data, size_t len, DFAMCH dfamch);
+MATCHPKT void DfaMatchPkt(const u_char *data, size_t len, DFAMCH &dfamch);
 
 void CALLBACK DPktParam(const ip_header *ih, const BYTE *data, void* user);
 

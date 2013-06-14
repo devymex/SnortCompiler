@@ -6,17 +6,17 @@
 void __stdcall MyProcess(const PARSERESULT &parseRes, void *lpParam)
 {
 	REGRULESMAP &rulesmap = *(REGRULESMAP*)lpParam;
-	ulong nFlag = parseRes.ulFlags;
+	PARSEFLAG::TYPE nFlag = parseRes.ulFlag;
 
 	if (parseRes.regRule.Size() == 0)
 	{
 		return;
 	}
-	else if (nFlag & CSnortRule::RULE_HASNOT)
+	else if (nFlag & PARSEFLAG::PARSE_HASNOT)
 	{
 		return;
 	}
-	else if (nFlag & CSnortRule::RULE_HASBYTE)
+	else if (nFlag & PARSEFLAG::PARSE_HASBYTE)
 	{
 		return;
 	}
