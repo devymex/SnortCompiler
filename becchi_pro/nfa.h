@@ -74,7 +74,7 @@
 using namespace std;
 
 class NFA;
-
+class CNfa;
 /* redefinitions used for convenience */
 
 typedef set<NFA*> nfa_set; 				//set of NFA states
@@ -301,7 +301,7 @@ public:
 	void output();
 
 	void nfa2CNfa(CNfa &cnfa);
-private:
+protected:
 	
 	/* returns the set of identifiers corresponding to the given set of NFA states
 	 * (convenient method used during subset construction) */

@@ -48,6 +48,8 @@
 #include <iostream>
 //#include <sys/time.h>
 
+#include <hwprj\dfa.h>
+
 using namespace std;
 
 #define MAX_DFA_SIZE_INCREMENT 50
@@ -206,7 +208,7 @@ void DFA::minimize() {
     int *inv_list_last = new int[n]; // the last element
     int c,s;
     
-    for (s=0;s<n;s++)
+    for (s=0;s<(int)n;s++)
     	inv_lists[s]=-1;
     
     for (c = 0; c < CSIZE; c++) {
@@ -952,7 +954,7 @@ void DFA::put_testbed(unsigned flag)
 				if (alpha_table[s] != prev_alpha[s])
 				{
 					if_new = 1;
-					prev_alpha[s] = alpha_table[s];
+					prev_alpha[s] = (unsigned short)alpha_table[s];
 				}
 			}
 			xres += if_new;
@@ -2667,8 +2669,8 @@ void DFA::analyze_classes(short *classes, short num_classes){
 			}
 		}
 		printf("state %ld: entry_states=%ld, entry_classes=%ld\n",s,entry_state[s],entry_class[s]);
-		if (entry_class[s]>max_eclass) max_eclass=entry_class[s];
-		if (entry_state[s]>max_estate) max_estate=entry_state[s];
+		if ((int)entry_class[s]>max_eclass) max_eclass=entry_class[s];
+		if ((int)entry_state[s]>max_estate) max_estate=entry_state[s];
 	}
 	printf("\n");
 	int num_states;
@@ -2794,7 +2796,8 @@ void DFA::analyze_default_tx(short *classes, short num_classes, int offset,FILE 
 	if (depth==NULL) set_depth();
 	printf("\n> Depth analysis...\n");
 	int max_d=0;
-	for(state_t s=0;s<_size;s++) if (depth[s]>max_d) max_d=depth[s];
+	for(state_t s=0;s<_size;s++)
+		if (depth[s]>max_d) max_d=depth[s];
 	printf("- max depth=%d\n",max_d);
 	state_t *state_d = new state_t[max_d+1];
 	state_t *target_d = new state_t[max_d+1];
@@ -3408,17 +3411,17 @@ void DFA::output()
 	}
 	std::cout << std::endl;
 }
-
-void DFA::Dfa2CDfaNew(CDfaNew &curDFA)
+#include <exception>
+void DFA::Dfa2CDfaNew(CDfa &curDFA)
 {
-	BYTE group[CSIZE];
+	byte group[CSIZE];
 	for (int i = 0; i < CSIZE; ++i)
 	{
-		group[i] = (BYTE)i;
+		group[i] = (byte)i;
 	}
 	
 	curDFA.Init(group);
-	curDFA.reserve(300);
+	curDFA.Reserve(300);
 	STATEID newIdx = 0;
 	STATEID *old2new = new STATEID[_size];
 	std::fill(old2new, old2new + _size, -1);
@@ -3429,10 +3432,7 @@ void DFA::Dfa2CDfaNew(CDfaNew &curDFA)
 			if (!accepted_rules[s]->empty())
 			{
 				linked_set *l = accepted_rules[s];
-				TERMSET tmpSta;
-				tmpSta.dfaSta = s;
-				tmpSta.dfaId = l->value();
-				curDFA.PushBackTermSet(tmpSta);
+				curDFA.GetFinalState().PushBack(s, l->value());
 				while (l != NULL)
 				{ 
 					l = l->succ();
@@ -3441,7 +3441,7 @@ void DFA::Dfa2CDfaNew(CDfaNew &curDFA)
 			if (state_table[s] != NULL)
 			{	
 				size_t ColNum = curDFA.GetGroupCount();
-				curDFA.PushBackDfa(CDfaRow(ColNum));	
+				curDFA.PushBack(CDfaRow(ColNum));	
 				for (size_t c = 0; c < ColNum; ++c)
 				{
 					curDFA[newIdx][c] = (STATEID)state_table[s][c];
@@ -3464,6 +3464,10 @@ void DFA::Dfa2CDfaNew(CDfaNew &curDFA)
 				STATEID nCur = curRow[c];
 				if (nCur != this->dead_state)
 				{
+					if (nCur >= _size)
+					{
+						throw exception("Error");
+					}
 					nDest = old2new[nCur];
 				}
 				curRow[c] = nDest;

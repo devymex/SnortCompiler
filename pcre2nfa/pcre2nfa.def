@@ -1,4 +1,0 @@
-LIBRARY pcre2nfa
-EXPORTS
-PcreToNFA @ 1
-match @ 2

@@ -64,7 +64,8 @@
 #include <map>
 #include <set>
 #include <list>
-#include "../dfanew/dfanew.h"
+
+class CDfa;
 
 using namespace std;
 
@@ -112,7 +113,7 @@ class DFA {
 	//---trick
 	//state_t *swap_table;
 
-	private:
+	protected:
 
 	/* number of entry allocated (for dynamic allocation) */
 	unsigned int entry_allocated;
@@ -301,7 +302,7 @@ class DFA {
 	 * Returns the resulting number of trees.
 	 */
 	unsigned CD2FA();
-	void Dfa2CDfaNew(CDfaNew &curDFA);
+	void Dfa2CDfaNew(CDfa &curDFA);
 };
 
 inline void DFA::add_transition(state_t old_state, symbol_t c, state_t new_state){ state_table[old_state][c]=new_state;}	
