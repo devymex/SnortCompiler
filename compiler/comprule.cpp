@@ -152,6 +152,48 @@ struct OPTIONPCRE : public CRuleOption
 {
 };
 
+/* complie one rule
+
+Arguments:
+  rule		the snort rule
+  lpVoid		the compile result
+
+Returns:		nothing
+
+*/
+void __stdcall CompileCallback(const PARSERESULT &parseRes, void *lpVoid)
+{
+	CCompileResults &result = *(CCompileResults*)lpVoid;
+	
+	result.GetSidDfaIds().PushBack(COMPILEDINFO());
+	COMPILEDINFO &ruleResult = result.GetSidDfaIds().Back();
+
+	ruleResult.m_nSid = parseRes.ulSid;
+	ruleResult.m_nResult = COMPILEDINFO::RES_SUCCESS;
+
+	if (parseRes.regRule.Size() == 0)
+	{
+		ruleResult.m_nResult |= COMPILEDINFO::RES_EMPTY;
+	}
+	if (parseRes.ulFlag & PARSEFLAG::PARSE_ERROR)
+	{
+		ruleResult.m_nResult |= COMPILEDINFO::RES_OPTIONERROR;
+	}
+	if (parseRes.ulFlag & PARSEFLAG::PARSE_HASNOT)
+	{
+		ruleResult.m_nResult |= COMPILEDINFO::RES_HASNOT;
+	}
+	if (parseRes.ulFlag & PARSEFLAG::PARSE_HASBYTE)
+	{
+		ruleResult.m_nResult |= COMPILEDINFO::RES_HASBYTE;
+	}
+
+	if (ruleResult.m_nResult == COMPILEDINFO::RES_SUCCESS)
+	{
+		Rule2Dfas(parseRes.regRule, result);
+	}
+}
+
 /*
 * read rules from a file
 */
@@ -575,10 +617,6 @@ ulong ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
 			}
 		}
 	}
-	if (sum == nCONT)
-	{
-		nFlag |= CSnortRule::RULE_HASNOSIG;
-	}
 	snortRule.SetFlag(nFlag);
 	return nResult;
 }
@@ -904,20 +942,22 @@ Arguments:
 Returns:		nothing
 
 */
-void Rule2Dfas(const CRegRule &rule, CCompileResults &result,
-			   COMPILEDRULE &ruleResult)
+void Rule2Dfas(const CRegRule &rule, CCompileResults &result)
 {
 	CTimer ctime;//for test
 	ctime.Reset();//for test
 	rule2pcretime += ctime.Reset();//for test
 
 	CRegRule regRule = rule;
-	ruleResult.m_nResult = COMPILEDRULE::RES_SUCCESS;
+	COMPILEDINFO &ruleResult = result.GetSidDfaIds().Back();
+
 	const ulong nDfaTblSize = result.GetDfaTable().Size();
 	const ulong nIncrement = rule.Size();
 	result.GetDfaTable().Resize(nDfaTblSize + nIncrement);
+
 	const ulong nRegexTblSize = result.GetRegexTbl().Size();
 	result.GetRegexTbl().Resize(nRegexTblSize + nIncrement);
+
 	ulong nDfaId;
 	ulong nChainId;
 	bool bHasSigs = false;
@@ -938,7 +978,7 @@ void Rule2Dfas(const CRegRule &rule, CCompileResults &result,
 		CDfa &dfa = result.GetDfaTable()[nDfaId];
 		if (nToNFAFlag == SC_ERROR)
 		{
-			ruleResult.m_nResult = COMPILEDRULE::RES_ERROR;
+			ruleResult.m_nResult |= COMPILEDINFO::RES_PCREERROR;
 			ruleResult.m_dfaIds.Clear();
 			result.GetDfaTable().Resize(nDfaTblSize);
 			result.GetRegexTbl().Resize(nRegexTblSize);
@@ -953,7 +993,7 @@ void Rule2Dfas(const CRegRule &rule, CCompileResults &result,
 
 			if (nToDFAFlag == -1)
 			{
-				ruleResult.m_nResult = COMPILEDRULE::RES_EXCEEDLIMIT;
+				ruleResult.m_nResult |= COMPILEDINFO::RES_EXCEEDLIMIT;
 				dfa.Clear();
 			}
 			else
@@ -967,7 +1007,7 @@ void Rule2Dfas(const CRegRule &rule, CCompileResults &result,
 				dfamintimetime += ctime.Reset();//for test
 				if (0 != nr || dfa.Size() > SC_MAXDFASIZE)
 				{
-					ruleResult.m_nResult = COMPILEDRULE::RES_EXCEEDLIMIT;
+					ruleResult.m_nResult |= COMPILEDINFO::RES_EXCEEDLIMIT;
 					dfa.Clear();
 				}
 			}
@@ -985,14 +1025,14 @@ void Rule2Dfas(const CRegRule &rule, CCompileResults &result,
 
 	if (!bHasSigs)
 	{
-		ruleResult.m_nResult = COMPILEDRULE::RES_HASNOSIG;
+		ruleResult.m_nResult |= COMPILEDINFO::RES_HASNOSIG;
 		ruleResult.m_dfaIds.Clear();
 		result.GetDfaTable().Resize(nDfaTblSize);
 		result.GetRegexTbl().Resize(nRegexTblSize);
 		return;
 	}
 
-	if (ruleResult.m_nResult != COMPILEDRULE::RES_ERROR)
+	if (ruleResult.m_nResult == COMPILEDINFO::RES_SUCCESS)
 	{
 		AssignSig(result, nRegexTblSize, nRegexTblSize + nIncrement);
 	}
