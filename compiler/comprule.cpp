@@ -22,7 +22,6 @@ double pcre2nfatime = 0.0;
 double nfa2dfatime = 0.0;
 double dfamintimetime = 0.0;
 
-#define nfaTreeReserve 100
 #define nfaReserve 10000
 
 /*
@@ -54,39 +53,6 @@ enum CONTYPE
 {
 	CONBYTE,
 	CONPCRE
-};
-
-enum OPTIONCONTENTFLAGS
-{
-	CF_NOCASE		= (1 << 0),//1
-	CF_OFFSET		= (1 << 1),//2
-	CF_DEPTH		= (1 << 2),//4
-	CF_DISTANCE		= (1 << 3),//8
-	CF_WITHIN		= (1 << 4),//16
-};
-
-enum PCREFLAGS
-{
-	PF_i = (1 << 0),
-	PF_s = (1 << 1),
-	PF_m = (1 << 2),
-	PF_x = (1 << 3),
-	PF_A = (1 << 4),
-	PF_E = (1 << 5),
-	PF_G = (1 << 6),
-	PF_R = (1 << 7),
-	PF_U = (1 << 8),
-	PF_B = (1 << 9),
-	PF_P = (1 << 10),
-	PF_H = (1 << 11),
-	PF_M = (1 << 12),
-	PF_C = (1 << 13),
-	PF_O = (1 << 14),
-	PF_I = (1 << 15),
-	PF_D = (1 << 16),
-	PF_K = (1 << 17),
-	PF_S = (1 << 18),
-	PF_Y = (1 << 19)
 };
 
 struct RULEOPTIONRAW
@@ -139,18 +105,8 @@ struct CONTENTNUM
 	}
 };
 
-struct OPTIONCONTENT : public CRuleOption
-{
-	BYTEARY vecconts;//content data
-	int nOffset;// offset constraint in snort rule
-	int nDepth;//depth constraint in snort rule
-	int nDistance;//distance constraint in snort rule
-	int nWithin;//within constraint in snort rule
-};
 
-struct OPTIONPCRE : public CRuleOption
-{
-};
+
 
 /*
 * read rules from a file
@@ -583,22 +539,6 @@ ulong ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
 	return nResult;
 }
 
-/*
-* process one rule
-*/
-void CompileRule(LPCSTR rule, RECIEVER recv, LPVOID lpUser)
-{
-	//Delete the rule header, reserve the rule options
-	std::string strRule(rule);
-	strRule.erase(strRule.begin(), find(strRule.begin(), strRule.end(), '(') + 1);
-	strRule.erase(find(strRule.rbegin(), strRule.rend(), ')').base() - 1, strRule.end());
-
-	CSnortRule snortRule;
-	if (0 == ProcessOption(strRule, snortRule))
-	{
-		recv(snortRule, lpUser);
-	}
-}
 
 /*
 * content has depth or within constraint
@@ -874,112 +814,7 @@ ulong content2Pcre(OPTIONCONTENT *pContent, CDllString &pcreStr)
 	return 0;
 }
 
-/*
-**	NAME
-**	 Rule2PcreList::
-*/
-/**
-**	This function converts a CSnortRule to a CRegRule and extract signatures from content option
-**
-**	According to the constraints of rule options, we split a snort rule into some option chains.
-**	For every option chain, the datapacket matchs from the first byte.
-**	Then we transfrom every option into pcre.
-**
-**	@param rule		 a CSnortRule object which contains the original information
-**					of a snort rule. 
-**	@param regrule	 the transformed CRegRule object which makes up of a number of pcre lists
-**						and the signatures in every pcre list.
-**
-**	@return integer
-**
-**	@retval  0 function successful
-**	@retval <>0 fatal error
-*/
 
-ulong Rule2PcreList(const CSnortRule &rule, CRegRule &regrule)
-{
-	regrule.Reserve(nfaTreeReserve);
-	ulong regChain_size = 0;
-	regrule.Resize(++regChain_size);
-	int cFlag = 0;
-
-	for(ulong i = 0; i < rule.Size(); ++i)
-	{
-		OPTIONCONTENT *pContent = dynamic_cast<OPTIONCONTENT*>(rule[i]);
-		OPTIONPCRE *pPcre = dynamic_cast<OPTIONPCRE*>(rule[i]);
-		
-		if(pContent != NULL)
-		{
-			if(!(pContent->TestFlag(CF_DISTANCE) || pContent->TestFlag(CF_WITHIN)))
-			{
-				if(regrule.Back().Size() != 0)
-				{
-					regrule.Resize(++regChain_size);
-				}
-			}
-			CDllString conPcreStr;
-
-			//transfrom content to pcre
-			cFlag = content2Pcre(pContent, conPcreStr);
-			if(cFlag != 0)
-			{
-				return cFlag;
-			}
-			if(pContent->vecconts.size() >= 4)
-			{
-				//extract signatures
-				BYTEARY contentTmp;
-				contentTmp.reserve(pContent->vecconts.size());
-				for(BYTEARY_ITER itTmp = pContent->vecconts.begin();
-					itTmp != pContent->vecconts.end(); ++itTmp)
-				{
-					byte c = *itTmp;
-					if (c >= 'A' && c <= 'Z')
-					{
-						contentTmp.push_back(c - 'A' + 'a');
-					}
-					else
-					{
-						contentTmp.push_back(c);
-					}
-				}
-
-				for(BYTEARY_ITER sigIt = contentTmp.begin();
-					sigIt + 3 != contentTmp.end(); ++sigIt)
-				{
-					SIGNATURE sig = *(SIGNATURE*)&(*sigIt);
-					regrule.Back().GetSigs().PushBack(sig);
-				}
-			}
-			regrule.Back().PushBack(conPcreStr);
-		}
-		else if(pPcre != NULL)
-		{
-			if(!(pPcre->GetFlag() & PF_R))
-			{
-				if(regrule.Back().Size() != 0)
-				{
-					regrule.Resize(++regChain_size);
-				}
-			}
-			std::string tmpStr;
-			tmpStr.resize(pPcre->GetPattern(NULL, 0));
-			pPcre->GetPattern(&tmpStr[0], tmpStr.size());
-			CDllString strPattern(tmpStr.c_str());
-			regrule.Back().PushBack(strPattern);
-		}
-	}
-
-	//regrule.Reserve(++regChain_size);
-	for(ulong i = 0; i < regrule.Size(); ++i)
-	{
-		if(regrule[i].GetSigs().Size() > 1)
-		{
-			regrule[i].GetSigs().Unique();
-		}
-	}
-	return 0;
-}
 
 
 /*
