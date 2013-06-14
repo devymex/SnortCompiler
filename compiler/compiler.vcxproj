@@ -68,12 +68,14 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
-      <Optimization>MaxSpeed</Optimization>
+      <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <BrowseInformation>true</BrowseInformation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -88,7 +90,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\include\hwprj\compiler.h" />
-    <ClInclude Include="..\include\hwprj\dfaarray.h" />
     <ClInclude Include="..\include\hwprj\compres.h" />
     <ClInclude Include="..\include\hwprj\pcrematch.h" />
     <ClInclude Include="..\include\hwprj\regchain.h" />
@@ -111,7 +112,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="compiler.cpp" />
-    <ClCompile Include="dfaarray.cpp" />
     <ClCompile Include="compres.cpp" />
     <ClCompile Include="p2nmain.cpp" />
     <ClCompile Include="pcre2nfa.cpp" />
@@ -217,6 +217,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="ClassDiagram.cd" />
     <None Include="compiler.def" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

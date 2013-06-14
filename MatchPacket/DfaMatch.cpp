@@ -6,7 +6,7 @@
 
 static ulong dpktnum = 0;
 
-void MatchOnedfa(const u_char * &data, ulong len, CDfa &dfa,
+void MatchOnedfa(const unsigned char * &data, ulong len, CDfa &dfa,
 				 std::vector<ulong> &matchedDids)
 {
 	if(dpktnum == 77)
@@ -298,7 +298,7 @@ MATCHPKT void DfaidSidMap(CGROUPRes &mergedDfas, DFASIDMAPPING &didSid)
 
 	for(ulong i = 0; i < sd.Size(); ++i)
 	{
-		COMPILEDRULENEW &onemap = sd[i];
+		COMPILEDINFO &onemap = sd[i];
 
 		didSid.sId_dIdVec;
 		didSid.sId_dIdVec[onemap.m_nSid].Resize(20);

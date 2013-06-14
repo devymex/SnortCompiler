@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 //#define NTDDI_VERSION NTDDI_WIN7
 //#define _WIN32_WINNT _WIN32_WINNT_WIN7
 //#define WINVER _WIN32_WINNT_WIN7
@@ -26,7 +26,7 @@
 #define MATCHPKT __declspec(dllexport)
 #endif
 
-/* 4×Ö½ÚµÄIPµØÖ· */
+/* 4å­—èŠ‚çš„IPåœ°å€ */
 typedef struct ip_address{
     u_char byte1;
     u_char byte2;
@@ -34,50 +34,50 @@ typedef struct ip_address{
     u_char byte4;
 }ip_address;
 
-/* IPv4 Ê×²¿ */
+/* 4å­—èŠ‚çš„IPåœ°å€ */
 typedef struct ip_header{
-    u_char  ver_ihl;        // °æ±¾ (4 bits) + Ê×²¿³¤¶È (4 bits)
-    u_char  tos;            // ·şÎñÀàĞÍ(Type of service) 
-    u_short tlen;           // ×Ü³¤(Total length) 
-    u_short identification; // ±êÊ¶(Identification)
-    u_short flags_fo;       // ±êÖ¾Î»(Flags) (3 bits) + ¶ÎÆ«ÒÆÁ¿(Fragment offset) (13 bits)
-    u_char  ttl;            // ´æ»îÊ±¼ä(Time to live)
-    u_char  proto;          // Ğ­Òé(Protocol)
-    u_short crc;            // Ê×²¿Ğ£ÑéºÍ(Header checksum)
-    ip_address  saddr;      // Ô´µØÖ·(Source address)
-    ip_address  daddr;      // Ä¿µÄµØÖ·(Destination address)
-    u_int   op_pad;         // Ñ¡ÏîÓëÌî³ä(Option + Padding)
+    u_char  ver_ihl;        // ï¿½æ±¾ (4 bits) + ï¿½×²ï¿½ï¿½ï¿½ï¿½ï¿½ (4 bits)
+    u_char  tos;            // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½(Type of service) 
+    u_short tlen;           // ï¿½Ü³ï¿½(Total length) 
+    u_short identification; // ï¿½ï¿½Ê¶(Identification)
+    u_short flags_fo;       // ï¿½ï¿½Ö¾Î»(Flags) (3 bits) + ï¿½ï¿½Æ«ï¿½ï¿½ï¿½ï¿½(Fragment offset) (13 bits)
+    u_char  ttl;            // ï¿½ï¿½ï¿½Ê±ï¿½ï¿½(Time to live)
+    u_char  proto;          // Ğ­ï¿½ï¿½(Protocol)
+    u_short crc;            // ï¿½×²ï¿½Ğ£ï¿½ï¿½ï¿½(Header checksum)
+    ip_address  saddr;      // Ô´ï¿½ï¿½Ö·(Source address)
+    ip_address  daddr;      // Ä¿ï¿½Äµï¿½Ö·(Destination address)
+    u_int   op_pad;         // Ñ¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½(Option + Padding)
 }ip_header;
 
-/* UDP Ê×²¿*/
+/* UDP ï¿½×²ï¿½*/
 typedef struct udp_header{
-    u_short sport;          // Ô´¶Ë¿Ú(Source port)
-    u_short dport;          // Ä¿µÄ¶Ë¿Ú(Destination port)
-    u_short len;            // UDPÊı¾İ°ü³¤¶È(Datagram length)
-    u_short crc;            // Ğ£ÑéºÍ(Checksum)
+    u_short sport;          // Ô´ï¿½Ë¿ï¿½(Source port)
+    u_short dport;          // Ä¿ï¿½Ä¶Ë¿ï¿½(Destination port)
+    u_short len;            // UDPï¿½ï¿½ï¿½İ°ï¿½ï¿½ï¿½ï¿½ï¿½(Datagram length)
+    u_short crc;            // Ğ£ï¿½ï¿½ï¿½(Checksum)
 }udp_header;
 
-typedef struct tcp_header //¶¨ÒåTCPÊ×²¿
+typedef struct tcp_header //ï¿½ï¿½ï¿½ï¿½TCPï¿½×²ï¿½
 
 {
 
-u_short saddr;           //16Î»Ô´¶Ë¿Ú
+u_short saddr;           //16Î»Ô´ï¿½Ë¿ï¿½
 
-u_short daddr;           //16Î»Ä¿µÄ¶Ë¿Ú
+u_short daddr;           //16Î»Ä¿ï¿½Ä¶Ë¿ï¿½
 
-u_int seq;               //32Î»ĞòÁĞºÅ
+u_int seq;               //32Î»ï¿½ï¿½ï¿½Ğºï¿½
 
-u_int ack;               //32Î»È·ÈÏºÅ
+u_int ack;               //32Î»È·ï¿½Ïºï¿½
 
-u_char lenres;           //4Î»Ê×²¿³¤¶È/6Î»±£Áô×Ö
+u_char lenres;           //4Î»ï¿½×²ï¿½ï¿½ï¿½ï¿½ï¿½/6Î»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-u_char flag;             //6Î»±êÖ¾Î»
+u_char flag;             //6Î»ï¿½ï¿½Ö¾Î»
 
-u_short window;          //16Î»´°¿Ú´óĞ¡
+u_short window;          //16Î»ï¿½ï¿½ï¿½Ú´ï¿½Ğ¡
 
-u_short crc;             //16Î»Ğ£ÑéºÍ
+u_short crc;             //16Î»Ğ£ï¿½ï¿½ï¿½
 
-u_short urp;            //16Î»½ô¼±Êı¾İÆ«ÒÆÁ¿
+u_short urp;            //16Î»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ«ï¿½ï¿½ï¿½ï¿½
 
 }tcp_header;
 
@@ -159,9 +159,9 @@ MATCHPKT bool LoadCapFile(const char* pFile, void* pUser);
 
 void __stdcall MyProcess(const CSnortRule &rule, LPVOID lpParam);
 MATCHPKT void MchCompile(LPCTSTR filename, LPVOID result);
-MATCHPKT bool TradithinalMatch(std::vector<u_char> &dataSrc, CRegRule &regRule);//µ÷ÓÃpcreMATCHPKT 
+MATCHPKT bool TradithinalMatch(std::vector<u_char> &dataSrc, CRegRule &regRule);//ï¿½ï¿½ï¿½ï¿½pcreMATCHPKT 
 
-//void GetMchRule(const u_char *data, ulong len, void* user, std::vector<ulong> &rules);
-//void HdlOnePkt(const u_char *data, ulong len, void*user);
-//bool PcreMatch(const u_char *data, ulong len, CRegRule &regRule);
-//MATCHPKT void HandleAllFile(const std::string &path, void* user);
+void GetMchRule(const u_char *data, ulong len, void* user, std::vector<ulong> &rules);
+void HdlOnePkt(const u_char *data, ulong len, void*user);
+bool PcreMatch(const u_char *data, ulong len, CRegRule &regRule);
+MATCHPKT void HandleAllFile(const std::string &path, void* user);

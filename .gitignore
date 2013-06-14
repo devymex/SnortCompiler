@@ -42,3 +42,5 @@ output/*
 ipch/*
 */Debug/*
 */Release/*
+*.BASE
+*.REMOTE

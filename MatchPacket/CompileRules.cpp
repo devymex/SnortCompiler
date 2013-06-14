@@ -3,12 +3,12 @@
 
 #include "MatchPkt.h"
 
-void __stdcall MyProcess(const CSnortRule &rule, LPVOID lpVoid)
+void __stdcall MyProcess(const PARSERESULT &parseRes, void *lpParam)
 {
-	REGRULESMAP &rulesmap = *(REGRULESMAP*)lpVoid;
-	ulong nFlag = rule.GetFlag();
+	REGRULESMAP &rulesmap = *(REGRULESMAP*)lpParam;
+	ulong nFlag = parseRes.ulFlags;
 
-	if (rule.Size() == 0)
+	if (parseRes.regRule.Size() == 0)
 	{
 		return;
 	}
@@ -24,12 +24,12 @@ void __stdcall MyProcess(const CSnortRule &rule, LPVOID lpVoid)
 	else
 	{
 		rulesmap.result.resize(rulesmap.result.size() + 1);
-		rulesmap.result.back().m_nSid = rule.GetSid();
-		Rule2PcreList(rule, rulesmap.result.back().regrule);
+		rulesmap.result.back().m_nSid = parseRes.ulSid;
+		rulesmap.result.back().regrule = parseRes.regRule;
 	}
 }
 
-MATCHPKT void MchCompile(LPCTSTR filename, LPVOID lpVoid)
+MATCHPKT void MchCompile(const char* filename, LPVOID lpVoid)
 {
 	//int sids[4653];
 	//std::memset(sids, 0, sizeof(sids));

@@ -1,3 +1,14 @@
+/*
+**	@file		grouping.h
+**
+**	@author		Lab 435, Xidian University
+**
+**	@brief		Grouping algorithm
+**
+**	Declaration of CGROUPS and CGROUPRes class
+**
+*/
+
 #pragma once
 
 #include <hwprj\unsary.h>

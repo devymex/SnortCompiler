@@ -1,3 +1,14 @@
+/*
+**	@file		compres.h
+**
+**	@author		Lab 435, Xidian University
+**
+**	@brief		Definition of the CCompileResults class
+**
+**	For compiler's result, access member, read and write etc. 
+**
+*/
+
 #pragma once
 
 #include <hwprj\dfaarray.h>

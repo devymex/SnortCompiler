@@ -1,3 +1,15 @@
+/*
+**	@file		buildhash.h
+**
+**	@author		Lab 435, Xidian University
+**
+**	@brief		Declaration of GROUPHASH class
+**
+**	Store mapping between grouping result and hash table
+**	Merge CDfa
+**
+*/
+
 #pragma once
 #include <map>
 #include <vector>

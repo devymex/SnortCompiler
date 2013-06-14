@@ -1,4 +1,4 @@
-/**
+/*
 **	@file		ctimer.h
 **
 **	@author		Devymex, Xidian University

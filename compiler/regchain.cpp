@@ -37,6 +37,11 @@ REGRULEHDR CDllString& CRegChain::operator[](ulong nIdx)
 	return (*m_pRegList)[nIdx];
 }
 
+REGRULEHDR const CDllString& CRegChain::operator[](ulong nIdx) const
+{
+	return (*m_pRegList)[nIdx];
+}
+
 REGRULEHDR const CRegChain& CRegChain::operator = (const CRegChain &other)
 {
 	*this->m_pRegList = *other.m_pRegList;

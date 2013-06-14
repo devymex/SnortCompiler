@@ -22,6 +22,7 @@ double pcre2nfatime = 0.0;
 double nfa2dfatime = 0.0;
 double dfamintimetime = 0.0;
 
+#define nfaTreeReserve 100
 #define nfaReserve 10000
 
 /*
@@ -53,6 +54,39 @@ enum CONTYPE
 {
 	CONBYTE,
 	CONPCRE
+};
+
+enum OPTIONCONTENTFLAGS
+{
+	CF_NOCASE		= (1 << 0),//1
+	CF_OFFSET		= (1 << 1),//2
+	CF_DEPTH		= (1 << 2),//4
+	CF_DISTANCE		= (1 << 3),//8
+	CF_WITHIN		= (1 << 4),//16
+};
+
+enum PCREFLAGS
+{
+	PF_i = (1 << 0),
+	PF_s = (1 << 1),
+	PF_m = (1 << 2),
+	PF_x = (1 << 3),
+	PF_A = (1 << 4),
+	PF_E = (1 << 5),
+	PF_G = (1 << 6),
+	PF_R = (1 << 7),
+	PF_U = (1 << 8),
+	PF_B = (1 << 9),
+	PF_P = (1 << 10),
+	PF_H = (1 << 11),
+	PF_M = (1 << 12),
+	PF_C = (1 << 13),
+	PF_O = (1 << 14),
+	PF_I = (1 << 15),
+	PF_D = (1 << 16),
+	PF_K = (1 << 17),
+	PF_S = (1 << 18),
+	PF_Y = (1 << 19)
 };
 
 struct RULEOPTIONRAW
@@ -105,8 +139,18 @@ struct CONTENTNUM
 	}
 };
 
+struct OPTIONCONTENT : public CRuleOption
+{
+	BYTEARY vecconts;//content data
+	int nOffset;// offset constraint in snort rule
+	int nDepth;//depth constraint in snort rule
+	int nDistance;//distance constraint in snort rule
+	int nWithin;//within constraint in snort rule
+};
 
-
+struct OPTIONPCRE : public CRuleOption
+{
+};
 
 /*
 * read rules from a file
@@ -539,151 +583,7 @@ ulong ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
 	return nResult;
 }
 
-
 /*
-* content has depth or within constraint
-* construct it to linear NFA
-*/
-void contentToLinearNFA(OPTIONCONTENT *pContent, CNfa &nfa)
-{
-	nfa.Reserve(nfaReserve);
-	ulong state_size = 0;
-
-	ulong patternLen = pContent->vecconts.size();
-	ulong mustCnt = 0, maxCnt = 0;//mustCnt和maxCnt分别代表经过任意字符跳转出现的最少和最多次数
-	if(pContent->TestFlag(CF_DEPTH))
-	{
-		mustCnt = pContent->nOffset;//必须跳转mustCnt次
-		maxCnt = pContent->nDepth - patternLen;//跳转了mustCnt次后，还需跳0-maxCnt次
-	}
-	else if(pContent->TestFlag(CF_WITHIN))
-	{
-		mustCnt = pContent->nDistance;
-		maxCnt = pContent->nWithin - patternLen;
-	}
-
-	//共offset + depth + 1或者distance + within + 1个状态，有一个初始状态
-	ulong stateID = mustCnt + maxCnt;//从stateID开始进行content字符串的跳转
-
-	//mustCnt：0-255任意字符跳转，必须要跳转的状态数
-	for(ulong i = 0; i < (mustCnt + maxCnt); ++i)
-	{
-		nfa.Resize(++state_size);
-		//nfa.PushBack(CNfaRow());
-		CNfaRow &row = nfa.Back();
-		ulong id = i + 1;
-		for(int j = 0; j < 256; ++j)
-		{
-			row.AddDest(j, id);
-		}
-		if(i >= mustCnt)
-		{
-			row.AddDest(SC_DFACOLCNT, stateID);
-		}
-	}
-
-	++stateID;
-	for(BYTEARY_CITER iter = pContent->vecconts.begin();
-		iter != pContent->vecconts.end(); ++iter)
-	{
-		nfa.Resize(++state_size);
-		//nfa.PushBack(CNfaRow());
-		CNfaRow &row = nfa.Back();
-
-		if(pContent->TestFlag(CF_NOCASE) && isalpha(*iter))
-		{
-			row.AddDest(toupper(*iter), stateID);
-			row.AddDest(tolower(*iter), stateID);
-		}
-		else
-		{
-			row.AddDest(*iter, stateID);
-		}
-
-		++stateID;
-	}
-
-	nfa.Reserve(++state_size);
-}
-
-//没有depth或者within标记的
-void contentToDefaultNFA(OPTIONCONTENT *pContent, CNfa &nfa)
-{
-	nfa.Reserve(nfaReserve);
-	ulong state_size = 0;
-
-	ulong mustCnt = 0;//经过的偏移字符个数
-	if((pContent->GetFlag() & CF_OFFSET))
-	{
-		mustCnt = pContent->nOffset;
-
-	}
-	else if((pContent->GetFlag() & CF_DISTANCE))
-	{
-		mustCnt = pContent->nDistance;
-	}
-
-	for(ulong i = 0; i < mustCnt; ++i)
-	{
-		nfa.Resize(++state_size);
-		//nfa.PushBack(CNfaRow());
-		CNfaRow &row = nfa.Back();
-		
-		ulong id = i + 1;
-		for(ulong j = 0; j < 256; ++j)
-		{
-			row.AddDest(j, id);
-		}
-	}
-
-	ulong stateID = mustCnt;//从stateID开始进行content.vecconts的匹配
-	ulong patternLen = pContent->vecconts.size(); 
-	BYTEARY pattern;
-	for(BYTEARY_CITER iter = pContent->vecconts.begin();
-		iter != pContent->vecconts.end(); ++iter)
-	{
-		byte c = byte((pContent->GetFlag() & CF_NOCASE) ? tolower(*iter) : *iter);
-		pattern.push_back(c);//如果content有nocase标记，则把模式串用字符的小写形式表示
-	}
-
-	//在前面加.*
-	for(ulong i = 0; i < patternLen; ++i)
-	{
-		nfa.Resize(++state_size);
-		//nfa.PushBack(CNfaRow());
-		CNfaRow &row = nfa.Back();
-		ulong id = stateID + i + 1;
-		for(ulong c = 0; c < 256; ++c)
-		{
-			if(i == 0)
-			{
-				row.AddDest(c, stateID);
-			}
-			byte character = byte((pContent->GetFlag() & CF_NOCASE) ? tolower(c) : c);
-			if(character == pattern[i])
-			{
-				row.AddDest(c, id);
-			}
-		}
-	}
-	nfa.Reserve(++state_size);
-}
-
-void content2Nfa(OPTIONCONTENT *pContent, CNfa &nfa)
-{
-	/*
-	如果有depth或者within，则构造成线性的FA; 否则，构造成默认FA
-	*/
-	if((pContent->GetFlag() & CF_DEPTH) || (pContent->GetFlag() & CF_WITHIN))
-	{
-		contentToLinearNFA(pContent, nfa);
-	}
-	else
-	{
-		contentToDefaultNFA(pContent, nfa);
-	}
-}
-
 //test function: output a nfa
 void PrintDfaToText(CNfa &nfa, std::string &fileName)
 {
@@ -814,7 +714,112 @@ ulong content2Pcre(OPTIONCONTENT *pContent, CDllString &pcreStr)
 	return 0;
 }
 
+/*
+**	NAME
+**	 Rule2PcreList::
+*/
+/**
+**	This function converts a CSnortRule to a CRegRule and extract signatures from content option
+**
+**	According to the constraints of rule options, we split a snort rule into some option chains.
+**	For every option chain, the datapacket matchs from the first byte.
+**	Then we transfrom every option into pcre.
+**
+**	@param rule		 a CSnortRule object which contains the original information
+**					of a snort rule. 
+**	@param regrule	 the transformed CRegRule object which makes up of a number of pcre lists
+**						and the signatures in every pcre list.
+**
+**	@return integer
+**
+**	@retval  0 function successful
+**	@retval <>0 fatal error
+*/
 
+ulong Rule2PcreList(const CSnortRule &rule, CRegRule &regrule)
+{
+	regrule.Reserve(nfaTreeReserve);
+	ulong regChain_size = 0;
+	regrule.Resize(++regChain_size);
+	int cFlag = 0;
+
+	for(ulong i = 0; i < rule.Size(); ++i)
+	{
+		OPTIONCONTENT *pContent = dynamic_cast<OPTIONCONTENT*>(rule[i]);
+		OPTIONPCRE *pPcre = dynamic_cast<OPTIONPCRE*>(rule[i]);
+		
+		if(pContent != NULL)
+		{
+			if(!(pContent->TestFlag(CF_DISTANCE) || pContent->TestFlag(CF_WITHIN)))
+			{
+				if(regrule.Back().Size() != 0)
+				{
+					regrule.Resize(++regChain_size);
+				}
+			}
+			CDllString conPcreStr;
+
+			//transfrom content to pcre
+			cFlag = content2Pcre(pContent, conPcreStr);
+			if(cFlag != 0)
+			{
+				return cFlag;
+			}
+			if(pContent->vecconts.size() >= 4)
+			{
+				//extract signatures
+				BYTEARY contentTmp;
+				contentTmp.reserve(pContent->vecconts.size());
+				for(BYTEARY_ITER itTmp = pContent->vecconts.begin();
+					itTmp != pContent->vecconts.end(); ++itTmp)
+				{
+					byte c = *itTmp;
+					if (c >= 'A' && c <= 'Z')
+					{
+						contentTmp.push_back(c - 'A' + 'a');
+					}
+					else
+					{
+						contentTmp.push_back(c);
+					}
+				}
+
+				for(BYTEARY_ITER sigIt = contentTmp.begin();
+					sigIt + 3 != contentTmp.end(); ++sigIt)
+				{
+					SIGNATURE sig = *(SIGNATURE*)&(*sigIt);
+					regrule.Back().GetSigs().PushBack(sig);
+				}
+			}
+			regrule.Back().PushBack(conPcreStr);
+		}
+		else if(pPcre != NULL)
+		{
+			if(!(pPcre->GetFlag() & PF_R))
+			{
+				if(regrule.Back().Size() != 0)
+				{
+					regrule.Resize(++regChain_size);
+				}
+			}
+			std::string tmpStr;
+			tmpStr.resize(pPcre->GetPattern(NULL, 0));
+			pPcre->GetPattern(&tmpStr[0], tmpStr.size());
+			CDllString strPattern(tmpStr.c_str());
+			regrule.Back().PushBack(strPattern);
+		}
+	}
+
+	//regrule.Reserve(++regChain_size);
+	for(ulong i = 0; i < regrule.Size(); ++i)
+	{
+		if(regrule[i].GetSigs().Size() > 1)
+		{
+			regrule[i].GetSigs().Unique();
+		}
+	}
+	return 0;
+}
 
 
 /*
@@ -835,20 +840,20 @@ ulong content2Pcre(OPTIONCONTENT *pContent, CDllString &pcreStr)
 **	@retval <>0 fatal error
 */
 
-ulong CRegChainToNFA(CRegChain &regchain, CNfa &nfa)
+ulong Chain2NFA(const CRegChain &regchain, CNfa &nfa, CSignatures &sigs)
 {
 	nfa.Reserve(nfaReserve);
 	int flag = 0;
 	for(ulong i = 0; i < regchain.Size(); ++i)
 	{
-		flag = PcreToNFA(regchain[i].GetStr(), nfa, regchain.GetSigs());
+		flag = PcreToNFA(regchain[i].GetStr(), nfa, sigs);
 		if(flag != 0)
 		{
 			nfa.Clear();
 			return flag;
 		}
 	}
-	regchain.GetSigs().Unique();
+	sigs.Unique();
 	return 0;
 }
 
@@ -886,5 +891,109 @@ void AssignSig(CCompileResults &result, ulong BegIdx, ulong EndIdx)
 		{
 			result.GetRegexTbl()[i].GetSigs().PushBack(vecRuleSigs[j]);
 		}
+	}
+}
+
+/* complie one rule to several dfas
+
+Arguments:
+  rule		the snort rule
+  result		the compile result
+  ruleResult  the relationship between sid and dfa ids
+
+Returns:		nothing
+
+*/
+void Rule2Dfas(const CRegRule &rule, CCompileResults &result,
+			   COMPILEDRULE &ruleResult)
+{
+	CTimer ctime;//for test
+	ctime.Reset();//for test
+	rule2pcretime += ctime.Reset();//for test
+
+	CRegRule regRule = rule;
+	ruleResult.m_nResult = COMPILEDRULE::RES_SUCCESS;
+	const ulong nDfaTblSize = result.GetDfaTable().Size();
+	const ulong nIncrement = rule.Size();
+	result.GetDfaTable().Resize(nDfaTblSize + nIncrement);
+	const ulong nRegexTblSize = result.GetRegexTbl().Size();
+	result.GetRegexTbl().Resize(nRegexTblSize + nIncrement);
+	ulong nDfaId;
+	ulong nChainId;
+	bool bHasSigs = false;
+	for (ulong i = 0; i < nIncrement; ++i)
+	{
+		CNfa nfa;
+
+		ulong nToNFAFlag = Chain2NFA(regRule[i], nfa, regRule[i].GetSigs());
+		pcre2nfatime += ctime.Reset();//for test
+
+		if (rule[i].GetSigs().Size() > 0)
+		{
+			bHasSigs = true;
+		}
+
+		nDfaId = nDfaTblSize + i;
+		nChainId = nRegexTblSize + i;
+		CDfa &dfa = result.GetDfaTable()[nDfaId];
+		if (nToNFAFlag == SC_ERROR)
+		{
+			ruleResult.m_nResult = COMPILEDRULE::RES_ERROR;
+			ruleResult.m_dfaIds.Clear();
+			result.GetDfaTable().Resize(nDfaTblSize);
+			result.GetRegexTbl().Resize(nRegexTblSize);
+			return;
+		}
+		else
+		{
+			ctime.Reset();//for test
+			dfa.SetId(nDfaId);
+			ulong nToDFAFlag = dfa.FromNFA(nfa);
+			nfa2dfatime += ctime.Reset();//for test
+
+			if (nToDFAFlag == -1)
+			{
+				ruleResult.m_nResult = COMPILEDRULE::RES_EXCEEDLIMIT;
+				dfa.Clear();
+			}
+			else
+			{
+				ctime.Reset();//for test
+				ulong nr = dfa.Minimize();
+				if (dfa.GetFinalState().Size() == 0)
+				{
+					system("pause");
+				}
+				dfamintimetime += ctime.Reset();//for test
+				if (0 != nr || dfa.Size() > SC_MAXDFASIZE)
+				{
+					ruleResult.m_nResult = COMPILEDRULE::RES_EXCEEDLIMIT;
+					dfa.Clear();
+				}
+			}
+		}
+		if (dfa.Size() == 0)
+		{
+			ruleResult.m_dfaIds.Clear();
+			result.GetDfaTable().Resize(nDfaTblSize);
+			result.GetRegexTbl().Resize(nRegexTblSize);
+			return;
+		}
+		ruleResult.m_dfaIds.PushBack(nDfaId);
+		result.GetRegexTbl()[nChainId] = regRule[i];
+	}
+
+	if (!bHasSigs)
+	{
+		ruleResult.m_nResult = COMPILEDRULE::RES_HASNOSIG;
+		ruleResult.m_dfaIds.Clear();
+		result.GetDfaTable().Resize(nDfaTblSize);
+		result.GetRegexTbl().Resize(nRegexTblSize);
+		return;
+	}
+
+	if (ruleResult.m_nResult != COMPILEDRULE::RES_ERROR)
+	{
+		AssignSig(result, nRegexTblSize, nRegexTblSize + nIncrement);
 	}
 }
