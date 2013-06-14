@@ -95,14 +95,14 @@ int main()
 	CTimer ctime;
 	CCompileResults result;
 	CompileRuleFile("..\\allrules.rule", result);
-	result.WriteToFile("..\\..\\output\\result_new.cdt");
-	//result.ReadFromFile("..\\result.cdt");
+	result.WriteToFile("..\\result_new.cdt");
+	//result.ReadFromFile("..\\result_new.cdt");
 	CGROUPRes groupRes;
 	Grouping(result, groupRes);
-	groupRes.WriteToFile("..\\..\\output\\GroupResut_new.cdt");
+	groupRes.WriteToFile("..\\GroupResut_new.cdt");
 	HASHRES HashResMap;
 	HashMapping(groupRes, HashResMap);
-	groupRes.WriteToFile("..\\..\\output\\FinalResut_new.cdt");
+	groupRes.WriteToFile("..\\FinalResut_new.cdt");
 	std::cout << "Total time: " << ctime.Reset() << std::endl;
 	std::cout << groupRes.GetGroups().Size() << std::endl;
 	std::cout << HashResMap.size() << std::endl;
