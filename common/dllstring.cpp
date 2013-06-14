@@ -8,8 +8,8 @@
 */
 
 #include "stdafx.h"
-#include <hwprj\trace.h>
 #include <hwprj\dllstring.h>
+#include <hwprj\trace.h>
 
 DLLSTRHDR CDllString::CDllString()
 {

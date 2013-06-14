@@ -15,10 +15,11 @@
 typedef unsigned char			byte;
 typedef unsigned long			ulong;
 typedef unsigned short			ushort;
-typedef ushort					STATEID;
-typedef ulong					DFAID;
 typedef char*					pstr;
 typedef const char*				pcstr;
+typedef ushort					STATEID;
+typedef ulong					DFAID;
+typedef ulong					SIGNATURE;
 
 /* compile configurations */
 #define SC_MAXDFASIZE	255

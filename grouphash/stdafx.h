@@ -10,14 +10,26 @@
 #include <tchar.h>
 #include <algorithm>
 #include <iostream>
+#include <vector>
 #include <fstream>
 #include <map>
 #include <windows.h>
 #include <numeric>
 #include <string>
 #include <sstream>
-#include <hwprj\trace.h>
+#include <unordered_map>
 
-#define GROUPHDR_DS
+#include <hwprj\trace.h>
+#include <hwprj\ctimer.h>
+#include <hwprj\signatures.h>
+#include <hwprj\dfa.h>
+#include <hwprj\dfaarray.h>
+#include <hwprj\compres.h>
+
+#define GROUPSHDR_DS
+#define GROUPRESHDR_DS
+#define GROUPINGHDR_DS
 
 #define HASHMAPHDR_DS
+
+typedef std::vector<struct ONEGROUP> GROUPVEC;

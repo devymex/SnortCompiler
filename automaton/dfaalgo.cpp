@@ -10,7 +10,6 @@
 */
 
 #include "stdafx.h"
-#include <hwprj\common.h>
 #include <hwprj\dfa.h>
 #include <hwprj\nfa.h>
 #include "dfaalgo.h"
@@ -358,7 +357,7 @@ void AddTermIntoDFA(STATEID otherSta, const CDfa &other,
 	const CFinalStates &orgFinStas = other.GetFinalState();
 	CFinalStates &newFinStas = lastDfa.GetFinalState();
 	newFinStas.PushBack(lastSta);
-	newFinStas.GetDfaIdSet(lastSta) = orgFinStas.GetDfaIdSet(otherSta);
+	newFinStas.GetDfaIdSet(lastSta).Append(orgFinStas.GetDfaIdSet(otherSta));
 }
 
 void SetStateFlags(byte *pFlags, STATEVEC states)

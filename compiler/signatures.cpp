@@ -3,13 +3,13 @@
 
 SIGHDR CSignatures::CSignatures()
 {
-	m_pSigs = new std::vector<SIGNATURE>;
+	m_pSigs = new SIGNATUREVEC;
 	CHECKALLOC(m_pSigs);
 }
 
 SIGHDR CSignatures::CSignatures(const CSignatures& other)
 {
-	m_pSigs = new std::vector<SIGNATURE>;
+	m_pSigs = new SIGNATUREVEC;
 	CHECKALLOC(m_pSigs);
 	*this = other;
 }
@@ -18,6 +18,16 @@ SIGHDR const CSignatures &CSignatures::operator=(const CSignatures &other)
 {
 	*m_pSigs = *other.m_pSigs;
 	return *this;
+}
+
+SIGHDR bool CSignatures::operator == (const CSignatures &other) const
+{
+	return *m_pSigs == *other.m_pSigs;
+}
+
+SIGHDR bool CSignatures::operator <	(const CSignatures &other) const
+{
+	return *m_pSigs < *other.m_pSigs;
 }
 
 SIGHDR CSignatures::~CSignatures()
@@ -60,4 +70,17 @@ SIGHDR void CSignatures::Unique()
 	std::sort(m_pSigs->begin(), m_pSigs->end());
 	m_pSigs->erase(std::unique(m_pSigs->begin(),
 		m_pSigs->end()), m_pSigs->end());
+}
+
+SIGHDR ulong CSignatures::Find(SIGNATURE Sig) const
+{
+	SIGVEC_ITER iter = std::find(m_pSigs->begin(), m_pSigs->end(), Sig);
+	if (iter == m_pSigs->end())
+	{
+		return ulong(-1);
+	}
+	else
+	{
+		return iter - m_pSigs->begin();
+	}
 }

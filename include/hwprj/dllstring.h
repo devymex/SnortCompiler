@@ -11,7 +11,6 @@
 
 #pragma once
 
-#include <string>
 #include <hwprj\common.h>
 
 #ifndef DLLSTRHDR_DS
