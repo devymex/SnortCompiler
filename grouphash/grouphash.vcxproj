@@ -104,6 +104,7 @@
     <ClInclude Include="..\include\hwprj\buildhash.h" />
     <ClInclude Include="..\include\hwprj\groupres.h" />
     <ClInclude Include="..\include\hwprj\groups.h" />
+    <ClInclude Include="hash.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
