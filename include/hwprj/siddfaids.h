@@ -1,3 +1,14 @@
+/*
+**	@file		siddfas.h
+**
+**	@author		Lab 435, Xidian University
+**
+**	@brief		Declaration of the CSidDfaIds class
+**
+**	Store the mapping between SID and DFAID
+**
+*/
+
 #pragma once
 
 #include <hwprj\unsary.h>
@@ -8,18 +19,17 @@
 #define SIDDFAHDR __declspec(dllexport)
 #endif
 
-struct COMPILEDRULE
+struct COMPILEDINFO
 {
-	enum
-	{
-		RES_SUCCESS = 0x0000,
-		RES_ERROR = 0x0001, 
-		RES_HASBYTE = 0x0002, 
-		RES_HASNOT = 0x0004, 
-		RES_EMPTY = 0x0008,
-		RES_HASNOSIG = 0x0010,
-		RES_EXCEEDLIMIT = 0x0020,
-	};
+	typedef ulong COMPRETCODE;
+	static const COMPRETCODE RES_SUCCESS		= 0x0000;
+	static const COMPRETCODE RES_PCREERROR		= 0x0001; 
+	static const COMPRETCODE RES_OPTIONERROR	= 0x0001; 
+	static const COMPRETCODE RES_HASBYTE		= 0x0002; 
+	static const COMPRETCODE RES_HASNOT			= 0x0004; 
+	static const COMPRETCODE RES_EMPTY			= 0x0008;
+	static const COMPRETCODE RES_HASNOSIG		= 0x0010;
+	static const COMPRETCODE RES_EXCEEDLIMIT	= 0x0020;
 	ulong m_nSid;
 	ulong m_nResult;
 	CUnsignedArray m_dfaIds;
@@ -33,13 +43,13 @@ public:
 	const CSidDfaIds &operator=(const CSidDfaIds &other);
 	~CSidDfaIds();
 
-	COMPILEDRULE& operator[](ulong index);
-	const COMPILEDRULE& operator[](ulong index) const;
+	COMPILEDINFO& operator[](ulong index);
+	const COMPILEDINFO& operator[](ulong index) const;
 	void Reserve(ulong nCount);
 	void Resize(ulong nSize);
 	const ulong Size() const;
-	void PushBack(const COMPILEDRULE &sidDfaIds);
-	COMPILEDRULE& Back();
+	void PushBack(const COMPILEDINFO &sidDfaIds);
+	COMPILEDINFO& Back();
 protected:
-	std::vector<COMPILEDRULE> *m_ruleResult;
+	std::vector<COMPILEDINFO> *m_ruleResult;
 };

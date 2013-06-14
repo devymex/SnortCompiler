@@ -1,11 +1,11 @@
-/**
+/*
 **	@file		finalstates.h
 **
 **	@author		Lab 435, Xidian University
 **
 **	@brief		Declaration of the CFinalStates class
 **
-** store the mapping between STATEID and DFAID
+**	Store the mapping between STATEID and DFAID
 **
 */
 

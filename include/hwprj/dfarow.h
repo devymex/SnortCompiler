@@ -1,13 +1,13 @@
-/**
+/*
 **	@file		dfarow.h
 **
 **	@author		Lab 435, Xidian University
 **
 **	@brief		Declaration of the CDfaRow class
 **
-** Store a row for CDfaRow. Array of std::vector<ulong>. Each element of the
-** array stand by a column that indicates the jumping character.
-** Each number in vector is the next state would be jump to by the character.
+**	Store a row for CDfaRow. Array of std::vector<ulong>. Each element of the
+**	array stand by a column that indicates the jumping character.
+**	Each number in vector is the next state would be jump to by the character.
 **
 */
 

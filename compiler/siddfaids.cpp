@@ -3,12 +3,12 @@
 
 SIDDFAHDR CSidDfaIds::CSidDfaIds()
 {
-	m_ruleResult = new std::vector<COMPILEDRULE>;
+	m_ruleResult = new std::vector<COMPILEDINFO>;
 }
 
 SIDDFAHDR CSidDfaIds::CSidDfaIds(const CSidDfaIds& other)
 {
-	m_ruleResult = new std::vector<COMPILEDRULE>;
+	m_ruleResult = new std::vector<COMPILEDINFO>;
 	*this = other;
 }
 
@@ -22,12 +22,12 @@ SIDDFAHDR CSidDfaIds::~CSidDfaIds()
 	delete m_ruleResult;
 }
 
-SIDDFAHDR COMPILEDRULE& CSidDfaIds::operator[](ulong index)
+SIDDFAHDR COMPILEDINFO& CSidDfaIds::operator[](ulong index)
 {
 	return (*m_ruleResult)[index];
 }
 
-SIDDFAHDR const COMPILEDRULE& CSidDfaIds::operator[](ulong index) const
+SIDDFAHDR const COMPILEDINFO& CSidDfaIds::operator[](ulong index) const
 {
 	return (*m_ruleResult)[index];
 }
@@ -47,12 +47,12 @@ SIDDFAHDR const ulong CSidDfaIds::Size() const
 	return m_ruleResult->size();
 }
 
-SIDDFAHDR void CSidDfaIds::PushBack(const COMPILEDRULE &ruleResult)
+SIDDFAHDR void CSidDfaIds::PushBack(const COMPILEDINFO &ruleResult)
 {
 	m_ruleResult->push_back(ruleResult);
 }
 
-SIDDFAHDR COMPILEDRULE& CSidDfaIds::Back()
+SIDDFAHDR COMPILEDINFO& CSidDfaIds::Back()
 {
 	return m_ruleResult->back();
 }

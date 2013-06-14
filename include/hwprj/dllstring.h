@@ -1,11 +1,11 @@
-/**
+/*
 **	@file		dllstring.h
 **
 **	@author		Lab 435, Xidian University
 **
 **	@brief		Common string class
 **
-**	Definiation of the CDllString class
+**	Definition of the CDllString class
 **
 */
 
@@ -42,7 +42,7 @@ public:
 	void			Append(const char* pChar);
 	char			Back() const;
 	void			PushBack(const char nChar);
-	const char*		GetStr();
+	const char*		GetStr() const;
 
 protected:
 	DLLSTRING *m_pString;

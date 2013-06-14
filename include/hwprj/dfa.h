@@ -1,4 +1,4 @@
-/**
+/*
 **	@file		dfa.h
 **
 **	@author		Lab 435, Xidian University
@@ -82,7 +82,8 @@ protected:
 };
 
 //需要更改接口，参数不能为stl对象！
-DFAHDR bool MergeMultipleDfas(std::vector<CDfa> &dfas, CDfa &lastDfa);
+//DFAHDR bool MergeMultipleDfas(std::vector<CDfa> &dfas, CDfa &lastDfa);
+DFAHDR bool MergeMultipleDfas(class CDfaArray &dfas, CDfa &lastDfa);
 
 DFAHDR void PrintDfaToGv(CDfa &newdfa, const char* fileName);
 

@@ -100,7 +100,7 @@ COMPRESHDR ulong CCompileResults::WriteToFile(const char *filename)
 	//start to write the relationship between sid and dfa ids
 	for (ulong i = 0; i < m_sidDfaIds.Size(); ++i)
 	{
-		COMPILEDRULE &ruleResult = m_sidDfaIds[i];
+		COMPILEDINFO &ruleResult = m_sidDfaIds[i];
 		WriteNum(fout, ruleResult.m_nSid);
 		WriteNum(fout, ruleResult.m_nResult);
 		WriteNum(fout, ruleResult.m_dfaIds.Size());
@@ -226,7 +226,7 @@ COMPRESHDR ulong CCompileResults::ReadFromFile(const char *filename)
 	ulong SidDfaNum;
 	for (ulong i = 0; i < ruleNum; ++i)
 	{
-		COMPILEDRULE &ruleResult = m_sidDfaIds[i];
+		COMPILEDINFO &ruleResult = m_sidDfaIds[i];
 		fin.read((char*)&ruleResult.m_nSid, 4);
 		fin.read((char*)&ruleResult.m_nResult, 4);
 		fin.read((char*)&SidDfaNum, 4);

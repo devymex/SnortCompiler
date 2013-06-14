@@ -1,6 +1,15 @@
-#define _CRTDBG_MAP_ALLOC
-#include <stdlib.h>
-#include <crtdbg.h>
+/*
+**	@file		stdafx.h
+**
+**	@author		Lab 435, Xidian University
+**
+**	@brief		Precompile header common library
+**
+*/
+
+//#define _CRTDBG_MAP_ALLOC
+//#include <stdlib.h>
+//#include <crtdbg.h>
 
 #include <iostream>
 #include <vector>
@@ -27,6 +36,7 @@
 #define FINSTAHDR_DS
 #define DFAHDR_DS
 #define NFAHDR_DS
+#define DFAARYHDR_DS
 
 typedef std::vector<STATEID>		STATEVEC;
 typedef STATEVEC::iterator			STATEVEC_ITER;
@@ -41,5 +51,6 @@ typedef std::vector<class CNfaRow>	NFAROWARY;
 typedef std::vector<ulong>			ULONGVEC;
 
 typedef std::set<DFAID>				DFAIDSET;
+typedef std::vector<class CDfa>		CDFAVEC;
 
 typedef std::unordered_map<STATEID, class CDfaIdSet> FINSTAMAP;

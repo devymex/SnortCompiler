@@ -90,7 +90,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\include\hwprj\compiler.h" />
-    <ClInclude Include="..\include\hwprj\dfaarray.h" />
     <ClInclude Include="..\include\hwprj\compres.h" />
     <ClInclude Include="..\include\hwprj\pcrematch.h" />
     <ClInclude Include="..\include\hwprj\regchain.h" />
@@ -113,7 +112,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="compiler.cpp" />
-    <ClCompile Include="dfaarray.cpp" />
     <ClCompile Include="compres.cpp" />
     <ClCompile Include="p2nmain.cpp" />
     <ClCompile Include="pcre2nfa.cpp" />
@@ -219,7 +217,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="ClassDiagram.cd" />
     <None Include="compiler.def" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

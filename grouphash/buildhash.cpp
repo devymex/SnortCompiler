@@ -408,7 +408,9 @@ void Combine(CGroupRes &groupRes, std::vector<GROUPHASH> &vecGroups, RESULTMAP &
 		{
 			for (std::vector<ulong>::iterator j = i->second.begin(); j != i->second.end(); ++j)
 			{
-				std::vector<CDfa> vecDfas(2);
+				//std::vector<CDfa> vecDfas(2);
+				CDfaArray vecDfas;
+				vecDfas.Resize(2);
 				vecDfas[0] = groupRes.GetDfaTable()[vecGroups[*j].mergeDfaId];
 				for (std::vector<ulong>::iterator k = j + 1; k != i->second.end(); )
 				{
@@ -470,7 +472,9 @@ void Combine(CGroupRes &groupRes, std::vector<GROUPHASH> &vecGroups, RESULTMAP &
 					GROUPHASH &g2 = vecGroups[result[vecKeys[j]][0]];
 					if (CanCombine(g1, g2, result, Sig))
 					{
-						std::vector<CDfa> vecDfas(2);
+						//std::vector<CDfa> vecDfas(2);
+						CDfaArray vecDfas;
+						vecDfas.Resize(2);
 						vecDfas[0] = groupRes.GetDfaTable()[g1.mergeDfaId];
 						vecDfas[1] = groupRes.GetDfaTable()[g2.mergeDfaId];
 						CDfa MergeDfa;

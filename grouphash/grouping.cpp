@@ -15,6 +15,8 @@
 #include "stdafx.h"
 #include <hwprj\ctimer.h>
 #include <hwprj\signatures.h>
+#include <hwprj\dfa.h>
+#include <hwprj\dfaarray.h>
 #include <hwprj\compres.h>
 #include <hwprj\groups.h>
 #include <hwprj\groupres.h>
@@ -108,7 +110,8 @@ void Merge(CCompileResults &res, CGroups &groups)
 		{
 			continue;
 		}
-		std::vector<CDfa> vecDfas(2);
+		CDfaArray vecDfas;
+		vecDfas.Resize(2);
 		CDfa MergeDfa;
 		MergeDfa.SetId(res.GetDfaTable().Size());
 		vecDfas[0] = res.GetDfaTable()[groups[i].DfaIds[0]];
@@ -188,7 +191,8 @@ void PutInBySig(const std::vector<CSignatures> &SigsVec, CCompileResults &res, C
 		std::cout << "Total: " << sigToGroupsMap.size() << std::endl << std::endl;
 		for (std::vector<ulong>::iterator j = i->second.begin(); j != i->second.end(); ++j)
 		{
-			std::vector<CDfa> vecDfas(2);
+			CDfaArray vecDfas;
+			vecDfas.Resize(2);
 			vecDfas[0] = res.GetDfaTable()[groups[*j].mergeDfaId];
 			for (std::vector<ulong>::iterator k = vecWaitForGroup.begin(); k != vecWaitForGroup.end(); )
 			{
@@ -377,7 +381,8 @@ void MergeGroup(CCompileResults &res, std::vector<SIGNATURE> &vecUsed, CGroups &
 			}
 		}
 		//++SigsToNumMap[vecSigs];
-		std::vector<CDfa> vecDfas(2);
+		CDfaArray vecDfas;
+		vecDfas.Resize(2);
 		vecDfas[0] = res.GetDfaTable()[newGroups[i].mergeDfaId];
 		for (; ;)
 		{

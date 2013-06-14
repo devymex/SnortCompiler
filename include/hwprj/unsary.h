@@ -1,7 +1,7 @@
-/**
+/*
 **	@file		unsary.h
 **
-**	@author	  Lab 435, Xidian University
+**	@author		Lab 435, Xidian University
 **
 **	@brief		Common unsgined long array
 **

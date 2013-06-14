@@ -1,3 +1,14 @@
+/*
+**	@file		regchain.h
+**
+**	@author		Lab 435, Xidian University
+**
+**	@brief		Construct regex chain with attribute of snort rules
+**
+**	Declaration of the CRegChain class
+**
+*/
+
 #pragma once
 
 #include <hwprj\dllstring.h>
@@ -19,6 +30,7 @@ public:
 	const CRegChain& operator = (const CRegChain &other);
 
 	CDllString& operator[](ulong nIdx);
+	const CDllString& operator[](ulong nIdx) const;
 
 	ulong Size() const;
 	CDllString& Back() const;

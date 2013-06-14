@@ -1,3 +1,14 @@
+/*
+**	@file		dfaarray.h
+**
+**	@author		Lab 435, Xidian University
+**
+**	@brief		Declaration of the CDfaArray class
+**
+**	Store multiple CDfa
+**
+*/
+
 #pragma once
 
 #include <hwprj\dfa.h>

@@ -61,7 +61,7 @@ DLLSTRHDR char CDllString::Back() const
 	return m_pString->back();
 }
 
-DLLSTRHDR const char* CDllString::GetStr()
+DLLSTRHDR const char* CDllString::GetStr() const
 {
 	return m_pString->c_str();
 }
