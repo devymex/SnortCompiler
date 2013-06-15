@@ -1015,11 +1015,8 @@ void Rule2Dfas(const CRegRule &rule, CCompileResults &result)
 			else
 			{
 				ctime.Reset();//for test
+				TASSERT(dfa.GetFinalState().Size() != 0);
 				ulong nr = dfa.Minimize();
-				if (dfa.GetFinalState().Size() == 0)
-				{
-					system("pause");
-				}
 				dfamintimetime += ctime.Reset();//for test
 				if (0 != nr || dfa.Size() > SC_MAXDFASIZE)
 				{

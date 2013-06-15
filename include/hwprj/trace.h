@@ -1,3 +1,4 @@
+#pragma once
 #include <hwprj\common.h>
 
 #ifndef TRACEHDR_DS
@@ -5,6 +6,7 @@
 #else
 #define TRACEHDR __declspec(dllexport)
 #endif
+
 class TRACEHDR CTrace
 {
 public:
@@ -35,9 +37,9 @@ protected:
 };
 
 #ifdef _DEBUG
-#define SCASSERT(s)	if (!(s)) throw CTrace(__FILE__, __LINE__, "!("#s")");
-#define SCVERIFY(s)	if (!(s)) throw CTrace(__FILE__, __LINE__, "!("#s")");
+#define TASSERT(s)	if (!(s)) throw CTrace(__FILE__, __LINE__, "!("#s")");
+#define TVERIFY(s)	if (!(s)) throw CTrace(__FILE__, __LINE__, "!("#s")");
 #else
-#define SCASSERT(s)	;
-#define SCVERIFY(s)	(s);
+#define TASSERT(s)	;
+#define TVERIFY(s)	(s);
 #endif

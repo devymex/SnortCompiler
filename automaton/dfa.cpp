@@ -19,7 +19,7 @@
 DFAHDR CDfa::CDfa()
 	: m_nId(ulong(-1)), m_nColNum(ulong(0)), m_nStartId(STATEID(0))
 {
-	std::fill(m_pGroup, m_pGroup + SC_DFACOLCNT, byte(-1));
+	memset(m_pGroup, -1, SC_DFACOLCNT * sizeof(m_pGroup[0]));
 	try
 	{
 		m_pDfa = new std::vector<CDfaRow>;
@@ -67,14 +67,16 @@ DFAHDR CDfa& CDfa::operator=(const CDfa &other)
 	return *this;
 }
 
-DFAHDR CDfaRow& CDfa::operator[](STATEID index)
+DFAHDR CDfaRow& CDfa::operator[](STATEID nIdx)
 {
-	return (*m_pDfa)[index];
+	TASSERT(nIdx < m_pDfa->size());
+	return (*m_pDfa)[nIdx];
 }
 
-DFAHDR const CDfaRow& CDfa::operator[](STATEID index) const
+DFAHDR const CDfaRow& CDfa::operator[](STATEID nIdx) const
 {
-	return (*m_pDfa)[index];
+	TASSERT(nIdx < m_pDfa->size());
+	return (*m_pDfa)[nIdx];
 }
 
 DFAHDR ulong CDfa::Size() const
@@ -227,7 +229,7 @@ DFAHDR ulong CDfa::FromNFA(const CNfa &nfa)
 
 		static STATEVEC nextNfaVec; //
 		nextNfaVec.clear();
-		byte compuFlag[SC_CHARSETSIZE];
+		byte compuFlag[CNfaRow::COLUMNCNT];
 
 		for (; nfaStasStack.size() > 0; )
 		{
@@ -581,8 +583,6 @@ ulong CDfa::PartStates(STATEVEC *pRevTbl)
 
 	for (PARTSETVEC_ITER i = partSets.begin(); i != partSets.end(); ++i)
 	{
-		//AbleTo[j] = {state|state belong to parSet && pRevTbl[state][j] is not null}
-		//0 <= j <= nGrpNum
 		CalcAbleTo(pRevTbl, nGrpNum, ulStaNum, *i);
 	}
 
@@ -599,53 +599,58 @@ ulong CDfa::PartStates(STATEVEC *pRevTbl)
 	{
 		pAbleToI = new byte[ulStaNum];
 		partSets.reserve(1000);
+	}
+	catch (std::exception &e)
+	{
+		throw CTrace(__FILE__, __LINE__, e.what());
+	}
 
-		ulong nr = 0;
-		for (; nr == 0; )
+	ulong nr = 0;
+	for (; nr == 0; )
+	{
+		ulong ulCurGrp = (byte)-1;
+		ulong nCurSet = (ulong)-1;
+		//choose and remove one set's index in pWait
+		ulCurGrp = FindNotEmpty(pWait, nGrpNum);
+		//finish the outer loop
+		if (ulCurGrp == -1)
 		{
-			ulong ulCurGrp = (byte)-1;
-			ulong nCurSet = (ulong)-1;
-			//choose and remove one set's index in pWait
-			ulCurGrp = FindNotEmpty(pWait, nGrpNum);
-			//finish the outer loop
-			if (ulCurGrp == -1)
-			{
-				break;
-			}
-			nCurSet = pWait[ulCurGrp].back();
-			pWait[ulCurGrp].pop_back();
+			break;
+		}
+		nCurSet = pWait[ulCurGrp].back();
+		pWait[ulCurGrp].pop_back();
 
-			PARTSET *pISet = &partSets[nCurSet];
-			ZeroMemory(pAbleToI, ulStaNum);
-			ulong nRevCnt = 0;
-			for (STATELIST_ITER iSta = pISet->StaSet.begin();
-				iSta != pISet->StaSet.end(); ++iSta)
-			{
-				ulong nRevIdx = *iSta * nGrpNum + ulCurGrp;
-				STATEVEC &revI = pRevTbl[nRevIdx];
-				SetStateFlags(pAbleToI, revI);
-				nRevCnt += revI.size();
-			}
+		PARTSET *pISet = &partSets[nCurSet];
+		ZeroMemory(pAbleToI, ulStaNum);
+		ulong nRevCnt = 0;
+		for (STATELIST_ITER iSta = pISet->StaSet.begin();
+			iSta != pISet->StaSet.end(); ++iSta)
+		{
+			ulong nRevIdx = *iSta * nGrpNum + ulCurGrp;
+			STATEVEC &revI = pRevTbl[nRevIdx];
+			SetStateFlags(pAbleToI, revI);
+			nRevCnt += revI.size();
+		}
 
-			if (nRevCnt != 0)
+		if (nRevCnt != 0)
+		{
+			for (ulong j = 0; j != partSets.size(); ++j)
 			{
-				for (ulong j = 0; j != partSets.size(); ++j)
+				/*choose partSet[j] and divide partSet[j] for a jump character*/
+				PARTSET *pJSet = &partSets[j];
+				if (SortPartition(pAbleToI, *pJSet) == false)
 				{
-					/*choose partSet[j] and divide partSet[j] for a jump character*/
-					PARTSET *pJSet = &partSets[j];
-					if (SortPartition(pAbleToI, *pJSet) == false)
-					{
-						continue;
-					}
+					continue;
+				}
 
-					partSets.push_back(PARTSET());
+				partSets.push_back(PARTSET());
 
-					pJSet = &partSets[j];
-					pISet = &partSets[nCurSet];
+				pJSet = &partSets[j];
+				pISet = &partSets[nCurSet];
 
-					STATELIST_ITER part = pJSet->StaSet.begin();
-					for (; part != pJSet->StaSet.end() &&
-						pAbleToI[*part] != 0; ++part);
+				STATELIST_ITER part = pJSet->StaSet.begin();
+				for (; part != pJSet->StaSet.end() &&
+					pAbleToI[*part] != 0; ++part);
 
 					if (partSets.size() > 254)
 					{
@@ -676,63 +681,65 @@ ulong CDfa::PartStates(STATEVEC *pRevTbl)
 						}
 						curWait.push_back(k);
 					}
-				}
 			}
 		}
-		delete []pAbleToI;
+	}
+	delete []pAbleToI;
 
 
-		if (nr != ulong(-1) && partSets.size() < m_pDfa->size())
+	if (nr != ulong(-1) && partSets.size() < m_pDfa->size())
+	{
+		STATEVEC sta2Part(m_pDfa->size());
+		STATEID nCol = (STATEID)GetGroupCount();
+
+		CFinalStates newFinStas;
+
+		DFAROWARY *pNewDfa = NULL;
+		try
 		{
-			STATEVEC sta2Part(m_pDfa->size());
-			STATEID nCol = (STATEID)GetGroupCount();
-
-			CFinalStates newFinStas;
-
-			DFAROWARY *pNewDfa = NULL;
 			pNewDfa = new DFAROWARY((STATEID)partSets.size(), CDfaRow(nCol));
-
-			//renumber DFA state
-			BuildDfaByPart(partSets, *m_pDfa, *pNewDfa);
-
-			//remark new start state and final states
-			for (PARTSETVEC_ITER i = partSets.begin(); i != partSets.end(); ++i)
-			{
-				STATEID nIdx = STATEID(i - partSets.begin());
-				for (STATELIST_ITER j = i->StaSet.begin(); j != i->StaSet.end(); ++j)
-				{
-					CDfaRow &curRow = (*m_pDfa)[*j];
-					if (curRow.GetFlag() & CDfaRow::START)
-					{
-						m_nStartId = nIdx;
-					}
-
-					if (curRow.GetFlag() & CDfaRow::TERMINAL)
-					{
-						newFinStas.PushBack(nIdx);
-						newFinStas.GetDfaIdSet(nIdx) = m_FinStas.GetDfaIdSet(*j);
-					}
-				}
-			}
-			m_FinStas.Swap(newFinStas);
-
-			//replace m_pDfa
-			swap(m_pDfa, pNewDfa);
-			delete pNewDfa;
-
-			std::cout << "Minimized: " << (ulStaNum - m_pDfa->size()) << std::endl;
+		}
+		catch (std::exception &e)
+		{
+			throw CTrace(__FILE__, __LINE__, e.what());
 		}
 
+		//renumber DFA state
+		BuildDfaByPart(partSets, *m_pDfa, *pNewDfa);
+
+		//remark new start state and final states
 		for (PARTSETVEC_ITER i = partSets.begin(); i != partSets.end(); ++i)
 		{
-			ReleaseAbleTo(*i);
+			STATEID nIdx = STATEID(i - partSets.begin());
+			for (STATELIST_ITER j = i->StaSet.begin(); j != i->StaSet.end(); ++j)
+			{
+				CDfaRow &curRow = (*m_pDfa)[*j];
+				if (curRow.GetFlag() & CDfaRow::START)
+				{
+					m_nStartId = nIdx;
+				}
+
+				if (curRow.GetFlag() & CDfaRow::TERMINAL)
+				{
+					newFinStas.PushBack(nIdx);
+					newFinStas.GetDfaIdSet(nIdx) = m_FinStas.GetDfaIdSet(*j);
+				}
+			}
 		}
-		return nr;
+		m_FinStas.Swap(newFinStas);
+
+		//replace m_pDfa
+		swap(m_pDfa, pNewDfa);
+		delete pNewDfa;
+
+		std::cout << "Minimized: " << (ulStaNum - m_pDfa->size()) << std::endl;
 	}
-	catch (std::exception &e)
+
+	for (PARTSETVEC_ITER i = partSets.begin(); i != partSets.end(); ++i)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		ReleaseAbleTo(*i);
 	}
+	return nr;
 }
 
 
@@ -790,7 +797,7 @@ DFAHDR void PrintDfaToGv(CDfa &newdfa, const char* fileName)
 			{
 				fout << i << " -> " << (ulong)newdfa[i][j] << " [label=\"" << j << "\"];" << std::endl;
 			}
-			else if (maxId != (STATEID)-1)
+			else if (maxId != STATEID(-1))
 			{
 				fout << i << " -> "  << (ulong)maxId << " [label=\"" << j << "\"];" << std::endl;
 			}
@@ -813,7 +820,6 @@ DFAHDR bool MergeMultipleDfas(CDfaArray &dfas, CDfa &lastDfa)
 	ulong dfaId = lastDfa.GetId();
 	lastDfa.Clear();
 	lastDfa.SetId(dfaId);
-#undef max
 
 	ulong dfasSize = dfas.Size();
 	STATEID nTermSta = 1;//nTermSta: terminal flag. 1: terminal, -1: non-terminal
@@ -825,175 +831,174 @@ DFAHDR bool MergeMultipleDfas(CDfaArray &dfas, CDfa &lastDfa)
 
 	ulong colCnt = lastDfa.GetGroupCount();
 
-	typedef std::unordered_map<std::vector<STATEID>, STATEID, TODFA_HASH> STATESETHASH;
+	typedef std::unordered_map<STATEVEC, STATEID, TODFA_HASH> STATESETHASH;
 	STATESETHASH statehash;
 
 	ulong finFlag = 0;//terminal state flag, 1: terminal state, 0: normal state
-	std::stack<std::vector<STATEID>> statesStack;
+	std::stack<STATEVEC> statesStack;
 
 	/*
 	**	use a size of (dfas.size() + 2) vector to represent a state of the merged dfa.
 	**	element 0 represents the state of dfas[0], ..., element n represents the state of dfas[n].
 	**	element n + 1 and element n + 2 are flags which show that whether this state is a start state or terminal state.
 	*/
-	std::vector<STATEID> startVec;
+	STATEVEC startVec;
 	
 	try
 	{
 		startVec.resize(dfasSize + 2);
-		lastDfa.Reserve(SC_CHARSETSIZE);
+		lastDfa.Reserve(CNfaRow::COLUMNCNT);
 		lastDfa.Resize(lastDfa.Size() + 1, colCnt);
-	
-		for(ulong i = 0; i < dfasSize; ++i)
-		{
-			STATEID nSta = dfas[i].GetStartState();
-			if((dfas[i][nSta].GetFlag() & CDfaRow::TERMINAL) != 0)
-			{
-				//this is a terminal state
-				finFlag = 1;
-				AddTermIntoDFA(nSta, dfas[i], 0, lastDfa);
-				CFinalStates &newFinSta = lastDfa.GetFinalState();
-				newFinSta.PushBack(0);
-				newFinSta.GetDfaIdSet(0).Append(
-					dfas[i].GetFinalState().GetDfaIdSet(nSta));
-
-			}
-			startVec[i] = nSta;
-		}
-		startVec[dfasSize] = 0;//this is start state
-		if(finFlag)
-		{
-			startVec[dfasSize + 1] = nTermSta;
-			lastDfa[0].SetFlag(lastDfa[0].GetFlag() | CDfaRow::START | CDfaRow::TERMINAL);
-		}
-		else
-		{
-			startVec[dfasSize + 1] = (STATEID)-1;
-			lastDfa[0].SetFlag(lastDfa[0].GetFlag() | CDfaRow::START);
-		}
-
-		std::vector<STATEID> NextVec;
-
-		statehash[startVec] = 0;
-		statesStack.push(startVec);
-		NextVec.resize(dfasSize + 2);
-
-		byte computFlag[SC_CHARSETSIZE];
-
-		while(!statesStack.empty())
-		{
-			std::vector<STATEID> curVec = statesStack.top();//current state, size is:dfasSize + 2
-			statesStack.pop();
-
-			STATESETHASH::iterator ir = statehash.find(curVec);
-			if (ir == statehash.end())
-			{
-				std::cout << "hash Error!" << std::endl;
-				return false;
-			}
-			STATEID curStaNum = ir->second;
-			ZeroMemory(computFlag, sizeof(computFlag));
-
-			//get next states
-			for(ulong curChar = 0; curChar < SC_DFACOLCNT; ++curChar)
-			{
-				finFlag = 0;
-				byte lastDfaGroup = groups[curChar];
-				if(computFlag[lastDfaGroup] == 1)
-				{
-					continue;
-				}
-				computFlag[lastDfaGroup] = 1;
-
-				ulong flag = 0;//flag = 0: empty next state
-				for(ulong i = 0; i < dfasSize; ++i)
-				{
-					STATEID sta = curVec[i];
-
-					if(sta != (STATEID)-1)
-					{
-						byte curgroup = dfas[i].Char2Group((byte)curChar);
-						STATEID nextId = dfas[i][sta][curgroup];//the next state the ith dfa transforms from state curVec[i] through curChar to
-						if(nextId != (STATEID)-1)
-						{
-							flag = 1;
-							if((dfas[i][nextId].GetFlag() & CDfaRow::TERMINAL) != 0)
-							{
-								finFlag = 1;
-							}
-						}
-						NextVec[i] = nextId; 
-					}
-					else
-					{
-						NextVec[i] = (STATEID)-1;
-					}
-				}
-				NextVec[dfasSize] = (STATEID)-1;
-				if(finFlag)
-				{
-					NextVec[dfasSize + 1] = nTermSta;
-				}
-				else
-				{
-					NextVec[dfasSize + 1] = (STATEID)-1;
-				}
-
-				if(flag)
-				{
-					STATESETHASH::iterator nextIt = statehash.find(NextVec);
-					if(nextIt == statehash.end())
-					{
-#undef max 
-						lastDfa.Resize(lastDfa.Size() + 1, colCnt);
-						if(lastDfa.Size() > SC_STATELIMIT)
-						{
-							//std::cerr << "SC_STATELIMIT!" << std::endl;
-							return false;
-						}
-						STATEID nextSta = (STATEID)statehash.size();
-						statehash[NextVec] = nextSta;
-						lastDfa[curStaNum][lastDfaGroup] = nextSta;
-
-						if(finFlag)
-						{
-							for(STATEID k = 0; k < dfasSize; ++k)
-							{
-								if(NextVec[k] != (STATEID)-1)
-								{
-									if((dfas[k][NextVec[k]].GetFlag() & CDfaRow::TERMINAL) != 0)
-									{
-										AddTermIntoDFA(NextVec[k], dfas[k], nextSta, lastDfa);
-									}
-								}
-							}
-							lastDfa[nextSta].SetFlag(lastDfa[nextSta].GetFlag() | CDfaRow::TERMINAL);
-						}
-
-						statesStack.push(NextVec);
-					}
-					else
-					{
-						lastDfa[curStaNum][lastDfaGroup] = nextIt->second;
-					}
-				}
-				else
-				{
-					lastDfa[curStaNum][lastDfaGroup] = (STATEID)-1;
-				}
-			}
-		}
-		//lastDfa.Minimize();
-		if(lastDfa.Size() > SC_MAXDFASIZE)
-		{
-			//std::cerr << "SC_MAXDFASIZE!" << std::endl;
-			return false;
-		}
-		return true;
 	}
 	catch (std::exception &e)
 	{
 		throw CTrace(__FILE__, __LINE__, e.what());
 	}
+
+	for(ulong i = 0; i < dfasSize; ++i)
+	{
+		STATEID nSta = dfas[i].GetStartState();
+		if((dfas[i][nSta].GetFlag() & CDfaRow::TERMINAL) != 0)
+		{
+			//this is a terminal state
+			finFlag = 1;
+			AddTermIntoDFA(nSta, dfas[i], 0, lastDfa);
+			CFinalStates &newFinSta = lastDfa.GetFinalState();
+			newFinSta.PushBack(0);
+			newFinSta.GetDfaIdSet(0).Append(
+				dfas[i].GetFinalState().GetDfaIdSet(nSta));
+
+		}
+		startVec[i] = nSta;
+	}
+	startVec[dfasSize] = 0;//this is start state
+	if(finFlag)
+	{
+		startVec[dfasSize + 1] = nTermSta;
+		lastDfa[0].SetFlag(lastDfa[0].GetFlag() | CDfaRow::START | CDfaRow::TERMINAL);
+	}
+	else
+	{
+		startVec[dfasSize + 1] = STATEID(-1);
+		lastDfa[0].SetFlag(lastDfa[0].GetFlag() | CDfaRow::START);
+	}
+
+	std::vector<STATEID> NextVec;
+
+	statehash[startVec] = 0;
+	statesStack.push(startVec);
+	NextVec.resize(dfasSize + 2);
+
+	byte computFlag[CNfaRow::COLUMNCNT];
+
+	bool br = true;
+	for (; br && !statesStack.empty(); )
+	{
+		std::vector<STATEID> curVec = statesStack.top();//current state, size is:dfasSize + 2
+		statesStack.pop();
+
+		STATESETHASH::iterator ir = statehash.find(curVec);
+		if (ir == statehash.end())
+		{
+			std::cout << "hash Error!" << std::endl;
+			return false;
+		}
+		STATEID curStaNum = ir->second;
+		ZeroMemory(computFlag, sizeof(computFlag));
+
+		//get next states
+		for(ulong curChar = 0; curChar < SC_DFACOLCNT; ++curChar)
+		{
+			finFlag = 0;
+			byte lastDfaGroup = groups[curChar];
+			if(computFlag[lastDfaGroup] == 1)
+			{
+				continue;
+			}
+			computFlag[lastDfaGroup] = 1;
+
+			ulong flag = 0;//flag = 0: empty next state
+			for(ulong i = 0; i < dfasSize; ++i)
+			{
+				STATEID sta = curVec[i];
+
+				if(sta != STATEID(-1))
+				{
+					byte curgroup = dfas[i].Char2Group((byte)curChar);
+					STATEID nextId = dfas[i][sta][curgroup];//the next state the ith dfa transforms from state curVec[i] through curChar to
+					if(nextId != STATEID(-1))
+					{
+						flag = 1;
+						if((dfas[i][nextId].GetFlag() & CDfaRow::TERMINAL) != 0)
+						{
+							finFlag = 1;
+						}
+					}
+					NextVec[i] = nextId; 
+				}
+				else
+				{
+					NextVec[i] = STATEID(-1);
+				}
+			}
+			NextVec[dfasSize] = STATEID(-1);
+			if(finFlag)
+			{
+				NextVec[dfasSize + 1] = nTermSta;
+			}
+			else
+			{
+				NextVec[dfasSize + 1] = STATEID(-1);
+			}
+
+			if(flag)
+			{
+				STATESETHASH::iterator nextIt = statehash.find(NextVec);
+				if(nextIt == statehash.end())
+				{
+					lastDfa.Resize(lastDfa.Size() + 1, colCnt);
+					if(lastDfa.Size() > SC_STATELIMIT)
+					{
+						br = false;
+						break;
+					}
+					STATEID nextSta = (STATEID)statehash.size();
+					statehash[NextVec] = nextSta;
+					lastDfa[curStaNum][lastDfaGroup] = nextSta;
+
+					if(finFlag)
+					{
+						for(STATEID k = 0; k < dfasSize; ++k)
+						{
+							if(NextVec[k] != STATEID(-1))
+							{
+								if((dfas[k][NextVec[k]].GetFlag() & CDfaRow::TERMINAL) != 0)
+								{
+									AddTermIntoDFA(NextVec[k], dfas[k], nextSta, lastDfa);
+								}
+							}
+						}
+						lastDfa[nextSta].SetFlag(lastDfa[nextSta].GetFlag() | CDfaRow::TERMINAL);
+					}
+					statesStack.push(NextVec);
+				}
+				else
+				{
+					lastDfa[curStaNum][lastDfaGroup] = nextIt->second;
+				}
+			}
+			else
+			{
+				lastDfa[curStaNum][lastDfaGroup] = STATEID(-1);
+			}
+		}
+	}
+	//lastDfa.Minimize();
+	if(lastDfa.Size() > SC_MAXDFASIZE)
+	{
+		//std::cerr << "SC_MAXDFASIZE!" << std::endl;
+		br = false;
+	}
+	return br;
 }
 

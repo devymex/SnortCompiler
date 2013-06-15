@@ -16,7 +16,6 @@
 #include <exception>
 int main()
 {
-	//std::vector<int> a;
 	//for (int i = 0; i < 100; ++i)
 	//{
 	//	std::vector<int> a(10);

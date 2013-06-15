@@ -49,22 +49,24 @@ struct TODFA_HASH
 
 struct GROUPKEY
 {
-	std::vector<ulong> key;
+	std::vector<ulong> val;
 	ulong hash;
-	__forceinline bool operator == (const GROUPKEY &other) const
-	{
-		ulong nSize = key.size();
-		if (nSize != other.key.size())
-		{
-			return false;
-		}
-		if (nSize == 0)
-		{
-			return true;
-		}
-		return (0 == memcmp(key.data(), other.key.data(), nSize * sizeof(ulong)));
-	}
 };
+
+inline bool operator == (const GROUPKEY &key1, const GROUPKEY &key2)
+{
+	size_t nSize = key1.val.size();
+	if (nSize != key2.val.size())
+	{
+		return false;
+	}
+	if (nSize == 0)
+	{
+		return true;
+	}
+	return (0 == memcmp(key1.val.data(), key2.val.data(),
+		nSize * sizeof(key1.val[0])));
+}
 
 struct NSTATESET_HASH
 {
