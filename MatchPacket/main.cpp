@@ -25,7 +25,7 @@ void main()
 
 	for(size_t i = 0; i < groupRes.GetGroups().Size(); ++i)
 	{
-		hashResMap[hash(groupRes.GetGroups()[i].currSig)].push_back(HASHNODE(groupRes.GetGroups()[i].currSig, groupRes.GetGroups()[i].mergeDfaId));
+		//hashResMap[hash(groupRes.GetGroups()[i].currSig)].push_back(HASHNODE(groupRes.GetGroups()[i].currSig, groupRes.GetGroups()[i].mergeDfaId));
 	}
 
 	DfaidSidMap(groupRes, dfamch.dIdSId);
