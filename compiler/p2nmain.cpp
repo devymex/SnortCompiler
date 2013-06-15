@@ -790,7 +790,7 @@ void ProcessALT(CNfa &nfa, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 {
 	if (ALTBegin)
 	{
-		nfa[PreState].AddDest(EMPTY, ALTBegState);
+		nfa[PreState][EMPTY].PushBack(ALTBegState);
 		ALTBegin = false;
 	}
 }
@@ -806,7 +806,7 @@ ulong OP_COMMON_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulon
 	//std::cout << ulong(*Beg) << " " << NUMS[*Beg] << std::endl;
 	for (ulong i = 0; i < NUMS[*Beg]; ++i)
 	{
-		nfa.Back().AddDest(tmp[i], CurState);
+		nfa.Back()[tmp[i]].PushBack(CurState);
 	}
 
 	return SC_SUCCESS;
@@ -816,53 +816,20 @@ void OP_CIRCM_FUNC(CNfa &nfa, ulong &CurState)
 {
 	ulong nCursize = nfa.Size();
 	nfa.Resize(nCursize + 3);
-	nfa[nCursize].AddDest(EMPTY, CurState + 1);
-	nfa[nCursize].AddDest(EMPTY, CurState + 3);
+	nfa[nCursize][EMPTY].PushBack(CurState + 1);
+	nfa[nCursize][EMPTY].PushBack(CurState + 3);
 	++CurState;
 
 	++nCursize;
 	for (ulong i = 0; i < 256; ++i)
 	{
-		nfa[nCursize].AddDest(i, CurState);
+		nfa[nCursize][i].PushBack(CurState);
 	}
-	//for (ulong i = 0; i < 10; ++i)
-	//{
-	//	nfa[nCursize].AddDest(i, CurState);
-	//}
-	nfa[nCursize].AddDest('\n', CurState + 1);
-	nfa[nCursize].AddDest('\n', CurState + 2);
-	nfa[nCursize].AddDest('\r', CurState + 2);
-	//nfa[nCursize].AddDest(11, CurState);
-	//nfa[nCursize].AddDest(12, CurState);
-	//for (ulong i = 14; i < 256; ++i)
-	//{
-	//	nfa[nCursize].AddDest(i, CurState);
-	//}
+	nfa[nCursize]['\n'].PushBack(CurState + 1);
+	nfa[nCursize]['\n'].PushBack(CurState + 2);
+	nfa[nCursize]['\r'].PushBack(CurState + 2);
 	CurState += 2;
-	nfa[nCursize + 1].AddDest('\r', CurState);
-
-//	ulong nCursize = nfa.Size();
-//	nfa.Resize(nCursize + 3);
-//	nfa[nCursize].AddDest(EMPTY, CurState + 1);
-//	nfa[nCursize].AddDest(EMPTY, CurState + 3);
-//	++CurState;
-//
-//	++nCursize;
-//	for (ulong i = 0; i < 10; ++i)
-//	{
-//		nfa[nCursize].AddDest(i, CurState);
-//	}
-//	nfa[nCursize].AddDest('\n', CurState + 1);
-//	nfa[nCursize].AddDest('\n', CurState + 2);
-//	nfa[nCursize].AddDest('\r', CurState + 2);
-//	nfa[nCursize].AddDest(11, CurState);
-//	nfa[nCursize].AddDest(12, CurState);
-//	for (ulong i = 14; i < 256; ++i)
-//	{
-//		nfa[nCursize].AddDest(i, CurState);
-//	}
-//	CurState += 2;
-//	nfa[nCursize + 1].AddDest('\r', CurState);
+	nfa[nCursize + 1]['\r'].PushBack(CurState);
 }
 
 
@@ -872,7 +839,7 @@ ulong OP_CHAR_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong 
 	++CurState;
 	ulong nCursize = nfa.Size();
 	nfa.Resize(nCursize + 1);
-	nfa.Back().AddDest(*(Beg + 1), CurState);
+	nfa.Back()[*(Beg + 1)].PushBack(CurState);
 
 	return SC_SUCCESS;
 }
@@ -886,12 +853,12 @@ ulong OP_CHARI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong
 	byte c = *(Beg + 1);
 	if (isalpha(c))
 	{
-		nfa.Back().AddDest(tolower(c), CurState);
-		nfa.Back().AddDest(toupper(c), CurState);
+		nfa.Back()[tolower(c)].PushBack(CurState);
+		nfa.Back()[toupper(c)].PushBack(CurState);
 	}
 	else
 	{
-		nfa.Back().AddDest(c, CurState);
+		nfa.Back()[c].PushBack(CurState);
 	}
 	
 	return SC_SUCCESS;
@@ -908,7 +875,7 @@ ulong OP_NOT_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &
 	{
 		if (j != c)
 		{
-			nfa.Back().AddDest(j, CurState);
+			nfa.Back()[j].PushBack(CurState);
 		}
 	}
 	
@@ -926,7 +893,7 @@ ulong OP_NOTI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong 
 	{
 		if (j != (ulong)tolower(c) && j != (ulong)toupper(c))
 		{
-			nfa.Back().AddDest(j, CurState);
+			nfa.Back()[j].PushBack(CurState);
 		}
 	}
 	
@@ -938,9 +905,9 @@ ulong OP_STAR_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong 
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
 	ulong nCursize = nfa.Size();
 	nfa.Resize(nCursize + 1);
-	nfa.Back().AddDest(*(Beg + 1), CurState);
+	nfa.Back()[*(Beg + 1)].PushBack(CurState);
 	++CurState;
-	nfa.Back().AddDest(EMPTY, CurState);
+	nfa.Back()[EMPTY].PushBack(CurState);
 	
 	return SC_SUCCESS;
 }
@@ -951,10 +918,10 @@ ulong OP_PLUS_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong 
 	ulong nCursize = nfa.Size();
 	nfa.Resize(nCursize + 2);
 	++CurState;
-	nfa[nCursize].AddDest(*(Beg + 1), CurState);
-	nfa.Back().AddDest(*(Beg + 1), CurState);
+	nfa[nCursize][*(Beg + 1)].PushBack(CurState);
+	nfa.Back()[*(Beg + 1)].PushBack(CurState);
 	++CurState;
-	nfa.Back().AddDest(EMPTY, CurState);
+	nfa.Back()[EMPTY].PushBack(CurState);
 	
 	return SC_SUCCESS;
 }
@@ -965,8 +932,8 @@ ulong OP_QUERY_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong
 	ulong nCursize = nfa.Size();
 	nfa.Resize(nCursize + 1);
 	++CurState;
-	nfa.Back().AddDest(*(Beg + 1), CurState);
-	nfa.Back().AddDest(EMPTY, CurState);
+	nfa.Back()[*(Beg + 1)].PushBack(CurState);
+	nfa.Back()[EMPTY].PushBack(CurState);
 	
 	return SC_SUCCESS;
 }
@@ -981,9 +948,9 @@ ulong OP_UPTO_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong 
 	byte c = *(Beg + 3);
 	for (ulong i = 0; i < count; ++i)
 	{
-		nfa[nCursize + i].AddDest(EMPTY, CurState - i + count);
+		nfa[nCursize + i][EMPTY].PushBack(CurState - i + count);
 		++CurState;
-		nfa[nCursize + i].AddDest(c, CurState);
+		nfa[nCursize + i][c].PushBack(CurState);
 	}
 	
 	return SC_SUCCESS;
@@ -999,7 +966,7 @@ ulong OP_EXACT_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong
 	for (ulong i = 0; i < count; ++i)
 	{
 		++CurState;
-		nfa[nCursize + i].AddDest(c, CurState);
+		nfa[nCursize + i][c].PushBack(CurState);
 	}
 	
 	return SC_SUCCESS;
@@ -1013,15 +980,15 @@ ulong OP_STARI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong
 	byte c = *(Beg + 1);
 	if (isalpha(c))
 	{
-		nfa.Back().AddDest(tolower(c), CurState);
-		nfa.Back().AddDest(toupper(c), CurState);
+		nfa.Back()[tolower(c)].PushBack(CurState);
+		nfa.Back()[toupper(c)].PushBack(CurState);
 	}
 	else
 	{
-		nfa.Back().AddDest(c, CurState);
+		nfa.Back()[c].PushBack(CurState);
 	}
 	++CurState;
-	nfa.Back().AddDest(EMPTY, CurState);
+	nfa.Back()[EMPTY].PushBack(CurState);
 	
 	return SC_SUCCESS;
 }
@@ -1035,24 +1002,24 @@ ulong OP_PLUSI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong
 	++CurState;
 	if (isalpha(c))
 	{
-		nfa[nCursize].AddDest(tolower(c), CurState);
-		nfa[nCursize].AddDest(toupper(c), CurState);
+		nfa[nCursize][tolower(c)].PushBack(CurState);
+		nfa[nCursize][toupper(c)].PushBack(CurState);
 	}
 	else
 	{
-		nfa[nCursize].AddDest(c, CurState);
+		nfa[nCursize][c].PushBack(CurState);
 	}
 	if (isalpha(c))
 	{
-		nfa.Back().AddDest(tolower(c), CurState);
-		nfa.Back().AddDest(toupper(c), CurState);
+		nfa.Back()[tolower(c)].PushBack(CurState);
+		nfa.Back()[toupper(c)].PushBack(CurState);
 	}
 	else
 	{
-		nfa.Back().AddDest(c, CurState);
+		nfa.Back()[c].PushBack(CurState);
 	}
 	++CurState;
-	nfa.Back().AddDest(EMPTY, CurState);
+	nfa.Back()[EMPTY].PushBack(CurState);
 	
 	return SC_SUCCESS;
 }
@@ -1066,14 +1033,14 @@ ulong OP_QUERYI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulon
 	++CurState;
 	if (isalpha(c))
 	{
-		nfa.Back().AddDest(tolower(c), CurState);
-		nfa.Back().AddDest(toupper(c), CurState);
+		nfa.Back()[tolower(c)].PushBack(CurState);
+		nfa.Back()[toupper(c)].PushBack(CurState);
 	}
 	else
 	{
-		nfa.Back().AddDest(c, CurState);
+		nfa.Back()[c].PushBack(CurState);
 	}
-	nfa.Back().AddDest(EMPTY, CurState);
+	nfa.Back()[EMPTY].PushBack(CurState);
 	
 	return SC_SUCCESS;
 }
@@ -1088,16 +1055,16 @@ ulong OP_UPTOI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong
 	byte c = *(Beg + 3);
 	for (ulong i = 0; i < count; ++i)
 	{
-		nfa[nCursize + i].AddDest(EMPTY, CurState - i + count);
+		nfa[nCursize + i][EMPTY].PushBack(CurState - i + count);
 		++CurState;
 		if (isalpha(c))
 		{
-			nfa[nCursize + i].AddDest(tolower(c), CurState);
-			nfa[nCursize + i].AddDest(toupper(c), CurState);
+			nfa[nCursize + i][tolower(c)].PushBack(CurState);
+			nfa[nCursize + i][toupper(c)].PushBack(CurState);
 		}
 		else
 		{
-			nfa[nCursize + i].AddDest(c, CurState);
+			nfa[nCursize + i][c].PushBack(CurState);
 		}
 	}
 	
@@ -1116,12 +1083,12 @@ ulong OP_EXACTI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulon
 		++CurState;
 		if (isalpha(c))
 		{
-			nfa[nCursize + i].AddDest(tolower(c), CurState);
-			nfa[nCursize + i].AddDest(toupper(c), CurState);
+			nfa[nCursize + i][tolower(c)].PushBack(CurState);
+			nfa[nCursize + i][toupper(c)].PushBack(CurState);
 		}
 		else
 		{
-			nfa[nCursize + i].AddDest(c, CurState);
+			nfa[nCursize + i][c].PushBack(CurState);
 		}
 	}
 	
@@ -1138,11 +1105,11 @@ ulong OP_NOTSTAR_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulo
 	{
 		if (i != c)
 		{
-			nfa.Back().AddDest(i, CurState);
+			nfa.Back()[i].PushBack(CurState);
 		}
 	}
 	++CurState;
-	nfa.Back().AddDest(EMPTY, CurState);
+	nfa.Back()[EMPTY].PushBack(CurState);
 	
 	return SC_SUCCESS;
 }
@@ -1158,12 +1125,12 @@ ulong OP_NOTPLUS_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulo
 	{
 		if (i != c)
 		{
-			nfa[nCursize].AddDest(i, CurState);
-			nfa.Back().AddDest(i, CurState);
+			nfa[nCursize][i].PushBack(CurState);
+			nfa.Back()[i].PushBack(CurState);
 		}
 	}
 	++CurState;
-	nfa.Back().AddDest(EMPTY, CurState);
+	nfa.Back()[EMPTY].PushBack(CurState);
 	
 	return SC_SUCCESS;
 }
@@ -1179,10 +1146,10 @@ ulong OP_NOTQUERY_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ul
 	{
 		if (i != c)
 		{
-			nfa.Back().AddDest(i, CurState);
+			nfa.Back()[i].PushBack(CurState);
 		}
 	}
-	nfa.Back().AddDest(EMPTY, CurState);
+	nfa.Back()[EMPTY].PushBack(CurState);
 	
 	return SC_SUCCESS;
 }
@@ -1196,13 +1163,13 @@ ulong OP_NOTUPTO_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulo
 	byte c = *(Beg + 3);
 	for (ulong i = 0; i < count; ++i)
 	{
-		nfa[nCursize + i].AddDest(EMPTY, CurState - i + count);
+		nfa[nCursize + i][EMPTY].PushBack(CurState - i + count);
 		++CurState;
 		for (ulong j = 0; j < 256; ++j)
 		{
 			if (j != c)
 			{
-				nfa[nCursize + i].AddDest(j, CurState);
+				nfa[nCursize + i][j].PushBack(CurState);
 			}
 		}
 	}
@@ -1224,7 +1191,7 @@ ulong OP_NOTEXACT_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ul
 		{
 			if (j != c)
 			{
-				nfa[nCursize + i].AddDest(j, CurState);
+				nfa[nCursize + i][j].PushBack(CurState);
 			}
 		}
 	}
@@ -1242,11 +1209,11 @@ ulong OP_NOTSTARI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ul
 	{
 		if (i != (ulong)tolower(c) && i != (ulong)toupper(c))
 		{
-			nfa.Back().AddDest(i, CurState);
+			nfa.Back()[i].PushBack(CurState);
 		}
 	}
 	++CurState;
-	nfa.Back().AddDest(EMPTY, CurState);
+	nfa.Back()[EMPTY].PushBack(CurState);
 	
 	return SC_SUCCESS;
 }
@@ -1262,12 +1229,12 @@ ulong OP_NOTPLUSI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ul
 	{
 		if (i != (ulong)tolower(c) && i != (ulong)toupper(c))
 		{
-			nfa[nCursize].AddDest(i, CurState);
-			nfa.Back().AddDest(i, CurState);
+			nfa[nCursize][i].PushBack(CurState);
+			nfa.Back()[i].PushBack(CurState);
 		}
 	}
 	++CurState;
-	nfa.Back().AddDest(EMPTY, CurState);
+	nfa.Back()[EMPTY].PushBack(CurState);
 	
 	return SC_SUCCESS;
 }
@@ -1283,10 +1250,10 @@ ulong OP_NOTQUERYI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, u
 	{
 		if (i != (ulong)tolower(c) && i != (ulong)toupper(c))
 		{
-			nfa.Back().AddDest(i, CurState);
+			nfa.Back()[i].PushBack(CurState);
 		}
 	}
-	nfa.Back().AddDest(EMPTY, CurState);
+	nfa.Back()[EMPTY].PushBack(CurState);
 	
 	return SC_SUCCESS;
 }
@@ -1300,13 +1267,13 @@ ulong OP_NOTUPTOI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ul
 	byte c = *(Beg + 3);
 	for (ulong i = 0; i < count; ++i)
 	{
-		nfa[nCursize + i].AddDest(EMPTY, CurState - i + count);
+		nfa[nCursize + i][EMPTY].PushBack(CurState - i + count);
 		++CurState;
 		for (ulong j = 0; j < 256; ++j)
 		{
 			if (j != (ulong)tolower(c) && j != (ulong)toupper(c))
 			{
-				nfa[nCursize + i].AddDest(j, CurState);
+				nfa[nCursize + i][j].PushBack(CurState);
 			}
 		}
 	}
@@ -1328,7 +1295,7 @@ ulong OP_NOTEXACTI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, u
 		{
 			if (j != (ulong)tolower(c) && j != (ulong)toupper(c))
 			{
-				nfa[nCursize + i].AddDest(j, CurState);
+				nfa[nCursize + i][j].PushBack(CurState);
 			}
 		}
 	}
@@ -1348,10 +1315,10 @@ ulong OP_TYPESTAR_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ul
 		ulong* tmp = ptr[c];
 		for (ulong i = 0; i < Cnt; ++i)
 		{
-			nfa.Back().AddDest(*(tmp + i), CurState);
+			nfa.Back()[*(tmp + i)].PushBack(CurState);
 		}
 		++CurState;
-		nfa.Back().AddDest(EMPTY, CurState);
+		nfa.Back()[EMPTY].PushBack(CurState);
 	}
 	
 	return SC_SUCCESS;
@@ -1370,11 +1337,11 @@ ulong OP_TYPEPLUS_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ul
 		ulong* tmp = ptr[c];
 		for (ulong i = 0; i < Cnt; ++i)
 		{
-			nfa[nCursize].AddDest(*(tmp + i), CurState);
-			nfa.Back().AddDest(*(tmp + i), CurState);
+			nfa[nCursize][*(tmp + i)].PushBack(CurState);
+			nfa.Back()[*(tmp + i)].PushBack(CurState);
 		}
 		++CurState;
-		nfa.Back().AddDest(EMPTY, CurState);
+		nfa.Back()[EMPTY].PushBack(CurState);
 	}
 	
 	return SC_SUCCESS;
@@ -1393,9 +1360,9 @@ ulong OP_TYPEQUERY_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, u
 		ulong* tmp = ptr[c];
 		for (ulong i = 0; i < Cnt; ++i)
 		{
-			nfa.Back().AddDest(*(tmp + i), CurState);
+			nfa.Back()[*(tmp + i)].PushBack(CurState);
 		}
-		nfa.Back().AddDest(EMPTY, CurState);
+		nfa.Back()[EMPTY].PushBack(CurState);
 	}
 	
 	return SC_SUCCESS;
@@ -1413,7 +1380,7 @@ ulong OP_TYPEUPTO_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ul
 		for (ulong i = 0; i < count; ++i)
 		{
 			FUNC[c](tmpBeg, End, nfa, CurState, PreState, ALTBeg, ALTBegState);
-			nfa.Back().AddDest(EMPTY, CurState - 1 + count - i);
+			nfa.Back()[EMPTY].PushBack(CurState - 1 + count - i);
 		}
 	}
 	
@@ -1452,8 +1419,8 @@ ulong OP_CLASS_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong
 		{
 			if (*(Beg + i + 1) & 1 << j)
 			{
-				nfa.Back().AddDest(i * 8 + j, tmp);
-				Row.AddDest(i * 8 + j, tmp);
+				nfa.Back()[i * 8 + j].PushBack(tmp);
+				Row[i * 8 + j].PushBack(tmp);
 			}
 		}
 	}
@@ -1463,33 +1430,33 @@ ulong OP_CLASS_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong
 	switch (*Beg)
 	{
 	case OP_CRSTAR:
-		for (ulong i = 0; i < SC_CHARSETSIZE; ++i)
+		for (ulong i = 0; i < CNfaRow::COLUMNCNT; ++i)
 		{
-			for (ulong j = 0; j < nfa.Back().DestCnt(i); ++j)
+			for (ulong j = 0; j < nfa.Back()[i].Size(); ++j)
 			{
-				if (nfa.Back().GetDest(i, j) == CurState + 1)
+				if (nfa.Back()[i][j] == CurState + 1)
 				{
-					nfa.Back().GetDest(i, j) = CurState;
+					nfa.Back()[i][j] = CurState;
 				}
 			}
 		}
 		++CurState;
-		nfa.Back().AddDest(EMPTY, CurState);
+		nfa.Back()[EMPTY].PushBack(CurState);
 		Beg += Steps[OP_CRSTAR];
 		break;
 	case OP_CRMINSTAR:
-		for (ulong i = 0; i < SC_CHARSETSIZE; ++i)
+		for (ulong i = 0; i < CNfaRow::COLUMNCNT; ++i)
 		{
-			for (ulong j = 0; j < nfa.Back().DestCnt(i); ++j)
+			for (ulong j = 0; j < nfa.Back()[i].Size(); ++j)
 			{
-				if (nfa.Back().GetDest(i, j) == CurState + 1)
+				if (nfa.Back()[i][j] == CurState + 1)
 				{
-					nfa.Back().GetDest(i, j) = CurState;
+					nfa.Back()[i][j] = CurState;
 				}
 			}
 		}
 		++CurState;
-		nfa.Back().AddDest(EMPTY, CurState);
+		nfa.Back()[EMPTY].PushBack(CurState);
 		Beg += Steps[OP_CRMINSTAR];
 		break;
 	case OP_CRPLUS:
@@ -1497,7 +1464,7 @@ ulong OP_CLASS_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong
 		Copy(nfa.Back(), Row, 0);
 		++CurState;
 		++CurState;
-		nfa.Back().AddDest(EMPTY, CurState);
+		nfa.Back()[EMPTY].PushBack(CurState);
 		Beg += Steps[OP_CRPLUS];
 		break;
 	case OP_CRMINPLUS:
@@ -1505,12 +1472,12 @@ ulong OP_CLASS_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong
 		Copy(nfa.Back(), Row, 0);
 		++CurState;
 		++CurState;
-		nfa.Back().AddDest(EMPTY, CurState);
+		nfa.Back()[EMPTY].PushBack(CurState);
 		Beg += Steps[OP_CRMINPLUS];
 		break;
 	case OP_CRQUERY:
 		++CurState;
-		nfa.Back().AddDest(EMPTY, CurState);
+		nfa.Back()[EMPTY].PushBack(CurState);
 		Beg += Steps[OP_CRQUERY];
 		break;
 	case OP_CRRANGE:
@@ -1526,15 +1493,15 @@ ulong OP_CLASS_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong
 		if (max == 0)
 		{
 			nfa.Resize(nCursize + min + 1);
-			for (ulong i = 0; i < SC_CHARSETSIZE; ++i)
+			for (ulong i = 0; i < CNfaRow::COLUMNCNT; ++i)
 			{
-				if (Row.DestCnt(i) == 1)
+				if (Row[i].Size() == 1)
 				{
-					nfa.Back().AddDest(i, CurState);
+					nfa.Back()[i].PushBack(CurState);
 				}
 			}
 			++CurState;
-			nfa.Back().AddDest(EMPTY, CurState);
+			nfa.Back()[EMPTY].PushBack(CurState);
 		}
 		else
 		{
@@ -1543,7 +1510,7 @@ ulong OP_CLASS_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong
 			for (ulong i = 0; i < nDiff; ++i)
 			{
 				Copy(nfa[nBeg + i], Row, min + i);
-				nfa[nBeg + i].AddDest(EMPTY, CurState - i + nDiff);
+				nfa[nBeg + i][EMPTY].PushBack(CurState - i + nDiff);
 				++CurState;
 			}
 		}
@@ -1571,8 +1538,8 @@ ulong OP_NCLASS_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulon
 			if (*(Beg + i + 1) & 1 << j)
 			{
 				ulong nCol = i * 8 + j;
-				nfa.Back().AddDest(nCol, tmp);
-				Row.AddDest(nCol, tmp);
+				nfa.Back()[nCol].PushBack(tmp);
+				Row[nCol].PushBack(tmp);
 			}
 		}
 	}
@@ -1581,12 +1548,12 @@ ulong OP_NCLASS_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulon
 	switch (*Beg)
 	{
 	case OP_CRSTAR:
-		for (ulong i = 0; i < SC_CHARSETSIZE; ++i)
+		for (ulong i = 0; i < CNfaRow::COLUMNCNT; ++i)
 		{
-			ulong nCnt = nfa.Back().DestCnt(i);
+			ulong nCnt = nfa.Back()[i].Size();
 			for (ulong j = 0; j < nCnt; ++j)
 			{
-				ulong &nSta = nfa.Back().GetDest(i, j);
+				ulong &nSta = nfa.Back()[i][j];
 				if (nSta == CurState + 1)
 				{
 					nSta = CurState;
@@ -1594,16 +1561,16 @@ ulong OP_NCLASS_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulon
 			}
 		}
 		++CurState;
-		nfa.Back().AddDest(EMPTY, CurState);
+		nfa.Back()[EMPTY].PushBack(CurState);
 		Beg += Steps[OP_CRSTAR];
 		break;
 	case OP_CRMINSTAR:
-		for (ulong i = 0; i < SC_CHARSETSIZE; ++i)
+		for (ulong i = 0; i < CNfaRow::COLUMNCNT; ++i)
 		{
-			ulong nCnt = nfa.Back().DestCnt(i);
+			ulong nCnt = nfa.Back()[i].Size();
 			for (ulong j = 0; j < nCnt; ++j)
 			{
-				ulong &nSta = nfa.Back().GetDest(i, j);
+				ulong &nSta = nfa.Back()[i][j];
 				if (nSta == CurState + 1)
 				{
 					nSta = CurState;
@@ -1611,7 +1578,7 @@ ulong OP_NCLASS_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulon
 			}
 		}
 		++CurState;
-		nfa.Back().AddDest(EMPTY, CurState);
+		nfa.Back()[EMPTY].PushBack(CurState);
 		Beg += Steps[OP_CRMINSTAR];
 		break;
 	case OP_CRPLUS:
@@ -1619,7 +1586,7 @@ ulong OP_NCLASS_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulon
 		Copy(nfa.Back(), Row, 0);
 		++CurState;
 		++CurState;
-		nfa.Back().AddDest(EMPTY, CurState);
+		nfa.Back()[EMPTY].PushBack(CurState);
 		Beg += Steps[OP_CRPLUS];
 		break;
 	case OP_CRMINPLUS:
@@ -1627,12 +1594,12 @@ ulong OP_NCLASS_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulon
 		Copy(nfa.Back(), Row, 0);
 		++CurState;
 		++CurState;
-		nfa.Back().AddDest(EMPTY, CurState);
+		nfa.Back()[EMPTY].PushBack(CurState);
 		Beg += Steps[OP_CRMINPLUS];
 		break;
 	case OP_CRQUERY:
 		++CurState;
-		nfa.Back().AddDest(EMPTY, CurState);
+		nfa.Back()[EMPTY].PushBack(CurState);
 		Beg += Steps[OP_CRQUERY];
 		break;
 	case OP_CRRANGE:
@@ -1648,15 +1615,15 @@ ulong OP_NCLASS_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulon
 		if (max == 0)
 		{
 			nfa.Resize(nCursize + min + 1);
-			for (ulong i = 0; i < SC_CHARSETSIZE; ++i)
+			for (ulong i = 0; i < CNfaRow::COLUMNCNT; ++i)
 			{
-				if (Row.DestCnt(i) == 1)
+				if (Row[i].Size() == 1)
 				{
-					nfa.Back().AddDest(i, CurState);
+					nfa.Back()[i].PushBack(CurState);
 				}
 			}
 			++CurState;
-			nfa.Back().AddDest(EMPTY, CurState);
+			nfa.Back()[EMPTY].PushBack(CurState);
 		}
 		else
 		{
@@ -1665,7 +1632,7 @@ ulong OP_NCLASS_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulon
 			{
 				ulong nCnt = min + i;
 				Copy(nfa[nCursize + nCnt], Row, nCnt);
-				nfa[nCursize + nCnt].AddDest(EMPTY, CurState + max - nCnt);
+				nfa[nCursize + nCnt][EMPTY].PushBack(CurState + max - nCnt);
 				++CurState;
 			}
 		}
@@ -1684,12 +1651,12 @@ void OP_ALT_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong Pr
 	for (ulong i = PreState; i < nfa.Size(); ++i)
 	{
 		CNfaRow &row = nfa[i];
-		for (ulong j = 0; j < SC_CHARSETSIZE; ++j)
+		for (ulong j = 0; j < CNfaRow::COLUMNCNT; ++j)
 		{
-			ulong nCnt = row.DestCnt(j);
+			ulong nCnt = row[j].Size();
 			for (ulong k = 0; k < nCnt; ++k)
 			{
-				ulong &nSta = row.GetDest(j, k);
+				ulong &nSta = row[j][k];
 				if (nSta == CurState)
 				{
 					nSta = MAX;
@@ -1699,7 +1666,7 @@ void OP_ALT_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong Pr
 	}
 	if (Beg == End)
 	{
-		nfa[PreState].AddDest(EMPTY, MAX);
+		nfa[PreState][EMPTY].PushBack(MAX);
 	}
 }
 
@@ -1707,19 +1674,19 @@ void OP_KET_FUNC(CNfa &nfa, ulong PreState, ulong &CurState, bool IsALT, bool Is
 {
 	if (IsBRAZERO)
 	{
-		nfa[PreState].AddDest(EMPTY, CurState);
+		nfa[PreState][EMPTY].PushBack(CurState);
 	}
 	if (IsALT)
 	{
 		for (ulong i = PreState; i < nfa.Size(); ++i)
 		{
 			CNfaRow &row = nfa[i];
-			for (ulong j = 0; j < SC_CHARSETSIZE; ++j)
+			for (ulong j = 0; j < CNfaRow::COLUMNCNT; ++j)
 			{
-				ulong nCnt = row.DestCnt(j);
+				ulong nCnt = row[j].Size();
 				for (ulong k = 0; k < nCnt; ++k)
 				{
-					ulong &nSta = row.GetDest(j, k);
+					ulong &nSta = row[j][k];
 					if (nSta == MAX)
 					{
 						nSta = CurState;
@@ -1737,12 +1704,12 @@ void OP_KETRMAX_FUNC(CNfa &nfa, ulong PreState, ulong &CurState, bool IsBRAZERO,
 		for (ulong i = PreState; i < nfa.Size(); ++i)
 		{
 			CNfaRow &row = nfa[i];
-			for (ulong j = 0; j < SC_CHARSETSIZE; ++j)
+			for (ulong j = 0; j < CNfaRow::COLUMNCNT; ++j)
 			{
-				ulong nCnt = row.DestCnt(j);
+				ulong nCnt = row[j].Size();
 				for (ulong k = 0; k < nCnt; ++k)
 				{
-					ulong &nSta = row.GetDest(j, k);
+					ulong &nSta = row[j][k];
 					if (nSta == MAX)
 					{
 						nSta = CurState;
@@ -1756,12 +1723,12 @@ void OP_KETRMAX_FUNC(CNfa &nfa, ulong PreState, ulong &CurState, bool IsBRAZERO,
 		for (ulong i = PreState; i < nfa.Size(); ++i)
 		{
 			CNfaRow &row = nfa[i];
-			for (ulong j = 0; j < SC_CHARSETSIZE; ++j)
+			for (ulong j = 0; j < CNfaRow::COLUMNCNT; ++j)
 			{
-				ulong nCnt = row.DestCnt(j);
+				ulong nCnt = row[j].Size();
 				for (ulong k = 0; k < nCnt; ++k)
 				{
-					ulong &nSta = row.GetDest(j, k);
+					ulong &nSta = row[j][k];
 					if (nSta == CurState)
 					{
 						nSta = PreState;
@@ -1770,7 +1737,7 @@ void OP_KETRMAX_FUNC(CNfa &nfa, ulong PreState, ulong &CurState, bool IsBRAZERO,
 			}
 			
 		}
-		nfa[PreState].AddDest(EMPTY, CurState);
+		nfa[PreState][EMPTY].PushBack(CurState);
 	}
 	else
 	{
@@ -1780,12 +1747,12 @@ void OP_KETRMAX_FUNC(CNfa &nfa, ulong PreState, ulong &CurState, bool IsBRAZERO,
 		for (ulong i = PreState; i < nCursize; ++i)
 		{
 			CNfaRow &row = nfa[i];
-			for (ulong j = 0; j < SC_CHARSETSIZE; ++j)
+			for (ulong j = 0; j < CNfaRow::COLUMNCNT; ++j)
 			{
-				ulong nCnt = row.DestCnt(j);
+				ulong nCnt = row[j].Size();
 				for (ulong k = 0; k < nCnt; ++k)
 				{
-					nfa[nCursize + i - PreState].AddDest(j, CurState + row.GetDest(j, k) - i);
+					nfa[nCursize + i - PreState][j].PushBack(CurState + row[j][k] - i);
 				}
 			}
 			++CurState;
@@ -1793,12 +1760,12 @@ void OP_KETRMAX_FUNC(CNfa &nfa, ulong PreState, ulong &CurState, bool IsBRAZERO,
 		for (ulong i = StartState; i < nfa.Size(); ++i)
 		{
 			CNfaRow &row = nfa[i];
-			for (ulong j = 0; j < SC_CHARSETSIZE; ++j)
+			for (ulong j = 0; j < CNfaRow::COLUMNCNT; ++j)
 			{
-				ulong nCnt = row.DestCnt(j);
+				ulong nCnt = row[j].Size();
 				for (ulong k = 0; k < nCnt; ++k)
 				{
-					ulong &nSta = row.GetDest(j, k);
+					ulong &nSta = row[j][k];
 					if (nSta == CurState)
 					{
 						nSta = StartState;
@@ -1806,7 +1773,7 @@ void OP_KETRMAX_FUNC(CNfa &nfa, ulong PreState, ulong &CurState, bool IsBRAZERO,
 				}
 			}
 		}
-		nfa[StartState].AddDest(EMPTY, CurState);
+		nfa[StartState][EMPTY].PushBack(CurState);
 	}
 }
 
@@ -1816,7 +1783,7 @@ ulong OP_BRA_CBRA_SCBRA_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &n
 	{
 		ulong nCursize = nfa.Size();
 		nfa.Resize(nCursize + 1);
-		nfa.Back().AddDest(EMPTY, MAX);
+		nfa.Back()[EMPTY].PushBack(MAX);
 		++CurState;
 	}
 	
@@ -1840,12 +1807,12 @@ ulong OP_SCBRA_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong
 
 void Copy(CNfaRow &NewRow, CNfaRow &Row, ulong increment)
 {
-	for (ulong i = 0; i < SC_CHARSETSIZE; ++i)
+	for (ulong i = 0; i < CNfaRow::COLUMNCNT; ++i)
 	{
-		ulong nDestCnt = Row.DestCnt(i);
+		ulong nDestCnt = Row[i].Size();
 		for (ulong j = 0; j < nDestCnt; ++j)
 		{
-			NewRow.AddDest(i, Row.GetDest(i, j) + increment);
+			NewRow[i].PushBack(Row[i][j] + increment);
 		}
 	}
 }
@@ -1855,7 +1822,7 @@ void AddEMPTY(CNfa &nfa, ulong &CurState)
 	ulong nCursize = nfa.Size();
 	nfa.Resize(nCursize + 1);
 	++CurState;
-	nfa.Back().AddDest(EMPTY, CurState);
+	nfa.Back()[EMPTY].PushBack(CurState);
 }
 
 void OutPut(std::vector<PCRE>::iterator &Pcre, CNfa &nfa, ulong count)
@@ -1883,13 +1850,13 @@ void OutPut(std::vector<PCRE>::iterator &Pcre, CNfa &nfa, ulong count)
 	for (ulong i = 0; i < Cnt; ++i)
 	{
 		CNfaRow &row = nfa[i];
-		for (ulong j = 0; j < SC_CHARSETSIZE; ++j)
+		for (ulong j = 0; j < CNfaRow::COLUMNCNT; ++j)
 		{
-			num = row.DestCnt(j);
+			num = row[j].Size();
 			fout.write((char*)&num, 4);
 			for (ulong k = 0; k < num; ++k)
 			{
-				fout.write((char*)&(row.GetDest(j, k)), 4);
+				fout.write((char*)&(row[j][k]), 4);
 			}
 		}
 	}

@@ -24,7 +24,7 @@ typedef ulong					SIGNATURE;
 /* compile configurations */
 #define SC_MAXDFASIZE	255
 #define SC_DFACOLCNT	256
-#define SC_CHARSETSIZE	260
+//#define SC_CHARSETSIZE	260
 #define SC_STATELIMIT	500
 
 /* error codes */

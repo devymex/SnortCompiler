@@ -36,12 +36,12 @@ public:
 	virtual ~CDfa();
 
 	CDfa&			operator =	(const CDfa &other);
-	CDfaRow&		operator []	(STATEID index);
-	const CDfaRow&	operator []	(STATEID index) const;
+	CDfaRow&		operator []	(STATEID nIdx);
+	const CDfaRow&	operator []	(STATEID nIdx) const;
 
 	ulong		Size() const;
 	CDfaRow&	Back();
-	void		Reserve(ulong nSize);
+	void		Reserve(ulong ulSize);
 	void		Resize(ulong nSize, ulong nCol);
 	void		Clear();
 	void		PushBack(CDfaRow &sta);

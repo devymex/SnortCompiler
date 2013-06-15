@@ -510,9 +510,9 @@ ulong PcreToNFA(const char *pPcre, CNfa &nfa, CSignatures &sigs)
 		CNfaRow &row = nfa.Back();
 		for (ulong i = 0; i < EMPTY; ++i)
 		{
-			row.AddDest(i, nCurSize);
+			row[i].PushBack(nCurSize);
 		}
-		row.AddDest(EMPTY, nCurSize + 1);
+		row[EMPTY].PushBack(nCurSize + 1);
 	}
 	ulong nr = ProcessPcre(Beg, End, nfa);
 	return nr;

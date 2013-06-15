@@ -14,9 +14,9 @@
 #pragma once
 
 #include <hwprj\common.h>
+#include <hwprj\unsary.h>
 
 #ifndef NFAHDR_DS
-class ULONGVEC;
 #define NFAHDR __declspec(dllimport)
 #else
 #define NFAHDR __declspec(dllexport)
@@ -25,25 +25,18 @@ class ULONGVEC;
 class NFAHDR CNfaRow
 {
 public:
-	explicit CNfaRow(ulong nSize = SC_CHARSETSIZE);
+	static const ulong COLUMNCNT = 260;
+
+	CNfaRow();
 	CNfaRow(const CNfaRow &other);
 	virtual ~CNfaRow();
 
-	CNfaRow& operator=(const CNfaRow &other);
-
-	void			Resize(ulong nSize);
-	ulong			Size() const;
-	ulong			DestCnt(ulong nCol) const;
-	ulong&			GetDest(ulong nCol, ulong nIdx);
-	const ulong&	GetDest(ulong nCol, ulong nIdx) const;
-	ulong*			GetCol(ulong nCol);
-	const ulong*	GetCol(ulong nCol) const;
-	void			CopyCol(ulong nCol, ulong *pOut) const;
-	void			AddDest(ulong nCol, ulong nDest);
+	CNfaRow&				operator =	(const CNfaRow &other);
+	CUnsignedArray&			operator []	(ulong ulCol);
+	const CUnsignedArray&	operator []	(ulong ulCol) const;
+	
 	void			SortAll();
 
-
 protected:
-	ulong m_nSize;
-	ULONGVEC *m_pDestSet;
+	CUnsignedArray *m_pDestSet;
 };

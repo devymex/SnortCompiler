@@ -39,7 +39,7 @@ void Warshall(byte *pMat, ulong nWidth, ulong nHeight)
 
 void NfaEClosure(const CNfa &nfa, std::vector<STATEVEC> &eClosure)
 {
-	SCASSERT(nfa.Size() < 65535);
+	TASSERT(nfa.Size() < 65535);
 
 	ushort nNfaSize = ushort(nfa.Size());
 	ushort nMatHeight = nNfaSize + 1;
@@ -58,8 +58,8 @@ void NfaEClosure(const CNfa &nfa, std::vector<STATEVEC> &eClosure)
 	for (ulong i = 0; i < nNfaSize; ++i)
 	{
 		const CNfaRow &row = nfa[i];
-		ulong nCnt = row.DestCnt(SC_DFACOLCNT);
-		const ulong *pDest = row.GetCol(SC_DFACOLCNT);
+		ulong nCnt = row[SC_DFACOLCNT].Size();
+		const ulong *pDest = row[SC_DFACOLCNT].Data();
 		for (ulong k = 0; k < nCnt; ++k)
 		{
 			pMat[i * nMatWidth + pDest[k]] = 1;
@@ -94,8 +94,8 @@ void NfaEClosure(const CNfa &nfa, std::vector<STATEVEC> &eClosure)
 void GetNextEClosureSet(const CNfa &nfa, const std::vector<STATEVEC> &eClosure,
 						const STATEVEC &curSet, ulong edge, STATEVEC &eClosureSet)
 {
-	SCASSERT(edge < SC_CHARSETSIZE);
-	SCASSERT(nfa.Size() < 65535);
+	TASSERT(edge < CNfaRow::COLUMNCNT);
+	TASSERT(nfa.Size() < 65535);
 
 	static STATEVEC nextSet; //
 	nextSet.clear();
@@ -110,13 +110,13 @@ void GetNextEClosureSet(const CNfa &nfa, const std::vector<STATEVEC> &eClosure,
 			{
 				const CNfaRow &row = nfa[nCurSta];
 				ulong nCurCnt = nextSet.size();
-				ulong nAddCnt = row.DestCnt(edge);
+				ulong nAddCnt = row[edge].Size();
 				if (nAddCnt != 0)
 				{
 					nextSet.resize(nCurCnt + nAddCnt);
 
 					STATEID *pDest = nextSet.data() + nCurCnt;
-					const ulong *pStates = row.GetCol(edge);
+					const ulong *pStates = row[edge].Data();
 
 					for (ulong k = 0; k < nAddCnt; ++k)
 					{
@@ -174,11 +174,11 @@ void NAvaiEdges(const CNfa &nfa, byte *group)
 	const ulong _FNV_offset_basis = 2166136261U;
 	const ulong _FNV_prime = 16777619U;
 
-	static COLUMNKEY columns[SC_CHARSETSIZE]; //
-	ulong zeroCnts[SC_CHARSETSIZE] = {0};
+	static COLUMNKEY columns[CNfaRow::COLUMNCNT]; //
+	ulong zeroCnts[CNfaRow::COLUMNCNT] = {0};
 
 	ulong nSize = nfa.Size();
-	for (ulong i = 0; i < SC_CHARSETSIZE; ++i)
+	for (ulong i = 0; i < CNfaRow::COLUMNCNT; ++i)
 	{
 		columns[i].key.clear();
 		columns[i].hash = _FNV_offset_basis;
@@ -188,11 +188,11 @@ void NAvaiEdges(const CNfa &nfa, byte *group)
 		for (ulong i = 0; i < nSize; ++i)
 		{
 			const CNfaRow &curRow = nfa[i];
-			for (ulong j = 0; j < SC_CHARSETSIZE; ++j)
+			for (ulong j = 0; j < CNfaRow::COLUMNCNT; ++j)
 			{
 				std::vector<ulong> &curCol = columns[j].key;
-				const ulong *pData = curRow.GetCol(j);
-				ulong nAddSize = curRow.DestCnt(j);
+				ulong nAddSize = curRow[j].Size();
+				const ulong *pData = curRow[j].Data();
 				if (nAddSize != 0)
 				{
 					if (zeroCnts[j] > 0)
@@ -218,7 +218,7 @@ void NAvaiEdges(const CNfa &nfa, byte *group)
 				}
 			}
 		}
-		for (ulong i = 0; i < SC_CHARSETSIZE; ++i)
+		for (ulong i = 0; i < CNfaRow::COLUMNCNT; ++i)
 		{
 			std::vector<ulong> &curCol = columns[i].key;
 			ulong nCurSize = curCol.size();
@@ -272,28 +272,31 @@ void CalcAbleTo(STATEVEC *pRevTbl, ulong nGrpNum, ulong nStaNum, PARTSET &ps)
 		ZeroMemory(pBuf, nStaNum * nGrpNum);
 		ps.AbleTo.resize(nGrpNum, 0);
 		ps.Ones.resize(nGrpNum, 0);
-		//计算AbleTo的值，每产生一个新的或者更新PARTSET对象计算一次
-		for (ulong j = 0; j < nGrpNum; ++j)
-		{
-			byte *pAbleTo = pBuf + j * nStaNum;
-			ps.AbleTo[j] = pAbleTo;
-			//遍历PARTSET中的每个状态t，若存在δ(-1)(t,j)≠Φ，AbleTo[t]标记为1
-			for (STATELIST_ITER k = ps.StaSet.begin(); k != ps.StaSet.end(); ++k)
-			{
-				bool br = !(pRevTbl[*k * nGrpNum + j].empty());
-				if (br == true && pAbleTo[*k] == 0)
-				{
-					pAbleTo[*k] = (byte)br;
-					++ps.Ones[j];
-				}
-			}
-		}
 	}
 	catch (std::exception &e)
 	{
 		throw CTrace(__FILE__, __LINE__, e.what());
 	}
+	//计算AbleTo的值，每产生一个新的或者更新PARTSET对象计算一次
+	for (ulong j = 0; j < nGrpNum; ++j)
+	{
+		byte *pAbleTo = pBuf + j * nStaNum;
+		/*AbleTo[j] = {state|state belong to parSet &&
+		pRevTbl[state][j] is not null} */
+		ps.AbleTo[j] = pAbleTo;
+		//遍历PARTSET中的每个状态t，若存在δ(-1)(t,j)≠Φ，AbleTo[t]标记为1
+		for (STATELIST_ITER k = ps.StaSet.begin(); k != ps.StaSet.end(); ++k)
+		{
+			bool br = !(pRevTbl[*k * nGrpNum + j].empty());
+			if (br == true && pAbleTo[*k] == 0)
+			{
+				pAbleTo[*k] = (byte)br;
+				++ps.Ones[j];
+			}
+		}
+	}
 }
+
 /*
 **	This function groups the merged dfa's columns on the ground of
 **	the column groups of dfas to be merged.
@@ -317,11 +320,10 @@ void DfaColGroup(CDfaArray &dfas, byte* groups)
 	const ulong _FNV_offset_basis = 2166136261U;
 	const ulong _FNV_prime = 16777619U;
 
-	GROUPKEY colum[SC_CHARSETSIZE];
+	GROUPKEY colum[SC_DFACOLCNT];
 
 	for(ulong c = 0; c < SC_DFACOLCNT; ++c)
 	{
-		colum[c].key.clear();
 		colum[c].hash = _FNV_offset_basis;
 	}
 
@@ -332,7 +334,7 @@ void DfaColGroup(CDfaArray &dfas, byte* groups)
 			for(ulong c = 0; c < SC_DFACOLCNT; ++c)
 			{
 				ulong group = dfas[i].Char2Group(byte(c));
-				colum[c].key.push_back(group);
+				colum[c].val.push_back(group);
 				colum[c].hash ^= group;
 				colum[c].hash *= _FNV_prime;
 			}

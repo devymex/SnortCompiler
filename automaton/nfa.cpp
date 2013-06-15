@@ -74,11 +74,6 @@ NFAHDR void CNfa::Resize(ulong ulSize)
 	{
 		throw CTrace(__FILE__, __LINE__, e.what());
 	}
-
-	for (NFAROWARY_ITER i = m_pNfa->begin(); i != m_pNfa->end(); ++i)
-	{
-		i->Resize(SC_CHARSETSIZE);
-	}
 }
 
 NFAHDR ulong CNfa::Size() const
@@ -147,7 +142,7 @@ NFAHDR void CNfa::Dump(const char *pFile) const
 		const CNfaRow &row = (*m_pNfa)[i];
 		for(ulong j = 0; j < 257; ++j)
 		{
-			ulong nCnt = row.DestCnt(j);
+			ulong nCnt = row[j].Size();
 			if(nCnt == 0)
 			{
 				fout << -1 << "\t";
@@ -156,7 +151,7 @@ NFAHDR void CNfa::Dump(const char *pFile) const
 			{
 				for(ulong k = 0; k < nCnt; ++k)
 				{
-					fout << row.GetDest(j, k) << ", ";
+					fout << row[j][k] << ", ";
 				}
 				fout << "\t";
 			}

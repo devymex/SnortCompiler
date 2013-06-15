@@ -131,7 +131,7 @@ DFAIDSETHDR CDfaIdSet& CFinalStates::GetDfaIdSet(STATEID nStaId)
 	FINSTAMAP_ITER iterMe = m_pDfaIds->find(nStaId);
 	if (iterMe == m_pDfaIds->end())
 	{
-		throw 0;
+		throw CTrace(__FILE__, __LINE__, "STATEID not found");
 	}
 	return iterMe->second;
 }
@@ -141,7 +141,7 @@ DFAIDSETHDR const CDfaIdSet& CFinalStates::GetDfaIdSet(STATEID nStaId) const
 	FINSTAMAP_CITER iterMe = m_pDfaIds->find(nStaId);
 	if (iterMe == m_pDfaIds->end())
 	{
-		throw 0;
+		throw CTrace(__FILE__, __LINE__, "STATEID not found");
 	}
 	return iterMe->second;
 }
