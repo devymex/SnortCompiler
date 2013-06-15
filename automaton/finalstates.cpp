@@ -6,8 +6,15 @@ typedef FINSTAMAP::const_iterator						FINSTAMAP_CITER;
 
 DFAIDSETHDR CFinalStates::CFinalStates()
 {
-	m_pStates = new STATEVEC;
-	m_pDfaIds = new FINSTAMAP;
+	try
+	{
+		m_pStates = new STATEVEC;
+		m_pDfaIds = new FINSTAMAP;
+	}
+	catch (std::exception &e)
+	{
+		throw CTrace(__FILE__, __LINE__, e.what());
+	}
 }
 
 DFAIDSETHDR CFinalStates::~CFinalStates()
@@ -18,15 +25,29 @@ DFAIDSETHDR CFinalStates::~CFinalStates()
 
 DFAIDSETHDR CFinalStates::CFinalStates(const CFinalStates &other)
 {
-	m_pStates = new STATEVEC;
-	m_pDfaIds = new FINSTAMAP;
+	try
+	{
+		m_pStates = new STATEVEC;
+		m_pDfaIds = new FINSTAMAP;
+	}
+	catch (std::exception &e)
+	{
+		throw CTrace(__FILE__, __LINE__, e.what());
+	}
 	*this = other;
 }
 
 DFAIDSETHDR CFinalStates& CFinalStates::operator=(const CFinalStates &other)
 {
-	*m_pStates = *other.m_pStates;
-	*m_pDfaIds = *other.m_pDfaIds;
+	try
+	{
+		*m_pStates = *other.m_pStates;
+		*m_pDfaIds = *other.m_pDfaIds;
+	}
+	catch (std::exception &e)
+	{
+		throw CTrace(__FILE__, __LINE__, e.what());
+	}
 	return *this;
 }
 
@@ -51,22 +72,36 @@ DFAIDSETHDR void CFinalStates::PushBack(STATEID nStaId)
 	FINSTAMAP_ITER iter = m_pDfaIds->find(nStaId);
 	if (iter == m_pDfaIds->end())
 	{
-		(*m_pDfaIds)[nStaId];
-		(*m_pStates).push_back(nStaId);
+		try
+		{
+			(*m_pDfaIds)[nStaId];
+			(*m_pStates).push_back(nStaId);
+		}
+		catch (std::exception &e)
+		{
+			throw CTrace(__FILE__, __LINE__, e.what());
+		}
 	}
 }
 
 DFAIDSETHDR void CFinalStates::PushBack(STATEID nStaId, DFAID nDfaId)
 {
 	FINSTAMAP_ITER iter = m_pDfaIds->find(nStaId);
-	if (iter == m_pDfaIds->end())
+	try
 	{
-		(*m_pDfaIds)[nStaId].Add(nDfaId);
-		(*m_pStates).push_back(nStaId);
+		if (iter == m_pDfaIds->end())
+		{
+			(*m_pDfaIds)[nStaId].Add(nDfaId);
+			(*m_pStates).push_back(nStaId);
+		}
+		else
+		{
+			iter->second.Add(nDfaId);
+		}
 	}
-	else
+	catch (std::exception &e)
 	{
-		iter->second.Add(nDfaId);
+		throw CTrace(__FILE__, __LINE__, e.what());
 	}
 }
 

@@ -27,14 +27,14 @@ public:
 	CNfa(const CNfa &other);
 
 	CNfa&			operator =	(const CNfa &other);
-	CNfaRow&		operator []	(ulong index);
-	const CNfaRow&	operator []	(ulong index) const;
+	CNfaRow&		operator []	(ulong ulIdx);
+	const CNfaRow&	operator []	(ulong ulIdx) const;
 
 	ulong		Size() const;
 	CNfaRow&	Back();
 	void		Clear();
-	void		Resize(ulong _Newsize);
-	void		Reserve(ulong _Count);
+	void		Resize(ulong ulSize);
+	void		Reserve(ulong ulSize);
 	void		Shrink();
 	void		PushBack(const CNfaRow &row);
 	void		PopBack();

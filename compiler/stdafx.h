@@ -30,6 +30,7 @@
 #include <hwprj\dfa.h>
 #include <hwprj\dllstring.h>
 #include <hwprj\ctimer.h>
+#include <hwprj\trace.h>
 
 #define COMPILERHDR_DS
 #define REGRULEHDR_DS

@@ -4,12 +4,26 @@
 SNORTRULEHDR CRuleOption::CRuleOption()
 	: m_nFlag(0)
 {
-	m_pPattern = new std::string;
+	try
+	{
+		m_pPattern = new std::string;
+	}
+	catch (std::exception &e)
+	{
+		throw CTrace(__FILE__, __LINE__, e.what());
+	}
 }
 
 SNORTRULEHDR CRuleOption::CRuleOption(const CRuleOption &other)
 {
-	m_pPattern = new std::string;
+	try
+	{
+		m_pPattern = new std::string;
+	}
+	catch (std::exception &e)
+	{
+		throw CTrace(__FILE__, __LINE__, e.what());
+	}
 	*this = other;
 }
 
@@ -20,7 +34,14 @@ SNORTRULEHDR CRuleOption::~CRuleOption()
 
 SNORTRULEHDR const CRuleOption& CRuleOption::operator=(const CRuleOption &other)
 {
-	*m_pPattern = *other.m_pPattern;
+	try
+	{
+		*m_pPattern = *other.m_pPattern;
+	}
+	catch (std::exception &e)
+	{
+		throw CTrace(__FILE__, __LINE__, e.what());
+	}
 	m_nFlag = other.m_nFlag;
 	return *this;
 }
@@ -41,7 +62,14 @@ SNORTRULEHDR ulong CRuleOption::GetPattern(LPSTR lpStr, ulong nLen) const
 
 SNORTRULEHDR void CRuleOption::SetPattern(LPCSTR lpStr)
 {
-	*m_pPattern = lpStr;
+	try
+	{
+		*m_pPattern = std::string(lpStr);
+	}
+	catch (std::exception &e)
+	{
+		throw CTrace(__FILE__, __LINE__, e.what());
+	}
 }
 
 SNORTRULEHDR ulong CRuleOption::GetFlag() const

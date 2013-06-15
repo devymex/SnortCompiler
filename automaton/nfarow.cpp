@@ -3,9 +3,25 @@
 
 
 NFAHDR CNfaRow::CNfaRow(ulong nSize)
-	: m_nSize(nSize)
+	: m_nSize(nSize), m_pDestSet(NULL)
 {
-	m_pDestSet = new std::vector<ulong>[m_nSize];
+	if (nSize != 0)
+	{
+		try
+		{
+			m_pDestSet = new std::vector<ulong>[m_nSize];
+		}
+		catch (std::exception &e)
+		{
+			throw CTrace(__FILE__, __LINE__, e.what());
+		}
+	}
+}
+
+NFAHDR CNfaRow::CNfaRow(const CNfaRow &other)
+	: m_nSize(0), m_pDestSet(0)
+{
+	*this = other;
 }
 
 NFAHDR CNfaRow::~CNfaRow()
@@ -23,7 +39,17 @@ NFAHDR void CNfaRow::Resize(ulong nSize)
 	if (m_nSize != nSize)
 	{
 		delete []m_pDestSet;
-		m_pDestSet = new std::vector<ulong>[nSize];
+		if (nSize != 0)
+		{
+			try
+			{
+				m_pDestSet = new std::vector<ulong>[nSize];
+			}
+			catch (std::exception &e)
+			{
+				throw CTrace(__FILE__, __LINE__, e.what());
+			}
+		}
 		m_nSize = nSize;
 	}
 }
@@ -56,12 +82,19 @@ NFAHDR const ulong* CNfaRow::GetCol(ulong nCol) const
 NFAHDR void CNfaRow::CopyCol(ulong nCol, ulong *pOut) const
 {
 	std::vector<ulong> &col = m_pDestSet[nCol];
-	memcpy(pOut, col.data(), col.size() * sizeof(ulong));
+	memcpy(pOut, col.data(), col.size() * sizeof(col[0]));
 }
 
 NFAHDR void CNfaRow::AddDest(ulong nCol, ulong nDest)
 {
-	m_pDestSet[nCol].push_back(nDest);
+	try
+	{
+		m_pDestSet[nCol].push_back(nDest);
+	}
+	catch (std::exception &e)
+	{
+		throw CTrace(__FILE__, __LINE__, e.what());
+	}
 }
 
 NFAHDR void CNfaRow::SortAll()
@@ -72,18 +105,19 @@ NFAHDR void CNfaRow::SortAll()
 	}
 }
 
-NFAHDR CNfaRow::CNfaRow(const CNfaRow &other)
-	: m_nSize(0), m_pDestSet(0)
-{
-	*this = other;
-}
-
 NFAHDR CNfaRow& CNfaRow::operator=(const CNfaRow &other)
 {
-	Resize(other.m_nSize);
-	for (ulong i = 0; i < m_nSize; ++i)
+	try
 	{
-		m_pDestSet[i] = other.m_pDestSet[i];
+		Resize(other.m_nSize);
+		for (ulong i = 0; i < m_nSize; ++i)
+		{
+			m_pDestSet[i] = other.m_pDestSet[i];
+		}
+	}
+	catch (std::exception &e)
+	{
+		throw CTrace(__FILE__, __LINE__, e.what());
 	}
 
 	return *this;

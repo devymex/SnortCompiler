@@ -6,7 +6,14 @@ typedef NFAROWARY::const_iterator	NFAROWARY_CITER;
 
 NFAHDR CNfa::CNfa()
 {
-	m_pNfa = new NFAROWARY;
+	try
+	{
+		m_pNfa = new NFAROWARY;
+	}
+	catch (std::exception &e)
+	{
+		throw CTrace(__FILE__, __LINE__, e.what());
+	}
 }
 
 NFAHDR CNfa::~CNfa()
@@ -16,19 +23,40 @@ NFAHDR CNfa::~CNfa()
 
 NFAHDR CNfa::CNfa(const CNfa &other)
 {
-	m_pNfa = new NFAROWARY;
+	try
+	{
+		m_pNfa = new NFAROWARY;
+	}
+	catch (std::exception &e)
+	{
+		throw CTrace(__FILE__, __LINE__, e.what());
+	}
 	*this = other;
 }
 
 NFAHDR CNfa& CNfa::operator=(const CNfa &other)
 {
-	*this->m_pNfa = *other.m_pNfa;
+	try
+	{
+		*this->m_pNfa = *other.m_pNfa;
+	}
+	catch (std::exception &e)
+	{
+		throw CTrace(__FILE__, __LINE__, e.what());
+	}
 	return *this;
 }
 
-NFAHDR void CNfa::Reserve(ulong _Count)
+NFAHDR void CNfa::Reserve(ulong ulSize)
 {
-	m_pNfa->reserve(_Count);
+	try
+	{
+		m_pNfa->reserve(ulSize);
+	}
+	catch (std::exception &e)
+	{
+		throw CTrace(__FILE__, __LINE__, e.what());
+	}
 }
 
 NFAHDR void CNfa::Shrink()
@@ -36,9 +64,17 @@ NFAHDR void CNfa::Shrink()
 	m_pNfa->shrink_to_fit();
 }
 
-NFAHDR void CNfa::Resize(ulong _Newsize)
+NFAHDR void CNfa::Resize(ulong ulSize)
 {
-	m_pNfa->resize(_Newsize);
+	try
+	{
+		m_pNfa->resize(ulSize);
+	}
+	catch (std::exception &e)
+	{
+		throw CTrace(__FILE__, __LINE__, e.what());
+	}
+
 	for (NFAROWARY_ITER i = m_pNfa->begin(); i != m_pNfa->end(); ++i)
 	{
 		i->Resize(SC_CHARSETSIZE);
@@ -60,14 +96,14 @@ NFAHDR CNfaRow& CNfa::Back()
 	return m_pNfa->back();
 }
 
-NFAHDR CNfaRow& CNfa::operator[](ulong index)
+NFAHDR CNfaRow& CNfa::operator[](ulong ulIdx)
 {
-	return (*m_pNfa)[index];
+	return (*m_pNfa)[ulIdx];
 }
 
-NFAHDR const CNfaRow& CNfa::operator[](ulong index) const
+NFAHDR const CNfaRow& CNfa::operator[](ulong ulIdx) const
 {
-	return (*m_pNfa)[index];
+	return (*m_pNfa)[ulIdx];
 }
 
 NFAHDR void CNfa::PopBack()
@@ -77,12 +113,19 @@ NFAHDR void CNfa::PopBack()
 
 NFAHDR void CNfa::PushBack(const CNfaRow &row)
 {
-	m_pNfa->push_back(row);
+	try
+	{
+		m_pNfa->push_back(row);
+	}
+	catch (std::exception &e)
+	{
+		throw CTrace(__FILE__, __LINE__, e.what());
+	}
 }
 
 NFAHDR void CNfa::SortAll()
 {
-	for(NFAROWARY_ITER i = m_pNfa->begin(); i != m_pNfa->end(); ++i)
+	for (NFAROWARY_ITER i = m_pNfa->begin(); i != m_pNfa->end(); ++i)
 	{
 		i->SortAll();
 	}

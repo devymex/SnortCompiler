@@ -3,7 +3,14 @@
 
 REGRULEHDR CRegChain::CRegChain()
 {
-	m_pRegList = new STRINGVEC;
+	try
+	{
+		m_pRegList = new STRINGVEC;
+	}
+	catch (std::exception &e)
+	{
+		throw CTrace(__FILE__, __LINE__, e.what());
+	}
 }
 
 REGRULEHDR CRegChain::~CRegChain()
@@ -13,7 +20,14 @@ REGRULEHDR CRegChain::~CRegChain()
 
 REGRULEHDR CRegChain::CRegChain(const CRegChain &other)
 {
-	m_pRegList = new STRINGVEC;
+	try
+	{
+		m_pRegList = new STRINGVEC;
+	}
+	catch (std::exception &e)
+	{
+		throw CTrace(__FILE__, __LINE__, e.what());
+	}
 	*this = other;
 }
 
@@ -29,7 +43,14 @@ REGRULEHDR CDllString& CRegChain::Back() const
 
 REGRULEHDR void CRegChain::PushBack(const CDllString &pcreStr)
 {
-	m_pRegList->push_back(pcreStr);
+	try
+	{
+		m_pRegList->push_back(pcreStr);
+	}
+	catch (std::exception &e)
+	{
+		throw CTrace(__FILE__, __LINE__, e.what());
+	}
 }
 
 REGRULEHDR CDllString& CRegChain::operator[](ulong nIdx)
@@ -44,14 +65,28 @@ REGRULEHDR const CDllString& CRegChain::operator[](ulong nIdx) const
 
 REGRULEHDR const CRegChain& CRegChain::operator = (const CRegChain &other)
 {
-	*this->m_pRegList = *other.m_pRegList;
+	try
+	{
+		*this->m_pRegList = *other.m_pRegList;
+	}
+	catch (std::exception &e)
+	{
+		throw CTrace(__FILE__, __LINE__, e.what());
+	}
 	this->m_sigs = other.m_sigs;
 	return *this;
 }
 
 REGRULEHDR void CRegChain::Resize(ulong nSize)
 {
-	m_pRegList->resize(nSize);
+	try
+	{
+		m_pRegList->resize(nSize);
+	}
+	catch (std::exception &e)
+	{
+		throw CTrace(__FILE__, __LINE__, e.what());
+	}
 }
 
 REGRULEHDR CSignatures& CRegChain::GetSigs()
