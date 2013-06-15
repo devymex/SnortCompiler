@@ -5,6 +5,7 @@
 #include <hwprj\buildhash.h>
 #include <hwprj\unsary.h>
 #include <hwprj\siddfaids.h>
+//#include <hwprj\groupres.h>
 #include "MatchPkt.h"
 
 struct DFASIDMAPPING
@@ -17,7 +18,7 @@ struct DFAMCH
 {
 	std::string resultPath;
 	HASHRES hashtable;
-	CGROUPRes mergedDfas;
+	CGroupRes mergedDfas;
 	DFASIDMAPPING dIdSId;
 };
 
@@ -33,11 +34,13 @@ void CALLBACK DPktParam(const ip_header *ih, const BYTE *data, void* user);
 
 bool DMyLoadCapFile(const char* pFile, PACKETRECV cv, void* pUser);
 
+void ResultFiles(const std::string &path, std::vector<std::string> &resultFiles);
+
 MATCHPKT bool DLoadCapFile(const char* pFile, void* pUser);
 
 MATCHPKT void DHandleAllFile(const std::string &path, void* user);
 
-MATCHPKT void DfaidSidMap(CGROUPRes &mergedDfas, DFASIDMAPPING &didSid);
+MATCHPKT void DfaidSidMap(CGroupRes &mergedDfas, DFASIDMAPPING &didSid);
 
 
 

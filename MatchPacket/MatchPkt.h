@@ -16,6 +16,7 @@
 #include <hwprj\snortrule.h>
 #include <hwprj\pcrematch.h>
 #include <hwprj\buildhash.h>
+//#include <hwprj\groupres.h>
 
 #define ETHDRLEN 14 
 #define _TCP 6
@@ -160,7 +161,7 @@ bool MyLoadCapFile(const char* pFile, PACKETRECV cv, void* pUser);
 MATCHPKT bool LoadCapFile(const char* pFile, void* pUser);
 
 void __stdcall MyProcess(const CSnortRule &rule, LPVOID lpParam);
-MATCHPKT void MchCompile(LPCTSTR filename, LPVOID result);
+MATCHPKT void MchCompile(const char* filename, LPVOID result);
 MATCHPKT bool TradithinalMatch(std::vector<u_char> &dataSrc, CRegRule &regRule);//����pcreMATCHPKT 
 
 void GetMchRule(const u_char *data, ulong len, void* user, std::vector<ulong> &rules);

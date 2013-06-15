@@ -143,7 +143,7 @@ MATCHPKT void DfaMatchPkt(const u_char *data, ulong len, DFAMCH &dfamch)
 		matchresult.open(dfamch.resultPath, std::ofstream::app);
 	}
 
-	matchresult << dpktnum << ":  ";
+	matchresult << dpktnum << " : ";
 	std::vector<ulong> matchdfas;
 	std::vector<ulong> matcheddfaids;
 	GetMchDfas(data, len, dfamch.hashtable, matchdfas);
@@ -219,7 +219,7 @@ void __stdcall DPktParam(const ip_header *ih, const byte *data, void* user)
 			data += _ihl + tcpHdrLen;
 
 			ulong tcpdatalen = _tlen - _ihl - tcpHdrLen;
-			if(tcpdatalen > 0)
+			if (_tlen > (_ihl + tcpHdrLen))
 			{
 				DfaMatchPkt(data, tcpdatalen, dfamch);
 			}
@@ -243,7 +243,10 @@ void __stdcall DPktParam(const ip_header *ih, const byte *data, void* user)
 		}
 	}
 	
-	std::cout << dpktnum << std::endl;
+	if (dpktnum % 100 == 0)
+	{
+		std::cout << dpktnum << std::endl;
+	}
 }
 
 bool DMyLoadCapFile(const char* pFile, PACKETRECV cv, void* pUser)
@@ -303,7 +306,7 @@ MATCHPKT void DHandleAllFile(const std::string &path, void* user)
 }
 
 
-MATCHPKT void DfaidSidMap(CGROUPRes &mergedDfas, DFASIDMAPPING &didSid)
+MATCHPKT void DfaidSidMap(CGroupRes &mergedDfas, DFASIDMAPPING &didSid)
 {
 	CSidDfaIds &sd = mergedDfas.GetSidDfaIds();
 
@@ -318,6 +321,41 @@ MATCHPKT void DfaidSidMap(CGROUPRes &mergedDfas, DFASIDMAPPING &didSid)
 		for(ulong j = 0; j < onemap.m_dfaIds.Size(); ++j)
 		{
 			didSid.dId_sId[onemap.m_dfaIds[j]] = onemap.m_nSid;
+		}
+	}
+}
+
+void ResultFiles(const std::string &path, std::vector<std::string> &resultFiles)
+{
+	WIN32_FIND_DATAA wfda;
+	const std::string ext = "*.*";
+	std::string str = path + std::string("\\");
+	std::string pat = str + ext;
+	HANDLE hff = ::FindFirstFileA(pat.c_str(), &wfda);
+	if(hff == INVALID_HANDLE_VALUE)
+	{
+		return;
+	}
+
+	for(BOOL br = TRUE; br == TRUE; br = FindNextFileA(hff, &wfda))
+	{
+		if(wfda.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY )
+		{
+			if (wfda.cFileName[0] != '.')
+			{
+				ResultFiles(str + std::string(wfda.cFileName), resultFiles);
+			}
+		}
+		else
+		{
+			std::string &temp = str + std::string(wfda.cFileName);
+			std::string &ext1 = temp.substr(temp.size() - 4, 4);
+
+			if(ext1 == ".txt")
+			{
+				resultFiles.push_back(temp);
+			}
+
 		}
 	}
 }
