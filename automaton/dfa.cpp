@@ -224,7 +224,7 @@ DFAHDR ulong CDfa::FromNFA(const CNfa &nfa)
 		if (startEVec.back() == nfa.Size())
 		{
 			firstRow.SetFlag(firstRow.GetFlag() | firstRow.TERMINAL);
-			m_FinStas.PushBack(0, m_nId);
+			m_FinStas.AddState(0).AddDfaId(m_nId);
 		}
 
 		static STATEVEC nextNfaVec; //
@@ -267,7 +267,7 @@ DFAHDR ulong CDfa::FromNFA(const CNfa &nfa)
 						{
 							CDfaRow &lastRow = m_pDfa->back();
 							lastRow.SetFlag(lastRow.GetFlag() | lastRow.TERMINAL);
-							m_FinStas.PushBack(nextSta, m_nId);
+							m_FinStas.AddState(nextSta).AddDfaId(m_nId);
 						}
 						nfaStasStack.push(nextNfaVec);
 					}
@@ -509,7 +509,7 @@ DFAHDR void CDfa::Load(byte *beg)
 		ulong nDfaId;
 		ReadNum(beg, nStaId, sizeof(byte));
 		ReadNum(beg, nDfaId);
-		m_FinStas.PushBack(nStaId, nDfaId);
+		m_FinStas.AddState(nStaId).AddDfaId(nDfaId);
 	}
 }
 
@@ -588,7 +588,7 @@ ulong CDfa::PartStates(STATEVEC *pRevTbl)
 
 	//divide partSet using pWait in a loop
 	//store index of partSet into pWait for different symbol 
-	std::vector<ulong> pWait[256];
+	ULONGVEC pWait[256];
 
 	//inital pWait; for same symbol, if |partSet[j]|<=|partSet[k]|£¬
 	//then insert j into pWait, otherwise£¬insert k	
@@ -668,7 +668,7 @@ ulong CDfa::PartStates(STATEVEC *pRevTbl)
 					for (byte m = 0; m < nGrpNum; ++m)
 					{
 						int k = partSets.size() - 1;
-						std::vector<ulong> &curWait = pWait[m];
+						ULONGVEC &curWait = pWait[m];
 						int aj = pJSet->Ones[m];
 						int ak = lastPart.Ones[m];
 						if (aj > 0 && aj <= ak)
@@ -710,19 +710,18 @@ ulong CDfa::PartStates(STATEVEC *pRevTbl)
 		//remark new start state and final states
 		for (PARTSETVEC_ITER i = partSets.begin(); i != partSets.end(); ++i)
 		{
-			STATEID nIdx = STATEID(i - partSets.begin());
+			STATEID nState = STATEID(i - partSets.begin());
 			for (STATELIST_ITER j = i->StaSet.begin(); j != i->StaSet.end(); ++j)
 			{
 				CDfaRow &curRow = (*m_pDfa)[*j];
 				if (curRow.GetFlag() & CDfaRow::START)
 				{
-					m_nStartId = nIdx;
+					m_nStartId = nState;
 				}
 
 				if (curRow.GetFlag() & CDfaRow::TERMINAL)
 				{
-					newFinStas.PushBack(nIdx);
-					newFinStas.GetDfaIdSet(nIdx) = m_FinStas.GetDfaIdSet(*j);
+					newFinStas.AddState(nState) = m_FinStas.GetDfaIdSet(*j);
 				}
 			}
 		}
@@ -864,8 +863,7 @@ DFAHDR bool MergeMultipleDfas(CDfaArray &dfas, CDfa &lastDfa)
 			finFlag = 1;
 			AddTermIntoDFA(nSta, dfas[i], 0, lastDfa);
 			CFinalStates &newFinSta = lastDfa.GetFinalState();
-			newFinSta.PushBack(0);
-			newFinSta.GetDfaIdSet(0).Append(
+			newFinSta.AddState(0).Append(
 				dfas[i].GetFinalState().GetDfaIdSet(nSta));
 
 		}

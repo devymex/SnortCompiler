@@ -79,7 +79,7 @@ DFAIDSETHDR void CDfaIdSet::Append(const CDfaIdSet &other)
 	}
 }
 
-DFAIDSETHDR void CDfaIdSet::Add(DFAID dfaId)
+DFAIDSETHDR void CDfaIdSet::AddDfaId(DFAID dfaId)
 {
 	try
 	{

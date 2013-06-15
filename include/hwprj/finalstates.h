@@ -30,11 +30,10 @@ public:
 
 	ulong	Size() const;
 	void	Clear();
-	void	PushBack(STATEID nStaId);
-	void	PushBack(STATEID nStaId, DFAID nDfaId);
-	ulong	GetDfaIdCount(STATEID nStaId) const;
-	ulong	GetAllDfaIdCount() const;
-	void	Swap(CFinalStates &other);
+
+	CDfaIdSet&	AddState(STATEID nStaId);
+	ulong		GetAllDfaIdCount() const;
+	void		Swap(CFinalStates &other);
 
 	CDfaIdSet&			GetDfaIdSet(STATEID nStaId);
 	const CDfaIdSet&	GetDfaIdSet(STATEID nStaId) const;

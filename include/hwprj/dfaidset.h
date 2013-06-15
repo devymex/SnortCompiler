@@ -34,7 +34,7 @@ public:
 	ulong	Size() const;
 	void	Clear();
 	void	Append(const CDfaIdSet &other);
-	void	Add(DFAID dfaId);
+	void	AddDfaId(DFAID dfaId);
 	void	CopyTo(CUnsignedArray &idAry) const;
 private:
 	DFAIDSET *m_pSet;

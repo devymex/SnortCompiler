@@ -67,7 +67,7 @@ DFAIDSETHDR void CFinalStates::Clear()
 	m_pStates->clear();
 }
 
-DFAIDSETHDR void CFinalStates::PushBack(STATEID nStaId)
+DFAIDSETHDR CDfaIdSet& CFinalStates::AddState(STATEID nStaId)
 {
 	FINSTAMAP_ITER iter = m_pDfaIds->find(nStaId);
 	if (iter == m_pDfaIds->end())
@@ -82,32 +82,7 @@ DFAIDSETHDR void CFinalStates::PushBack(STATEID nStaId)
 			throw CTrace(__FILE__, __LINE__, e.what());
 		}
 	}
-}
-
-DFAIDSETHDR void CFinalStates::PushBack(STATEID nStaId, DFAID nDfaId)
-{
-	FINSTAMAP_ITER iter = m_pDfaIds->find(nStaId);
-	try
-	{
-		if (iter == m_pDfaIds->end())
-		{
-			(*m_pDfaIds)[nStaId].Add(nDfaId);
-			(*m_pStates).push_back(nStaId);
-		}
-		else
-		{
-			iter->second.Add(nDfaId);
-		}
-	}
-	catch (std::exception &e)
-	{
-		throw CTrace(__FILE__, __LINE__, e.what());
-	}
-}
-
-DFAIDSETHDR ulong CFinalStates::GetDfaIdCount(STATEID nStaId) const
-{
-	return (*m_pDfaIds)[nStaId].Size();
+	return iter->second;
 }
 
 DFAIDSETHDR ulong CFinalStates::GetAllDfaIdCount() const
