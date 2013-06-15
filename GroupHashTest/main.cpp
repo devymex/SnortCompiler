@@ -16,10 +16,6 @@
 #include <exception>
 int main()
 {
-	std::vector<int> a;
-	size_t x = a.capacity();
-	a.push_back(1);
-	a.resize(2);
 	//for (int i = 0; i < 100; ++i)
 	//{
 	//	std::vector<int> a(10);
@@ -40,16 +36,16 @@ int main()
 	CompileRuleFile("..\\allrules.rule", result);
 	result.WriteToFile("..\\result.cdt");
 	//result.ReadFromFile("..\\result.cdt");
-	//CGroupRes groupRes;
-	//Grouping(result, groupRes);
-	//groupRes.WriteToFile("..\\GroupResult.cdt");
-	////groupRes.ReadFromFile("..\\GroupResult.cdt");
-	//HASHRES HashResMap;
-	//HashMapping(groupRes, HashResMap);
-	//groupRes.WriteToFile("..\\FinalResult.cdt");
-	//std::cout << "Total time: " << ctime.Reset() << std::endl;
-	//std::cout << groupRes.GetGroups().Size() << std::endl;
-	//std::cout << HashResMap.size() << std::endl;
+	CGroupRes groupRes;
+	Grouping(result, groupRes);
+	groupRes.WriteToFile("..\\GroupResult.cdt");
+	//groupRes.ReadFromFile("..\\GroupResult.cdt");
+	HASHRES HashResMap;
+	HashMapping(groupRes, HashResMap);
+	groupRes.WriteToFile("..\\FinalResult.cdt");
+	std::cout << "Total time: " << ctime.Reset() << std::endl;
+	std::cout << groupRes.GetGroups().Size() << std::endl;
+	std::cout << HashResMap.size() << std::endl;
 
 	//std::ifstream fin("..\\Ids.txt");
 	//std::vector<size_t> vecIds;

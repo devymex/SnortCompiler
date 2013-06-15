@@ -36,8 +36,7 @@ public:
 
 	__forceinline virtual ~CUnsignedArray()
 	{
-		free(m_pAry);
-		//delete []m_pAry;
+		Free(m_pAry);
 	}
 
 	// Overided operators
@@ -46,8 +45,7 @@ public:
 		if (m_ulCap < other.m_ulSize)
 		{
 			ulong *pNewBuf = Alloc(other.m_ulSize);
-			free(m_pAry);
-			//delete []m_pAry;
+			Free(m_pAry);
 			m_pAry = pNewBuf;
 			m_ulCap = other.m_ulSize;
 		}
@@ -189,6 +187,12 @@ protected:
 		return pNewBuf;
 	}
 
+	__forceinline void Free(ulong *p)
+	{
+		//delete []p;
+		free(p);
+	}
+
 	__forceinline void Increase()
 	{
 		if (m_ulCap == 0)
@@ -218,7 +222,7 @@ protected:
 			{
 				CopyFrom(pOldBuf);
 			}
-			delete []pOldBuf;
+			Free(pOldBuf);
 		}
 	}
 
