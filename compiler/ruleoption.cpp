@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include <hwprj\ruleoption.h>
+#include "comprule.h"
 
 SNORTRULEHDR CRuleOption::CRuleOption()
 	: m_nFlags(NOFLAG)
@@ -72,16 +73,21 @@ SNORTRULEHDR void CRuleOption::GetPattern(CDllString &out) const
 	out.Assign(m_pPat->c_str());
 }
 
-SNORTRULEHDR void CRuleOption::FromPattern(pcstr pPat)
+SNORTRULEHDR void CRuleOption::FromPattern(pcstr &pBeg, pcstr &pEnd)
 {
 	try
 	{
-		m_pPat->assign(pPat);
+		m_pPat->assign(pBeg, pEnd);
 	}
 	catch (std::exception &e)
 	{
 		TTHROW(e.what());
 	}
+	if (*std::find_if_not(pBeg, pEnd, ISSPACE()) == '!')
+	{
+		m_nFlags |= CSnortRule::RULE_HASNOT;
+	}
+	QuotedContext(pBeg, pEnd);
 }
 
 SNORTRULEHDR CRuleOption* CRuleOption::Clone() const

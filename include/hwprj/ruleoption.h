@@ -44,7 +44,7 @@ public:
 
 	void			GetPattern(CDllString &out) const;
 
-	virtual void			FromPattern(pcstr pPat);
+	virtual void			FromPattern(pcstr &pBeg, pcstr &pEnd);
 	virtual	CRuleOption*	Clone() const;
 
 protected:

@@ -781,11 +781,11 @@ DFAHDR void PrintDfaToGv(CDfa &newdfa, const char* fileName)
 		{
 			if (newdfa[i][j] != maxId)
 			{
-				fout << i << " -> " << (ulong)newdfa[i][j] << " [label=\"" << j << "\"];" << std::endl;
+				fout << i << " -> " << (ulong)newdfa[i][j] << " [label=\"" << (int)j << "\"];" << std::endl;
 			}
 			else if (maxId != STATEID(-1))
 			{
-				fout << i << " -> "  << (ulong)maxId << " [label=\"" << j << "\"];" << std::endl;
+				fout << i << " -> "  << (ulong)maxId << " [label=\"" << (int)j << "\"];" << std::endl;
 			}
 		}
 	}

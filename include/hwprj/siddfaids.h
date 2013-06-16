@@ -22,14 +22,14 @@
 struct COMPILEDINFO
 {
 	typedef ulong COMPRETCODE;
-	static const COMPRETCODE RES_SUCCESS		= 0x0000;
-	static const COMPRETCODE RES_PCREERROR		= 0x0001; 
-	static const COMPRETCODE RES_OPTIONERROR	= 0x0001; 
-	static const COMPRETCODE RES_HASBYTE		= 0x0002; 
-	static const COMPRETCODE RES_HASNOT			= 0x0004; 
-	static const COMPRETCODE RES_EMPTY			= 0x0008;
-	static const COMPRETCODE RES_HASNOSIG		= 0x0010;
-	static const COMPRETCODE RES_EXCEEDLIMIT	= 0x0020;
+	static const COMPRETCODE RES_SUCCESS		= 0;
+	static const COMPRETCODE RES_PCREERROR		= (1 << 0); 
+	static const COMPRETCODE RES_OPTIONERROR	= (1 << 1); 
+	static const COMPRETCODE RES_HASBYTE		= (1 << 2); 
+	static const COMPRETCODE RES_HASNOT			= (1 << 3); 
+	static const COMPRETCODE RES_EMPTY			= (1 << 4);
+	static const COMPRETCODE RES_HASNOSIG		= (1 << 5);
+	static const COMPRETCODE RES_EXCEEDLIMIT	= (1 << 5);
 	ulong m_nSid;
 	ulong m_nResult;
 	CUnsignedArray m_dfaIds;

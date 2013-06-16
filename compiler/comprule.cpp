@@ -176,11 +176,18 @@ void ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
 		}
 		else if (0 == stricmp("pcre", iOp->name.c_str()))
 		{
-			STRING strPat(opValueBeg, opValueEnd);
 			CPcreOption pcreOpt;
 			try
 			{
-				pcreOpt.FromPattern(strPat.c_str());
+				pcreOpt.FromPattern(opValueBeg._Ptr, opValueEnd._Ptr);
+				if (pcreOpt.HasFlags(CRuleOption::HASNOT))
+				{
+					nFlag |= CSnortRule::RULE_HASNOT;
+				}
+			}
+			catch (std::exception &e)
+			{
+				TTHROW(e.what());
 			}
 			catch (CTrace &e)
 			{
@@ -197,22 +204,22 @@ void ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
 			0 == stricmp("uricontent", iOp->name.c_str()))
 		{
 			CContentOption contOpt;
-			if (*std::find_if_not(opValueBeg, opValueEnd, ISSPACE()) == '!')
-			{
-				nFlag |= CSnortRule::RULE_HASNOT;
-				break;
-			}
-			QuotedContext(opValueBeg, opValueEnd);
-			std::string str;
 			try
 			{
-				str.assign(opValueBeg, opValueEnd);
+				contOpt.FromPattern(opValueBeg._Ptr, opValueEnd._Ptr);
+				if (contOpt.HasFlags(CRuleOption::HASNOT))
+				{
+					nFlag |= CSnortRule::RULE_HASNOT;
+				}
 			}
 			catch (std::exception &e)
 			{
 				TTHROW(e.what());
 			}
-			contOpt.FromPattern(str.c_str());
+			catch (CTrace &e)
+			{
+				TTHROW(e.What());
+			}
 			snortRule.PushBack(&contOpt);
 		}
 		else if (0 == stricmp("nocase", iOp->name.c_str()))

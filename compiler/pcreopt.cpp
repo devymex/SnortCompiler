@@ -22,19 +22,13 @@ CPcreOption& CPcreOption::operator = (const CPcreOption &other)
 	return *this;
 }
 
-void CPcreOption::FromPattern(pcstr pPat)
+void CPcreOption::FromPattern(pcstr &pBeg, pcstr &pEnd)
 {
-	CRuleOption::FromPattern(pPat);
-
-	size_t nLen = strlen(pPat);
-	pcstr pBeg = pPat, pEnd = pPat + nLen;
-	if (*std::find_if_not(pBeg, pEnd, g_isSpace) == '!')
+	CRuleOption::FromPattern(pBeg, pEnd);
+	if (HasFlags(CRuleOption::HASNOT))
 	{
-		AddFlags(CRuleOption::HASNOT);
 		return;
 	}
-
-	QuotedContext(pBeg, pEnd);
 
 	pcstr pPcreBeg = std::find(pBeg, pEnd, '/');
 	pcstr pPcreEnd = pEnd;

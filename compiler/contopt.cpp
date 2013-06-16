@@ -9,7 +9,7 @@
 BYTE g_MetaChar[256] = {
 	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
 	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-	0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0,
+	0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2,
@@ -66,7 +66,7 @@ inline char HexBit2UpperCase(byte hex)
 	}
 	if (hex < 16)
 	{
-		return (hex + 'A');
+		return (hex - 10 + 'A');
 	}
 	TTHROW(TI_BADPARAM);
 }
@@ -94,37 +94,43 @@ byte Char2HexBit(char c)
 	TTHROW(TI_INVALIDDATA);
 }
 
-void CContentOption::FromPattern(pcstr pPat)
+void CContentOption::FromPattern(pcstr &pBeg, pcstr &pEnd)
 {
-	CRuleOption::FromPattern(pPat);
+	CRuleOption::FromPattern(pBeg, pEnd);
+	if (HasFlags(CRuleOption::HASNOT))
+	{
+		return;
+	}
 
 	m_data.clear();
-	for (ulong i = 0; pPat[i] != '\0'; ++i)
+	for (; pBeg != pEnd; ++pBeg)
 	{
-		if (pPat[i] == '|')
+		if (*pBeg == '|')
 		{
-			for (ulong j = i + 1; ; ++j)
+			for (++pBeg; ; ++pBeg)
 			{
-				if (pPat[j] == '\0')
+				if (pBeg == pEnd)
 				{
 					TTHROW(TI_INVALIDDATA);
 				}
-				char cCur = pPat[j];
-				if (cCur == '|')
+				if (*pBeg == '|')
 				{
-					i = j;
 					break;
 				}
-				if (cCur != ' ')
+				if (*pBeg != ' ')
 				{
-					m_data.push_back((Char2HexBit(cCur) << 4) |
-						Char2HexBit(pPat[++j]));
+					if (pEnd - pBeg < 1)
+					{
+						TTHROW(TI_INVALIDDATA);
+					}
+					m_data.push_back((Char2HexBit(*(pBeg++)) << 4) |
+						Char2HexBit(*pBeg));
 				}
 			}
 		}
 		else
 		{
-			m_data.push_back(byte(pPat[i]));
+			m_data.push_back(byte(*pBeg));
 		}
 	}
 }

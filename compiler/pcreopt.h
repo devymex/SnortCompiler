@@ -45,6 +45,6 @@ public:
 	virtual ~CPcreOption();
 
 	CPcreOption&			operator = (const CPcreOption &other);
-	virtual void			FromPattern(pcstr pPat);
+	virtual void			FromPattern(pcstr &pBeg, pcstr &pEnd);
 	virtual CRuleOption*	Clone() const;
 };
