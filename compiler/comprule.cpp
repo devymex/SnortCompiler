@@ -162,7 +162,7 @@ void ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
 	ulong nContCnt = 0;
 	nContCnt = std::count_if(options.begin(), options.end(), ISCONTENT());
 
-	ulong nFlag = 0;
+	ulong nFlags = 0;
 
 	for(std::vector<RULEOPTIONRAW>::iterator iOp = options.begin(); iOp != options.end(); ++iOp)
 	{
@@ -182,7 +182,8 @@ void ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
 				pcreOpt.FromPattern(opValueBeg._Ptr, opValueEnd._Ptr);
 				if (pcreOpt.HasFlags(CRuleOption::HASNOT))
 				{
-					nFlag |= CSnortRule::RULE_HASNOT;
+					nFlags |= CSnortRule::HASNOT;
+					break;
 				}
 			}
 			catch (std::exception &e)
@@ -198,7 +199,7 @@ void ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
 		else if (0 == stricmp ("byte_jump", iOp->name.c_str()) ||
 			0 == stricmp("byte_test", iOp->name.c_str()))
 		{
-			nFlag |= CSnortRule::RULE_HASBYTE;
+			nFlags |= CSnortRule::HASBYTE;
 		}
 		else if (0 == stricmp("content", iOp->name.c_str()) ||
 			0 == stricmp("uricontent", iOp->name.c_str()))
@@ -209,7 +210,8 @@ void ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
 				contOpt.FromPattern(opValueBeg._Ptr, opValueEnd._Ptr);
 				if (contOpt.HasFlags(CRuleOption::HASNOT))
 				{
-					nFlag |= CSnortRule::RULE_HASNOT;
+					nFlags |= CSnortRule::HASNOT;
+					break;
 				}
 			}
 			catch (std::exception &e)
@@ -272,7 +274,11 @@ void ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
 			pCont->AddFlags(CContentOption::WITHIN);
 		}
 	}
-	snortRule.SetFlag(nFlag);
+	snortRule.SetFlags(nFlags);
+	if (nFlags != CRuleOption::NOFLAG)
+	{
+		snortRule.Clear();
+	}
 }
 
 /*

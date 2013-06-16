@@ -15,33 +15,31 @@
 
 int main()
 {
-	//CTimer ctime;
+	CTimer ctime;
 	CCompileResults result, result1;
-	//try
-	//{
-	//	CompileRuleFile("..\\allrules.rule", result);
-	//}
-	//catch (CTrace &e)
-	//{
-	//	std::cout << e.File() << " - " << e.Line() << ": " << e.What() << std::endl;
-	//	system("pause");
-	//}
-	//result.WriteToFile("..\\result.cdt");
+	try
+	{
+		CompileRuleFile("..\\allrules.rule", result);
+	}
+	catch (CTrace &e)
+	{
+		std::cout << e.File() << " - " << e.Line() << ": " << e.What() << std::endl;
+		system("pause");
+	}
+	result.WriteToFile("..\\result.cdt");
 
-	result.ReadFromFile("..\\result.cdt");
-	result1.ReadFromFile("..\\result1.cdt");
+	//result.ReadFromFile("..\\result.cdt");
 
-
-	//CGroupRes groupRes;
-	//Grouping(result, groupRes);
-	//groupRes.WriteToFile("..\\GroupResult.cdt");
-	////groupRes.ReadFromFile("..\\GroupResult.cdt");
-	//HASHRES HashResMap;
-	//HashMapping(groupRes, HashResMap);
-	//groupRes.WriteToFile("..\\FinalResult.cdt");
-	//std::cout << "Total time: " << ctime.Reset() << std::endl;
-	//std::cout << groupRes.GetGroups().Size() << std::endl;
-	//std::cout << HashResMap.size() << std::endl;
+	CGroupRes groupRes;
+	Grouping(result, groupRes);
+	groupRes.WriteToFile("..\\GroupResult.cdt");
+	//groupRes.ReadFromFile("..\\GroupResult.cdt");
+	HASHRES HashResMap;
+	HashMapping(groupRes, HashResMap);
+	groupRes.WriteToFile("..\\FinalResult.cdt");
+	std::cout << "Total time: " << ctime.Reset() << std::endl;
+	std::cout << groupRes.GetGroups().Size() << std::endl;
+	std::cout << HashResMap.size() << std::endl;
 
 	//std::ifstream fin("..\\Ids.txt");
 	//std::vector<size_t> vecIds;

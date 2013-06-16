@@ -4,7 +4,7 @@
 typedef std::vector<CRuleOption*>::iterator OPTVEC_ITER;
 
 SNORTRULEHDR CSnortRule::CSnortRule()
-	: m_nSid(0), m_nFlag(0)
+	: m_nSid(ulong(-1)), m_nFlags(NORMAL)
 {
 	try
 	{
@@ -17,7 +17,7 @@ SNORTRULEHDR CSnortRule::CSnortRule()
 }
 
 SNORTRULEHDR CSnortRule::CSnortRule(const CSnortRule &other)
-	: m_nSid(other.m_nSid), m_nFlag(other.m_nFlag)
+	: m_nSid(other.m_nSid), m_nFlags(other.m_nFlags)
 {
 	TASSERT(other.m_pOptions != null);
 	try
@@ -46,7 +46,7 @@ SNORTRULEHDR CSnortRule& CSnortRule::operator = (const CSnortRule &other)
 {
 	TASSERT(other.m_pOptions != null);
 	m_nSid = other.m_nSid;
-	m_nFlag = other.m_nFlag;
+	m_nFlags = other.m_nFlags;
 	try
 	{
 		Clear();
@@ -97,14 +97,14 @@ SNORTRULEHDR ulong CSnortRule::GetSid() const
 	return m_nSid;
 }
 
-SNORTRULEHDR void CSnortRule::SetFlag(PARSE_INFO flag)
+SNORTRULEHDR void CSnortRule::SetFlags(PARSE_INFO flag)
 {
-	m_nFlag = flag;
+	m_nFlags = flag;
 }
 
-SNORTRULEHDR CSnortRule::PARSE_INFO CSnortRule::GetFlag() const
+SNORTRULEHDR CSnortRule::PARSE_INFO CSnortRule::GetFlags() const
 {
-	return m_nFlag;
+	return m_nFlags;
 }
 
 SNORTRULEHDR void CSnortRule::PushBack(CRuleOption* pRuleOpt)

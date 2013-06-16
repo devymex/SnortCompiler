@@ -55,11 +55,11 @@ COMPILERHDR void ParseRuleFile(const char *pFileName, RECIEVER recv, void *lpUse
 				try
 				{
 					Rule2RegRule(snortRule, pr.regRule);
-					if (snortRule.GetFlag() & CSnortRule::RULE_HASBYTE)
+					if (snortRule.GetFlags() & CSnortRule::HASBYTE)
 					{
 						pr.ulFlag |= PARSEFLAG::PARSE_HASBYTE;
 					}
-					if (snortRule.GetFlag() & CSnortRule::RULE_HASNOT)
+					if (snortRule.GetFlags() & CSnortRule::HASNOT)
 					{
 						pr.ulFlag |= PARSEFLAG::PARSE_HASNOT;
 					}

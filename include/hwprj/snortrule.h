@@ -22,8 +22,10 @@ class SNORTRULEHDR CSnortRule
 {
 public:
 	typedef ulong PARSE_INFO;
-	static const PARSE_INFO RULE_HASBYTE	= 0x0001;
-	static const PARSE_INFO RULE_HASNOT		= 0x0002;
+
+	static const PARSE_INFO NORMAL		= 0x0001;
+	static const PARSE_INFO HASBYTE		= 0x0001;
+	static const PARSE_INFO HASNOT		= 0x0002;
 
 	CSnortRule();
 	CSnortRule(const CSnortRule &other);
@@ -40,11 +42,11 @@ public:
 
 	ulong			GetSid() const;
 	void			SetSid(ulong sid);
-	PARSE_INFO		GetFlag() const;
-	void			SetFlag(PARSE_INFO flag);
+	PARSE_INFO		GetFlags() const;
+	void			SetFlags(PARSE_INFO flag);
 
 protected:
 	ulong m_nSid;
-	PARSE_INFO m_nFlag;
+	PARSE_INFO m_nFlags;
 	OPTIONVEC *m_pOptions;
 };

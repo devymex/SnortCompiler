@@ -85,7 +85,7 @@ SNORTRULEHDR void CRuleOption::FromPattern(pcstr &pBeg, pcstr &pEnd)
 	}
 	if (*std::find_if_not(pBeg, pEnd, ISSPACE()) == '!')
 	{
-		m_nFlags |= CSnortRule::RULE_HASNOT;
+		m_nFlags |= CRuleOption::HASNOT;
 	}
 	QuotedContext(pBeg, pEnd);
 }
