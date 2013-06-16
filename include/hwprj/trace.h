@@ -20,7 +20,7 @@ public:
 	}
 	pcstr What()
 	{
-		return m_pFile;
+		return m_pMsg;
 	}
 	pcstr File()
 	{
@@ -38,6 +38,10 @@ protected:
 TRACEHDR extern pcstr TI_BADALLOC;
 TRACEHDR extern pcstr TI_NOTFOUND;
 TRACEHDR extern pcstr TI_OUTOFRANGE;
+TRACEHDR extern pcstr TI_INVALIDDATA;
+TRACEHDR extern pcstr TI_BADPARAM;
+TRACEHDR extern pcstr TI_UNSUPPORT;
+
 #define TTHROW(m) throw CTrace(__FILE__, __LINE__, m);
 
 

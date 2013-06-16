@@ -35,13 +35,15 @@ public:
 
 	// Overided operators
 
-	ulong	Size() const;
-	bool	Empty() const;
-	void	Clear();
-	void	Append(const char* pChar);
-	char	Back() const;
-	void	PushBack(const char nChar);
-	pcstr	GetStr() const;
+	ulong			Size() const;
+	bool			Empty() const;
+	void			Clear();
+	void			Assign(const char* pStr);
+	void			Append(const char* pStr);
+	char			Back() const;
+	void			PushBack(const char nChar);
+	pcstr			GetStr() const;
+	const char*		Data() const;
 
 protected:
 	DLLSTRING *m_pString;

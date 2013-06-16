@@ -77,6 +77,12 @@
     <ClInclude Include="..\include\hwprj\ruleoption.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="contopt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="pcreopt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -182,6 +188,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="comprule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="contopt.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="pcreopt.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

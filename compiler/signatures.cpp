@@ -15,19 +15,20 @@ SIGHDR CSignatures::CSignatures()
 
 SIGHDR CSignatures::CSignatures(const CSignatures& other)
 {
+	TASSERT(other.m_pSigs != null);
 	try
 	{
-		m_pSigs = new SIGNATUREVEC;
+		m_pSigs = new SIGNATUREVEC(*other.m_pSigs);
 	}
 	catch (std::exception &e)
 	{
 		TTHROW(e.what());
 	}
-	*this = other;
 }
 
 SIGHDR CSignatures &CSignatures::operator=(const CSignatures &other)
 {
+	TASSERT(other.m_pSigs != null);
 	try
 	{
 		*m_pSigs = *other.m_pSigs;

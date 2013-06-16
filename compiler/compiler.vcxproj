@@ -99,8 +99,10 @@
     <ClInclude Include="..\include\hwprj\signatures.h" />
     <ClInclude Include="..\include\hwprj\snortrule.h" />
     <ClInclude Include="comprule.h" />
+    <ClInclude Include="contopt.h" />
     <ClInclude Include="p2nmain.h" />
     <ClInclude Include="pcre2nfa.h" />
+    <ClInclude Include="pcreopt.h" />
     <ClInclude Include="pcre\config.h" />
     <ClInclude Include="pcre\pcre.h" />
     <ClInclude Include="pcre\pcrecpp.h" />
@@ -113,9 +115,11 @@
   <ItemGroup>
     <ClCompile Include="compiler.cpp" />
     <ClCompile Include="compres.cpp" />
+    <ClCompile Include="contopt.cpp" />
     <ClCompile Include="p2nmain.cpp" />
     <ClCompile Include="pcre2nfa.cpp" />
     <ClCompile Include="pcrematch.cpp" />
+    <ClCompile Include="pcreopt.cpp" />
     <ClCompile Include="pcre\pcre_byte_order.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>

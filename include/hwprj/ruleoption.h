@@ -13,6 +13,7 @@
 #pragma once
 
 #include <hwprj\common.h>
+#include <hwprj\dllstring.h>
 
 #ifndef SNORTRULEHDR_DS
 class STRING;
@@ -24,20 +25,29 @@ class STRING;
 class SNORTRULEHDR CRuleOption
 {
 public:
+	typedef ulong OPTIONFLAG;
+
+	static const OPTIONFLAG NOFLAG = 0;
+	static const OPTIONFLAG HASNOT = (1 << 0);
+
+public:
 	CRuleOption();
 	CRuleOption(const CRuleOption &other);
-	CRuleOption& operator = (const CRuleOption &other);
 	virtual ~CRuleOption();
 
-	void SetPattern(LPCSTR lpStr);
-	ulong GetPattern(LPSTR lpStr, ulong nLen) const;
+	CRuleOption&	operator = (const CRuleOption &other);
 
-	ulong GetFlag() const;
-	void SetFlag(ulong nFlag);
-	void AddFlag(ulong nFlag);
-	bool TestFlag(ulong nFlag) const;
+	OPTIONFLAG		GetFlags() const;
+	void			SetFlags(OPTIONFLAG nFlags);
+	void			AddFlags(OPTIONFLAG nFlags);
+	bool			HasFlags(OPTIONFLAG nFlags) const;
+
+	void			GetPattern(CDllString &out) const;
+
+	virtual void			FromPattern(pcstr pPat);
+	virtual	CRuleOption*	Clone() const;
 
 protected:
-	ulong m_nFlag;
-	STRING *m_pPattern;
+	OPTIONFLAG		m_nFlags;
+	STRING*			m_pPat;
 };

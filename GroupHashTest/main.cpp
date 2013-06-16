@@ -17,7 +17,15 @@ int main()
 {
 	CTimer ctime;
 	CCompileResults result;
-	CompileRuleFile("..\\allrules.rule", result);
+	try
+	{
+		CompileRuleFile("..\\allrules.rule", result);
+	}
+	catch (CTrace &e)
+	{
+		std::cout << e.File() << " - " << e.Line() << ": " << e.What() << std::endl;
+		system("pause");
+	}
 	result.WriteToFile("..\\result.cdt");
 	//result.ReadFromFile("..\\result.cdt");
 	CGroupRes groupRes;

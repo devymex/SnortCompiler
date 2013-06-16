@@ -15,15 +15,15 @@ REGRULEHDR CRegChain::CRegChain()
 
 REGRULEHDR CRegChain::CRegChain(const CRegChain &other)
 {
+	TASSERT(other.m_pRegList != null);
 	try
 	{
-		m_pRegList = new STRINGVEC;
+		m_pRegList = new STRINGVEC(*other.m_pRegList);
 	}
 	catch (std::exception &e)
 	{
 		TTHROW(e.what());
 	}
-	*this = other;
 }
 
 REGRULEHDR CRegChain::~CRegChain()
@@ -33,6 +33,7 @@ REGRULEHDR CRegChain::~CRegChain()
 
 REGRULEHDR CRegChain& CRegChain::operator = (const CRegChain &other)
 {
+	TASSERT(other.m_pRegList != null);
 	try
 	{
 		*this->m_pRegList = *other.m_pRegList;
@@ -42,6 +43,7 @@ REGRULEHDR CRegChain& CRegChain::operator = (const CRegChain &other)
 		TTHROW(e.what());
 	}
 	this->m_sigs = other.m_sigs;
+
 	return *this;
 }
 

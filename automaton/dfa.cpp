@@ -17,7 +17,9 @@
 
 
 DFAHDR CDfa::CDfa()
-	: m_nId(ulong(-1)), m_nColNum(ulong(0)), m_nStartId(STATEID(0))
+	: m_nId			(ulong(-1))
+	, m_nColNum		(ulong(0))
+	, m_nStartId	(STATEID(0))
 {
 	memset(m_pGroup, -1, sizeof(m_pGroup));
 	try
@@ -31,16 +33,20 @@ DFAHDR CDfa::CDfa()
 }
 
 DFAHDR CDfa::CDfa(const CDfa &other)
+	: m_nId			(other.m_nId)
+	, m_nColNum		(other.m_nColNum)
+	, m_nStartId	(other.m_nStartId)
+	, m_FinStas		(other.m_FinStas)
 {
 	try
 	{
-		m_pDfa = new std::vector<CDfaRow>;
+		m_pDfa = new std::vector<CDfaRow>(*other.m_pDfa);
 	}
 	catch (std::exception &e)
 	{
 		TTHROW(e.what());
 	}
-	*this = other;
+	CopyMemory(m_pGroup, other.m_pGroup, sizeof(m_pGroup));
 }
 
 DFAHDR CDfa::~CDfa()
@@ -742,8 +748,6 @@ ulong CDfa::PartStates(STATEVEC *pRevTbl)
 	}
 	return nr;
 }
-
-
 
 DFAHDR void PrintDfaToGv(CDfa &newdfa, const char* fileName)
 {

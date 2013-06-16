@@ -5,6 +5,7 @@ typedef FINSTAMAP::iterator			FINSTAMAP_ITER;
 typedef FINSTAMAP::const_iterator	FINSTAMAP_CITER;
 
 DFAIDSETHDR CFinalStates::CFinalStates()
+	: m_pStates(null), m_pDfaIds(null)
 {
 	try
 	{
@@ -24,20 +25,20 @@ DFAIDSETHDR CFinalStates::~CFinalStates()
 }
 
 DFAIDSETHDR CFinalStates::CFinalStates(const CFinalStates &other)
+	: m_pStates(null), m_pDfaIds(null)
 {
 	try
 	{
-		m_pStates = new STATEVEC;
-		m_pDfaIds = new FINSTAMAP;
+		m_pStates = new STATEVEC(*other.m_pStates);
+		m_pDfaIds = new FINSTAMAP(*other.m_pDfaIds);
 	}
 	catch (std::exception &e)
 	{
 		TTHROW(e.what());
 	}
-	*this = other;
 }
 
-DFAIDSETHDR CFinalStates& CFinalStates::operator=(const CFinalStates &other)
+DFAIDSETHDR CFinalStates& CFinalStates::operator = (const CFinalStates &other)
 {
 	TASSERT(other.m_pDfaIds != null);
 	TASSERT(other.m_pStates != null);

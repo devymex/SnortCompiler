@@ -17,13 +17,12 @@ SIDDFAHDR CSidDfaIds::CSidDfaIds(const CSidDfaIds& other)
 {
 	try
 	{
-		m_ruleResult = new std::vector<COMPILEDINFO>;
+		m_ruleResult = new std::vector<COMPILEDINFO>(*other.m_ruleResult);
 	}
 	catch (std::exception &e)
 	{
 		TTHROW(e.what());
 	}
-	*this = other;
 }
 
 SIDDFAHDR CSidDfaIds &CSidDfaIds::operator=(const CSidDfaIds &other)
@@ -38,6 +37,7 @@ SIDDFAHDR CSidDfaIds &CSidDfaIds::operator=(const CSidDfaIds &other)
 	}
 	return *this;
 }
+
 SIDDFAHDR CSidDfaIds::~CSidDfaIds()
 {
 	delete m_ruleResult;

@@ -5,6 +5,7 @@ typedef DFAIDSET::iterator			DFAIDSET_ITER;
 typedef DFAIDSET::const_iterator	DFAIDSET_CITER;
 
 DFAIDSETHDR CDfaIdSet::CDfaIdSet()
+	: m_pSet(null)
 {
 	try
 	{
@@ -20,13 +21,12 @@ DFAIDSETHDR CDfaIdSet::CDfaIdSet(const CDfaIdSet &other)
 {
 	try
 	{
-		m_pSet = new DFAIDSET;
+		m_pSet = new DFAIDSET(*other.m_pSet);
 	}
 	catch (std::exception &e)
 	{
 		TTHROW(e.what());
 	}
-	*this = other;
 }
 
 DFAIDSETHDR CDfaIdSet::~CDfaIdSet()

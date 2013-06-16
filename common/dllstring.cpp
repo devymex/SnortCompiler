@@ -25,6 +25,7 @@ DLLSTRHDR CDllString::CDllString()
 
 DLLSTRHDR CDllString::CDllString(const char *pStr)
 {
+	TASSERT(pStr != null);
 	try
 	{
 		m_pString = new std::string(pStr);
@@ -35,9 +36,16 @@ DLLSTRHDR CDllString::CDllString(const char *pStr)
 	}
 }
 
-DLLSTRHDR void CDllString::Append(const char* pChar)
+DLLSTRHDR CDllString::CDllString(const CDllString &other)
 {
-	m_pString->append(pChar);;
+	try
+	{
+		m_pString = new std::string(*other.m_pString);
+	}
+	catch (std::exception &e)
+	{
+		TTHROW(e.what());
+	}
 }
 
 DLLSTRHDR CDllString::~CDllString()
@@ -45,24 +53,11 @@ DLLSTRHDR CDllString::~CDllString()
 	delete m_pString;
 }
 
-DLLSTRHDR CDllString::CDllString(const CDllString &other)
-{
-	try
-	{
-		m_pString = new std::string;
-	}
-	catch (std::exception &e)
-	{
-		TTHROW(e.what());
-	}
-	*this = other;
-}
-
 DLLSTRHDR CDllString& CDllString::operator = (const CDllString &other)
 {
 	try
 	{
-		*this->m_pString = *other.m_pString;
+		*m_pString = *other.m_pString;
 	}
 	catch (std::exception &e)
 	{
@@ -93,6 +88,16 @@ DLLSTRHDR void CDllString::PushBack(const char nChar)
 	}
 }
 
+DLLSTRHDR void CDllString::Append(const char* pStr)
+{
+	m_pString->append(pStr);
+}
+
+DLLSTRHDR void CDllString::Assign(const char* pStr)
+{
+	m_pString->assign(pStr);
+}
+
 DLLSTRHDR char CDllString::Back() const
 {
 	return m_pString->back();
@@ -112,3 +117,9 @@ DLLSTRHDR bool CDllString::Empty() const
 {
 	return m_pString->empty();
 }
+
+DLLSTRHDR const char* CDllString::Data() const
+{
+	return m_pString->c_str();
+}
+

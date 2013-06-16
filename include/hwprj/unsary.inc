@@ -6,7 +6,12 @@ inline CUnsignedArray::CUnsignedArray()
 inline CUnsignedArray::CUnsignedArray(const CUnsignedArray &other)
 	: m_pAry(null), m_ulSize(0), m_ulCap(0)
 {
-	*this = other;
+	m_pAry = Alloc(other.m_ulSize);
+	m_ulSize = other.m_ulSize;
+	if (m_ulSize != 0)
+	{
+		CopyFrom(other.m_pAry);
+	}
 }
 
 inline CUnsignedArray::~CUnsignedArray()

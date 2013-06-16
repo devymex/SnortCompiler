@@ -27,18 +27,21 @@ public:
 
 	CSnortRule();
 	CSnortRule(const CSnortRule &other);
-	CSnortRule& operator = (const CSnortRule &other);
 	virtual ~CSnortRule();
 
-	CRuleOption* operator[](ulong nIdx) const;
+	CSnortRule&		operator = (const CSnortRule &other);
+	CRuleOption*	operator[](ulong nIdx) const;
 
-	ulong Size() const;
-	ulong GetSid() const;
-	void SetSid(ulong sid);
-	PARSE_INFO GetFlag() const;
-	void SetFlag(PARSE_INFO flag);
-	void PushBack(CRuleOption* ruleoption);
-	void PopBack();
+	ulong			Size() const;
+	void			Clear();
+	void			PushBack(CRuleOption* pRuleOption);
+	void			PopBack();
+	CRuleOption*	Back();
+
+	ulong			GetSid() const;
+	void			SetSid(ulong sid);
+	PARSE_INFO		GetFlag() const;
+	void			SetFlag(PARSE_INFO flag);
 
 protected:
 	ulong m_nSid;

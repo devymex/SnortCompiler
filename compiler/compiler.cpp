@@ -40,21 +40,30 @@ COMPILERHDR void ParseRuleFile(const char *pFileName, RECIEVER recv, void *lpUse
 				i->erase(find(i->rbegin(), i->rend(), ')').base() - 1, i->end());
 
 				CSnortRule snortRule;
-				if (0 == ProcessOption(*i, snortRule))
+				try
 				{
-					PARSERESULT pr;
-					pr.ulSid = snortRule.GetSid();
-					pr.ulFlag = PARSEFLAG::PARSE_DEFAULT;
-					if (SC_ERROR == Rule2PcreList(snortRule, pr.regRule))
-					{
-						pr.ulFlag |= PARSEFLAG::PARSE_ERROR;
-					}
-					else
-					{
-						pr.ulFlag |= snortRule.GetFlag();
-					}
-					recv(pr, lpUser);
+					ProcessOption(*i, snortRule);
 				}
+				catch (CTrace &e)
+				{
+					std::cout << "ProcessOption error: " << e.What() << std::endl;
+					continue;
+				}
+				PARSERESULT pr;
+				pr.ulSid = snortRule.GetSid();
+				pr.ulFlag = PARSEFLAG::PARSE_DEFAULT;
+				try
+				{
+					Rule2RegRule(snortRule, pr.regRule);
+					pr.ulFlag |= snortRule.GetFlag();
+				}
+				catch (CTrace &e)
+				{
+					std::cout << e.What() << std::endl;
+					pr.ulFlag |= PARSEFLAG::PARSE_ERROR;
+					std::cout << "Rule2RegRule error: " << e.What() << std::endl;
+				}
+				recv(pr, lpUser);
 			}
 		}
 	}

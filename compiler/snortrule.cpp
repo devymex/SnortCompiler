@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include <hwprj\snortrule.h>
 
+typedef std::vector<CRuleOption*>::iterator OPTVEC_ITER;
 
 SNORTRULEHDR CSnortRule::CSnortRule()
 	: m_nSid(0), m_nFlag(0)
@@ -16,25 +17,44 @@ SNORTRULEHDR CSnortRule::CSnortRule()
 }
 
 SNORTRULEHDR CSnortRule::CSnortRule(const CSnortRule &other)
+	: m_nSid(other.m_nSid), m_nFlag(other.m_nFlag)
 {
+	TASSERT(other.m_pOptions != null);
 	try
 	{
 		m_pOptions = new std::vector<CRuleOption*>;
+		m_pOptions->reserve((other.m_pOptions->size()));
+		for (OPTVEC_ITER i = other.m_pOptions->begin();
+			i != other.m_pOptions->end(); ++i)
+		{
+			m_pOptions->push_back((*i)->Clone());
+		}
 	}
 	catch (std::exception &e)
 	{
 		TTHROW(e.what());
 	}
-	*this = other;
+}
+
+SNORTRULEHDR CSnortRule::~CSnortRule()
+{
+	Clear();
+	delete m_pOptions;
 }
 
 SNORTRULEHDR CSnortRule& CSnortRule::operator = (const CSnortRule &other)
 {
+	TASSERT(other.m_pOptions != null);
 	m_nSid = other.m_nSid;
 	m_nFlag = other.m_nFlag;
 	try
 	{
-		*m_pOptions = *other.m_pOptions;
+		Clear();
+		for (OPTVEC_ITER i = other.m_pOptions->begin();
+			i != other.m_pOptions->end(); ++i)
+		{
+			m_pOptions->push_back((*i)->Clone());
+		}
 	}
 	catch (std::exception &e)
 	{
@@ -43,20 +63,28 @@ SNORTRULEHDR CSnortRule& CSnortRule::operator = (const CSnortRule &other)
 	return *this;
 }
 
-SNORTRULEHDR CSnortRule::~CSnortRule()
+SNORTRULEHDR CRuleOption* CSnortRule::operator[](ulong nIdx) const
 {
-	std::vector<CRuleOption*> &opts = *m_pOptions;
-	for (std::vector<CRuleOption*>::iterator i = opts.begin(); i != opts.end(); ++i)
-	{
-		delete *i;
-	}
-	opts.clear();
-	delete m_pOptions;
+	return (*m_pOptions)[nIdx];
 }
 
 SNORTRULEHDR ulong CSnortRule::Size() const
 {
 	return m_pOptions->size();
+}
+
+SNORTRULEHDR void CSnortRule::Clear()
+{
+	for (OPTVEC_ITER i = m_pOptions->begin(); i != m_pOptions->end(); ++i)
+	{
+		delete *i;
+	}
+	m_pOptions->clear();
+}
+
+SNORTRULEHDR CRuleOption* CSnortRule::Back()
+{
+	return m_pOptions->back();
 }
 
 SNORTRULEHDR void CSnortRule::SetSid(ulong sid)
@@ -79,11 +107,11 @@ SNORTRULEHDR CSnortRule::PARSE_INFO CSnortRule::GetFlag() const
 	return m_nFlag;
 }
 
-SNORTRULEHDR void CSnortRule::PushBack(CRuleOption* ruleoption)
+SNORTRULEHDR void CSnortRule::PushBack(CRuleOption* pRuleOpt)
 {
 	try
 	{
-		m_pOptions->push_back(ruleoption);
+		m_pOptions->push_back(pRuleOpt->Clone());
 	}
 	catch (std::exception &e)
 	{
@@ -93,10 +121,6 @@ SNORTRULEHDR void CSnortRule::PushBack(CRuleOption* ruleoption)
 
 SNORTRULEHDR void CSnortRule::PopBack()
 {
+	delete m_pOptions->back();
 	m_pOptions->pop_back();
-}
-
-SNORTRULEHDR CRuleOption* CSnortRule::operator[](ulong nIdx) const
-{
-	return (*m_pOptions)[nIdx];
 }

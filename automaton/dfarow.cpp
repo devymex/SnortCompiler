@@ -2,7 +2,8 @@
 #include <hwprj\dfarow.h>
 
 DFAHDR CDfaRow::CDfaRow(ulong ulColCnt)
-	: m_nFlags(CDfaRow::NORMAL)
+	: m_pDest	(null)
+	, m_nFlags	(CDfaRow::NORMAL)
 {
 	try
 	{
@@ -22,16 +23,18 @@ DFAHDR CDfaRow::~CDfaRow()
 }
 
 DFAHDR CDfaRow::CDfaRow(const CDfaRow &other)
+	: m_pDest	(null)
+	, m_nFlags	(other.m_nFlags)
 {
+	TASSERT(other.m_pDest != null);
 	try
 	{
-		m_pDest = new STATEVEC;
+		m_pDest = new STATEVEC(*other.m_pDest);
 	}
 	catch (std::exception &e)
 	{
 		TTHROW(e.what());
 	}
-	*this = other;
 }
 
 DFAHDR CDfaRow& CDfaRow::operator=(const CDfaRow &other)

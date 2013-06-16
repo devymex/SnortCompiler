@@ -13,22 +13,46 @@ REGRULEHDR CRegRule::CRegRule()
 	}
 }
 
-REGRULEHDR CRegRule::~CRegRule()
-{
-	delete m_pRegVec;
-}
-
 REGRULEHDR CRegRule::CRegRule(const CRegRule &other)
 {
+	TASSERT(other.m_pRegVec != null);
 	try
 	{
-		m_pRegVec = new CHAINVEC;
+		m_pRegVec = new CHAINVEC(*other.m_pRegVec);
 	}
 	catch (std::exception &e)
 	{
 		TTHROW(e.what());
 	}
-	*this = other;
+}
+
+REGRULEHDR CRegRule::~CRegRule()
+{
+	delete m_pRegVec;
+}
+
+REGRULEHDR CRegChain& CRegRule::operator[](ulong nIdx)
+{
+	return (*m_pRegVec)[nIdx];
+}
+
+REGRULEHDR const CRegChain& CRegRule::operator[](ulong nIdx) const
+{
+	return (*m_pRegVec)[nIdx];
+}
+
+REGRULEHDR CRegRule& CRegRule::operator = (const CRegRule &other)
+{
+	TASSERT(other.m_pRegVec != null);
+	try
+	{
+		*this->m_pRegVec = *other.m_pRegVec;
+	}
+	catch (std::exception &e)
+	{
+		TTHROW(e.what());
+	}
+	return *this;
 }
 
 REGRULEHDR ulong CRegRule::Size() const
@@ -77,25 +101,7 @@ REGRULEHDR void CRegRule::PushBack(const CRegChain &nRegChain)
 	}
 }
 
-REGRULEHDR CRegChain& CRegRule::operator[](ulong nIdx)
+REGRULEHDR void CRegRule::PopBack()
 {
-	return (*m_pRegVec)[nIdx];
-}
-
-REGRULEHDR const CRegChain& CRegRule::operator[](ulong nIdx) const
-{
-	return (*m_pRegVec)[nIdx];
-}
-
-REGRULEHDR CRegRule& CRegRule::operator = (const CRegRule &other)
-{
-	try
-	{
-		*this->m_pRegVec = *other.m_pRegVec;
-	}
-	catch (std::exception &e)
-	{
-		TTHROW(e.what());
-	}
-	return *this;
+	m_pRegVec->pop_back();
 }

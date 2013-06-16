@@ -23,15 +23,15 @@ NFAHDR CNfa::~CNfa()
 
 NFAHDR CNfa::CNfa(const CNfa &other)
 {
+	TASSERT(other.m_pNfa != null);
 	try
 	{
-		m_pNfa = new NFAROWARY;
+		m_pNfa = new NFAROWARY(*other.m_pNfa);
 	}
 	catch (std::exception &e)
 	{
 		TTHROW(e.what());
 	}
-	*this = other;
 }
 
 NFAHDR CNfa& CNfa::operator=(const CNfa &other)

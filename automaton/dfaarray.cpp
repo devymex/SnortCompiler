@@ -14,16 +14,16 @@ DFAARYHDR CDfaArray::CDfaArray()
 }
 
 DFAARYHDR CDfaArray::CDfaArray(const CDfaArray& other)
+	: m_pdfaTbl(null)
 {
 	try
 	{
-		m_pdfaTbl = new CDFAVEC;
+		m_pdfaTbl = new CDFAVEC(*other.m_pdfaTbl);
 	}
 	catch (std::exception &e)
 	{
 		TTHROW(e.what());
 	}
-	*this = other;
 }
 
 DFAARYHDR CDfaArray::~CDfaArray()
