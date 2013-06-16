@@ -21,6 +21,9 @@ typedef ushort					STATEID;
 typedef ulong					DFAID;
 typedef ulong					SIGNATURE;
 
+#ifndef null
+#define null	0
+#endif
 /* compile configurations */
 #define SC_MAXDFASIZE	255
 #define SC_DFACOLCNT	256

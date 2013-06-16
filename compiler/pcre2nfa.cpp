@@ -436,8 +436,8 @@ ulong PcreToCode(const std::string &OnePcre, BYTEARY &code)
 	pcre *re;
 	const char *error;
 	int erroffset;
-	re = pcre_compile(pattern, options, &error, &erroffset, NULL);
-	if (re == NULL)
+	re = pcre_compile(pattern, options, &error, &erroffset, null);
+	if (re == null)
 	{
 		std::cout << pattern << std::endl;
 		printf("PCRE compilation failed at offset %d: %s\n", erroffset, error);

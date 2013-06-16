@@ -9,7 +9,7 @@ SIDDFAHDR CSidDfaIds::CSidDfaIds()
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
 }
 
@@ -21,12 +21,12 @@ SIDDFAHDR CSidDfaIds::CSidDfaIds(const CSidDfaIds& other)
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
 	*this = other;
 }
 
-SIDDFAHDR const CSidDfaIds &CSidDfaIds::operator=(const CSidDfaIds &other)
+SIDDFAHDR CSidDfaIds &CSidDfaIds::operator=(const CSidDfaIds &other)
 {
 	try
 	{
@@ -34,7 +34,7 @@ SIDDFAHDR const CSidDfaIds &CSidDfaIds::operator=(const CSidDfaIds &other)
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
 	return *this;
 }
@@ -61,7 +61,7 @@ SIDDFAHDR void CSidDfaIds::Reserve(ulong nCount)
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
 }
 
@@ -73,7 +73,7 @@ SIDDFAHDR void CSidDfaIds::Resize(ulong nSize)
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
 }
 
@@ -90,7 +90,7 @@ SIDDFAHDR void CSidDfaIds::PushBack(const COMPILEDINFO &ruleResult)
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
 }
 

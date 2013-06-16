@@ -29,12 +29,12 @@ class SIGHDR CSignatures
 public:
 	CSignatures();
 	CSignatures(const CSignatures& other);
-	const CSignatures &operator=(const CSignatures &other);
+	CSignatures &operator=(const CSignatures &other);
 
 	bool operator == (const CSignatures &other) const;
 	bool operator <	(const CSignatures &other) const;
 
-	~CSignatures();
+	virtual ~CSignatures();
 
 	const ulong Size() const;
 	void Resize(ulong nSize);

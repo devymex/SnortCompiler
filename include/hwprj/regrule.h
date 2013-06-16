@@ -21,10 +21,10 @@ class REGRULEHDR CRegRule
 {
 public:
 	CRegRule();
-	~CRegRule();
 	CRegRule(const CRegRule &other);
-	const CRegRule& operator = (const CRegRule &other);
+	virtual ~CRegRule();
 
+	CRegRule& operator = (const CRegRule &other);
 	CRegChain& operator[](ulong nIdx);
 	const CRegChain& operator[](ulong nIdx) const;
 

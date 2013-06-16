@@ -2,7 +2,7 @@
 #include <hwprj\nfarow.h>
 
 NFAHDR CNfaRow::CNfaRow()
-	: m_pDestSet(NULL)
+	: m_pDestSet(null)
 {
 	try
 	{
@@ -10,7 +10,7 @@ NFAHDR CNfaRow::CNfaRow()
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
 }
 
@@ -35,6 +35,7 @@ NFAHDR void CNfaRow::SortAll()
 
 NFAHDR CNfaRow& CNfaRow::operator=(const CNfaRow &other)
 {
+	TASSERT(other.m_pDestSet != null);
 	try
 	{
 		for (ulong i = 0; i < COLUMNCNT; ++i)
@@ -44,7 +45,7 @@ NFAHDR CNfaRow& CNfaRow::operator=(const CNfaRow &other)
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
 
 	return *this;

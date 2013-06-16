@@ -55,7 +55,7 @@ bool MyPcreMatch(const u_char *data, size_t len, CRegRule &regRule)
 			}
 			else
 			{
-				pData = NULL;
+				pData = null;
 				dataSize = 0;
 			}
 		}

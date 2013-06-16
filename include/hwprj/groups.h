@@ -26,8 +26,9 @@ class GROUPSHDR CGroups
 public:
 	CGroups();
 	CGroups(const CGroups& other);
-	const CGroups &operator=(const CGroups &other);
-	~CGroups();
+	CGroups &operator=(const CGroups &other);
+	virtual ~CGroups();
+
 	const ulong Size() const;
 	void Resize(ulong nSize);
 	void PushBack(ONEGROUP oneGroup);
@@ -36,6 +37,7 @@ public:
 	const ONEGROUP &operator[](ulong nIdx) const;
 	void Clear();
 	void Erase(ulong nIdx);
+
 protected:
 	GROUPVEC *m_pGroups;
 };

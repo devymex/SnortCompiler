@@ -40,27 +40,27 @@ PCREMATCHHDR bool PcreMatch(const char* src, int length, std::string Regex, int 
 	//printf("string : %s\n", src);
 	//printf("pattern: \"%s\"\n", pattern);
 
-	re = pcre_compile(pattern, options, &error, &erroffset, NULL);
+	re = pcre_compile(pattern, options, &error, &erroffset, null);
 
-	if (re == NULL)
+	if (re == null)
 	{
 		//printf("pcre compilation failed at offset %d: %s\n", erroffset, error);
 		return false;
 	}
 
 	int wscount = 100;
-	int *workspace = NULL;
+	int *workspace = null;
 	try
 	{
 		workspace = new int[wscount];
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
 
 	//rc = pcre_exec(re, NULL, src, length, 0, 0, ovector, OVECCOUNT);
-	rc = pcre_dfa_exec(re, NULL,src, length, 0, 0, ovector, OVECCOUNT, workspace, wscount);
+	rc = pcre_dfa_exec(re, null,src, length, 0, 0, ovector, OVECCOUNT, workspace, wscount);
 	delete []workspace;
 	if (rc < 0)
 	{

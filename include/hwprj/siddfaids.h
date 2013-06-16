@@ -40,8 +40,8 @@ class SIDDFAHDR CSidDfaIds
 public:
 	CSidDfaIds();
 	CSidDfaIds(const CSidDfaIds& other);
-	const CSidDfaIds &operator=(const CSidDfaIds &other);
-	~CSidDfaIds();
+	CSidDfaIds &operator=(const CSidDfaIds &other);
+	virtual ~CSidDfaIds();
 
 	COMPILEDINFO& operator[](ulong index);
 	const COMPILEDINFO& operator[](ulong index) const;

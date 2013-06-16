@@ -26,29 +26,29 @@ class STATEVEC;
 class DFAHDR CDfaRow
 {
 public:
-	enum STATEFLAG
-	{
-		NORMAL	= 1 << 0,
-		START	 = 1 << 1,
-		TERMINAL = 1 << 2
-	};
+	//标记该状态/行的属性：NORMAL、START、FINAL
+	typedef ulong STATEFLAG;
+	static const STATEFLAG NORMAL	= 0x0001;
+	static const STATEFLAG START	= 0x0002;
+	static const STATEFLAG FINAL	= 0x0004;
 
-	explicit CDfaRow(ulong col);
-	~CDfaRow();
+	explicit CDfaRow(ulong ulColCnt);
 	CDfaRow(const CDfaRow &other);
-	CDfaRow& operator=(const CDfaRow &other);
+	virtual ~CDfaRow();
 
-	STATEID& operator[](byte nIdx);
-	const STATEID& operator[](byte nIdx) const;
+	CDfaRow&		operator =	(const CDfaRow &other);
+	const STATEID&	operator []	(byte nIdx) const;
+	STATEID&		operator []	(byte nIdx);
 
-	void SetFlag(ulong nFlag);
-	ulong GetFlag() const;
-	ulong GetColNum() const;
-	void Fill(STATEID _Val);
+	ulong			Size() const;
+	void			Fill(STATEID nState);
+
+	void			AddFlags(STATEFLAG nFlags);
+	void			SetFlags(STATEFLAG nFlags);
+	STATEFLAG		GetFlags() const;
 
 protected:
-	ulong m_nFlag;//标记该状态/行的属性：NORMAL、START、TERMINAL
-	ulong m_nColNum;
-	STATEVEC *m_pDest;
+	STATEVEC*		m_pDest;
+	STATEFLAG		m_nFlags;
 };
 

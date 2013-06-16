@@ -9,13 +9,8 @@ REGRULEHDR CRegChain::CRegChain()
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
-}
-
-REGRULEHDR CRegChain::~CRegChain()
-{
-	delete m_pRegList;
 }
 
 REGRULEHDR CRegChain::CRegChain(const CRegChain &other)
@@ -26,9 +21,38 @@ REGRULEHDR CRegChain::CRegChain(const CRegChain &other)
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
 	*this = other;
+}
+
+REGRULEHDR CRegChain::~CRegChain()
+{
+	delete m_pRegList;
+}
+
+REGRULEHDR CRegChain& CRegChain::operator = (const CRegChain &other)
+{
+	try
+	{
+		*this->m_pRegList = *other.m_pRegList;
+	}
+	catch (std::exception &e)
+	{
+		TTHROW(e.what());
+	}
+	this->m_sigs = other.m_sigs;
+	return *this;
+}
+
+REGRULEHDR CDllString& CRegChain::operator[](ulong nIdx)
+{
+	return (*m_pRegList)[nIdx];
+}
+
+REGRULEHDR const CDllString& CRegChain::operator[](ulong nIdx) const
+{
+	return (*m_pRegList)[nIdx];
 }
 
 REGRULEHDR ulong CRegChain::Size() const
@@ -49,32 +73,8 @@ REGRULEHDR void CRegChain::PushBack(const CDllString &pcreStr)
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
-}
-
-REGRULEHDR CDllString& CRegChain::operator[](ulong nIdx)
-{
-	return (*m_pRegList)[nIdx];
-}
-
-REGRULEHDR const CDllString& CRegChain::operator[](ulong nIdx) const
-{
-	return (*m_pRegList)[nIdx];
-}
-
-REGRULEHDR const CRegChain& CRegChain::operator = (const CRegChain &other)
-{
-	try
-	{
-		*this->m_pRegList = *other.m_pRegList;
-	}
-	catch (std::exception &e)
-	{
-		throw CTrace(__FILE__, __LINE__, e.what());
-	}
-	this->m_sigs = other.m_sigs;
-	return *this;
 }
 
 REGRULEHDR void CRegChain::Resize(ulong nSize)
@@ -85,7 +85,7 @@ REGRULEHDR void CRegChain::Resize(ulong nSize)
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
 }
 

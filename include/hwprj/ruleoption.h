@@ -26,7 +26,7 @@ class SNORTRULEHDR CRuleOption
 public:
 	CRuleOption();
 	CRuleOption(const CRuleOption &other);
-	const CRuleOption& operator = (const CRuleOption &other);
+	CRuleOption& operator = (const CRuleOption &other);
 	virtual ~CRuleOption();
 
 	void SetPattern(LPCSTR lpStr);

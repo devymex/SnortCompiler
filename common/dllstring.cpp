@@ -19,7 +19,7 @@ DLLSTRHDR CDllString::CDllString()
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
 }
 
@@ -31,7 +31,7 @@ DLLSTRHDR CDllString::CDllString(const char *pStr)
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
 }
 
@@ -53,7 +53,7 @@ DLLSTRHDR CDllString::CDllString(const CDllString &other)
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
 	*this = other;
 }
@@ -66,7 +66,7 @@ DLLSTRHDR CDllString& CDllString::operator = (const CDllString &other)
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
 	return *this;
 }
@@ -89,7 +89,7 @@ DLLSTRHDR void CDllString::PushBack(const char nChar)
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
 }
 

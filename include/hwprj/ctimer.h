@@ -17,18 +17,18 @@
 class CTimer
 {
 public:
-	__forceinline CTimer()
+	inline CTimer()
 	{
 		QueryPerformanceFrequency((PLARGE_INTEGER)&m_nFreq);
 		QueryPerformanceCounter((PLARGE_INTEGER)&m_nStart);
 	}
-	__forceinline double Cur()
+	inline double Cur()
 	{
 		__int64 nCur;
 		QueryPerformanceCounter((PLARGE_INTEGER)&nCur);
 		return double(nCur - m_nStart) / double(m_nFreq);
 	}
-	__forceinline double Reset()
+	inline double Reset()
 	{
 		__int64 nCur;
 		double dCur;

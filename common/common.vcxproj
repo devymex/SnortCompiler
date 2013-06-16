@@ -96,6 +96,7 @@
     <ClInclude Include="..\include\hwprj\dllstring.h" />
     <ClInclude Include="..\include\hwprj\trace.h" />
     <ClInclude Include="..\include\hwprj\unsary.h" />
+    <ClInclude Include="..\include\hwprj\unsary.inc" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>

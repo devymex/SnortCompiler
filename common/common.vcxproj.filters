@@ -29,6 +29,9 @@
     <ClInclude Include="..\include\hwprj\unsary.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\hwprj\unsary.inc">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

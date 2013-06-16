@@ -27,8 +27,8 @@ public:
 
 	CSnortRule();
 	CSnortRule(const CSnortRule &other);
-	const CSnortRule& operator = (const CSnortRule &other);
-	~CSnortRule();
+	CSnortRule& operator = (const CSnortRule &other);
+	virtual ~CSnortRule();
 
 	CRuleOption* operator[](ulong nIdx) const;
 

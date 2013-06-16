@@ -12,7 +12,7 @@ NFAHDR CNfa::CNfa()
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
 }
 
@@ -29,20 +29,21 @@ NFAHDR CNfa::CNfa(const CNfa &other)
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
 	*this = other;
 }
 
 NFAHDR CNfa& CNfa::operator=(const CNfa &other)
 {
+	TASSERT(other.m_pNfa != null);
 	try
 	{
 		*this->m_pNfa = *other.m_pNfa;
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
 	return *this;
 }
@@ -55,7 +56,7 @@ NFAHDR void CNfa::Reserve(ulong ulSize)
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
 }
 
@@ -72,7 +73,7 @@ NFAHDR void CNfa::Resize(ulong ulSize)
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
 }
 
@@ -93,16 +94,19 @@ NFAHDR CNfaRow& CNfa::Back()
 
 NFAHDR CNfaRow& CNfa::operator[](ulong ulIdx)
 {
+	TASSERT(ulIdx < m_pNfa->size());
 	return (*m_pNfa)[ulIdx];
 }
 
 NFAHDR const CNfaRow& CNfa::operator[](ulong ulIdx) const
 {
+	TASSERT(ulIdx < m_pNfa->size());
 	return (*m_pNfa)[ulIdx];
 }
 
 NFAHDR void CNfa::PopBack()
 {
+	TASSERT(m_pNfa->size() > 0);
 	m_pNfa->pop_back();
 }
 
@@ -114,7 +118,7 @@ NFAHDR void CNfa::PushBack(const CNfaRow &row)
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
 }
 

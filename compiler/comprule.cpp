@@ -495,7 +495,7 @@ ulong ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
 			}
 			catch (std::exception &e)
 			{
-				throw CTrace(__FILE__, __LINE__, e.what());
+				TTHROW(e.what());
 			}
 			ulong nr = FormatPcre(opValueBeg, opValueEnd, *pPcre);
 			if (nr != 0)
@@ -528,7 +528,7 @@ ulong ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
 			}
 			catch (std::exception &e)
 			{
-				throw CTrace(__FILE__, __LINE__, e.what());
+				TTHROW(e.what());
 			}
 			pContent->SetFlag(0);
 			pContent->nOffset = 0;
@@ -1015,7 +1015,8 @@ void Rule2Dfas(const CRegRule &rule, CCompileResults &result)
 			else
 			{
 				ctime.Reset();//for test
-				TASSERT(dfa.GetFinalState().Size() != 0);
+				TASSERT(dfa.GetFinalStates().Size() != 0);
+
 				ulong nr = dfa.Minimize();
 				dfamintimetime += ctime.Reset();//for test
 				if (0 != nr || dfa.Size() > SC_MAXDFASIZE)

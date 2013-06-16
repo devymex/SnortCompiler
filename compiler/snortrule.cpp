@@ -11,7 +11,7 @@ SNORTRULEHDR CSnortRule::CSnortRule()
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
 }
 
@@ -23,12 +23,12 @@ SNORTRULEHDR CSnortRule::CSnortRule(const CSnortRule &other)
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
 	*this = other;
 }
 
-SNORTRULEHDR const CSnortRule& CSnortRule::operator = (const CSnortRule &other)
+SNORTRULEHDR CSnortRule& CSnortRule::operator = (const CSnortRule &other)
 {
 	m_nSid = other.m_nSid;
 	m_nFlag = other.m_nFlag;
@@ -38,7 +38,7 @@ SNORTRULEHDR const CSnortRule& CSnortRule::operator = (const CSnortRule &other)
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
 	return *this;
 }
@@ -87,7 +87,7 @@ SNORTRULEHDR void CSnortRule::PushBack(CRuleOption* ruleoption)
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
 }
 

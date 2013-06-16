@@ -9,7 +9,7 @@ DFAARYHDR CDfaArray::CDfaArray()
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
 }
 
@@ -21,22 +21,9 @@ DFAARYHDR CDfaArray::CDfaArray(const CDfaArray& other)
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
 	*this = other;
-}
-
-DFAARYHDR const CDfaArray &CDfaArray::operator=(const CDfaArray &other)
-{
-	try
-	{
-		*m_pdfaTbl = *other.m_pdfaTbl;
-	}
-	catch (std::exception &e)
-	{
-		throw CTrace(__FILE__, __LINE__, e.what());
-	}
-	return *this;
 }
 
 DFAARYHDR CDfaArray::~CDfaArray()
@@ -44,41 +31,57 @@ DFAARYHDR CDfaArray::~CDfaArray()
 	delete m_pdfaTbl;
 }
 
-DFAARYHDR CDfa& CDfaArray::operator[](ulong index)
+DFAARYHDR CDfaArray &CDfaArray::operator=(const CDfaArray &other)
 {
-	return (*m_pdfaTbl)[index];
-}
-
-DFAARYHDR const CDfa& CDfaArray::operator[](ulong index) const
-{
-	return (*m_pdfaTbl)[index];
-}
-
-DFAARYHDR void CDfaArray::Reserve(ulong nCount)
-{
+	TASSERT(other.m_pdfaTbl != null);
 	try
 	{
-		m_pdfaTbl->reserve(nCount);
+		*m_pdfaTbl = *other.m_pdfaTbl;
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
+	return *this;
 }
 
-DFAARYHDR void CDfaArray::Resize(ulong nSize)
+DFAARYHDR CDfa& CDfaArray::operator[](ulong ulIdx)
+{
+	TASSERT(ulIdx < m_pdfaTbl->size());
+	return (*m_pdfaTbl)[ulIdx];
+}
+
+DFAARYHDR const CDfa& CDfaArray::operator[](ulong ulIdx) const
+{
+	TASSERT(ulIdx < m_pdfaTbl->size());
+	return (*m_pdfaTbl)[ulIdx];
+}
+
+DFAARYHDR void CDfaArray::Reserve(ulong ulCount)
 {
 	try
 	{
-		m_pdfaTbl->resize(nSize);
+		m_pdfaTbl->reserve(ulCount);
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
 }
 
-DFAARYHDR const ulong CDfaArray::Size() const
+DFAARYHDR void CDfaArray::Resize(ulong ulSize)
+{
+	try
+	{
+		m_pdfaTbl->resize(ulSize);
+	}
+	catch (std::exception &e)
+	{
+		TTHROW(e.what());
+	}
+}
+
+DFAARYHDR ulong CDfaArray::Size() const
 {
 	return m_pdfaTbl->size();
 }
@@ -91,7 +94,7 @@ DFAARYHDR void CDfaArray::PushBack(const CDfa &dfa)
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
 }
 

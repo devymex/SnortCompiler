@@ -15,7 +15,7 @@ void MatchOnedfa(const unsigned char * &data, ulong len, CDfa &dfa,
 
 
 	std::unordered_map<ulong, CUnsignedArray> dfaids;
-	const CFinalStates &finStas = dfa.GetFinalState();
+	const CFinalStates &finStas = dfa.GetFinalStates();
 	for (ulong i = 0; i < finStas.Size(); ++i)
 	{
 		STATEID nStaId = finStas[i];
@@ -28,7 +28,7 @@ void MatchOnedfa(const unsigned char * &data, ulong len, CDfa &dfa,
 	{
 		BYTE group = dfa.Char2Group(data[edgeiter]);
 
-		if (0 == (dfa[curSta].GetFlag() & CDfaRow::TERMINAL))
+		if (0 == (dfa[curSta].GetFlags() & CDfaRow::FINAL))
 		{
 			if (dfa[curSta][group] != (STATEID)-1)
 			{
@@ -62,7 +62,7 @@ void MatchOnedfa(const unsigned char * &data, ulong len, CDfa &dfa,
 		}
 	}
 
-	if((dfa[curSta].GetFlag() & CDfaRow::TERMINAL) != 0)
+	if((dfa[curSta].GetFlags() & CDfaRow::FINAL) != 0)
 	{
 		if(0 == flags[curSta])
 		{
@@ -251,7 +251,7 @@ void __stdcall DPktParam(const ip_header *ih, const byte *data, void* user)
 
 bool DMyLoadCapFile(const char* pFile, PACKETRECV cv, void* pUser)
 {
-	pcap_t *mypcap = pcap_open_offline(pFile, NULL);
+	pcap_t *mypcap = pcap_open_offline(pFile, null);
 	PACKETPARAM pp;
 	pp.pUser = pUser;
 	pp.pFunc = cv;

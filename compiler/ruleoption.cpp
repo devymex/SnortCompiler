@@ -10,7 +10,7 @@ SNORTRULEHDR CRuleOption::CRuleOption()
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
 }
 
@@ -22,7 +22,7 @@ SNORTRULEHDR CRuleOption::CRuleOption(const CRuleOption &other)
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
 	*this = other;
 }
@@ -32,7 +32,7 @@ SNORTRULEHDR CRuleOption::~CRuleOption()
 	delete m_pPattern;
 }
 
-SNORTRULEHDR const CRuleOption& CRuleOption::operator=(const CRuleOption &other)
+SNORTRULEHDR CRuleOption& CRuleOption::operator=(const CRuleOption &other)
 {
 	try
 	{
@@ -40,7 +40,7 @@ SNORTRULEHDR const CRuleOption& CRuleOption::operator=(const CRuleOption &other)
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
 	m_nFlag = other.m_nFlag;
 	return *this;
@@ -48,7 +48,7 @@ SNORTRULEHDR const CRuleOption& CRuleOption::operator=(const CRuleOption &other)
 
 SNORTRULEHDR ulong CRuleOption::GetPattern(LPSTR lpStr, ulong nLen) const
 {
-	if (lpStr == NULL || nLen == 0)
+	if (lpStr == null || nLen == 0)
 	{
 		return m_pPattern->length();
 	}
@@ -68,7 +68,7 @@ SNORTRULEHDR void CRuleOption::SetPattern(LPCSTR lpStr)
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
 }
 

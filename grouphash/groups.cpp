@@ -12,7 +12,7 @@ GROUPSHDR CGroups::CGroups(const CGroups& other)
 	*this = other;
 }
 
-GROUPSHDR const CGroups &CGroups::operator=(const CGroups &other)
+GROUPSHDR CGroups &CGroups::operator=(const CGroups &other)
 {
 	*m_pGroups = *other.m_pGroups;
 	return *this;

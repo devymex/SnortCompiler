@@ -9,7 +9,7 @@ REGRULEHDR CRegRule::CRegRule()
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
 }
 
@@ -26,7 +26,7 @@ REGRULEHDR CRegRule::CRegRule(const CRegRule &other)
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
 	*this = other;
 }
@@ -49,7 +49,7 @@ REGRULEHDR void CRegRule::Reserve(ulong nCount)
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
 }
 
@@ -61,7 +61,7 @@ REGRULEHDR void CRegRule::Resize(ulong nSize)
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
 }
 
@@ -73,7 +73,7 @@ REGRULEHDR void CRegRule::PushBack(const CRegChain &nRegChain)
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
 }
 
@@ -87,7 +87,7 @@ REGRULEHDR const CRegChain& CRegRule::operator[](ulong nIdx) const
 	return (*m_pRegVec)[nIdx];
 }
 
-REGRULEHDR const CRegRule& CRegRule::operator = (const CRegRule &other)
+REGRULEHDR CRegRule& CRegRule::operator = (const CRegRule &other)
 {
 	try
 	{
@@ -95,7 +95,7 @@ REGRULEHDR const CRegRule& CRegRule::operator = (const CRegRule &other)
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
 	return *this;
 }
