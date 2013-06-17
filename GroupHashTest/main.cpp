@@ -94,18 +94,19 @@ int main()
 
 	CTimer ctime;
 	CCompileResults result;
-	CompileRuleSet("..\\..\\input\\allrules.rule", result);
-	result.WriteToFile("..\\..\\output\\result_new.cdt");
-	//result.ReadFromFile("..\\result.cdt");
-	CGROUPRes groupRes;
-	Grouping(result, groupRes);
-	groupRes.WriteToFile("..\\..\\output\\GroupResut_new.cdt");
-	HASHRES HashResMap;
-	HashMapping(groupRes, HashResMap);
-	groupRes.WriteToFile("..\\..\\output\\FinalResut_new.cdt");
-	std::cout << "Total time: " << ctime.Reset() << std::endl;
-	std::cout << groupRes.GetGroups().Size() << std::endl;
-	std::cout << HashResMap.size() << std::endl;
+	//CompileRuleSet("..\\..\\input\\allrules.rule", result);
+	//result.WriteToFile("..\\..\\output\\result_new.cdt");
+	result.ReadFromFile("..\\result.cdt");
+	std::cout << result.GetDfaTable().Size() << std::endl;
+	//CGROUPRes groupRes;
+	//Grouping(result, groupRes);
+	//groupRes.WriteToFile("..\\..\\output\\GroupResut_new.cdt");
+	//HASHRES HashResMap;
+	//HashMapping(groupRes, HashResMap);
+	//groupRes.WriteToFile("..\\..\\output\\FinalResut_new.cdt");
+	//std::cout << "Total time: " << ctime.Reset() << std::endl;
+	//std::cout << groupRes.GetGroups().Size() << std::endl;
+	//std::cout << HashResMap.size() << std::endl;
 
 	system("pause");
 	return 0;
