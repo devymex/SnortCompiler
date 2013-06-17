@@ -16,7 +16,7 @@
 int main()
 {
 	CTimer ctime;
-	CCompileResults result, result1;
+	CCompileResults result;
 	try
 	{
 		CompileRuleFile("..\\allrules.rule", result);

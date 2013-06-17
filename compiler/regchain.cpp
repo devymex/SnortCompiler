@@ -25,6 +25,7 @@ REGRULEHDR CRegChain::CRegChain(const CRegChain &other)
 	{
 		TTHROW(e.what());
 	}
+	this->m_sigs = other.m_sigs;
 }
 
 REGRULEHDR CRegChain::~CRegChain()
