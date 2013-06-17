@@ -25,19 +25,18 @@ public:
 	CFinalStates(const CFinalStates &other);
 	virtual ~CFinalStates();
 
-	CFinalStates&	operator =	(const CFinalStates &other);
-	STATEID			operator []	(ulong nIdx) const;
+	CFinalStates&		operator =	(const CFinalStates &other);
+	STATEID				operator []	(ulong nIdx) const;
 
-	ulong	Size() const;
-	void	Clear();
-	void	PushBack(STATEID nStaId);
-	void	PushBack(STATEID nStaId, DFAID nDfaId);
-	ulong	GetDfaIdCount(STATEID nStaId) const;
-	ulong	GetAllDfaIdCount() const;
-	void	Swap(CFinalStates &other);
+	ulong				Size() const;
+	void				Clear();
+
+	CDfaIdSet&			AddState(STATEID nStaId);
+	void				Swap(CFinalStates &other);
 
 	CDfaIdSet&			GetDfaIdSet(STATEID nStaId);
 	const CDfaIdSet&	GetDfaIdSet(STATEID nStaId) const;
+	ulong				CountDfaIds() const;
 
 protected:
 	STATEVEC	*m_pStates;

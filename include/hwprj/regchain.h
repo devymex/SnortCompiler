@@ -25,11 +25,12 @@ class REGRULEHDR CRegChain
 {
 public:
 	CRegChain();
-	~CRegChain();
 	CRegChain(const CRegChain &other);
-	const CRegChain& operator = (const CRegChain &other);
+	virtual ~CRegChain();
 
+	CRegChain& operator = (const CRegChain &other);
 	CDllString& operator[](ulong nIdx);
+	const CDllString& operator[](ulong nIdx) const;
 
 	ulong Size() const;
 	CDllString& Back() const;

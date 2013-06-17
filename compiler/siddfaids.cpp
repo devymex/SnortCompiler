@@ -3,43 +3,78 @@
 
 SIDDFAHDR CSidDfaIds::CSidDfaIds()
 {
-	m_ruleResult = new std::vector<COMPILEDRULE>;
+	try
+	{
+		m_ruleResult = new std::vector<COMPILEDINFO>;
+	}
+	catch (std::exception &e)
+	{
+		TTHROW(e.what());
+	}
 }
 
 SIDDFAHDR CSidDfaIds::CSidDfaIds(const CSidDfaIds& other)
 {
-	m_ruleResult = new std::vector<COMPILEDRULE>;
-	*this = other;
+	try
+	{
+		m_ruleResult = new std::vector<COMPILEDINFO>(*other.m_ruleResult);
+	}
+	catch (std::exception &e)
+	{
+		TTHROW(e.what());
+	}
 }
 
-SIDDFAHDR const CSidDfaIds &CSidDfaIds::operator=(const CSidDfaIds &other)
+SIDDFAHDR CSidDfaIds &CSidDfaIds::operator=(const CSidDfaIds &other)
 {
-	*m_ruleResult = *other.m_ruleResult;
+	try
+	{
+		*m_ruleResult = *other.m_ruleResult;
+	}
+	catch (std::exception &e)
+	{
+		TTHROW(e.what());
+	}
 	return *this;
 }
+
 SIDDFAHDR CSidDfaIds::~CSidDfaIds()
 {
 	delete m_ruleResult;
 }
 
-SIDDFAHDR COMPILEDRULE& CSidDfaIds::operator[](ulong index)
+SIDDFAHDR COMPILEDINFO& CSidDfaIds::operator[](ulong index)
 {
 	return (*m_ruleResult)[index];
 }
 
-SIDDFAHDR const COMPILEDRULE& CSidDfaIds::operator[](ulong index) const
+SIDDFAHDR const COMPILEDINFO& CSidDfaIds::operator[](ulong index) const
 {
 	return (*m_ruleResult)[index];
 }
 
 SIDDFAHDR void CSidDfaIds::Reserve(ulong nCount)
 {
-	m_ruleResult->reserve(nCount);
+	try
+	{
+		m_ruleResult->reserve(nCount);
+	}
+	catch (std::exception &e)
+	{
+		TTHROW(e.what());
+	}
 }
 
 SIDDFAHDR void CSidDfaIds::Resize(ulong nSize)
 {
-	m_ruleResult->resize(nSize);
+	try
+	{
+		m_ruleResult->resize(nSize);
+	}
+	catch (std::exception &e)
+	{
+		TTHROW(e.what());
+	}
 }
 
 SIDDFAHDR const ulong CSidDfaIds::Size() const
@@ -47,12 +82,19 @@ SIDDFAHDR const ulong CSidDfaIds::Size() const
 	return m_ruleResult->size();
 }
 
-SIDDFAHDR void CSidDfaIds::PushBack(const COMPILEDRULE &ruleResult)
+SIDDFAHDR void CSidDfaIds::PushBack(const COMPILEDINFO &ruleResult)
 {
-	m_ruleResult->push_back(ruleResult);
+	try
+	{
+		m_ruleResult->push_back(ruleResult);
+	}
+	catch (std::exception &e)
+	{
+		TTHROW(e.what());
+	}
 }
 
-SIDDFAHDR COMPILEDRULE& CSidDfaIds::Back()
+SIDDFAHDR COMPILEDINFO& CSidDfaIds::Back()
 {
 	return m_ruleResult->back();
 }

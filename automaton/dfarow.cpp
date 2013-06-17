@@ -1,11 +1,19 @@
 #include "stdafx.h"
 #include <hwprj\dfarow.h>
 
-DFAHDR CDfaRow::CDfaRow(ulong col)
-	: m_nFlag(NORMAL), m_nColNum(col)
+DFAHDR CDfaRow::CDfaRow(ulong ulColCnt)
+	: m_pDest	(null)
+	, m_nFlags	(CDfaRow::NORMAL)
 {
-	m_pDest = new STATEVEC;
-	m_pDest->resize(m_nColNum);
+	try
+	{
+		m_pDest = new STATEVEC;
+		m_pDest->resize(ulColCnt);
+	}
+	catch (std::exception &e)
+	{
+		TTHROW(e.what());
+	}
 	memset(m_pDest->data(), -1, m_pDest->size() * sizeof(m_pDest->front()));
 }
 
@@ -15,45 +23,68 @@ DFAHDR CDfaRow::~CDfaRow()
 }
 
 DFAHDR CDfaRow::CDfaRow(const CDfaRow &other)
+	: m_pDest	(null)
+	, m_nFlags	(other.m_nFlags)
 {
-	m_pDest = new STATEVEC;
-	*this = other;
+	TASSERT(other.m_pDest != null);
+	try
+	{
+		m_pDest = new STATEVEC(*other.m_pDest);
+	}
+	catch (std::exception &e)
+	{
+		TTHROW(e.what());
+	}
 }
 
 DFAHDR CDfaRow& CDfaRow::operator=(const CDfaRow &other)
 {
-	m_nFlag = other.m_nFlag;
-	m_nColNum = other.m_nColNum;
-	*m_pDest = *other.m_pDest;
+	TASSERT(other.m_pDest != null);
+	try
+	{
+		*m_pDest = *other.m_pDest;
+		m_nFlags = other.m_nFlags;
+	}
+	catch (std::exception &e)
+	{
+		TTHROW(e.what());
+	}
 	return *this;
 }
 
 DFAHDR STATEID& CDfaRow::operator[](byte nIdx)
 {
+	TASSERT(nIdx < m_pDest->size());
 	return (*m_pDest)[nIdx];
 }
 
 DFAHDR const STATEID& CDfaRow::operator[](byte nIdx) const
 {
+	TASSERT(nIdx < m_pDest->size());
 	return (*m_pDest)[nIdx];
 }
 
-DFAHDR void CDfaRow::Fill(STATEID _Val)
+DFAHDR ulong CDfaRow::Size() const
 {
-	std::fill(m_pDest->begin(), m_pDest->end(), _Val);
+	return m_pDest->size();
 }
 
-DFAHDR void CDfaRow::SetFlag(ulong nFlag)
+DFAHDR void CDfaRow::Fill(STATEID nState)
 {
-	m_nFlag = nFlag;
+	std::fill(m_pDest->begin(), m_pDest->end(), nState);
 }
 
-DFAHDR ulong CDfaRow::GetFlag() const
+void CDfaRow::AddFlags(STATEFLAG nFlags)
 {
-	return m_nFlag;
+	m_nFlags |= nFlags;
 }
 
-DFAHDR ulong CDfaRow::GetColNum() const
+DFAHDR CDfaRow::STATEFLAG CDfaRow::GetFlags() const
 {
-	return m_nColNum;
+	return m_nFlags;
+}
+
+DFAHDR void CDfaRow::SetFlags(STATEFLAG nFlag)
+{
+	m_nFlags = nFlag;
 }

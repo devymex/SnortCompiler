@@ -3,7 +3,27 @@
 
 REGRULEHDR CRegRule::CRegRule()
 {
-	m_pRegVec = new CHAINVEC;
+	try
+	{
+		m_pRegVec = new CHAINVEC;
+	}
+	catch (std::exception &e)
+	{
+		TTHROW(e.what());
+	}
+}
+
+REGRULEHDR CRegRule::CRegRule(const CRegRule &other)
+{
+	TASSERT(other.m_pRegVec != null);
+	try
+	{
+		m_pRegVec = new CHAINVEC(*other.m_pRegVec);
+	}
+	catch (std::exception &e)
+	{
+		TTHROW(e.what());
+	}
 }
 
 REGRULEHDR CRegRule::~CRegRule()
@@ -11,10 +31,28 @@ REGRULEHDR CRegRule::~CRegRule()
 	delete m_pRegVec;
 }
 
-REGRULEHDR CRegRule::CRegRule(const CRegRule &other)
+REGRULEHDR CRegChain& CRegRule::operator[](ulong nIdx)
 {
-	m_pRegVec = new CHAINVEC;
-	*this = other;
+	return (*m_pRegVec)[nIdx];
+}
+
+REGRULEHDR const CRegChain& CRegRule::operator[](ulong nIdx) const
+{
+	return (*m_pRegVec)[nIdx];
+}
+
+REGRULEHDR CRegRule& CRegRule::operator = (const CRegRule &other)
+{
+	TASSERT(other.m_pRegVec != null);
+	try
+	{
+		*this->m_pRegVec = *other.m_pRegVec;
+	}
+	catch (std::exception &e)
+	{
+		TTHROW(e.what());
+	}
+	return *this;
 }
 
 REGRULEHDR ulong CRegRule::Size() const
@@ -29,30 +67,41 @@ REGRULEHDR CRegChain& CRegRule::Back() const
 
 REGRULEHDR void CRegRule::Reserve(ulong nCount)
 {
-	m_pRegVec->reserve(nCount);
+	try
+	{
+		m_pRegVec->reserve(nCount);
+	}
+	catch (std::exception &e)
+	{
+		TTHROW(e.what());
+	}
 }
+
 REGRULEHDR void CRegRule::Resize(ulong nSize)
 {
-	m_pRegVec->resize(nSize);
+	try
+	{
+		m_pRegVec->resize(nSize);
+	}
+	catch (std::exception &e)
+	{
+		TTHROW(e.what());
+	}
 }
 
 REGRULEHDR void CRegRule::PushBack(const CRegChain &nRegChain)
 {
-	m_pRegVec->push_back(nRegChain);
+	try
+	{
+		m_pRegVec->push_back(nRegChain);
+	}
+	catch (std::exception &e)
+	{
+		TTHROW(e.what());
+	}
 }
 
-REGRULEHDR CRegChain& CRegRule::operator[](ulong nIdx)
+REGRULEHDR void CRegRule::PopBack()
 {
-	return (*m_pRegVec)[nIdx];
-}
-
-REGRULEHDR const CRegChain& CRegRule::operator[](ulong nIdx) const
-{
-	return (*m_pRegVec)[nIdx];
-}
-
-REGRULEHDR const CRegRule& CRegRule::operator = (const CRegRule &other)
-{
-	*this->m_pRegVec = *other.m_pRegVec;
-	return *this;
+	m_pRegVec->pop_back();
 }

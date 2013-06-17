@@ -3,7 +3,27 @@
 
 REGRULEHDR CRegChain::CRegChain()
 {
-	m_pRegList = new STRINGVEC;
+	try
+	{
+		m_pRegList = new STRINGVEC;
+	}
+	catch (std::exception &e)
+	{
+		TTHROW(e.what());
+	}
+}
+
+REGRULEHDR CRegChain::CRegChain(const CRegChain &other)
+{
+	TASSERT(other.m_pRegList != null);
+	try
+	{
+		m_pRegList = new STRINGVEC(*other.m_pRegList);
+	}
+	catch (std::exception &e)
+	{
+		TTHROW(e.what());
+	}
 }
 
 REGRULEHDR CRegChain::~CRegChain()
@@ -11,10 +31,30 @@ REGRULEHDR CRegChain::~CRegChain()
 	delete m_pRegList;
 }
 
-REGRULEHDR CRegChain::CRegChain(const CRegChain &other)
+REGRULEHDR CRegChain& CRegChain::operator = (const CRegChain &other)
 {
-	m_pRegList = new STRINGVEC;
-	*this = other;
+	TASSERT(other.m_pRegList != null);
+	try
+	{
+		*this->m_pRegList = *other.m_pRegList;
+	}
+	catch (std::exception &e)
+	{
+		TTHROW(e.what());
+	}
+	this->m_sigs = other.m_sigs;
+
+	return *this;
+}
+
+REGRULEHDR CDllString& CRegChain::operator[](ulong nIdx)
+{
+	return (*m_pRegList)[nIdx];
+}
+
+REGRULEHDR const CDllString& CRegChain::operator[](ulong nIdx) const
+{
+	return (*m_pRegList)[nIdx];
 }
 
 REGRULEHDR ulong CRegChain::Size() const
@@ -29,24 +69,26 @@ REGRULEHDR CDllString& CRegChain::Back() const
 
 REGRULEHDR void CRegChain::PushBack(const CDllString &pcreStr)
 {
-	m_pRegList->push_back(pcreStr);
-}
-
-REGRULEHDR CDllString& CRegChain::operator[](ulong nIdx)
-{
-	return (*m_pRegList)[nIdx];
-}
-
-REGRULEHDR const CRegChain& CRegChain::operator = (const CRegChain &other)
-{
-	*this->m_pRegList = *other.m_pRegList;
-	this->m_sigs = other.m_sigs;
-	return *this;
+	try
+	{
+		m_pRegList->push_back(pcreStr);
+	}
+	catch (std::exception &e)
+	{
+		TTHROW(e.what());
+	}
 }
 
 REGRULEHDR void CRegChain::Resize(ulong nSize)
 {
-	m_pRegList->resize(nSize);
+	try
+	{
+		m_pRegList->resize(nSize);
+	}
+	catch (std::exception &e)
+	{
+		TTHROW(e.what());
+	}
 }
 
 REGRULEHDR CSignatures& CRegChain::GetSigs()

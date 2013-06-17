@@ -3,19 +3,27 @@
 
 DFAARYHDR CDfaArray::CDfaArray()
 {
-	m_pdfaTbl = new CDFAVEC;	
+	try
+	{
+		m_pdfaTbl = new CDFAVEC;	
+	}
+	catch (std::exception &e)
+	{
+		TTHROW(e.what());
+	}
 }
 
 DFAARYHDR CDfaArray::CDfaArray(const CDfaArray& other)
+	: m_pdfaTbl(null)
 {
-	m_pdfaTbl = new CDFAVEC;
-	*this = other;
-}
-
-DFAARYHDR const CDfaArray &CDfaArray::operator=(const CDfaArray &other)
-{
-	*m_pdfaTbl = *other.m_pdfaTbl;
-	return *this;
+	try
+	{
+		m_pdfaTbl = new CDFAVEC(*other.m_pdfaTbl);
+	}
+	catch (std::exception &e)
+	{
+		TTHROW(e.what());
+	}
 }
 
 DFAARYHDR CDfaArray::~CDfaArray()
@@ -23,34 +31,71 @@ DFAARYHDR CDfaArray::~CDfaArray()
 	delete m_pdfaTbl;
 }
 
-DFAARYHDR CDfa& CDfaArray::operator[](ulong index)
+DFAARYHDR CDfaArray &CDfaArray::operator=(const CDfaArray &other)
 {
-	return (*m_pdfaTbl)[index];
+	TASSERT(other.m_pdfaTbl != null);
+	try
+	{
+		*m_pdfaTbl = *other.m_pdfaTbl;
+	}
+	catch (std::exception &e)
+	{
+		TTHROW(e.what());
+	}
+	return *this;
 }
 
-DFAARYHDR const CDfa& CDfaArray::operator[](ulong index) const
+DFAARYHDR CDfa& CDfaArray::operator[](ulong ulIdx)
 {
-	return (*m_pdfaTbl)[index];
+	TASSERT(ulIdx < m_pdfaTbl->size());
+	return (*m_pdfaTbl)[ulIdx];
 }
 
-DFAARYHDR void CDfaArray::Reserve(ulong nCount)
+DFAARYHDR const CDfa& CDfaArray::operator[](ulong ulIdx) const
 {
-	m_pdfaTbl->reserve(nCount);
+	TASSERT(ulIdx < m_pdfaTbl->size());
+	return (*m_pdfaTbl)[ulIdx];
 }
 
-DFAARYHDR void CDfaArray::Resize(ulong nSize)
+DFAARYHDR void CDfaArray::Reserve(ulong ulCount)
 {
-	m_pdfaTbl->resize(nSize);
+	try
+	{
+		m_pdfaTbl->reserve(ulCount);
+	}
+	catch (std::exception &e)
+	{
+		TTHROW(e.what());
+	}
 }
 
-DFAARYHDR const ulong CDfaArray::Size() const
+DFAARYHDR void CDfaArray::Resize(ulong ulSize)
+{
+	try
+	{
+		m_pdfaTbl->resize(ulSize);
+	}
+	catch (std::exception &e)
+	{
+		TTHROW(e.what());
+	}
+}
+
+DFAARYHDR ulong CDfaArray::Size() const
 {
 	return m_pdfaTbl->size();
 }
 
 DFAARYHDR void CDfaArray::PushBack(const CDfa &dfa)
 {
-	m_pdfaTbl->push_back(dfa);
+	try
+	{
+		m_pdfaTbl->push_back(dfa);
+	}
+	catch (std::exception &e)
+	{
+		TTHROW(e.what());
+	}
 }
 
 DFAARYHDR void CDfaArray::Clear()

@@ -21,25 +21,32 @@ class OPTIONVEC;
 class SNORTRULEHDR CSnortRule
 {
 public:
-	enum {RULE_HASBYTE = 0x0001, RULE_HASNOT = 0x0002, RULE_HASNOSIG = 0x0004};
+	typedef ulong PARSE_INFO;
+
+	static const PARSE_INFO NORMAL		= 0x0001;
+	static const PARSE_INFO HASBYTE		= 0x0001;
+	static const PARSE_INFO HASNOT		= 0x0002;
 
 	CSnortRule();
 	CSnortRule(const CSnortRule &other);
-	const CSnortRule& operator = (const CSnortRule &other);
-	~CSnortRule();
+	virtual ~CSnortRule();
 
-	CRuleOption* operator[](ulong nIdx) const;
+	CSnortRule&		operator = (const CSnortRule &other);
+	CRuleOption*	operator[](ulong nIdx) const;
 
-	ulong Size() const;
-	ulong GetSid() const;
-	void SetSid(ulong sid);
-	ulong GetFlag() const;
-	void SetFlag(ulong flag);
-	void PushBack(CRuleOption* ruleoption);
-	void PopBack();
+	ulong			Size() const;
+	void			Clear();
+	void			PushBack(CRuleOption* pRuleOption);
+	void			PopBack();
+	CRuleOption*	Back();
+
+	ulong			GetSid() const;
+	void			SetSid(ulong sid);
+	PARSE_INFO		GetFlags() const;
+	void			SetFlags(PARSE_INFO flag);
 
 protected:
 	ulong m_nSid;
-	ulong m_nFlag;
+	PARSE_INFO m_nFlags;
 	OPTIONVEC *m_pOptions;
 };

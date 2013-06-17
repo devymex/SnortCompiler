@@ -23,25 +23,26 @@ class NFAHDR CNfa
 {
 public:
 	CNfa();
-	~CNfa();
 	CNfa(const CNfa &other);
+	virtual ~CNfa();
 
 	CNfa&			operator =	(const CNfa &other);
-	CNfaRow&		operator []	(ulong index);
-	const CNfaRow&	operator []	(ulong index) const;
+	CNfaRow&		operator []	(ulong ulIdx);
+	const CNfaRow&	operator []	(ulong ulIdx) const;
 
-	ulong		Size() const;
-	CNfaRow&	Back();
-	void		Clear();
-	void		Resize(ulong _Newsize);
-	void		Reserve(ulong _Count);
-	void		Shrink();
-	void		PushBack(const CNfaRow &row);
-	void		PopBack();
-	void		SortAll();
+	ulong			Size() const;
+	CNfaRow&		Back();
+	void			Clear();
+	void			Resize(ulong ulSize);
+	void			Reserve(ulong ulSize);
+	void			Shrink();
+	void			PushBack(const CNfaRow &row);
+	void			PopBack();
 
-	void		Dump(const char *pFile) const;
+	void			SortAll();
+
+	void			Dump(const char *pFile) const;
 
 protected:
-	NFAROWARY *m_pNfa;
+	NFAROWARY*		m_pNfa;
 };

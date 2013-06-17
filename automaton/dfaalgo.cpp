@@ -10,7 +10,6 @@
 */
 
 #include "stdafx.h"
-#include <hwprj\common.h>
 #include <hwprj\dfa.h>
 #include <hwprj\nfa.h>
 #include "dfaalgo.h"
@@ -40,11 +39,8 @@ void Warshall(byte *pMat, ulong nWidth, ulong nHeight)
 
 void NfaEClosure(const CNfa &nfa, std::vector<STATEVEC> &eClosure)
 {
-	if (nfa.Size() >= 65535)
-	{
-		system("pause");
-		throw std::exception("nfa.Size() >= 65535");
-	}
+	TASSERT(nfa.Size() < 65535);
+
 	ushort nNfaSize = ushort(nfa.Size());
 	ushort nMatHeight = nNfaSize + 1;
 	ushort nMatWidth = nMatHeight;
@@ -53,17 +49,17 @@ void NfaEClosure(const CNfa &nfa, std::vector<STATEVEC> &eClosure)
 		nMatWidth = (nMatWidth / 16) * 16 + 16;
 	}
 	byte *pMat = (byte*)_aligned_malloc(nMatWidth * nMatHeight, 128);
-	if (pMat == NULL)
+	if (pMat == null)
 	{
-		throw std::exception("Fatal Error");
+		throw CTrace(__FILE__, __LINE__, "Out of memory");
 	}
 	memset(pMat, 0, nMatWidth * nMatHeight);
 
 	for (ulong i = 0; i < nNfaSize; ++i)
 	{
 		const CNfaRow &row = nfa[i];
-		ulong nCnt = row.DestCnt(SC_DFACOLCNT);
-		const ulong *pDest = row.GetCol(SC_DFACOLCNT);
+		ulong nCnt = row[SC_DFACOLCNT].Size();
+		const ulong *pDest = row[SC_DFACOLCNT].Data();
 		for (ulong k = 0; k < nCnt; ++k)
 		{
 			pMat[i * nMatWidth + pDest[k]] = 1;
@@ -73,72 +69,78 @@ void NfaEClosure(const CNfa &nfa, std::vector<STATEVEC> &eClosure)
 
 	Warshall(pMat, nMatWidth, nMatHeight);
 
-	eClosure.resize(nNfaSize + 1);
-	for (STATEID i = 0; i < nNfaSize; ++i)
+	try
 	{
-		for (STATEID j = 0; j < nMatWidth; ++j)
+		eClosure.resize(nNfaSize + 1);
+		for (STATEID i = 0; i < nNfaSize; ++i)
 		{
-			if (pMat[i * nMatWidth + j])
+			for (STATEID j = 0; j < nMatWidth; ++j)
 			{
-				eClosure[i].push_back(j);
+				if (pMat[i * nMatWidth + j])
+				{
+					eClosure[i].push_back(j);
+				}
 			}
 		}
+		eClosure[nNfaSize].push_back(nNfaSize);
+		_aligned_free(pMat);
 	}
-	eClosure[nNfaSize].push_back(nNfaSize);
-	_aligned_free(pMat);
+	catch (std::exception &e)
+	{
+		TTHROW(e.what());
+	}
 }
 
 void GetNextEClosureSet(const CNfa &nfa, const std::vector<STATEVEC> &eClosure,
 						const STATEVEC &curSet, ulong edge, STATEVEC &eClosureSet)
 {
-	if (edge >= SC_CHARSETSIZE)
-	{
-		throw std::exception("edge >= SC_CHARSETSIZE");
-	}
-
-	if (nfa.Size() >= 65535)
-	{
-		system("pause");
-		throw std::exception("nfa.Size() >= 65535");
-	}
+	TASSERT(edge < CNfaRow::COLUMNCNT);
+	TASSERT(nfa.Size() < 65535);
 
 	static STATEVEC nextSet; //
 	nextSet.clear();
-	nextSet.reserve(1000);
-	ulong nSize = nfa.Size();
-	for(STATEVEC::const_iterator i = curSet.begin(); i != curSet.end(); ++i)
+	try
 	{
-		STATEID nCurSta = STATEID(*i);
-		if(nCurSta != nSize)
+		nextSet.reserve(1000);
+		ulong nSize = nfa.Size();
+		for(STATEVEC::const_iterator i = curSet.begin(); i != curSet.end(); ++i)
 		{
-			const CNfaRow &row = nfa[nCurSta];
-			ulong nCurCnt = nextSet.size();
-			ulong nAddCnt = row.DestCnt(edge);
-			if (nAddCnt != 0)
+			STATEID nCurSta = STATEID(*i);
+			if(nCurSta != nSize)
 			{
-				nextSet.resize(nCurCnt + nAddCnt);
-
-				STATEID *pDest = nextSet.data() + nCurCnt;
-				const ulong *pStates = row.GetCol(edge);
-
-				for (ulong k = 0; k < nAddCnt; ++k)
+				const CNfaRow &row = nfa[nCurSta];
+				ulong nCurCnt = nextSet.size();
+				ulong nAddCnt = row[edge].Size();
+				if (nAddCnt != 0)
 				{
-					pDest[k] = STATEID(pStates[k]);
+					nextSet.resize(nCurCnt + nAddCnt);
+
+					STATEID *pDest = nextSet.data() + nCurCnt;
+					const ulong *pStates = row[edge].Data();
+
+					for (ulong k = 0; k < nAddCnt; ++k)
+					{
+						pDest[k] = STATEID(pStates[k]);
+					}
 				}
 			}
 		}
-	}
-	std::sort(nextSet.begin(), nextSet.end());
-	nextSet.erase(std::unique(nextSet.begin(), nextSet.end()), nextSet.end());
+		std::sort(nextSet.begin(), nextSet.end());
+		nextSet.erase(std::unique(nextSet.begin(), nextSet.end()), nextSet.end());
 
-	for (STATEVEC::const_iterator i = nextSet.cbegin(); i != nextSet.cend(); ++i)
-	{
-		const STATEVEC &ci = eClosure[*i];
-		eClosureSet.insert(eClosureSet.end(), ci.cbegin(), ci.cend());
+		for (STATEVEC::const_iterator i = nextSet.cbegin(); i != nextSet.cend(); ++i)
+		{
+			const STATEVEC &ci = eClosure[*i];
+			eClosureSet.insert(eClosureSet.end(), ci.cbegin(), ci.cend());
+		}
+		std::sort(eClosureSet.begin(), eClosureSet.end());
+		eClosureSet.erase(std::unique(eClosureSet.begin(),
+			eClosureSet.end()), eClosureSet.end());
 	}
-	std::sort(eClosureSet.begin(), eClosureSet.end());
-	eClosureSet.erase(std::unique(eClosureSet.begin(),
-		eClosureSet.end()), eClosureSet.end());
+	catch (std::exception &e)
+	{
+		TTHROW(e.what());
+	}
 }
 
 void NAvaiEdges(const CNfa &nfa, byte *group)
@@ -147,7 +149,7 @@ void NAvaiEdges(const CNfa &nfa, byte *group)
 	{
 		std::vector<ulong> key;
 		ulong hash;
-		__forceinline bool operator == (const COLUMNKEY &other) const
+		inline bool operator == (const COLUMNKEY &other) const
 		{
 			ulong nSize = key.size();
 			if (nSize != other.key.size())
@@ -163,7 +165,7 @@ void NAvaiEdges(const CNfa &nfa, byte *group)
 	};
 	struct COLUMNKEYHASH
 	{
-		__forceinline ulong operator ()(const COLUMNKEY &column)
+		inline ulong operator ()(const COLUMNKEY &column)
 		{
 			return column.hash;
 		}
@@ -172,72 +174,79 @@ void NAvaiEdges(const CNfa &nfa, byte *group)
 	const ulong _FNV_offset_basis = 2166136261U;
 	const ulong _FNV_prime = 16777619U;
 
-	static COLUMNKEY columns[SC_CHARSETSIZE]; //
-	ulong zeroCnts[SC_CHARSETSIZE] = {0};
+	static COLUMNKEY columns[CNfaRow::COLUMNCNT]; //
+	ulong zeroCnts[CNfaRow::COLUMNCNT] = {0};
 
 	ulong nSize = nfa.Size();
-	for (ulong i = 0; i < SC_CHARSETSIZE; ++i)
+	for (ulong i = 0; i < CNfaRow::COLUMNCNT; ++i)
 	{
 		columns[i].key.clear();
 		columns[i].hash = _FNV_offset_basis;
 	}
-	for (ulong i = 0; i < nSize; ++i)
+	try
 	{
-		const CNfaRow &curRow = nfa[i];
-		for (ulong j = 0; j < SC_CHARSETSIZE; ++j)
+		for (ulong i = 0; i < nSize; ++i)
 		{
-			std::vector<ulong> &curCol = columns[j].key;
-			const ulong *pData = curRow.GetCol(j);
-			ulong nAddSize = curRow.DestCnt(j);
-			if (nAddSize != 0)
+			const CNfaRow &curRow = nfa[i];
+			for (ulong j = 0; j < CNfaRow::COLUMNCNT; ++j)
 			{
-				if (zeroCnts[j] > 0)
+				std::vector<ulong> &curCol = columns[j].key;
+				ulong nAddSize = curRow[j].Size();
+				const ulong *pData = curRow[j].Data();
+				if (nAddSize != 0)
 				{
-					curCol.resize(curCol.size() + zeroCnts[j], 0);
-					zeroCnts[j] = 0;
+					if (zeroCnts[j] > 0)
+					{
+						curCol.resize(curCol.size() + zeroCnts[j], 0);
+						zeroCnts[j] = 0;
+					}
+					curCol.push_back(nAddSize);
 				}
-				curCol.push_back(nAddSize);
+				else
+				{
+					++zeroCnts[j];
+				}
+
+				ulong &hash = columns[j].hash;
+				hash ^= nAddSize;
+				hash *= _FNV_prime;
+				for (ulong k = 0; k < nAddSize; ++k)
+				{
+					curCol.push_back(pData[k]);
+					hash ^= pData[k];
+					hash *= _FNV_prime;
+				}
+			}
+		}
+		for (ulong i = 0; i < CNfaRow::COLUMNCNT; ++i)
+		{
+			std::vector<ulong> &curCol = columns[i].key;
+			ulong nCurSize = curCol.size();
+			curCol.resize(nCurSize + zeroCnts[i]);
+			memset(curCol.data() + nCurSize, 0, zeroCnts[i] * sizeof(curCol[0]));
+		}
+
+		static COLUMNHASHMAP colHash; //
+		colHash.clear();
+		for(ulong i = 0; i < SC_DFACOLCNT; ++i)
+		{
+			COLUMNKEY &curCol = columns[i];
+			COLUMNHASHMAP::iterator same = colHash.find(curCol);
+			if(same == colHash.end())
+			{
+				byte curId = (byte)colHash.size();
+				colHash[curCol] = curId;
+				group[i] = curId;
 			}
 			else
 			{
-				++zeroCnts[j];
-			}
-
-			ulong &hash = columns[j].hash;
-			hash ^= nAddSize;
-			hash *= _FNV_prime;
-			for (ulong k = 0; k < nAddSize; ++k)
-			{
-				curCol.push_back(pData[k]);
-				hash ^= pData[k];
-				hash *= _FNV_prime;
+				group[i] = same->second;
 			}
 		}
 	}
-	for (ulong i = 0; i < SC_CHARSETSIZE; ++i)
+	catch (std::exception &e)
 	{
-		std::vector<ulong> &curCol = columns[i].key;
-		ulong nCurSize = curCol.size();
-		curCol.resize(nCurSize + zeroCnts[i]);
-		memset(curCol.data() + nCurSize, 0, zeroCnts[i] * sizeof(ulong));
-	}
-
-	static COLUMNHASHMAP colHash; //
-	colHash.clear();
-	for(ulong i = 0; i < SC_DFACOLCNT; ++i)
-	{
-		COLUMNKEY &curCol = columns[i];
-		COLUMNHASHMAP::iterator same = colHash.find(curCol);
-		if(same == colHash.end())
-		{
-			byte curId = (byte)colHash.size();
-			colHash[curCol] = curId;
-			group[i] = curId;
-		}
-		else
-		{
-			group[i] = same->second;
-		}
+		TTHROW(e.what());
 	}
 }
 
@@ -256,14 +265,24 @@ void CalcAbleTo(STATEVEC *pRevTbl, ulong nGrpNum, ulong nStaNum, PARTSET &ps)
 	//清空AbleTo
 	ReleaseAbleTo(ps);
 
-	byte *pBuf = new byte[nStaNum * nGrpNum];
-	ZeroMemory(pBuf, nStaNum * nGrpNum);
-	ps.AbleTo.resize(nGrpNum, 0);
-	ps.Ones.resize(nGrpNum, 0);
+	byte *pBuf = null;
+	try
+	{
+		pBuf = new byte[nStaNum * nGrpNum];
+		ZeroMemory(pBuf, nStaNum * nGrpNum);
+		ps.AbleTo.resize(nGrpNum, 0);
+		ps.Ones.resize(nGrpNum, 0);
+	}
+	catch (std::exception &e)
+	{
+		TTHROW(e.what());
+	}
 	//计算AbleTo的值，每产生一个新的或者更新PARTSET对象计算一次
 	for (ulong j = 0; j < nGrpNum; ++j)
 	{
 		byte *pAbleTo = pBuf + j * nStaNum;
+		/*AbleTo[j] = {state|state belong to parSet &&
+		pRevTbl[state][j] is not null} */
 		ps.AbleTo[j] = pAbleTo;
 		//遍历PARTSET中的每个状态t，若存在δ(-1)(t,j)≠Φ，AbleTo[t]标记为1
 		for (STATELIST_ITER k = ps.StaSet.begin(); k != ps.StaSet.end(); ++k)
@@ -277,6 +296,7 @@ void CalcAbleTo(STATEVEC *pRevTbl, ulong nGrpNum, ulong nStaNum, PARTSET &ps)
 		}
 	}
 }
+
 /*
 **	This function groups the merged dfa's columns on the ground of
 **	the column groups of dfas to be merged.
@@ -290,50 +310,56 @@ void DfaColGroup(CDfaArray &dfas, byte* groups)
 {
 	struct GROUPKEYHASH
 	{
-		__forceinline ulong operator ()(const GROUPKEY &column)
+		inline ulong operator ()(const GROUPKEY &column)
 		{
 			return column.hash;
 		}
 	};
+	typedef std::unordered_map<GROUPKEY, byte, GROUPKEYHASH> GROUPMAP;
 
 	const ulong _FNV_offset_basis = 2166136261U;
 	const ulong _FNV_prime = 16777619U;
 
-	GROUPKEY colum[SC_CHARSETSIZE];
-	typedef std::unordered_map<GROUPKEY, byte, GROUPKEYHASH> GROUPMAP;;
-	GROUPMAP groupMap;
+	GROUPKEY colum[SC_DFACOLCNT];
 
 	for(ulong c = 0; c < SC_DFACOLCNT; ++c)
 	{
-		colum[c].key.clear();
 		colum[c].hash = _FNV_offset_basis;
 	}
 
-	for(ulong i = 0; i < dfas.Size(); ++i)
+	try
 	{
+		for(ulong i = 0; i < dfas.Size(); ++i)
+		{
+			for(ulong c = 0; c < SC_DFACOLCNT; ++c)
+			{
+				ulong group = dfas[i].Char2Group(byte(c));
+				colum[c].val.push_back(group);
+				colum[c].hash ^= group;
+				colum[c].hash *= _FNV_prime;
+			}
+		}
+
+		GROUPMAP groupMap;
 		for(ulong c = 0; c < SC_DFACOLCNT; ++c)
 		{
-			ulong group = dfas[i].Char2Group(byte(c));
-			colum[c].key.push_back(group);
-			colum[c].hash ^= group;
-			colum[c].hash *= _FNV_prime;
+			GROUPKEY &curCol = colum[c];
+			GROUPMAP::iterator it = groupMap.find(curCol);
+			if(it == groupMap.end())
+			{
+				ulong curId = groupMap.size();
+				groups[c] = byte(curId);
+				groupMap[curCol] = byte(curId);
+			}
+			else
+			{
+				groups[c] = it->second;
+			}
 		}
 	}
-
-	for(ulong c = 0; c < SC_DFACOLCNT; ++c)
+	catch (std::exception &e)
 	{
-		GROUPKEY &curCol = colum[c];
-		GROUPMAP::iterator it = groupMap.find(curCol);
-		if(it == groupMap.end())
-		{
-			ulong curId = groupMap.size();
-			groups[c] = byte(curId);
-			groupMap[curCol] = byte(curId);
-		}
-		else
-		{
-			groups[c] = it->second;
-		}
+		TTHROW(e.what());
 	}
 }
 
@@ -353,10 +379,9 @@ void DfaColGroup(CDfaArray &dfas, byte* groups)
 void AddTermIntoDFA(STATEID otherSta, const CDfa &other,
 					STATEID lastSta, CDfa &lastDfa)
 {
-	const CFinalStates &orgFinStas = other.GetFinalState();
-	CFinalStates &newFinStas = lastDfa.GetFinalState();
-	newFinStas.PushBack(lastSta);
-	newFinStas.GetDfaIdSet(lastSta) = orgFinStas.GetDfaIdSet(otherSta);
+	const CFinalStates &orgFinStas = other.GetFinalStates();
+	CFinalStates &newFinStas = lastDfa.GetFinalStates();
+	newFinStas.AddState(lastSta).Append(orgFinStas.GetDfaIdSet(otherSta));
 }
 
 void SetStateFlags(byte *pFlags, STATEVEC states)
@@ -369,34 +394,41 @@ void SetStateFlags(byte *pFlags, STATEVEC states)
 
 bool SortPartition(const byte *pAbleTo, PARTSET &partSet)
 {
-	STATELIST_ITER t = partSet.StaSet.begin();
-	//将满足条件的t存在集合j的前段，不满足的存在集合j的后段
-	//满足条件的t标记为1，先滤去pAbleToI中前段为1的值
-	for (; t != partSet.StaSet.end() && pAbleTo[*t] != 0; ++t);
-	bool bHasAble = true;
-	if (t == partSet.StaSet.end())
+	try
 	{
-		return false;
-	}
-	if (t == partSet.StaSet.begin())
-	{
-		bHasAble = false;
-	}
-	//将后段中出现的值为1的插入至前段
-	for (; t != partSet.StaSet.end();)
-	{
-		if (pAbleTo[*t] == 1)
+		STATELIST_ITER t = partSet.StaSet.begin();
+		//将满足条件的t存在集合j的前段，不满足的存在集合j的后段
+		//满足条件的t标记为1，先滤去pAbleToI中前段为1的值
+		for (; t != partSet.StaSet.end() && pAbleTo[*t] != 0; ++t);
+		bool bHasAble = true;
+		if (t == partSet.StaSet.end())
 		{
-			partSet.StaSet.insert(partSet.StaSet.begin(), *t);
-			t = partSet.StaSet.erase(t);
-			bHasAble = true;
+			return false;
 		}
-		else
+		if (t == partSet.StaSet.begin())
 		{
-			++t;
+			bHasAble = false;
 		}
+		//将后段中出现的值为1的插入至前段
+		for (; t != partSet.StaSet.end();)
+		{
+			if (pAbleTo[*t] == 1)
+			{
+				partSet.StaSet.insert(partSet.StaSet.begin(), *t);
+				t = partSet.StaSet.erase(t);
+				bHasAble = true;
+			}
+			else
+			{
+				++t;
+			}
+		}
+		return bHasAble;
 	}
-	return bHasAble;
+	catch (std::exception &e)
+	{
+		TTHROW(e.what());
+	}
 }
 
 ulong FindNotEmpty(const std::vector<ulong> *pVecAry, ulong nCnt)
@@ -416,43 +448,50 @@ ulong FindNotEmpty(const std::vector<ulong> *pVecAry, ulong nCnt)
 void InitPartWait(const std::vector<PARTSET> &partSet,
 				  std::vector<ulong> *pWait, ulong ulGrpNum)
 {
-	typedef std::vector<PARTSET>::const_iterator PARTSETVEC_CITER;
-	for (ulong i = 0; i < ulGrpNum; ++i)
+	try
 	{
-		ulong AcpSum = 0, NonAcpSum = 0;
-		PARTSETVEC_CITER lastPart = partSet.cend() - 1;
-		for (PARTSETVEC_CITER j = partSet.cbegin(); j != lastPart; ++j)
+		typedef std::vector<PARTSET>::const_iterator PARTSETVEC_CITER;
+		for (ulong i = 0; i < ulGrpNum; ++i)
 		{
-			AcpSum += j->Ones[i];
-		}
-		NonAcpSum = partSet.back().Ones[i];
-		if (AcpSum != 0 && NonAcpSum == 0)
-		{
-			for (ulong k = 0; k < partSet.size() - 1; ++k)
+			ulong AcpSum = 0, NonAcpSum = 0;
+			PARTSETVEC_CITER lastPart = partSet.cend() - 1;
+			for (PARTSETVEC_CITER j = partSet.cbegin(); j != lastPart; ++j)
 			{
-				pWait[i].push_back(k);
+				AcpSum += j->Ones[i];
 			}
-		}
-		else if (AcpSum == 0 && NonAcpSum != 0)
-		{
-			pWait[i].push_back(partSet.size() - 1);
-		}
-		else if (AcpSum != 0 && NonAcpSum != 0)
-		{
-			if (AcpSum < NonAcpSum)
+			NonAcpSum = partSet.back().Ones[i];
+			if (AcpSum != 0 && NonAcpSum == 0)
+			{
+				for (ulong k = 0; k < partSet.size() - 1; ++k)
+				{
+					pWait[i].push_back(k);
+				}
+			}
+			else if (AcpSum == 0 && NonAcpSum != 0)
 			{
 				pWait[i].push_back(partSet.size() - 1);
 			}
-			for (ulong k = 0; k < partSet.size() - 1; ++k)
+			else if (AcpSum != 0 && NonAcpSum != 0)
 			{
-				pWait[i].push_back(k);
+				if (AcpSum < NonAcpSum)
+				{
+					pWait[i].push_back(partSet.size() - 1);
+				}
+				for (ulong k = 0; k < partSet.size() - 1; ++k)
+				{
+					pWait[i].push_back(k);
+				}
 			}
 		}
+	}
+	catch (std::exception &e)
+	{
+		TTHROW(e.what());
 	}
 }
 
 void BuildDfaByPart(const PARTSETVEC &partSets, const DFAROWARY &oldDfa,
-						 DFAROWARY &newDfa)
+					DFAROWARY &newDfa)
 {
 	STATEVEC old2New(oldDfa.size());
 	for (PARTSETVEC_CITER i = partSets.cbegin(); i != partSets.cend(); ++i)
@@ -464,7 +503,7 @@ void BuildDfaByPart(const PARTSETVEC &partSets, const DFAROWARY &oldDfa,
 		}
 	}
 
-	ulong ulColNum = oldDfa[0].GetColNum();
+	ulong ulColNum = oldDfa[0].Size();
 	for (PARTSETVEC_CITER i = partSets.begin(); i != partSets.end(); ++i)
 	{
 		CDfaRow &newRow = newDfa[i - partSets.cbegin()];
@@ -479,43 +518,50 @@ void BuildDfaByPart(const PARTSETVEC &partSets, const DFAROWARY &oldDfa,
 			newRow[byte(j)] = nDest;
 		}
 		//set a state attribute
-		newRow.SetFlag(oldRow.GetFlag());
+		newRow.SetFlags(oldRow.GetFlags());
 	}
 }
 
 void InitPartSet(const CFinalStates &finStas, ulong ulStaNum,
 				 std::vector<PARTSET> &partSets)
 {
-	partSets.clear();
-
-	//distinguish final state belonging to different DFA
-	CDfaIdSet *pTerm2Dfa = new CDfaIdSet[ulStaNum];
-
-	for (ulong i = 0; i < finStas.Size(); ++i)
+	try
 	{
-		STATEID nFinStaId = finStas[i];
-		pTerm2Dfa[nFinStaId] = finStas.GetDfaIdSet(nFinStaId);
-	}
+		partSets.clear();
+		CDfaIdSet *pTerm2Dfa = null;
+		//distinguish final state belonging to different DFA
+		pTerm2Dfa = new CDfaIdSet[ulStaNum];
 
-	/*distinguish between final states and normal states，if map's first is null，
-	then the PARTSET is the set of normal states,otherwise, it is final states.
-	initBSet is unordered*/
-	std::map<CDfaIdSet, PARTSET> initBSet;
-	for (STATEID i = 0; i < ulStaNum; ++i)
-	{
-		CDfaIdSet &curDfaSet = pTerm2Dfa[i];
-		initBSet[curDfaSet].StaSet.push_back(i);
-	}
-	delete []pTerm2Dfa;
-
-	//set initBSet orderly and store in vector, among them, the last is normal states
-	for (std::map<CDfaIdSet, PARTSET>::iterator i = initBSet.begin();
-		i != initBSet.end(); ++i)
-	{
-		if (i->first.Size() != 0)
+		for (ulong i = 0; i < finStas.Size(); ++i)
 		{
-			partSets.push_back(i->second);
+			STATEID nFinStaId = finStas[i];
+			pTerm2Dfa[nFinStaId] = finStas.GetDfaIdSet(nFinStaId);
 		}
+
+		/*distinguish between final states and normal states，if map's first is null，
+		then the PARTSET is the set of normal states,otherwise, it is final states.
+		initBSet is unordered*/
+		std::map<CDfaIdSet, PARTSET> initBSet;
+		for (STATEID i = 0; i < ulStaNum; ++i)
+		{
+			CDfaIdSet &curDfaSet = pTerm2Dfa[i];
+			initBSet[curDfaSet].StaSet.push_back(i);
+		}
+		delete []pTerm2Dfa;
+
+		//set initBSet orderly and store in vector, among them, the last is normal states
+		for (std::map<CDfaIdSet, PARTSET>::iterator i = initBSet.begin();
+			i != initBSet.end(); ++i)
+		{
+			if (i->first.Size() != 0)
+			{
+				partSets.push_back(i->second);
+			}
+		}
+		partSets.push_back(initBSet[CDfaIdSet()]);
 	}
-	partSets.push_back(initBSet[CDfaIdSet()]);
+	catch (std::exception &e)
+	{
+		TTHROW(e.what());
+	}
 }

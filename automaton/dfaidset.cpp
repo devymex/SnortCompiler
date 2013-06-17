@@ -5,14 +5,28 @@ typedef DFAIDSET::iterator			DFAIDSET_ITER;
 typedef DFAIDSET::const_iterator	DFAIDSET_CITER;
 
 DFAIDSETHDR CDfaIdSet::CDfaIdSet()
+	: m_pSet(null)
 {
-	m_pSet = new DFAIDSET;
+	try
+	{
+		m_pSet = new DFAIDSET;
+	}
+	catch (std::exception &e)
+	{
+		TTHROW(e.what());
+	}
 }
 
 DFAIDSETHDR CDfaIdSet::CDfaIdSet(const CDfaIdSet &other)
 {
-	m_pSet = new DFAIDSET;
-	*this = other;
+	try
+	{
+		m_pSet = new DFAIDSET(*other.m_pSet);
+	}
+	catch (std::exception &e)
+	{
+		TTHROW(e.what());
+	}
 }
 
 DFAIDSETHDR CDfaIdSet::~CDfaIdSet()
@@ -20,9 +34,16 @@ DFAIDSETHDR CDfaIdSet::~CDfaIdSet()
 	delete m_pSet;
 }
 
-DFAIDSETHDR const CDfaIdSet& CDfaIdSet::operator = (const CDfaIdSet &other)
+DFAIDSETHDR CDfaIdSet& CDfaIdSet::operator = (const CDfaIdSet &other)
 {
-	*m_pSet = *other.m_pSet;
+	try
+	{
+		*m_pSet = *other.m_pSet;
+	}
+	catch (std::exception &e)
+	{
+		TTHROW(e.what());
+	}
 	return *this;
 }
 
@@ -48,18 +69,39 @@ DFAIDSETHDR void CDfaIdSet::Clear()
 
 DFAIDSETHDR void CDfaIdSet::Append(const CDfaIdSet &other)
 {
-	m_pSet->insert(other.m_pSet->begin(), other.m_pSet->end());
+	try
+	{
+		m_pSet->insert(other.m_pSet->begin(), other.m_pSet->end());
+	}
+	catch (std::exception &e)
+	{
+		TTHROW(e.what());
+	}
 }
 
-DFAIDSETHDR void CDfaIdSet::Add(DFAID dfaId)
+DFAIDSETHDR void CDfaIdSet::AddDfaId(DFAID dfaId)
 {
-	m_pSet->insert(dfaId);
+	try
+	{
+		m_pSet->insert(dfaId);
+	}
+	catch (std::exception &e)
+	{
+		TTHROW(e.what());
+	}
 }
 
 DFAIDSETHDR void CDfaIdSet::CopyTo(CUnsignedArray &idAry) const
 {
-	for (DFAIDSET_CITER i = m_pSet->cbegin(); i != m_pSet->cend(); ++i)
+	try
 	{
-		idAry.PushBack(*i);
+		for (DFAIDSET_CITER i = m_pSet->cbegin(); i != m_pSet->cend(); ++i)
+		{
+			idAry.PushBack(*i);
+		}
+	}
+	catch (std::exception &e)
+	{
+		TTHROW(e.what());
 	}
 }

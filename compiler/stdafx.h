@@ -26,9 +26,11 @@
 #include <map>
 #include <set>
 
+#include <hwprj\common.h>
 #include <hwprj\dfa.h>
 #include <hwprj\dllstring.h>
 #include <hwprj\ctimer.h>
+#include <hwprj\trace.h>
 
 #define COMPILERHDR_DS
 #define REGRULEHDR_DS
@@ -42,7 +44,16 @@
 typedef std::vector<byte>					BYTEARY;
 typedef BYTEARY::iterator					BYTEARY_ITER;
 typedef BYTEARY::const_iterator				BYTEARY_CITER;
+
 typedef std::vector<CDllString>				STRINGVEC;
+
 typedef std::string							STRING;
+typedef STRING::iterator					STRING_ITER;
+typedef STRING::const_iterator				STRING_CITER;
+
 typedef std::vector<class CRuleOption*>		OPTIONVEC;
+
 typedef std::vector<class CRegChain>		CHAINVEC;
+
+typedef std::vector<SIGNATURE>              SIGNATUREVEC;
+typedef SIGNATUREVEC::iterator              SIGVEC_ITER;

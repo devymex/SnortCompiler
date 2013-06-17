@@ -3,19 +3,58 @@
 
 SIGHDR CSignatures::CSignatures()
 {
-	m_pSigs = new std::vector<SIGNATURE>;
+	try
+	{
+		m_pSigs = new SIGNATUREVEC;
+	}
+	catch (std::exception &e)
+	{
+		TTHROW(e.what());
+	}
 }
 
 SIGHDR CSignatures::CSignatures(const CSignatures& other)
 {
-	m_pSigs = new std::vector<SIGNATURE>;
-	*this = other;
+	TASSERT(other.m_pSigs != null);
+	try
+	{
+		m_pSigs = new SIGNATUREVEC(*other.m_pSigs);
+	}
+	catch (std::exception &e)
+	{
+		TTHROW(e.what());
+	}
 }
 
-SIGHDR const CSignatures &CSignatures::operator=(const CSignatures &other)
+SIGHDR CSignatures &CSignatures::operator=(const CSignatures &other)
 {
-	*m_pSigs = *other.m_pSigs;
+	TASSERT(other.m_pSigs != null);
+	try
+	{
+		*m_pSigs = *other.m_pSigs;
+	}
+	catch (std::exception &e)
+	{
+		TTHROW(e.what());
+	}
 	return *this;
+}
+
+SIGHDR bool CSignatures::operator == (const CSignatures &other) const
+{
+	try
+	{
+		return *m_pSigs == *other.m_pSigs;
+	}
+	catch (std::exception &e)
+	{
+		TTHROW(e.what());
+	}
+}
+
+SIGHDR bool CSignatures::operator <	(const CSignatures &other) const
+{
+	return *m_pSigs < *other.m_pSigs;
 }
 
 SIGHDR CSignatures::~CSignatures()
@@ -30,12 +69,26 @@ SIGHDR const ulong CSignatures::Size() const
 
 SIGHDR void CSignatures::Resize(ulong nSize)
 {
-	m_pSigs->resize(nSize);
+	try
+	{
+		m_pSigs->resize(nSize);
+	}
+	catch (std::exception &e)
+	{
+		TTHROW(e.what());
+	}
 }
 
 SIGHDR void CSignatures::PushBack(SIGNATURE Sig)
 {
-	m_pSigs->push_back(Sig);
+	try
+	{
+		m_pSigs->push_back(Sig);
+	}
+	catch (std::exception &e)
+	{
+		TTHROW(e.what());
+	}
 }
 
 SIGHDR SIGNATURE &CSignatures::operator[](ulong nIdx)
@@ -58,4 +111,17 @@ SIGHDR void CSignatures::Unique()
 	std::sort(m_pSigs->begin(), m_pSigs->end());
 	m_pSigs->erase(std::unique(m_pSigs->begin(),
 		m_pSigs->end()), m_pSigs->end());
+}
+
+SIGHDR ulong CSignatures::Find(SIGNATURE Sig) const
+{
+	SIGVEC_ITER iter = std::find(m_pSigs->begin(), m_pSigs->end(), Sig);
+	if (iter == m_pSigs->end())
+	{
+		return ulong(-1);
+	}
+	else
+	{
+		return iter - m_pSigs->begin();
+	}
 }

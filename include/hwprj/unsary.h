@@ -10,43 +10,60 @@
 #pragma once
 
 #include <hwprj\common.h>
+#include <hwprj\trace.h>
 
 #ifndef UNSARYHDR_DS
-class DLLULONGVEC;
 #define UNSARYHDR __declspec(dllimport)
 #else
 #define UNSARYHDR __declspec(dllexport)
 #endif
 
-/* Capsulate the std::vector<ulong> for dll using. */
+/* Capsulate the ulong* for dll using. */
 class UNSARYHDR CUnsignedArray
 {
 public:
 	// CDCA
-	CUnsignedArray();
-	CUnsignedArray(const CUnsignedArray &other);
-	virtual ~CUnsignedArray();
+	inline CUnsignedArray();
+	inline CUnsignedArray(const CUnsignedArray &other);
+	inline virtual ~CUnsignedArray();
 
 	// Overided operators
-	const CUnsignedArray&	operator =	(const CUnsignedArray &other);
-	ulong&					operator []	(ulong nIdx);
-	const ulong&			operator []	(ulong nIdx) const;
-	bool					operator ==	(const CUnsignedArray &other);
+	inline CUnsignedArray&	operator = (const CUnsignedArray &other);
+
+	inline ulong&			operator [] (ulong nIdx);
+	inline const ulong&		operator [] (ulong nIdx) const;
+	inline bool				operator == (const CUnsignedArray &other);
 
 	// Access member
-	void		Clear();
-	ulong		Size() const;
-	void		PopBack();
-	void		PushBack(ulong nState);
-	void		Reserve(ulong nCount);
-	void		Resize(ulong nSize);
-	ulong&		Back();
+	inline ulong			Size() const;
+	inline ulong&			Back();
+	inline void				Clear();
+	inline void				PopBack();
+	inline void				PushBack(ulong ulVal);
+	inline void				Reserve(ulong nCap);
+	inline void				Resize(ulong ulSize);
+	inline void				Resize(ulong ulSize, ulong ulVal);
+	inline ulong*			Data();
+	inline const ulong*		Data() const;
 
 	// Algorithms
-	void		Sort();
-	void		Unique();
-	void		Fill(ulong _Val);
+	inline void				Fill(ulong _Val);
+
+	void Sort();
+	void Unique();
 
 protected:
-	DLLULONGVEC *m_pSet;
+	inline ulong*	Alloc(ulong ulCap);
+	inline void		Free(ulong *pBuf);
+	inline void		Increase();
+	inline void		Realloc(ulong ulCap);
+
+	void	CopyFrom(ulong *pBuf);
+
+protected:
+	ulong*		m_pAry;
+	ulong		m_ulSize;
+	size_t		m_ulCap;
 };
+
+#include <hwprj\unsary.inc>

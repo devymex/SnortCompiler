@@ -100,7 +100,7 @@ COMPRESHDR ulong CCompileResults::WriteToFile(const char *filename)
 	//start to write the relationship between sid and dfa ids
 	for (ulong i = 0; i < m_sidDfaIds.Size(); ++i)
 	{
-		COMPILEDRULE &ruleResult = m_sidDfaIds[i];
+		COMPILEDINFO &ruleResult = m_sidDfaIds[i];
 		WriteNum(fout, ruleResult.m_nSid);
 		WriteNum(fout, ruleResult.m_nResult);
 		WriteNum(fout, ruleResult.m_dfaIds.Size());
@@ -119,12 +119,14 @@ COMPRESHDR ulong CCompileResults::WriteToFile(const char *filename)
 	fout.seekp(0, std::ios_base::end);
 
 	//start to write dfas
-	byte *dfaDetails = new byte[100000];
 	for (ulong i = 0; i < m_dfaTbl.Size(); ++i)
 	{
-		ulong len = m_dfaTbl[i].Save(dfaDetails);
+		ulong len = m_dfaTbl[i].CalcStoreSize();
+		byte *dfaDetails = new byte[len];
+		m_dfaTbl[i].Save(dfaDetails);
 		WriteNum(fout, len);
 		fout.write((char*)dfaDetails, len * sizeof(byte));
+		delete []dfaDetails;
 	}
 
 	//write the offset of regex
@@ -160,7 +162,6 @@ COMPRESHDR ulong CCompileResults::WriteToFile(const char *filename)
 	fout.close();
 	fout.clear();
 
-	delete []dfaDetails;
 	return 0;
 }
 
@@ -226,7 +227,7 @@ COMPRESHDR ulong CCompileResults::ReadFromFile(const char *filename)
 	ulong SidDfaNum;
 	for (ulong i = 0; i < ruleNum; ++i)
 	{
-		COMPILEDRULE &ruleResult = m_sidDfaIds[i];
+		COMPILEDINFO &ruleResult = m_sidDfaIds[i];
 		fin.read((char*)&ruleResult.m_nSid, 4);
 		fin.read((char*)&ruleResult.m_nResult, 4);
 		fin.read((char*)&SidDfaNum, 4);
@@ -239,14 +240,15 @@ COMPRESHDR ulong CCompileResults::ReadFromFile(const char *filename)
 
 	//start to read dfas
 	m_dfaTbl.Resize(dfaNum);
-	byte *dfaDetails = new byte[100000];
 	for (ulong i = 0; i < dfaNum; ++i)
 	{
 		CDfa &dfa = m_dfaTbl[i];
 		ulong len;
 		fin.read((char*)&len, 4);
+		byte *dfaDetails = new byte[len];
 		fin.read((char*)dfaDetails, len * sizeof(byte));
-		dfa.Load(dfaDetails, len);
+		dfa.Load(dfaDetails);
+		delete []dfaDetails;
 	}
 
 	//start to read regexes
@@ -276,6 +278,5 @@ COMPRESHDR ulong CCompileResults::ReadFromFile(const char *filename)
 	fin.close();
 	fin.clear();
 
-	delete []dfaDetails;
 	return 0;
 }

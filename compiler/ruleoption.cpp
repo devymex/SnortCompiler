@@ -1,65 +1,105 @@
 #include "stdafx.h"
 #include <hwprj\ruleoption.h>
+#include "comprule.h"
 
 SNORTRULEHDR CRuleOption::CRuleOption()
-	: m_nFlag(0)
+	: m_nFlags(NOFLAG)
 {
-	m_pPattern = new std::string;
+	try
+	{
+		m_pPat = new std::string;
+	}
+	catch (std::exception &e)
+	{
+		TTHROW(e.what());
+	}
 }
 
 SNORTRULEHDR CRuleOption::CRuleOption(const CRuleOption &other)
+	: m_nFlags(other.m_nFlags)
 {
-	m_pPattern = new std::string;
-	*this = other;
+	TASSERT(other.m_pPat != null);
+	try
+	{
+		m_pPat = new std::string(*other.m_pPat);
+	}
+	catch (std::exception &e)
+	{
+		TTHROW(e.what());
+	}
 }
 
 SNORTRULEHDR CRuleOption::~CRuleOption()
 {
-	delete m_pPattern;
+	delete m_pPat;
 }
 
-SNORTRULEHDR const CRuleOption& CRuleOption::operator=(const CRuleOption &other)
+SNORTRULEHDR CRuleOption& CRuleOption::operator = (const CRuleOption &other)
 {
-	*m_pPattern = *other.m_pPattern;
-	m_nFlag = other.m_nFlag;
+	TASSERT(other.m_pPat != null);
+	try
+	{
+		*m_pPat = *other.m_pPat;
+	}
+	catch (std::exception &e)
+	{
+		TTHROW(e.what());
+	}
 	return *this;
 }
 
-SNORTRULEHDR ulong CRuleOption::GetPattern(LPSTR lpStr, ulong nLen) const
+SNORTRULEHDR CRuleOption::OPTIONFLAG CRuleOption::GetFlags() const
 {
-	if (lpStr == NULL || nLen == 0)
+	return m_nFlags;
+}
+
+SNORTRULEHDR void CRuleOption::SetFlags(OPTIONFLAG nFlags)
+{
+	m_nFlags = nFlags;
+}
+
+SNORTRULEHDR void CRuleOption::AddFlags(OPTIONFLAG nFlags)
+{
+	m_nFlags |= nFlags;
+}
+
+SNORTRULEHDR bool CRuleOption::HasFlags(OPTIONFLAG nFlags) const
+{
+	return ((m_nFlags & nFlags) != 0);
+}
+
+SNORTRULEHDR void CRuleOption::GetPattern(CDllString &out) const
+{
+	out.Assign(m_pPat->c_str());
+}
+
+SNORTRULEHDR void CRuleOption::FromPattern(pcstr &pBeg, pcstr &pEnd)
+{
+	try
 	{
-		return m_pPattern->length();
+		m_pPat->assign(pBeg, pEnd);
 	}
-	if (nLen > m_pPattern->length())
+	catch (std::exception &e)
 	{
-		nLen = m_pPattern->length();
+		TTHROW(e.what());
 	}
-	CopyMemory(lpStr, &(*m_pPattern)[0], nLen);
-	return nLen;
+	if (*std::find_if_not(pBeg, pEnd, ISSPACE()) == '!')
+	{
+		m_nFlags |= CRuleOption::HASNOT;
+	}
+	QuotedContext(pBeg, pEnd);
 }
 
-SNORTRULEHDR void CRuleOption::SetPattern(LPCSTR lpStr)
+SNORTRULEHDR CRuleOption* CRuleOption::Clone() const
 {
-	*m_pPattern = lpStr;
-}
-
-SNORTRULEHDR ulong CRuleOption::GetFlag() const
-{
-	return m_nFlag;
-}
-
-SNORTRULEHDR void CRuleOption::SetFlag(ulong nFlag)
-{
-	m_nFlag = nFlag;
-}
-
-SNORTRULEHDR void CRuleOption::AddFlag(ulong nFlag)
-{
-	m_nFlag |= nFlag;
-}
-
-SNORTRULEHDR bool CRuleOption::TestFlag(ulong nFlag) const
-{
-	return ((m_nFlag & nFlag) != 0);
+	CRuleOption *pNew = null;
+	try
+	{
+		pNew = new CRuleOption(*this);
+	}
+	catch (std::exception &e)
+	{
+		TTHROW(e.what());
+	}
+	return pNew;
 }

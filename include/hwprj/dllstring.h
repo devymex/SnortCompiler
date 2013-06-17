@@ -11,7 +11,6 @@
 
 #pragma once
 
-#include <string>
 #include <hwprj\common.h>
 
 #ifndef DLLSTRHDR_DS
@@ -28,7 +27,7 @@ public:
 	// CDCA
 	CDllString();
 	CDllString(const CDllString &other);
-	explicit CDllString(const char *pStr);
+	explicit CDllString(pcstr pStr);
 	virtual ~CDllString();
 
 	CDllString&		operator =	(const CDllString &other);
@@ -36,13 +35,15 @@ public:
 
 	// Overided operators
 
-	const ulong		Size() const;
-	bool			Empty();
+	ulong			Size() const;
+	bool			Empty() const;
 	void			Clear();
-	void			Append(const char* pChar);
+	void			Assign(const char* pStr);
+	void			Append(const char* pStr);
 	char			Back() const;
 	void			PushBack(const char nChar);
-	const char*		GetStr();
+	pcstr			GetStr() const;
+	const char*		Data() const;
 
 protected:
 	DLLSTRING *m_pString;

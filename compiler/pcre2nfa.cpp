@@ -436,8 +436,8 @@ ulong PcreToCode(const std::string &OnePcre, BYTEARY &code)
 	pcre *re;
 	const char *error;
 	int erroffset;
-	re = pcre_compile(pattern, options, &error, &erroffset, NULL);
-	if (re == NULL)
+	re = pcre_compile(pattern, options, &error, &erroffset, null);
+	if (re == null)
 	{
 		std::cout << pattern << std::endl;
 		printf("PCRE compilation failed at offset %d: %s\n", erroffset, error);
@@ -510,9 +510,9 @@ ulong PcreToNFA(const char *pPcre, CNfa &nfa, CSignatures &sigs)
 		CNfaRow &row = nfa.Back();
 		for (ulong i = 0; i < EMPTY; ++i)
 		{
-			row.AddDest(i, nCurSize);
+			row[i].PushBack(nCurSize);
 		}
-		row.AddDest(EMPTY, nCurSize + 1);
+		row[EMPTY].PushBack(nCurSize + 1);
 	}
 	ulong nr = ProcessPcre(Beg, End, nfa);
 	return nr;

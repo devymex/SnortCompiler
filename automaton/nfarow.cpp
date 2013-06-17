@@ -1,11 +1,34 @@
 #include "stdafx.h"
 #include <hwprj\nfarow.h>
 
-
-NFAHDR CNfaRow::CNfaRow(ulong nSize)
-	: m_nSize(nSize)
+NFAHDR CNfaRow::CNfaRow()
+	: m_pDestSet(null)
 {
-	m_pDestSet = new std::vector<ulong>[m_nSize];
+	try
+	{
+		m_pDestSet = new CUnsignedArray[COLUMNCNT];
+	}
+	catch (std::exception &e)
+	{
+		TTHROW(e.what());
+	}
+}
+
+NFAHDR CNfaRow::CNfaRow(const CNfaRow &other)
+	: m_pDestSet(null)
+{
+	try
+	{
+		m_pDestSet = new CUnsignedArray[COLUMNCNT];
+		for (ulong i = 0; i < COLUMNCNT; ++i)
+		{
+			m_pDestSet[i] = other.m_pDestSet[i];
+		}
+	}
+	catch (std::exception &e)
+	{
+		TTHROW(e.what());
+	}
 }
 
 NFAHDR CNfaRow::~CNfaRow()
@@ -13,78 +36,40 @@ NFAHDR CNfaRow::~CNfaRow()
 	delete []m_pDestSet;
 }
 
-NFAHDR ulong CNfaRow::Size() const
+NFAHDR CNfaRow& CNfaRow::operator=(const CNfaRow &other)
 {
-	return m_nSize;
-}
-
-NFAHDR void CNfaRow::Resize(ulong nSize)
-{
-	if (m_nSize != nSize)
+	TASSERT(other.m_pDestSet != null);
+	try
 	{
-		delete []m_pDestSet;
-		m_pDestSet = new std::vector<ulong>[nSize];
-		m_nSize = nSize;
+		for (ulong i = 0; i < COLUMNCNT; ++i)
+		{
+			m_pDestSet[i] = other.m_pDestSet[i];
+		}
 	}
+	catch (std::exception &e)
+	{
+		TTHROW(e.what());
+	}
+
+	return *this;
 }
 
-NFAHDR ulong CNfaRow::DestCnt(ulong nCol) const
+NFAHDR CUnsignedArray& CNfaRow::operator[](ulong ulCol)
 {
-	return m_pDestSet[nCol].size();
+	TASSERT(ulCol < COLUMNCNT);
+	return m_pDestSet[ulCol];
 }
 
-NFAHDR ulong& CNfaRow::GetDest(ulong nCol, ulong nIdx)
+NFAHDR const CUnsignedArray& CNfaRow::operator[](ulong ulCol) const
 {
-	return m_pDestSet[nCol][nIdx];
-}
-
-NFAHDR const ulong& CNfaRow::GetDest(ulong nCol, ulong nIdx) const
-{
-	return m_pDestSet[nCol][nIdx];
-}
-
-NFAHDR ulong* CNfaRow::GetCol(ulong nCol)
-{
-	return m_pDestSet[nCol].data();
-}
-
-NFAHDR const ulong* CNfaRow::GetCol(ulong nCol) const
-{
-	return m_pDestSet[nCol].data();
-}
-
-NFAHDR void CNfaRow::CopyCol(ulong nCol, ulong *pOut) const
-{
-	std::vector<ulong> &col = m_pDestSet[nCol];
-	memcpy(pOut, col.data(), col.size() * sizeof(ulong));
-}
-
-NFAHDR void CNfaRow::AddDest(ulong nCol, ulong nDest)
-{
-	m_pDestSet[nCol].push_back(nDest);
+	TASSERT(ulCol < COLUMNCNT);
+	return m_pDestSet[ulCol];
 }
 
 NFAHDR void CNfaRow::SortAll()
 {
-	for (ulong i = 0; i < m_nSize; ++i)
+	for (ulong i = 0; i < COLUMNCNT; ++i)
 	{
-		std::sort(m_pDestSet[i].begin(), m_pDestSet[i].end());
+		m_pDestSet[i].Sort();
 	}
-}
-
-NFAHDR CNfaRow::CNfaRow(const CNfaRow &other)
-	: m_nSize(0), m_pDestSet(0)
-{
-	*this = other;
-}
-
-NFAHDR CNfaRow& CNfaRow::operator=(const CNfaRow &other)
-{
-	Resize(other.m_nSize);
-	for (ulong i = 0; i < m_nSize; ++i)
-	{
-		m_pDestSet[i] = other.m_pDestSet[i];
-	}
-
-	return *this;
 }

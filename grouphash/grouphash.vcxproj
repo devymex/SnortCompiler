@@ -92,7 +92,9 @@
   <ItemGroup>
     <ClCompile Include="grouping.cpp" />
     <ClCompile Include="buildhash.cpp" />
-    <ClCompile Include="Stdafx.cpp">
+    <ClCompile Include="groupres.cpp" />
+    <ClCompile Include="groups.cpp" />
+    <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
@@ -100,6 +102,9 @@
   <ItemGroup>
     <ClInclude Include="..\include\hwprj\grouping.h" />
     <ClInclude Include="..\include\hwprj\buildhash.h" />
+    <ClInclude Include="..\include\hwprj\groupres.h" />
+    <ClInclude Include="..\include\hwprj\groups.h" />
+    <ClInclude Include="hash.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>

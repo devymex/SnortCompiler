@@ -6,7 +6,14 @@ typedef NFAROWARY::const_iterator	NFAROWARY_CITER;
 
 NFAHDR CNfa::CNfa()
 {
-	m_pNfa = new NFAROWARY;
+	try
+	{
+		m_pNfa = new NFAROWARY;
+	}
+	catch (std::exception &e)
+	{
+		TTHROW(e.what());
+	}
 }
 
 NFAHDR CNfa::~CNfa()
@@ -16,19 +23,41 @@ NFAHDR CNfa::~CNfa()
 
 NFAHDR CNfa::CNfa(const CNfa &other)
 {
-	m_pNfa = new NFAROWARY;
-	*this = other;
+	TASSERT(other.m_pNfa != null);
+	try
+	{
+		m_pNfa = new NFAROWARY(*other.m_pNfa);
+	}
+	catch (std::exception &e)
+	{
+		TTHROW(e.what());
+	}
 }
 
 NFAHDR CNfa& CNfa::operator=(const CNfa &other)
 {
-	*this->m_pNfa = *other.m_pNfa;
+	TASSERT(other.m_pNfa != null);
+	try
+	{
+		*this->m_pNfa = *other.m_pNfa;
+	}
+	catch (std::exception &e)
+	{
+		TTHROW(e.what());
+	}
 	return *this;
 }
 
-NFAHDR void CNfa::Reserve(ulong _Count)
+NFAHDR void CNfa::Reserve(ulong ulSize)
 {
-	m_pNfa->reserve(_Count);
+	try
+	{
+		m_pNfa->reserve(ulSize);
+	}
+	catch (std::exception &e)
+	{
+		TTHROW(e.what());
+	}
 }
 
 NFAHDR void CNfa::Shrink()
@@ -36,12 +65,15 @@ NFAHDR void CNfa::Shrink()
 	m_pNfa->shrink_to_fit();
 }
 
-NFAHDR void CNfa::Resize(ulong _Newsize)
+NFAHDR void CNfa::Resize(ulong ulSize)
 {
-	m_pNfa->resize(_Newsize);
-	for (NFAROWARY_ITER i = m_pNfa->begin(); i != m_pNfa->end(); ++i)
+	try
 	{
-		i->Resize(SC_CHARSETSIZE);
+		m_pNfa->resize(ulSize);
+	}
+	catch (std::exception &e)
+	{
+		TTHROW(e.what());
 	}
 }
 
@@ -60,29 +92,39 @@ NFAHDR CNfaRow& CNfa::Back()
 	return m_pNfa->back();
 }
 
-NFAHDR CNfaRow& CNfa::operator[](ulong index)
+NFAHDR CNfaRow& CNfa::operator[](ulong ulIdx)
 {
-	return (*m_pNfa)[index];
+	TASSERT(ulIdx < m_pNfa->size());
+	return (*m_pNfa)[ulIdx];
 }
 
-NFAHDR const CNfaRow& CNfa::operator[](ulong index) const
+NFAHDR const CNfaRow& CNfa::operator[](ulong ulIdx) const
 {
-	return (*m_pNfa)[index];
+	TASSERT(ulIdx < m_pNfa->size());
+	return (*m_pNfa)[ulIdx];
 }
 
 NFAHDR void CNfa::PopBack()
 {
+	TASSERT(m_pNfa->size() > 0);
 	m_pNfa->pop_back();
 }
 
 NFAHDR void CNfa::PushBack(const CNfaRow &row)
 {
-	m_pNfa->push_back(row);
+	try
+	{
+		m_pNfa->push_back(row);
+	}
+	catch (std::exception &e)
+	{
+		TTHROW(e.what());
+	}
 }
 
 NFAHDR void CNfa::SortAll()
 {
-	for(NFAROWARY_ITER i = m_pNfa->begin(); i != m_pNfa->end(); ++i)
+	for (NFAROWARY_ITER i = m_pNfa->begin(); i != m_pNfa->end(); ++i)
 	{
 		i->SortAll();
 	}
@@ -104,7 +146,7 @@ NFAHDR void CNfa::Dump(const char *pFile) const
 		const CNfaRow &row = (*m_pNfa)[i];
 		for(ulong j = 0; j < 257; ++j)
 		{
-			ulong nCnt = row.DestCnt(j);
+			ulong nCnt = row[j].Size();
 			if(nCnt == 0)
 			{
 				fout << -1 << "\t";
@@ -113,7 +155,7 @@ NFAHDR void CNfa::Dump(const char *pFile) const
 			{
 				for(ulong k = 0; k < nCnt; ++k)
 				{
-					fout << row.GetDest(j, k) << ", ";
+					fout << row[j][k] << ", ";
 				}
 				fout << "\t";
 			}

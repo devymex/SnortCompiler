@@ -27,16 +27,16 @@ public:
 	CDfaIdSet(const CDfaIdSet &other);
 	virtual ~CDfaIdSet();
 
-	const CDfaIdSet&	operator =	(const CDfaIdSet &other);
-	bool				operator == (const CDfaIdSet &other) const;
-	bool				operator <	(const CDfaIdSet &other) const;
+	CDfaIdSet&	operator =	(const CDfaIdSet &other);
+	bool		operator == (const CDfaIdSet &other) const;
+	bool		operator <	(const CDfaIdSet &other) const;
 
-	ulong	Size() const;
-	void	Clear();
-	void	Append(const CDfaIdSet &other);
-	void	Add(DFAID dfaId);
-	void	CopyTo(CUnsignedArray &idAry) const;
+	ulong		Size() const;
+	void		Clear();
+	void		Append(const CDfaIdSet &other);
+	void		AddDfaId(DFAID dfaId);
+	void		CopyTo(CUnsignedArray &idAry) const;
+
 private:
-	DFAIDSET *m_pSet;
+	DFAIDSET*	m_pSet;
 };
-
