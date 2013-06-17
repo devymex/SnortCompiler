@@ -5,9 +5,8 @@
 
 #include <hwprj\compiler.h>
 #include <hwprj\snortrule.h>
-#include <hwprj\rule2nfa.h>
 #include <hwprj\nfa.h>
-#include <hwprj\pcre2nfa.h>
+#include "../compiler/pcre2nfa.h"
 
 #include <fstream>
 #include <iostream>
@@ -333,7 +332,7 @@ ULONG EqualDFA(CDfa &dfa1, std::vector<BYTE> &visited1, STATEID sta1, CDfa &dfa2
 	return 1;
 }
 
-void FoldDFA(CDfa &curDfa)
+void UnfoldDFA(CDfa &curDfa)
 {
 	CDfa foldDfa;
 	BYTE group[CSIZE];
@@ -342,9 +341,9 @@ void FoldDFA(CDfa &curDfa)
 		group[i] = (BYTE)i;
 	}
 
-	foldDfa.Init(group);
+	foldDfa.Load(group);
 	foldDfa.Reserve(300);
-	foldDfa.SetStartId(curDfa.GetStartId());
+	foldDfa.SetStartState(curDfa.GetStartState());
 	for (ULONG i = 0; i < curDfa.Size(); ++i)
 	{
 		foldDfa.PushBack(CDfaRow(CSIZE));
@@ -367,7 +366,7 @@ ULONG CompDfa(CDfa &OwnDfa, CDfa &BeDfa)
 	std::fill(visited2.begin(), visited2.end(), 0);
 	if (OwnDfa.Size() == BeDfa.Size())
 	{
-		if(EqualDFA(OwnDfa, visited1, OwnDfa.GetStartId(), BeDfa, visited2, BeDfa.GetStartId()))
+		if(EqualDFA(OwnDfa, visited1, OwnDfa.GetStartState(), BeDfa, visited2, BeDfa.GetStartState()))
 		{
 			Result = 1;
 		}
@@ -432,7 +431,7 @@ ULONG CompareWithPcre(const char *pPcre)
 	//std::cout << OwnDfa.Size() << std::endl;
 	OwnDfa.Minimize();	
 	//PrintDfaToText(OwnDfa,"..\\first.txt");
-	FoldDFA(OwnDfa);
+	UnfoldDFA(OwnDfa);
 	//PrintDfaToGv(OwnDfa,"..\\result1.txt");
 	//std::cout << (ULONG)OwnDfa.Size() << std::endl;
 	//display(OwnDfa);
@@ -473,56 +472,42 @@ ULONG CompareWithPcre(const char *pPcre)
 	return Result;
 }
 
-void CALLBACK Process(const CSnortRule &rule, LPVOID lpVoid)
+void __stdcall CompileCallback(const PARSERESULT &parseRes, void *lpVoid)
 {
 	CCompileResults &result = *(CCompileResults*)lpVoid;
+
 	std::vector<ULONG> NoMatchSids;
-	ULONG nFlag = rule.GetFlag();
-	if (rule.Size() == 0)
+
+	const CRegRule &rr = parseRes.regRule;
+	static ULONG num = 0;
+	std::cout << ++num << std::endl;
+	for (ULONG i = 0; i < rr.Size(); ++i)
 	{
-		return;
-	}
-	else if (nFlag & CSnortRule::RULE_HASNOT)
-	{
-		return;
-	}
-	else if (nFlag & CSnortRule::RULE_HASBYTE)
-	{
-		return;
-	}	
-	else
-	{
-		CRegRule rr;
-		Rule2PcreList(rule, rr);
-		static ULONG num = 0;
-		std::cout << ++num << std::endl;
-		for (ULONG i = 0; i < rr.Size(); ++i)
+		for (ULONG j = 0; j < rr[i].Size(); ++j)
 		{
-			for (ULONG j = 0; j < rr[i].Size(); ++j)
+			const char *tmp = rr[i][j].GetStr();
+			if (tmp != NULL && tmp[0] != '\0')
 			{
-				const char *tmp = rr[i][j].GetStr();
-				if (tmp != NULL && tmp[0] != '\0')
+				switch(CompareWithPcre(tmp))
 				{
-					switch(CompareWithPcre(tmp))
-					{
-					case 0:
-						std::cout << rule.GetSid() << std::endl;
-						//NoMatchSids.push_back(rule.GetSid());
-						system("pause");
-						continue;
-					case 1:
-						continue;
-					case 2:
-						std::cout << "nfa error" << std::endl;
-						continue;
-					case 3:
-						std::cout << "dfa error" << std::endl;
-						continue;
-					}
+				case 0:
+					std::cout << parseRes.ulSid << std::endl;
+					//NoMatchSids.push_back(rule.GetSid());
+					system("pause");
+					continue;
+				case 1:
+					continue;
+				case 2:
+					std::cout << "nfa error" << std::endl;
+					continue;
+				case 3:
+					std::cout << "dfa error" << std::endl;
+					continue;
 				}
 			}
 		}
 	}
+
 	//std::ofstream fout("..\\NoMatchSids.txt", ios::app);
 	//for (std::vector<ULONG>::iterator i = NoMatchSids.begin(); i != NoMatchSids.end(); ++i)
 	//{
@@ -556,7 +541,7 @@ int main(int argc, char **argv)
 	parser=new regex_parser(false,false);
 
 	CCompileResults result;
-	CompileFile(_T("..\\allrules.rule"), Process, &result);
+	ParseRuleFile("..\\allrules.rule", CompileCallback, &result);
 
 	//std::vector<std::string> regset;
 	//ReadRegexs(argv[3], regset);
