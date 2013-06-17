@@ -94,15 +94,18 @@ byte Char2HexBit(char c)
 	TTHROW(TI_INVALIDDATA);
 }
 
-void CContentOption::FromPattern(pcstr &pBeg, pcstr &pEnd)
+void CContentOption::FromPattern(const CDllString &strPat)
 {
-	CRuleOption::FromPattern(pBeg, pEnd);
+	CDllString strTmp = strPat;
+	FormatPattern(strTmp);
 	if (HasFlags(CRuleOption::HASNOT))
 	{
 		return;
 	}
 
 	m_data.clear();
+	pcstr pBeg = strTmp.Data();
+	pcstr pEnd = pBeg + strTmp.Size();
 	for (; pBeg != pEnd; ++pBeg)
 	{
 		if (*pBeg == '|')
@@ -119,12 +122,13 @@ void CContentOption::FromPattern(pcstr &pBeg, pcstr &pEnd)
 				}
 				if (*pBeg != ' ')
 				{
-					if (pEnd - pBeg < 1)
+					pcstr pNext = pBeg + 1;
+					if (pNext == pEnd)
 					{
 						TTHROW(TI_INVALIDDATA);
 					}
-					m_data.push_back((Char2HexBit(*(pBeg++)) << 4) |
-						Char2HexBit(*pBeg));
+					m_data.push_back((Char2HexBit(*pBeg) << 4) | Char2HexBit(*pNext));
+					++pBeg;
 				}
 			}
 		}
@@ -213,7 +217,7 @@ void CContentOption::ToPcre(CPcreOption &pcreOpt) const
 	}
 
 	std::stringstream ssPcre;
-	ssPcre << '/';
+	ssPcre << "\"/";
 
 	// If has constraint
 	if (nMinSkip > 0 || nMaxSkip >= 0)
@@ -268,11 +272,9 @@ void CContentOption::ToPcre(CPcreOption &pcreOpt) const
 	{
 		ssPcre << 'R';
 	}
+	ssPcre << '"';
 
-	STRING strPcre = ssPcre.str();
-	pcstr pBeg = strPcre.begin()._Ptr;
-	pcstr pEnd = strPcre.end()._Ptr;
-	pcreOpt.FromPattern(pBeg, pEnd);
+	pcreOpt.FromPattern(CDllString(ssPcre.str().c_str()));
 }
 
 void CContentOption::ExtractSignatures(CSignatures &sigs) const

@@ -5,19 +5,19 @@
 **
 **	@brief		Declaration of the CRegRule class
 **
-**	A rule includes multiple CRegChain, all store in CRegRule
+**	A rule includes multiple CPcreChain, all store in CRegRule
 **
 */
 
 #pragma once
 
-#include <hwprj\regchain.h>
+#include <hwprj\pcrechain.h>
 
-#ifndef REGRULEHDR_DS
+#ifndef SNORTRULEHDR_DS
 class CHAINVEC;
 #endif
 
-class REGRULEHDR CRegRule
+class SNORTRULEHDR CRegRule
 {
 public:
 	CRegRule();
@@ -25,14 +25,14 @@ public:
 	virtual ~CRegRule();
 
 	CRegRule&			operator = (const CRegRule &other);
-	CRegChain&			operator[](ulong nIdx);
-	const CRegChain&	operator[](ulong nIdx) const;
+	CPcreChain&			operator[](ulong nIdx);
+	const CPcreChain&	operator[](ulong nIdx) const;
 
 	ulong				Size() const;
 	void				Reserve(ulong nCount);
 	void				Resize(ulong nSize);
-	CRegChain&			Back() const;
-	void				PushBack(const CRegChain &nRegChain);
+	CPcreChain&			Back() const;
+	void				PushBack(const CPcreChain &nRegChain);
 	void				PopBack();
 
 protected:

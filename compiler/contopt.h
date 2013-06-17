@@ -36,7 +36,7 @@ public:
 	void					ExtractSignatures(CSignatures &sigs) const;
 	void					ToPcre(CPcreOption &pcreOpt) const;
 
-	virtual void			FromPattern(pcstr &pBeg, pcstr &pEnd);
+	virtual void			FromPattern(const CDllString &strPat);
 	virtual CRuleOption*	Clone() const;
 
 public:

@@ -11,6 +11,7 @@ SNORTRULEHDR CPcreOption::CPcreOption()
 
 SNORTRULEHDR CPcreOption::CPcreOption(const CPcreOption &other)
 	: CRuleOption(other)
+	, m_strPcre(other.m_strPcre)
 {
 }
 
@@ -20,34 +21,37 @@ SNORTRULEHDR CPcreOption::~CPcreOption()
 
 SNORTRULEHDR CPcreOption& CPcreOption::operator = (const CPcreOption &other)
 {
-	other;
-
+	m_strPcre = other.m_strPcre;
 	return *this;
 }
 
-SNORTRULEHDR void CPcreOption::FromPattern(pcstr &pBeg, pcstr &pEnd)
+SNORTRULEHDR void CPcreOption::FromPattern(const CDllString &strPat)
 {
-	CRuleOption::FromPattern(pBeg, pEnd);
+	CDllString strTemp = strPat;
+	FormatPattern(strTemp);
 
 	if (HasFlags(CRuleOption::HASNOT))
 	{
 		return;
 	}
 
-	pcstr pPcreBeg = std::find(pBeg, pEnd, '/');
-	pcstr pPcreEnd = pEnd;
-	for(; *pPcreEnd != '/'; --pPcreEnd);
+	STRING str = strTemp.Data();
 
-	if (pPcreBeg >= pPcreEnd)
+	STRING_ITER iEnd = str.end();
+	STRING_ITER iBeg = std::find(str.begin(), iEnd, '/');
+
+	for(--iEnd; *iEnd != '/'; --iEnd);
+
+	if (iBeg >= iEnd)
 	{
 		TTHROW(TI_INVALIDDATA);
 	}
 
-	m_strPcre.Assign(STRING(pPcreBeg, pPcreEnd).c_str());
+	m_strPcre.Assign(STRING(iBeg + 1, iEnd).c_str());
 
-	STRING strTmp = STRING(pPcreEnd + 1, pEnd);
+	STRING strSuffix = STRING(iEnd + 1, str.end());
 
-	for(STRING_ITER j = strTmp.begin(); j != strTmp.end(); ++j)
+	for(STRING_ITER j = strSuffix.begin(); j != strSuffix.end(); ++j)
 	{
 		switch (*j)
 		{
@@ -163,6 +167,11 @@ SNORTRULEHDR void CPcreOption::PcreToCode(BYTEARY &code) const
 	{
 		code.push_back((byte)*((byte*)re + name_table_offset + i));
 	}
+}
+
+SNORTRULEHDR void CPcreOption::SetPcreString(const CDllString& strPcre)
+{
+	m_strPcre = strPcre;
 }
 
 SNORTRULEHDR CDllString& CPcreOption::GetPcreString()

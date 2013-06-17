@@ -15,31 +15,55 @@
 
 int main()
 {
-	CTimer ctime;
-	CCompileResults result;
-	try
-	{
-		CompileRuleFile("..\\allrules.rule", result);
-	}
-	catch (CTrace &e)
-	{
-		std::cout << e.File() << " - " << e.Line() << ": " << e.What() << std::endl;
-		system("pause");
-	}
-	result.WriteToFile("..\\result.cdt");
+	//CTimer ctime;
+	CCompileResults result, result1;
+	//try
+	//{
+	//	CompileRuleFile("..\\allrules.rule", result);
+	//}
+	//catch (CTrace &e)
+	//{
+	//	std::cout << e.File() << " - " << e.Line() << ": " << e.What() << std::endl;
+	//	system("pause");
+	//}
+	//result.WriteToFile("..\\result.cdt");
 
-	//result.ReadFromFile("..\\result.cdt");
+	result.ReadFromFile("..\\result.cdt");
+	result1.ReadFromFile("..\\result1.cdt");
 
-	CGroupRes groupRes;
-	Grouping(result, groupRes);
-	groupRes.WriteToFile("..\\GroupResult.cdt");
-	//groupRes.ReadFromFile("..\\GroupResult.cdt");
-	HASHRES HashResMap;
-	HashMapping(groupRes, HashResMap);
-	groupRes.WriteToFile("..\\FinalResult.cdt");
-	std::cout << "Total time: " << ctime.Reset() << std::endl;
-	std::cout << groupRes.GetGroups().Size() << std::endl;
-	std::cout << HashResMap.size() << std::endl;
+	for (ulong i = 0; i < result.GetSidDfaIds().Size(); ++i)
+	{
+		if (result.GetSidDfaIds()[i].m_dfaIds.Size() !=
+			result1.GetSidDfaIds()[i].m_dfaIds.Size())
+		{
+			std::cout << i << ": " << result.GetSidDfaIds()[i].m_dfaIds.Size()
+				<< ", " << result1.GetSidDfaIds()[i].m_dfaIds.Size()
+				<< " - " << result1.GetSidDfaIds()[i].m_dfaIds[0] << std::endl;
+
+			system("pause");
+		}
+	}
+	for (ulong i = 0; i < result.GetDfaTable().Size(); ++i)
+	{
+		if (result.GetDfaTable()[i].Size() != result1.GetDfaTable()[i].Size())
+		{
+			std::cout << i << ": " << result.GetDfaTable()[i].Size() << ", "
+				<< result1.GetDfaTable()[i].Size() << std::endl;
+
+			system("pause");
+		}
+	}
+
+	//CGroupRes groupRes;
+	//Grouping(result, groupRes);
+	//groupRes.WriteToFile("..\\GroupResult.cdt");
+	////groupRes.ReadFromFile("..\\GroupResult.cdt");
+	//HASHRES HashResMap;
+	//HashMapping(groupRes, HashResMap);
+	//groupRes.WriteToFile("..\\FinalResult.cdt");
+	//std::cout << "Total time: " << ctime.Reset() << std::endl;
+	//std::cout << groupRes.GetGroups().Size() << std::endl;
+	//std::cout << HashResMap.size() << std::endl;
 
 	//std::ifstream fin("..\\Ids.txt");
 	//std::vector<size_t> vecIds;

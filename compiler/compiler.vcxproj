@@ -93,7 +93,7 @@
     <ClInclude Include="..\include\hwprj\compres.h" />
     <ClInclude Include="..\include\hwprj\pcrematch.h" />
     <ClInclude Include="..\include\hwprj\pcreopt.h" />
-    <ClInclude Include="..\include\hwprj\regchain.h" />
+    <ClInclude Include="..\include\hwprj\pcrechain.h" />
     <ClInclude Include="..\include\hwprj\regrule.h" />
     <ClInclude Include="..\include\hwprj\ruleoption.h" />
     <ClInclude Include="..\include\hwprj\siddfaids.h" />

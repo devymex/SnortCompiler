@@ -5,7 +5,7 @@
 **
 **	@brief		Construct regex chain with attribute of snort rules
 **
-**	Declaration of the CRegChain class
+**	Declaration of the CPcreChain class
 **
 */
 
@@ -14,21 +14,18 @@
 #include <hwprj\signatures.h>
 #include <hwprj\pcreopt.h>
 
-#ifndef REGRULEHDR_DS
+#ifndef SNORTRULEHDR_DS
 class PCREVEC;
-#define REGRULEHDR __declspec(dllimport)
-#else
-#define REGRULEHDR __declspec(dllexport)
 #endif
 
-class REGRULEHDR CRegChain
+class SNORTRULEHDR CPcreChain
 {
 public:
-	CRegChain();
-	CRegChain(const CRegChain &other);
-	virtual ~CRegChain();
+	CPcreChain();
+	CPcreChain(const CPcreChain &other);
+	virtual ~CPcreChain();
 
-	CRegChain&			operator = (const CRegChain &other);
+	CPcreChain&			operator = (const CPcreChain &other);
 	CPcreOption&		operator[](ulong nIdx);
 	const CPcreOption&	operator[](ulong nIdx) const;
 

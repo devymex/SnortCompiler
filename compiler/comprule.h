@@ -98,11 +98,11 @@ struct ISCONTENT
 
 void __stdcall CompileCallback(const PARSERESULT &parseRes, void *lpVoid);
 
-void ProcessOption(std::string &ruleOptions, CSnortRule &snortRule);
+void ParseOptions(std::string &ruleOptions, CSnortRule &snortRule);
 
 void Rule2RegRule(const CSnortRule &rule, CRegRule &regrule);
 
-ulong Chain2NFA(const CRegChain &regchain, CNfa &nfa, CSignatures &sigs);
+ulong Chain2NFA(const CPcreChain &regchain, CNfa &nfa, CSignatures &sigs);
 
 void CompileRule(LPCSTR rule, RECIEVER recv, LPVOID lpUser);
 

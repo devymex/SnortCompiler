@@ -154,7 +154,7 @@ inline byte HexByte(const char *p2Bytes)
 	return (HexBit(p2Bytes[0]) << 4 | HexBit(p2Bytes[1]));
 }
 
-void ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
+void ParseOptions(std::string &ruleOptions, CSnortRule &snortRule)
 {
 	std::vector<RULEOPTIONRAW> options;
 	SplitOption(ruleOptions, options);
@@ -177,7 +177,8 @@ void ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
 			CPcreOption pcreOpt;
 			try
 			{
-				pcreOpt.FromPattern(opValueBeg._Ptr, opValueEnd._Ptr);
+				STRING strTmp(opValueBeg, opValueEnd);
+				pcreOpt.FromPattern(CDllString(strTmp.c_str()));
 				if (pcreOpt.HasFlags(CRuleOption::HASNOT))
 				{
 					snortRule.AddFlags(CSnortRule::HASNOT);
@@ -204,7 +205,8 @@ void ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
 			CContentOption contOpt;
 			try
 			{
-				contOpt.FromPattern(opValueBeg._Ptr, opValueEnd._Ptr);
+				STRING strTmp(opValueBeg, opValueEnd);
+				contOpt.FromPattern(CDllString(strTmp.c_str()));
 				if (contOpt.HasFlags(CRuleOption::HASNOT))
 				{
 					snortRule.AddFlags(CSnortRule::HASNOT);
@@ -297,8 +299,8 @@ void ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
 void Rule2RegRule(const CSnortRule &rule, CRegRule &regRule)
 {
 	regRule.Reserve(SC_CHAINRESERV);
-	regRule.PushBack(CRegChain());
-	CRegChain *pCurChain = &regRule.Back();
+	regRule.PushBack(CPcreChain());
+	CPcreChain *pCurChain = &regRule.Back();
 	CPcreOption pcreOpt;
 
 	for(ulong i = 0; i < rule.Size(); ++i)
@@ -313,7 +315,7 @@ void Rule2RegRule(const CSnortRule &rule, CRegRule &regRule)
 		}
 		if(!pPcre->HasFlags(CPcreOption::PF_R) && pCurChain->Size() != 0)
 		{
-			regRule.PushBack(CRegChain());
+			regRule.PushBack(CPcreChain());
 			pCurChain = &regRule.Back();
 		}
 		pCurChain->PushBack(*pPcre);
@@ -339,11 +341,11 @@ void Rule2RegRule(const CSnortRule &rule, CRegRule &regRule)
 **	 CRegChainToNFA::
 */
 /**
-**	This function converts a CRegChain to a CNfa
+**	This function converts a CPcreChain to a CNfa
 **
 **	use pcre library to construct a nfa from a pcre
 **	
-**	@param regchain	a CRegChain object which contains a pcre list
+**	@param regchain	a CPcreChain object which contains a pcre list
 **	@param nfa		the transformed CNfa object 
 **
 **	@return integer
@@ -352,16 +354,16 @@ void Rule2RegRule(const CSnortRule &rule, CRegRule &regRule)
 **	@retval <>0 fatal error
 */
 
-ulong Chain2NFA(const CRegChain &regChain, CNfa &nfa, CSignatures &sigs)
+ulong Chain2NFA(const CPcreChain &pcreChain, CNfa &nfa, CSignatures &sigs)
 {
 	nfa.Reserve(SC_NFAROWRESERV);
-	ulong ulFlag = 0;
-	for (ulong i = 0; i < regChain.Size(); ++i)
+	for (ulong i = 0; i < pcreChain.Size(); ++i)
 	{
 		BYTEARY byteAry;
+		const CPcreOption &curOpt = pcreChain[i];
 		try
 		{
-			regChain[i].PcreToCode(byteAry);
+			curOpt.PcreToCode(byteAry);
 		}
 		catch (CTrace &e)
 		{
@@ -369,15 +371,17 @@ ulong Chain2NFA(const CRegChain &regChain, CNfa &nfa, CSignatures &sigs)
 			throw;
 		}
 
-		TASSERT(regChain[i].GetPcreString().Size() > 0);
-		bool bFromBeg = (regChain[i].GetPcreString()[0] == '^');
+		TASSERT(curOpt.GetPcreString().Size() > 0);
+		bool bFromBeg = (curOpt.GetPcreString()[0] == '^');
 
-		ulFlag = PcreToNFA(byteAry, bFromBeg, nfa, sigs);
-
-		if(ulFlag != 0)
+		try
+		{
+			PcreToNFA(byteAry, bFromBeg, nfa, sigs);
+		}
+		catch(CTrace &e)
 		{
 			nfa.Clear();
-			return ulFlag;
+			throw;
 		}
 	}
 	sigs.Unique();

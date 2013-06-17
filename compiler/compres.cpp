@@ -143,8 +143,8 @@ COMPRESHDR ulong CCompileResults::WriteToFile(const char *filename)
 		WriteNum(fout, m_RegexTbl[i].Size());
 		for (ulong j = 0; j < m_RegexTbl[i].Size(); ++j)
 		{
-			CDllString strPat;
-			m_RegexTbl[i][j].GetPattern(strPat);
+			WriteNum(fout, m_RegexTbl[i][j].GetFlags());
+			CDllString &strPat = m_RegexTbl[i][j].GetPcreString();
 			WriteNum(fout, strPat.Size());
 			fout.write(strPat.Data(), strPat.Size());
 		}
@@ -262,14 +262,16 @@ COMPRESHDR ulong CCompileResults::ReadFromFile(const char *filename)
 		fin.read((char*)&ChainSize, 4);
 		for (ulong j = 0; j < ChainSize; ++j)
 		{
+			CRuleOption::OPTIONFLAG nFlags = CRuleOption::NOFLAG;
+
+			fin.read((char*)&nFlags, 4);
 			fin.read((char*)&RegSize, 4);
 			char *pString = new char[RegSize + 1];
 			pString[RegSize] = '\0';
 			fin.read(pString, RegSize);
 			m_RegexTbl[i].PushBack(CPcreOption());
-
-			pcstr pBeg = pString, pEnd = pString + RegSize;
-			m_RegexTbl[i].Back().FromPattern(pBeg, pEnd);
+			m_RegexTbl[i].Back().SetFlags(nFlags);
+			m_RegexTbl[i].Back().SetPcreString(CDllString(pString));
 		}
 		fin.read((char*)&SigSize, 4);
 		for (ulong j = 0; j < SigSize; ++j)

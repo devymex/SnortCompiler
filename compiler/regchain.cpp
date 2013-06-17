@@ -1,7 +1,7 @@
 #include "stdafx.h"
-#include <hwprj\regchain.h>
+#include <hwprj\pcrechain.h>
 
-REGRULEHDR CRegChain::CRegChain()
+SNORTRULEHDR CPcreChain::CPcreChain()
 {
 	try
 	{
@@ -13,7 +13,7 @@ REGRULEHDR CRegChain::CRegChain()
 	}
 }
 
-REGRULEHDR CRegChain::CRegChain(const CRegChain &other)
+SNORTRULEHDR CPcreChain::CPcreChain(const CPcreChain &other)
 	: m_sigs(other.m_sigs)
 {
 	TASSERT(other.m_pPcreVec != null);
@@ -28,12 +28,12 @@ REGRULEHDR CRegChain::CRegChain(const CRegChain &other)
 	this->m_sigs = other.m_sigs;
 }
 
-REGRULEHDR CRegChain::~CRegChain()
+SNORTRULEHDR CPcreChain::~CPcreChain()
 {
 	delete m_pPcreVec;
 }
 
-REGRULEHDR CRegChain& CRegChain::operator = (const CRegChain &other)
+SNORTRULEHDR CPcreChain& CPcreChain::operator = (const CPcreChain &other)
 {
 	TASSERT(other.m_pPcreVec != null);
 	try
@@ -49,33 +49,33 @@ REGRULEHDR CRegChain& CRegChain::operator = (const CRegChain &other)
 	return *this;
 }
 
-REGRULEHDR CPcreOption& CRegChain::operator[](ulong nIdx)
+SNORTRULEHDR CPcreOption& CPcreChain::operator[](ulong nIdx)
 {
 	return (*m_pPcreVec)[nIdx];
 }
 
-REGRULEHDR const CPcreOption& CRegChain::operator[](ulong nIdx) const
+SNORTRULEHDR const CPcreOption& CPcreChain::operator[](ulong nIdx) const
 {
 	return (*m_pPcreVec)[nIdx];
 }
 
-REGRULEHDR ulong CRegChain::Size() const
+SNORTRULEHDR ulong CPcreChain::Size() const
 {
 	return m_pPcreVec->size();
 }
 
-REGRULEHDR void CRegChain::Clear()
+SNORTRULEHDR void CPcreChain::Clear()
 {
 	m_pPcreVec->clear();
 	m_sigs.Clear();
 }
 
-REGRULEHDR CPcreOption& CRegChain::Back() const
+SNORTRULEHDR CPcreOption& CPcreChain::Back() const
 {
 	return m_pPcreVec->back();
 }
 
-REGRULEHDR void CRegChain::PushBack(const CPcreOption &pcreStr)
+SNORTRULEHDR void CPcreChain::PushBack(const CPcreOption &pcreStr)
 {
 	try
 	{
@@ -87,7 +87,7 @@ REGRULEHDR void CRegChain::PushBack(const CPcreOption &pcreStr)
 	}
 }
 
-REGRULEHDR void CRegChain::Resize(ulong nSize)
+SNORTRULEHDR void CPcreChain::Resize(ulong nSize)
 {
 	try
 	{
@@ -99,12 +99,12 @@ REGRULEHDR void CRegChain::Resize(ulong nSize)
 	}
 }
 
-REGRULEHDR CSignatures& CRegChain::GetSigs()
+SNORTRULEHDR CSignatures& CPcreChain::GetSigs()
 {
 	return m_sigs;
 }
 
-REGRULEHDR const CSignatures& CRegChain::GetSigs() const
+SNORTRULEHDR const CSignatures& CPcreChain::GetSigs() const
 {
 	return m_sigs;
 }

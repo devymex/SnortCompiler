@@ -42,7 +42,7 @@ COMPILERHDR void ParseRuleFile(const char *pFileName, RECIEVER recv, void *lpUse
 				CSnortRule snortRule;
 				try
 				{
-					ProcessOption(*i, snortRule);
+					ParseOptions(*i, snortRule);
 				}
 				catch (CTrace &e)
 				{

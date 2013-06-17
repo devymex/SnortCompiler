@@ -46,8 +46,8 @@ TRACEHDR extern pcstr TI_UNSUPPORT;
 
 
 #ifdef _DEBUG
-#define TASSERT(s)	if (!(s)) TTHROW("!("#s")");
-#define TVERIFY(s)	if (!(s)) TTHROW("!("#s")");
+#define TASSERT(s)	if (!(s)) {TTHROW("!("#s")");}
+#define TVERIFY(s)	if (!(s)) {TTHROW("!("#s")");}
 #else
 #define TASSERT(s)	;
 #define TVERIFY(s)	(s);

@@ -50,10 +50,11 @@ public:
 	virtual ~CPcreOption();
 
 	CPcreOption&			operator = (const CPcreOption &other);
-	virtual void			FromPattern(pcstr &pBeg, pcstr &pEnd);
+	virtual void			FromPattern(const CDllString &strPat);
 	virtual CRuleOption*	Clone() const;
 	void					PcreToCode(BYTEARY &code) const;
 
+	void					SetPcreString(const CDllString& strPcre);
 	CDllString&				GetPcreString();
 	const CDllString&		GetPcreString() const;
 

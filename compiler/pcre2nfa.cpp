@@ -459,14 +459,14 @@ ulong PcreToCode(const std::string &OnePcre, BYTEARY &code)
 }
 
 //把单个pcre转化为NFA
-ulong PcreToNFA(BYTEARY &code, bool bFromBeg, CNfa &nfa, CSignatures &sigs)
+void PcreToNFA(BYTEARY &code, bool bFromBeg, CNfa &nfa, CSignatures &sigs)
 {
 	BYTEARY_ITER Beg, End;
 	Beg = code.begin();
 	End = code.end();
 	if (!CanProcess(Beg, End))
 	{
-		return ulong(SC_ERROR);
+		TTHROW(TI_UNSUPPORT);
 	}
 	Beg = code.begin();
 	End = code.end();
@@ -511,7 +511,6 @@ ulong PcreToNFA(BYTEARY &code, bool bFromBeg, CNfa &nfa, CSignatures &sigs)
 		}
 		row[EMPTY].PushBack(nCurSize + 1);
 	}
-	ulong nr = ProcessPcre(Beg, End, nfa);
-	return nr;
+	ProcessPcre(Beg, End, nfa);
 }
 
