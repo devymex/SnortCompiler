@@ -183,7 +183,7 @@ void ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
 				if (pcreOpt.HasFlags(CRuleOption::HASNOT))
 				{
 					nFlags |= CSnortRule::HASNOT;
-					break;
+					//break;
 				}
 			}
 			catch (std::exception &e)
@@ -211,7 +211,7 @@ void ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
 				if (contOpt.HasFlags(CRuleOption::HASNOT))
 				{
 					nFlags |= CSnortRule::HASNOT;
-					break;
+					//break;
 				}
 			}
 			catch (std::exception &e)
