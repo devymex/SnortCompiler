@@ -97,6 +97,11 @@ SNORTRULEHDR ulong CSnortRule::GetSid() const
 	return m_nSid;
 }
 
+SNORTRULEHDR void CSnortRule::AddFlags(PARSE_INFO nFlags)
+{
+	m_nFlags |= nFlags;
+}
+
 SNORTRULEHDR void CSnortRule::SetFlags(PARSE_INFO flag)
 {
 	m_nFlags = flag;
@@ -105,6 +110,11 @@ SNORTRULEHDR void CSnortRule::SetFlags(PARSE_INFO flag)
 SNORTRULEHDR CSnortRule::PARSE_INFO CSnortRule::GetFlags() const
 {
 	return m_nFlags;
+}
+
+SNORTRULEHDR bool CSnortRule::HasFlags(PARSE_INFO nFlags) const
+{
+	return (m_nFlags & nFlags) != 0;
 }
 
 SNORTRULEHDR void CSnortRule::PushBack(CRuleOption* pRuleOpt)

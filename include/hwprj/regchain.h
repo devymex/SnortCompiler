@@ -11,11 +11,11 @@
 
 #pragma once
 
-#include <hwprj\dllstring.h>
 #include <hwprj\signatures.h>
+#include <hwprj\pcreopt.h>
 
 #ifndef REGRULEHDR_DS
-class STRINGVEC;
+class PCREVEC;
 #define REGRULEHDR __declspec(dllimport)
 #else
 #define REGRULEHDR __declspec(dllexport)
@@ -28,19 +28,20 @@ public:
 	CRegChain(const CRegChain &other);
 	virtual ~CRegChain();
 
-	CRegChain& operator = (const CRegChain &other);
-	CDllString& operator[](ulong nIdx);
-	const CDllString& operator[](ulong nIdx) const;
+	CRegChain&			operator = (const CRegChain &other);
+	CPcreOption&		operator[](ulong nIdx);
+	const CPcreOption&	operator[](ulong nIdx) const;
 
-	ulong Size() const;
-	CDllString& Back() const;
-	void PushBack(const CDllString &pcreStr);
-	void Resize(ulong nSize);
+	ulong				Size() const;
+	void				Clear();
+	CPcreOption&		Back() const;
+	void				PushBack(const CPcreOption &pcreOpt);
+	void				Resize(ulong nSize);
 
-	CSignatures& GetSigs();
-	const CSignatures& GetSigs() const;
+	CSignatures&		GetSigs();
+	const CSignatures&	GetSigs() const;
 
 protected:
-	STRINGVEC *m_pRegList;
-	CSignatures m_sigs;
+	PCREVEC*			m_pPcreVec;
+	CSignatures			m_sigs;
 };

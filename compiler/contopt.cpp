@@ -160,7 +160,7 @@ CRuleOption* CContentOption::Clone() const
 **	@retval  0 function successful
 **	@retval -1 fatal error
 */
-void CContentOption::ToPcre(CDllString &strPcre) const
+void CContentOption::ToPcre(CPcreOption &pcreOpt) const
 {
 	int nMinSkip = 0, nMaxSkip = -1;
 
@@ -264,7 +264,15 @@ void CContentOption::ToPcre(CDllString &strPcre) const
 		ssPcre << "/s";
 	}
 
-	strPcre.Assign(ssPcre.str().c_str());
+	if (HasFlags(DISTANCE | WITHIN))
+	{
+		ssPcre << 'R';
+	}
+
+	STRING strPcre = ssPcre.str();
+	pcstr pBeg = strPcre.begin()._Ptr;
+	pcstr pEnd = strPcre.end()._Ptr;
+	pcreOpt.FromPattern(pBeg, pEnd);
 }
 
 void CContentOption::ExtractSignatures(CSignatures &sigs) const

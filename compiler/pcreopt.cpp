@@ -1,30 +1,34 @@
 #include "stdafx.h"
-#include "pcreopt.h"
 #include "comprule.h"
+#include "pcre\pcre.h"
+#include "p2nmain.h"
 
-CPcreOption::CPcreOption()
+#include <hwprj/pcreopt.h>
+
+SNORTRULEHDR CPcreOption::CPcreOption()
 {
 }
 
-CPcreOption::CPcreOption(const CPcreOption &other)
+SNORTRULEHDR CPcreOption::CPcreOption(const CPcreOption &other)
 	: CRuleOption(other)
 {
 }
 
-CPcreOption::~CPcreOption()
+SNORTRULEHDR CPcreOption::~CPcreOption()
 {
 }
 
-CPcreOption& CPcreOption::operator = (const CPcreOption &other)
+SNORTRULEHDR CPcreOption& CPcreOption::operator = (const CPcreOption &other)
 {
 	other;
 
 	return *this;
 }
 
-void CPcreOption::FromPattern(pcstr &pBeg, pcstr &pEnd)
+SNORTRULEHDR void CPcreOption::FromPattern(pcstr &pBeg, pcstr &pEnd)
 {
 	CRuleOption::FromPattern(pBeg, pEnd);
+
 	if (HasFlags(CRuleOption::HASNOT))
 	{
 		return;
@@ -38,6 +42,8 @@ void CPcreOption::FromPattern(pcstr &pBeg, pcstr &pEnd)
 	{
 		TTHROW(TI_INVALIDDATA);
 	}
+
+	m_strPcre.Assign(STRING(pPcreBeg, pPcreEnd).c_str());
 
 	STRING strTmp = STRING(pPcreEnd + 1, pEnd);
 
@@ -111,7 +117,7 @@ void CPcreOption::FromPattern(pcstr &pBeg, pcstr &pEnd)
 	}
 }
 
-CRuleOption* CPcreOption::Clone() const
+SNORTRULEHDR CRuleOption* CPcreOption::Clone() const
 {
 	CPcreOption *pNew = null;
 	try
@@ -123,4 +129,48 @@ CRuleOption* CPcreOption::Clone() const
 		throw CTrace(__FILE__, __LINE__, e.what());
 	}
 	return pNew;
+}
+
+SNORTRULEHDR void CPcreOption::PcreToCode(BYTEARY &code) const
+{
+	int options = 0;
+	if (HasFlags(PF_s))
+	{
+		options |= PCRE_DOTALL;
+	}
+	if (HasFlags(PF_m))
+	{
+		options |= PCRE_MULTILINE;
+	}
+	if (HasFlags(PF_i))
+	{
+		options |= PCRE_CASELESS;
+	}
+
+	const char *error;
+	int erroffset;
+	pcre *re = pcre_compile(m_strPcre.Data(), options, &error, &erroffset, null);
+	if (re == null)
+	{
+		TTHROW(TI_INVALIDDATA);
+	}
+
+	unsigned int size;
+	unsigned short name_table_offset;
+	size = *((unsigned int*)re + 1);
+	name_table_offset = *((unsigned short*)re + 12);
+	for (ulong i = 0; i < size - name_table_offset; ++i)
+	{
+		code.push_back((byte)*((byte*)re + name_table_offset + i));
+	}
+}
+
+SNORTRULEHDR CDllString& CPcreOption::GetPcreString()
+{
+	return m_strPcre;
+}
+
+SNORTRULEHDR const CDllString& CPcreOption::GetPcreString() const
+{
+	return m_strPcre;
 }

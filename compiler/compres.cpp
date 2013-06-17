@@ -143,9 +143,10 @@ COMPRESHDR ulong CCompileResults::WriteToFile(const char *filename)
 		WriteNum(fout, m_RegexTbl[i].Size());
 		for (ulong j = 0; j < m_RegexTbl[i].Size(); ++j)
 		{
-			WriteNum(fout, m_RegexTbl[i][j].Size());
-			const char *pString = m_RegexTbl[i][j].GetStr();
-			fout.write(pString, strlen(pString));
+			CDllString strPat;
+			m_RegexTbl[i][j].GetPattern(strPat);
+			WriteNum(fout, strPat.Size());
+			fout.write(strPat.Data(), strPat.Size());
 		}
 		WriteNum(fout, m_RegexTbl[i].GetSigs().Size());
 		for (ulong j = 0; j < m_RegexTbl[i].GetSigs().Size(); ++j)
@@ -265,7 +266,10 @@ COMPRESHDR ulong CCompileResults::ReadFromFile(const char *filename)
 			char *pString = new char[RegSize + 1];
 			pString[RegSize] = '\0';
 			fin.read(pString, RegSize);
-			m_RegexTbl[i].PushBack(CDllString(pString));
+			m_RegexTbl[i].PushBack(CPcreOption());
+
+			pcstr pBeg = pString, pEnd = pString + RegSize;
+			m_RegexTbl[i].Back().FromPattern(pBeg, pEnd);
 		}
 		fin.read((char*)&SigSize, 4);
 		for (ulong j = 0; j < SigSize; ++j)

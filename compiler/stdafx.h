@@ -55,5 +55,7 @@ typedef std::vector<class CRuleOption*>		OPTIONVEC;
 
 typedef std::vector<class CRegChain>		CHAINVEC;
 
+typedef std::vector<class CPcreOption>		PCREVEC;
+
 typedef std::vector<SIGNATURE>              SIGNATUREVEC;
 typedef SIGNATUREVEC::iterator              SIGVEC_ITER;

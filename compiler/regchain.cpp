@@ -5,7 +5,7 @@ REGRULEHDR CRegChain::CRegChain()
 {
 	try
 	{
-		m_pRegList = new STRINGVEC;
+		m_pPcreVec = new PCREVEC;
 	}
 	catch (std::exception &e)
 	{
@@ -14,11 +14,12 @@ REGRULEHDR CRegChain::CRegChain()
 }
 
 REGRULEHDR CRegChain::CRegChain(const CRegChain &other)
+	: m_sigs(other.m_sigs)
 {
-	TASSERT(other.m_pRegList != null);
+	TASSERT(other.m_pPcreVec != null);
 	try
 	{
-		m_pRegList = new STRINGVEC(*other.m_pRegList);
+		m_pPcreVec = new PCREVEC(*other.m_pPcreVec);
 	}
 	catch (std::exception &e)
 	{
@@ -28,15 +29,15 @@ REGRULEHDR CRegChain::CRegChain(const CRegChain &other)
 
 REGRULEHDR CRegChain::~CRegChain()
 {
-	delete m_pRegList;
+	delete m_pPcreVec;
 }
 
 REGRULEHDR CRegChain& CRegChain::operator = (const CRegChain &other)
 {
-	TASSERT(other.m_pRegList != null);
+	TASSERT(other.m_pPcreVec != null);
 	try
 	{
-		*this->m_pRegList = *other.m_pRegList;
+		*this->m_pPcreVec = *other.m_pPcreVec;
 	}
 	catch (std::exception &e)
 	{
@@ -47,31 +48,37 @@ REGRULEHDR CRegChain& CRegChain::operator = (const CRegChain &other)
 	return *this;
 }
 
-REGRULEHDR CDllString& CRegChain::operator[](ulong nIdx)
+REGRULEHDR CPcreOption& CRegChain::operator[](ulong nIdx)
 {
-	return (*m_pRegList)[nIdx];
+	return (*m_pPcreVec)[nIdx];
 }
 
-REGRULEHDR const CDllString& CRegChain::operator[](ulong nIdx) const
+REGRULEHDR const CPcreOption& CRegChain::operator[](ulong nIdx) const
 {
-	return (*m_pRegList)[nIdx];
+	return (*m_pPcreVec)[nIdx];
 }
 
 REGRULEHDR ulong CRegChain::Size() const
 {
-	return m_pRegList->size();
+	return m_pPcreVec->size();
 }
 
-REGRULEHDR CDllString& CRegChain::Back() const
+REGRULEHDR void CRegChain::Clear()
 {
-	return m_pRegList->back();
+	m_pPcreVec->clear();
+	m_sigs.Clear();
 }
 
-REGRULEHDR void CRegChain::PushBack(const CDllString &pcreStr)
+REGRULEHDR CPcreOption& CRegChain::Back() const
+{
+	return m_pPcreVec->back();
+}
+
+REGRULEHDR void CRegChain::PushBack(const CPcreOption &pcreStr)
 {
 	try
 	{
-		m_pRegList->push_back(pcreStr);
+		m_pPcreVec->push_back(pcreStr);
 	}
 	catch (std::exception &e)
 	{
@@ -83,7 +90,7 @@ REGRULEHDR void CRegChain::Resize(ulong nSize)
 {
 	try
 	{
-		m_pRegList->resize(nSize);
+		m_pPcreVec->resize(nSize);
 	}
 	catch (std::exception &e)
 	{

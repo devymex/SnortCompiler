@@ -80,7 +80,7 @@
     <ClInclude Include="contopt.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="pcreopt.h">
+    <ClInclude Include="..\include\hwprj\pcreopt.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

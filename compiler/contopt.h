@@ -15,6 +15,7 @@
 #include <hwprj\common.h>
 #include <hwprj\ruleoption.h>
 #include <hwprj\signatures.h>
+#include <hwprj\pcreopt.h>
 
 class CContentOption : public CRuleOption
 {
@@ -33,7 +34,7 @@ public:
 	CContentOption&			operator = (const CContentOption &other);
 
 	void					ExtractSignatures(CSignatures &sigs) const;
-	void					ToPcre(CDllString &pcre) const;
+	void					ToPcre(CPcreOption &pcreOpt) const;
 
 	virtual void			FromPattern(pcstr &pBeg, pcstr &pEnd);
 	virtual CRuleOption*	Clone() const;
