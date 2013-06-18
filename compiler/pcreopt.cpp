@@ -201,6 +201,10 @@ SNORTRULEHDR void CPcreOption::PreComp(BYTEARY &compData) const
 	{
 		options |= PCRE_CASELESS;
 	}
+	if (HasFlags(PF_x))
+	{
+		options |= PCRE_EXTENDED;
+	}
 
 	const char *error;
 	int erroffset;
