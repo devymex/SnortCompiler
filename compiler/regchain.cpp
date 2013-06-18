@@ -1,11 +1,11 @@
 #include "stdafx.h"
-#include <hwprj\regchain.h>
+#include <hwprj\pcrechain.h>
 
-REGRULEHDR CRegChain::CRegChain()
+SNORTRULEHDR CPcreChain::CPcreChain()
 {
 	try
 	{
-		m_pRegList = new STRINGVEC;
+		m_pPcreVec = new PCREVEC;
 	}
 	catch (std::exception &e)
 	{
@@ -13,12 +13,13 @@ REGRULEHDR CRegChain::CRegChain()
 	}
 }
 
-REGRULEHDR CRegChain::CRegChain(const CRegChain &other)
+SNORTRULEHDR CPcreChain::CPcreChain(const CPcreChain &other)
+	: m_sigs(other.m_sigs)
 {
-	TASSERT(other.m_pRegList != null);
+	TASSERT(other.m_pPcreVec != null);
 	try
 	{
-		m_pRegList = new STRINGVEC(*other.m_pRegList);
+		m_pPcreVec = new PCREVEC(*other.m_pPcreVec);
 	}
 	catch (std::exception &e)
 	{
@@ -27,17 +28,17 @@ REGRULEHDR CRegChain::CRegChain(const CRegChain &other)
 	this->m_sigs = other.m_sigs;
 }
 
-REGRULEHDR CRegChain::~CRegChain()
+SNORTRULEHDR CPcreChain::~CPcreChain()
 {
-	delete m_pRegList;
+	delete m_pPcreVec;
 }
 
-REGRULEHDR CRegChain& CRegChain::operator = (const CRegChain &other)
+SNORTRULEHDR CPcreChain& CPcreChain::operator = (const CPcreChain &other)
 {
-	TASSERT(other.m_pRegList != null);
+	TASSERT(other.m_pPcreVec != null);
 	try
 	{
-		*this->m_pRegList = *other.m_pRegList;
+		*this->m_pPcreVec = *other.m_pPcreVec;
 	}
 	catch (std::exception &e)
 	{
@@ -48,31 +49,37 @@ REGRULEHDR CRegChain& CRegChain::operator = (const CRegChain &other)
 	return *this;
 }
 
-REGRULEHDR CDllString& CRegChain::operator[](ulong nIdx)
+SNORTRULEHDR CPcreOption& CPcreChain::operator[](ulong nIdx)
 {
-	return (*m_pRegList)[nIdx];
+	return (*m_pPcreVec)[nIdx];
 }
 
-REGRULEHDR const CDllString& CRegChain::operator[](ulong nIdx) const
+SNORTRULEHDR const CPcreOption& CPcreChain::operator[](ulong nIdx) const
 {
-	return (*m_pRegList)[nIdx];
+	return (*m_pPcreVec)[nIdx];
 }
 
-REGRULEHDR ulong CRegChain::Size() const
+SNORTRULEHDR ulong CPcreChain::Size() const
 {
-	return m_pRegList->size();
+	return m_pPcreVec->size();
 }
 
-REGRULEHDR CDllString& CRegChain::Back() const
+SNORTRULEHDR void CPcreChain::Clear()
 {
-	return m_pRegList->back();
+	m_pPcreVec->clear();
+	m_sigs.Clear();
 }
 
-REGRULEHDR void CRegChain::PushBack(const CDllString &pcreStr)
+SNORTRULEHDR CPcreOption& CPcreChain::Back() const
+{
+	return m_pPcreVec->back();
+}
+
+SNORTRULEHDR void CPcreChain::PushBack(const CPcreOption &pcreStr)
 {
 	try
 	{
-		m_pRegList->push_back(pcreStr);
+		m_pPcreVec->push_back(pcreStr);
 	}
 	catch (std::exception &e)
 	{
@@ -80,11 +87,11 @@ REGRULEHDR void CRegChain::PushBack(const CDllString &pcreStr)
 	}
 }
 
-REGRULEHDR void CRegChain::Resize(ulong nSize)
+SNORTRULEHDR void CPcreChain::Resize(ulong nSize)
 {
 	try
 	{
-		m_pRegList->resize(nSize);
+		m_pPcreVec->resize(nSize);
 	}
 	catch (std::exception &e)
 	{
@@ -92,12 +99,12 @@ REGRULEHDR void CRegChain::Resize(ulong nSize)
 	}
 }
 
-REGRULEHDR CSignatures& CRegChain::GetSigs()
+SNORTRULEHDR CSignatures& CPcreChain::GetSigs()
 {
 	return m_sigs;
 }
 
-REGRULEHDR const CSignatures& CRegChain::GetSigs() const
+SNORTRULEHDR const CSignatures& CPcreChain::GetSigs() const
 {
 	return m_sigs;
 }

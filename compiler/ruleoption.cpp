@@ -5,46 +5,20 @@
 SNORTRULEHDR CRuleOption::CRuleOption()
 	: m_nFlags(NOFLAG)
 {
-	try
-	{
-		m_pPat = new std::string;
-	}
-	catch (std::exception &e)
-	{
-		TTHROW(e.what());
-	}
 }
 
 SNORTRULEHDR CRuleOption::CRuleOption(const CRuleOption &other)
 	: m_nFlags(other.m_nFlags)
 {
-	TASSERT(other.m_pPat != null);
-	try
-	{
-		m_pPat = new std::string(*other.m_pPat);
-	}
-	catch (std::exception &e)
-	{
-		TTHROW(e.what());
-	}
 }
 
 SNORTRULEHDR CRuleOption::~CRuleOption()
 {
-	delete m_pPat;
 }
 
 SNORTRULEHDR CRuleOption& CRuleOption::operator = (const CRuleOption &other)
 {
-	TASSERT(other.m_pPat != null);
-	try
-	{
-		*m_pPat = *other.m_pPat;
-	}
-	catch (std::exception &e)
-	{
-		TTHROW(e.what());
-	}
+	m_nFlags = other.m_nFlags;
 	return *this;
 }
 
@@ -68,38 +42,15 @@ SNORTRULEHDR bool CRuleOption::HasFlags(OPTIONFLAG nFlags) const
 	return ((m_nFlags & nFlags) != 0);
 }
 
-SNORTRULEHDR void CRuleOption::GetPattern(CDllString &out) const
+SNORTRULEHDR void CRuleOption::FormatPattern(CDllString &out)
 {
-	out.Assign(m_pPat->c_str());
-}
-
-SNORTRULEHDR void CRuleOption::FromPattern(pcstr &pBeg, pcstr &pEnd)
-{
-	try
-	{
-		m_pPat->assign(pBeg, pEnd);
-	}
-	catch (std::exception &e)
-	{
-		TTHROW(e.what());
-	}
-	if (*std::find_if_not(pBeg, pEnd, ISSPACE()) == '!')
+	m_nFlags = CRuleOption::NOFLAG;
+	STRING str = out.Data();
+	STRING_ITER iBeg = str.begin(), iEnd = str.end();
+	if (*std::find_if_not(iBeg, iEnd, ISSPACE()) == '!')
 	{
 		m_nFlags |= CRuleOption::HASNOT;
 	}
-	QuotedContext(pBeg, pEnd);
-}
-
-SNORTRULEHDR CRuleOption* CRuleOption::Clone() const
-{
-	CRuleOption *pNew = null;
-	try
-	{
-		pNew = new CRuleOption(*this);
-	}
-	catch (std::exception &e)
-	{
-		TTHROW(e.what());
-	}
-	return pNew;
+	QuotedContext(iBeg, iEnd);
+	out.Assign(STRING(iBeg, iEnd).c_str());
 }

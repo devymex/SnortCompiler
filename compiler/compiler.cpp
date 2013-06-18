@@ -42,7 +42,7 @@ COMPILERHDR void ParseRuleFile(const char *pFileName, RECIEVER recv, void *lpUse
 				CSnortRule snortRule;
 				try
 				{
-					ProcessOption(*i, snortRule);
+					ParseOptions(*i, snortRule);
 				}
 				catch (CTrace &e)
 				{
@@ -55,19 +55,23 @@ COMPILERHDR void ParseRuleFile(const char *pFileName, RECIEVER recv, void *lpUse
 				try
 				{
 					Rule2RegRule(snortRule, pr.regRule);
-					if (snortRule.GetFlags() & CSnortRule::HASBYTE)
-					{
-						pr.ulFlag |= PARSEFLAG::PARSE_HASBYTE;
-					}
-					if (snortRule.GetFlags() & CSnortRule::HASNOT)
-					{
-						pr.ulFlag |= PARSEFLAG::PARSE_HASNOT;
-					}
 				}
 				catch (CTrace &e)
 				{
 					pr.ulFlag |= PARSEFLAG::PARSE_ERROR;
 					std::cout << "Rule2RegRule error: " << e.What() << std::endl;
+				}
+				if (snortRule.GetFlags() & CSnortRule::HASBYTE)
+				{
+					pr.ulFlag |= PARSEFLAG::PARSE_HASBYTE;
+				}
+				if (snortRule.GetFlags() & CSnortRule::HASNOT)
+				{
+					pr.ulFlag |= PARSEFLAG::PARSE_HASNOT;
+				}
+				if (snortRule.Size() == 0)
+				{
+					pr.ulFlag |= PARSEFLAG::PARSE_EMPTY;
 				}
 				recv(pr, lpUser);
 			}

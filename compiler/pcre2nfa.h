@@ -13,4 +13,4 @@
 
 void GetSignature(BYTEARY &code, std::vector<BYTEARY> &strs);
 
-ulong PcreToNFA(const char *pPcre, CNfa &nfa, CSignatures &sigs);
+void PcreToNFA(BYTEARY &code, bool bFromBeg, CNfa &nfa, CSignatures &sigs);
