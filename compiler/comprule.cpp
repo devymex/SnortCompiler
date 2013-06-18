@@ -336,58 +336,6 @@ void Rule2RegRule(const CSnortRule &rule, CRegRule &regRule)
 }
 
 
-/*
-**	NAME
-**	 CRegChainToNFA::
-*/
-/**
-**	This function converts a CPcreChain to a CNfa
-**
-**	use pcre library to construct a nfa from a pcre
-**	
-**	@param regchain	a CPcreChain object which contains a pcre list
-**	@param nfa		the transformed CNfa object 
-**
-**	@return integer
-**
-**	@retval  0 function successful
-**	@retval <>0 fatal error
-*/
-
-ulong Chain2NFA(const CPcreChain &pcreChain, CNfa &nfa, CSignatures &sigs)
-{
-	nfa.Reserve(SC_NFAROWRESERV);
-	for (ulong i = 0; i < pcreChain.Size(); ++i)
-	{
-		BYTEARY byteAry;
-		const CPcreOption &curOpt = pcreChain[i];
-		try
-		{
-			curOpt.PcreToCode(byteAry);
-		}
-		catch (CTrace &e)
-		{
-			nfa.Clear();
-			throw;
-		}
-
-		TASSERT(curOpt.GetPcreString().Size() > 0);
-		bool bFromBeg = (curOpt.GetPcreString()[0] == '^');
-
-		try
-		{
-			PcreToNFA(byteAry, bFromBeg, nfa, sigs);
-		}
-		catch(CTrace &e)
-		{
-			nfa.Clear();
-			throw;
-		}
-	}
-	sigs.Unique();
-	return 0;
-}
-
 /* assign all the signatures of each rule to all its option list
 
 Arguments:
@@ -425,6 +373,91 @@ void AssignSig(CCompileResults &result, ulong BegIdx, ulong EndIdx)
 	}
 }
 
+struct INCLUDESEQUENCE
+{
+	const BYTEARY *m_pSeq;
+	INCLUDESEQUENCE(const BYTEARY &seq) : m_pSeq(&seq){}
+	bool operator() (const BYTEARY &seq)
+	{
+		return (seq.end() != std::search(seq.begin(), seq.end(),
+			m_pSeq->begin(), m_pSeq->end()));
+	}
+};
+
+void ExtractSignatures(const std::vector<BYTEARY> &seqAry, CSignatures &sigs)
+{
+	SIGNATURE nCurSig;
+	for (ulong i = 0; i < seqAry.size(); ++i)
+	{
+		const BYTEARY &curSeq = seqAry[i];
+		ulong ulLen = curSeq.size() - 3;
+		for (ulong j = 0; j < ulLen; ++j)
+		{
+			for (ulong k = 0; k < 4; ++k)
+			{
+				((byte*)&nCurSig)[k] = byte(tolower(seqAry[i][j + k]));
+			}
+			sigs.PushBack(nCurSig);
+		}
+	}
+}
+
+void PreCompileRule(CRegRule &regRule, std::vector<std::vector<BYTEARY>> &result)
+{
+	std::vector<std::vector<BYTEARY>> ruleSeq;
+
+	for (ulong i = 0; i < regRule.Size(); ++i)
+	{
+		ruleSeq.push_back(std::vector<BYTEARY>());
+		result.push_back(std::vector<BYTEARY>());
+
+		std::vector<BYTEARY> &chainSeq		= ruleSeq.back();
+		std::vector<BYTEARY> &chainCompData	= result.back();
+
+		CPcreChain &curPcreChain = regRule[i];
+
+		for (ulong j = 0; j < curPcreChain.Size(); ++j)
+		{
+			chainCompData.push_back(BYTEARY());
+			curPcreChain[j].PreComp(chainCompData.back());
+
+			ExtractSequence(chainCompData.back(), chainSeq);
+		}
+	}
+
+	for (ulong i = 0; i < regRule.Size(); ++i)
+	{
+		CPcreChain &curPcreChain = regRule[i];
+		std::vector<BYTEARY> &chainSeq = ruleSeq[i];
+
+		bool bChainErased = false;
+		if (curPcreChain.Size() == 1 && curPcreChain[0].HasFlags(CPcreOption::PF_F)
+			&& curPcreChain[0].GetPcreString().Size() == chainSeq[0].size())
+		{
+			BYTEARY &curChainSeq = chainSeq[0];
+			for (ulong j = 0; j < regRule.Size(); ++j)
+			{
+				if (i != j)
+				{
+					if (std::find_if(ruleSeq[j].begin(), ruleSeq[j].end(),
+						INCLUDESEQUENCE(curChainSeq)) != ruleSeq[j].end())
+					{
+						regRule.Erase(i);
+						result.erase(result.begin() + i);
+						ruleSeq.erase(ruleSeq.begin() + i);
+						bChainErased = true;
+						break;
+					}
+				}
+			}
+		}
+		if (!bChainErased)
+		{
+			ExtractSignatures(ruleSeq[i], regRule[i].GetSigs());
+		}
+	}
+}
+
 /* complie one rule to several dfas
 
 Arguments:
@@ -437,34 +470,47 @@ Returns:		nothing
 */
 void Rule2Dfas(const CRegRule &rule, CCompileResults &result)
 {
-	CTimer ctime;//for test
-
 	CRegRule regRule = rule;
+
+	std::vector<std::vector<BYTEARY>> preCompData;
+	PreCompileRule(regRule, preCompData);
+
 	COMPILEDINFO &ruleResult = result.GetSidDfaIds().Back();
 
 	const ulong nOldDfaSize = result.GetDfaTable().Size();
 
-	const ulong nCurRuleSize = rule.Size();
+	const ulong nCurRuleSize = regRule.Size();
 	result.GetDfaTable().Resize(nOldDfaSize + nCurRuleSize);
 
 	const ulong nOldRegexSize = result.GetRegexTbl().Size();
 	result.GetRegexTbl().Resize(nOldRegexSize + nCurRuleSize);
 
+
 	bool bHasSigs = false;
 	CNfa nfa;
+	nfa.Reserve(SC_NFAROWRESERV);
 	for (ulong i = 0; i < nCurRuleSize; ++i)
 	{
-		try
+		CPcreChain &curPcreChain = regRule[i];
+
+		nfa.Clear();
+		for (ulong j = 0; j < curPcreChain.Size(); ++j)
 		{
-			nfa.Clear();
-			Chain2NFA(regRule[i], nfa, regRule[i].GetSigs());
+			const CPcreOption &curOpt = curPcreChain[j];
+			TASSERT(curOpt.GetPcreString().Size() > 0);
+
+			try
+			{
+				bool bFromBeg = curOpt.GetPcreString()[0] == '^';
+				PcreToNFA(preCompData[i][j], bFromBeg, nfa);
+			}
+			catch (CTrace &e)
+			{
+				ruleResult.m_nResult |= COMPILEDINFO::RES_PCREERROR;
+				nfa.Clear();
+				throw;
+			}
 		}
-		catch (CTrace &e)
-		{
-			ruleResult.m_nResult |= COMPILEDINFO::RES_PCREERROR;
-			break;
-		}
-		pcre2nfatime += ctime.Reset();//for test
 
 		if (regRule[i].GetSigs().Size() > 0)
 		{
@@ -476,10 +522,8 @@ void Rule2Dfas(const CRegRule &rule, CCompileResults &result)
 
 		CDfa &dfa = result.GetDfaTable()[nDfaId];
 
-		ctime.Reset();//for test
 		dfa.SetId(nDfaId);
 		ulong nToDFAFlag = dfa.FromNFA(nfa);
-		nfa2dfatime += ctime.Reset();//for test
 
 		if (nToDFAFlag == -1)
 		{
@@ -488,11 +532,9 @@ void Rule2Dfas(const CRegRule &rule, CCompileResults &result)
 			break;
 		}
 
-		ctime.Reset();//for test
 		TASSERT(dfa.GetFinalStates().Size() != 0);
 
 		ulong nr = dfa.Minimize();
-		dfamintimetime += ctime.Reset();//for test
 		if (0 != nr || dfa.Size() > SC_MAXDFASIZE)
 		{
 			ruleResult.m_nResult |= COMPILEDINFO::RES_EXCEEDLIMIT;

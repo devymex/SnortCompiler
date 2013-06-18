@@ -36,15 +36,18 @@ SNORTRULEHDR CPcreChain::~CPcreChain()
 SNORTRULEHDR CPcreChain& CPcreChain::operator = (const CPcreChain &other)
 {
 	TASSERT(other.m_pPcreVec != null);
-	try
+	if (this != &other)
 	{
-		*this->m_pPcreVec = *other.m_pPcreVec;
+		try
+		{
+			*this->m_pPcreVec = *other.m_pPcreVec;
+		}
+		catch (std::exception &e)
+		{
+			TTHROW(e.what());
+		}
+		this->m_sigs = other.m_sigs;
 	}
-	catch (std::exception &e)
-	{
-		TTHROW(e.what());
-	}
-	this->m_sigs = other.m_sigs;
 
 	return *this;
 }

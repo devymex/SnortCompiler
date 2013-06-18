@@ -36,13 +36,16 @@ DFAIDSETHDR CDfaIdSet::~CDfaIdSet()
 
 DFAIDSETHDR CDfaIdSet& CDfaIdSet::operator = (const CDfaIdSet &other)
 {
-	try
+	if (this != &other)
 	{
-		*m_pSet = *other.m_pSet;
-	}
-	catch (std::exception &e)
-	{
-		TTHROW(e.what());
+		try
+		{
+			*m_pSet = *other.m_pSet;
+		}
+		catch (std::exception &e)
+		{
+			TTHROW(e.what());
+		}
 	}
 	return *this;
 }

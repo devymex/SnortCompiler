@@ -6,7 +6,7 @@
 
 #define MYGET(cur) ((code[cur + 1] << 8) | code[cur + 2])
 
-void GetSignature(BYTEARY &code, std::vector<BYTEARY> &strs)
+void ExtractSequence(BYTEARY &code, std::vector<BYTEARY> &seqAry)
 {
 	ulong cur = 0;
 	ulong bra = 0;
@@ -19,23 +19,20 @@ void GetSignature(BYTEARY &code, std::vector<BYTEARY> &strs)
 		switch(curCode)
 		{
 		case OP_END:
-			if(!str.empty() && (str.size() >= 4))
+			if(!str.empty())
 			{
-				strs.resize(strs.size() + 1);
-				strs.back() = str;
+				seqAry.push_back(str);
 			}
 			str.clear();
 			return;
 
-		case  OP_ALT:				/* 113 Start of alternation */
-			strs.clear();
+		case OP_ALT:				/* 113 Start of alternation */
+			seqAry.clear();
 			return;
-			break;
 
 		case OP_CHARI:			 /* 30 Match one character: caselessly */
 		case OP_CHAR:			/* 29 Match one character: casefully */
-			str.resize(str.size() + 1);
-			str.back() = code[cur +1];
+			str.push_back(code[cur +1]);
 			cur = cur + Steps[curCode];
 			curCode = code[cur];
 			break;
@@ -45,10 +42,9 @@ void GetSignature(BYTEARY &code, std::vector<BYTEARY> &strs)
 			bra += MYGET(bra);
 			if(code[bra] == OP_ALT)
 			{
-				if(!str.empty() && (str.size() >= 4))
+				if(!str.empty())
 				{
-					strs.resize(strs.size() + 1);
-					strs.back() = str;
+					seqAry.push_back(str);
 				}
 				str.clear();
 				while(code[bra] == OP_ALT)
@@ -68,16 +64,11 @@ void GetSignature(BYTEARY &code, std::vector<BYTEARY> &strs)
 			break;
 
 		case OP_POSPLUS:		/* 43 Possessified plus: caseful */
-			str.resize(str.size() + 1);
-			str.back() = code[cur + 1];
-			if(str.size() >= 4)
-			{
-				strs.resize(strs.size() + 1);
-				strs.back() = str;
-			}
+			str.push_back(code[cur + 1]);
+			seqAry.push_back(str);
+
 			str.clear();
-			str.resize(str.size() + 1);
-			str.back() = code[cur + 1];
+			str.push_back(code[cur + 1]);
 			
 			cur = cur + Steps[curCode];
 			curCode = code[cur];
@@ -94,22 +85,19 @@ void GetSignature(BYTEARY &code, std::vector<BYTEARY> &strs)
 			times = MYGET(cur);
 			for(ulong i = 0; i < times; ++i)
 			{
-				str.resize(str.size() + 1);
-				str.back() = code[cur + 3];
+				str.push_back(code[cur + 3]);
 			}
 			temp = code[cur + Steps[curCode]];
 			if(((temp == OP_UPTO) || (temp == OP_MINUPTO) || (temp == OP_UPTOI) || (temp == OP_MINUPTOI)) && (code[cur + 3] == code[cur + Steps[curCode] + 3]))
 			{
 				if(!str.empty() && (str.size() >= 4))
 				{
-					strs.resize(strs.size() + 1);
-					strs.back() = str;
+					seqAry.push_back(str);
 				}
 				str.clear();
 				for(ulong i = 0; i < times; ++i)
 				{
-					str.resize(str.size() + 1);
-					str.back() = code[cur + 3];
+					str.push_back(code[cur + 3]);
 				}
 				cur = cur + Steps[curCode] + Steps[OP_UPTO];
 				curCode = code[cur];
@@ -122,16 +110,10 @@ void GetSignature(BYTEARY &code, std::vector<BYTEARY> &strs)
 			break;
 
 		case OP_PLUS:			/* 35 the minimizing one second. */
-			str.resize(str.size() + 1);
-			str.back() = code[cur + 1];
-			if(str.size() >= 4)
-			{
-				strs.resize(strs.size() + 1);
-				strs.back() = str;
-			}
+			str.push_back(code[cur + 1]);
+			seqAry.push_back(str);
 			str.clear();
-			str.resize(str.size() + 1);
-			str.back() = code[cur + 1];
+			str.push_back(code[cur + 1]);
 
 			cur = cur + Steps[curCode];
 			curCode = code[cur];
@@ -139,10 +121,9 @@ void GetSignature(BYTEARY &code, std::vector<BYTEARY> &strs)
 
 		case OP_BRAZERO:		/* 140 These two must remain together and in this */
 
-			if(!str.empty() && (str.size() >= 4))
+			if(!str.empty())
 			{
-				strs.resize(strs.size()+ 1);
-				strs.back() = str;
+				seqAry.push_back(str);
 			}
 			str.clear();
 
@@ -278,7 +259,6 @@ void GetSignature(BYTEARY &code, std::vector<BYTEARY> &strs)
 		case OP_TYPEMINPLUS:	 /* 88 be in exactly the same order as those above. */
 		case OP_TYPEQUERY:		/* 89 */
 		case OP_TYPEMINQUERY:	/* 90 */
-
 		case OP_TYPEUPTO:		 /* 91 From 0 to n matches */
 		case OP_TYPEMINUPTO:	 /* 92 */
 		case OP_TYPEEXACT:		/* 93 Exactly n matches */
@@ -297,7 +277,6 @@ void GetSignature(BYTEARY &code, std::vector<BYTEARY> &strs)
 		case OP_CRMINPLUS:		/* 101 be in exactly the same order as those above. */
 		case OP_CRQUERY:		/* 102 */
 		case OP_CRMINQUERY:	  /* 103 */
-
 		case OP_CRRANGE:		/* 104 These are different to the three sets above. */
 		case OP_CRMINRANGE:	  /* 105 */
 
@@ -310,27 +289,18 @@ void GetSignature(BYTEARY &code, std::vector<BYTEARY> &strs)
 		case OP_REFI:			/* 110 Match a back reference: caselessly */
 		case OP_RECURSE:		/* 111 Match a numbered subpattern (possibly recursive) */
 		case OP_CALLOUT:		/* 112 Call out to external function if provided */
-
-
-
 		case OP_KETRMAX:		/* 115 These two must remain together and in this */
 		case OP_KETRMIN:		/* 116 order. They are for groups the repeat for ever. */
 		case OP_KETRPOS:		/* 117 Possessive unlimited repeat. */
-
-
 		case OP_REVERSE:		/* 118 Move pointer back - used in lookbehind assertions */
 		case OP_ASSERT:			/* 119 Positive lookahead */
 		case OP_ASSERT_NOT:	  /* 120 Negative lookahead */
 		case OP_ASSERTBACK:	  /* 121 Positive lookbehind */
 		case OP_ASSERTBACK_NOT: /* 122 Negative lookbehind */
-
-
 		case OP_ONCE:			/* 123 Atomic group: contains captures */
 		case OP_ONCE_NC:		/* 124 Atomic group containing no captures */
 		case OP_BRA:				/* 125 Start of non-capturing bracket */
-
 		case OP_BRAPOS:			/* 126 Ditto: with unlimited: possessive repeat */
-
 		case OP_CBRAPOS:		/* 128 Ditto: with unlimited: possessive repeat */
 		case OP_COND:			/* 129 Conditional group */
 
@@ -350,11 +320,8 @@ void GetSignature(BYTEARY &code, std::vector<BYTEARY> &strs)
 		case OP_RREF:			/* 137 Used to hold a recursion number as condition */
 		case OP_NRREF:			 /* 138 Same: but generated by a name reference*/
 		case OP_DEF:				/* 139 The DEFINE condition */
-
 		case OP_BRAMINZERO:	  /* 141 order. */
 		case OP_BRAPOSZERO:	  /* 142 */
-
-
 		case OP_MARK:			
 		case OP_PRUNE:			
 		case OP_PRUNE_ARG:	  
@@ -362,29 +329,24 @@ void GetSignature(BYTEARY &code, std::vector<BYTEARY> &strs)
 		case OP_THEN:			
 		case OP_THEN_ARG:		 
 		case OP_COMMIT:			
-
-
-
 		case OP_FAIL:			
-		case  OP_ACCEPT:		 
+		case OP_ACCEPT:		 
 		case OP_ASSERT_ACCEPT:  
 		case OP_CLOSE:		
-
 		case OP_SKIPZERO:		 
-
-		case  OP_TABLE_LENGTH:
+		case OP_TABLE_LENGTH:
 			cur = cur + Steps[curCode];
 			curCode = code[cur];
-			if(!str.empty() && (str.size() >= 4))
+			if (!str.empty())
 			{
-				strs.resize(strs.size() + 1);
-				strs.back() = str;
+				seqAry.push_back(str);
 			}
-				str.clear();
+			str.clear();
 			break;
 		}
 	}
 }
+
 //使用Pcre8.32库解析单个pcre
 ulong PcreToCode(const std::string &OnePcre, BYTEARY &code)
 {
@@ -459,7 +421,7 @@ ulong PcreToCode(const std::string &OnePcre, BYTEARY &code)
 }
 
 //把单个pcre转化为NFA
-void PcreToNFA(BYTEARY &code, bool bFromBeg, CNfa &nfa, CSignatures &sigs)
+void PcreToNFA(BYTEARY &code, bool bFromBeg, CNfa &nfa)
 {
 	BYTEARY_ITER Beg, End;
 	Beg = code.begin();
@@ -471,46 +433,18 @@ void PcreToNFA(BYTEARY &code, bool bFromBeg, CNfa &nfa, CSignatures &sigs)
 	Beg = code.begin();
 	End = code.end();
 
-	if (code.size() > 0)
-	{
-		std::vector<BYTEARY> strs;
-		GetSignature(code, strs);
-
-		if (strs.size() > 0)
-		{
-			for (ulong i = 0; i < strs.size(); ++i)
-			{
-				for(BYTEARY_ITER iter = strs[i].begin(); iter != strs[i].end(); ++iter)
-				{
-					if ((*iter >= 65) && (*iter <= 90))
-					{
-						*iter = (byte)tolower(*iter);
-					}
-				}
-			}
-
-			for (ulong i = 0; i < strs.size(); ++i)
-			{
-				for (BYTEARY_ITER iter = strs[i].begin(); iter + 3 != strs[i].end(); ++iter)
-				{
-					SIGNATURE sig = *(SIGNATURE*)&(*iter);
-					sigs.PushBack(sig);
-				}
-			}
-		}
-	}
-
 	if (!bFromBeg)
 	{
-		ulong nCurSize = nfa.Size();
-		nfa.Resize(nCurSize + 1);
+		ulong nLastRow = nfa.Size();
+		nfa.PushBack(CNfaRow());
 		CNfaRow &row = nfa.Back();
 		for (ulong i = 0; i < EMPTY; ++i)
 		{
-			row[i].PushBack(nCurSize);
+			row[i].PushBack(nLastRow);
 		}
-		row[EMPTY].PushBack(nCurSize + 1);
+		row[EMPTY].PushBack(nLastRow + 1);
 	}
+
 	ProcessPcre(Beg, End, nfa);
 }
 

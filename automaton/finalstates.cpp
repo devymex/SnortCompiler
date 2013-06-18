@@ -42,14 +42,17 @@ DFAIDSETHDR CFinalStates& CFinalStates::operator = (const CFinalStates &other)
 {
 	TASSERT(other.m_pDfaIds != null);
 	TASSERT(other.m_pStates != null);
-	try
+	if (this != &other)
 	{
-		*m_pStates = *other.m_pStates;
-		*m_pDfaIds = *other.m_pDfaIds;
-	}
-	catch (std::exception &e)
-	{
-		TTHROW(e.what());
+		try
+		{
+			*m_pStates = *other.m_pStates;
+			*m_pDfaIds = *other.m_pDfaIds;
+		}
+		catch (std::exception &e)
+		{
+			TTHROW(e.what());
+		}
 	}
 	return *this;
 }

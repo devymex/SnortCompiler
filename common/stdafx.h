@@ -19,5 +19,6 @@
 #define DLLSTRHDR_DS
 #define TRACEHDR_DS
 
-typedef std::string					DLLSTRING;
-typedef std::vector<unsigned long>	DLLULONGVEC;
+typedef std::string						DLLSTRING;
+typedef std::vector<unsigned long>		DLLULONGVEC;
+typedef std::vector<class CDllString>	DLLSTRINGARY;

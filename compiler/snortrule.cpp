@@ -45,20 +45,23 @@ SNORTRULEHDR CSnortRule::~CSnortRule()
 SNORTRULEHDR CSnortRule& CSnortRule::operator = (const CSnortRule &other)
 {
 	TASSERT(other.m_pOptions != null);
-	m_nSid = other.m_nSid;
-	m_nFlags = other.m_nFlags;
-	try
+	if (this != &other)
 	{
-		Clear();
-		for (OPTVEC_ITER i = other.m_pOptions->begin();
-			i != other.m_pOptions->end(); ++i)
+		m_nSid = other.m_nSid;
+		m_nFlags = other.m_nFlags;
+		try
 		{
-			m_pOptions->push_back((*i)->Clone());
+			Clear();
+			for (OPTVEC_ITER i = other.m_pOptions->begin();
+				i != other.m_pOptions->end(); ++i)
+			{
+				m_pOptions->push_back((*i)->Clone());
+			}
 		}
-	}
-	catch (std::exception &e)
-	{
-		TTHROW(e.what());
+		catch (std::exception &e)
+		{
+			TTHROW(e.what());
+		}
 	}
 	return *this;
 }

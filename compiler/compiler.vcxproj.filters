@@ -91,9 +91,6 @@
     <ClCompile Include="compiler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="regchain.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="regrule.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -194,6 +191,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="pcreopt.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="pcrechain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
