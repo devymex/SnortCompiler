@@ -30,6 +30,15 @@ Returns:				hash slot
 
 HASHMAPHDR ulong hash(const SIGNATURE &oneSig)
 {
+	//const ulong _FNV_offset_basis = 2166136261U;
+	//const ulong _FNV_prime = 16777619U;
+
+	//ulong _Val = _FNV_offset_basis;
+	//_Val ^= oneSig;
+	//_Val *= _FNV_prime;
+
+	//return (_Val);
+
 	return oneSig % 16001;
 }
 

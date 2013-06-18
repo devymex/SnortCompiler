@@ -159,6 +159,7 @@ COMPRESHDR ulong CCompileResults::WriteToFile(const char *filename)
 	fout.seekp(fileSizePos, std::ios_base::beg);
 	WriteNum(fout, endPos, 4);
 	fout.seekp(0, std::ios_base::end);
+	fout.flush();
 	fout.close();
 	fout.clear();
 

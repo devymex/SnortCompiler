@@ -814,22 +814,38 @@ ulong OP_COMMON_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulon
 
 void OP_CIRCM_FUNC(CNfa &nfa, ulong &CurState)
 {
-	ulong nCursize = nfa.Size();
-	nfa.Resize(nCursize + 3);
-	nfa[nCursize][EMPTY].PushBack(CurState + 1);
-	nfa[nCursize][EMPTY].PushBack(CurState + 3);
-	++CurState;
+	//ulong nCursize = nfa.Size();
+	//nfa.Resize(nCursize + 3);
+	//nfa[nCursize][EMPTY].PushBack(CurState + 1);
+	//nfa[nCursize][EMPTY].PushBack(CurState + 3);
+	//++CurState;
 
+	//++nCursize;
+	//for (ulong i = 0; i < 256; ++i)
+	//{
+	//	nfa[nCursize][i].PushBack(CurState);
+	//}
+	//nfa[nCursize]['\n'].PushBack(CurState + 1);
+	//nfa[nCursize]['\n'].PushBack(CurState + 2);
+	//nfa[nCursize]['\r'].PushBack(CurState + 2);
+	//CurState += 2;
+	//nfa[nCursize + 1]['\r'].PushBack(CurState);
+
+	ulong nCursize = nfa.Size();
+	nfa.Resize(nCursize + 2);
+
+	nfa[nCursize][EMPTY].PushBack(CurState + 1);
+	nfa[nCursize][EMPTY].PushBack(CurState + 2);
+
+	++CurState;
 	++nCursize;
 	for (ulong i = 0; i < 256; ++i)
 	{
 		nfa[nCursize][i].PushBack(CurState);
 	}
-	nfa[nCursize]['\n'].PushBack(CurState + 1);
-	nfa[nCursize]['\n'].PushBack(CurState + 2);
-	nfa[nCursize]['\r'].PushBack(CurState + 2);
-	CurState += 2;
-	nfa[nCursize + 1]['\r'].PushBack(CurState);
+	
+	++CurState;
+	nfa[nCursize]['\n'].PushBack(CurState);
 }
 
 
