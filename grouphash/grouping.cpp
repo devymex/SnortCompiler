@@ -91,6 +91,25 @@ Returns:				nothing
 
 */
 
+void Sort(CCompileResults &res, CGroups &groups)
+{
+	for (ulong i = 0; i < groups.Size(); ++i)
+	{
+		for (ulong j = 0; j < groups[i].DfaIds.Size(); ++j)
+		{
+			ulong idx1 = groups[i].DfaIds[j];
+			for (ulong k = j + 1; k < groups[i].DfaIds.Size(); ++k)
+			{
+				ulong idx2 = groups[i].DfaIds[k];
+				if (res.GetDfaTable()[idx1].Size() > res.GetDfaTable()[idx2].Size())
+				{
+					std::swap(idx1, idx2);
+				}
+			}
+		}
+	}
+}
+
 void Merge(CCompileResults &res, CGroups &groups)
 {
 	for (ulong i = 0; i < groups.Size(); ++i)
@@ -621,6 +640,7 @@ GROUPINGHDR void Grouping(CCompileResults &res, CGroupRes &groupRes)
 
 	//Merge dfa with only one signature...
 	g_log << "Merge dfa with only one signature..." << g_log.nl;
+	//Sort(res, groups);
 	Merge(res, groups);
 	g_log << "Completed in " << t1.Reset() << " Sec." << g_log.nl << g_log.nl;
 
@@ -633,6 +653,7 @@ GROUPINGHDR void Grouping(CCompileResults &res, CGroupRes &groupRes)
 	g_log << "Build group which has the same signatures..." << g_log.nl;
 	CGroups newGroups;
 	BuildGroupBySig(SigsVec, newGroups, vecWaitForGroup);
+	//Sort(res, newGroups);
 	Merge(res, newGroups);
 	g_log << "Completed in " << t1.Reset() << " Sec." << g_log.nl << g_log.nl;
 

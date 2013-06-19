@@ -47,7 +47,7 @@ TRACEHDR extern pcstr TI_INCOMPATIBLE;
 #define TTHROW(m) throw CTrace(__FILE__, __LINE__, m);
 
 
-#ifdef _DEBUG
+#ifndef _DEBUG
 #define TASSERT(s)	if (!(s)) {TTHROW("!("#s")");}
 #define TVERIFY(s)	if (!(s)) {TTHROW("!("#s")");}
 #else

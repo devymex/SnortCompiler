@@ -45,8 +45,8 @@ COMPILERHDR void ParseRuleFile(const char *pFileName, RECIEVER recv, void *lpUse
 				}
 				catch (CTrace &e)
 				{
-					g_log << "ProcessOption error: " << e.What() << g_log.nl;
-					continue;
+					g_log << "ParseOptions error: " << e.What() << g_log.nl;
+					throw;
 				}
 				PARSERESULT pr;
 				pr.ulSid = snortRule.GetSid();
