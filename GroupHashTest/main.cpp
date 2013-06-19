@@ -12,6 +12,7 @@
 #include <hwprj\grouping.h>
 #include <hwprj\buildhash.h>
 #include <hwprj\trace.h>
+#include <hwprj\logger.h>
 
 CTimer ctime;
 
@@ -38,12 +39,12 @@ int main()
 	}
 	catch (CTrace &e)
 	{
-		std::cout << e.File() << " - " << e.Line() << ": " << e.What() << std::endl;
+		g_log << e.File() << " - " << e.Line() << ": " << e.What() << g_log.nl;
 		system("pause");
 	}
 	result.WriteToFile("..\\result.cdt");
 
-	Group(result);
+	//Group(result);
 
 	//result.ReadFromFile("..\\result.cdt");
 	//result1.ReadFromFile("..\\result1.cdt");

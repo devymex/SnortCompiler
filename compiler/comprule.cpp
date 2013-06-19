@@ -546,7 +546,7 @@ void ProcessRule(CRegRule &regRule, RULECOMPDATA &result)
 				result.erase(result.begin() + i);
 				ruleSeq.erase(ruleSeq.begin() + i);
 				bErased = true;
-				std::cout << "Erased one chain" << std::endl;
+				g_log << "Erased one chain" << g_log.nl;
 			}
 		}
 		if (!bErased)

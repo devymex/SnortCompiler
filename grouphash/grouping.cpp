@@ -95,9 +95,9 @@ void Merge(CCompileResults &res, CGroups &groups)
 {
 	for (ulong i = 0; i < groups.Size(); ++i)
 	{
-		std::cout << "Merge " << std::endl;
-		std::cout << "NO: " << i << std::endl;
-		std::cout << "Total: " << groups.Size() << std::endl << std::endl;
+		g_log << "Merge " << g_log.nl;
+		g_log << "NO: " << i << g_log.nl;
+		g_log << "Total: " << groups.Size() << g_log.nl << g_log.nl;
 		groups[i].mergeDfaId = groups[i].DfaIds[0];
 
 		//not need merge for group with only one dfa
@@ -181,9 +181,9 @@ void PutInBySig(const std::vector<CSignatures> &SigsVec, CCompileResults &res, C
 	idx = 0;
 	for (std::map<SIGNATURE, std::vector<ulong>>::iterator i = sigToGroupsMap.begin(); i != sigToGroupsMap.end(); ++i, ++idx)
 	{
-		std::cout << "PutInBySig " << std::endl;
-		std::cout << "NO: " << idx << std::endl;
-		std::cout << "Total: " << sigToGroupsMap.size() << std::endl << std::endl;
+		g_log << "PutInBySig " << g_log.nl;
+		g_log << "NO: " << idx << g_log.nl;
+		g_log << "Total: " << sigToGroupsMap.size() << g_log.nl << g_log.nl;
 		for (std::vector<ulong>::iterator j = i->second.begin(); j != i->second.end(); ++j)
 		{
 			CDfaArray vecDfas;
@@ -364,9 +364,9 @@ void MergeGroup(CCompileResults &res, std::vector<SIGNATURE> &vecUsed, CGroups &
 	}
 	for (ulong i = 0; i < newGroups.Size(); ++i)
 	{
-		std::cout << "MergeGroup " << std::endl;
-		std::cout << "NO: " << i << std::endl;
-		std::cout << "Total: " << newGroups.Size() << std::endl << std::endl;
+		g_log << "MergeGroup " << g_log.nl;
+		g_log << "NO: " << i << g_log.nl;
+		g_log << "Total: " << newGroups.Size() << g_log.nl << g_log.nl;
 		std::vector<SIGNATURE> vecSigs;
 		for (ulong j = 0; j < newGroups[i].ComSigs.Size(); ++j)
 		{
@@ -462,7 +462,7 @@ void MergeGroup(CCompileResults &res, std::vector<SIGNATURE> &vecUsed, CGroups &
 				}
 				else
 				{
-					std::cout << "ERROR" << std::endl;
+					g_log << "ERROR" << g_log.nl;
 					system("pause");
 				}
 			}
@@ -577,19 +577,19 @@ void outPutGroups(CGroupRes &groupRes, const char* fileName)
 	std::ofstream fout(fileName);
 	if(!fout)
 	{
-		std::cerr << "open file failure!" << std::endl;
+		std::cerr << "open file failure!" << g_log.nl;
 		return;
 	}
-	fout << "groupNumber\t" << "MergeId\t" << "origDfaId" << std::endl; 
+	fout << "groupNumber\t" << "MergeId\t" << "origDfaId" << g_log.nl; 
 	for(ulong i = 0; i < groupRes.GetGroups().Size(); ++i)
 	{
 		fout << i << "\t";
 		fout << groupRes.GetGroups()[i].mergeDfaId << "\t";
 		for(ulong j = 0; j < groupRes.GetGroups()[i].DfaIds.Size(); ++j)
 		{
-			fout << groupRes.GetGroups()[i].DfaIds[j] << std::endl << "\t" << "\t";
+			fout << groupRes.GetGroups()[i].DfaIds[j] << g_log.nl << "\t" << "\t";
 		}
-		fout << std::endl;
+		fout << g_log.nl;
 	}
 	fout.close();
 }
@@ -608,57 +608,57 @@ GROUPINGHDR void Grouping(CCompileResults &res, CGroupRes &groupRes)
 {
 	CTimer t1, tAll;
 
-	std::cout << "Extract Dfa's information..." << std::endl;
+	g_log << "Extract Dfa's information..." << g_log.nl;
 	std::vector<CSignatures> SigsVec;
 	std::vector<ulong> vecWaitForGroup;
 	ExtractSigsVec(res, SigsVec, vecWaitForGroup);
-	std::cout << "Completed in " << t1.Reset() << " Sec." << std::endl << std::endl;
+	g_log << "Completed in " << t1.Reset() << " Sec." << g_log.nl << g_log.nl;
 
-	std::cout << "Group dfa who has only one sig..." << std::endl;
+	g_log << "Group dfa who has only one sig..." << g_log.nl;
 	CGroups groups;
 	GroupOnlyOneSig(SigsVec, vecWaitForGroup, groups);
-	std::cout << "Completed in " << t1.Reset() << " Sec." << std::endl << std::endl;
+	g_log << "Completed in " << t1.Reset() << " Sec." << g_log.nl << g_log.nl;
 
 	//Merge dfa with only one signature...
-	std::cout << "Merge dfa with only one signature..." << std::endl;
+	g_log << "Merge dfa with only one signature..." << g_log.nl;
 	Merge(res, groups);
-	std::cout << "Completed in " << t1.Reset() << " Sec." << std::endl << std::endl;
+	g_log << "Completed in " << t1.Reset() << " Sec." << g_log.nl << g_log.nl;
 
 	//Put dfa in group which have the same signature...
-	std::cout << "Put dfa in group which have the same signature..." << std::endl;
+	g_log << "Put dfa in group which have the same signature..." << g_log.nl;
 	PutInBySig(SigsVec, res, groups, vecWaitForGroup);
-	std::cout << "Completed in " << t1.Reset() << " Sec." << std::endl << std::endl;
+	g_log << "Completed in " << t1.Reset() << " Sec." << g_log.nl << g_log.nl;
 
 	//Build group which has the same signature...
-	std::cout << "Build group which has the same signatures..." << std::endl;
+	g_log << "Build group which has the same signatures..." << g_log.nl;
 	CGroups newGroups;
 	BuildGroupBySig(SigsVec, newGroups, vecWaitForGroup);
 	Merge(res, newGroups);
-	std::cout << "Completed in " << t1.Reset() << " Sec." << std::endl << std::endl;
+	g_log << "Completed in " << t1.Reset() << " Sec." << g_log.nl << g_log.nl;
 
 	//Extract the already used signatures...
-	std::cout << "Extract the already used signatures..." << std::endl;
+	g_log << "Extract the already used signatures..." << g_log.nl;
 	std::vector<SIGNATURE> vecUsed;
 	ExtractUsedSigs(groups, vecUsed);
-	std::cout << "Completed in " << t1.Reset() << " Sec." << std::endl << std::endl;
+	g_log << "Completed in " << t1.Reset() << " Sec." << g_log.nl << g_log.nl;
 
 	//Merge group which have the same signature...
-	std::cout << "Merge group which have the same signatures..." << std::endl;
+	g_log << "Merge group which have the same signatures..." << g_log.nl;
 	MergeGroup(res, vecUsed, newGroups);
-	std::cout << "Completed in " << t1.Reset() << " Sec." << std::endl << std::endl;
+	g_log << "Completed in " << t1.Reset() << " Sec." << g_log.nl << g_log.nl;
 	
 	//Add new groups...
-	std::cout << "Add new groups..." << std::endl;
+	g_log << "Add new groups..." << g_log.nl;
 	AddNewGroups(newGroups, groups);
-	std::cout << "Completed in " << t1.Reset() << " Sec." << std::endl << std::endl;
+	g_log << "Completed in " << t1.Reset() << " Sec." << g_log.nl << g_log.nl;
 
 	//Clear up the result...
-	std::cout << "Clear up the result..." << std::endl;
+	g_log << "Clear up the result..." << g_log.nl;
 	ClearUpRes(res, groups, groupRes);
 
-	std::cout << "Completed in " << t1.Reset() << " Sec." << std::endl << std::endl;
+	g_log << "Completed in " << t1.Reset() << " Sec." << g_log.nl << g_log.nl;
 
-	std::cout << groupRes.GetGroups().Size() << std::endl;
+	g_log << groupRes.GetGroups().Size() << g_log.nl;
 
-	std::cout << "Total time: " << tAll.Reset() << " Sec." << std::endl;
+	g_log << "Total time: " << tAll.Reset() << " Sec." << g_log.nl;
 }

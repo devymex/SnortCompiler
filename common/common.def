@@ -1,2 +1,4 @@
 LIBRARY
 EXPORTS
+
+g_log @ 1

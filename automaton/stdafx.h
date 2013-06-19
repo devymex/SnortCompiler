@@ -30,6 +30,7 @@
 #include <exception>
 #include <hwprj\common.h>
 #include <hwprj\trace.h>
+#include <hwprj\logger.h>
 
 #undef max
 

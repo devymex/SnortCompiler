@@ -34,7 +34,7 @@ COMPILERHDR void ParseRuleFile(const char *pFileName, RECIEVER recv, void *lpUse
 		{
 			for(STRINGVEC_ITER i = rules.begin(); i != rules.end(); ++i)
 			{
-				std::cout << "Compiling: " << i - rules.begin() + 1 << std::endl;
+				g_log << "Compiling: " << i - rules.begin() + 1 << g_log.nl;
 				i->erase(i->begin(), find(i->begin(), i->end(), '(') + 1);
 				i->erase(find(i->rbegin(), i->rend(), ')').base() - 1, i->end());
 
@@ -45,7 +45,7 @@ COMPILERHDR void ParseRuleFile(const char *pFileName, RECIEVER recv, void *lpUse
 				}
 				catch (CTrace &e)
 				{
-					std::cout << "ProcessOption error: " << e.What() << std::endl;
+					g_log << "ProcessOption error: " << e.What() << g_log.nl;
 					continue;
 				}
 				PARSERESULT pr;
@@ -58,7 +58,7 @@ COMPILERHDR void ParseRuleFile(const char *pFileName, RECIEVER recv, void *lpUse
 				catch (CTrace &e)
 				{
 					pr.ulFlag |= PARSEFLAG::PARSE_ERROR;
-					std::cout << "Rule2RegRule error: " << e.What() << std::endl;
+					g_log << "Rule2RegRule error: " << e.What() << g_log.nl;
 				}
 				if (snortRule.GetFlags() & CSnortRule::HASBYTE)
 				{
