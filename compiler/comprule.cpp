@@ -527,7 +527,7 @@ void PreCompileRule(const CRegRule &regRule, RULESEQUENCE &ruleSeq,
 		}
 	}
 }
-int n = 0;
+
 void ProcessRule(CRegRule &regRule, RULECOMPDATA &result)
 {
 	RULESEQUENCE ruleSeq;
@@ -546,7 +546,7 @@ void ProcessRule(CRegRule &regRule, RULECOMPDATA &result)
 				result.erase(result.begin() + i);
 				ruleSeq.erase(ruleSeq.begin() + i);
 				bErased = true;
-				std::cout << "Erased: " << ++n << std::endl;
+				std::cout << "Erased one chain" << std::endl;
 			}
 		}
 		if (!bErased)

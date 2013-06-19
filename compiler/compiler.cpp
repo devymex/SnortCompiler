@@ -34,8 +34,7 @@ COMPILERHDR void ParseRuleFile(const char *pFileName, RECIEVER recv, void *lpUse
 		{
 			for(STRINGVEC_ITER i = rules.begin(); i != rules.end(); ++i)
 			{
-				std::cout << i - rules.begin() + 1 << std::endl;
-				//std::cout << ": " << g_dTimer << std::endl;
+				std::cout << "Compiling: " << i - rules.begin() + 1 << std::endl;
 				i->erase(i->begin(), find(i->begin(), i->end(), '(') + 1);
 				i->erase(find(i->rbegin(), i->rend(), ')').base() - 1, i->end());
 
