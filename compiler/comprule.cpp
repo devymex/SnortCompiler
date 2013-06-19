@@ -649,7 +649,12 @@ void Rule2Dfas(const CRegRule &rule, CCompileResults &result)
 		result.GetRegexTbl()[nChainId] = regRule[i];
 	}
 
-	if (ruleResult.m_nResult == COMPILEDINFO::RES_SUCCESS && bHasSigs)
+	if (!bHasSigs)
+	{
+		ruleResult.m_nResult |= COMPILEDINFO::RES_HASNOSIG;
+	}
+
+	if (ruleResult.m_nResult == COMPILEDINFO::RES_SUCCESS)
 	{
 		AssignSig(result, nOldRegexSize, nOldRegexSize + nCurRuleSize);
 	}

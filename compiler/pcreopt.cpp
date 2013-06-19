@@ -86,7 +86,6 @@ SNORTRULEHDR void CPcreOption::FromPattern(const CDllString &strPat)
 		switch (*j)
 		{
 		case 'A':
-			TASSERT(!HasFlags(PF_R));
 			AddFlags(PF_A);
 			if (m_strPcre[0] != '^')
 			{
@@ -94,7 +93,6 @@ SNORTRULEHDR void CPcreOption::FromPattern(const CDllString &strPat)
 			}
 			continue;
 		case 'R':
-			TASSERT(!HasFlags(PF_A));
 			AddFlags(PF_R);
 			continue;
 		case 'i':
