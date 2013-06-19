@@ -532,7 +532,7 @@ void ProcessRule(CRegRule &regRule, RULECOMPDATA &result)
 {
 	RULESEQUENCE ruleSeq;
 	PreCompileRule(regRule, ruleSeq, result);
-	for (ulong i = 0; i < regRule.Size(); ++i)
+	for (ulong i = 0; i < regRule.Size();)
 	{
 		CPcreChain &curChain = regRule[i];
 		CHAINSEQUENCE &curChainSeq = ruleSeq[i];
@@ -555,6 +555,7 @@ void ProcessRule(CRegRule &regRule, RULECOMPDATA &result)
 			{
 				ExtractSignatures(curChainSeq[j], regRule[i].GetSigs());
 			}
+			++i;
 		}
 	}
 }

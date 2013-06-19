@@ -43,6 +43,8 @@ int main()
 	}
 	result.WriteToFile("..\\result.cdt");
 
+	Group(result);
+
 	//result.ReadFromFile("..\\result.cdt");
 	//result1.ReadFromFile("..\\result1.cdt");
 	//for (ulong i = 0; i < result.GetSidDfaIds().Size(); ++i)
@@ -67,7 +69,6 @@ int main()
 	//	}
 	//}
 
-	//Group(result);
 
 	//std::ifstream fin("..\\Ids.txt");
 	//std::vector<size_t> vecIds;
