@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <iostream>
 #include <vector>
+#include <deque>
 #include <fstream>
 #include <map>
 #include <windows.h>

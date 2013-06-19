@@ -16,51 +16,11 @@
 
 int main()
 {
-	//std::ifstream fin("..\\allrules.rule");
-	//std::vector<std::string> vecRules;
-	//std::string str;
-	//while (std::getline(fin, str))
-	//{
-	//	vecRules.push_back(str);
-	//}
-	//fin.clear();
-	//fin.close();
-
-	//CCompileResults result;
-	//result.ReadFromFile("..\\result.cdt");
-
-	//CCompileResults result1;
-	//result1.ReadFromFile("..\\result1.cdt");
-
-	//std::ofstream fout("..\\OneSig.txt");
-	//for (ulong i = 0; i < result.GetSidDfaIds().Size(); ++i)
-	//{
-	//	if (result.GetSidDfaIds()[i].m_nResult == COMPILEDINFO::RES_SUCCESS && 
-	//		//result.GetRegexTbl()[result.GetSidDfaIds()[i].m_dfaIds[0]].GetSigs().Size() == 1 &&
-	//		result1.GetSidDfaIds()[i].m_nResult != COMPILEDINFO::RES_SUCCESS)
-	//	{
-	//		str = "sid:";
-	//		std::string sid;
-	//		std::stringstream ss;
-	//		ss << result.GetSidDfaIds()[i].m_nSid;
-	//		ss >> sid;
-	//		str += sid;
-	//		str += ";";
-	//		for (ulong j = 0; j < vecRules.size(); ++j)
-	//		{
-	//			if (vecRules[j].find(str, 0) != std::string::npos)
-	//			{
-	//				fout << vecRules[j] << std::endl;
-	//			}
-	//		}
-	//	}
-	//}
-
 	CTimer ctime;
 	CCompileResults result;
 	try
 	{
-		CompileRuleFile("..\\allrules.rule", result);
+		CompileRuleFile("..\\testrules.rule", result);
 	}
 	catch (CTrace &e)
 	{
@@ -69,7 +29,7 @@ int main()
 	}
 	result.WriteToFile("..\\result.cdt");
 
-	//result.ReadFromFile("..\\result.cdt");
+	//result.ReadFromFile("..\\result_new.cdt");
 
 	CGroupRes groupRes;
 	Grouping(result, groupRes);
