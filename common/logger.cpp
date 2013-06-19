@@ -12,7 +12,10 @@ LOGGERHDR CLogger::CLogger()
 
 LOGGERHDR CLogger::~CLogger()
 {
-	delete m_pLogFile;
+	if (m_pLogFile != &std::cout)
+	{
+		delete m_pLogFile;
+	}
 }
 
 LOGGERHDR CLogger::CLogger(const CLogger&)
