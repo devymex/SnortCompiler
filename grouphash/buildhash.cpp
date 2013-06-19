@@ -477,9 +477,9 @@ void Combine(CGroupRes &groupRes, std::vector<GROUPHASH> &vecGroups, RESULTMAP &
 
 	for (ulong i = 0; i < vecKeys.size(); ++i)
 	{
-		std::cout << "Combine" << std::endl;
-		std::cout << "NO: " << i << std::endl;
-		std::cout << "Total: " << vecKeys.size() << std::endl;
+		g_log << "Combine" << g_log.nl;
+		g_log << "NO: " << i << g_log.nl;
+		g_log << "Total: " << vecKeys.size() << g_log.nl;
 		if (result[vecKeys[i]].size() == 1)
 		{
 			for (ulong j = 0; j < vecKeys.size(); ++j)

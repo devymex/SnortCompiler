@@ -102,8 +102,6 @@ void ParseOptions(std::string &ruleOptions, CSnortRule &snortRule);
 
 void Rule2RegRule(const CSnortRule &rule, CRegRule &regrule);
 
-ulong Chain2NFA(const CPcreChain &regchain, CNfa &nfa, CSignatures &sigs);
-
 void CompileRule(LPCSTR rule, RECIEVER recv, LPVOID lpUser);
 
 ulong LoadFile(const char *fileName, std::vector<std::string> &rules);

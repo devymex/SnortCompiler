@@ -21,8 +21,38 @@ SNORTRULEHDR CPcreOption::~CPcreOption()
 
 SNORTRULEHDR CPcreOption& CPcreOption::operator = (const CPcreOption &other)
 {
-	m_strPcre = other.m_strPcre;
+	if (this != &other)
+	{
+		CRuleOption::operator = (other);
+		m_strPcre = other.m_strPcre;
+	}
 	return *this;
+}
+
+void CPcreOption::Append(const CPcreOption &next)
+{
+	if (!next.HasFlags(PF_R))
+	{
+		TTHROW(TI_INCOMPATIBLE);
+	}
+	OPTIONFLAG nFlags = next.m_nFlags & (~PF_R);
+	if (m_nFlags != nFlags)
+	{
+		TTHROW(TI_INCOMPATIBLE);
+	}
+	CDllString strOther = next.m_strPcre;
+	if (strOther.Size() != 0)
+	{
+		if (strOther[0] == '^')
+		{
+			strOther.Erase(0);
+		}
+		m_strPcre.Append(strOther);
+	}
+	if (!next.HasFlags(PF_F))
+	{
+		DelFlags(PF_F);
+	}
 }
 
 SNORTRULEHDR void CPcreOption::FromPattern(const CDllString &strPat)
@@ -55,6 +85,18 @@ SNORTRULEHDR void CPcreOption::FromPattern(const CDllString &strPat)
 	{
 		switch (*j)
 		{
+		case 'A':
+			TASSERT(!HasFlags(PF_R));
+			AddFlags(PF_A);
+			if (m_strPcre[0] != '^')
+			{
+				m_strPcre.Insert(0, '^');
+			}
+			continue;
+		case 'R':
+			TASSERT(!HasFlags(PF_A));
+			AddFlags(PF_R);
+			continue;
 		case 'i':
 			AddFlags(PF_i);
 			continue;
@@ -67,17 +109,11 @@ SNORTRULEHDR void CPcreOption::FromPattern(const CDllString &strPat)
 		case 'x':
 			AddFlags(PF_x);
 			continue;
-		case 'A':
-			AddFlags(PF_A);
-			continue;
 		case 'E':
 			AddFlags(PF_E);
 			continue;
 		case 'G':
 			AddFlags(PF_G);
-			continue;
-		case 'R':
-			AddFlags(PF_R);
 			continue;
 		case 'U':
 			AddFlags(PF_U);
@@ -116,8 +152,12 @@ SNORTRULEHDR void CPcreOption::FromPattern(const CDllString &strPat)
 			AddFlags(PF_Y);
 			continue;			
 		default:
-			AddFlags(0);
+			TTHROW(TI_INVALIDDATA);
 		}
+	}
+	if (m_strPcre[0] == '^')
+	{
+		AddFlags(PF_A);
 	}
 }
 
@@ -135,7 +175,22 @@ SNORTRULEHDR CRuleOption* CPcreOption::Clone() const
 	return pNew;
 }
 
-SNORTRULEHDR void CPcreOption::PcreToCode(BYTEARY &code) const
+SNORTRULEHDR void CPcreOption::SetPcreString(const CDllString& strPcre)
+{
+	m_strPcre = strPcre;
+}
+
+SNORTRULEHDR CDllString& CPcreOption::GetPcreString()
+{
+	return m_strPcre;
+}
+
+SNORTRULEHDR const CDllString& CPcreOption::GetPcreString() const
+{
+	return m_strPcre;
+}
+
+SNORTRULEHDR void CPcreOption::PreComp(BYTEARY &compData) const
 {
 	int options = 0;
 	if (HasFlags(PF_s))
@@ -169,21 +224,6 @@ SNORTRULEHDR void CPcreOption::PcreToCode(BYTEARY &code) const
 	name_table_offset = *((unsigned short*)re + 12);
 	for (ulong i = 0; i < size - name_table_offset; ++i)
 	{
-		code.push_back((byte)*((byte*)re + name_table_offset + i));
+		compData.push_back((byte)*((byte*)re + name_table_offset + i));
 	}
-}
-
-SNORTRULEHDR void CPcreOption::SetPcreString(const CDllString& strPcre)
-{
-	m_strPcre = strPcre;
-}
-
-SNORTRULEHDR CDllString& CPcreOption::GetPcreString()
-{
-	return m_strPcre;
-}
-
-SNORTRULEHDR const CDllString& CPcreOption::GetPcreString() const
-{
-	return m_strPcre;
 }

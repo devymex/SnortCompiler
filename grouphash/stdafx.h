@@ -26,6 +26,7 @@
 #include <hwprj\dfa.h>
 #include <hwprj\dfaarray.h>
 #include <hwprj\compres.h>
+#include <hwprj\logger.h>
 
 #define GROUPSHDR_DS
 #define GROUPRESHDR_DS

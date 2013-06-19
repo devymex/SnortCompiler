@@ -38,10 +38,13 @@ public:
 	ulong			Size() const;
 	bool			Empty() const;
 	void			Clear();
+	void			Erase(ulong ulIdx);
+	void			Insert(ulong ulIdx, char nChar);
+	void			Insert(ulong ulIdx, pcstr pChar);
 	void			Assign(const char* pStr);
-	void			Append(const char* pStr);
+	void			Append(const CDllString &other);
 	char			Back() const;
-	void			PushBack(const char nChar);
+	void			PushBack(char nChar);
 	pcstr			GetStr() const;
 	const char*		Data() const;
 

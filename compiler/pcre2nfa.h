@@ -11,6 +11,6 @@
 #include <hwprj\nfa.h>
 #include <hwprj\signatures.h>
 
-void GetSignature(BYTEARY &code, std::vector<BYTEARY> &strs);
+void ExtractSequence(BYTEARY &code, std::vector<BYTEARY> &seqAry);
 
-void PcreToNFA(BYTEARY &code, bool bFromBeg, CNfa &nfa, CSignatures &sigs);
+void PcreToNFA(BYTEARY &code, bool bFromBeg, CNfa &nfa);

@@ -18,7 +18,10 @@ SNORTRULEHDR CRuleOption::~CRuleOption()
 
 SNORTRULEHDR CRuleOption& CRuleOption::operator = (const CRuleOption &other)
 {
-	m_nFlags = other.m_nFlags;
+	if (this != &other)
+	{
+		m_nFlags = other.m_nFlags;
+	}
 	return *this;
 }
 
@@ -40,6 +43,11 @@ SNORTRULEHDR void CRuleOption::AddFlags(OPTIONFLAG nFlags)
 SNORTRULEHDR bool CRuleOption::HasFlags(OPTIONFLAG nFlags) const
 {
 	return ((m_nFlags & nFlags) != 0);
+}
+
+SNORTRULEHDR void CRuleOption::DelFlags(OPTIONFLAG nFlags)
+{
+	m_nFlags &= (~nFlags);
 }
 
 SNORTRULEHDR void CRuleOption::FormatPattern(CDllString &out)

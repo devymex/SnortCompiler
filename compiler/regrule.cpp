@@ -44,13 +44,16 @@ SNORTRULEHDR const CPcreChain& CRegRule::operator[](ulong nIdx) const
 SNORTRULEHDR CRegRule& CRegRule::operator = (const CRegRule &other)
 {
 	TASSERT(other.m_pRegVec != null);
-	try
+	if (this != &other)
 	{
-		*this->m_pRegVec = *other.m_pRegVec;
-	}
-	catch (std::exception &e)
-	{
-		TTHROW(e.what());
+		try
+		{
+			*this->m_pRegVec = *other.m_pRegVec;
+		}
+		catch (std::exception &e)
+		{
+			TTHROW(e.what());
+		}
 	}
 	return *this;
 }
@@ -58,6 +61,11 @@ SNORTRULEHDR CRegRule& CRegRule::operator = (const CRegRule &other)
 SNORTRULEHDR ulong CRegRule::Size() const
 {
 	return m_pRegVec->size();
+}
+
+SNORTRULEHDR void CRegRule::Erase(ulong ulIdx)
+{
+	m_pRegVec->erase(m_pRegVec->begin() + ulIdx);
 }
 
 SNORTRULEHDR CPcreChain& CRegRule::Back() const

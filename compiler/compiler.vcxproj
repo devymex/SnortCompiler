@@ -208,7 +208,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="regchain.cpp" />
+    <ClCompile Include="pcrechain.cpp" />
     <ClCompile Include="regrule.cpp" />
     <ClCompile Include="comprule.cpp" />
     <ClCompile Include="ruleoption.cpp" />

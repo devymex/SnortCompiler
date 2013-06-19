@@ -29,6 +29,7 @@ public:
 	const CPcreChain&	operator[](ulong nIdx) const;
 
 	ulong				Size() const;
+	void				Erase(ulong ulIdx);
 	void				Reserve(ulong nCount);
 	void				Resize(ulong nSize);
 	CPcreChain&			Back() const;

@@ -536,7 +536,7 @@ DFAHDR void CDfa::Dump(const char *pFile)
 	std::ofstream fout(pFile);
 	if(!fout)
 	{
-		std::cout << "file open error!" << std::endl;
+		g_log << "file open error!" << g_log.nl;
 	}
 
 	fout << "字符和组对应关系：" << std::endl;
@@ -739,7 +739,7 @@ ulong CDfa::PartStates(STATEVEC *pRevTbl)
 		swap(m_pDfa, pNewDfa);
 		delete pNewDfa;
 
-		std::cout << "Minimized: " << (ulStaNum - m_pDfa->size()) << std::endl;
+		g_log << "Minimized: " << (ulStaNum - m_pDfa->size()) << g_log.nl;
 	}
 
 	for (PARTSETVEC_ITER i = partSets.begin(); i != partSets.end(); ++i)
@@ -904,7 +904,7 @@ DFAHDR bool MergeMultipleDfas(CDfaArray &inputDfas, CDfa &mergedDfa)
 		STATESETHASH::iterator ir = statehash.find(curVec);
 		if (ir == statehash.end())
 		{
-			std::cout << "hash Error!" << std::endl;
+			g_log << "hash Error!" << g_log.nl;
 			return false;
 		}
 		STATEID curStaNum = ir->second;

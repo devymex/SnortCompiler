@@ -7,6 +7,7 @@ inline CUnsignedArray::CUnsignedArray(const CUnsignedArray &other)
 	: m_pAry(null), m_ulSize(0), m_ulCap(0)
 {
 	m_pAry = Alloc(other.m_ulSize);
+	m_ulCap = other.m_ulCap;
 	m_ulSize = other.m_ulSize;
 	if (m_ulSize != 0)
 	{
@@ -23,17 +24,20 @@ inline CUnsignedArray::~CUnsignedArray()
 inline CUnsignedArray& CUnsignedArray::operator = (
 	const CUnsignedArray &other)
 {
-	if (m_ulCap < other.m_ulSize)
+	if (this != &other)
 	{
-		ulong *pNewBuf = Alloc(other.m_ulSize);
-		Free(m_pAry);
-		m_pAry = pNewBuf;
-		m_ulCap = other.m_ulSize;
-	}
-	m_ulSize = other.m_ulSize;
-	if (m_ulSize != 0)
-	{
-		CopyFrom(other.m_pAry);
+		if (m_ulCap < other.m_ulSize)
+		{
+			ulong *pNewBuf = Alloc(other.m_ulSize);
+			Free(m_pAry);
+			m_pAry = pNewBuf;
+			m_ulCap = other.m_ulSize;
+		}
+		m_ulSize = other.m_ulSize;
+		if (m_ulSize != 0)
+		{
+			CopyFrom(other.m_pAry);
+		}
 	}
 	return *this;
 }
@@ -105,7 +109,7 @@ inline void CUnsignedArray::PopBack()
 inline void CUnsignedArray::PushBack(ulong ulVal)
 {
 	TASSERT(m_ulCap >= m_ulSize);
-	if (m_ulCap <= m_ulSize)
+	for (; m_ulCap <= m_ulSize; )
 	{
 		Increase();
 	}
@@ -177,7 +181,7 @@ inline void CUnsignedArray::Increase()
 	}
 	else
 	{
-		Realloc(m_ulSize * 2);
+		Realloc(m_ulCap * 2);
 	}
 }
 

@@ -25,6 +25,13 @@ double pcre2nfatime = 0.0;
 double nfa2dfatime = 0.0;
 double dfamintimetime = 0.0;
 
+typedef std::vector<BYTEARY>			PCRESEQUENCE;
+typedef std::vector<PCRESEQUENCE>		CHAINSEQUENCE;
+typedef std::vector<CHAINSEQUENCE>		RULESEQUENCE;
+typedef std::vector<BYTEARY>			CHAINCOMPDATA;
+typedef std::vector<CHAINCOMPDATA>		RULECOMPDATA;
+
+
 /* complie one rule
 
 Arguments:
@@ -336,58 +343,6 @@ void Rule2RegRule(const CSnortRule &rule, CRegRule &regRule)
 }
 
 
-/*
-**	NAME
-**	 CRegChainToNFA::
-*/
-/**
-**	This function converts a CPcreChain to a CNfa
-**
-**	use pcre library to construct a nfa from a pcre
-**	
-**	@param regchain	a CPcreChain object which contains a pcre list
-**	@param nfa		the transformed CNfa object 
-**
-**	@return integer
-**
-**	@retval  0 function successful
-**	@retval <>0 fatal error
-*/
-
-ulong Chain2NFA(const CPcreChain &pcreChain, CNfa &nfa, CSignatures &sigs)
-{
-	nfa.Reserve(SC_NFAROWRESERV);
-	for (ulong i = 0; i < pcreChain.Size(); ++i)
-	{
-		BYTEARY byteAry;
-		const CPcreOption &curOpt = pcreChain[i];
-		try
-		{
-			curOpt.PcreToCode(byteAry);
-		}
-		catch (CTrace &e)
-		{
-			nfa.Clear();
-			throw;
-		}
-
-		TASSERT(curOpt.GetPcreString().Size() > 0);
-		bool bFromBeg = (curOpt.GetPcreString()[0] == '^');
-
-		try
-		{
-			PcreToNFA(byteAry, bFromBeg, nfa, sigs);
-		}
-		catch(CTrace &e)
-		{
-			nfa.Clear();
-			throw;
-		}
-	}
-	sigs.Unique();
-	return 0;
-}
-
 /* assign all the signatures of each rule to all its option list
 
 Arguments:
@@ -425,6 +380,186 @@ void AssignSig(CCompileResults &result, ulong BegIdx, ulong EndIdx)
 	}
 }
 
+bool CaselessComp(char a, char b)
+{
+	return tolower(a) == tolower(b);
+}
+
+struct INCLUDESEQUENCE
+{
+	const BYTEARY *m_pSeq;
+	bool m_bCaseless;
+	INCLUDESEQUENCE(const BYTEARY &seq, bool bCaseless = false)
+		: m_pSeq(&seq), m_bCaseless(bCaseless)
+	{
+	}
+	bool operator() (const BYTEARY &seq)
+	{
+		if (m_bCaseless)
+		{
+			return (seq.end() != std::search(seq.begin(), seq.end(),
+				m_pSeq->begin(), m_pSeq->end(), CaselessComp));
+		}
+		else
+		{
+			return (seq.end() != std::search(seq.begin(), seq.end(),
+				m_pSeq->begin(), m_pSeq->end(), CaselessComp));
+		}
+	}
+};
+
+void ExtractSignatures(const std::vector<BYTEARY> &seqAry, CSignatures &sigs)
+{
+	SIGNATURE nCurSig;
+	for (ulong i = 0; i < seqAry.size(); ++i)
+	{
+		const BYTEARY &curSeq = seqAry[i];
+		long ulLen = long(curSeq.size()) - 3;
+		for (long j = 0; j < ulLen; ++j)
+		{
+			for (ulong k = 0; k < 4; ++k)
+			{
+				((byte*)&nCurSig)[k] = byte(tolower(curSeq[j + k]));
+			}
+			sigs.PushBack(nCurSig);
+		}
+	}
+}
+
+bool SeqIncBy(const CRegRule &regRule, const RULESEQUENCE &ruleSeq, ulong ulIdx)
+{
+	TASSERT(ulIdx < ruleSeq.size());
+	TASSERT(ruleSeq[ulIdx].size() == 1);
+	TASSERT(ruleSeq[ulIdx].front().size() == 1);
+
+	const BYTEARY &seq = ruleSeq[ulIdx].front().front();
+	for (ulong i = 0; i < ruleSeq.size(); ++i)
+	{
+		if (ulIdx != i)
+		{
+			const CHAINSEQUENCE &curChainSeq = ruleSeq[i];
+			for (ulong j = 0; j < curChainSeq.size(); ++j)
+			{
+				const PCRESEQUENCE &curPcreSeq = curChainSeq[j];
+				bool bCaseless = true;
+				// as long as the content has nocase mod
+				// a caseless comparation can be executed.
+				if (!regRule[ulIdx][0].HasFlags(CPcreOption::PF_i))
+				{
+					// if the content is case-sensitive and the
+					// pcre is case-less, this content can't be erased
+					if (regRule[i][j].HasFlags(CPcreOption::PF_i))
+					{
+						continue;
+					}
+					// if the pcre is case-sensitive, a case-sensitive
+					// comparation shoud be executed.
+					bCaseless = false;
+				}
+
+				// if the content has no '^', comparation should be excuted
+				if (regRule[ulIdx][0].HasFlags(CPcreOption::PF_A))
+				{
+					// if the content has a '^', and the pcre has no '^',
+					// this content can't be erased.
+					if (!regRule[i][j].HasFlags(CPcreOption::PF_A))
+					{
+						continue;
+					}
+					// if the pcre has '^', but also has a '/m' mod,
+					// this content can't be erased.
+					if (regRule[i][j].HasFlags(CPcreOption::PF_m))
+					{
+						continue;
+					}
+				}
+				if (std::find_if(curPcreSeq.cbegin(), curPcreSeq.cend(),
+					INCLUDESEQUENCE(seq)) != curPcreSeq.cend())
+				{
+					return true;
+				}
+			}
+		}
+	}
+	return false;
+}
+
+bool IsOneContentChain(const CPcreChain &chain, const CHAINSEQUENCE &chainSeq)
+{
+	if (chain.Size() != 1)
+	{
+		return false;
+	}
+	if (chainSeq.size() != 1)
+	{
+		return false;
+	}
+	if (!chain[0].HasFlags(CPcreOption::PF_F))
+	{
+		return false;
+	}
+	if (chainSeq[0].size() != 1)
+	{
+		return false;
+	}
+	return true;
+}
+
+void PreCompileRule(const CRegRule &regRule, RULESEQUENCE &ruleSeq,
+					RULECOMPDATA &ruleCompData)
+{
+	for (ulong i = 0; i < regRule.Size(); ++i)
+	{
+		ruleSeq.push_back(CHAINSEQUENCE());
+		ruleCompData.push_back(CHAINCOMPDATA());
+
+		CHAINSEQUENCE &chainSeq			= ruleSeq.back();
+		CHAINCOMPDATA &chainCompData	= ruleCompData.back();
+
+		const CPcreChain &curPcreChain = regRule[i];
+
+		for (ulong j = 0; j < curPcreChain.Size(); ++j)
+		{
+			chainCompData.push_back(BYTEARY());
+			chainSeq.push_back(PCRESEQUENCE());
+			curPcreChain[j].PreComp(chainCompData.back());
+			ExtractSequence(chainCompData.back(), chainSeq.back());
+		}
+	}
+}
+
+void ProcessRule(CRegRule &regRule, RULECOMPDATA &result)
+{
+	RULESEQUENCE ruleSeq;
+	PreCompileRule(regRule, ruleSeq, result);
+	for (ulong i = 0; i < regRule.Size();)
+	{
+		CPcreChain &curChain = regRule[i];
+		CHAINSEQUENCE &curChainSeq = ruleSeq[i];
+
+		bool bErased = false;
+		if (IsOneContentChain(curChain, curChainSeq))
+		{
+			if (SeqIncBy(regRule, ruleSeq, i))
+			{
+				regRule.Erase(i);
+				result.erase(result.begin() + i);
+				ruleSeq.erase(ruleSeq.begin() + i);
+				bErased = true;
+				g_log << "Erased one chain" << g_log.nl;
+			}
+		}
+		if (!bErased)
+		{
+			for (ulong j = 0; j < curChainSeq.size(); ++j)
+			{
+				ExtractSignatures(curChainSeq[j], regRule[i].GetSigs());
+			}
+			++i;
+		}
+	}
+}
+
 /* complie one rule to several dfas
 
 Arguments:
@@ -437,35 +572,49 @@ Returns:		nothing
 */
 void Rule2Dfas(const CRegRule &rule, CCompileResults &result)
 {
-	CTimer ctime;//for test
-
 	CRegRule regRule = rule;
+
+	RULECOMPDATA ruleCompData;
+	ProcessRule(regRule, ruleCompData);
+
 	COMPILEDINFO &ruleResult = result.GetSidDfaIds().Back();
 
 	const ulong nOldDfaSize = result.GetDfaTable().Size();
 
-	const ulong nCurRuleSize = rule.Size();
+	const ulong nCurRuleSize = regRule.Size();
 	result.GetDfaTable().Resize(nOldDfaSize + nCurRuleSize);
 
 	const ulong nOldRegexSize = result.GetRegexTbl().Size();
 	result.GetRegexTbl().Resize(nOldRegexSize + nCurRuleSize);
 
+
 	bool bHasSigs = false;
 	CNfa nfa;
+	nfa.Reserve(SC_NFAROWRESERV);
 	for (ulong i = 0; i < nCurRuleSize; ++i)
 	{
-		try
+		CPcreChain &curPcreChain = regRule[i];
+
+		nfa.Clear();
+		for (ulong j = 0; j < curPcreChain.Size(); ++j)
 		{
-			nfa.Clear();
-			Chain2NFA(regRule[i], nfa, regRule[i].GetSigs());
+			const CPcreOption &curPcre = curPcreChain[j];
+			try
+			{
+				PcreToNFA(ruleCompData[i][j],
+					curPcre.HasFlags(CPcreOption::PF_A), nfa);
+			}
+			catch (CTrace &e)
+			{
+				ruleResult.m_nResult |= COMPILEDINFO::RES_PCREERROR;
+				nfa.Clear();
+				break;
+			}
 		}
-		catch (CTrace &e)
+		if (ruleResult.m_nResult != COMPILEDINFO::RES_SUCCESS)
 		{
-			ruleResult.m_nResult |= COMPILEDINFO::RES_PCREERROR;
 			break;
 		}
-		pcre2nfatime += ctime.Reset();//for test
-
 		if (regRule[i].GetSigs().Size() > 0)
 		{
 			bHasSigs = true;
@@ -476,10 +625,8 @@ void Rule2Dfas(const CRegRule &rule, CCompileResults &result)
 
 		CDfa &dfa = result.GetDfaTable()[nDfaId];
 
-		ctime.Reset();//for test
 		dfa.SetId(nDfaId);
 		ulong nToDFAFlag = dfa.FromNFA(nfa);
-		nfa2dfatime += ctime.Reset();//for test
 
 		if (nToDFAFlag == -1)
 		{
@@ -488,11 +635,9 @@ void Rule2Dfas(const CRegRule &rule, CCompileResults &result)
 			break;
 		}
 
-		ctime.Reset();//for test
 		TASSERT(dfa.GetFinalStates().Size() != 0);
 
 		ulong nr = dfa.Minimize();
-		dfamintimetime += ctime.Reset();//for test
 		if (0 != nr || dfa.Size() > SC_MAXDFASIZE)
 		{
 			ruleResult.m_nResult |= COMPILEDINFO::RES_EXCEEDLIMIT;

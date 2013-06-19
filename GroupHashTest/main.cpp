@@ -16,11 +16,37 @@
 
 int main()
 {
+	//CCompileResults result;
+	//result.ReadFromFile("..\\result.cdt");
+
+	//CGroupRes groupRes;
+	//groupRes.ReadFromFile("..\\FinalResult.cdt");
+
+	//std::ofstream fout("..\\Ids.txt");
+	//for (ulong i = 0; i < groupRes.GetGroups().Size(); ++i)
+	//{
+	//	for (ulong j = 0; j < groupRes.GetGroups()[i].DfaIds.Size(); ++j)
+	//	{
+	//		fout << groupRes.GetGroups()[i].DfaIds[j] << " ";
+	//	}
+	//	fout << std::endl;
+	//}
+	//fout.clear();
+	//fout.close();
+
+	//std::ofstream foutMerge("..\\MergeId.txt");
+	//for (ulong i = 0; i < groupRes.GetGroups().Size(); ++i)
+	//{
+	//	foutMerge << groupRes.GetDfaTable()[groupRes.GetGroups()[i].mergeDfaId].GetFinalStates().CountDfaIds() << std::endl;
+	//}
+	//foutMerge.clear();
+	//foutMerge.close();
+
 	CTimer ctime;
 	CCompileResults result;
 	try
 	{
-		CompileRuleFile("..\\testrules.rule", result);
+		CompileRuleFile("..\\allrules.rule", result);
 	}
 	catch (CTrace &e)
 	{
@@ -29,7 +55,7 @@ int main()
 	}
 	result.WriteToFile("..\\result.cdt");
 
-	//result.ReadFromFile("..\\result_new.cdt");
+	//result.ReadFromFile("..\\result.cdt");
 
 	CGroupRes groupRes;
 	Grouping(result, groupRes);
@@ -42,28 +68,47 @@ int main()
 	std::cout << groupRes.GetGroups().Size() << std::endl;
 	std::cout << HashResMap.size() << std::endl;
 
-	//std::ifstream fin("..\\Ids.txt");
-	//std::vector<size_t> vecIds;
-	//size_t id;
-	//while (fin >> id)
-	//{
-	//	vecIds.push_back(id);
-	//}
-
 	//CCompileResults result;
 	//result.ReadFromFile("..\\result.cdt");
-
-	//CDfaArray vecDfas;
-	//vecDfas.Resize(2);
-	//vecDfas[0] = result.GetDfaTable()[vecIds[0]];
-	//for (ulong i = 1; i < vecIds.size(); ++i)
+	//std::ifstream fin("..\\Ids.txt");
+	//std::ifstream finMerge("..\\MergeId.txt");
+	//std::vector<size_t> mergeDfaSize;
+	//size_t id;
+	//while (finMerge >> id)
 	//{
-	//	vecDfas[1] = result.GetDfaTable()[vecIds[i]];
-	//	CDfa MergeDfa;
-	//	MergeMultipleDfas(vecDfas, MergeDfa);
-	//	vecDfas[0] = MergeDfa;
+	//	mergeDfaSize.push_back(id);
 	//}
-	//CFinalStates finalState = vecDfas[0].GetFinalStates();
+
+	//size_t count = 0;
+	//std::string str;
+	//while (std::getline(fin, str))
+	//{
+	//	//std::cout << count << std::endl;
+	//	std::stringstream ss(str);
+	//	std::vector<size_t> vecIds;
+	//	while (ss >> id)
+	//	{
+	//		vecIds.push_back(id);
+	//	}
+
+	//	CDfaArray vecDfas;
+	//	vecDfas.Resize(2);
+	//	vecDfas[0] = result.GetDfaTable()[vecIds[0]];
+	//	for (ulong i = 1; i < vecIds.size(); ++i)
+	//	{
+	//		vecDfas[1] = result.GetDfaTable()[vecIds[i]];
+	//		CDfa MergeDfa;
+	//		if (!MergeMultipleDfas(vecDfas, MergeDfa))
+	//		{
+	//			std::cout << "error" << std::endl;
+	//		}
+	//		vecDfas[0] = MergeDfa;
+	//	}
+	//	if (vecDfas[0].GetFinalStates().CountDfaIds() != mergeDfaSize[count++])
+	//	{
+	//		std::cout << "error" << std::endl;
+	//	}
+	//}
 
 	//std::ifstream fin("..\\allrules.rule");
 	//std::vector<std::string> vecRules;

@@ -49,11 +49,15 @@ CContentOption::~CContentOption()
 
 CContentOption& CContentOption::operator = (const CContentOption &other)
 {
-	m_nOffset	= other.m_nOffset;
-	m_nDepth	= other.m_nDepth;
-	m_nDistance	= other.m_nDistance;
-	m_nWithin	= other.m_nWithin;
-	m_data		= other.m_data;
+	if (this != &other)
+	{
+		CRuleOption::operator = (other);
+		m_nOffset	= other.m_nOffset;
+		m_nDepth	= other.m_nDepth;
+		m_nDistance	= other.m_nDistance;
+		m_nWithin	= other.m_nWithin;
+		m_data		= other.m_data;
+	}
 
 	return *this;
 }
@@ -236,10 +240,6 @@ void CContentOption::ToPcre(CPcreOption &pcreOpt) const
 			ssPcre << '}';
 		}
 	}
-	else
-	{
-		ssPcre << ".*";
-	}
 
 	char code[3] = {0};
 	for (BYTEARY_CITER i = m_data.cbegin(); i != m_data.cend(); ++i)
@@ -275,6 +275,7 @@ void CContentOption::ToPcre(CPcreOption &pcreOpt) const
 	ssPcre << '"';
 
 	pcreOpt.FromPattern(CDllString(ssPcre.str().c_str()));
+	pcreOpt.AddFlags(CPcreOption::PF_F);
 }
 
 void CContentOption::ExtractSignatures(CSignatures &sigs) const
