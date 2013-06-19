@@ -587,7 +587,6 @@ void Rule2Dfas(const CRegRule &rule, CCompileResults &result)
 	const ulong nOldRegexSize = result.GetRegexTbl().Size();
 	result.GetRegexTbl().Resize(nOldRegexSize + nCurRuleSize);
 
-
 	bool bHasSigs = false;
 	CNfa nfa;
 	nfa.Reserve(SC_NFAROWRESERV);

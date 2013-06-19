@@ -8,6 +8,7 @@ inline CUnsignedArray::CUnsignedArray(const CUnsignedArray &other)
 {
 	m_pAry = Alloc(other.m_ulSize);
 	m_ulSize = other.m_ulSize;
+	m_ulCap = other.m_ulCap;
 	if (m_ulSize != 0)
 	{
 		CopyFrom(other.m_pAry);
