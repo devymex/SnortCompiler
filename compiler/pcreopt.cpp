@@ -155,6 +155,10 @@ SNORTRULEHDR void CPcreOption::FromPattern(const CDllString &strPat)
 			TTHROW(TI_INVALIDDATA);
 		}
 	}
+	if (m_strPcre[0] == '^')
+	{
+		AddFlags(PF_A);
+	}
 }
 
 SNORTRULEHDR CRuleOption* CPcreOption::Clone() const

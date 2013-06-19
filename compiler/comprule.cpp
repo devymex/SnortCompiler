@@ -25,6 +25,13 @@ double pcre2nfatime = 0.0;
 double nfa2dfatime = 0.0;
 double dfamintimetime = 0.0;
 
+typedef std::vector<BYTEARY>			PCRESEQUENCE;
+typedef std::vector<PCRESEQUENCE>		CHAINSEQUENCE;
+typedef std::vector<CHAINSEQUENCE>		RULESEQUENCE;
+typedef std::vector<BYTEARY>			CHAINCOMPDATA;
+typedef std::vector<CHAINCOMPDATA>		RULECOMPDATA;
+
+
 /* complie one rule
 
 Arguments:
@@ -373,14 +380,31 @@ void AssignSig(CCompileResults &result, ulong BegIdx, ulong EndIdx)
 	}
 }
 
+bool CaselessComp(char a, char b)
+{
+	return tolower(a) == tolower(b);
+}
+
 struct INCLUDESEQUENCE
 {
 	const BYTEARY *m_pSeq;
-	INCLUDESEQUENCE(const BYTEARY &seq) : m_pSeq(&seq){}
+	bool m_bCaseless;
+	INCLUDESEQUENCE(const BYTEARY &seq, bool bCaseless = false)
+		: m_pSeq(&seq), m_bCaseless(bCaseless)
+	{
+	}
 	bool operator() (const BYTEARY &seq)
 	{
-		return (seq.end() != std::search(seq.begin(), seq.end(),
-			m_pSeq->begin(), m_pSeq->end()));
+		if (m_bCaseless)
+		{
+			return (seq.end() != std::search(seq.begin(), seq.end(),
+				m_pSeq->begin(), m_pSeq->end(), CaselessComp));
+		}
+		else
+		{
+			return (seq.end() != std::search(seq.begin(), seq.end(),
+				m_pSeq->begin(), m_pSeq->end(), CaselessComp));
+		}
 	}
 };
 
@@ -390,70 +414,147 @@ void ExtractSignatures(const std::vector<BYTEARY> &seqAry, CSignatures &sigs)
 	for (ulong i = 0; i < seqAry.size(); ++i)
 	{
 		const BYTEARY &curSeq = seqAry[i];
-		ulong ulLen = curSeq.size() - 3;
-		for (ulong j = 0; j < ulLen; ++j)
+		long ulLen = long(curSeq.size()) - 3;
+		for (long j = 0; j < ulLen; ++j)
 		{
 			for (ulong k = 0; k < 4; ++k)
 			{
-				((byte*)&nCurSig)[k] = byte(tolower(seqAry[i][j + k]));
+				((byte*)&nCurSig)[k] = byte(tolower(curSeq[j + k]));
 			}
 			sigs.PushBack(nCurSig);
 		}
 	}
 }
 
-void PreCompileRule(CRegRule &regRule, std::vector<std::vector<BYTEARY>> &result)
+bool SeqIncBy(const CRegRule &regRule, const RULESEQUENCE &ruleSeq, ulong ulIdx)
 {
-	std::vector<std::vector<BYTEARY>> ruleSeq;
+	TASSERT(ulIdx < ruleSeq.size());
+	TASSERT(ruleSeq[ulIdx].size() == 1);
+	TASSERT(ruleSeq[ulIdx].front().size() == 1);
 
+	const BYTEARY &seq = ruleSeq[ulIdx].front().front();
+	for (ulong i = 0; i < ruleSeq.size(); ++i)
+	{
+		if (ulIdx != i)
+		{
+			const CHAINSEQUENCE &curChainSeq = ruleSeq[i];
+			for (ulong j = 0; j < curChainSeq.size(); ++j)
+			{
+				const PCRESEQUENCE &curPcreSeq = curChainSeq[j];
+				bool bCaseless = true;
+				// as long as the content has nocase mod
+				// a caseless comparation can be executed.
+				if (!regRule[ulIdx][0].HasFlags(CPcreOption::PF_i))
+				{
+					// if the content is case-sensitive and the
+					// pcre is case-less, this content can't be erased
+					if (regRule[i][j].HasFlags(CPcreOption::PF_i))
+					{
+						continue;
+					}
+					// if the pcre is case-sensitive, a case-sensitive
+					// comparation shoud be executed.
+					bCaseless = false;
+				}
+
+				// if the content has no '^', comparation should be excuted
+				if (regRule[ulIdx][0].HasFlags(CPcreOption::PF_A))
+				{
+					// if the content has a '^', and the pcre has no '^',
+					// this content can't be erased.
+					if (!regRule[i][j].HasFlags(CPcreOption::PF_A))
+					{
+						continue;
+					}
+					// if the pcre has '^', but also has a '/m' mod,
+					// this content can't be erased.
+					if (regRule[i][j].HasFlags(CPcreOption::PF_m))
+					{
+						continue;
+					}
+				}
+				if (std::find_if(curPcreSeq.cbegin(), curPcreSeq.cend(),
+					INCLUDESEQUENCE(seq)) != curPcreSeq.cend())
+				{
+					return true;
+				}
+			}
+		}
+	}
+	return false;
+}
+
+bool IsOneContentChain(const CPcreChain &chain, const CHAINSEQUENCE &chainSeq)
+{
+	if (chain.Size() != 1)
+	{
+		return false;
+	}
+	if (chainSeq.size() != 1)
+	{
+		return false;
+	}
+	if (!chain[0].HasFlags(CPcreOption::PF_F))
+	{
+		return false;
+	}
+	if (chainSeq[0].size() != 1)
+	{
+		return false;
+	}
+	return true;
+}
+
+void PreCompileRule(const CRegRule &regRule, RULESEQUENCE &ruleSeq,
+					RULECOMPDATA &ruleCompData)
+{
 	for (ulong i = 0; i < regRule.Size(); ++i)
 	{
-		ruleSeq.push_back(std::vector<BYTEARY>());
-		result.push_back(std::vector<BYTEARY>());
+		ruleSeq.push_back(CHAINSEQUENCE());
+		ruleCompData.push_back(CHAINCOMPDATA());
 
-		std::vector<BYTEARY> &chainSeq		= ruleSeq.back();
-		std::vector<BYTEARY> &chainCompData	= result.back();
+		CHAINSEQUENCE &chainSeq			= ruleSeq.back();
+		CHAINCOMPDATA &chainCompData	= ruleCompData.back();
 
-		CPcreChain &curPcreChain = regRule[i];
+		const CPcreChain &curPcreChain = regRule[i];
 
 		for (ulong j = 0; j < curPcreChain.Size(); ++j)
 		{
 			chainCompData.push_back(BYTEARY());
+			chainSeq.push_back(PCRESEQUENCE());
 			curPcreChain[j].PreComp(chainCompData.back());
-
-			ExtractSequence(chainCompData.back(), chainSeq);
+			ExtractSequence(chainCompData.back(), chainSeq.back());
 		}
 	}
-
+}
+int n = 0;
+void ProcessRule(CRegRule &regRule, RULECOMPDATA &result)
+{
+	RULESEQUENCE ruleSeq;
+	PreCompileRule(regRule, ruleSeq, result);
 	for (ulong i = 0; i < regRule.Size(); ++i)
 	{
-		CPcreChain &curPcreChain = regRule[i];
-		std::vector<BYTEARY> &chainSeq = ruleSeq[i];
+		CPcreChain &curChain = regRule[i];
+		CHAINSEQUENCE &curChainSeq = ruleSeq[i];
 
-		bool bChainErased = false;
-		if (curPcreChain.Size() == 1 && curPcreChain[0].HasFlags(CPcreOption::PF_F)
-			&& curPcreChain[0].GetPcreString().Size() == chainSeq[0].size())
+		bool bErased = false;
+		if (IsOneContentChain(curChain, curChainSeq))
 		{
-			BYTEARY &curChainSeq = chainSeq[0];
-			for (ulong j = 0; j < regRule.Size(); ++j)
+			if (SeqIncBy(regRule, ruleSeq, i))
 			{
-				if (i != j)
-				{
-					if (std::find_if(ruleSeq[j].begin(), ruleSeq[j].end(),
-						INCLUDESEQUENCE(curChainSeq)) != ruleSeq[j].end())
-					{
-						regRule.Erase(i);
-						result.erase(result.begin() + i);
-						ruleSeq.erase(ruleSeq.begin() + i);
-						bChainErased = true;
-						break;
-					}
-				}
+				regRule.Erase(i);
+				result.erase(result.begin() + i);
+				ruleSeq.erase(ruleSeq.begin() + i);
+				bErased = true;
+				std::cout << "Erased: " << ++n << std::endl;
 			}
 		}
-		if (!bChainErased)
+		if (!bErased)
 		{
-			ExtractSignatures(ruleSeq[i], regRule[i].GetSigs());
+			for (ulong j = 0; j < curChainSeq.size(); ++j)
+			{
+				ExtractSignatures(curChainSeq[j], regRule[i].GetSigs());
+			}
 		}
 	}
 }
@@ -472,8 +573,8 @@ void Rule2Dfas(const CRegRule &rule, CCompileResults &result)
 {
 	CRegRule regRule = rule;
 
-	std::vector<std::vector<BYTEARY>> preCompData;
-	PreCompileRule(regRule, preCompData);
+	RULECOMPDATA ruleCompData;
+	ProcessRule(regRule, ruleCompData);
 
 	COMPILEDINFO &ruleResult = result.GetSidDfaIds().Back();
 
@@ -496,22 +597,23 @@ void Rule2Dfas(const CRegRule &rule, CCompileResults &result)
 		nfa.Clear();
 		for (ulong j = 0; j < curPcreChain.Size(); ++j)
 		{
-			const CPcreOption &curOpt = curPcreChain[j];
-			TASSERT(curOpt.GetPcreString().Size() > 0);
-
+			const CPcreOption &curPcre = curPcreChain[j];
 			try
 			{
-				bool bFromBeg = curOpt.GetPcreString()[0] == '^';
-				PcreToNFA(preCompData[i][j], bFromBeg, nfa);
+				PcreToNFA(ruleCompData[i][j],
+					curPcre.HasFlags(CPcreOption::PF_A), nfa);
 			}
 			catch (CTrace &e)
 			{
 				ruleResult.m_nResult |= COMPILEDINFO::RES_PCREERROR;
 				nfa.Clear();
-				throw;
+				break;
 			}
 		}
-
+		if (ruleResult.m_nResult != COMPILEDINFO::RES_SUCCESS)
+		{
+			break;
+		}
 		if (regRule[i].GetSigs().Size() > 0)
 		{
 			bHasSigs = true;

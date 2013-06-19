@@ -43,29 +43,29 @@ int main()
 	}
 	result.WriteToFile("..\\result.cdt");
 
-	result.ReadFromFile("..\\result.cdt");
-	result1.ReadFromFile("..\\result1.cdt");
-	for (ulong i = 0; i < result.GetSidDfaIds().Size(); ++i)
-	{
-		if (result.GetSidDfaIds()[i].m_dfaIds.Size() !=
-			result1.GetSidDfaIds()[i].m_dfaIds.Size())
-		{
-			std::cout << i << ": " << result.GetSidDfaIds()[i].m_dfaIds.Size()
-				<< ", " << result1.GetSidDfaIds()[i].m_dfaIds.Size() << std::endl;
+	//result.ReadFromFile("..\\result.cdt");
+	//result1.ReadFromFile("..\\result1.cdt");
+	//for (ulong i = 0; i < result.GetSidDfaIds().Size(); ++i)
+	//{
+	//	if (result.GetSidDfaIds()[i].m_dfaIds.Size() !=
+	//		result1.GetSidDfaIds()[i].m_dfaIds.Size())
+	//	{
+	//		std::cout << i << ": " << result.GetSidDfaIds()[i].m_dfaIds.Size()
+	//			<< ", " << result1.GetSidDfaIds()[i].m_dfaIds.Size() << std::endl;
 
-			system("pause");
-		}
-	}
-	for (ulong i = 0; i < result.GetDfaTable().Size(); ++i)
-	{
-		if (result.GetDfaTable()[i].Size() != result1.GetDfaTable()[i].Size())
-		{
-			std::cout << i << ": " << result.GetDfaTable()[i].Size() << ", "
-				<< result1.GetDfaTable()[i].Size() << std::endl;
+	//		system("pause");
+	//	}
+	//}
+	//for (ulong i = 0; i < result.GetDfaTable().Size(); ++i)
+	//{
+	//	if (result.GetDfaTable()[i].Size() != result1.GetDfaTable()[i].Size())
+	//	{
+	//		std::cout << i << ": " << result.GetDfaTable()[i].Size() << ", "
+	//			<< result1.GetDfaTable()[i].Size() << std::endl;
 
-			system("pause");
-		}
-	}
+	//		system("pause");
+	//	}
+	//}
 
 	//Group(result);
 
