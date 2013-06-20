@@ -9,7 +9,7 @@ DFAIDSETHDR CFinalStates::CFinalStates()
 {
 	try
 	{
-		m_pStates = new STATEVEC;
+		m_pStates = new STATEIDARY;
 		m_pDfaIds = new FINSTAMAP;
 	}
 	catch (std::exception &e)
@@ -29,7 +29,7 @@ DFAIDSETHDR CFinalStates::CFinalStates(const CFinalStates &other)
 {
 	try
 	{
-		m_pStates = new STATEVEC(*other.m_pStates);
+		m_pStates = new STATEIDARY(*other.m_pStates);
 		m_pDfaIds = new FINSTAMAP(*other.m_pDfaIds);
 	}
 	catch (std::exception &e)

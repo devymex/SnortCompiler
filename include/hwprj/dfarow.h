@@ -17,7 +17,7 @@
 
 
 #ifndef DFAHDR_DS
-class STATEVEC;
+class STATEIDARY;
 #define DFAHDR __declspec(dllimport)
 #else
 #define DFAHDR __declspec(dllexport)
@@ -48,7 +48,7 @@ public:
 	STATEFLAG		GetFlags() const;
 
 protected:
-	STATEVEC*		m_pDest;
+	STATEIDARY*		m_pDest;
 	STATEFLAG		m_nFlags;
 };
 
