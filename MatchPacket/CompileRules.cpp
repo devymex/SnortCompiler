@@ -1,6 +1,4 @@
 #include "stdafx.h"
-#include <hwprj\compiler.h>
-
 #include "MatchPkt.h"
 
 void __stdcall MyProcess(const PARSERESULT &parseRes, void *lpParam)
@@ -29,7 +27,7 @@ void __stdcall MyProcess(const PARSERESULT &parseRes, void *lpParam)
 	}
 }
 
-//×¢ÊÍ
+
 MATCHPKT void MchCompile(const char* filename, LPVOID lpVoid)
 {
 	//int sids[4653];

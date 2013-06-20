@@ -10,10 +10,15 @@
 #include <fstream>
 
 #include <hwprj\dfa.h>
+#include <hwprj\ruleoption.h>
+#include <hwprj\regrule.h>
+#include <hwprj\signatures.h>
 #include <hwprj\compiler.h>
+#include <hwprj\pcrechain.h>
 #include <hwprj\snortrule.h>
 #include <hwprj\pcrematch.h>
 #include <hwprj\buildhash.h>
+
 
 #define ETHDRLEN 14 
 #define _TCP 6
