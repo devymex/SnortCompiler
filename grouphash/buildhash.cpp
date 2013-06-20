@@ -599,6 +599,11 @@ void ClearUpHashRes(std::vector<GROUPHASH> &vecGroups, RESULTMAP &result, CGroup
 		groupRes.GetDfaTable().PushBack(*i);
 	}
 
+	for (ulong i = 0; i < groupRes.GetDfaTable().Size(); ++i)
+	{
+		groupRes.GetDfaTable()[i].Minimize();
+	}
+
 	for (RESULTMAP::iterator i = result.begin(); i != result.end(); ++i)
 	{
 		for (std::vector<ulong>::iterator j = i->second.begin(); j != i->second.end(); ++j)

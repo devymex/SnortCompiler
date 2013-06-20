@@ -14,6 +14,8 @@
 #include "comprule.h"
 #include <hwprj\compiler.h>
 
+int count = 0;
+
 /*
 * read rules from a file
 * then process the rules to CSnortRule
@@ -81,4 +83,5 @@ COMPILERHDR void ParseRuleFile(const char *pFileName, RECIEVER recv, void *lpUse
 COMPILERHDR void CompileRuleFile(const char *pFileName, CCompileResults &compRes)
 {
 	ParseRuleFile(pFileName, CompileCallback, &compRes);
+	std::cout << count << std::endl;
 }

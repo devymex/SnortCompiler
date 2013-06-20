@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "p2nmain.h"
+#include <hwprj\compiler.h>
 #include <hwprj\trace.h>
 
 #pragma warning (push)
@@ -394,6 +395,14 @@ bool CanProcess(BYTEARY_ITER &Beg, const BYTEARY_ITER &End)
 			case OP_CIRCM:
 				Beg += Steps[*Beg];
 				break;
+			case OP_DOLL:
+				++count;
+				Beg += Steps[OP_DOLL];
+				return false;
+			case OP_DOLLM:
+				++count;
+				Beg += Steps[OP_DOLLM];
+				return false;
 			case OP_CLASS:
 				Beg += Steps[OP_CLASS];
 				NextForCLASS(Beg);
