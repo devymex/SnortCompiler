@@ -14,7 +14,7 @@
 #include <hwprj\dfaidset.h>
 
 #ifndef DFAIDSETHDR_DS
-class STATEVEC;
+class STATEIDARY;
 class FINSTAMAP;
 #endif
 
@@ -39,6 +39,6 @@ public:
 	ulong				CountDfaIds() const;
 
 protected:
-	STATEVEC	*m_pStates;
+	STATEIDARY	*m_pStates;
 	FINSTAMAP	*m_pDfaIds;
 };

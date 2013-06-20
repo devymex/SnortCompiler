@@ -40,9 +40,9 @@
 #define NFAHDR_DS
 #define DFAARYHDR_DS
 
-typedef std::vector<STATEID>		STATEVEC;
-typedef STATEVEC::iterator			STATEVEC_ITER;
-typedef STATEVEC::const_iterator	STATEVEC_CITER;
+typedef std::vector<STATEID>		STATEIDARY;
+typedef STATEIDARY::iterator			STATEIDARY_ITER;
+typedef STATEIDARY::const_iterator	STATEIDARY_CITER;
 
 typedef std::list<STATEID>			STATELIST;
 typedef STATELIST::iterator			STATELIST_ITER;
