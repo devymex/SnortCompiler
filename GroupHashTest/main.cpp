@@ -65,10 +65,10 @@ int main()
 	HashMapping(groupRes, HashResMap);
 
 	groupRes.WriteToFile("..\\FinalResult.cdt");
-	for (ulong i = 0; i < groupRes.GetDfaTable().Size(); ++i)
-	{
-		groupRes.GetDfaTable()[i].MergeColumn();
-	}
+	//for (ulong i = 0; i < groupRes.GetDfaTable().Size(); ++i)
+	//{
+	//	groupRes.GetDfaTable()[i].MergeColumn();
+	//}
 	std::cout << "Total time: " << ctime.Reset() << std::endl;
 	std::cout << groupRes.GetGroups().Size() << std::endl;
 	std::cout << HashResMap.size() << std::endl;
