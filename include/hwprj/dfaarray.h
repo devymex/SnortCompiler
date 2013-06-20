@@ -25,15 +25,18 @@ class DFAARYHDR CDfaArray
 public:
 	CDfaArray();
 	CDfaArray(const CDfaArray& other);
-	const CDfaArray &operator=(const CDfaArray &other);
-	~CDfaArray();
-	CDfa& operator[](ulong index);
-	const CDfa& operator[](ulong index) const;
-	void Reserve(ulong nCount);
-	void Resize(ulong nSize);
-	const ulong Size() const;
-	void PushBack(const CDfa &dfa);
-	void Clear();
+	virtual ~CDfaArray();
+
+	CDfaArray&		operator =	(const CDfaArray &other);
+	CDfa&			operator []	(ulong ulIdx);
+	const CDfa&		operator []	(ulong ulIdx) const;
+
+	ulong			Size() const;
+	void			Clear();
+	void			Reserve(ulong ulCount);
+	void			Resize(ulong ulSize);
+	void			PushBack(const CDfa &dfa);
+
 protected:
 	CDFAVEC *m_pdfaTbl;
 };

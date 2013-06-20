@@ -8,13 +8,27 @@ GROUPSHDR CGroups::CGroups()
 
 GROUPSHDR CGroups::CGroups(const CGroups& other)
 {
-	m_pGroups = new GROUPVEC;
-	*this = other;
+	TASSERT(other.m_pGroups != null);
+	try
+	{
+		m_pGroups = new GROUPVEC(*other.m_pGroups);
+	}
+	catch (std::exception &e)
+	{
+		TTHROW(e.what());
+	}
 }
 
-GROUPSHDR const CGroups &CGroups::operator=(const CGroups &other)
+GROUPSHDR CGroups &CGroups::operator=(const CGroups &other)
 {
-	*m_pGroups = *other.m_pGroups;
+	try
+	{
+		*m_pGroups = *other.m_pGroups;
+	}
+	catch (std::exception &e)
+	{
+		TTHROW(e.what());
+	}
 	return *this;
 }
 
@@ -30,7 +44,14 @@ GROUPSHDR const ulong CGroups::Size() const
 
 GROUPSHDR void CGroups::Resize(ulong nSize)
 {
-	m_pGroups->resize(nSize);
+	try
+	{
+		m_pGroups->resize(nSize);
+	}
+	catch (std::exception &e)
+	{
+		TTHROW(e.what());
+	}
 }
 
 GROUPSHDR ONEGROUP &CGroups::operator[](ulong nIdx)

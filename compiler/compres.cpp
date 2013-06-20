@@ -121,7 +121,7 @@ COMPRESHDR ulong CCompileResults::WriteToFile(const char *filename)
 	//start to write dfas
 	for (ulong i = 0; i < m_dfaTbl.Size(); ++i)
 	{
-		ulong len = m_dfaTbl[i].MemSpace();
+		ulong len = m_dfaTbl[i].CalcStoreSize();
 		byte *dfaDetails = new byte[len];
 		m_dfaTbl[i].Save(dfaDetails);
 		WriteNum(fout, len);
@@ -143,9 +143,10 @@ COMPRESHDR ulong CCompileResults::WriteToFile(const char *filename)
 		WriteNum(fout, m_RegexTbl[i].Size());
 		for (ulong j = 0; j < m_RegexTbl[i].Size(); ++j)
 		{
-			WriteNum(fout, m_RegexTbl[i][j].Size());
-			const char *pString = m_RegexTbl[i][j].GetStr();
-			fout.write(pString, strlen(pString));
+			WriteNum(fout, m_RegexTbl[i][j].GetFlags());
+			CDllString &strPat = m_RegexTbl[i][j].GetPcreString();
+			WriteNum(fout, strPat.Size());
+			fout.write(strPat.Data(), strPat.Size());
 		}
 		WriteNum(fout, m_RegexTbl[i].GetSigs().Size());
 		for (ulong j = 0; j < m_RegexTbl[i].GetSigs().Size(); ++j)
@@ -159,6 +160,7 @@ COMPRESHDR ulong CCompileResults::WriteToFile(const char *filename)
 	fout.seekp(fileSizePos, std::ios_base::beg);
 	WriteNum(fout, endPos, 4);
 	fout.seekp(0, std::ios_base::end);
+	fout.flush();
 	fout.close();
 	fout.clear();
 
@@ -261,11 +263,16 @@ COMPRESHDR ulong CCompileResults::ReadFromFile(const char *filename)
 		fin.read((char*)&ChainSize, 4);
 		for (ulong j = 0; j < ChainSize; ++j)
 		{
+			CRuleOption::OPTIONFLAG nFlags = CRuleOption::NOFLAG;
+
+			fin.read((char*)&nFlags, 4);
 			fin.read((char*)&RegSize, 4);
 			char *pString = new char[RegSize + 1];
 			pString[RegSize] = '\0';
 			fin.read(pString, RegSize);
-			m_RegexTbl[i].PushBack(CDllString(pString));
+			m_RegexTbl[i].PushBack(CPcreOption());
+			m_RegexTbl[i].Back().SetFlags(nFlags);
+			m_RegexTbl[i].Back().SetPcreString(CDllString(pString));
 		}
 		fin.read((char*)&SigSize, 4);
 		for (ulong j = 0; j < SigSize; ++j)

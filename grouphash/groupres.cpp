@@ -113,7 +113,7 @@ GROUPRESHDR ulong CGroupRes::WriteToFile(const char *filename)
 	//start to write dfas
 	for (ulong i = 0; i < m_dfaTbl.Size(); ++i)
 	{
-		ulong len = m_dfaTbl[i].MemSpace();
+		ulong len = m_dfaTbl[i].CalcStoreSize();
 		byte *dfaDetails = new byte[len];
 		m_dfaTbl[i].Save(dfaDetails);
 		WriteNum(fout, len);

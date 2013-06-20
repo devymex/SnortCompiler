@@ -17,30 +17,36 @@
 
 
 DFAHDR CDfa::CDfa()
-	: m_nId(ulong(-1)), m_nColNum(ulong(0)), m_nStartId(STATEID(0))
+	: m_nId			(ulong(-1))
+	, m_nColNum		(ulong(0))
+	, m_nStartId	(STATEID(0))
 {
-	memset(m_pGroup, -1, SC_DFACOLCNT * sizeof(m_pGroup[0]));
+	memset(m_pGroup, -1, sizeof(m_pGroup));
 	try
 	{
 		m_pDfa = new std::vector<CDfaRow>;
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
 }
 
 DFAHDR CDfa::CDfa(const CDfa &other)
+	: m_nId			(other.m_nId)
+	, m_nColNum		(other.m_nColNum)
+	, m_nStartId	(other.m_nStartId)
+	, m_FinStas		(other.m_FinStas)
 {
 	try
 	{
-		m_pDfa = new std::vector<CDfaRow>;
+		m_pDfa = new std::vector<CDfaRow>(*other.m_pDfa);
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
-	*this = other;
+	CopyMemory(m_pGroup, other.m_pGroup, sizeof(m_pGroup));
 }
 
 DFAHDR CDfa::~CDfa()
@@ -50,18 +56,19 @@ DFAHDR CDfa::~CDfa()
 
 DFAHDR CDfa& CDfa::operator=(const CDfa &other)
 {
-	Clear();
+	TASSERT(other.m_pDfa != null);
+
 	m_nId = other.m_nId;
 	m_nColNum = other.m_nColNum;
 	m_nStartId = other.m_nStartId;
-	CopyMemory(m_pGroup, other.m_pGroup, SC_DFACOLCNT * sizeof(byte));
+	CopyMemory(m_pGroup, other.m_pGroup, sizeof(m_pGroup));
 	try
 	{
 		*m_pDfa = *other.m_pDfa;
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
 	m_FinStas = other.m_FinStas;
 	return *this;
@@ -97,7 +104,7 @@ DFAHDR void CDfa::Reserve(ulong nSize)
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
 }
 
@@ -109,7 +116,7 @@ DFAHDR void CDfa::Resize(ulong nSize, ulong nCol)
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
 }
 
@@ -145,6 +152,7 @@ DFAHDR ushort CDfa::GetGroupCount() const
 
 DFAHDR void CDfa::SetGroups(byte *pGroup)
 {
+	TASSERT(pGroup != null);
 	//1 if the group is used, 0 otherwise
 	byte occurred[SC_DFACOLCNT] = {0};
 	for (ulong i = 0; i < SC_DFACOLCNT; ++i) 
@@ -191,6 +199,26 @@ DFAHDR byte CDfa::Char2Group(byte nIdx)
 	return m_pGroup[nIdx];
 }
 
+DFAHDR STATEID CDfa::GetStartState() const
+{
+	return m_nStartId;
+}
+
+DFAHDR void CDfa::SetStartState(STATEID id)
+{
+	m_nStartId = id;
+}
+
+CFinalStates& CDfa::GetFinalStates()
+{
+	return m_FinStas;
+}
+
+const CFinalStates& CDfa::GetFinalStates() const
+{
+	return m_FinStas;
+}
+
 DFAHDR ulong CDfa::FromNFA(const CNfa &nfa)
 {
 	typedef std::unordered_map<STATEVEC, STATEID, NSTATESET_HASH> STATESETHASH;
@@ -219,12 +247,12 @@ DFAHDR ulong CDfa::FromNFA(const CNfa &nfa)
 		m_pDfa->push_back(CDfaRow(m_nColNum));
 
 		CDfaRow &firstRow = m_pDfa->back();
-		firstRow.SetFlag(firstRow.GetFlag() | firstRow.START);
+		firstRow.AddFlags(CDfaRow::START);
 
 		if (startEVec.back() == nfa.Size())
 		{
-			firstRow.SetFlag(firstRow.GetFlag() | firstRow.TERMINAL);
-			m_FinStas.PushBack(0, m_nId);
+			firstRow.AddFlags(CDfaRow::FINAL);
+			m_FinStas.AddState(0).AddDfaId(m_nId);
 		}
 
 		static STATEVEC nextNfaVec; //
@@ -266,8 +294,8 @@ DFAHDR ulong CDfa::FromNFA(const CNfa &nfa)
 						if (nextNfaVec.back() == nfa.Size())
 						{
 							CDfaRow &lastRow = m_pDfa->back();
-							lastRow.SetFlag(lastRow.GetFlag() | lastRow.TERMINAL);
-							m_FinStas.PushBack(nextSta, m_nId);
+							lastRow.AddFlags(CDfaRow::FINAL);
+							m_FinStas.AddState(nextSta).AddDfaId(m_nId);
 						}
 						nfaStasStack.push(nextNfaVec);
 					}
@@ -284,7 +312,7 @@ DFAHDR ulong CDfa::FromNFA(const CNfa &nfa)
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
 }
 
@@ -299,7 +327,7 @@ DFAHDR ulong CDfa::Minimize()
 
 	//Indicate current state would be jump to the next state set through the character.
 	nSize = m_pDfa->size();
-	STATEVEC *pRevTab = NULL;
+	STATEVEC *pRevTab = null;
 	try
 	{
 		pRevTab = new STATEVEC[nSize * nCols];
@@ -317,7 +345,7 @@ DFAHDR ulong CDfa::Minimize()
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
 
 	ulong nr = PartStates(pRevTab);
@@ -327,53 +355,7 @@ DFAHDR ulong CDfa::Minimize()
 	return nr;
 }
 
-DFAHDR STATEID CDfa::GetStartState() const
-{
-	return m_nStartId;
-}
-
-DFAHDR void CDfa::SetStartState(STATEID id)
-{
-	m_nStartId = id;
-}
-
-DFAHDR ulong CDfa::Process(byte *ByteStream, ulong len, STATEARY &StaSet)
-{
-	std::vector<bool> res;
-	ulong nPos = 0;
-	try
-	{
-		res.resize(m_pDfa->size(), false);
-		STATEID ActiveState = m_nStartId;
-		for (nPos = 0; nPos < len; ++nPos)
-		{
-			if ((*this)[ActiveState].GetFlag() & CDfaRow::TERMINAL)
-			{
-				res[ActiveState] = true;
-			}
-			ActiveState = (*this)[ActiveState][m_pGroup[*(ByteStream + nPos)]];
-			if (ActiveState == STATEID(-1))
-			{
-				break;
-			}
-		}
-	}
-	catch (std::exception &e)
-	{
-		throw CTrace(__FILE__, __LINE__, e.what());
-	}
-	for (ulong i = 0; i < res.size(); ++i)
-	{
-		if (res[i])
-		{
-			StaSet.PushBack(i);
-		}
-	}
-
-	return nPos;
-}
-
-DFAHDR ulong CDfa::MemSpace() const
+DFAHDR ulong CDfa::CalcStoreSize() const
 {
 	ulong nSize = 0;
 
@@ -401,7 +383,7 @@ DFAHDR ulong CDfa::MemSpace() const
 	nSize += sizeof(ulong);
 
 	//the relationship of final state and dfa id
-	nSize += m_FinStas.GetAllDfaIdCount() * (sizeof(byte) + sizeof(ulong));
+	nSize += m_FinStas.CountDfaIds() * (sizeof(byte) + sizeof(ulong));
 
 	return nSize;
 }
@@ -428,7 +410,7 @@ DFAHDR void CDfa::Save(byte *beg)
 	for (ulong i = 0; i < m_pDfa->size(); ++i)
 	{
 		//write the flag of dfa state
-		WriteNum(beg, (*m_pDfa)[i].GetFlag());
+		WriteNum(beg, (*m_pDfa)[i].GetFlags());
 		for (byte j = 0; j < m_nColNum; ++j)
 		{
 			WriteNum(beg, (*m_pDfa)[i][j], sizeof(byte));
@@ -439,7 +421,7 @@ DFAHDR void CDfa::Save(byte *beg)
 	WriteNum(beg, m_nStartId, sizeof(byte));
 
 	//write the relationship between dfa's terminal state and dfa id
-	WriteNum(beg, m_FinStas.GetAllDfaIdCount());
+	WriteNum(beg, m_FinStas.CountDfaIds());
 	for (ulong i = 0; i < m_FinStas.Size(); ++i)
 	{
 		STATEID nStaId = m_FinStas[i];
@@ -484,7 +466,7 @@ DFAHDR void CDfa::Load(byte *beg)
 	{
 		//read the flag of dfa state
 		ReadNum(beg, nFlag);
-		(*m_pDfa)[i].SetFlag(nFlag);
+		(*m_pDfa)[i].SetFlags(nFlag);
 		for (byte j = 0; j < m_nColNum; ++j)
 		{
 			(*m_pDfa)[i][j] = 0;
@@ -509,18 +491,44 @@ DFAHDR void CDfa::Load(byte *beg)
 		ulong nDfaId;
 		ReadNum(beg, nStaId, sizeof(byte));
 		ReadNum(beg, nDfaId);
-		m_FinStas.PushBack(nStaId, nDfaId);
+		m_FinStas.AddState(nStaId).AddDfaId(nDfaId);
 	}
 }
 
-CFinalStates& CDfa::GetFinalState()
+DFAHDR ulong CDfa::Process(byte *ByteStream, ulong len, STATEARY &StaSet)
 {
-	return m_FinStas;
-}
+	std::vector<bool> res;
+	ulong nPos = 0;
+	try
+	{
+		res.resize(m_pDfa->size(), false);
+		STATEID ActiveState = m_nStartId;
+		for (nPos = 0; nPos < len; ++nPos)
+		{
+			if ((*this)[ActiveState].GetFlags() & CDfaRow::FINAL)
+			{
+				res[ActiveState] = true;
+			}
+			ActiveState = (*this)[ActiveState][m_pGroup[*(ByteStream + nPos)]];
+			if (ActiveState == STATEID(-1))
+			{
+				break;
+			}
+		}
+	}
+	catch (std::exception &e)
+	{
+		TTHROW(e.what());
+	}
+	for (ulong i = 0; i < res.size(); ++i)
+	{
+		if (res[i])
+		{
+			StaSet.PushBack(i);
+		}
+	}
 
-const CFinalStates& CDfa::GetFinalState() const
-{
-	return m_FinStas;
+	return nPos;
 }
 
 DFAHDR void CDfa::Dump(const char *pFile)
@@ -528,7 +536,7 @@ DFAHDR void CDfa::Dump(const char *pFile)
 	std::ofstream fout(pFile);
 	if(!fout)
 	{
-		std::cout << "file open error!" << std::endl;
+		g_log << "file open error!" << g_log.nl;
 	}
 
 	fout << "字符和组对应关系：" << std::endl;
@@ -546,7 +554,7 @@ DFAHDR void CDfa::Dump(const char *pFile)
 	fout << std::endl;
 	for(ulong i = 0; i != m_pDfa->size(); ++i)
 	{
-		if(((*m_pDfa)[i].GetFlag() & CDfaRow::TERMINAL) != 0)
+		if(((*m_pDfa)[i].GetFlags() & CDfaRow::FINAL) != 0)
 		{
 			fout << i << ",Term\t";
 		}
@@ -588,13 +596,13 @@ ulong CDfa::PartStates(STATEVEC *pRevTbl)
 
 	//divide partSet using pWait in a loop
 	//store index of partSet into pWait for different symbol 
-	std::vector<ulong> pWait[256];
+	ULONGVEC pWait[256];
 
 	//inital pWait; for same symbol, if |partSet[j]|<=|partSet[k]|，
 	//then insert j into pWait, otherwise，insert k	
 	InitPartWait(partSets, pWait, nGrpNum);
 
-	byte *pAbleToI = NULL;
+	byte *pAbleToI = null;
 	try
 	{
 		pAbleToI = new byte[ulStaNum];
@@ -602,7 +610,7 @@ ulong CDfa::PartStates(STATEVEC *pRevTbl)
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
 
 	ulong nr = 0;
@@ -668,7 +676,7 @@ ulong CDfa::PartStates(STATEVEC *pRevTbl)
 					for (byte m = 0; m < nGrpNum; ++m)
 					{
 						int k = partSets.size() - 1;
-						std::vector<ulong> &curWait = pWait[m];
+						ULONGVEC &curWait = pWait[m];
 						int aj = pJSet->Ones[m];
 						int ak = lastPart.Ones[m];
 						if (aj > 0 && aj <= ak)
@@ -694,14 +702,14 @@ ulong CDfa::PartStates(STATEVEC *pRevTbl)
 
 		CFinalStates newFinStas;
 
-		DFAROWARY *pNewDfa = NULL;
+		DFAROWARY *pNewDfa = null;
 		try
 		{
 			pNewDfa = new DFAROWARY((STATEID)partSets.size(), CDfaRow(nCol));
 		}
 		catch (std::exception &e)
 		{
-			throw CTrace(__FILE__, __LINE__, e.what());
+			TTHROW(e.what());
 		}
 
 		//renumber DFA state
@@ -710,19 +718,18 @@ ulong CDfa::PartStates(STATEVEC *pRevTbl)
 		//remark new start state and final states
 		for (PARTSETVEC_ITER i = partSets.begin(); i != partSets.end(); ++i)
 		{
-			STATEID nIdx = STATEID(i - partSets.begin());
+			STATEID nState = STATEID(i - partSets.begin());
 			for (STATELIST_ITER j = i->StaSet.begin(); j != i->StaSet.end(); ++j)
 			{
 				CDfaRow &curRow = (*m_pDfa)[*j];
-				if (curRow.GetFlag() & CDfaRow::START)
+				if (curRow.GetFlags() & CDfaRow::START)
 				{
-					m_nStartId = nIdx;
+					m_nStartId = nState;
 				}
 
-				if (curRow.GetFlag() & CDfaRow::TERMINAL)
+				if (curRow.GetFlags() & CDfaRow::FINAL)
 				{
-					newFinStas.PushBack(nIdx);
-					newFinStas.GetDfaIdSet(nIdx) = m_FinStas.GetDfaIdSet(*j);
+					newFinStas.AddState(nState) = m_FinStas.GetDfaIdSet(*j);
 				}
 			}
 		}
@@ -732,7 +739,7 @@ ulong CDfa::PartStates(STATEVEC *pRevTbl)
 		swap(m_pDfa, pNewDfa);
 		delete pNewDfa;
 
-		std::cout << "Minimized: " << (ulStaNum - m_pDfa->size()) << std::endl;
+		g_log << "Minimized: " << (ulStaNum - m_pDfa->size()) << g_log.nl;
 	}
 
 	for (PARTSETVEC_ITER i = partSets.begin(); i != partSets.end(); ++i)
@@ -740,6 +747,57 @@ ulong CDfa::PartStates(STATEVEC *pRevTbl)
 		ReleaseAbleTo(*i);
 	}
 	return nr;
+}
+
+DFAHDR void PrintDfaToGv(CDfa &newdfa, const char* fileName)
+{
+	std::ofstream fout(fileName);
+	fout << "digraph G {" << std::endl;
+	fout << "S -> " << (ulong)newdfa.GetStartState() << std::endl;
+
+	for(STATEID i = 0; i != newdfa.Size(); ++i)
+	{
+		std::map<STATEID, ulong> rowStateCnt;
+		for(byte j = 0; j != newdfa.GetGroupCount(); ++j)
+		{
+			try
+			{
+				rowStateCnt[newdfa[i][j]]++;
+			}
+			catch (std::exception &e)
+			{
+				TTHROW(e.what());
+			}
+		}
+		STATEID maxId = 0;
+		for (std::map<STATEID, ulong>::iterator j = rowStateCnt.begin(); j != rowStateCnt.end(); ++j)
+		{
+			if (j->second > rowStateCnt[maxId])
+			{
+				maxId = j->first;
+			}
+		}
+		for(byte j = 0; j != newdfa.GetGroupCount(); ++j)
+		{
+			if (newdfa[i][j] != maxId)
+			{
+				fout << i << " -> " << (ulong)newdfa[i][j] << " [label=\"" << (int)j << "\"];" << std::endl;
+			}
+			else if (maxId != STATEID(-1))
+			{
+				fout << i << " -> "  << (ulong)maxId << " [label=\"" << (int)j << "\"];" << std::endl;
+			}
+		}
+	}
+	for (STATEID i = 0; i < newdfa.Size(); ++i)
+	{
+		if (newdfa[i].GetFlags() & CDfaRow::FINAL)
+		{
+			fout << (ulong)i << " [peripheries=2];" << std::endl;
+		}
+	}
+	fout << "}" << std::endl;
+	fout.close();
 }
 
 
@@ -762,74 +820,21 @@ ulong CDfa::PartStates(STATEVEC *pRevTbl)
 **	@retval true function successful
 **	@retval fasle fatal error
 */
-
-DFAHDR void PrintDfaToGv(CDfa &newdfa, const char* fileName)
+DFAHDR bool MergeMultipleDfas(CDfaArray &inputDfas, CDfa &mergedDfa)
 {
-	std::ofstream fout(fileName);
-	fout << "digraph G {" << std::endl;
-	fout << "S -> " << (ulong)newdfa.GetStartState() << std::endl;
+	ulong dfaId = mergedDfa.GetId();
+	mergedDfa.Clear();
+	mergedDfa.SetId(dfaId);
 
-	for(STATEID i = 0; i != newdfa.Size(); ++i)
-	{
-		std::map<STATEID, ulong> rowStateCnt;
-		for(byte j = 0; j != newdfa.GetGroupCount(); ++j)
-		{
-			try
-			{
-				rowStateCnt[newdfa[i][j]]++;
-			}
-			catch (std::exception &e)
-			{
-				throw CTrace(__FILE__, __LINE__, e.what());
-			}
-		}
-		STATEID maxId = 0;
-		for (std::map<STATEID, ulong>::iterator j = rowStateCnt.begin(); j != rowStateCnt.end(); ++j)
-		{
-			if (j->second > rowStateCnt[maxId])
-			{
-				maxId = j->first;
-			}
-		}
-		for(byte j = 0; j != newdfa.GetGroupCount(); ++j)
-		{
-			if (newdfa[i][j] != maxId)
-			{
-				fout << i << " -> " << (ulong)newdfa[i][j] << " [label=\"" << j << "\"];" << std::endl;
-			}
-			else if (maxId != STATEID(-1))
-			{
-				fout << i << " -> "  << (ulong)maxId << " [label=\"" << j << "\"];" << std::endl;
-			}
-		}
-	}
-	for (STATEID i = 0; i < newdfa.Size(); ++i)
-	{
-		if (newdfa[i].GetFlag() & CDfaRow::TERMINAL)
-		{
-			fout << (ulong)i << " [peripheries=2];" << std::endl;
-		}
-	}
-	fout << "}" << std::endl;
-	fout.close();
-}
-
-
-DFAHDR bool MergeMultipleDfas(CDfaArray &dfas, CDfa &lastDfa)
-{
-	ulong dfaId = lastDfa.GetId();
-	lastDfa.Clear();
-	lastDfa.SetId(dfaId);
-
-	ulong dfasSize = dfas.Size();
+	ulong dfasSize = inputDfas.Size();
 	STATEID nTermSta = 1;//nTermSta: terminal flag. 1: terminal, -1: non-terminal
 
-	//group the lastDfa's columns
+	//group the mergedDfa's columns
 	byte groups[SC_DFACOLCNT];
-	DfaColGroup(dfas, groups);
-	lastDfa.SetGroups(groups);
+	DfaColGroup(inputDfas, groups);
+	mergedDfa.SetGroups(groups);
 
-	ulong colCnt = lastDfa.GetGroupCount();
+	ulong colCnt = mergedDfa.GetGroupCount();
 
 	typedef std::unordered_map<STATEVEC, STATEID, TODFA_HASH> STATESETHASH;
 	STATESETHASH statehash;
@@ -838,8 +843,8 @@ DFAHDR bool MergeMultipleDfas(CDfaArray &dfas, CDfa &lastDfa)
 	std::stack<STATEVEC> statesStack;
 
 	/*
-	**	use a size of (dfas.size() + 2) vector to represent a state of the merged dfa.
-	**	element 0 represents the state of dfas[0], ..., element n represents the state of dfas[n].
+	**	use a size of (inputDfas.size() + 2) vector to represent a state of the merged dfa.
+	**	element 0 represents the state of inputDfas[0], ..., element n represents the state of inputDfas[n].
 	**	element n + 1 and element n + 2 are flags which show that whether this state is a start state or terminal state.
 	*/
 	STATEVEC startVec;
@@ -847,26 +852,25 @@ DFAHDR bool MergeMultipleDfas(CDfaArray &dfas, CDfa &lastDfa)
 	try
 	{
 		startVec.resize(dfasSize + 2);
-		lastDfa.Reserve(CNfaRow::COLUMNCNT);
-		lastDfa.Resize(lastDfa.Size() + 1, colCnt);
+		mergedDfa.Reserve(CNfaRow::COLUMNCNT);
+		mergedDfa.Resize(mergedDfa.Size() + 1, colCnt);
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
 
 	for(ulong i = 0; i < dfasSize; ++i)
 	{
-		STATEID nSta = dfas[i].GetStartState();
-		if((dfas[i][nSta].GetFlag() & CDfaRow::TERMINAL) != 0)
+		STATEID nSta = inputDfas[i].GetStartState();
+		if((inputDfas[i][nSta].GetFlags() & CDfaRow::FINAL) != 0)
 		{
 			//this is a terminal state
 			finFlag = 1;
-			AddTermIntoDFA(nSta, dfas[i], 0, lastDfa);
-			CFinalStates &newFinSta = lastDfa.GetFinalState();
-			newFinSta.PushBack(0);
-			newFinSta.GetDfaIdSet(0).Append(
-				dfas[i].GetFinalState().GetDfaIdSet(nSta));
+			AddTermIntoDFA(nSta, inputDfas[i], 0, mergedDfa);
+			CFinalStates &newFinSta = mergedDfa.GetFinalStates();
+			newFinSta.AddState(0).Append(
+				inputDfas[i].GetFinalStates().GetDfaIdSet(nSta));
 
 		}
 		startVec[i] = nSta;
@@ -875,12 +879,12 @@ DFAHDR bool MergeMultipleDfas(CDfaArray &dfas, CDfa &lastDfa)
 	if(finFlag)
 	{
 		startVec[dfasSize + 1] = nTermSta;
-		lastDfa[0].SetFlag(lastDfa[0].GetFlag() | CDfaRow::START | CDfaRow::TERMINAL);
+		mergedDfa[0].AddFlags(CDfaRow::START | CDfaRow::FINAL);
 	}
 	else
 	{
 		startVec[dfasSize + 1] = STATEID(-1);
-		lastDfa[0].SetFlag(lastDfa[0].GetFlag() | CDfaRow::START);
+		mergedDfa[0].AddFlags(CDfaRow::START);
 	}
 
 	std::vector<STATEID> NextVec;
@@ -900,7 +904,7 @@ DFAHDR bool MergeMultipleDfas(CDfaArray &dfas, CDfa &lastDfa)
 		STATESETHASH::iterator ir = statehash.find(curVec);
 		if (ir == statehash.end())
 		{
-			std::cout << "hash Error!" << std::endl;
+			g_log << "hash Error!" << g_log.nl;
 			return false;
 		}
 		STATEID curStaNum = ir->second;
@@ -924,12 +928,12 @@ DFAHDR bool MergeMultipleDfas(CDfaArray &dfas, CDfa &lastDfa)
 
 				if(sta != STATEID(-1))
 				{
-					byte curgroup = dfas[i].Char2Group((byte)curChar);
-					STATEID nextId = dfas[i][sta][curgroup];//the next state the ith dfa transforms from state curVec[i] through curChar to
+					byte curgroup = inputDfas[i].Char2Group((byte)curChar);
+					STATEID nextId = inputDfas[i][sta][curgroup];//the next state the ith dfa transforms from state curVec[i] through curChar to
 					if(nextId != STATEID(-1))
 					{
 						flag = 1;
-						if((dfas[i][nextId].GetFlag() & CDfaRow::TERMINAL) != 0)
+						if((inputDfas[i][nextId].GetFlags() & CDfaRow::FINAL) != 0)
 						{
 							finFlag = 1;
 						}
@@ -956,15 +960,15 @@ DFAHDR bool MergeMultipleDfas(CDfaArray &dfas, CDfa &lastDfa)
 				STATESETHASH::iterator nextIt = statehash.find(NextVec);
 				if(nextIt == statehash.end())
 				{
-					lastDfa.Resize(lastDfa.Size() + 1, colCnt);
-					if(lastDfa.Size() > SC_STATELIMIT)
+					mergedDfa.Resize(mergedDfa.Size() + 1, colCnt);
+					if(mergedDfa.Size() > SC_STATELIMIT)
 					{
 						br = false;
 						break;
 					}
 					STATEID nextSta = (STATEID)statehash.size();
 					statehash[NextVec] = nextSta;
-					lastDfa[curStaNum][lastDfaGroup] = nextSta;
+					mergedDfa[curStaNum][lastDfaGroup] = nextSta;
 
 					if(finFlag)
 					{
@@ -972,29 +976,31 @@ DFAHDR bool MergeMultipleDfas(CDfaArray &dfas, CDfa &lastDfa)
 						{
 							if(NextVec[k] != STATEID(-1))
 							{
-								if((dfas[k][NextVec[k]].GetFlag() & CDfaRow::TERMINAL) != 0)
+								if((inputDfas[k][NextVec[k]].GetFlags() &
+									CDfaRow::FINAL) != 0)
 								{
-									AddTermIntoDFA(NextVec[k], dfas[k], nextSta, lastDfa);
+									AddTermIntoDFA(NextVec[k], inputDfas[k],
+										nextSta, mergedDfa);
 								}
 							}
 						}
-						lastDfa[nextSta].SetFlag(lastDfa[nextSta].GetFlag() | CDfaRow::TERMINAL);
+						mergedDfa[nextSta].AddFlags(CDfaRow::FINAL);
 					}
 					statesStack.push(NextVec);
 				}
 				else
 				{
-					lastDfa[curStaNum][lastDfaGroup] = nextIt->second;
+					mergedDfa[curStaNum][lastDfaGroup] = nextIt->second;
 				}
 			}
 			else
 			{
-				lastDfa[curStaNum][lastDfaGroup] = STATEID(-1);
+				mergedDfa[curStaNum][lastDfaGroup] = STATEID(-1);
 			}
 		}
 	}
-	//lastDfa.Minimize();
-	if(lastDfa.Size() > SC_MAXDFASIZE)
+	//mergedDfa.Minimize();
+	if(mergedDfa.Size() > SC_MAXDFASIZE)
 	{
 		//std::cerr << "SC_MAXDFASIZE!" << std::endl;
 		br = false;

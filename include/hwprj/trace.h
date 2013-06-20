@@ -20,7 +20,7 @@ public:
 	}
 	pcstr What()
 	{
-		return m_pFile;
+		return m_pMsg;
 	}
 	pcstr File()
 	{
@@ -28,7 +28,6 @@ public:
 	}
 
 public:
-	static pcstr TI_BADALLOC;
 
 protected:
 	pcstr m_pFile;
@@ -36,10 +35,24 @@ protected:
 	ulong m_ulLine;
 };
 
-#ifdef _DEBUG
-#define TASSERT(s)	if (!(s)) throw CTrace(__FILE__, __LINE__, "!("#s")");
-#define TVERIFY(s)	if (!(s)) throw CTrace(__FILE__, __LINE__, "!("#s")");
+TRACEHDR extern pcstr TI_BADALLOC;
+TRACEHDR extern pcstr TI_NOTFOUND;
+TRACEHDR extern pcstr TI_OUTOFRANGE;
+TRACEHDR extern pcstr TI_INVALIDDATA;
+TRACEHDR extern pcstr TI_BADPARAM;
+TRACEHDR extern pcstr TI_UNSUPPORT;
+TRACEHDR extern pcstr TI_NOTALLOW;
+TRACEHDR extern pcstr TI_INCOMPATIBLE;
+
+#define TTHROW(m) throw CTrace(__FILE__, __LINE__, m);
+
+
+#ifndef _DEBUG
+#define TASSERT(s)	if (!(s)) {TTHROW("!("#s")");}
+#define TVERIFY(s)	if (!(s)) {TTHROW("!("#s")");}
 #else
 #define TASSERT(s)	;
 #define TVERIFY(s)	(s);
 #endif
+
+

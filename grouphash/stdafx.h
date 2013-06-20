@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <iostream>
 #include <vector>
+#include <deque>
 #include <fstream>
 #include <map>
 #include <windows.h>
@@ -25,6 +26,7 @@
 #include <hwprj\dfa.h>
 #include <hwprj\dfaarray.h>
 #include <hwprj\compres.h>
+#include <hwprj\logger.h>
 
 #define GROUPSHDR_DS
 #define GROUPRESHDR_DS

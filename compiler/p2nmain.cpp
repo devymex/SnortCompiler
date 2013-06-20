@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "p2nmain.h"
+#include <hwprj\trace.h>
 
 #pragma warning (push)
 #pragma warning (disable : 4100)
@@ -69,12 +70,12 @@ ulong OP_ALLANY_ELEMS[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
 	243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255};
 
 ulong* ptr[] = {
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	null,
+	null,
+	null,
+	null,
+	null,
+	null,
 	OP_NOT_DIGIT_ELEMS,
 	OP_DIGIT_ELEMS,
 	OP_NOT_WHITESPACE_ELEMS,
@@ -104,15 +105,15 @@ ulong NUMS[] = {
 
 Fn FUNC[156] = 
 {
-	NULL,						/* 0 End of pattern */
+	null,						/* 0 End of pattern */
 
 	/* Values corresponding to backslashed metacharacters */
 
-	NULL,						/* 1 Start of data: \A */
-	NULL,						/* 2 Start of match (subject + offset): \G */
-	NULL,						/* 3 Set start of match (\K) */
-	NULL,						/* 4 \B */
-	NULL,						/* 5 \b */
+	null,						/* 1 Start of data: \A */
+	null,						/* 2 Start of match (subject + offset): \G */
+	null,						/* 3 Set start of match (\K) */
+	null,						/* 4 \B */
+	null,						/* 5 \b */
 	OP_COMMON_FUNC,				/* 6 \D */
 	OP_COMMON_FUNC,				/* 7 \d */
 	OP_COMMON_FUNC,				/* 8 \S */
@@ -122,22 +123,22 @@ Fn FUNC[156] =
 
 	OP_COMMON_FUNC,				/* 12 Match any character except newline (\N) */
 	OP_COMMON_FUNC,				/* 13 Match any character */
-	NULL,						/* 14 Match any byte (\C); different to OP_ANY for UTF-8 */
-	NULL,						/* 15 \P (not Unicode property) */
-	NULL,						/* 16 \p (Unicode property) */
-	NULL,						/* 17 \R (any newline sequence) */
-	NULL,						/* 18 \H (not horizontal whitespace) */
-	NULL,						/* 19 \h (horizontal whitespace) */
-	NULL,						/* 20 \V (not vertical whitespace) */
-	NULL,						/* 21 \v (vertical whitespace) */
-	NULL,						/* 22 \X (extended Unicode sequence */
-	NULL,						/* 23 End of data or \n at end of data (\Z) */
-	NULL,						/* 24 End of data (\z) */
+	null,						/* 14 Match any byte (\C); different to OP_ANY for UTF-8 */
+	null,						/* 15 \P (not Unicode property) */
+	null,						/* 16 \p (Unicode property) */
+	null,						/* 17 \R (any newline sequence) */
+	null,						/* 18 \H (not horizontal whitespace) */
+	null,						/* 19 \h (horizontal whitespace) */
+	null,						/* 20 \V (not vertical whitespace) */
+	null,						/* 21 \v (vertical whitespace) */
+	null,						/* 22 \X (extended Unicode sequence */
+	null,						/* 23 End of data or \n at end of data (\Z) */
+	null,						/* 24 End of data (\z) */
 
-	NULL,						/* 25 Start of line - not multiline */
-	NULL,						/* 26 Start of line - multiline */
-	NULL,						/* 27 End of line - not multiline */
-	NULL,						/* 28 End of line - multiline */
+	null,						/* 25 Start of line - not multiline */
+	null,						/* 26 Start of line - multiline */
+	null,						/* 27 End of line - not multiline */
+	null,						/* 28 End of line - multiline */
 	OP_CHAR_FUNC,				/* 29 Match one character, casefully */
 	OP_CHARI_FUNC,				/* 30 Match one character, caselessly */
 	OP_NOT_FUNC,				/* 31 Match one character, not the given one, casefully */
@@ -240,99 +241,99 @@ Fn FUNC[156] =
 	/* These are used for character classes and back references; only the
 	first six are the same as the sets above. */
 
-	NULL,						/* 98 The maximizing and minimizing versions of */
-	NULL,						/* 99 all these opcodes must come in pairs, with */
-	NULL,						/* 100 the minimizing one second. These codes must */
-	NULL,						/* 101 be in exactly the same order as those above. */
-	NULL,						/* 102 */
-	NULL,						/* 103 */
+	null,						/* 98 The maximizing and minimizing versions of */
+	null,						/* 99 all these opcodes must come in pairs, with */
+	null,						/* 100 the minimizing one second. These codes must */
+	null,						/* 101 be in exactly the same order as those above. */
+	null,						/* 102 */
+	null,						/* 103 */
 
-	NULL,						/* 104 These are different to the three sets above. */
-	NULL,						/* 105 */
+	null,						/* 104 These are different to the three sets above. */
+	null,						/* 105 */
 
 	/* End of quantifier opcodes */
 
-	NULL,						/* 106 Match a character class, chars < 256 only */
-	NULL,						/* 107 Same, but the bitmap was created from a negative
+	null,						/* 106 Match a character class, chars < 256 only */
+	null,						/* 107 Same, but the bitmap was created from a negative
 								class - the difference is relevant only when a
 								character > 255 is encountered. */
-	NULL,						/* 108 Extended class for handling > 255 chars within the
+	null,						/* 108 Extended class for handling > 255 chars within the
 								class. This does both positive and negative. */
-	NULL,						/* 109 Match a back reference, casefully */
-	NULL,						/* 110 Match a back reference, caselessly */
-	NULL,						/* 111 Match a numbered subpattern (possibly recursive) */
-	NULL,						/* 112 Call out to external function if provided */
+	null,						/* 109 Match a back reference, casefully */
+	null,						/* 110 Match a back reference, caselessly */
+	null,						/* 111 Match a numbered subpattern (possibly recursive) */
+	null,						/* 112 Call out to external function if provided */
 
-	NULL,						/* 113 Start of alternation */
-	NULL,						/* 114 End of group that doesn't have an unbounded repeat */
-	NULL,						/* 115 These two must remain together and in this */
-	NULL,						/* 116 order. They are for groups the repeat for ever. */
-	NULL,						/* 117 Possessive unlimited repeat. */
+	null,						/* 113 Start of alternation */
+	null,						/* 114 End of group that doesn't have an unbounded repeat */
+	null,						/* 115 These two must remain together and in this */
+	null,						/* 116 order. They are for groups the repeat for ever. */
+	null,						/* 117 Possessive unlimited repeat. */
 
 								/* The assertions must come before BRA, CBRA, ONCE, and COND, and the four
 								asserts must remain in order. */
 
-	NULL,						/* 118 Move pointer back - used in lookbehind assertions */
-	NULL,						/* 119 Positive lookahead */
-	NULL,						/* 120 Negative lookahead */
-	NULL,						/* 121 Positive lookbehind */
-	NULL,						/* 122 Negative lookbehind */
+	null,						/* 118 Move pointer back - used in lookbehind assertions */
+	null,						/* 119 Positive lookahead */
+	null,						/* 120 Negative lookahead */
+	null,						/* 121 Positive lookbehind */
+	null,						/* 122 Negative lookbehind */
 
 	/* ONCE, ONCE_NC, BRA, BRAPOS, CBRA, CBRAPOS, and COND must come immediately
 	after the assertions, with ONCE first, as there's a test for >= ONCE for a
 	subpattern that isn't an assertion. The POS versions must immediately follow
 	the non-POS versions in each case. */
 
-	NULL,						/* 123 Atomic group, contains captures */
-	NULL,						/* 124 Atomic group containing no captures */
-	NULL,						/* 125 Start of non-capturing bracket */
-	NULL,						/* 126 Ditto, with unlimited, possessive repeat */
-	NULL,						/* 127 Start of capturing bracket */
-	NULL,						/* 128 Ditto, with unlimited, possessive repeat */
-	NULL,						/* 129 Conditional group */
+	null,						/* 123 Atomic group, contains captures */
+	null,						/* 124 Atomic group containing no captures */
+	null,						/* 125 Start of non-capturing bracket */
+	null,						/* 126 Ditto, with unlimited, possessive repeat */
+	null,						/* 127 Start of capturing bracket */
+	null,						/* 128 Ditto, with unlimited, possessive repeat */
+	null,						/* 129 Conditional group */
 
 	/* These five must follow the previous five, in the same order. There's a
 	check for >= SBRA to distinguish the two sets. */
 
-	NULL,						/* 130 Start of non-capturing bracket, check empty */
-	NULL,						/* 131 Ditto, with unlimited, possessive repeat */
-	NULL,						/* 132 Start of capturing bracket, check empty */
-	NULL,						/* 133 Ditto, with unlimited, possessive repeat */
-	NULL,						/* 134 Conditional group, check empty */
+	null,						/* 130 Start of non-capturing bracket, check empty */
+	null,						/* 131 Ditto, with unlimited, possessive repeat */
+	null,						/* 132 Start of capturing bracket, check empty */
+	null,						/* 133 Ditto, with unlimited, possessive repeat */
+	null,						/* 134 Conditional group, check empty */
 
 	/* The next two pairs must (respectively) be kept together. */
 
-	NULL,						/* 135 Used to hold a capture number as condition */
-	NULL,						/* 136 Same, but generated by a name reference*/
-	NULL,						/* 137 Used to hold a recursion number as condition */
-	NULL,						/* 138 Same, but generated by a name reference*/
-	NULL,						/* 139 The DEFINE condition */
+	null,						/* 135 Used to hold a capture number as condition */
+	null,						/* 136 Same, but generated by a name reference*/
+	null,						/* 137 Used to hold a recursion number as condition */
+	null,						/* 138 Same, but generated by a name reference*/
+	null,						/* 139 The DEFINE condition */
 
-	NULL,						/* 140 These two must remain together and in this */
-	NULL,						/* 141 order. */
-	NULL,						/* 142 */
+	null,						/* 140 These two must remain together and in this */
+	null,						/* 141 order. */
+	null,						/* 142 */
 
 	/* These are backtracking control verbs */
 
-	NULL,						/* 143 always has an argument */
-	NULL,						/* 144 */
-	NULL,						/* 145 same, but with argument */
-	NULL,						/* 146 */
-	NULL,						/* 147 same, but with argument */
-	NULL,						/* 148 */
-	NULL,						/* 149 same, but with argument */
-	NULL,						/* 150 */
+	null,						/* 143 always has an argument */
+	null,						/* 144 */
+	null,						/* 145 same, but with argument */
+	null,						/* 146 */
+	null,						/* 147 same, but with argument */
+	null,						/* 148 */
+	null,						/* 149 same, but with argument */
+	null,						/* 150 */
 
 	/* These are forced failure and success verbs */
 
-	NULL,						/* 151 */
-	NULL,						/* 152 */
-	NULL,						/* 153 Used inside assertions */
-	NULL,						/* 154 Used before OP_ACCEPT to close open captures */
+	null,						/* 151 */
+	null,						/* 152 */
+	null,						/* 153 Used inside assertions */
+	null,						/* 154 Used before OP_ACCEPT to close open captures */
 
 	/* This is used to skip a subpattern with a {0} quantifier */
 
-	NULL						/* 155 */
+	null						/* 155 */
 
 	/* This is not an opcode, but is used to check that tables indexed by opcode
 	are the correct length, in order to catch updating errors - there have been
@@ -380,7 +381,7 @@ bool CanProcess(BYTEARY_ITER &Beg, const BYTEARY_ITER &End)
 	BYTEARY_ITER start, end;
 	for (;Beg != End;)
 	{
-		if (FUNC[*Beg] != NULL)
+		if (FUNC[*Beg] != null)
 		{
 			Beg += Steps[*Beg];
 		}
@@ -508,17 +509,17 @@ void NextForCLASS(BYTEARY_ITER &Beg)
 	}
 }
 
-ulong ProcessPcre(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa)
+void ProcessPcre(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa)
 {
 	ulong CurState = nfa.Size();
 	bool ALTBeg = false;
 	std::vector<PCRESIGN> vecPath;
 	std::vector<ulong> PreStates;
 	ulong ALTPreBeg = CurState;
-	return Process(Beg, End, nfa, CurState, PreStates, ALTPreBeg, ALTBeg, ulong(-1), false, false, false, vecPath);
+	Process(Beg, End, nfa, CurState, PreStates, ALTPreBeg, ALTBeg, ulong(-1), false, false, false, vecPath);
 }
 
-ulong Process(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, std::vector<ulong> &PreStates, ulong ALTPreBeg, bool &ALTBeg, ulong ALTBeginState, bool bCBRA, bool bALT, bool bBRAZERO, std::vector<PCRESIGN> &vecPath)
+void Process(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, std::vector<ulong> &PreStates, ulong ALTPreBeg, bool &ALTBeg, ulong ALTBeginState, bool bCBRA, bool bALT, bool bBRAZERO, std::vector<PCRESIGN> &vecPath)
 {
 	BYTEARY_ITER start, end;
 	ulong CurPreState;
@@ -535,12 +536,11 @@ ulong Process(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurS
 	bool IsALT = bALT;
 	bool IsBRAZERO = bBRAZERO;
 	ulong ALTBegState = ALTBeginState;
-	ulong flag = SC_SUCCESS;
 	for (;Beg != End;)
 	{
-		if (FUNC[*Beg] != NULL)
+		if (FUNC[*Beg] != null)
 		{
-			flag = FUNC[*Beg](Beg, End, nfa, CurState, ALTPreState, ALTBeg, ALTBegState);
+			FUNC[*Beg](Beg, End, nfa, CurState, ALTPreState, ALTBeg, ALTBegState);
 			Beg += Steps[*Beg];
 		}
 		else
@@ -557,10 +557,10 @@ ulong Process(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurS
 				Beg += Steps[*Beg];
 				break;
 			case OP_CLASS:
-				flag = OP_CLASS_FUNC(Beg, End, nfa, CurState, ALTPreState, ALTBeg, ALTBegState);
+				OP_CLASS_FUNC(Beg, End, nfa, CurState, ALTPreState, ALTBeg, ALTBegState);
 				break;
 			case OP_NCLASS:
-				flag = OP_NCLASS_FUNC(Beg, End, nfa, CurState, ALTPreState, ALTBeg, ALTBegState);
+				OP_NCLASS_FUNC(Beg, End, nfa, CurState, ALTPreState, ALTBeg, ALTBegState);
 				break;
 			case OP_ALT:
 				ALTBeg = true;
@@ -572,13 +572,13 @@ ulong Process(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurS
 				end = Beg + GET(Beg + 1);
 				start = Beg + Steps[OP_ALT];
 				OP_ALT_FUNC(start, end, nfa, ALTPreState, CurState);
-				flag = Process(start, end, nfa, CurState, PreStates, ALTPreState, ALTBeg, ALTBegState, IsCBRA, IsALT, IsBRAZERO, vecPath);
+				Process(start, end, nfa, CurState, PreStates, ALTPreState, ALTBeg, ALTBegState, IsCBRA, IsALT, IsBRAZERO, vecPath);
 				Beg = end;
 				break;
 			case OP_KET:
 				if (vecPath.size() == 0)
 				{
-					std::cout << "ERROR!" << std::endl;
+					TTHROW(TI_INVALIDDATA);
 					break;
 				}
 				if (vecPath.back() == CBRA)
@@ -662,8 +662,7 @@ ulong Process(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurS
 				}
 				else
 				{
-					std::cout << "ERROR!" << std::endl;
-					break;
+					TTHROW(TI_INVALIDDATA);
 				}
 				OP_KET_FUNC(nfa, CurPreState, CurState, IsALT, IsBRAZERO);
 				Beg += Steps[OP_KET];
@@ -671,8 +670,7 @@ ulong Process(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurS
 			case OP_KETRMAX:
 				if (vecPath.size() == 0)
 				{
-					std::cout << "ERROR!" << std::endl;
-					break;
+					TTHROW(TI_INVALIDDATA);
 				}
 				IsALT = false;
 				IsBRAZERO = false;
@@ -715,7 +713,7 @@ ulong Process(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurS
 				vecPath.push_back(ONCE);
 				PreStates.push_back(CurState);
 				AddEMPTY(nfa, CurState);
-				flag = Process(start, end, nfa, CurState, PreStates, ALTPreState, ALTBeg, ALTBegState, IsCBRA, IsALT, IsBRAZERO, vecPath);
+				Process(start, end, nfa, CurState, PreStates, ALTPreState, ALTBeg, ALTBegState, IsCBRA, IsALT, IsBRAZERO, vecPath);
 				Beg = end;
 				break;
 			case OP_BRA:
@@ -731,7 +729,7 @@ ulong Process(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurS
 				PreStates.push_back(CurState);
 				AddEMPTY(nfa, CurState);
 				OP_BRA_FUNC(start, end, nfa, CurState);
-				flag = Process(start, end, nfa, CurState, PreStates, ALTPreState, ALTBeg, ALTBegState, IsCBRA, IsALT, IsBRAZERO, vecPath);
+				Process(start, end, nfa, CurState, PreStates, ALTPreState, ALTBeg, ALTBegState, IsCBRA, IsALT, IsBRAZERO, vecPath);
 				Beg = end;
 				break;
 			case OP_CBRA:
@@ -745,7 +743,7 @@ ulong Process(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurS
 				PreStates.push_back(CurState);
 				AddEMPTY(nfa, CurState);
 				OP_CBRA_FUNC(start, end, nfa, CurState);
-				flag = Process(start, end, nfa, CurState, PreStates, ALTPreState, ALTBeg, ALTBegState, IsCBRA, IsALT, IsBRAZERO, vecPath);
+				Process(start, end, nfa, CurState, PreStates, ALTPreState, ALTBeg, ALTBegState, IsCBRA, IsALT, IsBRAZERO, vecPath);
 				Beg = end;
 				break;
 			case OP_SCBRA:
@@ -759,7 +757,7 @@ ulong Process(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurS
 				}
 				PreStates.push_back(CurState);
 				AddEMPTY(nfa, CurState);
-				flag = Process(start, end, nfa, CurState, PreStates, ALTPreState, ALTBeg, ALTBegState, IsCBRA, IsALT, IsBRAZERO, vecPath);
+				Process(start, end, nfa, CurState, PreStates, ALTPreState, ALTBeg, ALTBegState, IsCBRA, IsALT, IsBRAZERO, vecPath);
 				Beg = end;
 				break;
 			case OP_BRAZERO:
@@ -772,18 +770,12 @@ ulong Process(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurS
 				}
 				PreStates.push_back(CurState);
 				AddEMPTY(nfa, CurState);
-				flag = Process(start, end, nfa, CurState, PreStates, ALTPreState, ALTBeg, ALTBegState, IsCBRA, IsALT, IsBRAZERO, vecPath);
+				Process(start, end, nfa, CurState, PreStates, ALTPreState, ALTBeg, ALTBegState, IsCBRA, IsALT, IsBRAZERO, vecPath);
 				Beg = end;
 				break;
 			}
 		}
-		if (flag != SC_SUCCESS)
-		{
-			return flag;
-		}
 	}
-
-	return SC_SUCCESS;
 }
 
 void ProcessALT(CNfa &nfa, ulong PreState, bool &ALTBegin, ulong ALTBegState)
@@ -795,7 +787,7 @@ void ProcessALT(CNfa &nfa, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 	}
 }
 
-ulong OP_COMMON_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
+void OP_COMMON_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
 	ulong nCursize = nfa.Size();
@@ -803,48 +795,59 @@ ulong OP_COMMON_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulon
 	++CurState;
 	ulong* tmp = ptr[*Beg];
 
-	//std::cout << ulong(*Beg) << " " << NUMS[*Beg] << std::endl;
 	for (ulong i = 0; i < NUMS[*Beg]; ++i)
 	{
 		nfa.Back()[tmp[i]].PushBack(CurState);
 	}
-
-	return SC_SUCCESS;
 }
 
 void OP_CIRCM_FUNC(CNfa &nfa, ulong &CurState)
 {
-	ulong nCursize = nfa.Size();
-	nfa.Resize(nCursize + 3);
-	nfa[nCursize][EMPTY].PushBack(CurState + 1);
-	nfa[nCursize][EMPTY].PushBack(CurState + 3);
-	++CurState;
+	//ulong nCursize = nfa.Size();
+	//nfa.Resize(nCursize + 3);
+	//nfa[nCursize][EMPTY].PushBack(CurState + 1);
+	//nfa[nCursize][EMPTY].PushBack(CurState + 3);
+	//++CurState;
 
+	//++nCursize;
+	//for (ulong i = 0; i < 256; ++i)
+	//{
+	//	nfa[nCursize][i].PushBack(CurState);
+	//}
+	//nfa[nCursize]['\n'].PushBack(CurState + 1);
+	//nfa[nCursize]['\n'].PushBack(CurState + 2);
+	//nfa[nCursize]['\r'].PushBack(CurState + 2);
+	//CurState += 2;
+	//nfa[nCursize + 1]['\r'].PushBack(CurState);
+
+	ulong nCursize = nfa.Size();
+	nfa.Resize(nCursize + 2);
+
+	nfa[nCursize][EMPTY].PushBack(CurState + 1);
+	nfa[nCursize][EMPTY].PushBack(CurState + 2);
+
+	++CurState;
 	++nCursize;
 	for (ulong i = 0; i < 256; ++i)
 	{
 		nfa[nCursize][i].PushBack(CurState);
 	}
-	nfa[nCursize]['\n'].PushBack(CurState + 1);
-	nfa[nCursize]['\n'].PushBack(CurState + 2);
-	nfa[nCursize]['\r'].PushBack(CurState + 2);
-	CurState += 2;
-	nfa[nCursize + 1]['\r'].PushBack(CurState);
+	
+	++CurState;
+	nfa[nCursize]['\n'].PushBack(CurState);
 }
 
 
-ulong OP_CHAR_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
+void OP_CHAR_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
 	++CurState;
 	ulong nCursize = nfa.Size();
 	nfa.Resize(nCursize + 1);
 	nfa.Back()[*(Beg + 1)].PushBack(CurState);
-
-	return SC_SUCCESS;
 }
 
-ulong OP_CHARI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
+void OP_CHARI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
 	ulong nCursize = nfa.Size();
@@ -860,11 +863,9 @@ ulong OP_CHARI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong
 	{
 		nfa.Back()[c].PushBack(CurState);
 	}
-	
-	return SC_SUCCESS;
 }
 
-ulong OP_NOT_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
+void OP_NOT_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
 	ulong nCursize = nfa.Size();
@@ -878,11 +879,9 @@ ulong OP_NOT_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &
 			nfa.Back()[j].PushBack(CurState);
 		}
 	}
-	
-	return SC_SUCCESS;
 }
 
-ulong OP_NOTI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
+void OP_NOTI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
 	ulong nCursize = nfa.Size();
@@ -896,11 +895,9 @@ ulong OP_NOTI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong 
 			nfa.Back()[j].PushBack(CurState);
 		}
 	}
-	
-	return SC_SUCCESS;
 }
 
-ulong OP_STAR_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
+void OP_STAR_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
 	ulong nCursize = nfa.Size();
@@ -908,11 +905,9 @@ ulong OP_STAR_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong 
 	nfa.Back()[*(Beg + 1)].PushBack(CurState);
 	++CurState;
 	nfa.Back()[EMPTY].PushBack(CurState);
-	
-	return SC_SUCCESS;
 }
 
-ulong OP_PLUS_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
+void OP_PLUS_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
 	ulong nCursize = nfa.Size();
@@ -922,11 +917,9 @@ ulong OP_PLUS_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong 
 	nfa.Back()[*(Beg + 1)].PushBack(CurState);
 	++CurState;
 	nfa.Back()[EMPTY].PushBack(CurState);
-	
-	return SC_SUCCESS;
 }
 
-ulong OP_QUERY_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
+void OP_QUERY_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
 	ulong nCursize = nfa.Size();
@@ -934,11 +927,9 @@ ulong OP_QUERY_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong
 	++CurState;
 	nfa.Back()[*(Beg + 1)].PushBack(CurState);
 	nfa.Back()[EMPTY].PushBack(CurState);
-	
-	return SC_SUCCESS;
 }
 
-ulong OP_UPTO_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
+void OP_UPTO_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
 
@@ -952,11 +943,9 @@ ulong OP_UPTO_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong 
 		++CurState;
 		nfa[nCursize + i][c].PushBack(CurState);
 	}
-	
-	return SC_SUCCESS;
 }
 
-ulong OP_EXACT_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
+void OP_EXACT_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
 	ulong count = GET(Beg + 1);
@@ -968,11 +957,9 @@ ulong OP_EXACT_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong
 		++CurState;
 		nfa[nCursize + i][c].PushBack(CurState);
 	}
-	
-	return SC_SUCCESS;
 }
 
-ulong OP_STARI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
+void OP_STARI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
 	ulong nCursize = nfa.Size();
@@ -989,11 +976,9 @@ ulong OP_STARI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong
 	}
 	++CurState;
 	nfa.Back()[EMPTY].PushBack(CurState);
-	
-	return SC_SUCCESS;
 }
 
-ulong OP_PLUSI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
+void OP_PLUSI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
 	ulong nCursize = nfa.Size();
@@ -1020,11 +1005,9 @@ ulong OP_PLUSI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong
 	}
 	++CurState;
 	nfa.Back()[EMPTY].PushBack(CurState);
-	
-	return SC_SUCCESS;
 }
 
-ulong OP_QUERYI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
+void OP_QUERYI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
 	ulong nCursize = nfa.Size();
@@ -1041,11 +1024,9 @@ ulong OP_QUERYI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulon
 		nfa.Back()[c].PushBack(CurState);
 	}
 	nfa.Back()[EMPTY].PushBack(CurState);
-	
-	return SC_SUCCESS;
 }
 
-ulong OP_UPTOI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
+void OP_UPTOI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
 
@@ -1067,11 +1048,9 @@ ulong OP_UPTOI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong
 			nfa[nCursize + i][c].PushBack(CurState);
 		}
 	}
-	
-	return SC_SUCCESS;
 }
 
-ulong OP_EXACTI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
+void OP_EXACTI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
 	ulong count = GET(Beg + 1);
@@ -1091,11 +1070,9 @@ ulong OP_EXACTI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulon
 			nfa[nCursize + i][c].PushBack(CurState);
 		}
 	}
-	
-	return SC_SUCCESS;
 }
 
-ulong OP_NOTSTAR_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
+void OP_NOTSTAR_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
 	ulong nCursize = nfa.Size();
@@ -1110,11 +1087,9 @@ ulong OP_NOTSTAR_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulo
 	}
 	++CurState;
 	nfa.Back()[EMPTY].PushBack(CurState);
-	
-	return SC_SUCCESS;
 }
 
-ulong OP_NOTPLUS_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
+void OP_NOTPLUS_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
 	ulong nCursize = nfa.Size();
@@ -1131,11 +1106,9 @@ ulong OP_NOTPLUS_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulo
 	}
 	++CurState;
 	nfa.Back()[EMPTY].PushBack(CurState);
-	
-	return SC_SUCCESS;
 }
 
-ulong OP_NOTQUERY_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
+void OP_NOTQUERY_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
 	ulong nCursize = nfa.Size();
@@ -1150,11 +1123,9 @@ ulong OP_NOTQUERY_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ul
 		}
 	}
 	nfa.Back()[EMPTY].PushBack(CurState);
-	
-	return SC_SUCCESS;
 }
 
-ulong OP_NOTUPTO_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
+void OP_NOTUPTO_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
 	ulong count = GET(Beg + 1);
@@ -1173,11 +1144,9 @@ ulong OP_NOTUPTO_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulo
 			}
 		}
 	}
-	
-	return SC_SUCCESS;
 }
 
-ulong OP_NOTEXACT_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
+void OP_NOTEXACT_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
 	ulong count = GET(Beg + 1);
@@ -1195,11 +1164,9 @@ ulong OP_NOTEXACT_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ul
 			}
 		}
 	}
-	
-	return SC_SUCCESS;
 }
 
-ulong OP_NOTSTARI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
+void OP_NOTSTARI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
 	ulong nCursize = nfa.Size();
@@ -1214,11 +1181,9 @@ ulong OP_NOTSTARI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ul
 	}
 	++CurState;
 	nfa.Back()[EMPTY].PushBack(CurState);
-	
-	return SC_SUCCESS;
 }
 
-ulong OP_NOTPLUSI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
+void OP_NOTPLUSI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
 	ulong nCursize = nfa.Size();
@@ -1235,11 +1200,9 @@ ulong OP_NOTPLUSI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ul
 	}
 	++CurState;
 	nfa.Back()[EMPTY].PushBack(CurState);
-	
-	return SC_SUCCESS;
 }
 
-ulong OP_NOTQUERYI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
+void OP_NOTQUERYI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
 	ulong nCursize = nfa.Size();
@@ -1254,11 +1217,9 @@ ulong OP_NOTQUERYI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, u
 		}
 	}
 	nfa.Back()[EMPTY].PushBack(CurState);
-	
-	return SC_SUCCESS;
 }
 
-ulong OP_NOTUPTOI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
+void OP_NOTUPTOI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
 	ulong count = GET(Beg + 1);
@@ -1277,11 +1238,9 @@ ulong OP_NOTUPTOI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ul
 			}
 		}
 	}
-	
-	return SC_SUCCESS;
 }
 
-ulong OP_NOTEXACTI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
+void OP_NOTEXACTI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
 	ulong count = GET(Beg + 1);
@@ -1299,15 +1258,13 @@ ulong OP_NOTEXACTI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, u
 			}
 		}
 	}
-	
-	return SC_SUCCESS;
 }
 
-ulong OP_TYPESTAR_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
+void OP_TYPESTAR_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
 	byte c = *(Beg + 1);
-	if (c < sizeof(NUMS) / sizeof(ulong) && ptr[c] != NULL)
+	if (c < sizeof(NUMS) / sizeof(ulong) && ptr[c] != null)
 	{
 		ulong nCursize = nfa.Size();
 		nfa.Resize(nCursize + 1);
@@ -1320,15 +1277,13 @@ ulong OP_TYPESTAR_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ul
 		++CurState;
 		nfa.Back()[EMPTY].PushBack(CurState);
 	}
-	
-	return SC_SUCCESS;
 }
 
-ulong OP_TYPEPLUS_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
+void OP_TYPEPLUS_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
 	byte c = *(Beg + 1);
-	if (c < sizeof(NUMS) / sizeof(ulong) && ptr[c] != NULL)
+	if (c < sizeof(NUMS) / sizeof(ulong) && ptr[c] != null)
 	{
 		ulong nCursize = nfa.Size();
 		nfa.Resize(nCursize + 2);
@@ -1343,15 +1298,13 @@ ulong OP_TYPEPLUS_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ul
 		++CurState;
 		nfa.Back()[EMPTY].PushBack(CurState);
 	}
-	
-	return SC_SUCCESS;
 }
 
-ulong OP_TYPEQUERY_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
+void OP_TYPEQUERY_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
 	byte c = *(Beg + 1);
-	if (c < sizeof(NUMS) / sizeof(ulong) && ptr[c] != NULL)
+	if (c < sizeof(NUMS) / sizeof(ulong) && ptr[c] != null)
 	{
 		ulong nCursize = nfa.Size();
 		nfa.Resize(nCursize + 1);
@@ -1364,17 +1317,15 @@ ulong OP_TYPEQUERY_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, u
 		}
 		nfa.Back()[EMPTY].PushBack(CurState);
 	}
-	
-	return SC_SUCCESS;
 }
 
-ulong OP_TYPEUPTO_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
+void OP_TYPEUPTO_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
 	ulong count = GET(Beg + 1);
 	bool ALTBeg = ALTBegin;
 	byte c = *(Beg + 3);
-	if (c >=OP_NOT_DIGIT && c <= OP_ALLANY && FUNC[c] != NULL)
+	if (c >=OP_NOT_DIGIT && c <= OP_ALLANY && FUNC[c] != null)
 	{
 		BYTEARY_ITER tmpBeg = Beg + 3;
 		for (ulong i = 0; i < count; ++i)
@@ -1383,17 +1334,15 @@ ulong OP_TYPEUPTO_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ul
 			nfa.Back()[EMPTY].PushBack(CurState - 1 + count - i);
 		}
 	}
-	
-	return SC_SUCCESS;
 }
 
-ulong OP_TYPEEXACT_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
+void OP_TYPEEXACT_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
 	ulong count = GET(Beg + 1);
 	bool ALTBeg = ALTBegin;
 	byte c = *(Beg + 3);
-	if (c >=OP_NOT_DIGIT && c <= OP_ALLANY && FUNC[c] != NULL)
+	if (c >=OP_NOT_DIGIT && c <= OP_ALLANY && FUNC[c] != null)
 	{
 		BYTEARY_ITER tmpBeg = Beg + 3;
 
@@ -1402,11 +1351,9 @@ ulong OP_TYPEEXACT_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, u
 			FUNC[c](tmpBeg, End, nfa, CurState, PreState, ALTBeg, ALTBegState);
 		}
 	}
-	
-	return SC_SUCCESS;
 }
 
-ulong OP_CLASS_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
+void OP_CLASS_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
 	ulong nCursize = nfa.Size();
@@ -1520,11 +1467,9 @@ ulong OP_CLASS_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong
 		++CurState;
 		break;
 	}
-	
-	return SC_SUCCESS;
 }
 
-ulong OP_NCLASS_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
+void OP_NCLASS_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 {
 	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
 	ulong nCursize = nfa.Size();
@@ -1642,8 +1587,6 @@ ulong OP_NCLASS_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulon
 		++CurState;
 		break;
 	}
-	
-	return SC_SUCCESS;
 }
 
 void OP_ALT_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong PreState, ulong &CurState)
@@ -1777,7 +1720,7 @@ void OP_KETRMAX_FUNC(CNfa &nfa, ulong PreState, ulong &CurState, bool IsBRAZERO,
 	}
 }
 
-ulong OP_BRA_CBRA_SCBRA_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState)
+void OP_BRA_CBRA_SCBRA_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState)
 {
 	if (Beg == End)
 	{
@@ -1786,23 +1729,21 @@ ulong OP_BRA_CBRA_SCBRA_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &n
 		nfa.Back()[EMPTY].PushBack(MAX);
 		++CurState;
 	}
-	
-	return SC_SUCCESS;
 }
 
-ulong OP_BRA_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState)
+void OP_BRA_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState)
 {
-	return OP_BRA_CBRA_SCBRA_FUNC(Beg, End, nfa, CurState);
+	OP_BRA_CBRA_SCBRA_FUNC(Beg, End, nfa, CurState);
 }
 
-ulong OP_CBRA_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState)
+void OP_CBRA_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState)
 {
-	return OP_BRA_CBRA_SCBRA_FUNC(Beg, End, nfa, CurState);
+	OP_BRA_CBRA_SCBRA_FUNC(Beg, End, nfa, CurState);
 }
 
-ulong OP_SCBRA_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState)
+void OP_SCBRA_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState)
 {
-	return OP_BRA_CBRA_SCBRA_FUNC(Beg, End, nfa, CurState);
+	OP_BRA_CBRA_SCBRA_FUNC(Beg, End, nfa, CurState);
 }
 
 void Copy(CNfaRow &NewRow, CNfaRow &Row, ulong increment)

@@ -35,8 +35,8 @@ public:
 	CUnsignedArray&			operator []	(ulong ulCol);
 	const CUnsignedArray&	operator []	(ulong ulCol) const;
 	
-	void			SortAll();
+	void					SortAll();
 
 protected:
-	CUnsignedArray *m_pDestSet;
+	CUnsignedArray*			m_pDestSet;
 };

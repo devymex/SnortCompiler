@@ -26,6 +26,7 @@ struct PARSEFLAG {
 	static const TYPE PARSE_HASBYTE		= 0x0001;
 	static const TYPE PARSE_HASNOT		= 0x0002;
 	static const TYPE PARSE_ERROR		= 0x0003;
+	static const TYPE PARSE_EMPTY		= 0x0004;
 };
 
 struct PARSERESULT

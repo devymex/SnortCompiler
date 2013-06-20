@@ -5,6 +5,7 @@ typedef DFAIDSET::iterator			DFAIDSET_ITER;
 typedef DFAIDSET::const_iterator	DFAIDSET_CITER;
 
 DFAIDSETHDR CDfaIdSet::CDfaIdSet()
+	: m_pSet(null)
 {
 	try
 	{
@@ -12,7 +13,7 @@ DFAIDSETHDR CDfaIdSet::CDfaIdSet()
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
 }
 
@@ -20,13 +21,12 @@ DFAIDSETHDR CDfaIdSet::CDfaIdSet(const CDfaIdSet &other)
 {
 	try
 	{
-		m_pSet = new DFAIDSET;
+		m_pSet = new DFAIDSET(*other.m_pSet);
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
-	*this = other;
 }
 
 DFAIDSETHDR CDfaIdSet::~CDfaIdSet()
@@ -34,15 +34,18 @@ DFAIDSETHDR CDfaIdSet::~CDfaIdSet()
 	delete m_pSet;
 }
 
-DFAIDSETHDR const CDfaIdSet& CDfaIdSet::operator = (const CDfaIdSet &other)
+DFAIDSETHDR CDfaIdSet& CDfaIdSet::operator = (const CDfaIdSet &other)
 {
-	try
+	if (this != &other)
 	{
-		*m_pSet = *other.m_pSet;
-	}
-	catch (std::exception &e)
-	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		try
+		{
+			*m_pSet = *other.m_pSet;
+		}
+		catch (std::exception &e)
+		{
+			TTHROW(e.what());
+		}
 	}
 	return *this;
 }
@@ -75,11 +78,11 @@ DFAIDSETHDR void CDfaIdSet::Append(const CDfaIdSet &other)
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
 }
 
-DFAIDSETHDR void CDfaIdSet::Add(DFAID dfaId)
+DFAIDSETHDR void CDfaIdSet::AddDfaId(DFAID dfaId)
 {
 	try
 	{
@@ -87,7 +90,7 @@ DFAIDSETHDR void CDfaIdSet::Add(DFAID dfaId)
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
 }
 
@@ -102,6 +105,6 @@ DFAIDSETHDR void CDfaIdSet::CopyTo(CUnsignedArray &idAry) const
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
 }

@@ -1,10 +1,11 @@
 #include "stdafx.h"
 #include <hwprj\finalstates.h>
 
-typedef FINSTAMAP::iterator								FINSTAMAP_ITER;
-typedef FINSTAMAP::const_iterator						FINSTAMAP_CITER;
+typedef FINSTAMAP::iterator			FINSTAMAP_ITER;
+typedef FINSTAMAP::const_iterator	FINSTAMAP_CITER;
 
 DFAIDSETHDR CFinalStates::CFinalStates()
+	: m_pStates(null), m_pDfaIds(null)
 {
 	try
 	{
@@ -13,7 +14,7 @@ DFAIDSETHDR CFinalStates::CFinalStates()
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
 }
 
@@ -24,35 +25,41 @@ DFAIDSETHDR CFinalStates::~CFinalStates()
 }
 
 DFAIDSETHDR CFinalStates::CFinalStates(const CFinalStates &other)
+	: m_pStates(null), m_pDfaIds(null)
 {
 	try
 	{
-		m_pStates = new STATEVEC;
-		m_pDfaIds = new FINSTAMAP;
+		m_pStates = new STATEVEC(*other.m_pStates);
+		m_pDfaIds = new FINSTAMAP(*other.m_pDfaIds);
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
-	*this = other;
 }
 
-DFAIDSETHDR CFinalStates& CFinalStates::operator=(const CFinalStates &other)
+DFAIDSETHDR CFinalStates& CFinalStates::operator = (const CFinalStates &other)
 {
-	try
+	TASSERT(other.m_pDfaIds != null);
+	TASSERT(other.m_pStates != null);
+	if (this != &other)
 	{
-		*m_pStates = *other.m_pStates;
-		*m_pDfaIds = *other.m_pDfaIds;
-	}
-	catch (std::exception &e)
-	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		try
+		{
+			*m_pStates = *other.m_pStates;
+			*m_pDfaIds = *other.m_pDfaIds;
+		}
+		catch (std::exception &e)
+		{
+			TTHROW(e.what());
+		}
 	}
 	return *this;
 }
 
 DFAIDSETHDR STATEID CFinalStates::operator[](ulong nIdx) const
 {
+	TASSERT(nIdx < m_pStates->size());
 	return (*m_pStates)[nIdx];
 }
 
@@ -67,61 +74,33 @@ DFAIDSETHDR void CFinalStates::Clear()
 	m_pStates->clear();
 }
 
-DFAIDSETHDR void CFinalStates::PushBack(STATEID nStaId)
+DFAIDSETHDR CDfaIdSet& CFinalStates::AddState(STATEID nStaId)
 {
+	CDfaIdSet *pFound = null;
 	FINSTAMAP_ITER iter = m_pDfaIds->find(nStaId);
 	if (iter == m_pDfaIds->end())
 	{
 		try
 		{
-			(*m_pDfaIds)[nStaId];
+			pFound = &(*m_pDfaIds)[nStaId];
 			(*m_pStates).push_back(nStaId);
 		}
 		catch (std::exception &e)
 		{
-			throw CTrace(__FILE__, __LINE__, e.what());
+			TTHROW(e.what());
 		}
 	}
-}
-
-DFAIDSETHDR void CFinalStates::PushBack(STATEID nStaId, DFAID nDfaId)
-{
-	FINSTAMAP_ITER iter = m_pDfaIds->find(nStaId);
-	try
+	else
 	{
-		if (iter == m_pDfaIds->end())
-		{
-			(*m_pDfaIds)[nStaId].Add(nDfaId);
-			(*m_pStates).push_back(nStaId);
-		}
-		else
-		{
-			iter->second.Add(nDfaId);
-		}
+		pFound = &(iter->second);
 	}
-	catch (std::exception &e)
-	{
-		throw CTrace(__FILE__, __LINE__, e.what());
-	}
-}
-
-DFAIDSETHDR ulong CFinalStates::GetDfaIdCount(STATEID nStaId) const
-{
-	return (*m_pDfaIds)[nStaId].Size();
-}
-
-DFAIDSETHDR ulong CFinalStates::GetAllDfaIdCount() const
-{
-	ulong nSum = 0;
-	for (FINSTAMAP_CITER i = m_pDfaIds->cbegin(); i != m_pDfaIds->end(); ++i)
-	{
-		nSum += i->second.Size();
-	}
-	return nSum;
+	return *pFound;
 }
 
 DFAIDSETHDR void CFinalStates::Swap(CFinalStates &other)
 {
+	TASSERT(other.m_pDfaIds != null);
+	TASSERT(other.m_pStates != null);
 	std::swap(m_pStates, other.m_pStates);
 	std::swap(m_pDfaIds, other.m_pDfaIds);
 }
@@ -131,7 +110,7 @@ DFAIDSETHDR CDfaIdSet& CFinalStates::GetDfaIdSet(STATEID nStaId)
 	FINSTAMAP_ITER iterMe = m_pDfaIds->find(nStaId);
 	if (iterMe == m_pDfaIds->end())
 	{
-		throw CTrace(__FILE__, __LINE__, "STATEID not found");
+		TTHROW(TI_NOTFOUND);
 	}
 	return iterMe->second;
 }
@@ -141,7 +120,17 @@ DFAIDSETHDR const CDfaIdSet& CFinalStates::GetDfaIdSet(STATEID nStaId) const
 	FINSTAMAP_CITER iterMe = m_pDfaIds->find(nStaId);
 	if (iterMe == m_pDfaIds->end())
 	{
-		throw CTrace(__FILE__, __LINE__, "STATEID not found");
+		TTHROW(TI_NOTFOUND);
 	}
 	return iterMe->second;
+}
+
+DFAIDSETHDR ulong CFinalStates::CountDfaIds() const
+{
+	ulong nSum = 0;
+	for (FINSTAMAP_CITER i = m_pDfaIds->cbegin(); i != m_pDfaIds->end(); ++i)
+	{
+		nSum += i->second.Size();
+	}
+	return nSum;
 }

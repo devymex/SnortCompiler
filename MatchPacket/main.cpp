@@ -25,10 +25,7 @@ void main()
 
 	for(size_t i = 0; i < groupRes.GetGroups().Size(); ++i)
 	{
-		HASHNODE hashnode;
-		hashnode.m_nDfaId = groupRes.GetGroups()[i].mergeDfaId;
-		hashnode.m_sig = groupRes.GetGroups()[i].currSig;
-		hashResMap[hash(groupRes.GetGroups()[i].currSig)].push_back(hashnode);
+		//hashResMap[hash(groupRes.GetGroups()[i].currSig)].push_back(HASHNODE(groupRes.GetGroups()[i].currSig, groupRes.GetGroups()[i].mergeDfaId));
 	}
 
 	DfaidSidMap(groupRes, dfamch.dIdSId);
@@ -37,40 +34,40 @@ void main()
 	/////////////////////////////////////////////////////////////////////
 	/*for(size_t i = 0; i < groupRes.GetSidDfaIds().Size(); ++ i)
 	{
-	if(groupRes.GetSidDfaIds()[i].m_nSid == 467)
-	{
-	for(size_t j = 0; j < groupRes.GetSidDfaIds()[i].m_dfaIds.Size(); ++j)
-	{
-	std::cout << groupRes.GetSidDfaIds()[i].m_dfaIds[j] << "  ";
-	}
-	}
+		if(groupRes.GetSidDfaIds()[i].m_nSid == 467)
+		{
+			for(size_t j = 0; j < groupRes.GetSidDfaIds()[i].m_dfaIds.Size(); ++j)
+			{
+			std::cout << groupRes.GetSidDfaIds()[i].m_dfaIds[j] << "  ";
+			}
+		}
 	}
 
-
+	
 
 
 	std::vector<size_t> cvec;
 	std::unordered_map<size_t, GROUPNUM> groupresult;
 	for(size_t i = 0; i < groupRes.GetGroups().Size(); ++i)
 	{
-	if(groupRes.GetGroups()[i].mergeDfaId == 817)
-	{
-	for(size_t n = 0; n < groupRes.GetGroups()[i].DfaIds.Size(); ++n)
-	{
-	cvec.push_back(groupRes.GetGroups()[i].DfaIds[n]);
-	}
-	}
-	for(size_t j = 0; j < groupRes.GetGroups()[i].DfaIds.Size(); ++j)
-	{
-	groupresult[groupRes.GetGroups()[i].DfaIds[j]].ComSigs = groupRes.GetGroups()[i].ComSigs;
-	groupresult[groupRes.GetGroups()[i].DfaIds[j]].mergeDfaId = groupRes.GetGroups()[i].mergeDfaId;
-	}
+		if(groupRes.GetGroups()[i].mergeDfaId == 817)
+		{
+			for(size_t n = 0; n < groupRes.GetGroups()[i].DfaIds.Size(); ++n)
+			{
+				cvec.push_back(groupRes.GetGroups()[i].DfaIds[n]);
+			}
+		}
+		for(size_t j = 0; j < groupRes.GetGroups()[i].DfaIds.Size(); ++j)
+		{
+			groupresult[groupRes.GetGroups()[i].DfaIds[j]].ComSigs = groupRes.GetGroups()[i].ComSigs;
+			groupresult[groupRes.GetGroups()[i].DfaIds[j]].mergeDfaId = groupRes.GetGroups()[i].mergeDfaId;
+		}
 	}
 
 	std::vector<size_t> rvec;
 	for(std::vector<size_t>::iterator iter = cvec.begin(); iter != cvec.end(); ++iter)
 	{
-	rvec.push_back(dfamch.dIdSId.dId_sId[*iter]);
+		rvec.push_back(dfamch.dIdSId.dId_sId[*iter]);
 	}
 	std::sort(rvec.begin(), rvec.end());
 	rvec.erase(std::unique(rvec.begin(), rvec.end()), rvec.end());
@@ -81,7 +78,7 @@ void main()
 
 
 
-	//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
 
 	//	for(size_t i = 0; i < groupRes.GetGroups().Size(); ++i)
 	//{
@@ -99,7 +96,7 @@ void main()
 	//CDfa dfanew= groupRes.GetDfaTable()[0];
 	//dfanew.Dump("..\\..\\output\\dfanew.txt");
 
-	std::string path = "E:\\allPkt\\02";
+	std::string path = "E:\\allPkt";
 
 	DHandleAllFile(path, &dfamch);
 
@@ -122,14 +119,13 @@ void main()
 //	rulesmap.resultpath = "..\\..\\output\\pmatchresult";
 //	HandleAllFile("E:\\allPkt", &rulesmap);
 //}
-//
+
 //#include "stdafx.h"
 //#include "DfaMatch.h"
 //
 //void main()
 //{
-//	std::string dpath1 = "D:\\projects\\output\\pmatchresult",
-//
+//	std::string dpath1 = "D:\\projects\\output\\backup\\d",
 //		dpath2 = "D:\\projects\\output\\dmatchresult";
 //
 //	std::vector<std::string> result1, result2;
@@ -140,7 +136,7 @@ void main()
 //	ResultFiles(dpath2, result2);
 //
 //	size_t max = result1.size();
-//	if (result2.size() < max)
+//	if (result2.size() > max)
 //	{
 //		max = result2.size();
 //	}
@@ -163,9 +159,10 @@ void main()
 //		{
 //			if( tem1.compare(tem2) != 0)
 //			{
-//				ofs << tem1 << std::endl << tem2 << std::endl << std::endl;
+//				ofs << "different:  " << tem1 << std::endl << tem2 << std::endl;
 //			}
 //		}
+//
 //
 //	}
 //	std::cout << std::endl;

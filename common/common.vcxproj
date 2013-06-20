@@ -94,16 +94,21 @@
     <ClInclude Include="..\include\hwprj\common.h" />
     <ClInclude Include="..\include\hwprj\ctimer.h" />
     <ClInclude Include="..\include\hwprj\dllstring.h" />
+    <ClInclude Include="..\include\hwprj\logger.h" />
+    <ClInclude Include="..\include\hwprj\strary.h" />
     <ClInclude Include="..\include\hwprj\trace.h" />
     <ClInclude Include="..\include\hwprj\unsary.h" />
+    <ClInclude Include="..\include\hwprj\unsary.inc" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllstring.cpp" />
+    <ClCompile Include="logger.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="strary.cpp" />
     <ClCompile Include="trace.cpp" />
     <ClCompile Include="unsary.cpp" />
   </ItemGroup>

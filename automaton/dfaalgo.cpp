@@ -49,7 +49,7 @@ void NfaEClosure(const CNfa &nfa, std::vector<STATEVEC> &eClosure)
 		nMatWidth = (nMatWidth / 16) * 16 + 16;
 	}
 	byte *pMat = (byte*)_aligned_malloc(nMatWidth * nMatHeight, 128);
-	if (pMat == NULL)
+	if (pMat == null)
 	{
 		throw CTrace(__FILE__, __LINE__, "Out of memory");
 	}
@@ -87,7 +87,7 @@ void NfaEClosure(const CNfa &nfa, std::vector<STATEVEC> &eClosure)
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
 }
 
@@ -139,7 +139,7 @@ void GetNextEClosureSet(const CNfa &nfa, const std::vector<STATEVEC> &eClosure,
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
 }
 
@@ -149,7 +149,7 @@ void NAvaiEdges(const CNfa &nfa, byte *group)
 	{
 		std::vector<ulong> key;
 		ulong hash;
-		__forceinline bool operator == (const COLUMNKEY &other) const
+		inline bool operator == (const COLUMNKEY &other) const
 		{
 			ulong nSize = key.size();
 			if (nSize != other.key.size())
@@ -165,7 +165,7 @@ void NAvaiEdges(const CNfa &nfa, byte *group)
 	};
 	struct COLUMNKEYHASH
 	{
-		__forceinline ulong operator ()(const COLUMNKEY &column)
+		inline ulong operator ()(const COLUMNKEY &column)
 		{
 			return column.hash;
 		}
@@ -246,7 +246,7 @@ void NAvaiEdges(const CNfa &nfa, byte *group)
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
 }
 
@@ -265,7 +265,7 @@ void CalcAbleTo(STATEVEC *pRevTbl, ulong nGrpNum, ulong nStaNum, PARTSET &ps)
 	//清空AbleTo
 	ReleaseAbleTo(ps);
 
-	byte *pBuf = NULL;
+	byte *pBuf = null;
 	try
 	{
 		pBuf = new byte[nStaNum * nGrpNum];
@@ -275,7 +275,7 @@ void CalcAbleTo(STATEVEC *pRevTbl, ulong nGrpNum, ulong nStaNum, PARTSET &ps)
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
 	//计算AbleTo的值，每产生一个新的或者更新PARTSET对象计算一次
 	for (ulong j = 0; j < nGrpNum; ++j)
@@ -310,7 +310,7 @@ void DfaColGroup(CDfaArray &dfas, byte* groups)
 {
 	struct GROUPKEYHASH
 	{
-		__forceinline ulong operator ()(const GROUPKEY &column)
+		inline ulong operator ()(const GROUPKEY &column)
 		{
 			return column.hash;
 		}
@@ -359,7 +359,7 @@ void DfaColGroup(CDfaArray &dfas, byte* groups)
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
 }
 
@@ -379,10 +379,9 @@ void DfaColGroup(CDfaArray &dfas, byte* groups)
 void AddTermIntoDFA(STATEID otherSta, const CDfa &other,
 					STATEID lastSta, CDfa &lastDfa)
 {
-	const CFinalStates &orgFinStas = other.GetFinalState();
-	CFinalStates &newFinStas = lastDfa.GetFinalState();
-	newFinStas.PushBack(lastSta);
-	newFinStas.GetDfaIdSet(lastSta).Append(orgFinStas.GetDfaIdSet(otherSta));
+	const CFinalStates &orgFinStas = other.GetFinalStates();
+	CFinalStates &newFinStas = lastDfa.GetFinalStates();
+	newFinStas.AddState(lastSta).Append(orgFinStas.GetDfaIdSet(otherSta));
 }
 
 void SetStateFlags(byte *pFlags, STATEVEC states)
@@ -428,7 +427,7 @@ bool SortPartition(const byte *pAbleTo, PARTSET &partSet)
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
 }
 
@@ -487,7 +486,7 @@ void InitPartWait(const std::vector<PARTSET> &partSet,
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
 }
 
@@ -504,7 +503,7 @@ void BuildDfaByPart(const PARTSETVEC &partSets, const DFAROWARY &oldDfa,
 		}
 	}
 
-	ulong ulColNum = oldDfa[0].GetColNum();
+	ulong ulColNum = oldDfa[0].Size();
 	for (PARTSETVEC_CITER i = partSets.begin(); i != partSets.end(); ++i)
 	{
 		CDfaRow &newRow = newDfa[i - partSets.cbegin()];
@@ -519,7 +518,7 @@ void BuildDfaByPart(const PARTSETVEC &partSets, const DFAROWARY &oldDfa,
 			newRow[byte(j)] = nDest;
 		}
 		//set a state attribute
-		newRow.SetFlag(oldRow.GetFlag());
+		newRow.SetFlags(oldRow.GetFlags());
 	}
 }
 
@@ -529,7 +528,7 @@ void InitPartSet(const CFinalStates &finStas, ulong ulStaNum,
 	try
 	{
 		partSets.clear();
-		CDfaIdSet *pTerm2Dfa = NULL;
+		CDfaIdSet *pTerm2Dfa = null;
 		//distinguish final state belonging to different DFA
 		pTerm2Dfa = new CDfaIdSet[ulStaNum];
 
@@ -563,6 +562,6 @@ void InitPartSet(const CFinalStates &finStas, ulong ulStaNum,
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
 }

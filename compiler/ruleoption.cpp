@@ -1,93 +1,64 @@
 #include "stdafx.h"
 #include <hwprj\ruleoption.h>
+#include "comprule.h"
 
 SNORTRULEHDR CRuleOption::CRuleOption()
-	: m_nFlag(0)
+	: m_nFlags(NOFLAG)
 {
-	try
-	{
-		m_pPattern = new std::string;
-	}
-	catch (std::exception &e)
-	{
-		throw CTrace(__FILE__, __LINE__, e.what());
-	}
 }
 
 SNORTRULEHDR CRuleOption::CRuleOption(const CRuleOption &other)
+	: m_nFlags(other.m_nFlags)
 {
-	try
-	{
-		m_pPattern = new std::string;
-	}
-	catch (std::exception &e)
-	{
-		throw CTrace(__FILE__, __LINE__, e.what());
-	}
-	*this = other;
 }
 
 SNORTRULEHDR CRuleOption::~CRuleOption()
 {
-	delete m_pPattern;
 }
 
-SNORTRULEHDR const CRuleOption& CRuleOption::operator=(const CRuleOption &other)
+SNORTRULEHDR CRuleOption& CRuleOption::operator = (const CRuleOption &other)
 {
-	try
+	if (this != &other)
 	{
-		*m_pPattern = *other.m_pPattern;
+		m_nFlags = other.m_nFlags;
 	}
-	catch (std::exception &e)
-	{
-		throw CTrace(__FILE__, __LINE__, e.what());
-	}
-	m_nFlag = other.m_nFlag;
 	return *this;
 }
 
-SNORTRULEHDR ulong CRuleOption::GetPattern(LPSTR lpStr, ulong nLen) const
+SNORTRULEHDR CRuleOption::OPTIONFLAG CRuleOption::GetFlags() const
 {
-	if (lpStr == NULL || nLen == 0)
+	return m_nFlags;
+}
+
+SNORTRULEHDR void CRuleOption::SetFlags(OPTIONFLAG nFlags)
+{
+	m_nFlags = nFlags;
+}
+
+SNORTRULEHDR void CRuleOption::AddFlags(OPTIONFLAG nFlags)
+{
+	m_nFlags |= nFlags;
+}
+
+SNORTRULEHDR bool CRuleOption::HasFlags(OPTIONFLAG nFlags) const
+{
+	return ((m_nFlags & nFlags) != 0);
+}
+
+SNORTRULEHDR void CRuleOption::DelFlags(OPTIONFLAG nFlags)
+{
+	m_nFlags &= (~nFlags);
+}
+
+SNORTRULEHDR void CRuleOption::FormatPattern(CDllString &out)
+{
+	m_nFlags = CRuleOption::NOFLAG;
+	STRING str = out.Data();
+	STRING_ITER iBeg = str.begin(), iEnd = str.end();
+	if (*std::find_if_not(iBeg, iEnd, ISSPACE()) == '!')
 	{
-		return m_pPattern->length();
+		m_nFlags |= CRuleOption::HASNOT;
 	}
-	if (nLen > m_pPattern->length())
-	{
-		nLen = m_pPattern->length();
-	}
-	CopyMemory(lpStr, &(*m_pPattern)[0], nLen);
-	return nLen;
-}
-
-SNORTRULEHDR void CRuleOption::SetPattern(LPCSTR lpStr)
-{
-	try
-	{
-		*m_pPattern = std::string(lpStr);
-	}
-	catch (std::exception &e)
-	{
-		throw CTrace(__FILE__, __LINE__, e.what());
-	}
-}
-
-SNORTRULEHDR ulong CRuleOption::GetFlag() const
-{
-	return m_nFlag;
-}
-
-SNORTRULEHDR void CRuleOption::SetFlag(ulong nFlag)
-{
-	m_nFlag = nFlag;
-}
-
-SNORTRULEHDR void CRuleOption::AddFlag(ulong nFlag)
-{
-	m_nFlag |= nFlag;
-}
-
-SNORTRULEHDR bool CRuleOption::TestFlag(ulong nFlag) const
-{
-	return ((m_nFlag & nFlag) != 0);
+	QuotedContext(iBeg, iEnd);
+	out.Assign(STRING(iBeg, iEnd).c_str());
 }

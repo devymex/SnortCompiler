@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include <hwprj\regrule.h>
 
-REGRULEHDR CRegRule::CRegRule()
+SNORTRULEHDR CRegRule::CRegRule()
 {
 	try
 	{
@@ -9,39 +9,71 @@ REGRULEHDR CRegRule::CRegRule()
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
 }
 
-REGRULEHDR CRegRule::~CRegRule()
+SNORTRULEHDR CRegRule::CRegRule(const CRegRule &other)
+{
+	TASSERT(other.m_pRegVec != null);
+	try
+	{
+		m_pRegVec = new CHAINVEC(*other.m_pRegVec);
+	}
+	catch (std::exception &e)
+	{
+		TTHROW(e.what());
+	}
+}
+
+SNORTRULEHDR CRegRule::~CRegRule()
 {
 	delete m_pRegVec;
 }
 
-REGRULEHDR CRegRule::CRegRule(const CRegRule &other)
+SNORTRULEHDR CPcreChain& CRegRule::operator[](ulong nIdx)
 {
-	try
-	{
-		m_pRegVec = new CHAINVEC;
-	}
-	catch (std::exception &e)
-	{
-		throw CTrace(__FILE__, __LINE__, e.what());
-	}
-	*this = other;
+	return (*m_pRegVec)[nIdx];
 }
 
-REGRULEHDR ulong CRegRule::Size() const
+SNORTRULEHDR const CPcreChain& CRegRule::operator[](ulong nIdx) const
+{
+	return (*m_pRegVec)[nIdx];
+}
+
+SNORTRULEHDR CRegRule& CRegRule::operator = (const CRegRule &other)
+{
+	TASSERT(other.m_pRegVec != null);
+	if (this != &other)
+	{
+		try
+		{
+			*this->m_pRegVec = *other.m_pRegVec;
+		}
+		catch (std::exception &e)
+		{
+			TTHROW(e.what());
+		}
+	}
+	return *this;
+}
+
+SNORTRULEHDR ulong CRegRule::Size() const
 {
 	return m_pRegVec->size();
 }
 
-REGRULEHDR CRegChain& CRegRule::Back() const
+SNORTRULEHDR void CRegRule::Erase(ulong ulIdx)
+{
+	m_pRegVec->erase(m_pRegVec->begin() + ulIdx);
+}
+
+SNORTRULEHDR CPcreChain& CRegRule::Back() const
 {
 	return m_pRegVec->back();
 }
 
-REGRULEHDR void CRegRule::Reserve(ulong nCount)
+SNORTRULEHDR void CRegRule::Reserve(ulong nCount)
 {
 	try
 	{
@@ -49,11 +81,11 @@ REGRULEHDR void CRegRule::Reserve(ulong nCount)
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
 }
 
-REGRULEHDR void CRegRule::Resize(ulong nSize)
+SNORTRULEHDR void CRegRule::Resize(ulong nSize)
 {
 	try
 	{
@@ -61,11 +93,11 @@ REGRULEHDR void CRegRule::Resize(ulong nSize)
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
 }
 
-REGRULEHDR void CRegRule::PushBack(const CRegChain &nRegChain)
+SNORTRULEHDR void CRegRule::PushBack(const CPcreChain &nRegChain)
 {
 	try
 	{
@@ -73,29 +105,11 @@ REGRULEHDR void CRegRule::PushBack(const CRegChain &nRegChain)
 	}
 	catch (std::exception &e)
 	{
-		throw CTrace(__FILE__, __LINE__, e.what());
+		TTHROW(e.what());
 	}
 }
 
-REGRULEHDR CRegChain& CRegRule::operator[](ulong nIdx)
+SNORTRULEHDR void CRegRule::PopBack()
 {
-	return (*m_pRegVec)[nIdx];
-}
-
-REGRULEHDR const CRegChain& CRegRule::operator[](ulong nIdx) const
-{
-	return (*m_pRegVec)[nIdx];
-}
-
-REGRULEHDR const CRegRule& CRegRule::operator = (const CRegRule &other)
-{
-	try
-	{
-		*this->m_pRegVec = *other.m_pRegVec;
-	}
-	catch (std::exception &e)
-	{
-		throw CTrace(__FILE__, __LINE__, e.what());
-	}
-	return *this;
+	m_pRegVec->pop_back();
 }
