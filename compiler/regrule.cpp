@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include <hwprj\regrule.h>
 
-REGRULEHDR CRegRule::CRegRule()
+SNORTRULEHDR CRegRule::CRegRule()
 {
 	try
 	{
@@ -13,7 +13,7 @@ REGRULEHDR CRegRule::CRegRule()
 	}
 }
 
-REGRULEHDR CRegRule::CRegRule(const CRegRule &other)
+SNORTRULEHDR CRegRule::CRegRule(const CRegRule &other)
 {
 	TASSERT(other.m_pRegVec != null);
 	try
@@ -26,46 +26,54 @@ REGRULEHDR CRegRule::CRegRule(const CRegRule &other)
 	}
 }
 
-REGRULEHDR CRegRule::~CRegRule()
+SNORTRULEHDR CRegRule::~CRegRule()
 {
 	delete m_pRegVec;
 }
 
-REGRULEHDR CRegChain& CRegRule::operator[](ulong nIdx)
+SNORTRULEHDR CPcreChain& CRegRule::operator[](ulong nIdx)
 {
 	return (*m_pRegVec)[nIdx];
 }
 
-REGRULEHDR const CRegChain& CRegRule::operator[](ulong nIdx) const
+SNORTRULEHDR const CPcreChain& CRegRule::operator[](ulong nIdx) const
 {
 	return (*m_pRegVec)[nIdx];
 }
 
-REGRULEHDR CRegRule& CRegRule::operator = (const CRegRule &other)
+SNORTRULEHDR CRegRule& CRegRule::operator = (const CRegRule &other)
 {
 	TASSERT(other.m_pRegVec != null);
-	try
+	if (this != &other)
 	{
-		*this->m_pRegVec = *other.m_pRegVec;
-	}
-	catch (std::exception &e)
-	{
-		TTHROW(e.what());
+		try
+		{
+			*this->m_pRegVec = *other.m_pRegVec;
+		}
+		catch (std::exception &e)
+		{
+			TTHROW(e.what());
+		}
 	}
 	return *this;
 }
 
-REGRULEHDR ulong CRegRule::Size() const
+SNORTRULEHDR ulong CRegRule::Size() const
 {
 	return m_pRegVec->size();
 }
 
-REGRULEHDR CRegChain& CRegRule::Back() const
+SNORTRULEHDR void CRegRule::Erase(ulong ulIdx)
+{
+	m_pRegVec->erase(m_pRegVec->begin() + ulIdx);
+}
+
+SNORTRULEHDR CPcreChain& CRegRule::Back() const
 {
 	return m_pRegVec->back();
 }
 
-REGRULEHDR void CRegRule::Reserve(ulong nCount)
+SNORTRULEHDR void CRegRule::Reserve(ulong nCount)
 {
 	try
 	{
@@ -77,7 +85,7 @@ REGRULEHDR void CRegRule::Reserve(ulong nCount)
 	}
 }
 
-REGRULEHDR void CRegRule::Resize(ulong nSize)
+SNORTRULEHDR void CRegRule::Resize(ulong nSize)
 {
 	try
 	{
@@ -89,7 +97,7 @@ REGRULEHDR void CRegRule::Resize(ulong nSize)
 	}
 }
 
-REGRULEHDR void CRegRule::PushBack(const CRegChain &nRegChain)
+SNORTRULEHDR void CRegRule::PushBack(const CPcreChain &nRegChain)
 {
 	try
 	{
@@ -101,7 +109,7 @@ REGRULEHDR void CRegRule::PushBack(const CRegChain &nRegChain)
 	}
 }
 
-REGRULEHDR void CRegRule::PopBack()
+SNORTRULEHDR void CRegRule::PopBack()
 {
 	m_pRegVec->pop_back();
 }

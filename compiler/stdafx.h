@@ -31,6 +31,7 @@
 #include <hwprj\dllstring.h>
 #include <hwprj\ctimer.h>
 #include <hwprj\trace.h>
+#include <hwprj\logger.h>
 
 #define COMPILERHDR_DS
 #define REGRULEHDR_DS
@@ -53,7 +54,9 @@ typedef STRING::const_iterator				STRING_CITER;
 
 typedef std::vector<class CRuleOption*>		OPTIONVEC;
 
-typedef std::vector<class CRegChain>		CHAINVEC;
+typedef std::vector<class CPcreChain>		CHAINVEC;
+
+typedef std::vector<class CPcreOption>		PCREVEC;
 
 typedef std::vector<SIGNATURE>              SIGNATUREVEC;
 typedef SIGNATUREVEC::iterator              SIGVEC_ITER;

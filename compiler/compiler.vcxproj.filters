@@ -23,9 +23,6 @@
     <ClInclude Include="..\include\hwprj\compiler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\hwprj\regchain.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\hwprj\regrule.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -80,7 +77,10 @@
     <ClInclude Include="contopt.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="pcreopt.h">
+    <ClInclude Include="..\include\hwprj\pcreopt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\hwprj\pcrechain.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -89,9 +89,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="compiler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="regchain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="regrule.cpp">
@@ -194,6 +191,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="pcreopt.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="pcrechain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -13,7 +13,7 @@
 #include <hwprj\ruleoption.h>
 #include "pcre2nfa.h"
 #include "contopt.h"
-#include "pcreopt.h"
+#include <hwprj\pcreopt.h>
 #include "comprule.h"
 
 #pragma warning(disable:4996)
@@ -24,6 +24,13 @@ double rule2pcretime = 0.0;
 double pcre2nfatime = 0.0;
 double nfa2dfatime = 0.0;
 double dfamintimetime = 0.0;
+
+typedef std::vector<BYTEARY>			PCRESEQUENCE;
+typedef std::vector<PCRESEQUENCE>		CHAINSEQUENCE;
+typedef std::vector<CHAINSEQUENCE>		RULESEQUENCE;
+typedef std::vector<BYTEARY>			CHAINCOMPDATA;
+typedef std::vector<CHAINCOMPDATA>		RULECOMPDATA;
+
 
 /* complie one rule
 
@@ -44,7 +51,7 @@ void __stdcall CompileCallback(const PARSERESULT &parseRes, void *lpVoid)
 	ruleResult.m_nSid = parseRes.ulSid;
 	ruleResult.m_nResult = COMPILEDINFO::RES_SUCCESS;
 
-	if (parseRes.regRule.Size() == 0)
+	if (parseRes.ulFlag & PARSEFLAG::PARSE_EMPTY)
 	{
 		ruleResult.m_nResult |= COMPILEDINFO::RES_EMPTY;
 	}
@@ -154,15 +161,13 @@ inline byte HexByte(const char *p2Bytes)
 	return (HexBit(p2Bytes[0]) << 4 | HexBit(p2Bytes[1]));
 }
 
-void ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
+void ParseOptions(std::string &ruleOptions, CSnortRule &snortRule)
 {
 	std::vector<RULEOPTIONRAW> options;
 	SplitOption(ruleOptions, options);
 
 	ulong nContCnt = 0;
 	nContCnt = std::count_if(options.begin(), options.end(), ISCONTENT());
-
-	ulong nFlags = 0;
 
 	for(std::vector<RULEOPTIONRAW>::iterator iOp = options.begin(); iOp != options.end(); ++iOp)
 	{
@@ -179,11 +184,11 @@ void ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
 			CPcreOption pcreOpt;
 			try
 			{
-				pcreOpt.FromPattern(opValueBeg._Ptr, opValueEnd._Ptr);
+				STRING strTmp(opValueBeg, opValueEnd);
+				pcreOpt.FromPattern(CDllString(strTmp.c_str()));
 				if (pcreOpt.HasFlags(CRuleOption::HASNOT))
 				{
-					nFlags |= CSnortRule::HASNOT;
-					break;
+					snortRule.AddFlags(CSnortRule::HASNOT);
 				}
 			}
 			catch (std::exception &e)
@@ -199,7 +204,7 @@ void ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
 		else if (0 == stricmp ("byte_jump", iOp->name.c_str()) ||
 			0 == stricmp("byte_test", iOp->name.c_str()))
 		{
-			nFlags |= CSnortRule::HASBYTE;
+			snortRule.AddFlags(CSnortRule::HASBYTE);
 		}
 		else if (0 == stricmp("content", iOp->name.c_str()) ||
 			0 == stricmp("uricontent", iOp->name.c_str()))
@@ -207,11 +212,11 @@ void ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
 			CContentOption contOpt;
 			try
 			{
-				contOpt.FromPattern(opValueBeg._Ptr, opValueEnd._Ptr);
+				STRING strTmp(opValueBeg, opValueEnd);
+				contOpt.FromPattern(CDllString(strTmp.c_str()));
 				if (contOpt.HasFlags(CRuleOption::HASNOT))
 				{
-					nFlags |= CSnortRule::HASNOT;
-					break;
+					snortRule.AddFlags(CSnortRule::HASNOT);
 				}
 			}
 			catch (std::exception &e)
@@ -274,11 +279,6 @@ void ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
 			pCont->AddFlags(CContentOption::WITHIN);
 		}
 	}
-	snortRule.SetFlags(nFlags);
-	if (nFlags != CRuleOption::NOFLAG)
-	{
-		snortRule.Clear();
-	}
 }
 
 /*
@@ -306,39 +306,26 @@ void ProcessOption(std::string &ruleOptions, CSnortRule &snortRule)
 void Rule2RegRule(const CSnortRule &rule, CRegRule &regRule)
 {
 	regRule.Reserve(SC_CHAINRESERV);
-	regRule.PushBack(CRegChain());
+	regRule.PushBack(CPcreChain());
+	CPcreChain *pCurChain = &regRule.Back();
+	CPcreOption pcreOpt;
 
 	for(ulong i = 0; i < rule.Size(); ++i)
 	{
-		CContentOption *pCont = dynamic_cast<CContentOption*>(rule[i]);
 		CPcreOption *pPcre = dynamic_cast<CPcreOption*>(rule[i]);
-		
-		if (pCont != NULL)
+		if (pPcre == null)
 		{
-			if(!pCont->HasFlags(CContentOption::DISTANCE |
-				CContentOption::WITHIN) && regRule.Back().Size() != 0)
-			{
-				regRule.PushBack(CRegChain());
-			}
-			CRegChain &curChain = regRule.Back();
-
-			pCont->ExtractSignatures(curChain.GetSigs());
-
-			CDllString strPcre;
-			pCont->ToPcre(strPcre);
-			curChain.PushBack(strPcre);
+			CContentOption *pCont = dynamic_cast<CContentOption*>(rule[i]);
+			TASSERT(pCont != NULL);
+			pCont->ToPcre(pcreOpt);
+			pPcre = &pcreOpt;
 		}
-		else if (pPcre != NULL)
+		if(!pPcre->HasFlags(CPcreOption::PF_R) && pCurChain->Size() != 0)
 		{
-			if(!pPcre->HasFlags(CPcreOption::PF_R) &&
-				regRule.Back().Size() != 0)
-			{
-				regRule.PushBack(CRegChain());
-			}
-			CDllString strPat;
-			pPcre->GetPattern(strPat);
-			regRule.Back().PushBack(strPat);
+			regRule.PushBack(CPcreChain());
+			pCurChain = &regRule.Back();
 		}
+		pCurChain->PushBack(*pPcre);
 	}
 
 	if (regRule.Back().Size() == 0)
@@ -355,41 +342,6 @@ void Rule2RegRule(const CSnortRule &rule, CRegRule &regRule)
 	}
 }
 
-
-/*
-**	NAME
-**	 CRegChainToNFA::
-*/
-/**
-**	This function converts a CRegChain to a CNfa
-**
-**	use pcre library to construct a nfa from a pcre
-**	
-**	@param regchain	a CRegChain object which contains a pcre list
-**	@param nfa		the transformed CNfa object 
-**
-**	@return integer
-**
-**	@retval  0 function successful
-**	@retval <>0 fatal error
-*/
-
-ulong Chain2NFA(const CRegChain &regChain, CNfa &nfa, CSignatures &sigs)
-{
-	nfa.Reserve(SC_NFAROWRESERV);
-	ulong ulFlag = 0;
-	for (ulong i = 0; i < regChain.Size(); ++i)
-	{
-		ulFlag = PcreToNFA(regChain[i].GetStr(), nfa, sigs);
-		if(ulFlag != 0)
-		{
-			nfa.Clear();
-			return ulFlag;
-		}
-	}
-	sigs.Unique();
-	return 0;
-}
 
 /* assign all the signatures of each rule to all its option list
 
@@ -428,6 +380,186 @@ void AssignSig(CCompileResults &result, ulong BegIdx, ulong EndIdx)
 	}
 }
 
+bool CaselessComp(char a, char b)
+{
+	return tolower(a) == tolower(b);
+}
+
+struct INCLUDESEQUENCE
+{
+	const BYTEARY *m_pSeq;
+	bool m_bCaseless;
+	INCLUDESEQUENCE(const BYTEARY &seq, bool bCaseless = false)
+		: m_pSeq(&seq), m_bCaseless(bCaseless)
+	{
+	}
+	bool operator() (const BYTEARY &seq)
+	{
+		if (m_bCaseless)
+		{
+			return (seq.end() != std::search(seq.begin(), seq.end(),
+				m_pSeq->begin(), m_pSeq->end(), CaselessComp));
+		}
+		else
+		{
+			return (seq.end() != std::search(seq.begin(), seq.end(),
+				m_pSeq->begin(), m_pSeq->end(), CaselessComp));
+		}
+	}
+};
+
+void ExtractSignatures(const std::vector<BYTEARY> &seqAry, CSignatures &sigs)
+{
+	SIGNATURE nCurSig;
+	for (ulong i = 0; i < seqAry.size(); ++i)
+	{
+		const BYTEARY &curSeq = seqAry[i];
+		long ulLen = long(curSeq.size()) - 3;
+		for (long j = 0; j < ulLen; ++j)
+		{
+			for (ulong k = 0; k < 4; ++k)
+			{
+				((byte*)&nCurSig)[k] = byte(tolower(curSeq[j + k]));
+			}
+			sigs.PushBack(nCurSig);
+		}
+	}
+}
+
+bool SeqIncBy(const CRegRule &regRule, const RULESEQUENCE &ruleSeq, ulong ulIdx)
+{
+	TASSERT(ulIdx < ruleSeq.size());
+	TASSERT(ruleSeq[ulIdx].size() == 1);
+	TASSERT(ruleSeq[ulIdx].front().size() == 1);
+
+	const BYTEARY &seq = ruleSeq[ulIdx].front().front();
+	for (ulong i = 0; i < ruleSeq.size(); ++i)
+	{
+		if (ulIdx != i)
+		{
+			const CHAINSEQUENCE &curChainSeq = ruleSeq[i];
+			for (ulong j = 0; j < curChainSeq.size(); ++j)
+			{
+				const PCRESEQUENCE &curPcreSeq = curChainSeq[j];
+				bool bCaseless = true;
+				// as long as the content has nocase mod
+				// a caseless comparation can be executed.
+				if (!regRule[ulIdx][0].HasFlags(CPcreOption::PF_i))
+				{
+					// if the content is case-sensitive and the
+					// pcre is case-less, this content can't be erased
+					if (regRule[i][j].HasFlags(CPcreOption::PF_i))
+					{
+						continue;
+					}
+					// if the pcre is case-sensitive, a case-sensitive
+					// comparation shoud be executed.
+					bCaseless = false;
+				}
+
+				// if the content has no '^', comparation should be excuted
+				if (regRule[ulIdx][0].HasFlags(CPcreOption::PF_A))
+				{
+					// if the content has a '^', and the pcre has no '^',
+					// this content can't be erased.
+					if (!regRule[i][j].HasFlags(CPcreOption::PF_A))
+					{
+						continue;
+					}
+					// if the pcre has '^', but also has a '/m' mod,
+					// this content can't be erased.
+					if (regRule[i][j].HasFlags(CPcreOption::PF_m))
+					{
+						continue;
+					}
+				}
+				if (std::find_if(curPcreSeq.cbegin(), curPcreSeq.cend(),
+					INCLUDESEQUENCE(seq)) != curPcreSeq.cend())
+				{
+					return true;
+				}
+			}
+		}
+	}
+	return false;
+}
+
+bool IsOneContentChain(const CPcreChain &chain, const CHAINSEQUENCE &chainSeq)
+{
+	if (chain.Size() != 1)
+	{
+		return false;
+	}
+	if (chainSeq.size() != 1)
+	{
+		return false;
+	}
+	if (!chain[0].HasFlags(CPcreOption::PF_F))
+	{
+		return false;
+	}
+	if (chainSeq[0].size() != 1)
+	{
+		return false;
+	}
+	return true;
+}
+
+void PreCompileRule(const CRegRule &regRule, RULESEQUENCE &ruleSeq,
+					RULECOMPDATA &ruleCompData)
+{
+	for (ulong i = 0; i < regRule.Size(); ++i)
+	{
+		ruleSeq.push_back(CHAINSEQUENCE());
+		ruleCompData.push_back(CHAINCOMPDATA());
+
+		CHAINSEQUENCE &chainSeq			= ruleSeq.back();
+		CHAINCOMPDATA &chainCompData	= ruleCompData.back();
+
+		const CPcreChain &curPcreChain = regRule[i];
+
+		for (ulong j = 0; j < curPcreChain.Size(); ++j)
+		{
+			chainCompData.push_back(BYTEARY());
+			chainSeq.push_back(PCRESEQUENCE());
+			curPcreChain[j].PreComp(chainCompData.back());
+			ExtractSequence(chainCompData.back(), chainSeq.back());
+		}
+	}
+}
+
+void ProcessRule(CRegRule &regRule, RULECOMPDATA &result)
+{
+	RULESEQUENCE ruleSeq;
+	PreCompileRule(regRule, ruleSeq, result);
+	for (ulong i = 0; i < regRule.Size();)
+	{
+		CPcreChain &curChain = regRule[i];
+		CHAINSEQUENCE &curChainSeq = ruleSeq[i];
+
+		bool bErased = false;
+		if (IsOneContentChain(curChain, curChainSeq))
+		{
+			if (SeqIncBy(regRule, ruleSeq, i))
+			{
+				regRule.Erase(i);
+				result.erase(result.begin() + i);
+				ruleSeq.erase(ruleSeq.begin() + i);
+				bErased = true;
+				g_log << "Erased one chain" << g_log.nl;
+			}
+		}
+		if (!bErased)
+		{
+			for (ulong j = 0; j < curChainSeq.size(); ++j)
+			{
+				ExtractSignatures(curChainSeq[j], regRule[i].GetSigs());
+			}
+			++i;
+		}
+	}
+}
+
 /* complie one rule to several dfas
 
 Arguments:
@@ -440,79 +572,78 @@ Returns:		nothing
 */
 void Rule2Dfas(const CRegRule &rule, CCompileResults &result)
 {
-	CTimer ctime;//for test
-	ctime.Reset();//for test
-	rule2pcretime += ctime.Reset();//for test
-
 	CRegRule regRule = rule;
+
+	RULECOMPDATA ruleCompData;
+	ProcessRule(regRule, ruleCompData);
+
 	COMPILEDINFO &ruleResult = result.GetSidDfaIds().Back();
 
-	const ulong nDfaTblSize = result.GetDfaTable().Size();
-	const ulong nIncrement = rule.Size();
-	result.GetDfaTable().Resize(nDfaTblSize + nIncrement);
+	const ulong nOldDfaSize = result.GetDfaTable().Size();
 
-	const ulong nRegexTblSize = result.GetRegexTbl().Size();
-	result.GetRegexTbl().Resize(nRegexTblSize + nIncrement);
+	const ulong nCurRuleSize = regRule.Size();
+	result.GetDfaTable().Resize(nOldDfaSize + nCurRuleSize);
 
-	ulong nDfaId;
-	ulong nChainId;
+	const ulong nOldRegexSize = result.GetRegexTbl().Size();
+	result.GetRegexTbl().Resize(nOldRegexSize + nCurRuleSize);
+
 	bool bHasSigs = false;
-	for (ulong i = 0; i < nIncrement; ++i)
+	CNfa nfa;
+	nfa.Reserve(SC_NFAROWRESERV);
+	for (ulong i = 0; i < nCurRuleSize; ++i)
 	{
-		CNfa nfa;
+		CPcreChain &curPcreChain = regRule[i];
 
-		ulong nToNFAFlag = Chain2NFA(regRule[i], nfa, regRule[i].GetSigs());
-		pcre2nfatime += ctime.Reset();//for test
-
+		nfa.Clear();
+		for (ulong j = 0; j < curPcreChain.Size(); ++j)
+		{
+			const CPcreOption &curPcre = curPcreChain[j];
+			try
+			{
+				PcreToNFA(ruleCompData[i][j],
+					curPcre.HasFlags(CPcreOption::PF_A), nfa);
+			}
+			catch (CTrace &e)
+			{
+				ruleResult.m_nResult |= COMPILEDINFO::RES_PCREERROR;
+				nfa.Clear();
+				break;
+			}
+		}
+		if (ruleResult.m_nResult != COMPILEDINFO::RES_SUCCESS)
+		{
+			break;
+		}
 		if (regRule[i].GetSigs().Size() > 0)
 		{
 			bHasSigs = true;
 		}
 
-		nDfaId = nDfaTblSize + i;
-		nChainId = nRegexTblSize + i;
+		ulong nDfaId = nOldDfaSize + i;
+		ulong nChainId = nOldRegexSize + i;
+
 		CDfa &dfa = result.GetDfaTable()[nDfaId];
-		if (nToNFAFlag == SC_ERROR)
-		{
-			ruleResult.m_nResult |= COMPILEDINFO::RES_PCREERROR;
-			ruleResult.m_dfaIds.Clear();
-			result.GetDfaTable().Resize(nDfaTblSize);
-			result.GetRegexTbl().Resize(nRegexTblSize);
-			return;
-		}
-		else
-		{
-			ctime.Reset();//for test
-			dfa.SetId(nDfaId);
-			ulong nToDFAFlag = dfa.FromNFA(nfa);
-			nfa2dfatime += ctime.Reset();//for test
 
-			if (nToDFAFlag == -1)
-			{
-				ruleResult.m_nResult |= COMPILEDINFO::RES_EXCEEDLIMIT;
-				dfa.Clear();
-			}
-			else
-			{
-				ctime.Reset();//for test
-				TASSERT(dfa.GetFinalStates().Size() != 0);
+		dfa.SetId(nDfaId);
+		ulong nToDFAFlag = dfa.FromNFA(nfa);
 
-				ulong nr = dfa.Minimize();
-				dfamintimetime += ctime.Reset();//for test
-				if (0 != nr || dfa.Size() > SC_MAXDFASIZE)
-				{
-					ruleResult.m_nResult |= COMPILEDINFO::RES_EXCEEDLIMIT;
-					dfa.Clear();
-				}
-			}
-		}
-		if (dfa.Size() == 0)
+		if (nToDFAFlag == -1)
 		{
-			ruleResult.m_dfaIds.Clear();
-			result.GetDfaTable().Resize(nDfaTblSize);
-			result.GetRegexTbl().Resize(nRegexTblSize);
-			return;
+			ruleResult.m_nResult |= COMPILEDINFO::RES_EXCEEDLIMIT;
+			dfa.Clear();
+			break;
 		}
+
+		TASSERT(dfa.GetFinalStates().Size() != 0);
+
+		ulong nr = dfa.Minimize();
+		if (0 != nr || dfa.Size() > SC_MAXDFASIZE)
+		{
+			ruleResult.m_nResult |= COMPILEDINFO::RES_EXCEEDLIMIT;
+			dfa.Clear();
+			break;
+		}
+
 		ruleResult.m_dfaIds.PushBack(nDfaId);
 		result.GetRegexTbl()[nChainId] = regRule[i];
 	}
@@ -520,14 +651,16 @@ void Rule2Dfas(const CRegRule &rule, CCompileResults &result)
 	if (!bHasSigs)
 	{
 		ruleResult.m_nResult |= COMPILEDINFO::RES_HASNOSIG;
-		ruleResult.m_dfaIds.Clear();
-		result.GetDfaTable().Resize(nDfaTblSize);
-		result.GetRegexTbl().Resize(nRegexTblSize);
-		return;
 	}
 
 	if (ruleResult.m_nResult == COMPILEDINFO::RES_SUCCESS)
 	{
-		AssignSig(result, nRegexTblSize, nRegexTblSize + nIncrement);
+		AssignSig(result, nOldRegexSize, nOldRegexSize + nCurRuleSize);
+	}
+	else
+	{
+		ruleResult.m_dfaIds.Clear();
+		result.GetDfaTable().Resize(nOldDfaSize);
+		result.GetRegexTbl().Resize(nOldRegexSize);
 	}
 }

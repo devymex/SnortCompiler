@@ -13,9 +13,14 @@
 #pragma once
 
 #include <hwprj\common.h>
+#include <hwprj\strary.h>
 #include <hwprj\ruleoption.h>
 
-class CPcreOption : public CRuleOption
+#ifndef SNORTRULEHDR_DS
+class BYTEARY;
+#endif
+
+class SNORTRULEHDR CPcreOption : public CRuleOption
 {
 public:
 	static const OPTIONFLAG PF_i = (1 << 2);
@@ -38,6 +43,7 @@ public:
 	static const OPTIONFLAG PF_K = (1 << 19);
 	static const OPTIONFLAG PF_S = (1 << 20);
 	static const OPTIONFLAG PF_Y = (1 << 21);
+	static const OPTIONFLAG PF_F = (1 << 22); //From content
 
 public:
 	CPcreOption();
@@ -45,6 +51,18 @@ public:
 	virtual ~CPcreOption();
 
 	CPcreOption&			operator = (const CPcreOption &other);
-	virtual void			FromPattern(pcstr &pBeg, pcstr &pEnd);
+	void					Append(const CPcreOption &next);
+
+	virtual void			FromPattern(const CDllString &strPat);
 	virtual CRuleOption*	Clone() const;
+
+	void					SetPcreString(const CDllString& strPcre);
+	CDllString&				GetPcreString();
+	const CDllString&		GetPcreString() const;
+
+	void					PreComp(BYTEARY &compData) const;
+
+protected:
+
+	CDllString				m_strPcre;
 };

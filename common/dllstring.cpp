@@ -55,13 +55,16 @@ DLLSTRHDR CDllString::~CDllString()
 
 DLLSTRHDR CDllString& CDllString::operator = (const CDllString &other)
 {
-	try
+	if (this != &other)
 	{
-		*m_pString = *other.m_pString;
-	}
-	catch (std::exception &e)
-	{
-		TTHROW(e.what());
+		try
+		{
+			*m_pString = *other.m_pString;
+		}
+		catch (std::exception &e)
+		{
+			TTHROW(e.what());
+		}
 	}
 	return *this;
 }
@@ -76,7 +79,7 @@ DLLSTRHDR ulong CDllString::Size() const
 	return m_pString->size();
 }
 
-DLLSTRHDR void CDllString::PushBack(const char nChar)
+DLLSTRHDR void CDllString::PushBack(char nChar)
 {
 	try
 	{
@@ -88,9 +91,19 @@ DLLSTRHDR void CDllString::PushBack(const char nChar)
 	}
 }
 
-DLLSTRHDR void CDllString::Append(const char* pStr)
+DLLSTRHDR void CDllString::Append(const CDllString &other)
 {
-	m_pString->append(pStr);
+	m_pString->append(other.Data());
+}
+
+DLLSTRHDR void CDllString::Insert(ulong ulIdx, char nChar)
+{
+	m_pString->insert(m_pString->begin() + ulIdx, nChar);
+}
+
+DLLSTRHDR void CDllString::Insert(ulong ulIdx, pcstr pChar)
+{
+	m_pString->insert(m_pString->begin() + ulIdx, pChar, pChar + strlen(pChar));
 }
 
 DLLSTRHDR void CDllString::Assign(const char* pStr)
@@ -111,6 +124,11 @@ DLLSTRHDR const char* CDllString::GetStr() const
 DLLSTRHDR void CDllString::Clear()
 {
 	m_pString->clear();
+}
+
+DLLSTRHDR void CDllString::Erase(ulong ulIdx)
+{
+	m_pString->erase(m_pString->begin() + ulIdx);
 }
 
 DLLSTRHDR bool CDllString::Empty() const

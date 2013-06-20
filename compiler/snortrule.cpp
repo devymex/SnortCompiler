@@ -45,20 +45,23 @@ SNORTRULEHDR CSnortRule::~CSnortRule()
 SNORTRULEHDR CSnortRule& CSnortRule::operator = (const CSnortRule &other)
 {
 	TASSERT(other.m_pOptions != null);
-	m_nSid = other.m_nSid;
-	m_nFlags = other.m_nFlags;
-	try
+	if (this != &other)
 	{
-		Clear();
-		for (OPTVEC_ITER i = other.m_pOptions->begin();
-			i != other.m_pOptions->end(); ++i)
+		m_nSid = other.m_nSid;
+		m_nFlags = other.m_nFlags;
+		try
 		{
-			m_pOptions->push_back((*i)->Clone());
+			Clear();
+			for (OPTVEC_ITER i = other.m_pOptions->begin();
+				i != other.m_pOptions->end(); ++i)
+			{
+				m_pOptions->push_back((*i)->Clone());
+			}
 		}
-	}
-	catch (std::exception &e)
-	{
-		TTHROW(e.what());
+		catch (std::exception &e)
+		{
+			TTHROW(e.what());
+		}
 	}
 	return *this;
 }
@@ -97,6 +100,11 @@ SNORTRULEHDR ulong CSnortRule::GetSid() const
 	return m_nSid;
 }
 
+SNORTRULEHDR void CSnortRule::AddFlags(PARSE_INFO nFlags)
+{
+	m_nFlags |= nFlags;
+}
+
 SNORTRULEHDR void CSnortRule::SetFlags(PARSE_INFO flag)
 {
 	m_nFlags = flag;
@@ -105,6 +113,11 @@ SNORTRULEHDR void CSnortRule::SetFlags(PARSE_INFO flag)
 SNORTRULEHDR CSnortRule::PARSE_INFO CSnortRule::GetFlags() const
 {
 	return m_nFlags;
+}
+
+SNORTRULEHDR bool CSnortRule::HasFlags(PARSE_INFO nFlags) const
+{
+	return (m_nFlags & nFlags) != 0;
 }
 
 SNORTRULEHDR void CSnortRule::PushBack(CRuleOption* pRuleOpt)

@@ -49,11 +49,15 @@ CContentOption::~CContentOption()
 
 CContentOption& CContentOption::operator = (const CContentOption &other)
 {
-	m_nOffset	= other.m_nOffset;
-	m_nDepth	= other.m_nDepth;
-	m_nDistance	= other.m_nDistance;
-	m_nWithin	= other.m_nWithin;
-	m_data		= other.m_data;
+	if (this != &other)
+	{
+		CRuleOption::operator = (other);
+		m_nOffset	= other.m_nOffset;
+		m_nDepth	= other.m_nDepth;
+		m_nDistance	= other.m_nDistance;
+		m_nWithin	= other.m_nWithin;
+		m_data		= other.m_data;
+	}
 
 	return *this;
 }
@@ -94,15 +98,18 @@ byte Char2HexBit(char c)
 	TTHROW(TI_INVALIDDATA);
 }
 
-void CContentOption::FromPattern(pcstr &pBeg, pcstr &pEnd)
+void CContentOption::FromPattern(const CDllString &strPat)
 {
-	CRuleOption::FromPattern(pBeg, pEnd);
+	CDllString strTmp = strPat;
+	FormatPattern(strTmp);
 	if (HasFlags(CRuleOption::HASNOT))
 	{
 		return;
 	}
 
 	m_data.clear();
+	pcstr pBeg = strTmp.Data();
+	pcstr pEnd = pBeg + strTmp.Size();
 	for (; pBeg != pEnd; ++pBeg)
 	{
 		if (*pBeg == '|')
@@ -119,12 +126,13 @@ void CContentOption::FromPattern(pcstr &pBeg, pcstr &pEnd)
 				}
 				if (*pBeg != ' ')
 				{
-					if (pEnd - pBeg < 1)
+					pcstr pNext = pBeg + 1;
+					if (pNext == pEnd)
 					{
 						TTHROW(TI_INVALIDDATA);
 					}
-					m_data.push_back((Char2HexBit(*(pBeg++)) << 4) |
-						Char2HexBit(*pBeg));
+					m_data.push_back((Char2HexBit(*pBeg) << 4) | Char2HexBit(*pNext));
+					++pBeg;
 				}
 			}
 		}
@@ -160,7 +168,7 @@ CRuleOption* CContentOption::Clone() const
 **	@retval  0 function successful
 **	@retval -1 fatal error
 */
-void CContentOption::ToPcre(CDllString &strPcre) const
+void CContentOption::ToPcre(CPcreOption &pcreOpt) const
 {
 	int nMinSkip = 0, nMaxSkip = -1;
 
@@ -213,7 +221,7 @@ void CContentOption::ToPcre(CDllString &strPcre) const
 	}
 
 	std::stringstream ssPcre;
-	ssPcre << '/';
+	ssPcre << "\"/";
 
 	// If has constraint
 	if (nMinSkip > 0 || nMaxSkip >= 0)
@@ -231,10 +239,6 @@ void CContentOption::ToPcre(CDllString &strPcre) const
 			}
 			ssPcre << '}';
 		}
-	}
-	else
-	{
-		ssPcre << ".*";
 	}
 
 	char code[3] = {0};
@@ -264,7 +268,14 @@ void CContentOption::ToPcre(CDllString &strPcre) const
 		ssPcre << "/s";
 	}
 
-	strPcre.Assign(ssPcre.str().c_str());
+	if (HasFlags(DISTANCE | WITHIN))
+	{
+		ssPcre << 'R';
+	}
+	ssPcre << '"';
+
+	pcreOpt.FromPattern(CDllString(ssPcre.str().c_str()));
+	pcreOpt.AddFlags(CPcreOption::PF_F);
 }
 
 void CContentOption::ExtractSignatures(CSignatures &sigs) const

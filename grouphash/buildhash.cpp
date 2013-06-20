@@ -30,6 +30,15 @@ Returns:				hash slot
 
 HASHMAPHDR ulong hash(const SIGNATURE &oneSig)
 {
+	//const ulong _FNV_offset_basis = 2166136261U;
+	//const ulong _FNV_prime = 16777619U;
+
+	//ulong _Val = _FNV_offset_basis;
+	//_Val ^= oneSig;
+	//_Val *= _FNV_prime;
+
+	//return (_Val);
+
 	return oneSig % 16001;
 }
 
@@ -54,7 +63,7 @@ Returns:				true if find a adjust path to reduce conflict
 
 */
 
-bool myFind(std::vector<GROUPHASH> &vecGroups, RESULTMAP &result, SIGNATURE &currSig, std::vector<STATION> &vecPath, ulong &depth)
+bool myFind(std::vector<GROUPHASH> &vecGroups, RESULTMAP &result, SIGNATURE &currSig, std::deque<STATION> &seqPath, ulong &depth)
 {
 	++depth;
 
@@ -71,18 +80,35 @@ bool myFind(std::vector<GROUPHASH> &vecGroups, RESULTMAP &result, SIGNATURE &cur
 	{
 		for (std::vector<ulong>::iterator i = result[hash(currSig)].begin(); i != result[hash(currSig)].end(); ++i)
 		{
+			std::deque<STATION>::iterator iter;
+			for (iter = seqPath.begin(); iter != seqPath.end(); ++iter)
+			{
+				if (iter->dfaId == *i)
+				{
+					break;
+				}
+			}
+			if (iter != seqPath.end())
+			{
+				continue;
+			}
 			for (std::vector<SIGNATURE>::iterator j = vecGroups[*i].vecSigs.begin(); j != vecGroups[*i].vecSigs.end(); ++j)
 			{
 				if (*j == vecGroups[*i].currSig)
 				{
 					continue;
 				}
-				if (myFind(vecGroups, result, *j, vecPath, depth))
+				seqPath.push_front(STATION());
+				seqPath.front().dfaId = *i;
+				seqPath.front().sig = *j;
+				if (myFind(vecGroups, result, *j, seqPath, depth))
 				{
-					vecPath.push_back(STATION());
-					vecPath.back().dfaId = *i;
-					vecPath.back().sig = *j;
 					return true;
+				}
+				else
+				{
+					seqPath.pop_front();
+					--depth;
 				}
 			}
 		}
@@ -113,7 +139,7 @@ void RecursiveAdjust(std::vector<GROUPHASH> &vecGroups, RESULTMAP &result)
 			{
 				for (std::vector<ulong>::iterator j = i->second.begin(); j != i->second.end();)
 				{
-					std::vector<STATION> vecPath;
+					std::deque<STATION> seqPath;
 					ulong depth;
 					bool change = false;
 					for (std::vector<SIGNATURE>::iterator k = vecGroups[*j].vecSigs.begin(); k != vecGroups[*j].vecSigs.end(); ++k)
@@ -122,31 +148,27 @@ void RecursiveAdjust(std::vector<GROUPHASH> &vecGroups, RESULTMAP &result)
 						{
 							continue;
 						}
-						vecPath.clear();
+						seqPath.clear();
 						depth = 0;
-						if (myFind(vecGroups, result, *k, vecPath, depth))
+						seqPath.push_front(STATION());
+						seqPath.front().dfaId = *j;
+						seqPath.front().sig = *k;
+						if (myFind(vecGroups, result, *k, seqPath, depth))
 						{
 							flag = true;
 							change = true;
-							vecGroups[*j].currSig = *k;
-							std::vector<ulong>::iterator iter = std::find(result[hash(*k)].begin(), result[hash(*k)].end(), *j);
-							if (iter != result[hash(*k)].end())
-							{
-								result[hash(*k)].erase(iter);
-							}
-							result[hash(*k)].push_back(*j);
 							j = i->second.erase(j);
-							while (!vecPath.empty())
+							while (!seqPath.empty())
 							{
-								std::vector<ulong> &Ids = result[hash(vecGroups[vecPath.back().dfaId].currSig)];
-								iter = std::find(Ids.begin(), Ids.end(), vecPath.back().dfaId);
+								std::vector<ulong> &Ids = result[hash(vecGroups[seqPath.back().dfaId].currSig)];
+								std::vector<ulong>::iterator iter = std::find(Ids.begin(), Ids.end(), seqPath.back().dfaId);
 								if (iter != Ids.end())
 								{
 									Ids.erase(iter);
 								}
-								vecGroups[vecPath.back().dfaId].currSig = vecPath.back().sig;
-								result[hash(vecGroups[vecPath.back().dfaId].currSig)].push_back(vecPath.back().dfaId);
-								vecPath.pop_back();
+								vecGroups[seqPath.back().dfaId].currSig = seqPath.back().sig;
+								result[hash(vecGroups[seqPath.back().dfaId].currSig)].push_back(seqPath.back().dfaId);
+								seqPath.pop_back();
 							}
 							break;
 						}
@@ -455,9 +477,9 @@ void Combine(CGroupRes &groupRes, std::vector<GROUPHASH> &vecGroups, RESULTMAP &
 
 	for (ulong i = 0; i < vecKeys.size(); ++i)
 	{
-		std::cout << "Combine" << std::endl;
-		std::cout << "NO: " << i << std::endl;
-		std::cout << "Total: " << vecKeys.size() << std::endl;
+		g_log << "Combine" << g_log.nl;
+		g_log << "NO: " << i << g_log.nl;
+		g_log << "Total: " << vecKeys.size() << g_log.nl;
 		if (result[vecKeys[i]].size() == 1)
 		{
 			for (ulong j = 0; j < vecKeys.size(); ++j)

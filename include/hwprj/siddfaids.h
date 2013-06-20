@@ -29,7 +29,7 @@ struct COMPILEDINFO
 	static const COMPRETCODE RES_HASNOT			= (1 << 3); 
 	static const COMPRETCODE RES_EMPTY			= (1 << 4);
 	static const COMPRETCODE RES_HASNOSIG		= (1 << 5);
-	static const COMPRETCODE RES_EXCEEDLIMIT	= (1 << 5);
+	static const COMPRETCODE RES_EXCEEDLIMIT	= (1 << 6);
 	ulong m_nSid;
 	ulong m_nResult;
 	CUnsignedArray m_dfaIds;

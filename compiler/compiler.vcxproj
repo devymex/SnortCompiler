@@ -92,7 +92,8 @@
     <ClInclude Include="..\include\hwprj\compiler.h" />
     <ClInclude Include="..\include\hwprj\compres.h" />
     <ClInclude Include="..\include\hwprj\pcrematch.h" />
-    <ClInclude Include="..\include\hwprj\regchain.h" />
+    <ClInclude Include="..\include\hwprj\pcreopt.h" />
+    <ClInclude Include="..\include\hwprj\pcrechain.h" />
     <ClInclude Include="..\include\hwprj\regrule.h" />
     <ClInclude Include="..\include\hwprj\ruleoption.h" />
     <ClInclude Include="..\include\hwprj\siddfaids.h" />
@@ -102,7 +103,6 @@
     <ClInclude Include="contopt.h" />
     <ClInclude Include="p2nmain.h" />
     <ClInclude Include="pcre2nfa.h" />
-    <ClInclude Include="pcreopt.h" />
     <ClInclude Include="pcre\config.h" />
     <ClInclude Include="pcre\pcre.h" />
     <ClInclude Include="pcre\pcrecpp.h" />
@@ -208,7 +208,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="regchain.cpp" />
+    <ClCompile Include="pcrechain.cpp" />
     <ClCompile Include="regrule.cpp" />
     <ClCompile Include="comprule.cpp" />
     <ClCompile Include="ruleoption.cpp" />

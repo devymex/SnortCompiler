@@ -34,20 +34,19 @@ COMPILERHDR void ParseRuleFile(const char *pFileName, RECIEVER recv, void *lpUse
 		{
 			for(STRINGVEC_ITER i = rules.begin(); i != rules.end(); ++i)
 			{
-				std::cout << i - rules.begin() + 1 << std::endl;
-				//std::cout << ": " << g_dTimer << std::endl;
+				g_log << "Compiling: " << i - rules.begin() + 1 << g_log.nl;
 				i->erase(i->begin(), find(i->begin(), i->end(), '(') + 1);
 				i->erase(find(i->rbegin(), i->rend(), ')').base() - 1, i->end());
 
 				CSnortRule snortRule;
 				try
 				{
-					ProcessOption(*i, snortRule);
+					ParseOptions(*i, snortRule);
 				}
 				catch (CTrace &e)
 				{
-					std::cout << "ProcessOption error: " << e.What() << std::endl;
-					continue;
+					g_log << "ParseOptions error: " << e.What() << g_log.nl;
+					throw;
 				}
 				PARSERESULT pr;
 				pr.ulSid = snortRule.GetSid();
@@ -55,19 +54,23 @@ COMPILERHDR void ParseRuleFile(const char *pFileName, RECIEVER recv, void *lpUse
 				try
 				{
 					Rule2RegRule(snortRule, pr.regRule);
-					if (snortRule.GetFlags() & CSnortRule::HASBYTE)
-					{
-						pr.ulFlag |= PARSEFLAG::PARSE_HASBYTE;
-					}
-					if (snortRule.GetFlags() & CSnortRule::HASNOT)
-					{
-						pr.ulFlag |= PARSEFLAG::PARSE_HASNOT;
-					}
 				}
 				catch (CTrace &e)
 				{
 					pr.ulFlag |= PARSEFLAG::PARSE_ERROR;
-					std::cout << "Rule2RegRule error: " << e.What() << std::endl;
+					g_log << "Rule2RegRule error: " << e.What() << g_log.nl;
+				}
+				if (snortRule.GetFlags() & CSnortRule::HASBYTE)
+				{
+					pr.ulFlag |= PARSEFLAG::PARSE_HASBYTE;
+				}
+				if (snortRule.GetFlags() & CSnortRule::HASNOT)
+				{
+					pr.ulFlag |= PARSEFLAG::PARSE_HASNOT;
+				}
+				if (snortRule.Size() == 0)
+				{
+					pr.ulFlag |= PARSEFLAG::PARSE_EMPTY;
 				}
 				recv(pr, lpUser);
 			}
