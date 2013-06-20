@@ -28,12 +28,12 @@ public:
 	CStringArray(const CStringArray &other);
 	virtual ~CStringArray();
 
+	// Overided operators
 	CStringArray&		operator =	(const CStringArray &other);
 	CDllString&			operator[]	(ulong nIdx);
 	const CDllString&	operator[]	(ulong nIdx) const;
 
-	// Overided operators
-
+	// Normal operations
 	ulong				Size() const;
 	void				Clear();
 	void				PushBack(const CDllString &str);

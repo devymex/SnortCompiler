@@ -96,7 +96,48 @@ struct ISCONTENT
 	}
 };
 
+inline bool CaselessComp(char a, char b)
+{
+	return tolower(a) == tolower(b);
+}
+
+struct INCLUDESEQUENCE
+{
+	const BYTEARY *m_pSeq;
+	bool m_bCaseless;
+	INCLUDESEQUENCE(const BYTEARY &seq, bool bCaseless = false)
+		: m_pSeq(&seq), m_bCaseless(bCaseless)
+	{
+	}
+	bool operator() (const BYTEARY &seq)
+	{
+		if (m_bCaseless)
+		{
+			return (seq.end() != std::search(seq.begin(), seq.end(),
+				m_pSeq->begin(), m_pSeq->end(), CaselessComp));
+		}
+		else
+		{
+			return (seq.end() != std::search(seq.begin(), seq.end(),
+				m_pSeq->begin(), m_pSeq->end(), CaselessComp));
+		}
+	}
+};
+
+typedef std::vector<BYTEARY>			PCRESEQUENCE;
+typedef std::vector<PCRESEQUENCE>		CHAINSEQUENCE;
+typedef std::vector<CHAINSEQUENCE>		RULESEQUENCE;
+typedef std::vector<BYTEARY>			CHAINCOMPDATA;
+typedef std::vector<CHAINCOMPDATA>		RULECOMPDATA;
+
+
 void __stdcall CompileCallback(const PARSERESULT &parseRes, void *lpVoid);
+
+bool SeqIncBy(const CRegRule &regRule, const RULESEQUENCE &ruleSeq, ulong ulIdx);
+
+bool IsOneContentChain(const CPcreChain &chain, const CHAINSEQUENCE &chainSeq);
+
+void ProcessRule(CRegRule &regRule, RULECOMPDATA &result);
 
 void ParseOptions(std::string &ruleOptions, CSnortRule &snortRule);
 
@@ -104,10 +145,18 @@ void Rule2RegRule(const CSnortRule &rule, CRegRule &regrule);
 
 void CompileRule(LPCSTR rule, RECIEVER recv, LPVOID lpUser);
 
+void PreCompileRule(const CRegRule &regRule,
+					RULESEQUENCE &ruleSeq,
+					RULECOMPDATA &ruleCompData);
+
 ulong LoadFile(const char *fileName, std::vector<std::string> &rules);
 
-void Rule2Dfas(const CSnortRule &rule, CCompileResults &result, COMPILEDINFO &ruleResult);
+void Rule2Dfas(const CSnortRule &rule,
+			   CCompileResults &result,
+			   COMPILEDINFO &ruleResult);
 
 void AssignSig(CCompileResults &result, ulong BegIdx, ulong EndIdx);
 
 void Rule2Dfas(const CRegRule &rule, CCompileResults &result);
+
+void ExtractSigs(const std::vector<BYTEARY> &seqAry, CSignatures &sigs);

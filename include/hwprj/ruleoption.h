@@ -42,12 +42,12 @@ public:
 	void			AddFlags(OPTIONFLAG nFlags);
 	void			DelFlags(OPTIONFLAG nFlags);
 	bool			HasFlags(OPTIONFLAG nFlags) const;
-
-	virtual void			FromPattern(const CDllString &out) = 0;
+	virtual void	FromPattern(const CDllString &out) = 0;
 	virtual	CRuleOption*	Clone() const = 0;
 
 protected:
-	virtual void			FormatPattern(CDllString &out);
+	virtual void	FormatPattern(CDllString &out);
 
+protected:
 	OPTIONFLAG		m_nFlags;
 };

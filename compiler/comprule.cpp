@@ -25,13 +25,6 @@ double pcre2nfatime = 0.0;
 double nfa2dfatime = 0.0;
 double dfamintimetime = 0.0;
 
-typedef std::vector<BYTEARY>			PCRESEQUENCE;
-typedef std::vector<PCRESEQUENCE>		CHAINSEQUENCE;
-typedef std::vector<CHAINSEQUENCE>		RULESEQUENCE;
-typedef std::vector<BYTEARY>			CHAINCOMPDATA;
-typedef std::vector<CHAINCOMPDATA>		RULECOMPDATA;
-
-
 /* complie one rule
 
 Arguments:
@@ -380,35 +373,7 @@ void AssignSig(CCompileResults &result, ulong BegIdx, ulong EndIdx)
 	}
 }
 
-bool CaselessComp(char a, char b)
-{
-	return tolower(a) == tolower(b);
-}
-
-struct INCLUDESEQUENCE
-{
-	const BYTEARY *m_pSeq;
-	bool m_bCaseless;
-	INCLUDESEQUENCE(const BYTEARY &seq, bool bCaseless = false)
-		: m_pSeq(&seq), m_bCaseless(bCaseless)
-	{
-	}
-	bool operator() (const BYTEARY &seq)
-	{
-		if (m_bCaseless)
-		{
-			return (seq.end() != std::search(seq.begin(), seq.end(),
-				m_pSeq->begin(), m_pSeq->end(), CaselessComp));
-		}
-		else
-		{
-			return (seq.end() != std::search(seq.begin(), seq.end(),
-				m_pSeq->begin(), m_pSeq->end(), CaselessComp));
-		}
-	}
-};
-
-void ExtractSignatures(const std::vector<BYTEARY> &seqAry, CSignatures &sigs)
+void ExtractSigs(const std::vector<BYTEARY> &seqAry, CSignatures &sigs)
 {
 	SIGNATURE nCurSig;
 	for (ulong i = 0; i < seqAry.size(); ++i)
@@ -505,7 +470,8 @@ bool IsOneContentChain(const CPcreChain &chain, const CHAINSEQUENCE &chainSeq)
 	return true;
 }
 
-void PreCompileRule(const CRegRule &regRule, RULESEQUENCE &ruleSeq,
+void PreCompileRule(const CRegRule &regRule,
+					RULESEQUENCE &ruleSeq,
 					RULECOMPDATA &ruleCompData)
 {
 	for (ulong i = 0; i < regRule.Size(); ++i)
@@ -553,7 +519,7 @@ void ProcessRule(CRegRule &regRule, RULECOMPDATA &result)
 		{
 			for (ulong j = 0; j < curChainSeq.size(); ++j)
 			{
-				ExtractSignatures(curChainSeq[j], regRule[i].GetSigs());
+				ExtractSigs(curChainSeq[j], regRule[i].GetSigs());
 			}
 			++i;
 		}
