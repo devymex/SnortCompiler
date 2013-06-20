@@ -31,11 +31,22 @@ public:
 	ulong				Size() const;
 	void				Clear();
 
+	/*	函数名：AddState
+	**	参数：nStaId-状态编号
+	**	功能：终态集合中增加DFA终态的编号
+	*/
 	CDfaIdSet&			AddState(STATEID nStaId);
 	void				Swap(CFinalStates &other);
 
+	/*	函数名：GetDfaIdSet
+	**	参数：nStaId-状态编号
+	**	功能：获取DFA终态对应的DfaId集合
+	*/
 	CDfaIdSet&			GetDfaIdSet(STATEID nStaId);
 	const CDfaIdSet&	GetDfaIdSet(STATEID nStaId) const;
+	/*	函数名：CountDfaIds
+	**	功能：计算DFA终态对应的DfaId的个数
+	*/
 	ulong				CountDfaIds() const;
 
 protected:

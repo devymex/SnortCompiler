@@ -43,8 +43,18 @@ public:
 	ulong			Size() const;
 	void			Fill(STATEID nState);
 
+	/*	函数名：AddFlags
+	**	参数：nFlags-属性取值
+	**	功能：增加状态属性
+	*/
 	void			AddFlags(STATEFLAG nFlags);
+	/*	函数名：SetFlags
+	**	功能：设置状态属性
+	*/
 	void			SetFlags(STATEFLAG nFlags);
+	/*	函数名：GetFlags
+	**	功能：获取状态属性
+	*/
 	STATEFLAG		GetFlags() const;
 
 protected:

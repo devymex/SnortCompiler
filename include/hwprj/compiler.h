@@ -38,6 +38,15 @@ struct PARSERESULT
 
 typedef void (__stdcall *RECIEVER)(const PARSERESULT &parseRes, void *lpUser);
 
+/*	ParseRuleFile
+**	参数：输入规则文件路径，回调函数解析规则，输出规则对应的DFA
+**	功能：解析规则
+*/
 COMPILERHDR void ParseRuleFile(const char *pFileName, RECIEVER recv, void *lpUser);
 
+/*	接口函数：CompileRuleFile
+**	参数：输入规则文件路径，输出规则对应的DFA
+**	功能：处理Snort规则，将规则中的content、uricontent、pcre选项编写为PCRE链
+**	将PCRE链编译为DFA，并提取连续4字节长度signature
+*/
 COMPILERHDR void CompileRuleFile(const char *pFileName, CCompileResults &compRes);

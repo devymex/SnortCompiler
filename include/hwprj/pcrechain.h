@@ -1,9 +1,9 @@
 /*
-**	@file		regchain.h
+**	@file		pcrechain.h
 **
 **	@author		Lab 435, Xidian University
 **
-**	@brief		Construct regex chain with attribute of snort rules
+**	@brief		Construct pcre chain with attribute of snort rules
 **
 **	Declaration of the CPcreChain class
 **
