@@ -5,7 +5,6 @@
 #include <hwprj\buildhash.h>
 #include <hwprj\unsary.h>
 #include <hwprj\siddfaids.h>
-//#include <hwprj\groupres.h>
 #include "MatchPkt.h"
 
 struct DFASIDMAPPING

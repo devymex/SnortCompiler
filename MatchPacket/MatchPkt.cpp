@@ -13,7 +13,7 @@ void GetMchRule(const u_char *data, size_t len, void* user, std::vector<size_t> 
 		u_char csig[4];
 		size_t flag = 0;
 
-		for(const u_char* iter = data; iter != &data[len - 4]; ++iter)
+		for(const u_char* iter = data; iter != &data[len - 3]; ++iter)
 		{
 			for(size_t i = 0; i < 4; ++i)
 			{
@@ -75,7 +75,9 @@ void HdlOnePkt(const u_char *data, size_t len, void*user)
 	rulesmap.mchresult << pktnum << " : ";
 	for(size_t i = 0; i < rules.size(); ++i)
 	{
+
 		bool flag = MyPcreMatch(data, len, rulesmap.result[rules[i]].regrule);
+
 		if(flag)
 		{
 			matchvec.push_back(rulesmap.result[rules[i]].m_nSid);
@@ -144,6 +146,8 @@ void packet_handler(u_char *param, const struct pcap_pkthdr *header, const u_cha
 void CALLBACK PktParam(const ip_header *ih, const BYTE *data, void* user)
 {
 	++pktnum;	
+
+
 	REGRULESMAP &rulesmap = *(REGRULESMAP *)user;
 	u_short  _ihl = (ih->ver_ihl & 0x0f) * 4;
 	
@@ -164,7 +168,7 @@ void CALLBACK PktParam(const ip_header *ih, const BYTE *data, void* user)
 			data += _ihl + tcpHdrLen;
 
 			size_t tcpdatalen = _tlen - _ihl - tcpHdrLen;
-			if(tcpdatalen > 0)
+			if (_tlen > _ihl + tcpHdrLen)
 			{
 				HdlOnePkt(data, tcpdatalen, user);
 			}
@@ -185,7 +189,12 @@ void CALLBACK PktParam(const ip_header *ih, const BYTE *data, void* user)
 			break;
 		}
 	}
-	std::cout << pktnum << std::endl;
+
+	if (pktnum % 100 == 0)
+	{
+		std::cout << pktnum << std::endl;
+	}
+
 }
 
 bool MyLoadCapFile(const char* pFile, PACKETRECV cv, void* pUser)

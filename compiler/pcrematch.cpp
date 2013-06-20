@@ -48,7 +48,7 @@ PCREMATCHHDR bool PcreMatch(const char* src, int length, std::string Regex, int 
 		return false;
 	}
 
-	int wscount = 100;
+	int wscount = 10000;
 	int *workspace = NULL;
 	try
 	{

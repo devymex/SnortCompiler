@@ -1,7 +1,5 @@
 ﻿#pragma once
-//#define NTDDI_VERSION NTDDI_WIN7
-//#define _WIN32_WINNT _WIN32_WINNT_WIN7
-//#define WINVER _WIN32_WINNT_WIN7
+
 
 #include <Windows.h>
 #include <pcap.h>
@@ -16,7 +14,6 @@
 #include <hwprj\snortrule.h>
 #include <hwprj\pcrematch.h>
 #include <hwprj\buildhash.h>
-//#include <hwprj\groupres.h>
 
 #define ETHDRLEN 14 
 #define _TCP 6
@@ -39,48 +36,48 @@ typedef struct ip_address{
 
 /* 4字节的IP地址 */
 typedef struct ip_header{
-    u_char  ver_ihl;        // �汾 (4 bits) + �ײ����� (4 bits)
-    u_char  tos;            // ��������(Type of service) 
-    u_short tlen;           // �ܳ�(Total length) 
-    u_short identification; // ��ʶ(Identification)
-    u_short flags_fo;       // ��־λ(Flags) (3 bits) + ��ƫ����(Fragment offset) (13 bits)
-    u_char  ttl;            // ���ʱ��(Time to live)
-    u_char  proto;          // Э��(Protocol)
-    u_short crc;            // �ײ�У���(Header checksum)
-    ip_address  saddr;      // Դ��ַ(Source address)
-    ip_address  daddr;      // Ŀ�ĵ�ַ(Destination address)
-    u_int   op_pad;         // ѡ�������(Option + Padding)
+    u_char  ver_ihl;        // 版本 (4 bits) + 首部长度 (4 bits)
+    u_char  tos;            // 服务类型(Type of service) 
+    u_short tlen;           // 总长(Total length)  
+    u_short identification; // 标识(Identification)
+    u_short flags_fo;       // 标志位(Flags) (3 bits) + 段偏移量(Fragment offset) (13 bits)
+    u_char  ttl;            // 存活时间(Time to live)
+    u_char  proto;          // 协议(Protocol)
+    u_short crc;            // 首部校验和(Header checksum)
+    ip_address  saddr;      // 源地址(Source address)
+    ip_address  daddr;      // 目的地址(Destination address)
+    u_int   op_pad;         // 选项与填充(Option + Padding)
 }ip_header;
 
-/* UDP �ײ�*/
+/* UDP 首部*/
 typedef struct udp_header{
-    u_short sport;          // Դ�˿�(Source port)
-    u_short dport;          // Ŀ�Ķ˿�(Destination port)
-    u_short len;            // UDP���ݰ�����(Datagram length)
-    u_short crc;            // У���(Checksum)
+    u_short sport;          // 源端口(Source port)
+    u_short dport;          // 目的端口(Destination port)
+    u_short len;            // UDP数据包长度(Datagram length)
+    u_short crc;            // 校验和(Checksum)
 }udp_header;
 
-typedef struct tcp_header //����TCP�ײ�
+typedef struct tcp_header //定义TCP首部
 
 {
 
-u_short saddr;           //16λԴ�˿�
+u_short saddr;           //16位源端口
 
-u_short daddr;           //16λĿ�Ķ˿�
+u_short daddr;           //16位目的端口
 
-u_int seq;               //32λ���к�
+u_int seq;               //32位序列号
 
-u_int ack;               //32λȷ�Ϻ�
+u_int ack;               //32位确认号
 
-u_char lenres;           //4λ�ײ�����/6λ������
+u_char lenres;           //4位首部长度/6位保留字
 
-u_char flag;             //6λ��־λ
+u_char flag;             //6位标志位
 
-u_short window;          //16λ���ڴ�С
+u_short window;          //16位窗口大小
 
-u_short crc;             //16λУ���
+u_short crc;             //16位校验和
 
-u_short urp;            //16λ�������ƫ����
+u_short urp;             //16位紧急数据偏移量
 
 }tcp_header;
 

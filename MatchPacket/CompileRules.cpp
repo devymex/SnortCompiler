@@ -29,6 +29,7 @@ void __stdcall MyProcess(const PARSERESULT &parseRes, void *lpParam)
 	}
 }
 
+//×¢ÊÍ
 MATCHPKT void MchCompile(const char* filename, LPVOID lpVoid)
 {
 	//int sids[4653];
@@ -39,6 +40,10 @@ MATCHPKT void MchCompile(const char* filename, LPVOID lpVoid)
 	std::vector<REGRULES>::iterator mapbegin = rulesmap.result.begin();
 	for (std::vector<REGRULES>::iterator iter = mapbegin; iter != rulesmap.result.end(); ++iter)
 	{
+		if (iter->m_nSid == 12077)
+		{
+			std::cout << std::endl;
+		}
 		SIGNATURE tempsig = (SIGNATURE)-1;
 		ulong flag = 0;
         ulong pos = iter - mapbegin;
@@ -46,6 +51,16 @@ MATCHPKT void MchCompile(const char* filename, LPVOID lpVoid)
 		{
 			SIGNATURE sig;
 			ulong sigcnt = (iter->regrule)[chainsize].GetSigs().Size();
+
+			if(iter->m_nSid == 12166)
+			{
+				for (size_t m = 0; m < sigcnt; ++m)
+				{
+					char *csig = (char*) &((iter->regrule)[chainsize].GetSigs()[m]);
+					std::cout << " ";
+				}
+			}
+
 			if (sigcnt > 0)
 			{
 				flag |= (1 << 1);
@@ -55,6 +70,7 @@ MATCHPKT void MchCompile(const char* filename, LPVOID lpVoid)
 				for (ulong cursig = 0; cursig < sigcnt; ++cursig)
 				{
 					sig = (iter->regrule)[chainsize].GetSigs()[cursig];
+					char *csig = (char*)&sig;
 
 					if (rulesmap.sigmap.count(sig) != 0)
 					{

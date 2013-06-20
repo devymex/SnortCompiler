@@ -13,7 +13,6 @@ void MatchOnedfa(const unsigned char * &data, ulong len, CDfa &dfa,
 	size_t size = sizeof(flags);
 	std::memset(flags, 0, sizeof(flags));
 
-
 	std::unordered_map<ulong, CUnsignedArray> dfaids;
 	const CFinalStates &finStas = dfa.GetFinalState();
 	for (ulong i = 0; i < finStas.Size(); ++i)
@@ -99,7 +98,7 @@ void GetMchDfas(const u_char *data, ulong len, HASHRES &hashtable, std::vector<u
 		char flags[3000];
 		std::memset(flags, 0, sizeof(flags));
 
-		for (const u_char* iter = data; iter != &data[len - 4]; ++iter)
+		for (const u_char* iter = data; iter != &data[len - 3]; ++iter)
 		{
 			for (size_t i = 0; i < 4; ++i)
 			{
@@ -133,15 +132,8 @@ void GetMchDfas(const u_char *data, ulong len, HASHRES &hashtable, std::vector<u
 MATCHPKT void DfaMatchPkt(const u_char *data, ulong len, DFAMCH &dfamch)
 {
 	std::ofstream matchresult;
-	if (dpktnum == 1)
-	{
-		matchresult.open(dfamch.resultPath);
-		matchresult << "-----------------------" << dfamch.resultPath << "-----------------------" << std::endl;
-	}
-	else
-	{
-		matchresult.open(dfamch.resultPath, std::ofstream::app);
-	}
+
+	matchresult.open(dfamch.resultPath, std::ofstream::app);
 
 	matchresult << dpktnum << " : ";
 	std::vector<ulong> matchdfas;
@@ -200,6 +192,13 @@ void __stdcall DPktParam(const ip_header *ih, const byte *data, void* user)
 	++dpktnum;
 	
 	DFAMCH &dfamch = *(DFAMCH *)user;
+
+	std::ofstream matchresult;
+	if (dpktnum == 1)
+	{
+		matchresult.open(dfamch.resultPath);
+		matchresult << "-----------------------" << dfamch.resultPath << "-----------------------" << std::endl;
+	}
 	u_short  _ihl = (ih->ver_ihl & 0x0f) * 4;
 	
 	u_short _tlen = ih->tlen;
@@ -243,10 +242,11 @@ void __stdcall DPktParam(const ip_header *ih, const byte *data, void* user)
 		}
 	}
 	
-	if (dpktnum % 100 == 0)
+	if (dpktnum % 1000 == 0)
 	{
 		std::cout << dpktnum << std::endl;
 	}
+
 }
 
 bool DMyLoadCapFile(const char* pFile, PACKETRECV cv, void* pUser)
@@ -259,6 +259,7 @@ bool DMyLoadCapFile(const char* pFile, PACKETRECV cv, void* pUser)
 	pcap_loop(mypcap, 0, MchDfaHdler, (byte*)&pp);
 	pcap_close(mypcap);
 	return true;
+
 }
 
 MATCHPKT bool DLoadCapFile(const char* pFile, void* pUser)
