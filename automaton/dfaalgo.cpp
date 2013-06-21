@@ -72,9 +72,9 @@ void NfaEClosure(const CNfa &nfa, std::vector<STATEIDARY> &eClosure)
 	try
 	{
 		eClosure.resize(nNfaSize + 1);
-		for (STATEID i = 0; i < nNfaSize; ++i)
+		for (ulong i = 0; i < nNfaSize; ++i)
 		{
-			for (STATEID j = 0; j < nMatWidth; ++j)
+			for (ulong j = 0; j < nMatWidth; ++j)
 			{
 				if (pMat[i * nMatWidth + j])
 				{

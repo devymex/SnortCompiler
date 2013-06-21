@@ -321,7 +321,7 @@ DFAHDR ulong CDfa::Minimize()
 {
 	ulong nSize = m_pDfa->size();
 	ulong nCols = GetGroupCount();
-	if (nSize == 0 || nSize == 0)
+	if (nSize == 0 || nCols == 0)
 	{
 		return ulong(-1);
 	}
