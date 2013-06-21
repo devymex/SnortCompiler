@@ -62,7 +62,6 @@ int main()
 	//groupRes.ReadFromFile("..\\GroupResult.cdt");
 	HASHRES HashResMap;
 	HashMapping(groupRes, HashResMap);
-
 	groupRes.WriteToFile("..\\FinalResult.cdt");
 	//for (ulong i = 0; i < groupRes.GetDfaTable().Size(); ++i)
 	//{

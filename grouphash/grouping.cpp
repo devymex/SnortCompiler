@@ -417,7 +417,6 @@ void MergeGroup(CCompileResults &res, std::vector<SIGNATURE> &vecUsed, CGroups &
 					CDfa MergeDfa;
 					if (MergeMultipleDfas(vecDfas, MergeDfa))
 					{
-
 						//select the fittest group to merge
 						int nReduceSize = vecDfas[0].Size() + vecDfas[1].Size() - MergeDfa.Size();
 						if (nMax < nReduceSize)

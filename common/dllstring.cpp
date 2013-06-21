@@ -138,6 +138,7 @@ DLLSTRHDR bool CDllString::Empty() const
 
 DLLSTRHDR const char* CDllString::Data() const
 {
+	TASSERT(!m_pString->empty());
 	return m_pString->c_str();
 }
 

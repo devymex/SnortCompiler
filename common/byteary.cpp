@@ -106,10 +106,12 @@ BYTEARYHDR void CByteArray::Reserve(ulong ulCap)
 
 BYTEARYHDR byte* CByteArray::Data()
 {
+	TASSERT(!m_pAry->empty());
 	return m_pAry->data();
 }
 
 BYTEARYHDR const byte* CByteArray::Data() const
 {
+	TASSERT(!m_pAry->empty());
 	return m_pAry->data();
 }
