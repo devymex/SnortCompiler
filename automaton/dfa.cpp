@@ -247,7 +247,7 @@ DFAHDR ulong CDfa::FromNFA(const CNfa &nfa)
 		m_pDfa->push_back(CDfaRow(m_usColNum));
 
 		CDfaRow &firstRow = m_pDfa->back();
-		firstRow.AddFlags(CDfaRow::START);
+		m_nStartId = 0;
 
 		if (startEVec.back() == nfa.Size())
 		{
@@ -321,7 +321,7 @@ DFAHDR ulong CDfa::Minimize()
 {
 	ulong nSize = m_pDfa->size();
 	ulong nCols = GetGroupCount();
-	if (nSize == 0 || nSize == 0)
+	if (nSize == 0 || nCols == 0)
 	{
 		return ulong(-1);
 	}
@@ -427,7 +427,6 @@ DFAHDR void CDfa::Save(byte *beg)
 	for (ulong i = 0; i < m_pDfa->size(); ++i)
 	{
 		//write the flag of dfa state
-		WriteNum(beg, (*m_pDfa)[i].GetFlags());
 		for (byte j = 0; j < m_usColNum; ++j)
 		{
 			WriteNum(beg, (*m_pDfa)[i][j], sizeof(byte));
@@ -478,12 +477,9 @@ DFAHDR void CDfa::Load(byte *beg)
 
 	//read dfa table
 	m_pDfa->resize(dfaSize, CDfaRow(m_usColNum));
-	ulong nFlag;
 	for (ulong i = 0; i < m_pDfa->size(); ++i)
 	{
 		//read the flag of dfa state
-		ReadNum(beg, nFlag);
-		(*m_pDfa)[i].SetFlags(nFlag);
 		for (byte j = 0; j < m_usColNum; ++j)
 		{
 			(*m_pDfa)[i][j] = 0;
@@ -509,6 +505,7 @@ DFAHDR void CDfa::Load(byte *beg)
 		ReadNum(beg, nStaId, sizeof(byte));
 		ReadNum(beg, nDfaId);
 		m_FinStas.AddState(nStaId).AddDfaId(nDfaId);
+		(*m_pDfa)[nStaId].SetFlags(CDfaRow::FINAL);
 	}
 }
 
@@ -732,6 +729,7 @@ ulong CDfa::PartStates(STATEIDARY *pRevTbl)
 		//renumber DFA state
 		BuildDfaByPart(partSets, *m_pDfa, *pNewDfa);
 
+		STATEID m_nOldStartId = m_nStartId;
 		//remark new start state and final states
 		for (PARTSETVEC_ITER i = partSets.begin(); i != partSets.end(); ++i)
 		{
@@ -739,7 +737,7 @@ ulong CDfa::PartStates(STATEIDARY *pRevTbl)
 			for (STATELIST_ITER j = i->StaSet.begin(); j != i->StaSet.end(); ++j)
 			{
 				CDfaRow &curRow = (*m_pDfa)[*j];
-				if (curRow.GetFlags() & CDfaRow::START)
+				if (*j == m_nOldStartId)
 				{
 					m_nStartId = nState;
 				}
@@ -896,12 +894,11 @@ DFAHDR bool MergeMultipleDfas(CDfaArray &inputDfas, CDfa &mergedDfa)
 	if(finFlag)
 	{
 		startVec[dfasSize + 1] = nTermSta;
-		mergedDfa[0].AddFlags(CDfaRow::START | CDfaRow::FINAL);
+		mergedDfa[0].AddFlags(CDfaRow::FINAL);
 	}
 	else
 	{
 		startVec[dfasSize + 1] = STATEID(-1);
-		mergedDfa[0].AddFlags(CDfaRow::START);
 	}
 
 	std::vector<STATEID> NextVec;

@@ -5,7 +5,7 @@
 #include "DfaMatch.h"
 
 ulong g_dpktnum = 0;
-
+ulong signum = 0;
 void MatchOnedfa(const unsigned char * &data, ulong len, CDfa &dfa,
 				 std::vector<ulong> &matchedDids)
 {
@@ -92,12 +92,13 @@ void GetMchDfas(const u_char *data, ulong len, HASHRES &hashtable, std::vector<u
 	if (len > 3)
 	{
 		std::ofstream sigfile;
-		sigfile.open("..\\..\\output\\sigfile.txt");
+		sigfile.open("..\\..\\output\\sigfile.txt", std::ofstream::app);
 		SIGNATURE sig;
 		u_char csig[4];
 		char flags[3000];
 		std::memset(flags, 0, sizeof(flags));
 
+		ulong signum = 0;
 		for (const u_char* iter = data; iter != &data[len - 3]; ++iter)
 		{
 			for (size_t i = 0; i < 4; ++i)
@@ -106,10 +107,10 @@ void GetMchDfas(const u_char *data, ulong len, HASHRES &hashtable, std::vector<u
 			}
 			sig = *(SIGNATURE *)csig;
 
-
 			size_t hashsig = hash(sig);
 			if (hashtable.count(hashsig))
 			{
+				++signum;
 				for (std::vector<HASHNODE>::iterator iter = hashtable[hashsig].begin(); iter != hashtable[hashsig].end(); ++iter)
 				{
 					if ((sig == iter->m_sig) && (flags[iter->m_nDfaId] == 0))
@@ -120,12 +121,10 @@ void GetMchDfas(const u_char *data, ulong len, HASHRES &hashtable, std::vector<u
 				}
 			}
 		}
-		if (matchdfas.size() > 8)
+		if (signum > 8)
 		{
-			sigfile << g_dpktnum << "  ";
+			++signum;
 		}
-		//std::sort(matchdfas.begin(), matchdfas.end());
-		//matchdfas.erase(std::unique(matchdfas.begin(), matchdfas.end()), matchdfas.end());
 	}
 }
 

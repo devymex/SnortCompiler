@@ -82,3 +82,18 @@ COMPILERHDR void CompileRuleFile(const char *pFileName, CCompileResults &compRes
 {
 	ParseRuleFile(pFileName, CompileCallback, &compRes);
 }
+
+COMPILERHDR void ExtractSignatures(CRegRule &regRule)
+{
+	RULESEQUENCE ruleSeq;
+	RULECOMPDATA ruleCompData;
+	PreCompileRule(regRule, ruleSeq, ruleCompData);
+	for (ulong i = 0; i < regRule.Size(); ++i)
+	{
+		CHAINSEQUENCE &curChainSeq = ruleSeq[i];
+		for (ulong j = 0; j < curChainSeq.size(); ++j)
+		{
+			ExtractSigs(curChainSeq[j], regRule[i].GetSigs());
+		}
+	}
+}
