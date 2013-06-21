@@ -35,12 +35,25 @@ public:
 
 	/*	函数名：ExtractSignatures
 	**	参数：sigs-特征字符串类型
-	**	功能：从
+	**	功能：从content转换成的PCRE链中提取signature
 	*/
 	void					ExtractSignatures(CSignatures &sigs) const;
+
+	/*	函数名：ToPcre
+	**	参数：pcreOpt-PCRE链类型
+	**	功能：将content及其修饰选项转换为PCRE链
+	*/
 	void					ToPcre(CPcreOption &pcreOpt) const;
 
+	/*	函数名：FromPattern
+	**	参数：strPat-Snort规则中content及其属性字符串
+	**	功能：解析Snort规则中的content选项及其属性
+	*/
 	virtual void			FromPattern(const CDllString &strPat);
+
+	/*	函数名：Clone
+	**	功能：复制当前CContentOption内容
+	*/
 	virtual CRuleOption*	Clone() const;
 
 public:
