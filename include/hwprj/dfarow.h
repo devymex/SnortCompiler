@@ -49,6 +49,7 @@ public:
 	*/
 	void			AddFlags(STATEFLAG nFlags);
 	/*	函数名：SetFlags
+	**	参数：nFlags-属性取值
 	**	功能：设置状态属性
 	*/
 	void			SetFlags(STATEFLAG nFlags);

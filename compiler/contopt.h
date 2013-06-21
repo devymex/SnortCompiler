@@ -3,10 +3,10 @@
 **
 **	@author		Lab 435, Xidian University
 **
-**	@brief		Declaration of the CRuleOption class
+**	@brief		Declaration of the CContentOption class
 **
-**	Extract relevant attribute of a rule, 
-**	such as "content", "pcre" and "uricontent".
+**	inherit CRuleOption class
+**	process “content” attribute in a Snort rule
 **
 */
 
@@ -33,6 +33,10 @@ public:
 
 	CContentOption&			operator = (const CContentOption &other);
 
+	/*	函数名：ExtractSignatures
+	**	参数：sigs-特征字符串类型
+	**	功能：从
+	*/
 	void					ExtractSignatures(CSignatures &sigs) const;
 	void					ToPcre(CPcreOption &pcreOpt) const;
 

@@ -18,7 +18,7 @@
 #define UNSARYHDR __declspec(dllexport)
 #endif
 
-/* Capsulate the ulong* for dll using. */
+/* Ê¹ÓÃdll·â×°ulong* */
 class UNSARYHDR CUnsignedArray
 {
 public:

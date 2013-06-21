@@ -49,6 +49,7 @@ public:
 	*/
 	ulong				GetId();
 	/*	函数名：SetId
+	**	参数：ulId-unsigned long类型DFA编号
 	**	功能：设置DFA ID
 	*/
 	void				SetId(ulong ulId);
@@ -58,10 +59,12 @@ public:
 	*/
 	ushort				GetGroupCount() const;
 	/*	函数名：SetGroups
+	**	参数：pGroup-分类后的字符集
 	**	功能：设置某一DFA的跳转字符集合
 	*/
 	void				SetGroups(byte *pGroup);
 	/*	函数名：Char2Group
+	**	参数：nIdx-字符集中的一个字符
 	**	功能：压缩字符集，原字符集为ASCII码，共256个，
 	**	将等价的字符合并分类，减少字符集的个数
 	*/
@@ -72,6 +75,7 @@ public:
 	*/
 	STATEID				GetStartState() const;
 	/*	函数名：SetStartState
+	**	参数：id-DFA状态编号
 	**	功能：设置DFA开始状态id
 	*/
 	void				SetStartState(STATEID id);
@@ -96,10 +100,12 @@ public:
 	*/
 	ulong				CalcStoreSize() const;
 	/*	函数名：Save
+	**	参数：beg-DFA的二进制字节流
 	**	功能：将一个DFA以unsigned char*类型存入内存
 	*/
 	void				Save(byte *beg);
 	/*	函数名：Load
+	**	参数：beg-DFA的二进制字节流
 	**	功能：从内存读取一个DFA，存入unsigned char*类型变量中
 	*/
 	void				Load(byte *beg);

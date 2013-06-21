@@ -36,6 +36,10 @@ public:
 	**	功能：终态集合中增加DFA终态的编号
 	*/
 	CDfaIdSet&			AddState(STATEID nStaId);
+	/*	函数名：Swap
+	**	参数：other-DFA终态集合
+	**	功能：将另一个DFA的终态集合替换当前DFA的终态集合
+	*/
 	void				Swap(CFinalStates &other);
 
 	/*	函数名：GetDfaIdSet

@@ -35,6 +35,9 @@ public:
 	void				PushBack(const CPcreOption &pcreOpt);
 	void				Resize(ulong nSize);
 
+	/*	函数名：GetSigs
+	**	功能：获取一个PCRE链的特征字符串signature
+	*/
 	CSignatures&		GetSigs();
 	const CSignatures&	GetSigs() const;
 

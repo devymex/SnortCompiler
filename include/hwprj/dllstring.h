@@ -20,7 +20,7 @@ class DLLSTRING;
 #define DLLSTRHDR __declspec(dllexport)
 #endif
 
-/* Capsulate the std::string for dll using. */
+/* Ê¹ÓÃdll·â×°std::string*/
 class DLLSTRHDR CDllString
 {
 public:
