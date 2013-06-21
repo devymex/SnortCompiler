@@ -18,6 +18,7 @@
 #include "stdafx.h"
 #include "hash.h"
 #include <hwprj\buildhash.h>
+#include <hwprj\siddfaids.h>
 
 /* hash function, correspond to a hash slot for a given signature
 
@@ -28,19 +29,21 @@ Returns:				hash slot
 
 */
 
-HASHMAPHDR ulong hash(const SIGNATURE &oneSig)
+struct SIGHASH
 {
-	//const ulong _FNV_offset_basis = 2166136261U;
-	//const ulong _FNV_prime = 16777619U;
+	ulong nBucketCnt;
+	ulong operator()(const SIGNATURE &oneSig)
+	{
+		const ulong _FNV_offset_basis = 2166136261U;
+		const ulong _FNV_prime = 16777619U;
 
-	//ulong _Val = _FNV_offset_basis;
-	//_Val ^= oneSig;
-	//_Val *= _FNV_prime;
+		ulong _Val = _FNV_offset_basis;
+		_Val ^= oneSig;
+		_Val *= _FNV_prime;
 
-	//return (_Val);
-
-	return oneSig % 16001;
-}
+		return (_Val % nBucketCnt);
+	}
+}hash;
 
 //one point in the adjust path
 struct STATION
@@ -663,6 +666,16 @@ HASHMAPHDR void HashMapping(CGroupRes &groupRes, HASHRES &HashResMap)
 			dmap[i].push_back(vecGroups[i].vecSigs[j]);
 		}
 	}
+
+	ulong nRuleCnt = 0;
+	for (ulong i = 0; i < groupRes.GetSidDfaIds().Size(); ++i)
+	{
+		if (groupRes.GetSidDfaIds()[i].m_nResult == COMPILEDINFO::RES_SUCCESS)
+		{
+			++nRuleCnt;
+		}
+	}
+	hash.nBucketCnt = 4 * nRuleCnt;
 
 	RESULTMAP result;
 	Mapping(vecGroups, gmap, dmap, result);
