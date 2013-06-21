@@ -372,24 +372,6 @@ void AssignSig(CCompileResults &result, ulong BegIdx, ulong EndIdx)
 	}
 }
 
-void ExtractSigs(const std::vector<CByteArray> &seqAry, CUnsignedArray &sigs)
-{
-	SIGNATURE nCurSig;
-	for (ulong i = 0; i < seqAry.size(); ++i)
-	{
-		const CByteArray &curSeq = seqAry[i];
-		long ulLen = long(curSeq.Size()) - 3;
-		for (long j = 0; j < ulLen; ++j)
-		{
-			for (ulong k = 0; k < 4; ++k)
-			{
-				((byte*)&nCurSig)[k] = byte(tolower(curSeq[j + k]));
-			}
-			sigs.PushBack(nCurSig);
-		}
-	}
-}
-
 bool SeqIncBy(const CRegRule &regRule, const RULESEQUENCE &ruleSeq, ulong ulIdx)
 {
 	TASSERT(ulIdx < ruleSeq.size());
@@ -438,7 +420,7 @@ bool SeqIncBy(const CRegRule &regRule, const RULESEQUENCE &ruleSeq, ulong ulIdx)
 					}
 				}
 				if (std::find_if(curPcreSeq.cbegin(), curPcreSeq.cend(),
-					INCLUDESEQUENCE(seq)) != curPcreSeq.cend())
+					INCLUDESEQUENCE(seq, bCaseless)) != curPcreSeq.cend())
 				{
 					return true;
 				}
@@ -518,8 +500,13 @@ void ProcessRule(CRegRule &regRule, RULECOMPDATA &result)
 		{
 			for (ulong j = 0; j < curChainSeq.size(); ++j)
 			{
-				ExtractSigs(curChainSeq[j], regRule[i].GetSigs());
+				PCRESEQUENCE &curPcreSeq = curChainSeq[j];
+				for (ulong k = 0; k < curPcreSeq.size(); ++k)
+				{
+					ExtractSignatures(curPcreSeq[k], regRule[i].GetSigs());
+				}
 			}
+			regRule[i].GetSigs().Unique();
 			++i;
 		}
 	}
