@@ -53,20 +53,20 @@ int main()
 		std::cout << e.File() << " - " << e.Line() << ": " << e.What() << std::endl;
 		system("pause");
 	}
-	//result.WriteToFile("..\\result.cdt");
+	result.WriteToFile("..\\result.cdt");
 
-	////result.ReadFromFile("..\\result.cdt");
+	//result.ReadFromFile("..\\result.cdt");
 
-	//CGroupRes groupRes;
-	//Grouping(result, groupRes);
-	//groupRes.WriteToFile("..\\GroupResult.cdt");
-	////groupRes.ReadFromFile("..\\GroupResult.cdt");
-	//HASHRES HashResMap;
-	//HashMapping(groupRes, HashResMap);
-	//groupRes.WriteToFile("..\\FinalResult.cdt");
-	//std::cout << "Total time: " << ctime.Reset() << std::endl;
-	//std::cout << groupRes.GetGroups().Size() << std::endl;
-	//std::cout << HashResMap.size() << std::endl;
+	CGroupRes groupRes;
+	Grouping(result, groupRes);
+	groupRes.WriteToFile("..\\GroupResult.cdt");
+	//groupRes.ReadFromFile("..\\GroupResult.cdt");
+	HASHRES HashResMap;
+	HashMapping(groupRes, HashResMap);
+	groupRes.WriteToFile("..\\FinalResult.cdt");
+	std::cout << "Total time: " << ctime.Reset() << std::endl;
+	std::cout << groupRes.GetGroups().Size() << std::endl;
+	std::cout << HashResMap.size() << std::endl;
 
 	//CCompileResults result;
 	//result.ReadFromFile("..\\result.cdt");

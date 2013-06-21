@@ -36,8 +36,6 @@ struct PARSERESULT
 	PARSEFLAG::TYPE	ulFlag;
 };
 
-extern COMPILERHDR int count;
-
 typedef void (__stdcall *RECIEVER)(const PARSERESULT &parseRes, void *lpUser);
 
 COMPILERHDR void ParseRuleFile(const char *pFileName, RECIEVER recv, void *lpUser);
