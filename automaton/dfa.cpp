@@ -18,7 +18,7 @@
 
 DFAHDR CDfa::CDfa()
 	: m_nId			(ulong(-1))
-	, m_nColNum		(ulong(0))
+	, m_usColNum	(ulong(0))
 	, m_nStartId	(STATEID(0))
 {
 	memset(m_pGroup, -1, sizeof(m_pGroup));
@@ -34,7 +34,7 @@ DFAHDR CDfa::CDfa()
 
 DFAHDR CDfa::CDfa(const CDfa &other)
 	: m_nId			(other.m_nId)
-	, m_nColNum		(other.m_nColNum)
+	, m_usColNum	(other.m_usColNum)
 	, m_nStartId	(other.m_nStartId)
 	, m_FinStas		(other.m_FinStas)
 {
@@ -59,7 +59,7 @@ DFAHDR CDfa& CDfa::operator=(const CDfa &other)
 	TASSERT(other.m_pDfa != null);
 
 	m_nId = other.m_nId;
-	m_nColNum = other.m_nColNum;
+	m_usColNum = other.m_usColNum;
 	m_nStartId = other.m_nStartId;
 	CopyMemory(m_pGroup, other.m_pGroup, sizeof(m_pGroup));
 	try
@@ -123,7 +123,7 @@ DFAHDR void CDfa::Resize(ulong nSize, ulong nCol)
 DFAHDR void CDfa::Clear()
 {
 	m_nId = ulong(-1);
-	m_nColNum = ulong(0);
+	m_usColNum = ulong(0);
 	m_nStartId = STATEID(0);
 	memset(m_pGroup, 0xFF, SC_DFACOLCNT);
 	m_pDfa->clear();
@@ -147,7 +147,7 @@ DFAHDR void CDfa::SetId(ulong id)
 
 DFAHDR ushort CDfa::GetGroupCount() const
 {
-	return m_nColNum;
+	return m_usColNum;
 }
 
 DFAHDR void CDfa::SetGroups(byte *pGroup)
@@ -185,7 +185,7 @@ DFAHDR void CDfa::SetGroups(byte *pGroup)
 	//the group is reasonable, and nZeroBegPos is the number of groups
 	if (flag)
 	{
-		m_nColNum = nZeroBegPos;
+		m_usColNum = nZeroBegPos;
 		CopyMemory(m_pGroup, pGroup, SC_DFACOLCNT * sizeof(byte));
 	}
 	else
@@ -221,22 +221,22 @@ const CFinalStates& CDfa::GetFinalStates() const
 
 DFAHDR ulong CDfa::FromNFA(const CNfa &nfa)
 {
-	typedef std::unordered_map<STATEVEC, STATEID, NSTATESET_HASH> STATESETHASH;
+	typedef std::unordered_map<STATEIDARY, STATEID, NSTATESET_HASH> STATESETHASH;
 	//std::vector<std::pair<std::vector<ulong>, STATEID>> termStasVec;
 
 	ulong dfaId = m_nId;
 	Clear();
 	m_nId = dfaId;
 	
-	std::vector<STATEVEC> eClosure;
+	std::vector<STATEIDARY> eClosure;
 	NfaEClosure(nfa, eClosure);
 
-	byte groups[SC_DFACOLCNT];
-	NAvaiEdges(nfa, groups);
+	byte groups[CNfaRow::COLUMNCNT];
+	GroupNfaColumns(nfa, groups);
 	SetGroups(groups);
 
-	std::stack<STATEVEC> nfaStasStack;
-	STATEVEC &startEVec = eClosure.front();
+	std::stack<STATEIDARY> nfaStasStack;
+	STATEIDARY &startEVec = eClosure.front();
 	STATESETHASH ssh;
 
 	try
@@ -244,10 +244,10 @@ DFAHDR ulong CDfa::FromNFA(const CNfa &nfa)
 		nfaStasStack.push(startEVec);
 		ssh[startEVec] = 0;
 		m_pDfa->reserve(300);
-		m_pDfa->push_back(CDfaRow(m_nColNum));
+		m_pDfa->push_back(CDfaRow(m_usColNum));
 
 		CDfaRow &firstRow = m_pDfa->back();
-		firstRow.AddFlags(CDfaRow::START);
+		m_nStartId = 0;
 
 		if (startEVec.back() == nfa.Size())
 		{
@@ -255,13 +255,13 @@ DFAHDR ulong CDfa::FromNFA(const CNfa &nfa)
 			m_FinStas.AddState(0).AddDfaId(m_nId);
 		}
 
-		static STATEVEC nextNfaVec; //
+		static STATEIDARY nextNfaVec; //
 		nextNfaVec.clear();
 		byte compuFlag[CNfaRow::COLUMNCNT];
 
 		for (; nfaStasStack.size() > 0; )
 		{
-			STATEVEC curNfaVec = nfaStasStack.top();
+			STATEIDARY curNfaVec = nfaStasStack.top();
 			nfaStasStack.pop();
 
 			memset(compuFlag, 0, sizeof(compuFlag));
@@ -280,7 +280,7 @@ DFAHDR ulong CDfa::FromNFA(const CNfa &nfa)
 				{
 					if(ssh.count(nextNfaVec) == 0)
 					{
-						m_pDfa->push_back(CDfaRow(m_nColNum));
+						m_pDfa->push_back(CDfaRow(m_usColNum));
 						if (m_pDfa->size() > SC_STATELIMIT)
 						{
 							return (ulong)-1;
@@ -308,6 +308,7 @@ DFAHDR ulong CDfa::FromNFA(const CNfa &nfa)
 		}
 
 		m_pDfa->shrink_to_fit();
+
 		return 0;
 	}
 	catch (std::exception &e)
@@ -327,10 +328,10 @@ DFAHDR ulong CDfa::Minimize()
 
 	//Indicate current state would be jump to the next state set through the character.
 	nSize = m_pDfa->size();
-	STATEVEC *pRevTab = null;
+	STATEIDARY *pRevTab = null;
 	try
 	{
-		pRevTab = new STATEVEC[nSize * nCols];
+		pRevTab = new STATEIDARY[nSize * nCols];
 		for (STATEID i = 0; i < nSize; ++i)
 		{
 			for (byte j = 0; j < nCols; ++j)
@@ -355,6 +356,22 @@ DFAHDR ulong CDfa::Minimize()
 	return nr;
 }
 
+DFAHDR void CDfa::MergeColumn()
+{
+	byte groups[SC_DFACOLCNT];
+	GroupDfaColumns(*this, groups);
+	std::set<byte> gpset;
+	for (ushort i = 0; i < m_usColNum; ++i)
+	{
+		gpset.insert(groups[i]);
+	}
+	if (gpset.size() != m_usColNum)
+	{
+		std::cout << m_usColNum << ": " << m_usColNum - gpset.size() << std::endl;
+		//TTHROW("gpset.size() != m_usColNum");
+	}
+}
+
 DFAHDR ulong CDfa::CalcStoreSize() const
 {
 	ulong nSize = 0;
@@ -374,7 +391,7 @@ DFAHDR ulong CDfa::CalcStoreSize() const
 	nSize += SC_DFACOLCNT * sizeof(byte);
 
 	//dfa
-	nSize += m_pDfa->size() * (sizeof(ulong) + m_nColNum);
+	nSize += m_pDfa->size() * (sizeof(ulong) + m_usColNum);
 
 	//m_nStartId
 	nSize += sizeof(byte);
@@ -410,8 +427,7 @@ DFAHDR void CDfa::Save(byte *beg)
 	for (ulong i = 0; i < m_pDfa->size(); ++i)
 	{
 		//write the flag of dfa state
-		WriteNum(beg, (*m_pDfa)[i].GetFlags());
-		for (byte j = 0; j < m_nColNum; ++j)
+		for (byte j = 0; j < m_usColNum; ++j)
 		{
 			WriteNum(beg, (*m_pDfa)[i][j], sizeof(byte));
 		}
@@ -460,14 +476,11 @@ DFAHDR void CDfa::Load(byte *beg)
 	m_nId = dfaId;
 
 	//read dfa table
-	m_pDfa->resize(dfaSize, CDfaRow(m_nColNum));
-	ulong nFlag;
+	m_pDfa->resize(dfaSize, CDfaRow(m_usColNum));
 	for (ulong i = 0; i < m_pDfa->size(); ++i)
 	{
 		//read the flag of dfa state
-		ReadNum(beg, nFlag);
-		(*m_pDfa)[i].SetFlags(nFlag);
-		for (byte j = 0; j < m_nColNum; ++j)
+		for (byte j = 0; j < m_usColNum; ++j)
 		{
 			(*m_pDfa)[i][j] = 0;
 			ReadNum(beg, (*m_pDfa)[i][j], sizeof(byte));
@@ -492,6 +505,7 @@ DFAHDR void CDfa::Load(byte *beg)
 		ReadNum(beg, nStaId, sizeof(byte));
 		ReadNum(beg, nDfaId);
 		m_FinStas.AddState(nStaId).AddDfaId(nDfaId);
+		(*m_pDfa)[nStaId].SetFlags(CDfaRow::FINAL);
 	}
 }
 
@@ -547,7 +561,7 @@ DFAHDR void CDfa::Dump(const char *pFile)
 
 	fout << 255 << "\t" << (ulong)m_pGroup[255] << std::endl;
 	fout << "\t";
-	for(byte j = 0; j != m_nColNum; ++j)
+	for(byte j = 0; j != m_usColNum; ++j)
 	{
 		fout << (ulong)j << "\t";
 	}
@@ -562,7 +576,7 @@ DFAHDR void CDfa::Dump(const char *pFile)
 		{
 			fout << i << "\t";
 		}
-		for(byte j = 0; j != m_nColNum; ++j)
+		for(byte j = 0; j != m_usColNum; ++j)
 		{
 			fout << (ulong)(*m_pDfa)[i][j] << "\t";
 		}
@@ -581,7 +595,7 @@ Returns:		0 success
 				-1 error 
 */
 
-ulong CDfa::PartStates(STATEVEC *pRevTbl)
+ulong CDfa::PartStates(STATEIDARY *pRevTbl)
 {
 	ulong nGrpNum = GetGroupCount();
 	ulong ulStaNum = m_pDfa->size();
@@ -635,7 +649,7 @@ ulong CDfa::PartStates(STATEVEC *pRevTbl)
 			iSta != pISet->StaSet.end(); ++iSta)
 		{
 			ulong nRevIdx = *iSta * nGrpNum + ulCurGrp;
-			STATEVEC &revI = pRevTbl[nRevIdx];
+			STATEIDARY &revI = pRevTbl[nRevIdx];
 			SetStateFlags(pAbleToI, revI);
 			nRevCnt += revI.size();
 		}
@@ -697,7 +711,7 @@ ulong CDfa::PartStates(STATEVEC *pRevTbl)
 
 	if (nr != ulong(-1) && partSets.size() < m_pDfa->size())
 	{
-		STATEVEC sta2Part(m_pDfa->size());
+		STATEIDARY sta2Part(m_pDfa->size());
 		STATEID nCol = (STATEID)GetGroupCount();
 
 		CFinalStates newFinStas;
@@ -715,6 +729,7 @@ ulong CDfa::PartStates(STATEVEC *pRevTbl)
 		//renumber DFA state
 		BuildDfaByPart(partSets, *m_pDfa, *pNewDfa);
 
+		STATEID m_nOldStartId = m_nStartId;
 		//remark new start state and final states
 		for (PARTSETVEC_ITER i = partSets.begin(); i != partSets.end(); ++i)
 		{
@@ -722,7 +737,7 @@ ulong CDfa::PartStates(STATEVEC *pRevTbl)
 			for (STATELIST_ITER j = i->StaSet.begin(); j != i->StaSet.end(); ++j)
 			{
 				CDfaRow &curRow = (*m_pDfa)[*j];
-				if (curRow.GetFlags() & CDfaRow::START)
+				if (*j == m_nOldStartId)
 				{
 					m_nStartId = nState;
 				}
@@ -836,18 +851,18 @@ DFAHDR bool MergeMultipleDfas(CDfaArray &inputDfas, CDfa &mergedDfa)
 
 	ulong colCnt = mergedDfa.GetGroupCount();
 
-	typedef std::unordered_map<STATEVEC, STATEID, TODFA_HASH> STATESETHASH;
+	typedef std::unordered_map<STATEIDARY, STATEID, TODFA_HASH> STATESETHASH;
 	STATESETHASH statehash;
 
 	ulong finFlag = 0;//terminal state flag, 1: terminal state, 0: normal state
-	std::stack<STATEVEC> statesStack;
+	std::stack<STATEIDARY> statesStack;
 
 	/*
 	**	use a size of (inputDfas.size() + 2) vector to represent a state of the merged dfa.
 	**	element 0 represents the state of inputDfas[0], ..., element n represents the state of inputDfas[n].
 	**	element n + 1 and element n + 2 are flags which show that whether this state is a start state or terminal state.
 	*/
-	STATEVEC startVec;
+	STATEIDARY startVec;
 	
 	try
 	{
@@ -879,12 +894,11 @@ DFAHDR bool MergeMultipleDfas(CDfaArray &inputDfas, CDfa &mergedDfa)
 	if(finFlag)
 	{
 		startVec[dfasSize + 1] = nTermSta;
-		mergedDfa[0].AddFlags(CDfaRow::START | CDfaRow::FINAL);
+		mergedDfa[0].AddFlags(CDfaRow::FINAL);
 	}
 	else
 	{
 		startVec[dfasSize + 1] = STATEID(-1);
-		mergedDfa[0].AddFlags(CDfaRow::START);
 	}
 
 	std::vector<STATEID> NextVec;

@@ -17,7 +17,7 @@
 
 
 #ifndef DFAHDR_DS
-class STATEVEC;
+class STATEIDARY;
 #define DFAHDR __declspec(dllimport)
 #else
 #define DFAHDR __declspec(dllexport)
@@ -27,10 +27,9 @@ class DFAHDR CDfaRow
 {
 public:
 	//标记该状态/行的属性：NORMAL、START、FINAL
-	typedef ulong STATEFLAG;
-	static const STATEFLAG NORMAL	= 0x0001;
-	static const STATEFLAG START	= 0x0002;
-	static const STATEFLAG FINAL	= 0x0004;
+	typedef byte STATEFLAG;
+	static const STATEFLAG NORMAL	= 0;
+	static const STATEFLAG FINAL	= (1 << 1);
 
 	explicit CDfaRow(ulong ulColCnt);
 	CDfaRow(const CDfaRow &other);
@@ -48,7 +47,7 @@ public:
 	STATEFLAG		GetFlags() const;
 
 protected:
-	STATEVEC*		m_pDest;
+	STATEIDARY*		m_pDest;
 	STATEFLAG		m_nFlags;
 };
 

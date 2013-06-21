@@ -49,5 +49,5 @@ public:
 	const char*		Data() const;
 
 protected:
-	DLLSTRING *m_pString;
+	DLLSTRING*		m_pString;
 };

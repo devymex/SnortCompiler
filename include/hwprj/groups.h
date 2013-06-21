@@ -15,10 +15,10 @@ class GROUPVEC;
 
 struct ONEGROUP
 {
-	CUnsignedArray DfaIds;
-	CSignatures ComSigs;
-	SIGNATURE currSig;
-	ulong mergeDfaId;
+	CUnsignedArray	DfaIds;
+	CSignatures		ComSigs;
+	SIGNATURE		currSig;
+	ulong			mergeDfaId;
 };
 
 class GROUPSHDR CGroups
@@ -26,18 +26,19 @@ class GROUPSHDR CGroups
 public:
 	CGroups();
 	CGroups(const CGroups& other);
-	CGroups &operator=(const CGroups &other);
 	virtual ~CGroups();
 
-	const ulong Size() const;
-	void Resize(ulong nSize);
-	void PushBack(ONEGROUP oneGroup);
-	ONEGROUP& Back();
-	ONEGROUP &operator[](ulong nIdx);
-	const ONEGROUP &operator[](ulong nIdx) const;
-	void Clear();
-	void Erase(ulong nIdx);
+	CGroups&			operator=(const CGroups &other);
+	ONEGROUP&			operator[](ulong nIdx);
+	const ONEGROUP&		operator[](ulong nIdx) const;
+
+	ulong				Size() const;
+	void				Resize(ulong nSize);
+	void				PushBack(ONEGROUP oneGroup);
+	ONEGROUP&			Back();
+	void				Clear();
+	void				Erase(ulong nIdx);
 
 protected:
-	GROUPVEC *m_pGroups;
+	GROUPVEC*			m_pGroups;
 };

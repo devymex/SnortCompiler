@@ -58,6 +58,7 @@ public:
 
 	ulong				FromNFA(const CNfa &nfa);
 	ulong				Minimize();
+	void				MergeColumn();
 
 	ulong				CalcStoreSize() const;
 	void				Save(byte *beg);
@@ -67,11 +68,11 @@ public:
 	void				Dump(pcstr pFile);
 
 protected:
-	ulong				PartStates(STATEVEC *pRevTbl);
+	ulong				PartStates(STATEIDARY *pRevTbl);
 
 protected:
 	ulong				m_nId;
-	ushort				m_nColNum;
+	ushort				m_usColNum;
 	STATEID				m_nStartId;
 	DFAROWARY*			m_pDfa;
 	CFinalStates		m_FinStas;

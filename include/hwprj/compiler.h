@@ -41,3 +41,5 @@ typedef void (__stdcall *RECIEVER)(const PARSERESULT &parseRes, void *lpUser);
 COMPILERHDR void ParseRuleFile(const char *pFileName, RECIEVER recv, void *lpUser);
 
 COMPILERHDR void CompileRuleFile(const char *pFileName, CCompileResults &compRes);
+
+COMPILERHDR void ExtractSignatures(CRegRule &regRule);
