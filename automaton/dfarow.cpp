@@ -7,7 +7,7 @@ DFAHDR CDfaRow::CDfaRow(ulong ulColCnt)
 {
 	try
 	{
-		m_pDest = new STATEVEC;
+		m_pDest = new STATEIDARY;
 		m_pDest->resize(ulColCnt);
 	}
 	catch (std::exception &e)
@@ -29,7 +29,7 @@ DFAHDR CDfaRow::CDfaRow(const CDfaRow &other)
 	TASSERT(other.m_pDest != null);
 	try
 	{
-		m_pDest = new STATEVEC(*other.m_pDest);
+		m_pDest = new STATEIDARY(*other.m_pDest);
 	}
 	catch (std::exception &e)
 	{

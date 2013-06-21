@@ -37,7 +37,7 @@ void Warshall(byte *pMat, ulong nWidth, ulong nHeight)
 	}
 }
 
-void NfaEClosure(const CNfa &nfa, std::vector<STATEVEC> &eClosure)
+void NfaEClosure(const CNfa &nfa, std::vector<STATEIDARY> &eClosure)
 {
 	TASSERT(nfa.Size() < 65535);
 
@@ -72,9 +72,9 @@ void NfaEClosure(const CNfa &nfa, std::vector<STATEVEC> &eClosure)
 	try
 	{
 		eClosure.resize(nNfaSize + 1);
-		for (STATEID i = 0; i < nNfaSize; ++i)
+		for (ulong i = 0; i < nNfaSize; ++i)
 		{
-			for (STATEID j = 0; j < nMatWidth; ++j)
+			for (ulong j = 0; j < nMatWidth; ++j)
 			{
 				if (pMat[i * nMatWidth + j])
 				{
@@ -91,19 +91,19 @@ void NfaEClosure(const CNfa &nfa, std::vector<STATEVEC> &eClosure)
 	}
 }
 
-void GetNextEClosureSet(const CNfa &nfa, const std::vector<STATEVEC> &eClosure,
-						const STATEVEC &curSet, ulong edge, STATEVEC &eClosureSet)
+void GetNextEClosureSet(const CNfa &nfa, const std::vector<STATEIDARY> &eClosure,
+						const STATEIDARY &curSet, ulong edge, STATEIDARY &eClosureSet)
 {
 	TASSERT(edge < CNfaRow::COLUMNCNT);
 	TASSERT(nfa.Size() < 65535);
 
-	static STATEVEC nextSet; //
+	static STATEIDARY nextSet; //
 	nextSet.clear();
 	try
 	{
 		nextSet.reserve(1000);
 		ulong nSize = nfa.Size();
-		for(STATEVEC::const_iterator i = curSet.begin(); i != curSet.end(); ++i)
+		for(STATEIDARY::const_iterator i = curSet.begin(); i != curSet.end(); ++i)
 		{
 			STATEID nCurSta = STATEID(*i);
 			if(nCurSta != nSize)
@@ -128,9 +128,9 @@ void GetNextEClosureSet(const CNfa &nfa, const std::vector<STATEVEC> &eClosure,
 		std::sort(nextSet.begin(), nextSet.end());
 		nextSet.erase(std::unique(nextSet.begin(), nextSet.end()), nextSet.end());
 
-		for (STATEVEC::const_iterator i = nextSet.cbegin(); i != nextSet.cend(); ++i)
+		for (STATEIDARY::const_iterator i = nextSet.cbegin(); i != nextSet.cend(); ++i)
 		{
-			const STATEVEC &ci = eClosure[*i];
+			const STATEIDARY &ci = eClosure[*i];
 			eClosureSet.insert(eClosureSet.end(), ci.cbegin(), ci.cend());
 		}
 		std::sort(eClosureSet.begin(), eClosureSet.end());
@@ -143,111 +143,131 @@ void GetNextEClosureSet(const CNfa &nfa, const std::vector<STATEVEC> &eClosure,
 	}
 }
 
-void NAvaiEdges(const CNfa &nfa, byte *group)
+ulong CalcFNV(const std::vector<ulong> &ary)
 {
-	struct COLUMNKEY
-	{
-		std::vector<ulong> key;
-		ulong hash;
-		inline bool operator == (const COLUMNKEY &other) const
-		{
-			ulong nSize = key.size();
-			if (nSize != other.key.size())
-			{
-				return false;
-			}
-			if (nSize == 0)
-			{
-				return true;
-			}
-			return (0 == memcmp(key.data(), other.key.data(), nSize * sizeof(ulong)));
-		}
-	};
-	struct COLUMNKEYHASH
-	{
-		inline ulong operator ()(const COLUMNKEY &column)
-		{
-			return column.hash;
-		}
-	};
-	typedef std::unordered_map<COLUMNKEY, byte, COLUMNKEYHASH> COLUMNHASHMAP;
 	const ulong _FNV_offset_basis = 2166136261U;
 	const ulong _FNV_prime = 16777619U;
 
-	static COLUMNKEY columns[CNfaRow::COLUMNCNT]; //
-	ulong zeroCnts[CNfaRow::COLUMNCNT] = {0};
-
-	ulong nSize = nfa.Size();
-	for (ulong i = 0; i < CNfaRow::COLUMNCNT; ++i)
+	ulong hash = _FNV_offset_basis;
+	for (std::vector<ulong>::const_iterator i = ary.cbegin(); i != ary.cend(); ++i)
 	{
-		columns[i].key.clear();
-		columns[i].hash = _FNV_offset_basis;
+		hash ^= *i;
+		hash *= _FNV_prime;
 	}
-	try
+	return hash;
+}
+
+void CalcDfaColumnKeys(const CDfa &dfa, COLUMNKEY *pColumns)
+{
+	ulong nSize = dfa.Size();
+	ulong nCols = dfa.GetGroupCount();
+	for (ulong i = 0; i < nSize; ++i)
 	{
-		for (ulong i = 0; i < nSize; ++i)
+		const CDfaRow &curRow = dfa[STATEID(i)];
+		for (ulong j = 0; j < nCols; ++j)
 		{
-			const CNfaRow &curRow = nfa[i];
-			for (ulong j = 0; j < CNfaRow::COLUMNCNT; ++j)
-			{
-				std::vector<ulong> &curCol = columns[j].key;
-				ulong nAddSize = curRow[j].Size();
-				const ulong *pData = curRow[j].Data();
-				if (nAddSize != 0)
-				{
-					if (zeroCnts[j] > 0)
-					{
-						curCol.resize(curCol.size() + zeroCnts[j], 0);
-						zeroCnts[j] = 0;
-					}
-					curCol.push_back(nAddSize);
-				}
-				else
-				{
-					++zeroCnts[j];
-				}
-
-				ulong &hash = columns[j].hash;
-				hash ^= nAddSize;
-				hash *= _FNV_prime;
-				for (ulong k = 0; k < nAddSize; ++k)
-				{
-					curCol.push_back(pData[k]);
-					hash ^= pData[k];
-					hash *= _FNV_prime;
-				}
-			}
+			pColumns[j].key.push_back(curRow[byte(j)]);
 		}
-		for (ulong i = 0; i < CNfaRow::COLUMNCNT; ++i)
-		{
-			std::vector<ulong> &curCol = columns[i].key;
-			ulong nCurSize = curCol.size();
-			curCol.resize(nCurSize + zeroCnts[i]);
-			memset(curCol.data() + nCurSize, 0, zeroCnts[i] * sizeof(curCol[0]));
-		}
+	}
+	for (ulong i = 0; i < nCols; ++i)
+	{
+		pColumns[i].hash = CalcFNV(pColumns[i].key);
+	}
+}
 
-		static COLUMNHASHMAP colHash; //
-		colHash.clear();
-		for(ulong i = 0; i < SC_DFACOLCNT; ++i)
+void CalcNfaColumnKeys(const CNfa &nfa, COLUMNKEY *pColumns)
+{
+	ulong nSize = nfa.Size();
+	ulong zeroCnts[CNfaRow::COLUMNCNT] = {0};
+	for (ulong i = 0; i < nSize; ++i)
+	{
+		const CNfaRow &curRow = nfa[i];
+		for (ulong j = 0; j < CNfaRow::COLUMNCNT; ++j)
 		{
-			COLUMNKEY &curCol = columns[i];
-			COLUMNHASHMAP::iterator same = colHash.find(curCol);
-			if(same == colHash.end())
+			std::vector<ulong> &curCol = pColumns[j].key;
+			ulong ulElemSize = curRow[j].Size();
+			const ulong *pElem = curRow[j].Data();
+			if (ulElemSize != 0)
 			{
-				byte curId = (byte)colHash.size();
-				colHash[curCol] = curId;
-				group[i] = curId;
+				if (zeroCnts[j] > 0)
+				{
+					curCol.resize(curCol.size() + zeroCnts[j], ulong(-1));
+					zeroCnts[j] = 0;
+				}
+				curCol.push_back(ulong(-1));
+				for (ulong k = 0; k < ulElemSize; ++k)
+				{
+					curCol.push_back(pElem[k]);
+				}
 			}
 			else
 			{
-				group[i] = same->second;
+				++zeroCnts[j];
 			}
 		}
 	}
-	catch (std::exception &e)
+	for (ulong i = 0; i < CNfaRow::COLUMNCNT; ++i)
 	{
-		TTHROW(e.what());
+		std::vector<ulong> &curCol = pColumns[i].key;
+		ulong nCurSize = curCol.size();
+		curCol.resize(nCurSize + zeroCnts[i]);
+		memset(curCol.data() + nCurSize, -1, zeroCnts[i] * sizeof(curCol[0]));
+		pColumns[i].hash = CalcFNV(pColumns[i].key);
 	}
+}
+
+
+void ColumnHashGroup(const COLUMNKEY *pColumns, ulong ulColCnt, byte *pGroups)
+{
+	typedef std::unordered_map<COLUMNKEY, byte, COLUMNKEYHASH> COLUMNHASHMAP;
+	static COLUMNHASHMAP colHash;
+	colHash.clear();
+	for(ulong i = 0; i < ulColCnt; ++i)
+	{
+		const COLUMNKEY &curCol = pColumns[i];
+		COLUMNHASHMAP::iterator identical = colHash.find(curCol);
+		if(identical == colHash.end())
+		{
+			byte curId = (byte)colHash.size();
+			try
+			{
+				colHash[curCol] = curId;
+			}
+			catch (std::exception &e)
+			{
+				TTHROW(e.what());
+			}
+			pGroups[i] = curId;
+		}
+		else
+		{
+			pGroups[i] = identical->second;
+		}
+	}
+}
+
+void GroupDfaColumns(const CDfa &dfa, byte *pGroups)
+{
+	static COLUMNKEY columns[SC_DFACOLCNT];
+	ulong ulColCnt = dfa.GetGroupCount();
+	for (ulong i = 0; i < ulColCnt; ++i)
+	{
+		columns[i].key.clear();
+	}
+
+	CalcDfaColumnKeys(dfa, columns);
+	ColumnHashGroup(columns, ulColCnt, pGroups);
+}
+
+void GroupNfaColumns(const CNfa &nfa, byte *pGroups)
+{
+	static COLUMNKEY columns[CNfaRow::COLUMNCNT];
+	for (ulong i = 0; i < CNfaRow::COLUMNCNT; ++i)
+	{
+		columns[i].key.clear();
+	}
+	CalcNfaColumnKeys(nfa, columns);
+	ColumnHashGroup(columns, CNfaRow::COLUMNCNT, pGroups);
 }
 
 void ReleaseAbleTo(PARTSET &ps)
@@ -260,7 +280,7 @@ void ReleaseAbleTo(PARTSET &ps)
 	ps.Ones.clear();
 }
 
-void CalcAbleTo(STATEVEC *pRevTbl, ulong nGrpNum, ulong nStaNum, PARTSET &ps)
+void CalcAbleTo(STATEIDARY *pRevTbl, ulong nGrpNum, ulong nStaNum, PARTSET &ps)
 {
 	//Çå¿ÕAbleTo
 	ReleaseAbleTo(ps);
@@ -384,9 +404,9 @@ void AddTermIntoDFA(STATEID otherSta, const CDfa &other,
 	newFinStas.AddState(lastSta).Append(orgFinStas.GetDfaIdSet(otherSta));
 }
 
-void SetStateFlags(byte *pFlags, STATEVEC states)
+void SetStateFlags(byte *pFlags, STATEIDARY states)
 {
-	for (STATEVEC_ITER i = states.begin(); i != states.end(); ++i)
+	for (STATEIDARY_ITER i = states.begin(); i != states.end(); ++i)
 	{
 		pFlags[*i] = 1;
 	}
@@ -493,7 +513,7 @@ void InitPartWait(const std::vector<PARTSET> &partSet,
 void BuildDfaByPart(const PARTSETVEC &partSets, const DFAROWARY &oldDfa,
 					DFAROWARY &newDfa)
 {
-	STATEVEC old2New(oldDfa.size());
+	STATEIDARY old2New(oldDfa.size());
 	for (PARTSETVEC_CITER i = partSets.cbegin(); i != partSets.cend(); ++i)
 	{
 		STATEID nSetIdx = STATEID(i - partSets.cbegin());

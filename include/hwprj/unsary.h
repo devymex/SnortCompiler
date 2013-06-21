@@ -53,17 +53,17 @@ public:
 	void Unique();
 
 protected:
-	inline ulong*	Alloc(ulong ulCap);
-	inline void		Free(ulong *pBuf);
-	inline void		Increase();
-	inline void		Realloc(ulong ulCap);
+	inline ulong*			Alloc(ulong ulCap);
+	inline void				Free(ulong *pBuf);
+	inline void				Increase();
+	inline void				Realloc(ulong ulCap);
 
-	void	CopyFrom(ulong *pBuf);
+	void					CopyFrom(ulong *pBuf);
 
 protected:
-	ulong*		m_pAry;
-	ulong		m_ulSize;
-	size_t		m_ulCap;
+	ulong*					m_pAry;
+	ulong					m_ulSize;
+	size_t					m_ulCap;
 };
 
 #include <hwprj\unsary.inc>

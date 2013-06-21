@@ -22,7 +22,7 @@ struct PARTSET
 {
 	STATELIST StaSet;
 	std::vector<byte*> AbleTo;
-	STATEVEC Ones;
+	STATEIDARY Ones;
 };
 
 typedef std::vector<PARTSET>		PARTSETVEC;
@@ -44,6 +44,32 @@ struct TODFA_HASH
 		}
 
 		return (_Val);
+	}
+};
+struct COLUMNKEY
+{
+	std::vector<ulong> key;
+	ulong hash;
+	inline bool operator == (const COLUMNKEY &other) const
+	{
+		ulong nSize = key.size();
+		if (nSize != other.key.size())
+		{
+			return false;
+		}
+		if (nSize == 0)
+		{
+			return true;
+		}
+		return (0 == memcmp(key.data(), other.key.data(), nSize * sizeof(ulong)));
+	}
+};
+
+struct COLUMNKEYHASH
+{
+	inline ulong operator ()(const COLUMNKEY &column)
+	{
+		return column.hash;
 	}
 };
 
@@ -71,7 +97,7 @@ inline bool operator == (const GROUPKEY &key1, const GROUPKEY &key2)
 struct NSTATESET_HASH
 {
 	enum {MAX_SIZE = 20000};
-	ulong operator()(const STATEVEC &set)
+	ulong operator()(const STATEIDARY &set)
 	{
 		const ulong _FNV_offset_basis = 2166136261U;
 		const ulong _FNV_prime = 16777619U;
@@ -105,16 +131,18 @@ void ReadNum(byte*& pBuf, _Ty &_num, ulong nBytes = sizeof(_Ty))
 
 void Warshall(byte *pMat, ulong nWidth, ulong nHeight);
 
-void NfaEClosure(const CNfa &nfa, std::vector<STATEVEC> &eClosure);
+void NfaEClosure(const CNfa &nfa, std::vector<STATEIDARY> &eClosure);
 
-void GetNextEClosureSet(const CNfa &nfa, const std::vector<STATEVEC> &eClosure,
-	const STATEVEC &curSet, ulong edge, STATEVEC &eClosureSet);
+void GetNextEClosureSet(const CNfa &nfa, const std::vector<STATEIDARY> &eClosure,
+	const STATEIDARY &curSet, ulong edge, STATEIDARY &eClosureSet);
 
-void NAvaiEdges(const CNfa &nfa, byte *group);
+void GroupNfaColumns(const CNfa &nfa, byte *pGroups);
+
+void GroupDfaColumns(const CDfa &dfa, byte *pGroups);
 
 void ReleaseAbleTo(PARTSET &ps);
 
-void CalcAbleTo(STATEVEC *pRevTbl, ulong nGrpNum, ulong nStaNum, PARTSET &ps);
+void CalcAbleTo(STATEIDARY *pRevTbl, ulong nGrpNum, ulong nStaNum, PARTSET &ps);
 
 /*
 **	This function groups the merged dfa's columns on the ground of
@@ -127,7 +155,7 @@ void DfaColGroup(CDfaArray &dfas, byte* groups);
 void AddTermIntoDFA(STATEID otherSta, const CDfa &other,
 					STATEID lastSta, CDfa &lastDfa);
 
-void SetStateFlags(byte *pFlags, STATEVEC states);
+void SetStateFlags(byte *pFlags, STATEIDARY states);
 
 bool SortPartition(const byte *pAbleTo, PARTSET &partSet);
 

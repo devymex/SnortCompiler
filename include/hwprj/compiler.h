@@ -50,3 +50,5 @@ COMPILERHDR void ParseRuleFile(const char *pFileName, RECIEVER recv, void *lpUse
 **	将PCRE链编译为DFA，并提取连续4字节长度signature
 */
 COMPILERHDR void CompileRuleFile(const char *pFileName, CCompileResults &compRes);
+
+COMPILERHDR void ExtractSignatures(CRegRule &regRule);

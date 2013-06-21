@@ -94,6 +94,7 @@ public:
 	**	功能：最小化DFA的状态数，采用Hopcrof算法（1976）
 	*/
 	ulong				Minimize();
+	void				MergeColumn();
 
 	/*	函数名：CalcStoreSize
 	**	功能：计算一个DFA需要的存储空间大小
@@ -122,11 +123,11 @@ public:
 	void				Dump(pcstr pFile);
 
 protected:
-	ulong				PartStates(STATEVEC *pRevTbl);
+	ulong				PartStates(STATEIDARY *pRevTbl);
 
 protected:
 	ulong				m_nId;
-	ushort				m_nColNum;
+	ushort				m_usColNum;
 	STATEID				m_nStartId;
 	DFAROWARY*			m_pDfa;
 	CFinalStates		m_FinStas;
