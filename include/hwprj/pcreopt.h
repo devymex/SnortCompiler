@@ -14,6 +14,7 @@
 
 #include <hwprj\common.h>
 #include <hwprj\strary.h>
+#include <hwprj\byteary.h>
 #include <hwprj\ruleoption.h>
 
 #ifndef SNORTRULEHDR_DS
@@ -60,7 +61,7 @@ public:
 	CDllString&				GetPcreString();
 	const CDllString&		GetPcreString() const;
 
-	void					PreComp(BYTEARY &compData) const;
+	void					Precompile(CByteArray &pcResult) const;
 
 protected:
 

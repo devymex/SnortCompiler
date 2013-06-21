@@ -28,7 +28,7 @@ Returns:				nothing
 
 */
 
-void ExtractSigsVec(const CCompileResults &res, std::vector<CSignatures> &SigsVec, std::vector<ulong> &vecWaitForGroup)
+void ExtractSigsVec(const CCompileResults &res, std::vector<CUnsignedArray> &SigsVec, std::vector<ulong> &vecWaitForGroup)
 {
 	ulong nSize = res.GetRegexTbl().Size();
 	SigsVec.resize(nSize);
@@ -53,7 +53,7 @@ Returns:				nothing
 
 */
 
-void GroupOnlyOneSig(const std::vector<CSignatures> &SigsVec, std::vector<ulong> &vecWaitForGroup, CGroups &groups)
+void GroupOnlyOneSig(const std::vector<CUnsignedArray> &SigsVec, std::vector<ulong> &vecWaitForGroup, CGroups &groups)
 {
 	std::map<SIGNATURE, CUnsignedArray> sigToIdsMap;
 	for (std::vector<ulong>::iterator i = vecWaitForGroup.begin(); i != vecWaitForGroup.end();)
@@ -188,7 +188,7 @@ Returns:				nothing
 
 */
 
-void PutInBySig(const std::vector<CSignatures> &SigsVec, CCompileResults &res, CGroups &groups, std::vector<ulong> &vecWaitForGroup)
+void PutInBySig(const std::vector<CUnsignedArray> &SigsVec, CCompileResults &res, CGroups &groups, std::vector<ulong> &vecWaitForGroup)
 {
 	std::map<SIGNATURE, std::vector<ulong>> sigToGroupsMap;
 	ulong idx = 0;
@@ -249,9 +249,9 @@ Returns:				nothing
 
 */
 
-void BuildGroupBySig(const std::vector<CSignatures> &SigsVec, CGroups &newGroups, std::vector<ulong> &vecWaitForGroup)
+void BuildGroupBySig(const std::vector<CUnsignedArray> &SigsVec, CGroups &newGroups, std::vector<ulong> &vecWaitForGroup)
 {
-	std::map<CSignatures, CUnsignedArray> sigsToIdsMap;
+	std::map<CUnsignedArray, CUnsignedArray> sigsToIdsMap;
 	for (ulong i = 0; i < vecWaitForGroup.size(); ++i)
 	{
 		sigsToIdsMap[SigsVec[vecWaitForGroup[i]]].PushBack(vecWaitForGroup[i]);
@@ -260,7 +260,7 @@ void BuildGroupBySig(const std::vector<CSignatures> &SigsVec, CGroups &newGroups
 
 	newGroups.Resize(sigsToIdsMap.size());
 	ulong idx = 0;
-	for (std::map<CSignatures, CUnsignedArray>::iterator i = sigsToIdsMap.begin(); i != sigsToIdsMap.end(); ++i, ++idx)
+	for (std::map<CUnsignedArray, CUnsignedArray>::iterator i = sigsToIdsMap.begin(); i != sigsToIdsMap.end(); ++i, ++idx)
 	{
 		for (ulong j = 0; j < i->first.Size(); ++j)
 		{
@@ -628,7 +628,7 @@ GROUPINGHDR void Grouping(CCompileResults &res, CGroupRes &groupRes)
 	CTimer t1, tAll;
 
 	g_log << "Extract Dfa's information..." << g_log.nl;
-	std::vector<CSignatures> SigsVec;
+	std::vector<CUnsignedArray> SigsVec;
 	std::vector<ulong> vecWaitForGroup;
 	ExtractSigsVec(res, SigsVec, vecWaitForGroup);
 	g_log << "Completed in " << t1.Reset() << " Sec." << g_log.nl << g_log.nl;

@@ -55,7 +55,7 @@ inline const ulong& CUnsignedArray::operator [] (ulong nIdx) const
 	return m_pAry[nIdx];
 }
 
-inline bool CUnsignedArray::operator == (const CUnsignedArray &other)
+inline bool CUnsignedArray::operator == (const CUnsignedArray &other) const
 {
 	if (m_ulSize != other.m_ulSize)
 	{
@@ -69,6 +69,24 @@ inline bool CUnsignedArray::operator == (const CUnsignedArray &other)
 		}
 	}
 	return true;
+}
+
+inline bool CUnsignedArray::operator <	(const CUnsignedArray &other) const
+{
+	ulong ulMinSize = m_ulSize;
+	if (ulMinSize > other.m_ulSize)
+	{
+		ulMinSize = other.m_ulSize;
+	
+	}
+	for (ulong i = 0; i < ulMinSize; ++i)
+	{
+		if (m_pAry[i] != other.m_pAry[i])
+		{
+			return m_pAry[i] < other.m_pAry[i];
+		}
+	}
+	return m_ulSize < other.m_ulSize;
 }
 
 // Access member
@@ -157,6 +175,19 @@ inline void CUnsignedArray::Fill(ulong _Val)
 	{
 		m_pAry[i] = _Val;
 	}
+}
+
+inline ulong CUnsignedArray::Find(ulong _Val) const
+{
+	ulong ulIdx = ulong(-1);
+	for (ulong i = 0; i < m_ulSize; ++i)
+	{
+		if (m_pAry[i] == _Val)
+		{
+			return i;
+		}
+	}
+	return ulIdx;
 }
 
 inline ulong* CUnsignedArray::Alloc(ulong ulCap)

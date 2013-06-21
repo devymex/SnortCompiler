@@ -22,7 +22,6 @@
 
 #include <hwprj\trace.h>
 #include <hwprj\ctimer.h>
-#include <hwprj\signatures.h>
 #include <hwprj\dfa.h>
 #include <hwprj\dfaarray.h>
 #include <hwprj\compres.h>

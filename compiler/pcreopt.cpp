@@ -188,7 +188,7 @@ SNORTRULEHDR const CDllString& CPcreOption::GetPcreString() const
 	return m_strPcre;
 }
 
-SNORTRULEHDR void CPcreOption::PreComp(BYTEARY &compData) const
+SNORTRULEHDR void CPcreOption::Precompile(CByteArray &pcResult) const
 {
 	int options = 0;
 	if (HasFlags(PF_s))
@@ -222,6 +222,6 @@ SNORTRULEHDR void CPcreOption::PreComp(BYTEARY &compData) const
 	name_table_offset = *((unsigned short*)re + 12);
 	for (ulong i = 0; i < size - name_table_offset; ++i)
 	{
-		compData.push_back((byte)*((byte*)re + name_table_offset + i));
+		pcResult.PushBack((byte)*((byte*)re + name_table_offset + i));
 	}
 }

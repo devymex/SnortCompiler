@@ -11,7 +11,6 @@
 
 #include "stdafx.h"
 #include <hwprj\ruleoption.h>
-#include "pcre2nfa.h"
 #include "contopt.h"
 #include <hwprj\pcreopt.h>
 #include "comprule.h"
@@ -373,13 +372,13 @@ void AssignSig(CCompileResults &result, ulong BegIdx, ulong EndIdx)
 	}
 }
 
-void ExtractSigs(const std::vector<BYTEARY> &seqAry, CSignatures &sigs)
+void ExtractSigs(const std::vector<CByteArray> &seqAry, CUnsignedArray &sigs)
 {
 	SIGNATURE nCurSig;
 	for (ulong i = 0; i < seqAry.size(); ++i)
 	{
-		const BYTEARY &curSeq = seqAry[i];
-		long ulLen = long(curSeq.size()) - 3;
+		const CByteArray &curSeq = seqAry[i];
+		long ulLen = long(curSeq.Size()) - 3;
 		for (long j = 0; j < ulLen; ++j)
 		{
 			for (ulong k = 0; k < 4; ++k)
@@ -397,7 +396,7 @@ bool SeqIncBy(const CRegRule &regRule, const RULESEQUENCE &ruleSeq, ulong ulIdx)
 	TASSERT(ruleSeq[ulIdx].size() == 1);
 	TASSERT(ruleSeq[ulIdx].front().size() == 1);
 
-	const BYTEARY &seq = ruleSeq[ulIdx].front().front();
+	const CByteArray &seq = ruleSeq[ulIdx].front().front();
 	for (ulong i = 0; i < ruleSeq.size(); ++i)
 	{
 		if (ulIdx != i)
@@ -486,9 +485,9 @@ void PreCompileRule(const CRegRule &regRule,
 
 		for (ulong j = 0; j < curPcreChain.Size(); ++j)
 		{
-			chainCompData.push_back(BYTEARY());
+			chainCompData.push_back(CByteArray());
 			chainSeq.push_back(PCRESEQUENCE());
-			curPcreChain[j].PreComp(chainCompData.back());
+			curPcreChain[j].Precompile(chainCompData.back());
 			ExtractSequence(chainCompData.back(), chainSeq.back());
 		}
 	}
@@ -566,7 +565,7 @@ void Rule2Dfas(const CRegRule &rule, CCompileResults &result)
 			const CPcreOption &curPcre = curPcreChain[j];
 			try
 			{
-				PcreToNFA(ruleCompData[i][j],
+				CodeToNFA(ruleCompData[i][j],
 					curPcre.HasFlags(CPcreOption::PF_A), nfa);
 			}
 			catch (CTrace &e)
