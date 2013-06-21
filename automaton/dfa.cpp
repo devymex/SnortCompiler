@@ -391,7 +391,7 @@ DFAHDR ulong CDfa::CalcStoreSize() const
 	nSize += SC_DFACOLCNT * sizeof(byte);
 
 	//dfa
-	nSize += m_pDfa->size() * (sizeof(ulong) + m_usColNum);
+	nSize += m_pDfa->size() * m_usColNum;
 
 	//m_nStartId
 	nSize += sizeof(byte);
