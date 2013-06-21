@@ -14,6 +14,7 @@
 
 #include <hwprj\common.h>
 #include <hwprj\strary.h>
+#include <hwprj\byteary.h>
 #include <hwprj\ruleoption.h>
 
 #ifndef SNORTRULEHDR_DS
@@ -75,11 +76,7 @@ public:
 	CDllString&				GetPcreString();
 	const CDllString&		GetPcreString() const;
 
-	/*	函数名：PreComp
-	**	参数：compData-编译pcre结果数据
-	**	功能：编译和解析Snort规则中pcre字符串
-	*/
-	void					PreComp(BYTEARY &compData) const;
+	void					Precompile(CByteArray &pcResult) const;
 
 protected:
 

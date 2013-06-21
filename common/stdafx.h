@@ -19,8 +19,10 @@
 #define DLLSTRHDR_DS
 #define TRACEHDR_DS
 #define LOGGERHDR_DS
+#define BYTEARYHDR_DS
 
 typedef std::string						DLLSTRING;
 typedef std::vector<unsigned long>		DLLULONGVEC;
 typedef std::vector<class CDllString>	DLLSTRINGARY;
 typedef std::ostream					LOGFILE;
+typedef std::vector<unsigned char>		DLLBYTEARY;

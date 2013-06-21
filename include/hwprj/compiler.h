@@ -51,4 +51,8 @@ COMPILERHDR void ParseRuleFile(const char *pFileName, RECIEVER recv, void *lpUse
 */
 COMPILERHDR void CompileRuleFile(const char *pFileName, CCompileResults &compRes);
 
-COMPILERHDR void ExtractSignatures(CRegRule &regRule);
+COMPILERHDR void ExtractSequence(const CByteArray &pcResult, std::vector<CByteArray> &seqAry);
+
+COMPILERHDR void ExtractSignatures(const CByteArray &seqAry, CUnsignedArray &sigs);
+
+COMPILERHDR void CodeToNFA(const CByteArray &pcResult, bool bFromBeg, CNfa &nfa);

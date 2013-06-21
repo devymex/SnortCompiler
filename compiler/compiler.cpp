@@ -12,6 +12,7 @@
 #include "stdafx.h"
 #include <hwprj\snortrule.h>
 #include "comprule.h"
+#include "p2nmain.h"
 #include <hwprj\compiler.h>
 
 /*
@@ -83,17 +84,204 @@ COMPILERHDR void CompileRuleFile(const char *pFileName, CCompileResults &compRes
 	ParseRuleFile(pFileName, CompileCallback, &compRes);
 }
 
-COMPILERHDR void ExtractSignatures(CRegRule &regRule)
+COMPILERHDR void ExtractSequence(const CByteArray &pcResult,
+								 std::vector<CByteArray> &seqAry)
 {
-	RULESEQUENCE ruleSeq;
-	RULECOMPDATA ruleCompData;
-	PreCompileRule(regRule, ruleSeq, ruleCompData);
-	for (ulong i = 0; i < regRule.Size(); ++i)
+
+	struct MYGET
 	{
-		CHAINSEQUENCE &curChainSeq = ruleSeq[i];
-		for (ulong j = 0; j < curChainSeq.size(); ++j)
+		const CByteArray *pCode;
+		MYGET(const CByteArray &pcResult) : pCode(&pcResult) {}
+		ulong operator()(ulong ulIdx)
 		{
-			ExtractSigs(curChainSeq[j], regRule[i].GetSigs());
+			return (((*pCode)[ulIdx + 1] << 8) | (*pCode)[ulIdx + 2]);
+		}
+	} myget(pcResult);
+
+	ulong cur = 0;
+	ulong bra = 0;
+	ulong times = 0;
+	byte temp = 0;
+	byte curCode = pcResult[0];
+	CByteArray str;
+	for (;;)
+	{
+		switch(curCode)
+		{
+		case OP_END:
+			if(!str.Empty())
+			{
+				seqAry.push_back(str);
+			}
+			str.Empty();
+			return;
+
+		case OP_ALT:				/* 113 Start of alternation */
+			seqAry.clear();
+			return;
+
+		case OP_CHARI:				/* 30 Match one character: caselessly */
+		case OP_CHAR:				/* 29 Match one character: casefully */
+			str.PushBack(pcResult[cur +1]);
+			cur = cur + Steps[curCode];
+			curCode = pcResult[cur];
+			break;
+
+		case OP_CBRA:				/* 127 Start of capturing bracket */
+			bra = cur;
+			bra += myget(bra);
+			if(pcResult[bra] == OP_ALT)
+			{
+				if(!str.Empty())
+				{
+					seqAry.push_back(str);
+				}
+				str.Clear();
+				while(pcResult[bra] == OP_ALT)
+				{
+					bra += myget(bra);
+				}
+
+				cur = bra + Steps[pcResult[bra]];
+				curCode = pcResult[cur];
+
+			}
+			else
+			{
+				cur += Steps[curCode];
+				curCode = pcResult[cur];
+			}
+			break;
+
+		case OP_POSPLUS:			/* 43 Possessified plus: caseful */
+			str.PushBack(pcResult[cur + 1]);
+			seqAry.push_back(str);
+
+			str.Clear();
+			str.PushBack(pcResult[cur + 1]);
+			
+			cur = cur + Steps[curCode];
+			curCode = pcResult[cur];
+			break;
+
+		case OP_KET:				/* 114 End of group that doesn't have an unbounded repeat */
+			cur = cur + Steps[curCode];
+			curCode = pcResult[cur];
+			break;
+
+		case OP_EXACT:				/* 41 Exactly n matches */
+		case OP_EXACTI:				/* 54 */
+
+			times = myget(cur);
+			for(ulong i = 0; i < times; ++i)
+			{
+				str.PushBack(pcResult[cur + 3]);
+			}
+			temp = pcResult[cur + Steps[curCode]];
+			if(((temp == OP_UPTO) || (temp == OP_MINUPTO) || (temp == OP_UPTOI) || (temp == OP_MINUPTOI)) && (pcResult[cur + 3] == pcResult[cur + Steps[curCode] + 3]))
+			{
+				if(!str.Empty() && (str.Size() >= 4))
+				{
+					seqAry.push_back(str);
+				}
+				str.Clear();
+				for(ulong i = 0; i < times; ++i)
+				{
+					str.PushBack(pcResult[cur + 3]);
+				}
+				cur = cur + Steps[curCode] + Steps[OP_UPTO];
+				curCode = pcResult[cur];
+			}
+			else
+			{
+				cur = cur + Steps[curCode];
+				curCode = pcResult[cur];
+			}
+			break;
+
+		case OP_PLUS:				/* 35 the minimizing one second. */
+			str.PushBack(pcResult[cur + 1]);
+			seqAry.push_back(str);
+			str.Clear();
+			str.PushBack(pcResult[cur + 1]);
+
+			cur = cur + Steps[curCode];
+			curCode = pcResult[cur];
+			break;
+
+		case OP_BRAZERO:			/* 140 These two must remain together and in this */
+
+			if(!str.Empty())
+			{
+				seqAry.push_back(str);
+			}
+			str.Clear();
+
+			bra = cur + Steps[curCode];
+			bra += myget(bra);
+			while(pcResult[bra] == OP_ALT)
+			{
+				bra += myget(bra);
+			}
+
+			bra += Steps[OP_KET];
+			cur = bra;
+			curCode = pcResult[cur];
+
+			break;
+
+		default:
+			cur = cur + Steps[curCode];
+			curCode = pcResult[cur];
+			if (!str.Empty())
+			{
+				seqAry.push_back(str);
+			}
+			str.Clear();
+			break;
 		}
 	}
+}
+
+COMPILERHDR void ExtractSignatures(const CByteArray &seqAry, CUnsignedArray &sigs)
+{
+	long ulLen = long(seqAry.Size()) - 3;
+	for (long j = 0; j < ulLen; ++j)
+	{
+		ulong nCurSig = 0;
+		for (ulong k = 0; k < 4; ++k)
+		{
+			((byte*)&nCurSig)[k] = byte(tolower(seqAry[j + k]));
+		}
+		sigs.PushBack(nCurSig);
+	}
+}
+
+COMPILERHDR void CodeToNFA(const CByteArray &pcResult, bool bFromBeg, CNfa &nfa)
+{
+	BYTEARY codeAry(pcResult.Data(), pcResult.Data() + pcResult.Size());
+
+	BYTEARY_ITER Beg, End;
+	Beg = codeAry.begin();
+	End = codeAry.end();
+	if (!CanProcess(Beg, End))
+	{
+		TTHROW(TI_UNSUPPORT);
+	}
+	Beg = codeAry.begin();
+	End = codeAry.end();
+
+	if (!bFromBeg)
+	{
+		ulong nLastRow = nfa.Size();
+		nfa.PushBack(CNfaRow());
+		CNfaRow &row = nfa.Back();
+		for (ulong i = 0; i < EMPTY; ++i)
+		{
+			row[i].PushBack(nLastRow);
+		}
+		row[EMPTY].PushBack(nLastRow + 1);
+	}
+
+	ProcessPcre(Beg, End, nfa);
 }

@@ -31,6 +31,4 @@ struct HASHNODE
 
 typedef std::map<ulong, std::vector<HASHNODE>> HASHRES;
 
-HASHMAPHDR ulong hash(const SIGNATURE &oneSig);
-
 HASHMAPHDR void HashMapping(CGroupRes &groupRes, HASHRES &HashResMap);

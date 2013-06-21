@@ -32,7 +32,8 @@ public:
 
 	inline ulong&			operator [] (ulong nIdx);
 	inline const ulong&		operator [] (ulong nIdx) const;
-	inline bool				operator == (const CUnsignedArray &other);
+	inline bool				operator == (const CUnsignedArray &other) const;
+	inline bool				operator <	(const CUnsignedArray &other) const;
 
 	// Access member
 	inline ulong			Size() const;
@@ -48,6 +49,7 @@ public:
 
 	// Algorithms
 	inline void				Fill(ulong _Val);
+	inline ulong			Find(ulong _Val) const;
 
 	void Sort();
 	void Unique();

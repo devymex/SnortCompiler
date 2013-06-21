@@ -6,7 +6,6 @@
 
 #include <hwprj\ctimer.h>
 #include <hwprj\unsary.h>
-#include <hwprj\signatures.h>
 #include <hwprj\compiler.h>
 #include <hwprj\compres.h>
 #include <hwprj\groupres.h>

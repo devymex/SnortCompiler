@@ -11,7 +11,6 @@
 
 #pragma once
 
-#include <hwprj\signatures.h>
 #include <hwprj\pcreopt.h>
 
 #ifndef SNORTRULEHDR_DS
@@ -25,23 +24,20 @@ public:
 	CPcreChain(const CPcreChain &other);
 	virtual ~CPcreChain();
 
-	CPcreChain&			operator = (const CPcreChain &other);
-	CPcreOption&		operator[](ulong nIdx);
-	const CPcreOption&	operator[](ulong nIdx) const;
+	CPcreChain&				operator = (const CPcreChain &other);
+	CPcreOption&			operator[](ulong nIdx);
+	const CPcreOption&		operator[](ulong nIdx) const;
 
-	ulong				Size() const;
-	void				Clear();
-	CPcreOption&		Back() const;
-	void				PushBack(const CPcreOption &pcreOpt);
-	void				Resize(ulong nSize);
+	ulong					Size() const;
+	void					Clear();
+	CPcreOption&			Back() const;
+	void					PushBack(const CPcreOption &pcreOpt);
+	void					Resize(ulong nSize);
 
-	/*	函数名：GetSigs
-	**	功能：获取一个PCRE链的特征字符串signature
-	*/
-	CSignatures&		GetSigs();
-	const CSignatures&	GetSigs() const;
+	CUnsignedArray&			GetSigs();
+	const CUnsignedArray&	GetSigs() const;
 
 protected:
-	PCREVEC*			m_pPcreVec;
-	CSignatures			m_sigs;
+	PCREVEC*				m_pPcreVec;
+	CUnsignedArray			m_sigs;
 };

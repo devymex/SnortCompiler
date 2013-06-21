@@ -102,12 +102,12 @@ SNORTRULEHDR void CPcreChain::Resize(ulong nSize)
 	}
 }
 
-SNORTRULEHDR CSignatures& CPcreChain::GetSigs()
+SNORTRULEHDR CUnsignedArray& CPcreChain::GetSigs()
 {
 	return m_sigs;
 }
 
-SNORTRULEHDR const CSignatures& CPcreChain::GetSigs() const
+SNORTRULEHDR const CUnsignedArray& CPcreChain::GetSigs() const
 {
 	return m_sigs;
 }

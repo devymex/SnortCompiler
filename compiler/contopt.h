@@ -14,8 +14,8 @@
 
 #include <hwprj\common.h>
 #include <hwprj\ruleoption.h>
-#include <hwprj\signatures.h>
 #include <hwprj\pcreopt.h>
+#include <hwprj\byteary.h>
 
 class CContentOption : public CRuleOption
 {
@@ -33,11 +33,6 @@ public:
 
 	CContentOption&			operator = (const CContentOption &other);
 
-	/*	函数名：ExtractSignatures
-	**	参数：sigs-特征字符串类型
-	**	功能：从content转换成的PCRE链中提取signature
-	*/
-	void					ExtractSignatures(CSignatures &sigs) const;
 
 	/*	函数名：ToPcre
 	**	参数：pcreOpt-PCRE链类型
@@ -63,5 +58,5 @@ public:
 	int						m_nWithin;
 
 protected:
-	BYTEARY					m_data;
+	CByteArray				m_data;
 };
