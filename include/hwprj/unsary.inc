@@ -28,9 +28,8 @@ inline CUnsignedArray& CUnsignedArray::operator = (
 	{
 		if (m_ulCap < other.m_ulSize)
 		{
-			ulong *pNewBuf = Alloc(other.m_ulSize);
 			Free(m_pAry);
-			m_pAry = pNewBuf;
+			m_pAry = Alloc(other.m_ulSize);
 			m_ulCap = other.m_ulSize;
 		}
 		m_ulSize = other.m_ulSize;
@@ -102,13 +101,11 @@ inline ulong& CUnsignedArray::Back()
 
 inline ulong* CUnsignedArray::Data()
 {
-	TASSERT(m_pAry != null);
 	return m_pAry;
 }
 
 inline const ulong* CUnsignedArray::Data() const
 {
-	TASSERT(m_pAry != null);
 	return m_pAry;
 }
 
@@ -140,8 +137,7 @@ inline void CUnsignedArray::PushBack(ulong ulVal)
 			Realloc(m_ulCap * 2);
 		}
 	}
-	m_pAry[m_ulSize] = ulVal;
-	++m_ulSize;
+	m_pAry[m_ulSize++] = ulVal;
 }
 
 inline void CUnsignedArray::Reserve(ulong nCap)
