@@ -48,7 +48,7 @@ public:
 	bool			HasFlags(PARSE_INFO nFlags) const;
 
 protected:
-	ulong m_nSid;
-	PARSE_INFO m_nFlags;
-	OPTIONVEC *m_pOptions;
+	ulong			m_nSid;
+	PARSE_INFO		m_nFlags;
+	OPTIONVEC*		m_pOptions;
 };

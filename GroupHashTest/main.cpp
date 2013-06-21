@@ -56,21 +56,21 @@ int main()
 
 	//result.ReadFromFile("..\\result.cdt");
 
-	CGroupRes groupRes;
-	Grouping(result, groupRes);
-	groupRes.WriteToFile("..\\GroupResult.cdt");
-	//groupRes.ReadFromFile("..\\GroupResult.cdt");
-	HASHRES HashResMap;
-	HashMapping(groupRes, HashResMap);
+	//CGroupRes groupRes;
+	//Grouping(result, groupRes);
+	//groupRes.WriteToFile("..\\GroupResult.cdt");
+	////groupRes.ReadFromFile("..\\GroupResult.cdt");
+	//HASHRES HashResMap;
+	//HashMapping(groupRes, HashResMap);
 
-	groupRes.WriteToFile("..\\FinalResult.cdt");
-	//for (ulong i = 0; i < groupRes.GetDfaTable().Size(); ++i)
-	//{
-	//	groupRes.GetDfaTable()[i].MergeColumn();
-	//}
-	std::cout << "Total time: " << ctime.Reset() << std::endl;
-	std::cout << groupRes.GetGroups().Size() << std::endl;
-	std::cout << HashResMap.size() << std::endl;
+	//groupRes.WriteToFile("..\\FinalResult.cdt");
+	////for (ulong i = 0; i < groupRes.GetDfaTable().Size(); ++i)
+	////{
+	////	groupRes.GetDfaTable()[i].MergeColumn();
+	////}
+	//std::cout << "Total time: " << ctime.Reset() << std::endl;
+	//std::cout << groupRes.GetGroups().Size() << std::endl;
+	//std::cout << HashResMap.size() << std::endl;
 
 	//CCompileResults result;
 	//result.ReadFromFile("..\\result.cdt");

@@ -390,8 +390,8 @@ DFAHDR ulong CDfa::CalcStoreSize() const
 	//group
 	nSize += SC_DFACOLCNT * sizeof(byte);
 
-	//dfa
-	nSize += m_pDfa->size() * (sizeof(ulong) + m_usColNum);
+	//dfa rows
+	nSize += m_pDfa->size() * m_usColNum;
 
 	//m_nStartId
 	nSize += sizeof(byte);
