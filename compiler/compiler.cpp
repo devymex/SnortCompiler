@@ -85,7 +85,7 @@ COMPILERHDR void CompileRuleFile(const char *pFileName, CCompileResults &compRes
 }
 
 COMPILERHDR void ExtractSequence(const CByteArray &pcResult,
-								 std::vector<CByteArray> &seqAry)
+								 std::vector<CByteArray> &strs)
 {
 
 	struct MYGET
@@ -111,13 +111,13 @@ COMPILERHDR void ExtractSequence(const CByteArray &pcResult,
 		case OP_END:
 			if(!str.Empty())
 			{
-				seqAry.push_back(str);
+				strs.push_back(str);
 			}
 			str.Empty();
 			return;
 
 		case OP_ALT:				/* 113 Start of alternation */
-			seqAry.clear();
+			strs.clear();
 			return;
 
 		case OP_CHARI:				/* 30 Match one character: caselessly */
@@ -134,7 +134,7 @@ COMPILERHDR void ExtractSequence(const CByteArray &pcResult,
 			{
 				if(!str.Empty())
 				{
-					seqAry.push_back(str);
+					strs.push_back(str);
 				}
 				str.Clear();
 				while(pcResult[bra] == OP_ALT)
@@ -155,7 +155,7 @@ COMPILERHDR void ExtractSequence(const CByteArray &pcResult,
 
 		case OP_POSPLUS:			/* 43 Possessified plus: caseful */
 			str.PushBack(pcResult[cur + 1]);
-			seqAry.push_back(str);
+			strs.push_back(str);
 
 			str.Clear();
 			str.PushBack(pcResult[cur + 1]);
@@ -182,7 +182,7 @@ COMPILERHDR void ExtractSequence(const CByteArray &pcResult,
 			{
 				if(!str.Empty() && (str.Size() >= 4))
 				{
-					seqAry.push_back(str);
+					strs.push_back(str);
 				}
 				str.Clear();
 				for(ulong i = 0; i < times; ++i)
@@ -201,7 +201,7 @@ COMPILERHDR void ExtractSequence(const CByteArray &pcResult,
 
 		case OP_PLUS:				/* 35 the minimizing one second. */
 			str.PushBack(pcResult[cur + 1]);
-			seqAry.push_back(str);
+			strs.push_back(str);
 			str.Clear();
 			str.PushBack(pcResult[cur + 1]);
 
@@ -213,7 +213,7 @@ COMPILERHDR void ExtractSequence(const CByteArray &pcResult,
 
 			if(!str.Empty())
 			{
-				seqAry.push_back(str);
+				strs.push_back(str);
 			}
 			str.Clear();
 
@@ -235,7 +235,7 @@ COMPILERHDR void ExtractSequence(const CByteArray &pcResult,
 			curCode = pcResult[cur];
 			if (!str.Empty())
 			{
-				seqAry.push_back(str);
+				strs.push_back(str);
 			}
 			str.Clear();
 			break;
@@ -243,15 +243,15 @@ COMPILERHDR void ExtractSequence(const CByteArray &pcResult,
 	}
 }
 
-COMPILERHDR void ExtractSignatures(const CByteArray &seqAry, CUnsignedArray &sigs)
+COMPILERHDR void ExtractSignatures(const CByteArray &strs, CUnsignedArray &sigs)
 {
-	long ulLen = long(seqAry.Size()) - 3;
+	long ulLen = long(strs.Size()) - 3;
 	for (long j = 0; j < ulLen; ++j)
 	{
 		ulong nCurSig = 0;
 		for (ulong k = 0; k < 4; ++k)
 		{
-			((byte*)&nCurSig)[k] = byte(tolower(seqAry[j + k]));
+			((byte*)&nCurSig)[k] = byte(tolower(strs[j + k]));
 		}
 		sigs.PushBack(nCurSig);
 	}

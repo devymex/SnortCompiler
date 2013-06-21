@@ -111,18 +111,16 @@ struct INCLUDESEQUENCE
 	}
 	bool operator() (const CByteArray &seq)
 	{
-		const byte *pBeg = m_pSeq->Data();
-		const byte *pEnd = pBeg + m_pSeq->Size();
+		const byte *pBeg = m_pSeq->Data(), *pEnd = pBeg + m_pSeq->Size();
 
-		const byte *pFBeg = seq.Data();
-		const byte *pFEnd = pFBeg + seq.Size();
+		const byte *pFBeg = seq.Data(), *pFEnd = pFBeg + seq.Size();
 		if (m_bCaseless)
 		{
-			return (pFEnd != std::search(pFEnd, pFEnd, pBeg, pEnd, CaselessComp));
+			return (pFEnd != std::search(pFBeg, pFEnd, pBeg, pEnd, CaselessComp));
 		}
 		else
 		{
-			return (pFEnd != std::search(pFEnd, pFEnd, pBeg, pEnd));
+			return (pFEnd != std::search(pFBeg, pFEnd, pBeg, pEnd));
 		}
 	}
 };

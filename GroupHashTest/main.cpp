@@ -43,27 +43,26 @@ int main()
 
 	CTimer ctime;
 	CCompileResults result;
-	//try
-	//{
-	//	CompileRuleFile("..\\allrules.rule", result);
-	//}
-	//catch (CTrace &e)
-	//{
-	//	std::cout << e.File() << " - " << e.Line() << ": " << e.What() << std::endl;
-	//	system("pause");
-	//}
-	//result.WriteToFile("..\\result.cdt");
+	try
+	{
+		CompileRuleFile("..\\allrules.rule", result);
+	}
+	catch (CTrace &e)
+	{
+		std::cout << e.File() << " - " << e.Line() << ": " << e.What() << std::endl;
+		system("pause");
+	}
+	result.WriteToFile("..\\result.cdt");
 
-	result.ReadFromFile("..\\result.cdt");
+	//result.ReadFromFile("..\\result.cdt");
 
 	CGroupRes groupRes;
 	Grouping(result, groupRes);
-	//groupRes.WriteToFile("..\\GroupResult.cdt");
+	groupRes.WriteToFile("..\\GroupResult.cdt");
 	//groupRes.ReadFromFile("..\\GroupResult.cdt");
 	HASHRES HashResMap;
 	HashMapping(groupRes, HashResMap);
-
-	//groupRes.WriteToFile("..\\FinalResult.cdt");
+	groupRes.WriteToFile("..\\FinalResult.cdt");
 	//for (ulong i = 0; i < groupRes.GetDfaTable().Size(); ++i)
 	//{
 	//	groupRes.GetDfaTable()[i].MergeColumn();

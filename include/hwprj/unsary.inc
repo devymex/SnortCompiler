@@ -7,7 +7,7 @@ inline CUnsignedArray::CUnsignedArray(const CUnsignedArray &other)
 	: m_pAry(null), m_ulSize(0), m_ulCap(0)
 {
 	m_pAry = Alloc(other.m_ulSize);
-	m_ulCap = other.m_ulCap;
+	m_ulCap = other.m_ulSize;
 	m_ulSize = other.m_ulSize;
 	if (m_ulSize != 0)
 	{
