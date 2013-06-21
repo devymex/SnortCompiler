@@ -31,6 +31,8 @@
 #define MATCHPKT __declspec(dllexport)
 #endif
 
+extern ulong g_pktnum;
+
 /* 4字节的IP地址 */
 typedef struct ip_address{
     u_char byte1;
@@ -112,7 +114,7 @@ struct PACKETPARAM
 
 struct MATCHRESULT
 {
-	ulong pktnum;
+	ulong g_pktnum;
 	std::vector<ulong> matchedSids;
 };
 

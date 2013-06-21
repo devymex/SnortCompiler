@@ -7,6 +7,8 @@
 #include <hwprj\siddfaids.h>
 #include "MatchPkt.h"
 
+extern ulong g_dpktnum;
+
 struct DFASIDMAPPING
 {
 	std::unordered_map<ulong, ulong> dId_sId;
@@ -15,10 +17,17 @@ struct DFASIDMAPPING
 
 struct DFAMCH
 {
+	std::string resultFolder;
 	std::string resultPath;
 	HASHRES hashtable;
 	CGroupRes mergedDfas;
 	DFASIDMAPPING dIdSId;
+};
+
+struct PCREDFA
+{
+	DFAMCH dfamch;
+	REGRULESMAP rulesmap;
 };
 
 void MatchOnedfa(const u_char * &data, size_t len, CDfa &dfa, std::vector<size_t> &matchedDids);
@@ -34,10 +43,11 @@ void CALLBACK DPktParam(const ip_header *ih, const BYTE *data, void* user);
 bool DMyLoadCapFile(const char* pFile, PACKETRECV cv, void* pUser);
 
 void ResultFiles(const std::string &path, std::vector<std::string> &resultFiles);
+void CompareResult(const char* path1, const char* path2);
 
 MATCHPKT bool DLoadCapFile(const char* pFile, void* pUser);
 
-MATCHPKT void DHandleAllFile(const std::string &path, void* user);
+MATCHPKT void PDHandleAllFile(const std::string &path, void* user);
 
 MATCHPKT void DfaidSidMap(CGroupRes &mergedDfas, DFASIDMAPPING &didSid);
 

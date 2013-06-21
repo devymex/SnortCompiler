@@ -528,7 +528,7 @@ void PreCompileRule(const CRegRule &regRule, RULESEQUENCE &ruleSeq,
 	}
 }
 
-void ProcessRule(CRegRule &regRule, RULECOMPDATA &result)
+COMPILERHDR void ProcessRule(CRegRule &regRule, RULECOMPDATA &result)
 {
 	RULESEQUENCE ruleSeq;
 	PreCompileRule(regRule, ruleSeq, result);

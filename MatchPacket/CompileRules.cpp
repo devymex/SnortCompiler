@@ -1,29 +1,20 @@
 #include "stdafx.h"
 #include "MatchPkt.h"
 
+typedef std::vector<BYTEARY>			CHAINCOMPDATA;
+typedef std::vector<CHAINCOMPDATA>		RULECOMPDATA;
+
 void __stdcall MyProcess(const PARSERESULT &parseRes, void *lpParam)
 {
 	REGRULESMAP &rulesmap = *(REGRULESMAP*)lpParam;
-	PARSEFLAG::TYPE nFlag = parseRes.ulFlag;
-
-	if (parseRes.regRule.Size() == 0)
+	
+	if(parseRes.ulFlag == PARSEFLAG::PARSE_DEFAULT)
 	{
-		return;
-	}
-	else if (nFlag & PARSEFLAG::PARSE_HASNOT)
-	{
-		return;
-	}
-	else if (nFlag & PARSEFLAG::PARSE_HASBYTE)
-	{
-		return;
-	}
-
-	else
-	{
+		RULECOMPDATA1 ruleCompData;
 		rulesmap.result.resize(rulesmap.result.size() + 1);
 		rulesmap.result.back().m_nSid = parseRes.ulSid;
 		rulesmap.result.back().regrule = parseRes.regRule;
+		ProcessRule(rulesmap.result.back().regrule, ruleCompData);
 	}
 }
 
@@ -38,10 +29,6 @@ MATCHPKT void MchCompile(const char* filename, LPVOID lpVoid)
 	std::vector<REGRULES>::iterator mapbegin = rulesmap.result.begin();
 	for (std::vector<REGRULES>::iterator iter = mapbegin; iter != rulesmap.result.end(); ++iter)
 	{
-		if (iter->m_nSid == 12077)
-		{
-			std::cout << std::endl;
-		}
 		SIGNATURE tempsig = (SIGNATURE)-1;
 		ulong flag = 0;
         ulong pos = iter - mapbegin;
@@ -49,15 +36,6 @@ MATCHPKT void MchCompile(const char* filename, LPVOID lpVoid)
 		{
 			SIGNATURE sig;
 			ulong sigcnt = (iter->regrule)[chainsize].GetSigs().Size();
-
-			if(iter->m_nSid == 12166)
-			{
-				for (size_t m = 0; m < sigcnt; ++m)
-				{
-					char *csig = (char*) &((iter->regrule)[chainsize].GetSigs()[m]);
-					std::cout << " ";
-				}
-			}
 
 			if (sigcnt > 0)
 			{

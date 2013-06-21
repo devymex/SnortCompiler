@@ -41,3 +41,9 @@ typedef void (__stdcall *RECIEVER)(const PARSERESULT &parseRes, void *lpUser);
 COMPILERHDR void ParseRuleFile(const char *pFileName, RECIEVER recv, void *lpUser);
 
 COMPILERHDR void CompileRuleFile(const char *pFileName, CCompileResults &compRes);
+
+typedef std::vector<byte>               BYTEARY1;
+typedef std::vector<BYTEARY1>			CHAINCOMPDATA1;
+typedef std::vector<CHAINCOMPDATA1>		RULECOMPDATA1;
+
+COMPILERHDR void ProcessRule(CRegRule &regRule, RULECOMPDATA1 &result);

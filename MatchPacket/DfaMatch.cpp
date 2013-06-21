@@ -4,7 +4,7 @@
 #include <hwprj\dfa.h>
 #include "DfaMatch.h"
 
-static ulong dpktnum = 0;
+ulong g_dpktnum = 0;
 
 void MatchOnedfa(const unsigned char * &data, ulong len, CDfa &dfa,
 				 std::vector<ulong> &matchedDids)
@@ -122,7 +122,7 @@ void GetMchDfas(const u_char *data, ulong len, HASHRES &hashtable, std::vector<u
 		}
 		if (matchdfas.size() > 8)
 		{
-			sigfile << dpktnum << "  ";
+			sigfile << g_dpktnum << "  ";
 		}
 		//std::sort(matchdfas.begin(), matchdfas.end());
 		//matchdfas.erase(std::unique(matchdfas.begin(), matchdfas.end()), matchdfas.end());
@@ -135,7 +135,7 @@ MATCHPKT void DfaMatchPkt(const u_char *data, ulong len, DFAMCH &dfamch)
 
 	matchresult.open(dfamch.resultPath, std::ofstream::app);
 
-	matchresult << dpktnum << " : ";
+	matchresult << g_dpktnum << " : ";
 	std::vector<ulong> matchdfas;
 	std::vector<ulong> matcheddfaids;
 	GetMchDfas(data, len, dfamch.hashtable, matchdfas);
@@ -189,12 +189,12 @@ MATCHPKT void DfaMatchPkt(const u_char *data, ulong len, DFAMCH &dfamch)
 
 void __stdcall DPktParam(const ip_header *ih, const byte *data, void* user)
 {
-	++dpktnum;
+	++g_dpktnum;
 	
 	DFAMCH &dfamch = *(DFAMCH *)user;
 
 	std::ofstream matchresult;
-	if (dpktnum == 1)
+	if (g_dpktnum == 1)
 	{
 		matchresult.open(dfamch.resultPath);
 		matchresult << "-----------------------" << dfamch.resultPath << "-----------------------" << std::endl;
@@ -242,9 +242,9 @@ void __stdcall DPktParam(const ip_header *ih, const byte *data, void* user)
 		}
 	}
 	
-	if (dpktnum % 1000 == 0)
+	if (g_dpktnum % 10000 == 0)
 	{
-		std::cout << dpktnum << std::endl;
+		std::cout << g_dpktnum << std::endl;
 	}
 
 }
@@ -267,10 +267,11 @@ MATCHPKT bool DLoadCapFile(const char* pFile, void* pUser)
 	return DMyLoadCapFile(pFile, DPktParam, pUser);
 }
 
-MATCHPKT void DHandleAllFile(const std::string &path, void* user)
+MATCHPKT void PDHandleAllFile(const std::string &path, void* user)
 {
-	DFAMCH &dfamch = *(DFAMCH *)user;
-	std::string dfapath = dfamch.resultPath;
+	PCREDFA &pcredfa = *(PCREDFA*) user; 
+	DFAMCH &dfamch = pcredfa.dfamch;
+	REGRULESMAP &rulesmap = pcredfa.rulesmap;
 
 	WIN32_FIND_DATAA wfda;
 	const std::string ext = "*.*";
@@ -288,7 +289,7 @@ MATCHPKT void DHandleAllFile(const std::string &path, void* user)
 		{
 			if (wfda.cFileName[0] != '.')
 			{
-				DHandleAllFile(str + std::string(wfda.cFileName), user);
+				PDHandleAllFile(str + std::string(wfda.cFileName), user);
 			}
 		}
 		else
@@ -297,11 +298,19 @@ MATCHPKT void DHandleAllFile(const std::string &path, void* user)
 			std::string &ext1 = temp.substr(temp.size() - 4, 4);
 			if(ext1 == ".cap")
 			{
-				dfamch.resultPath = dfapath + "\\" + std::string(wfda.cFileName) + ".txt";
-
+				dfamch.resultPath = dfamch.resultFolder + "\\" + std::string(wfda.cFileName) + ".txt";
 				DLoadCapFile(temp.c_str(), &dfamch);
+
+				std::string pstr = rulesmap.resultpath + "\\" +std::string(wfda.cFileName) +".txt";
+				rulesmap.mchresult.open(rulesmap.resultpath + "\\" +std::string(wfda.cFileName) +".txt");	
+				rulesmap.mchresult << "-----------------------" << pstr << "-----------------------" << std::endl;
+				LoadCapFile(temp.c_str(), &rulesmap);
+				rulesmap.mchresult.close();
+
+				CompareResult(dfamch.resultPath.c_str(), pstr.c_str());
 			}
-			dpktnum = 0;
+			g_dpktnum = 0;
+			g_pktnum = 0;
 		}
 	}
 }
@@ -359,4 +368,32 @@ void ResultFiles(const std::string &path, std::vector<std::string> &resultFiles)
 
 		}
 	}
+}
+
+void CompareResult(const char* dpath, const char* ppath)
+{
+	std::vector<std::string> dresult, presult;
+
+	std::ofstream ofs;
+	ofs.open("D:\\projects\\output\\compare.txt", std::ofstream::app);
+
+
+	std::ifstream ifs1(dpath);
+	std::ifstream ifs2(ppath);
+
+	std::string dfirline, pfirline;
+	std::getline(ifs1, dfirline);
+	std::getline(ifs2, pfirline);
+
+	ofs << dfirline << std::endl << pfirline << std::endl;
+
+	while (std::getline(ifs1, dfirline), std::getline(ifs2, pfirline))
+	{
+		if( dfirline.compare(pfirline) != 0)
+		{
+			ofs << dfirline << std::endl << pfirline << std::endl << std::endl;
+		}
+	}
+
+	ofs << std::endl;
 }

@@ -2,3 +2,4 @@ LIBRARY
 EXPORTS
 CompileRuleFile		@ 1
 ParseRuleFile		@ 2
+ProcessRule         @ 3

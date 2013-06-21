@@ -1,8 +1,7 @@
 #include "stdafx.h"
 #include "MatchPkt.h"
 
-static size_t pktnum = 0;
-
+ulong g_pktnum = 0;
 void GetMchRule(const u_char *data, size_t len, void* user, std::vector<size_t> &rules)
 {
 	if(len > 3)
@@ -43,8 +42,8 @@ bool MyPcreMatch(const u_char *data, size_t len, CRegRule &regRule)
 			//对规则选项进行匹配
 			int Pos = -1;
 
-			bool flag = 0;
-			//PcreMatch((const char*)pData, dataSize, regRule[i][j].GetStr(), Pos);
+			
+			bool flag = PcreMatch((const char*)pData, dataSize, regRule[i][j], Pos);
 			if(!flag)
 			{
 				return false;
@@ -66,18 +65,19 @@ bool MyPcreMatch(const u_char *data, size_t len, CRegRule &regRule)
 
 void HdlOnePkt(const u_char *data, size_t len, void*user)
 {
-	//const u_char p[] = {0, 0, 'f', 'g', 0, 'a', 'b', 'C', 'd', 0, 'd', 'e', 235, 0, 42, 'A', 123, 'B', 40, '1', '2', 93, 63, 'a', 'b', 'c', 'd', 'e', 'a'};
-	//data = p;
-	//len = sizeof(p);
 	REGRULESMAP &rulesmap = *(REGRULESMAP *)user;
 	std::vector<size_t> rules;
 	GetMchRule(data, len, user, rules);
 	std::vector<size_t> matchvec;
-	rulesmap.mchresult << pktnum << " : ";
+	rulesmap.mchresult << g_pktnum << " : ";
 	for(size_t i = 0; i < rules.size(); ++i)
 	{
-
+		//if(rulesmap.result[rules[i]].m_nSid == 12425)
+		//{
+		//	std::cout << std::endl;
+		//}
 		bool flag = MyPcreMatch(data, len, rulesmap.result[rules[i]].regrule);
+
 
 		if(flag)
 		{
@@ -122,14 +122,13 @@ MATCHPKT void HandleAllFile(const std::string &path, void* user)
 
 			if(ext1 == ".cap")
 			{
-			std::string str = rulesmap.resultpath + "\\" +std::string(wfda.cFileName) +".txt";
 			rulesmap.mchresult.open(rulesmap.resultpath + "\\" +std::string(wfda.cFileName) +".txt");	
 			rulesmap.mchresult << "-----------------------" << temp << "-----------------------" << std::endl;
 			LoadCapFile(temp.c_str(), &rulesmap);
 			rulesmap.mchresult.close();
 			}
 
-			pktnum = 0;
+			g_pktnum = 0;
 		}
 	}
 }
@@ -146,8 +145,7 @@ void packet_handler(u_char *param, const struct pcap_pkthdr *header, const u_cha
 
 void CALLBACK PktParam(const ip_header *ih, const BYTE *data, void* user)
 {
-	++pktnum;	
-
+	++g_pktnum;	
 
 	REGRULESMAP &rulesmap = *(REGRULESMAP *)user;
 	u_short  _ihl = (ih->ver_ihl & 0x0f) * 4;
@@ -191,11 +189,10 @@ void CALLBACK PktParam(const ip_header *ih, const BYTE *data, void* user)
 		}
 	}
 
-	if (pktnum % 100 == 0)
+	if (g_pktnum % 10000 == 0)
 	{
-		std::cout << pktnum << std::endl;
+		std::cout << g_pktnum << std::endl;
 	}
-
 }
 
 bool MyLoadCapFile(const char* pFile, PACKETRECV cv, void* pUser)
