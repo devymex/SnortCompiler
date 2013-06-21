@@ -7,9 +7,8 @@ inline CUnsignedArray::CUnsignedArray(const CUnsignedArray &other)
 	: m_pAry(null), m_ulSize(0), m_ulCap(0)
 {
 	m_pAry = Alloc(other.m_ulSize);
-	m_ulCap = other.m_ulCap;
+	m_ulCap = other.m_ulSize;
 	m_ulSize = other.m_ulSize;
-	m_ulCap = other.m_ulCap;
 	if (m_ulSize != 0)
 	{
 		CopyFrom(other.m_pAry);
@@ -29,9 +28,8 @@ inline CUnsignedArray& CUnsignedArray::operator = (
 	{
 		if (m_ulCap < other.m_ulSize)
 		{
-			ulong *pNewBuf = Alloc(other.m_ulSize);
 			Free(m_pAry);
-			m_pAry = pNewBuf;
+			m_pAry = Alloc(other.m_ulSize);
 			m_ulCap = other.m_ulSize;
 		}
 		m_ulSize = other.m_ulSize;
@@ -55,7 +53,7 @@ inline const ulong& CUnsignedArray::operator [] (ulong nIdx) const
 	return m_pAry[nIdx];
 }
 
-inline bool CUnsignedArray::operator == (const CUnsignedArray &other)
+inline bool CUnsignedArray::operator == (const CUnsignedArray &other) const
 {
 	if (m_ulSize != other.m_ulSize)
 	{
@@ -69,6 +67,24 @@ inline bool CUnsignedArray::operator == (const CUnsignedArray &other)
 		}
 	}
 	return true;
+}
+
+inline bool CUnsignedArray::operator <	(const CUnsignedArray &other) const
+{
+	ulong ulMinSize = m_ulSize;
+	if (ulMinSize > other.m_ulSize)
+	{
+		ulMinSize = other.m_ulSize;
+	
+	}
+	for (ulong i = 0; i < ulMinSize; ++i)
+	{
+		if (m_pAry[i] != other.m_pAry[i])
+		{
+			return m_pAry[i] < other.m_pAry[i];
+		}
+	}
+	return m_ulSize < other.m_ulSize;
 }
 
 // Access member
@@ -112,10 +128,16 @@ inline void CUnsignedArray::PushBack(ulong ulVal)
 	TASSERT(m_ulCap >= m_ulSize);
 	for (; m_ulCap <= m_ulSize; )
 	{
-		Increase();
+		if (m_ulCap == 0)
+		{
+			Realloc(1);
+		}
+		else
+		{
+			Realloc(m_ulCap * 2);
+		}
 	}
-	m_pAry[m_ulSize] = ulVal;
-	++m_ulSize;
+	m_pAry[m_ulSize++] = ulVal;
 }
 
 inline void CUnsignedArray::Reserve(ulong nCap)
@@ -159,6 +181,19 @@ inline void CUnsignedArray::Fill(ulong _Val)
 	}
 }
 
+inline ulong CUnsignedArray::Find(ulong _Val) const
+{
+	ulong ulIdx = ulong(-1);
+	for (ulong i = 0; i < m_ulSize; ++i)
+	{
+		if (m_pAry[i] == _Val)
+		{
+			return i;
+		}
+	}
+	return ulIdx;
+}
+
 inline ulong* CUnsignedArray::Alloc(ulong ulCap)
 {
 	ulong *pNewBuf = null;
@@ -172,18 +207,6 @@ inline ulong* CUnsignedArray::Alloc(ulong ulCap)
 inline void CUnsignedArray::Free(ulong *pBuf)
 {
 	delete []pBuf;
-}
-
-inline void CUnsignedArray::Increase()
-{
-	if (m_ulCap == 0)
-	{
-		Realloc(1);
-	}
-	else
-	{
-		Realloc(m_ulCap * 2);
-	}
 }
 
 inline void CUnsignedArray::Realloc(ulong ulCap)

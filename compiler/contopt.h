@@ -14,8 +14,8 @@
 
 #include <hwprj\common.h>
 #include <hwprj\ruleoption.h>
-#include <hwprj\signatures.h>
 #include <hwprj\pcreopt.h>
+#include <hwprj\byteary.h>
 
 class CContentOption : public CRuleOption
 {
@@ -33,7 +33,6 @@ public:
 
 	CContentOption&			operator = (const CContentOption &other);
 
-	void					ExtractSignatures(CSignatures &sigs) const;
 	void					ToPcre(CPcreOption &pcreOpt) const;
 
 	virtual void			FromPattern(const CDllString &strPat);
@@ -46,5 +45,5 @@ public:
 	int						m_nWithin;
 
 protected:
-	BYTEARY					m_data;
+	CByteArray				m_data;
 };

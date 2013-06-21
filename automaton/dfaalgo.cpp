@@ -78,7 +78,7 @@ void NfaEClosure(const CNfa &nfa, std::vector<STATEIDARY> &eClosure)
 			{
 				if (pMat[i * nMatWidth + j])
 				{
-					eClosure[i].push_back(j);
+					eClosure[i].push_back(STATEID(j));
 				}
 			}
 		}

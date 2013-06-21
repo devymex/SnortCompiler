@@ -103,31 +103,33 @@ inline bool CaselessComp(char a, char b)
 
 struct INCLUDESEQUENCE
 {
-	const BYTEARY *m_pSeq;
+	const CByteArray *m_pSeq;
 	bool m_bCaseless;
-	INCLUDESEQUENCE(const BYTEARY &seq, bool bCaseless = false)
+	INCLUDESEQUENCE(const CByteArray &seq, bool bCaseless = false)
 		: m_pSeq(&seq), m_bCaseless(bCaseless)
 	{
 	}
-	bool operator() (const BYTEARY &seq)
+	bool operator() (const CByteArray &seq)
 	{
+		const byte *pBeg = m_pSeq->Data(), *pEnd = pBeg + m_pSeq->Size();
+
+		const byte *pFBeg = seq.Data(), *pFEnd = pFBeg + seq.Size();
 		if (m_bCaseless)
 		{
-			return (seq.end() != std::search(seq.begin(), seq.end(),
-				m_pSeq->begin(), m_pSeq->end(), CaselessComp));
+			return (pFEnd != std::search(pFBeg, pFEnd, pBeg, pEnd, CaselessComp));
 		}
 		else
 		{
-			return (seq.end() != std::search(seq.begin(), seq.end(),
-				m_pSeq->begin(), m_pSeq->end(), CaselessComp));
+			return (pFEnd != std::search(pFBeg, pFEnd, pBeg, pEnd));
 		}
 	}
 };
 
-typedef std::vector<BYTEARY>			PCRESEQUENCE;
+typedef std::vector<CByteArray>			PCRESEQUENCE;
 typedef std::vector<PCRESEQUENCE>		CHAINSEQUENCE;
 typedef std::vector<CHAINSEQUENCE>		RULESEQUENCE;
-typedef std::vector<BYTEARY>			CHAINCOMPDATA;
+
+typedef std::vector<CByteArray>			CHAINCOMPDATA;
 typedef std::vector<CHAINCOMPDATA>		RULECOMPDATA;
 
 
@@ -158,5 +160,3 @@ void Rule2Dfas(const CSnortRule &rule,
 void AssignSig(CCompileResults &result, ulong BegIdx, ulong EndIdx);
 
 void Rule2Dfas(const CRegRule &rule, CCompileResults &result);
-
-void ExtractSigs(const std::vector<BYTEARY> &seqAry, CSignatures &sigs);

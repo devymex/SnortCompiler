@@ -6,7 +6,6 @@
 
 #include <hwprj\ctimer.h>
 #include <hwprj\unsary.h>
-#include <hwprj\signatures.h>
 #include <hwprj\compiler.h>
 #include <hwprj\compres.h>
 #include <hwprj\groupres.h>
@@ -63,7 +62,6 @@ int main()
 	//groupRes.ReadFromFile("..\\GroupResult.cdt");
 	HASHRES HashResMap;
 	HashMapping(groupRes, HashResMap);
-
 	groupRes.WriteToFile("..\\FinalResult.cdt");
 	//for (ulong i = 0; i < groupRes.GetDfaTable().Size(); ++i)
 	//{

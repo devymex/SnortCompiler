@@ -1,7 +1,6 @@
 #pragma once
 
 #include <hwprj\unsary.h>
-#include <hwprj\signatures.h>
 
 #ifndef GROUPSHDR_DS
 #define GROUPSHDR __declspec(dllimport)
@@ -16,7 +15,7 @@ class GROUPVEC;
 struct ONEGROUP
 {
 	CUnsignedArray	DfaIds;
-	CSignatures		ComSigs;
+	CUnsignedArray	ComSigs;
 	SIGNATURE		currSig;
 	ulong			mergeDfaId;
 };

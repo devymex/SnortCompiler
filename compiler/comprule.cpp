@@ -11,7 +11,6 @@
 
 #include "stdafx.h"
 #include <hwprj\ruleoption.h>
-#include "pcre2nfa.h"
 #include "contopt.h"
 #include <hwprj\pcreopt.h>
 #include "comprule.h"
@@ -373,31 +372,13 @@ void AssignSig(CCompileResults &result, ulong BegIdx, ulong EndIdx)
 	}
 }
 
-void ExtractSigs(const std::vector<BYTEARY> &seqAry, CSignatures &sigs)
-{
-	SIGNATURE nCurSig;
-	for (ulong i = 0; i < seqAry.size(); ++i)
-	{
-		const BYTEARY &curSeq = seqAry[i];
-		long ulLen = long(curSeq.size()) - 3;
-		for (long j = 0; j < ulLen; ++j)
-		{
-			for (ulong k = 0; k < 4; ++k)
-			{
-				((byte*)&nCurSig)[k] = byte(tolower(curSeq[j + k]));
-			}
-			sigs.PushBack(nCurSig);
-		}
-	}
-}
-
 bool SeqIncBy(const CRegRule &regRule, const RULESEQUENCE &ruleSeq, ulong ulIdx)
 {
 	TASSERT(ulIdx < ruleSeq.size());
 	TASSERT(ruleSeq[ulIdx].size() == 1);
 	TASSERT(ruleSeq[ulIdx].front().size() == 1);
 
-	const BYTEARY &seq = ruleSeq[ulIdx].front().front();
+	const CByteArray &seq = ruleSeq[ulIdx].front().front();
 	for (ulong i = 0; i < ruleSeq.size(); ++i)
 	{
 		if (ulIdx != i)
@@ -439,7 +420,7 @@ bool SeqIncBy(const CRegRule &regRule, const RULESEQUENCE &ruleSeq, ulong ulIdx)
 					}
 				}
 				if (std::find_if(curPcreSeq.cbegin(), curPcreSeq.cend(),
-					INCLUDESEQUENCE(seq)) != curPcreSeq.cend())
+					INCLUDESEQUENCE(seq, bCaseless)) != curPcreSeq.cend())
 				{
 					return true;
 				}
@@ -486,9 +467,9 @@ void PreCompileRule(const CRegRule &regRule,
 
 		for (ulong j = 0; j < curPcreChain.Size(); ++j)
 		{
-			chainCompData.push_back(BYTEARY());
+			chainCompData.push_back(CByteArray());
 			chainSeq.push_back(PCRESEQUENCE());
-			curPcreChain[j].PreComp(chainCompData.back());
+			curPcreChain[j].Precompile(chainCompData.back());
 			ExtractSequence(chainCompData.back(), chainSeq.back());
 		}
 	}
@@ -519,8 +500,13 @@ COMPILERHDR void ProcessRule(CRegRule &regRule, RULECOMPDATA &result)
 		{
 			for (ulong j = 0; j < curChainSeq.size(); ++j)
 			{
-				ExtractSigs(curChainSeq[j], regRule[i].GetSigs());
+				PCRESEQUENCE &curPcreSeq = curChainSeq[j];
+				for (ulong k = 0; k < curPcreSeq.size(); ++k)
+				{
+					ExtractSignatures(curPcreSeq[k], regRule[i].GetSigs());
+				}
 			}
+			regRule[i].GetSigs().Unique();
 			++i;
 		}
 	}
@@ -566,7 +552,7 @@ void Rule2Dfas(const CRegRule &rule, CCompileResults &result)
 			const CPcreOption &curPcre = curPcreChain[j];
 			try
 			{
-				PcreToNFA(ruleCompData[i][j],
+				CodeToNFA(ruleCompData[i][j],
 					curPcre.HasFlags(CPcreOption::PF_A), nfa);
 			}
 			catch (CTrace &e)

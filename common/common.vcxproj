@@ -91,6 +91,7 @@
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\include\hwprj\byteary.h" />
     <ClInclude Include="..\include\hwprj\common.h" />
     <ClInclude Include="..\include\hwprj\ctimer.h" />
     <ClInclude Include="..\include\hwprj\dllstring.h" />
@@ -102,6 +103,7 @@
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="byteary.cpp" />
     <ClCompile Include="dllstring.cpp" />
     <ClCompile Include="logger.cpp" />
     <ClCompile Include="stdafx.cpp">

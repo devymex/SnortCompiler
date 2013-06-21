@@ -42,8 +42,8 @@ COMPILERHDR void ParseRuleFile(const char *pFileName, RECIEVER recv, void *lpUse
 
 COMPILERHDR void CompileRuleFile(const char *pFileName, CCompileResults &compRes);
 
-typedef std::vector<byte>               BYTEARY1;
-typedef std::vector<BYTEARY1>			CHAINCOMPDATA1;
-typedef std::vector<CHAINCOMPDATA1>		RULECOMPDATA1;
+COMPILERHDR void ExtractSequence(const CByteArray &pcResult, std::vector<CByteArray> &seqAry);
 
-COMPILERHDR void ProcessRule(CRegRule &regRule, RULECOMPDATA1 &result);
+COMPILERHDR void ExtractSignatures(const CByteArray &seqAry, CUnsignedArray &sigs);
+
+COMPILERHDR void CodeToNFA(const CByteArray &pcResult, bool bFromBeg, CNfa &nfa);
