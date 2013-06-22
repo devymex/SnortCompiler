@@ -71,7 +71,14 @@ BYTEARYHDR void CByteArray::Clear()
 
 BYTEARYHDR void CByteArray::PushBack(byte byVal)
 {
-	m_pAry->push_back(byVal);
+	try
+	{
+		m_pAry->push_back(byVal);
+	}
+	catch (std::exception &e)
+	{
+		throw CTrace(__FILE__, __LINE__, e.what());
+	}
 }
 
 BYTEARYHDR void CByteArray::PopBack()

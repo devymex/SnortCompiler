@@ -51,7 +51,7 @@ COMPILERHDR void ParseRuleFile(const char *pFileName, RECIEVER recv, void *lpUse
 				}
 				PARSERESULT pr;
 				pr.ulSid = snortRule.GetSid();
-				pr.ulFlag = PARSEFLAG::PARSE_DEFAULT;
+				pr.ulFlag = PARSEFLAG::PARSE_SUCCESS;
 				try
 				{
 					Rule2RegRule(snortRule, pr.regRule);

@@ -44,7 +44,7 @@ public:
 	static const OPTIONFLAG PF_K = (1 << 19);
 	static const OPTIONFLAG PF_S = (1 << 20);
 	static const OPTIONFLAG PF_Y = (1 << 21);
-	static const OPTIONFLAG PF_F = (1 << 22); //From content
+	static const OPTIONFLAG PF_F = (1 << 22); 
 
 public:
 	CPcreOption();
@@ -54,13 +54,34 @@ public:
 	CPcreOption&			operator = (const CPcreOption &other);
 	void					Append(const CPcreOption &next);
 
+	/*	函数名：FromPattern
+	**	参数：strPat-Snort规则中pcre字符串
+	**	功能：处理Snort规则中pcre字符串内容及其修饰项，
+	**	存入当前处理后的pcre字符串
+	*/
 	virtual void			FromPattern(const CDllString &strPat);
+
+	/*	函数名：Clone
+	**	功能：拷贝当前pcre字符串
+	*/
 	virtual CRuleOption*	Clone() const;
 
+	/*	函数名：SetPcreString
+	**	参数：strPcre-设置pcre
+	**	功能：设置处理后的pcre字符串
+	*/
 	void					SetPcreString(const CDllString& strPcre);
+
+	/*	函数名：GetPcreString
+	**	功能：获取处理后的pcre字符串
+	*/
 	CDllString&				GetPcreString();
 	const CDllString&		GetPcreString() const;
 
+	/*	函数名：Precompile
+	**	参数：pcResult-PCRE链
+	**	功能：编译及解析处理后的pcre字符串，转换为PCRE链
+	*/
 	void					Precompile(CByteArray &pcResult) const;
 
 protected:

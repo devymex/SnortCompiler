@@ -81,16 +81,6 @@ void GroupOnlyOneSig(const std::vector<CUnsignedArray> &SigsVec, std::vector<ulo
 	}
 }
 
-/* try to merge dfa in one group, merge if success, otherwise seperate the group into two
-
-Arguments:
-  res					the compile result, the merged dfa will be pushed into the res's dfa table
-  groups				the group result
-
-Returns:				nothing
-
-*/
-
 struct DFASIZECOMP
 {
 	const CCompileResults *m_pRes;
@@ -101,7 +91,17 @@ struct DFASIZECOMP
 	}
 };
 
-void DfaSizeSort(CCompileResults &res, CGroups &groups)
+/* sort dfaids by dfa size
+
+Arguments:
+  res					the compile result, the merged dfa will be pushed into the res's dfa table
+  groups				the group result
+
+Returns:				nothing
+
+*/
+
+void DfaSizeSort(const CCompileResults &res, CGroups &groups)
 {
 	for (ulong i = 0; i < groups.Size(); ++i)
 	{
@@ -109,6 +109,16 @@ void DfaSizeSort(CCompileResults &res, CGroups &groups)
 		std::sort(pBeg, pBeg + groups[i].DfaIds.Size(), DFASIZECOMP(&res));
 	}
 }
+
+/* try to merge dfa in one group, merge if success, otherwise seperate the group into two
+
+Arguments:
+  res					the compile result, the merged dfa will be pushed into the res's dfa table
+  groups				the group result
+
+Returns:				nothing
+
+*/
 
 void Merge(CCompileResults &res, CGroups &groups)
 {

@@ -30,8 +30,8 @@ public:
 
 	// Overided operators
 	CStringArray&		operator =	(const CStringArray &other);
-	CDllString&			operator[]	(ulong nIdx);
-	const CDllString&	operator[]	(ulong nIdx) const;
+	CDllString&			operator[]	(ulong ulIdx);
+	const CDllString&	operator[]	(ulong ulIdx) const;
 
 	// Normal operations
 	ulong				Size() const;

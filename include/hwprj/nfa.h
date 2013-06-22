@@ -39,8 +39,16 @@ public:
 	void			PushBack(const CNfaRow &row);
 	void			PopBack();
 
+	/*	函数名：SortAll
+	**	功能：NFA结构为矩阵，矩阵行表示NFA状态，矩阵列表示跳转字符
+	**	将NFA每一个状态中的元素排序
+	*/
 	void			SortAll();
 
+	/*	函数名：Dump
+	**	参数：pFile-输出文件路径
+	**	功能：将一个NFA输出到文件中
+	*/
 	void			Dump(const char *pFile) const;
 
 protected:

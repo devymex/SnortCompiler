@@ -7,6 +7,15 @@
 #else
 #define GROUPSHDR __declspec(dllexport)
 #endif
+/*
+**	@file		groups.h
+**
+**	@author		Lab 435, Xidian University
+**
+**	@brief		Definition of the CGroups class
+**
+**
+*/
 
 #ifndef GROUPSHDR_DS
 class GROUPVEC;
