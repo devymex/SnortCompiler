@@ -36,8 +36,19 @@ COMPILERHDR void ParseRuleFile(const char *pFileName, RECIEVER recv, void *lpUse
 			for(STRINGVEC_ITER i = rules.begin(); i != rules.end(); ++i)
 			{
 				g_log << "Compiling: " << i - rules.begin() + 1 << g_log.nl;
-				i->erase(i->begin(), find(i->begin(), i->end(), '(') + 1);
-				i->erase(find(i->rbegin(), i->rend(), ')').base() - 1, i->end());
+				STRING_ITER iBra = std::find(i->begin(), i->end(), '(');
+				if (iBra == i->end())
+				{
+					TTHROW(TI_INVALIDDATA);
+				}
+				i->erase(i->begin(), iBra + 1);
+
+				iBra = std::find(i->rbegin(), i->rend(), ')').base();
+				if (iBra == i->rend().base())
+				{
+					TTHROW(TI_INVALIDDATA);
+				}
+				i->erase(iBra - 1, i->end());
 
 				CSnortRule snortRule;
 				try
