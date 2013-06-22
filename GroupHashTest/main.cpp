@@ -153,6 +153,7 @@ int main()
 	//}
 	//fout.clear();
 	//fout.close();
+	//std::cout << HashResMap.size() << std::endl;
 
 	system("pause");
 	return 0;

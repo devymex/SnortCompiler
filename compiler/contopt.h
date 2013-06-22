@@ -3,10 +3,10 @@
 **
 **	@author		Lab 435, Xidian University
 **
-**	@brief		Declaration of the CRuleOption class
+**	@brief		Declaration of the CContentOption class
 **
-**	Extract relevant attribute of a rule, 
-**	such as "content", "pcre" and "uricontent".
+**	inherit CRuleOption class
+**	process “content” attribute in a Snort rule
 **
 */
 
@@ -33,9 +33,22 @@ public:
 
 	CContentOption&			operator = (const CContentOption &other);
 
+
+	/*	函数名：ToPcre
+	**	参数：pcreOpt-PCRE链类型
+	**	功能：将content及其修饰选项转换为PCRE链
+	*/
 	void					ToPcre(CPcreOption &pcreOpt) const;
 
+	/*	函数名：FromPattern
+	**	参数：strPat-Snort规则中content及其属性字符串
+	**	功能：解析Snort规则中的content选项及其属性
+	*/
 	virtual void			FromPattern(const CDllString &strPat);
+
+	/*	函数名：Clone
+	**	功能：复制当前content选项中内容
+	*/
 	virtual CRuleOption*	Clone() const;
 
 public:
