@@ -33,16 +33,19 @@ public:
 
 	ulong		Size() const;
 	void		Clear();
+
 	/*	函数名：Append
 	**	参数：另一个DfaIdSet
 	**	功能：将另一个DfaIdSet连接到当前的DfaIdSet
 	*/
 	void		Append(const CDfaIdSet &other);
+
 	/*	函数名：AddDfaId
 	**	参数：dfaId-DFA编号
 	**	功能：添加DFA ID
 	*/
 	void		AddDfaId(DFAID dfaId);
+
 	/*	函数名：CopyTo
 	**	参数：idAry-DfaIdSet的数组
 	**	功能：将DfaIdSet中的数值复制给DfaIdSet的数组

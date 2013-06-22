@@ -47,7 +47,7 @@ public:
 	virtual void			FromPattern(const CDllString &strPat);
 
 	/*	函数名：Clone
-	**	功能：复制当前CContentOption内容
+	**	功能：复制当前content选项中内容
 	*/
 	virtual CRuleOption*	Clone() const;
 

@@ -48,6 +48,7 @@ public:
 	**	功能：获取DFA ID
 	*/
 	ulong				GetId();
+
 	/*	函数名：SetId
 	**	参数：ulId-unsigned long类型DFA编号
 	**	功能：设置DFA ID
@@ -58,11 +59,13 @@ public:
 	**	功能：获取DFA跳转字符的个数
 	*/
 	ushort				GetGroupCount() const;
+
 	/*	函数名：SetGroups
 	**	参数：pGroup-分类后的字符集
-	**	功能：设置某一DFA的跳转字符集合
+	**	功能：设置一个DFA的跳转字符集合
 	*/
 	void				SetGroups(byte *pGroup);
+
 	/*	函数名：Char2Group
 	**	参数：nIdx-字符集中的一个字符
 	**	功能：压缩字符集，原字符集为ASCII码，共256个，
@@ -74,11 +77,13 @@ public:
 	**	功能：获取DFA开始状态id
 	*/
 	STATEID				GetStartState() const;
+
 	/*	函数名：SetStartState
 	**	参数：id-DFA状态编号
 	**	功能：设置DFA开始状态id
 	*/
 	void				SetStartState(STATEID id);
+
 	/*	函数名：GetFinalStates
 	**	功能：获取DFA终态集合
 	*/
@@ -90,24 +95,31 @@ public:
 	**	NFA转化为DFA，采用子集构造算法
 	*/
 	ulong				FromNFA(const CNfa &nfa);
+
 	/*	函数名：Minimize
 	**	功能：最小化DFA的状态数，采用Hopcrof算法（1976）
 	*/
 	ulong				Minimize();
+
+	/*	函数名：MergeColumn
+	**	功能：NFA转化为DFA后，再一次压缩字符集，以减少存储空间
+	*/
 	void				MergeColumn();
 
 	/*	函数名：CalcStoreSize
 	**	功能：计算一个DFA需要的存储空间大小
 	*/
 	ulong				CalcStoreSize() const;
+
 	/*	函数名：Save
 	**	参数：beg-DFA的二进制字节流
 	**	功能：将一个DFA以unsigned char*类型存入内存
 	*/
 	void				Save(byte *beg);
+
 	/*	函数名：Load
 	**	参数：beg-DFA的二进制字节流
-	**	功能：从内存读取一个DFA，存入unsigned char*类型变量中
+	**	功能：从内存读取一个DFA，存入unsigned char*类型变量
 	*/
 	void				Load(byte *beg);
 
@@ -116,6 +128,7 @@ public:
 	**	功能：处理数据包与DFA的匹配过程
 	*/
 	ulong				Process(byte *ByteStream, ulong len, STATEARY &StaSet);
+
 	/*	函数名：Dump
 	**	参数：pFile-输出文件路径
 	**	功能：将一个DFA输出到文件中

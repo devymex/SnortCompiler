@@ -34,6 +34,9 @@ public:
 	void					PushBack(const CPcreOption &pcreOpt);
 	void					Resize(ulong nSize);
 
+	/*	函数名：GetSigs
+	**	功能：获取PCRE链中的signature
+	*/
 	CUnsignedArray&			GetSigs();
 	const CUnsignedArray&	GetSigs() const;
 

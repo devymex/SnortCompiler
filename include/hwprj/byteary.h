@@ -20,7 +20,7 @@ class DLLBYTEARY;
 #define BYTEARYHDR __declspec(dllexport)
 #endif
 
-/* Capsulate the std::string for dll using. */
+/* Ê¹ÓÃdll·â×°std::string */
 class BYTEARYHDR CByteArray
 {
 public:

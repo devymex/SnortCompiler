@@ -55,4 +55,8 @@ COMPILERHDR void ExtractSequence(const CByteArray &pcResult, std::vector<CByteAr
 
 COMPILERHDR void ExtractSignatures(const CByteArray &seqAry, CUnsignedArray &sigs);
 
+/*	函数名：CodeToNFA
+**	参数：pcResult-PCRE链，bFromBeg-判断pcre中开始位置是否包含"^"，nfa-一个CNfa类型的nfa
+**	功能：解析PCRE链，构造一个NFA
+*/
 COMPILERHDR void CodeToNFA(const CByteArray &pcResult, bool bFromBeg, CNfa &nfa);

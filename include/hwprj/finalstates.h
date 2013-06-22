@@ -36,6 +36,7 @@ public:
 	**	功能：终态集合中增加DFA终态的编号
 	*/
 	CDfaIdSet&			AddState(STATEID nStaId);
+
 	/*	函数名：Swap
 	**	参数：other-DFA终态集合
 	**	功能：将另一个DFA的终态集合替换当前DFA的终态集合
@@ -48,6 +49,7 @@ public:
 	*/
 	CDfaIdSet&			GetDfaIdSet(STATEID nStaId);
 	const CDfaIdSet&	GetDfaIdSet(STATEID nStaId) const;
+
 	/*	函数名：CountDfaIds
 	**	功能：计算DFA终态对应的DfaId的个数
 	*/
