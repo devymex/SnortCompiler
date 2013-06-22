@@ -1,4 +1,4 @@
-/**<summary>
+/*
 **	@file		common.h
 **
 **	@author		Lab 435, Xidian University
@@ -7,7 +7,7 @@
 **
 **	Common type defination, compile configurations and error codes
 **
-</summary>*/
+*/
 
 #pragma once
 
@@ -35,10 +35,3 @@ typedef ulong					SIGNATURE;
 /* error codes */
 #define SC_SUCCESS				ulong(0)
 #define SC_ERROR				ulong(-1)
-
-/**
-  * <summary>
-  * text 
- *  text2
-   *  </summary>
-*/
