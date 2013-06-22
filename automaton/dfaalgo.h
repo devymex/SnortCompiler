@@ -144,11 +144,11 @@ void ReleaseAbleTo(PARTSET &ps);
 
 void CalcAbleTo(STATEIDARY *pRevTbl, ulong nGrpNum, ulong nStaNum, PARTSET &ps);
 
+//void DfaColGroup(std::vector<CDfa> &dfas, byte* groups);
 /*
 **	This function groups the merged dfa's columns on the ground of
 **	the column groups of dfas to be merged.
 */
-//void DfaColGroup(std::vector<CDfa> &dfas, byte* groups);
 void DfaColGroup(CDfaArray &dfas, byte* groups);
 
 /*	this function marks the lastDfa's terminal states. */

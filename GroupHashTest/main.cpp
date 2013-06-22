@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <sstream>
 #include <tchar.h>
+#include <filesystem>
 
 #include <hwprj\ctimer.h>
 #include <hwprj\unsary.h>
@@ -15,6 +16,64 @@
 
 int main()
 {
+	// Defina a path object to express a directory
+	std::tr2::sys::path rulePath("D:\\Projects\\VS2012\\SnortCompiler\\rules\\");
+	// Construct a directory iterator for visit this path.
+	std::tr2::sys::directory_iterator iDirCur(rulePath);
+	//the end iterator for this path.
+	std::tr2::sys::directory_iterator iDirEnd;
+
+	CCompileResults result;
+	char szExt[] = {'s', 'e', 'l', 'u', 'r'};
+	for (; iDirCur != iDirEnd; ++iDirCur)
+	{
+		const std::tr2::sys::path &curPath = *iDirCur;
+		if (!std::tr2::sys::is_directory(curPath))
+		{
+			std::string strFullName = rulePath.directory_string();
+			strFullName.append(curPath.directory_string());
+			if (strFullName.size() < 5)
+			{
+				continue;
+			}
+			std::string::reverse_iterator rb = strFullName.rbegin();
+			std::string::reverse_iterator re = rb + 5;
+			std::string::reverse_iterator ri = rb;
+			for (; ri != re; ++ri)
+			{
+				if (tolower(*ri) != tolower(szExt[ri - rb]))
+				{
+					break;
+				}
+			}
+			if (ri != re)
+			{
+				continue;
+			}
+			std::cout << strFullName << std::endl;
+			try
+			{
+				CompileRuleFile(strFullName.c_str(), result);
+			}
+			catch (CTrace &e)
+			{
+				std::cout << e.File() << " - " << e.Line() << ": " << e.What() << std::endl;
+				system("pause");
+			}
+		}
+	}
+	result.WriteToFile("..\\result.cdt");
+
+	ulong ulRuleCnt = 0;
+	for (ulong i = 0; i < result.GetSidDfaIds().Size(); ++i)
+	{
+		if (result.GetSidDfaIds()[i].m_nResult == COMPILEDINFO::RES_SUCCESS)
+		{
+			++ulRuleCnt;
+		}
+	}
+	std::cout << result.GetSidDfaIds().Size() << ": " << ulRuleCnt << std::endl;
+
 	//CCompileResults result;
 	//result.ReadFromFile("..\\result.cdt");
 
@@ -41,35 +100,35 @@ int main()
 	//foutMerge.clear();
 	//foutMerge.close();
 
-	CTimer ctime;
-	CCompileResults result;
-	try
-	{
-		CompileRuleFile("..\\allrules.rule", result);
-	}
-	catch (CTrace &e)
-	{
-		std::cout << e.File() << " - " << e.Line() << ": " << e.What() << std::endl;
-		system("pause");
-	}
-	result.WriteToFile("..\\result.cdt");
-
-	//result.ReadFromFile("..\\result.cdt");
-
-	CGroupRes groupRes;
-	Grouping(result, groupRes);
-	groupRes.WriteToFile("..\\GroupResult.cdt");
-	//groupRes.ReadFromFile("..\\GroupResult.cdt");
-	HASHRES HashResMap;
-	HashMapping(groupRes, HashResMap);
-	groupRes.WriteToFile("..\\FinalResult.cdt");
-	//for (ulong i = 0; i < groupRes.GetDfaTable().Size(); ++i)
+	//CTimer ctime;
+	//CCompileResults result;
+	//try
 	//{
-	//	groupRes.GetDfaTable()[i].MergeColumn();
+	//	CompileRuleFile("..\\allrules.rule", result);
 	//}
-	std::cout << "Total time: " << ctime.Reset() << std::endl;
-	std::cout << groupRes.GetGroups().Size() << std::endl;
-	std::cout << HashResMap.size() << std::endl;
+	//catch (CTrace &e)
+	//{
+	//	std::cout << e.File() << " - " << e.Line() << ": " << e.What() << std::endl;
+	//	system("pause");
+	//}
+	//result.WriteToFile("..\\result.cdt");
+
+	////result.ReadFromFile("..\\result.cdt");
+
+	//CGroupRes groupRes;
+	//Grouping(result, groupRes);
+	//groupRes.WriteToFile("..\\GroupResult.cdt");
+	////groupRes.ReadFromFile("..\\GroupResult.cdt");
+	//HASHRES HashResMap;
+	//HashMapping(groupRes, HashResMap);
+	//groupRes.WriteToFile("..\\FinalResult.cdt");
+	////for (ulong i = 0; i < groupRes.GetDfaTable().Size(); ++i)
+	////{
+	////	groupRes.GetDfaTable()[i].MergeColumn();
+	////}
+	//std::cout << "Total time: " << ctime.Reset() << std::endl;
+	//std::cout << groupRes.GetGroups().Size() << std::endl;
+	//std::cout << HashResMap.size() << std::endl;
 
 	//CCompileResults result;
 	//result.ReadFromFile("..\\result.cdt");
@@ -148,6 +207,7 @@ int main()
 	//}
 	//fout.clear();
 	//fout.close();
+	//std::cout << HashResMap.size() << std::endl;
 
 	system("pause");
 	return 0;

@@ -58,9 +58,9 @@ DFAHDR CDfa& CDfa::operator=(const CDfa &other)
 {
 	TASSERT(other.m_pDfa != null);
 
-	m_nId = other.m_nId;
-	m_usColNum = other.m_usColNum;
-	m_nStartId = other.m_nStartId;
+	m_nId		= other.m_nId;
+	m_usColNum	= other.m_usColNum;
+	m_nStartId	= other.m_nStartId;
 	CopyMemory(m_pGroup, other.m_pGroup, sizeof(m_pGroup));
 	try
 	{

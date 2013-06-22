@@ -35,6 +35,9 @@ public:
 	CUnsignedArray&			operator []	(ulong ulCol);
 	const CUnsignedArray&	operator []	(ulong ulCol) const;
 	
+	/*	函数名：SortAll
+	**	功能：将NFA每一个状态中的元素排序
+	*/
 	void					SortAll();
 
 protected:

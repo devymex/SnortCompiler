@@ -22,11 +22,11 @@
 
 struct PARSEFLAG {
 	typedef ulong TYPE;
-	static const TYPE PARSE_DEFAULT		= 0x0000;
-	static const TYPE PARSE_HASBYTE		= 0x0001;
-	static const TYPE PARSE_HASNOT		= 0x0002;
-	static const TYPE PARSE_ERROR		= 0x0003;
-	static const TYPE PARSE_EMPTY		= 0x0004;
+	static const TYPE PARSE_SUCCESS		= 0;
+	static const TYPE PARSE_HASBYTE		= (1 << 0);
+	static const TYPE PARSE_HASNOT		= (1 << 1);
+	static const TYPE PARSE_ERROR		= (1 << 2);
+	static const TYPE PARSE_EMPTY		= (1 << 3);
 };
 
 struct PARSERESULT
@@ -38,12 +38,25 @@ struct PARSERESULT
 
 typedef void (__stdcall *RECIEVER)(const PARSERESULT &parseRes, void *lpUser);
 
+/*	函数名：ParseRuleFile
+**	参数：pFileName-输入规则文件路径，recv-回调函数解析规则，lpUser-输出规则对应的DFA
+**	功能：解析规则
+*/
 COMPILERHDR void ParseRuleFile(const char *pFileName, RECIEVER recv, void *lpUser);
 
+/*	接口函数：CompileRuleFile
+**	参数：pFileName-输入规则文件路径，compRes-输出规则对应的DFA
+**	功能：处理Snort规则，将规则中的content、uricontent、pcre选项编写为PCRE链
+**	将PCRE链编译为DFA，并提取连续4字节长度signature
+*/
 COMPILERHDR void CompileRuleFile(const char *pFileName, CCompileResults &compRes);
 
 COMPILERHDR void ExtractSequence(const CByteArray &pcResult, std::vector<CByteArray> &seqAry);
 
 COMPILERHDR void ExtractSignatures(const CByteArray &seqAry, CUnsignedArray &sigs);
 
+/*	函数名：CodeToNFA
+**	参数：pcResult-PCRE链，bFromBeg-判断pcre中开始位置是否包含"^"，nfa-一个CNfa类型的nfa
+**	功能：解析PCRE链，构造一个NFA
+*/
 COMPILERHDR void CodeToNFA(const CByteArray &pcResult, bool bFromBeg, CNfa &nfa);

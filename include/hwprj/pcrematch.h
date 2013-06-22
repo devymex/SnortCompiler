@@ -15,4 +15,8 @@
 #define PCREMATCHHDR __declspec(dllexport)
 #endif
 
-PCREMATCHHDR bool PcreMatch(const char* src, int length,  CPcreOption &pcreopt, int &Pos);
+/*	函数名：PcreMatch
+**	参数：src-输入数据包二进制字节流，length-数据包长度，Regex-输入PCRE，Pos-匹配位置
+**	功能：判断PCRE与数据包是否匹配，返回true或者false
+*/
+PCREMATCHHDR bool PcreMatch(const char* src, int length, CPcreOption &pcreopt, int &Pos);
