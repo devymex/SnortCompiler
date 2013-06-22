@@ -91,22 +91,22 @@ Returns:				nothing
 
 */
 
-void Sort(CCompileResults &res, CGroups &groups)
+struct DFASIZECOMP
+{
+	const CCompileResults *m_pRes;
+	DFASIZECOMP(const CCompileResults *pRes) : m_pRes(pRes) {}
+	bool operator()(ulong idx1, ulong idx2)
+	{
+		return m_pRes->GetDfaTable()[idx1].Size() < m_pRes->GetDfaTable()[idx2].Size();
+	}
+};
+
+void DfaSizeSort(CCompileResults &res, CGroups &groups)
 {
 	for (ulong i = 0; i < groups.Size(); ++i)
 	{
-		for (ulong j = 0; j < groups[i].DfaIds.Size(); ++j)
-		{
-			ulong idx1 = groups[i].DfaIds[j];
-			for (ulong k = j + 1; k < groups[i].DfaIds.Size(); ++k)
-			{
-				ulong idx2 = groups[i].DfaIds[k];
-				if (res.GetDfaTable()[idx1].Size() > res.GetDfaTable()[idx2].Size())
-				{
-					std::swap(idx1, idx2);
-				}
-			}
-		}
+		ulong *pBeg = groups[i].DfaIds.Data();
+		std::sort(pBeg, pBeg + groups[i].DfaIds.Size(), DFASIZECOMP(&res));
 	}
 }
 
@@ -337,13 +337,13 @@ Returns:				the used upper limit of the signatures
 
 ulong AvailableNum(const std::vector<SIGNATURE> &vecSigs)
 {
-	if (vecSigs.size() <= 1)
+	if (vecSigs.size() <= 2)
 	{
 		return 0;
 	}
 	else
 	{
-		return vecSigs.size() - 2;
+		return vecSigs.size() - 3;
 	}
 }
 
@@ -639,7 +639,7 @@ GROUPINGHDR void Grouping(CCompileResults &res, CGroupRes &groupRes)
 
 	//Merge dfa with only one signature...
 	g_log << "Merge dfa with only one signature..." << g_log.nl;
-	//Sort(res, groups);
+	DfaSizeSort(res, groups);
 	Merge(res, groups);
 	g_log << "Completed in " << t1.Reset() << " Sec." << g_log.nl << g_log.nl;
 
@@ -652,7 +652,7 @@ GROUPINGHDR void Grouping(CCompileResults &res, CGroupRes &groupRes)
 	g_log << "Build group which has the same signatures..." << g_log.nl;
 	CGroups newGroups;
 	BuildGroupBySig(SigsVec, newGroups, vecWaitForGroup);
-	//Sort(res, newGroups);
+	//DfaSizeSort(res, newGroups);
 	Merge(res, newGroups);
 	g_log << "Completed in " << t1.Reset() << " Sec." << g_log.nl << g_log.nl;
 

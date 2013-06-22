@@ -29,6 +29,8 @@ Returns:				hash slot
 
 */
 
+SIGHASH hash;
+
 //one point in the adjust path
 struct STATION
 {
@@ -604,6 +606,7 @@ void ClearUpHashRes(std::vector<GROUPHASH> &vecGroups, RESULTMAP &result, CGroup
 			}
 		}
 	}
+	groupRes.SetBucketCnt(hash.nBucketCnt);
 }
 
 /* mapping groups into hash table and combine groups in some situation to reduce 

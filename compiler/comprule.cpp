@@ -324,14 +324,6 @@ void Rule2RegRule(const CSnortRule &rule, CRegRule &regRule)
 	{
 		regRule.PopBack();
 	}
-
-	for(ulong i = 0; i < regRule.Size(); ++i)
-	{
-		if(regRule[i].GetSigs().Size() > 1)
-		{
-			regRule[i].GetSigs().Unique();
-		}
-	}
 }
 
 

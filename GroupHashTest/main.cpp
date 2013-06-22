@@ -41,6 +41,17 @@ int main()
 	//foutMerge.clear();
 	//foutMerge.close();
 
+	//CGroupRes groupRes;
+	//groupRes.ReadFromFile("..\\FinalResult.cdt");
+	//HASHRES HashResMap;
+	//for (ulong i = 0; i < groupRes.GetGroups().Size(); ++i)
+	//{
+	//	HASHNODE node;
+	//	node.m_sig = groupRes.GetGroups()[i].currSig;
+	//	node.m_nDfaId = groupRes.GetGroups()[i].mergeDfaId;
+	//	HashResMap[hash(groupRes.GetGroups()[i].currSig)].push_back(node);
+	//}
+
 	CTimer ctime;
 	CCompileResults result;
 	try

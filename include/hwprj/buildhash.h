@@ -45,7 +45,9 @@ struct SIGHASH
 
 		return (oneSig % nBucketCnt);
 	}
-}hash;
+};
+
+extern SIGHASH hash;
 
 typedef std::map<ulong, std::vector<HASHNODE>> HASHRES;
 

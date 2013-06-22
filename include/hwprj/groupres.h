@@ -17,6 +17,7 @@ protected:
 	CDfaArray m_dfaTbl;
 	CSidDfaIds m_sidDfaIds; 
 	CGroups m_groups;
+	ulong nBucketCnt;
 public:
 	CDfaArray &GetDfaTable();
 	CSidDfaIds &GetSidDfaIds();
@@ -24,6 +25,9 @@ public:
 	const CDfaArray &GetDfaTable() const;
 	const CSidDfaIds &GetSidDfaIds() const;
 	const CGroups &GetGroups() const;
+	ulong &GetBucketCnt();
+	const ulong &GetBucketCnt() const;
+	void SetBucketCnt(ulong nBucketSize);
 	ulong WriteToFile(const char *filename);
 	ulong ReadFromFile(const char *filename);
 };

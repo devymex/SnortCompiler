@@ -105,7 +105,7 @@ struct INCLUDESEQUENCE
 {
 	const CByteArray *m_pSeq;
 	bool m_bCaseless;
-	INCLUDESEQUENCE(const CByteArray &seq, bool bCaseless = false)
+	INCLUDESEQUENCE(const CByteArray &seq, bool bCaseless)
 		: m_pSeq(&seq), m_bCaseless(bCaseless)
 	{
 	}
