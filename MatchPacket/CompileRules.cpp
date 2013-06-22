@@ -6,15 +6,29 @@ typedef std::vector<CHAINCOMPDATA>		RULECOMPDATA;
 
 void __stdcall MyProcess(const PARSERESULT &parseRes, void *lpParam)
 {
-	REGRULESMAP &rulesmap = *(REGRULESMAP*)lpParam;
-	
-	if(parseRes.ulFlag == PARSEFLAG::PARSE_DEFAULT)
+	CByteArray byteary;
+	if (parseRes.ulFlag == PARSEFLAG::PARSE_SUCCESS)
 	{
-		RULECOMPDATA1 ruleCompData;
-		rulesmap.result.resize(rulesmap.result.size() + 1);
-		rulesmap.result.back().m_nSid = parseRes.ulSid;
+		REGRULESMAP &rulesmap = *(REGRULESMAP*)lpParam;
+		rulesmap.result.push_back(REGRULES());
 		rulesmap.result.back().regrule = parseRes.regRule;
-		ProcessRule(rulesmap.result.back().regrule, ruleCompData);
+		rulesmap.result.back().m_nSid = parseRes.ulSid;
+		CRegRule &rrule = rulesmap.result.back().regrule;
+
+		for(size_t i = 0; i < rrule.Size(); ++i)
+		{
+			for(size_t j = 0; j < rrule[i].Size(); ++j)
+			{
+				std::vector<CByteArray> seqAry;
+				rrule[i][j].Precompile(byteary);
+				ExtractSequence(byteary, seqAry);
+				for(size_t k = 0; k < seqAry.size(); ++k)
+				{
+					ExtractSignatures(seqAry[k], rrule[i].GetSigs());
+				}
+			}
+			rrule[i].GetSigs().Unique();
+		}
 	}
 }
 

@@ -21,6 +21,7 @@ void main()
 	CGroupRes &groupRes = dfamch.mergedDfas;
 	HASHRES &hashResMap = dfamch.hashtable;
 	groupRes.ReadFromFile("..\\..\\output\\FinalResult.cdt");
+	hash.nBucketCnt = groupRes.GetBucketCnt();
 	for(size_t i = 0; i < groupRes.GetGroups().Size(); ++i)
 	{
 		HASHNODE hashnode;
@@ -28,7 +29,6 @@ void main()
 		hashnode.m_sig = groupRes.GetGroups()[i].currSig;
 		hashResMap[hash(groupRes.GetGroups()[i].currSig)].push_back(hashnode);
 	}
-
 
 	DfaidSidMap(groupRes, dfamch.dIdSId);
 	REGRULESMAP &rulesmap = pcredfa.rulesmap;
