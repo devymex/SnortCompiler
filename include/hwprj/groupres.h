@@ -29,6 +29,7 @@ protected:
 	CDfaArray m_dfaTbl;
 	CSidDfaIds m_sidDfaIds; 
 	CGroups m_groups;
+	ulong nBucketCnt;
 public:
 	/*	函数名：GetDfaTable
 	**	功能：获取DFA集合
@@ -49,6 +50,18 @@ public:
 	const CSidDfaIds &GetSidDfaIds() const;
 	const CGroups &GetGroups() const;
 
+	/*	函数名：GetBucketCnt
+	**	功能：获取hash槽数
+	*/
+	ulong &GetBucketCnt();
+	const ulong &GetBucketCnt() const;
+
+	/*	函数名：GetBucketCnt
+	**	参数：nBucketSize-hash槽数
+	**	功能：设置hash槽数,便于把hash槽数写入文件
+	*/
+	void SetBucketCnt(ulong nBucketSize);
+	
 	/*	函数名：WriteToFile
 	**	参数：filename-输出文件路径
 	**	功能：将分组结果输出文件

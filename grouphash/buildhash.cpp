@@ -29,23 +29,7 @@ Returns:				hash slot
 
 */
 
-struct SIGHASH
-{
-	ulong nBucketCnt;
-	ulong operator()(const SIGNATURE &oneSig)
-	{
-		//const ulong _FNV_offset_basis = 2166136261U;
-		//const ulong _FNV_prime = 16777619U;
-
-		//ulong _Val = _FNV_offset_basis;
-		//_Val ^= oneSig;
-		//_Val *= _FNV_prime;
-
-		//return (_Val % nBucketCnt);
-
-		return (oneSig % nBucketCnt);
-	}
-}hash;
+HASHMAPHDR SIGHASH hash;
 
 //one point in the adjust path
 struct STATION
@@ -622,6 +606,7 @@ void ClearUpHashRes(std::vector<GROUPHASH> &vecGroups, RESULTMAP &result, CGroup
 			}
 		}
 	}
+	groupRes.SetBucketCnt(hash.nBucketCnt);
 }
 
 /* mapping groups into hash table and combine groups in some situation to reduce 
