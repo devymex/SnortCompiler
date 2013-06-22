@@ -45,7 +45,6 @@ public:
 	void			Append(const CDllString &other);
 	char			Back() const;
 	void			PushBack(char nChar);
-	pcstr			GetStr() const;
 	const char*		Data() const;
 
 protected:
