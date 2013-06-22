@@ -44,6 +44,7 @@ int main()
 
 	CTimer ctime;
 	CCompileResults result;
+	std::cout << "Begin compile ... " << std::endl;
 	try
 	{
 		CompileRuleFile("..\\allrules.rule", result);
@@ -53,22 +54,39 @@ int main()
 		std::cout << e.File() << " - " << e.Line() << ": " << e.What() << std::endl;
 		system("pause");
 	}
-	result.WriteToFile("..\\result.cdt");
+	result.WriteToFile("..\\result_new.cdt");
 
+	std::cout << "Compile finished!" << std::endl;
 	//result.ReadFromFile("..\\result.cdt");
-
+	std::cout << "Begin grouping ... " << std::endl;
 	CGroupRes groupRes;
 	Grouping(result, groupRes);
-	groupRes.WriteToFile("..\\GroupResult.cdt");
+	groupRes.WriteToFile("..\\GroupResult_new.cdt");
 	//groupRes.ReadFromFile("..\\GroupResult.cdt");
 	HASHRES HashResMap;
 	HashMapping(groupRes, HashResMap);
 
-	groupRes.WriteToFile("..\\FinalResult.cdt");
-	for (ulong i = 0; i < groupRes.GetDfaTable().Size(); ++i)
+	groupRes.WriteToFile("..\\FinalResult_new.cdt");
+	std::cout << "Group finished!" << std::endl;
+
+	//for (ulong i = 0; i < groupRes.GetDfaTable().Size(); ++i)
+	//{
+	//	groupRes.GetDfaTable()[i].MergeColumn();
+	//}
+
+
+	std::ofstream fout1("F:\\cppProject\\huawei\\PreciseMatch\\output\\RowMergeDfasSize.txt");
+	if(!fout1)
 	{
-		groupRes.GetDfaTable()[i].MergeColumn();
+		std::cout << "Open file failure!" << std::endl;
 	}
+	fout1 << "dfa\t" << "dfa states num" << std::endl;
+	for(ulong i = 0; i < groupRes.GetDfaTable().Size(); ++i)
+	{
+		fout1 << i << "\t" << groupRes.GetDfaTable()[i].Size() << std::endl;
+	}
+	fout1.close();
+
 	std::cout << "Total time: " << ctime.Reset() << std::endl;
 	std::cout << groupRes.GetGroups().Size() << std::endl;
 	std::cout << HashResMap.size() << std::endl;
