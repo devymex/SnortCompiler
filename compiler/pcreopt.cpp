@@ -216,6 +216,7 @@ SNORTRULEHDR void CPcreOption::Precompile(CByteArray &pcResult) const
 		TTHROW(TI_INVALIDDATA);
 	}
 
+	pcResult.Clear();
 	unsigned int size;
 	unsigned short name_table_offset;
 	size = *((unsigned int*)re + 1);

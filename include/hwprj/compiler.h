@@ -22,11 +22,11 @@
 
 struct PARSEFLAG {
 	typedef ulong TYPE;
-	static const TYPE PARSE_DEFAULT		= 0x0000;
-	static const TYPE PARSE_HASBYTE		= 0x0001;
-	static const TYPE PARSE_HASNOT		= 0x0002;
-	static const TYPE PARSE_ERROR		= 0x0003;
-	static const TYPE PARSE_EMPTY		= 0x0004;
+	static const TYPE PARSE_SUCCESS		= 0;
+	static const TYPE PARSE_HASBYTE		= (1 << 0);
+	static const TYPE PARSE_HASNOT		= (1 << 1);
+	static const TYPE PARSE_ERROR		= (1 << 2);
+	static const TYPE PARSE_EMPTY		= (1 << 3);
 };
 
 struct PARSERESULT
