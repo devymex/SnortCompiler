@@ -29,7 +29,7 @@ Returns:				hash slot
 
 */
 
-SIGHASH hash;
+HASHMAPHDR SIGHASH hash;
 
 //one point in the adjust path
 struct STATION
