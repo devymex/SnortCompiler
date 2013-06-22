@@ -32,6 +32,10 @@
 *.txt
 *.user
 *.vsp
+*.rules
+*.BASE
+*.REMOTE
+*.conf
 
 bin/*
 Debug/*
@@ -40,7 +44,6 @@ x64/*
 input/*
 output/*
 ipch/*
+
 */Debug/*
 */Release/*
-*.BASE
-*.REMOTE
