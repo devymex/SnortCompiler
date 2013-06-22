@@ -22,8 +22,9 @@ typedef ulong					DFAID;
 typedef ulong					SIGNATURE;
 
 #ifndef null
-#define null	0
+#define null					0
 #endif
+
 /* compile configurations */
 #define SC_MAXDFASIZE			255
 #define SC_DFACOLCNT			256
@@ -32,6 +33,6 @@ typedef ulong					SIGNATURE;
 #define SC_NFAROWRESERV			500
 
 /* error codes */
-#define SC_SUCCESS		ulong(0)
-#define SC_ERROR		ulong(-1)
+#define SC_SUCCESS				ulong(0)
+#define SC_ERROR				ulong(-1)
 
