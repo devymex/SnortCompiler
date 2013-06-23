@@ -33,10 +33,10 @@ public:
 	virtual ~CDfa();
 
 	CDfa& operator =	(const CDfa &other);
-	CDfaRow& operator []	(STATEID nIdx);
-	const CDfaRow& operator []	(STATEID nIdx) const;
+	CDfaRow& operator [] (STATEID nIdx);
+	const CDfaRow& operator [] (STATEID nIdx) const;
 
-	ulong				Size() const;
+	ulong Size() const;
 	CDfaRow& Back();
 	void Reserve(ulong ulSize);
 	void Resize(ulong ulSize, ulong ulColNum);
@@ -44,7 +44,7 @@ public:
 	void PushBack(CDfaRow &sta);
 
 	/// @brief		获取DFA的编号。
-	ulong				GetId();
+	ulong GetId();
 
 	/// @brief		设置DFA的编号。
 	/// @param[in] ulId DFA编号。

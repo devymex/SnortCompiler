@@ -27,11 +27,11 @@ public:
 	CDfaArray(const CDfaArray& other);
 	virtual ~CDfaArray();
 
-	CDfaArray& operator =	(const CDfaArray &other);
-	CDfa& operator []	(ulong ulIdx);
-	const CDfa& operator []	(ulong ulIdx) const;
+	CDfaArray& operator = (const CDfaArray &other);
+	CDfa& operator [] (ulong ulIdx);
+	const CDfa& operator [] (ulong ulIdx) const;
 
-	ulong			Size() const;
+	ulong Size() const;
 	void Clear();
 	void Reserve(ulong ulCount);
 	void Resize(ulong ulSize);
