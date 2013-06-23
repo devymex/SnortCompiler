@@ -1,12 +1,7 @@
 /*!
-* @file		dfaalgo.h
-**
+* @file			dfaalgo.h
 * @author		Lab 435, Xidian University
-**
-* @brief			Functions declaration of dfa's algorithms
-**
-* Includes empty closure etc.
-**
+* @brief		DFA的算法的函数声明
 */
 
 #include <hwprj\common.h>
