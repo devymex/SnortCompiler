@@ -1,8 +1,7 @@
 /*!
-* @file		dfa.h
+* @file			dfa.h
 * @author		Lab 435, Xidian University
-* @brief		Deterministic Finite Automaton
-* Declaration of the CDfa class
+* @brief		定义了CDfa类，用以表示DFA的数据结构
 */
 
 #pragma once
@@ -23,8 +22,8 @@ typedef CUnsignedArray STATEARY;
 
 /*!
 * @brief		实现DFA数据结构及相关算法
-* 封装了CDfaRow的动态数组、始态编号以及终态集合等。实现的算法包括：nfa的确定化、\
-* dfa的最小化、字符集的压缩等。
+* @remark		封装了CDfaRow的动态数组、始态编号以及终态集合等。实现的算法包括：
+*				nfa的确定化、dfa的最小化、字符集的压缩等。
 */
 class DFAHDR CDfa
 {
