@@ -1,8 +1,8 @@
-/*************************************************
+/*!************************************************
 *		Perl-Compatible Regular Expressions		 *
 *************************************************/
 
-/* PCRE is a library of functions to support regular expressions whose syntax
+/*! PCRE is a library of functions to support regular expressions whose syntax
 and semantics are as close as possible to those of the Perl 5 language.
 
 							Written by Philip Hazel
@@ -38,24 +38,24 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-/* This module contains the external function pcre_config(). */
+/*! This module contains the external function pcre_config(). */
 
 
 //#ifdef HAVE_CONFIG_H
 #include "config.h"
 //#endif
 
-/* Keep the original link size. */
+/*! Keep the original link size. */
 static int real_link_size = LINK_SIZE;
 
 #include "pcre_internal.h"
 
 
-/*************************************************
+/*!************************************************
 * Return info about what features are configured *
 *************************************************/
 
-/* This function has an extensible interface so that additional items can be
+/*! This function has an extensible interface so that additional items can be
 added compatibly.
 
 Arguments:
@@ -183,4 +183,4 @@ switch (what)
 return 0;
 }
 
-/* End of pcre_config.c */
+/*! End of pcre_config.c */

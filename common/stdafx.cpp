@@ -1,9 +1,9 @@
-/**
-**	@file		stdafx.cpp
+/*!*
+* @file		stdafx.cpp
 **
-**	@author	  Lab 435, Xidian University
+* @author	  Lab 435, Xidian University
 **
-**	@brief		Precompile header common library
+* @brief			Precompile header common library
 **
 */
 

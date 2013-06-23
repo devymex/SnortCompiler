@@ -1,13 +1,13 @@
-/*
-**	@file		nfarow.h
+/*!
+* @file		nfarow.h
 **
-**	@author		Lab 435, Xidian University
+* @author		Lab 435, Xidian University
 **
-**	@brief		Declaration of CNfaRow
+* @brief			Declaration of CNfaRow
 **
-**	Store a row for CNfa. Array of std::vector<ulong>. Each element of the
-**	array stand by a column that indicates the jumping character.
-**	Each number in vector is the next state would be jump to by the character.
+* Store a row for CNfa. Array of std::vector<ulong>. Each element of the
+* array stand by a column that indicates the jumping character.
+* Each number in vector is the next state would be jump to by the character.
 **
 */
 
@@ -31,15 +31,13 @@ public:
 	CNfaRow(const CNfaRow &other);
 	virtual ~CNfaRow();
 
-	CNfaRow&				operator =	(const CNfaRow &other);
-	CUnsignedArray&			operator []	(ulong ulCol);
-	const CUnsignedArray&	operator []	(ulong ulCol) const;
+	CNfaRow& operator = (const CNfaRow &other);
+	CUnsignedArray&	 operator [] (ulong ulCol);
+	const CUnsignedArray& operator [] (ulong ulCol) const;
 	
-	/*	函数名：SortAll
-	**	功能：将NFA每一个状态中的元素排序
-	*/
-	void					SortAll();
+	/// @brief		将NFA每一个状态中的元素排序
+	void SortAll();
 
 protected:
-	CUnsignedArray*			m_pDestSet;
+	CUnsignedArray* m_pDestSet;
 };

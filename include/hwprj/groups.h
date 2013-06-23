@@ -7,12 +7,12 @@
 #else
 #define GROUPSHDR __declspec(dllexport)
 #endif
-/*
-**	@file		groups.h
+/*!
+* @file		groups.h
 **
-**	@author		Lab 435, Xidian University
+* @author		Lab 435, Xidian University
 **
-**	@brief		Definition of the CGroups class
+* @brief			Definition of the CGroups class
 **
 **
 */

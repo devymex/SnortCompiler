@@ -1,17 +1,17 @@
-/**
-**	@file		buildhash.cpp
+/*!*
+* @file		buildhash.cpp
 **
-**	@author		Lab 435, Xidian University
+* @author		Lab 435, Xidian University
 **
-**	@brief		Support functions for mapping groups into hash table
+* @brief			Support functions for mapping groups into hash table
 **
-**	This implements mapping groups into hash table algorithm, the algorithm has 
-**	four steps in general. At first, it maps groups which has only one signature. 
-**	Then, it maps groups which has two or more signatures, for one group, select
-**	a signature which corresponds to a hash slot with least groups. Thirdly, 
-**	simple adjust for conflict hash slot. Finally, recursive adjust for conflict 
-**	hash slot. After that, try to combine two groups in a hash slot or two hash 
-**	slots in some situations.
+* This implements mapping groups into hash table algorithm, the algorithm has 
+* four steps in general. At first, it maps groups which has only one signature. 
+* Then, it maps groups which has two or more signatures, for one group, select
+* a signature which corresponds to a hash slot with least groups. Thirdly, 
+* simple adjust for conflict hash slot. Finally, recursive adjust for conflict 
+* hash slot. After that, try to combine two groups in a hash slot or two hash 
+* slots in some situations.
 **
 */
 
@@ -20,7 +20,7 @@
 #include <hwprj\buildhash.h>
 #include <hwprj\siddfaids.h>
 
-/* hash function, correspond to a hash slot for a given signature
+/*! hash function, correspond to a hash slot for a given signature
 
 Arguments:
   oneSig				signature
@@ -38,7 +38,7 @@ struct STATION
 	SIGNATURE sig;
 };
 
-/* find the adjust path
+/*! find the adjust path
 
 Arguments:
   vecGroups			the result of group
@@ -105,7 +105,7 @@ bool myFind(std::vector<GROUPHASH> &vecGroups, RESULTMAP &result, SIGNATURE &cur
 	}
 }
 
-/* recursive adjust for conflict hash slot.
+/*! recursive adjust for conflict hash slot.
 
 Arguments:
   vecGroups			    the result of group
@@ -179,7 +179,7 @@ void RecursiveAdjust(std::vector<GROUPHASH> &vecGroups, RESULTMAP &result)
 	}
 }
 
-/* simple adjust for conflict hash slot.
+/*! simple adjust for conflict hash slot.
 
 Arguments:
   vecGroups			    the result of group
@@ -227,7 +227,7 @@ void Adjust(std::vector<GROUPHASH> &vecGroups, RESULTMAP &result)
 	}
 }
 
-/* map groups which has two or more signatures, for one group, select
+/*! map groups which has two or more signatures, for one group, select
 a signature which corresponds to a hash slot with least groups
 
 Arguments:
@@ -267,7 +267,7 @@ void Optimize(std::vector<GROUPHASH> &vecGroups, const IDMAP &dmap, std::vector<
 	}
 }
 
-/* map groups into hash slot
+/*! map groups into hash slot
 
 Arguments:
   vecGroups			the result of group
@@ -308,7 +308,7 @@ void Mapping(std::vector<GROUPHASH> &vecGroups, const SIGNATUREMAP &gmap, const 
 	RecursiveAdjust(vecGroups, result);
 }
 
-/* extract common signatures from two groups
+/*! extract common signatures from two groups
 
 Arguments:
   g1					 the first group
@@ -340,7 +340,7 @@ void CommonSigs(const GROUPHASH &g1, const GROUPHASH &g2, std::vector<SIGNATURE>
 	}
 }
 
-/* update g1's signatures to the common signatures of g1 and g2
+/*! update g1's signatures to the common signatures of g1 and g2
 
 Arguments:
   g1					 the first group
@@ -361,7 +361,7 @@ void UpdateSigs(GROUPHASH &g1, const GROUPHASH &g2)
 	}
 }
 
-/* judge the group g1 and g2 can combine or not
+/*! judge the group g1 and g2 can combine or not
 
 Arguments:
   g1					 the first group
@@ -400,7 +400,7 @@ bool CanCombine(const GROUPHASH &g1, const GROUPHASH &g2, RESULTMAP &result, SIG
 	return false;
 }
 
-/* try to combine two groups in a hash slot or two hash slots in some situations.
+/*! try to combine two groups in a hash slot or two hash slots in some situations.
 
 Arguments:
   groupRes			 the merged dfa will be pushed into the groupRes's dfa table
@@ -543,7 +543,7 @@ void Combine(CGroupRes &groupRes, std::vector<GROUPHASH> &vecGroups, RESULTMAP &
 	}
 }
 
-/* clear up the group result and hash table
+/*! clear up the group result and hash table
 
 Arguments:
   vecGroups			the result of group
@@ -609,7 +609,7 @@ void ClearUpHashRes(std::vector<GROUPHASH> &vecGroups, RESULTMAP &result, CGroup
 	groupRes.SetBucketCnt(hash.nBucketCnt);
 }
 
-/* mapping groups into hash table and combine groups in some situation to reduce 
+/*! mapping groups into hash table and combine groups in some situation to reduce 
 number of groups
 
 Arguments:

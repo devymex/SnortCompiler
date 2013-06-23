@@ -1,9 +1,9 @@
-/**
-**	@file		unsary.h
+/*!*
+* @file		unsary.h
 **
-**	@author	  Lab 435, Xidian University
+* @author	  Lab 435, Xidian University
 **
-**	@brief		Impletation of the CDllString class
+* @brief			Impletation of the CDllString class
 **
 */
 

@@ -1,11 +1,11 @@
-/*
-**	@file		dfaarray.h
+/*!
+* @file		dfaarray.h
 **
-**	@author		Lab 435, Xidian University
+* @author		Lab 435, Xidian University
 **
-**	@brief		Declaration of the CDfaArray class
+* @brief			Declaration of the CDfaArray class
 **
-**	Store multiple CDfa
+* Store multiple CDfa
 **
 */
 

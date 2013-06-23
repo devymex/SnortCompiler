@@ -29,9 +29,6 @@
     <ClInclude Include="..\include\hwprj\unsary.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\hwprj\unsary.inc">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\hwprj\strary.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -39,6 +36,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\include\hwprj\byteary.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\hwprj\unsary.inl">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

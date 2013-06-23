@@ -1,11 +1,11 @@
-/*
-**	@file		nfa.h
+/*!
+* @file		nfa.h
 **
-**	@author		Lab 435, Xidian University
+* @author		Lab 435, Xidian University
 **
-**	@brief		Declaration of the CNfa class		
+* @brief			Declaration of the CNfa class		
 **
-**	Functions declaration of nfa's essential algorithm
+* Functions declaration of nfa's essential algorithm
 **
 */
 
@@ -18,7 +18,11 @@
 class NFAROWARY;
 #endif
 
-/* Store one nfa in table format. Each row of the table is a CNfaRow */
+/*!
+* @brief		实现NFA的数据结构。
+* NFA结构为矩阵，矩阵行表示NFA状态，矩阵列表示跳转字符，\
+* 矩阵中每一个元素代表经所在列指定的字符跳转到的下一组状态集合。
+*/
 class NFAHDR CNfa
 {
 public:
@@ -39,16 +43,12 @@ public:
 	void			PushBack(const CNfaRow &row);
 	void			PopBack();
 
-	/*	函数名：SortAll
-	**	功能：NFA结构为矩阵，矩阵行表示NFA状态，矩阵列表示跳转字符
-	**	将NFA每一个状态中的元素排序
-	*/
+	/// @brief		将NFA每一个状态中的元素排序。
+	///	
 	void			SortAll();
 
-	/*	函数名：Dump
-	**	参数：pFile-输出文件路径
-	**	功能：将一个NFA输出到文件中
-	*/
+	/// @brief		将一个NFA输出到文件中。
+	/// @param	pFile 输出文件路径。
 	void			Dump(const char *pFile) const;
 
 protected:

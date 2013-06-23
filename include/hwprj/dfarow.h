@@ -1,13 +1,13 @@
-/*
-**	@file		dfarow.h
+/*!
+* @file		dfarow.h
 **
-**	@author		Lab 435, Xidian University
+* @author		Lab 435, Xidian University
 **
-**	@brief		Declaration of the CDfaRow class
+* @brief			Declaration of the CDfaRow class
 **
-**	Store a row for CDfaRow. Array of std::vector<ulong>. Each element of the
-**	array stand by a column that indicates the jumping character.
-**	Each number in vector is the next state would be jump to by the character.
+* Store a row for CDfaRow. Array of std::vector<ulong>. Each element of the
+* array stand by a column that indicates the jumping character.
+* Each number in vector is the next state would be jump to by the character.
 **
 */
 
@@ -42,21 +42,15 @@ public:
 	ulong			Size() const;
 	void			Fill(STATEID nState);
 
-	/*	函数名：AddFlags
-	**	参数：nFlags-属性取值
-	**	功能：增加状态属性
-	*/
+	/// @brief		增加状态属性
+	/// @param nFlags 属性取值
 	void			AddFlags(STATEFLAG nFlags);
 
-	/*	函数名：SetFlags
-	**	参数：nFlags-属性取值
-	**	功能：设置状态属性
-	*/
+	/// @brief		设置状态属性
+	/// @param	nFlags 属性取值
 	void			SetFlags(STATEFLAG nFlags);
 
-	/*	函数名：GetFlags
-	**	功能：获取状态属性
-	*/
+	/// @brief		获取状态属性
 	STATEFLAG		GetFlags() const;
 
 protected:

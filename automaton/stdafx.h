@@ -1,16 +1,3 @@
-/*
-**	@file		stdafx.h
-**
-**	@author		Lab 435, Xidian University
-**
-**	@brief		Precompile header common library
-**
-*/
-
-//#define _CRTDBG_MAP_ALLOC
-//#include <stdlib.h>
-//#include <crtdbg.h>
-
 #include <iostream>
 #include <vector>
 #include <list>

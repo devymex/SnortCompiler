@@ -1,8 +1,8 @@
-/*************************************************
+/*!************************************************
 *		Perl-Compatible Regular Expressions		 *
 *************************************************/
 
-/* PCRE is a library of functions to support regular expressions whose syntax
+/*! PCRE is a library of functions to support regular expressions whose syntax
 and semantics are as close as possible to those of the Perl 5 language.
 
 							Written by Philip Hazel
@@ -38,7 +38,7 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-/* This module contains the external function pcre_maketables(), which builds
+/*! This module contains the external function pcre_maketables(), which builds
 character tables for PCRE in the current locale. The file is compiled on its
 own as part of the PCRE library. However, it is also included in the
 compilation of dftables.c, in which case the macro DFTABLES is defined. */
@@ -52,11 +52,11 @@ compilation of dftables.c, in which case the macro DFTABLES is defined. */
 #endif
 
 
-/*************************************************
+/*!************************************************
 *			Create PCRE character tables			*
 *************************************************/
 
-/* This function builds a set of character tables for use by PCRE and returns
+/*! This function builds a set of character tables for use by PCRE and returns
 a pointer to them. They are build using the ctype functions, and consequently
 their contents will depend upon the current locale setting. When compiled as
 part of the library, the store is obtained via PUBL(malloc)(), but when
@@ -89,15 +89,15 @@ yield = (unsigned char*)malloc(tables_length);
 if (yield == NULL) return NULL;
 p = yield;
 
-/* First comes the lower casing table */
+/*! First comes the lower casing table */
 
 for (i = 0; i < 256; i++) *p++ = tolower(i);
 
-/* Next the case-flipping table */
+/*! Next the case-flipping table */
 
 for (i = 0; i < 256; i++) *p++ = islower(i)? toupper(i) : tolower(i);
 
-/* Then the character class tables. Don't try to be clever and save effort on
+/*! Then the character class tables. Don't try to be clever and save effort on
 exclusive ones - in some locales things may be different. Note that the table
 for "space" includes everything "isspace" gives, including VT in the default
 locale. This makes it work for the POSIX class [:space:]. Note also that it is
@@ -123,7 +123,7 @@ for (i = 0; i < 256; i++)
   }
 p += cbit_length;
 
-/* Finally, the character type table. In this, we exclude VT from the white
+/*! Finally, the character type table. In this, we exclude VT from the white
 space chars, because Perl doesn't recognize it as such for \s and for comments
 within regexes. */
 
@@ -136,7 +136,7 @@ for (i = 0; i < 256; i++)
   if (isxdigit(i)) x += ctype_xdigit;
   if (isalnum(i) || i == '_') x += ctype_word;
 
-  /* Note: strchr includes the terminating zero in the characters it considers.
+  /*! Note: strchr includes the terminating zero in the characters it considers.
   In this instance, that is ok because we want binary zero to be flagged as a
   meta-character, which in this sense is any character that terminates a run
   of data characters. */
@@ -148,4 +148,4 @@ for (i = 0; i < 256; i++)
 return yield;
 }
 
-/* End of pcre_maketables.c */
+/*! End of pcre_maketables.c */

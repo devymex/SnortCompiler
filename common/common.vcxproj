@@ -101,7 +101,7 @@
     <ClInclude Include="..\include\hwprj\strary.h" />
     <ClInclude Include="..\include\hwprj\trace.h" />
     <ClInclude Include="..\include\hwprj\unsary.h" />
-    <ClInclude Include="..\include\hwprj\unsary.inc" />
+    <ClInclude Include="..\include\hwprj\unsary.inl" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>

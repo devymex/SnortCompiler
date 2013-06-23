@@ -1,12 +1,8 @@
-/*
-**	@file		dfa.h
-**
-**	@author		Lab 435, Xidian University
-**
-**	@brief		Deterministic Finite Automaton
-**
-**	Declaration of the CDfa class
-**
+/*!
+* @file		dfa.h
+* @author		Lab 435, Xidian University
+* @brief		Deterministic Finite Automaton
+* Declaration of the CDfa class
 */
 
 #pragma once
@@ -19,13 +15,17 @@
 
 #include <vector>
 
-/* Hiding the stl object in member of CDfa*/
 #ifndef DFAHDR_DS
 class DFAROWARY;
 #endif
 
 typedef CUnsignedArray STATEARY;
 
+/*!
+* @brief		实现DFA数据结构及相关算法
+* 封装了CDfaRow的动态数组、始态编号以及终态集合等。实现的算法包括：nfa的确定化、\
+* dfa的最小化、字符集的压缩等。
+*/
 class DFAHDR CDfa
 {
 public:
@@ -44,95 +44,67 @@ public:
 	void				Clear();
 	void				PushBack(CDfaRow &sta);
 
-	/*	函数名：GetId
-	**	功能：获取DFA ID
-	*/
+	/// @brief		获取DFA的编号。
 	ulong				GetId();
 
-	/*	函数名：SetId
-	**	参数：ulId-unsigned long类型DFA编号
-	**	功能：设置DFA ID
-	*/
+	/// @brief		设置DFA的编号。
+	/// @param[in] ulId DFA编号。
 	void				SetId(ulong ulId);
 
-	/*	函数名：GetGroupCount
-	**	功能：获取DFA跳转字符的个数
-	*/
+	/// @brief		获取DFA字符集的大小。
 	ushort				GetGroupCount() const;
 
-	/*	函数名：SetGroups
-	**	参数：pGroup-分类后的字符集
-	**	功能：设置一个DFA的跳转字符集合
-	*/
+	/// @brief		设置一个DFA的跳转字符集合
+	/// @param[in] pGroup 分类后的字符集
 	void				SetGroups(byte *pGroup);
 
-	/*	函数名：Char2Group
-	**	参数：nIdx-字符集中的一个字符
-	**	功能：压缩字符集，原字符集为ASCII码，共256个，
-	**	将等价的字符合并分类，减少字符集的个数
-	*/
+	/// @brief		从标准ANSI字符集映射到DFA的字符集。
+	/// @param[in]	nIdx 标准ANSI字符编码。
+	/// @return		与指定字符编码对应的DFA字符。
 	byte				Char2Group(byte nIdx);
 
-	/*	函数名：GetStartState
-	**	功能：获取DFA开始状态id
-	*/
+	/// @brief		获取DFA开始状态id
 	STATEID				GetStartState() const;
 
-	/*	函数名：SetStartState
-	**	参数：id-DFA状态编号
-	**	功能：设置DFA开始状态id
-	*/
+	/// @brief		设置DFA开始状态id
+	/// @param[in]	id DFA状态编号
 	void				SetStartState(STATEID id);
 
-	/*	函数名：GetFinalStates
-	**	功能：获取DFA终态集合
-	*/
+	/// @brief		获取DFA终态集合
 	CFinalStates&		GetFinalStates();
+
+	/// @brief		获取DFA终态集合（常量）
 	const CFinalStates&	GetFinalStates() const;
 
-	/*	函数名：FromNFA
-	**	参数：CNfa类型的一个NFA
-	**	NFA转化为DFA，采用子集构造算法
-	*/
+	/// @brief		NFA转化为DFA，采用子集构造算法
+	/// @param[in]	CNfa类型的一个NFA
 	ulong				FromNFA(const CNfa &nfa);
 
-	/*	函数名：Minimize
-	**	功能：最小化DFA的状态数，采用Hopcrof算法（1976）
-	*/
+	/// @brief		最小化DFA的状态数，采用Hopcrof算法（1976）
 	ulong				Minimize();
 
-	/*	函数名：MergeColumn
-	**	功能：NFA转化为DFA后，再一次压缩字符集，以减少存储空间
-	*/
+	/// @brief		NFA转化为DFA后，再一次压缩字符集，以减少存储空间
 	void				MergeColumn();
 
-	/*	函数名：CalcStoreSize
-	**	功能：计算一个DFA需要的存储空间大小
-	*/
+	/// @brief		计算一个DFA需要的存储空间大小
 	ulong				CalcStoreSize() const;
 
-	/*	函数名：Save
-	**	参数：beg-DFA的二进制字节流
-	**	功能：将一个DFA以unsigned char*类型存入内存
-	*/
+	/// @brief		将一个DFA以unsigned char*类型存入内存
+	/// @param[in]	beg DFA的二进制字节流
 	void				Save(byte *beg);
 
-	/*	函数名：Load
-	**	参数：beg-DFA的二进制字节流
-	**	功能：从内存读取一个DFA，存入unsigned char*类型变量
-	*/
+	/// @brief		从内存读取一个DFA，存入unsigned char*类型变量
+	/// @param[in]	beg DFA的二进制字节流
 	void				Load(byte *beg);
 
-	/*	函数名：Process
-	**	参数：ByteStream-输入数据包的二进制字节流，len-数据包长度，StaSet-CDfa状态数组
-	**	功能：处理数据包与DFA的匹配过程
-	*/
+	/// @brief		处理数据包与DFA的匹配过程
+	/// @param[in]	ByteStream 输入数据包的二进制字节流。
+	/// @param[in]	len 数据包长度。
+	/// @param[out]	StaSet CDfa状态数组。
 	ulong				Process(byte *ByteStream, ulong len, STATEARY &StaSet);
 
-	/*	函数名：Dump
-	**	参数：pFile-输出文件路径
-	**	功能：将一个DFA输出到文件中
-	*/
+	/// @brief		将一个DFA输出到文件中
+	/// @param[in]	pFile 输出文件路径
 	void				Dump(pcstr pFile);
 
 protected:
@@ -147,15 +119,13 @@ protected:
 	byte				m_pGroup[SC_DFACOLCNT];
 };
 
-/*	函数名：MergeMultipleDfas
-**	参数：inputDfas-输入多个DFA，mergedDfa-输出一个合并DFA
-**	功能：将分组中多个DFA合并为一个DFA
-*/
+/// @brief		将分组中多个DFA合并为一个DFA
+/// @param[in] nputDfas 输入多个DFA
+/// @param[out] mergedDfa 输出一个合并DFA
 DFAHDR bool MergeMultipleDfas(class CDfaArray &inputDfas, CDfa &mergedDfa);
 
-/*	函数名：PrintDfaToGv
-**	参数：newdfa-输入DFA，fileName-输出文件路径
-**	功能：DFA存储为矩阵结构，将DFA输出文件保存
-*/
+/// @brief		DFA存储为矩阵结构，将DFA输出文件保存
+/// @param[in] newdfa 输入DFA。
+/// @param[in] fileName 输出文件路径
 DFAHDR void PrintDfaToGv(CDfa &newdfa, const char* fileName);
 

@@ -29,7 +29,7 @@
 #define MATCHPKT __declspec(dllexport)
 #endif
 
-/* 4字节的IP地址 */
+/*! 4字节的IP地址 */
 typedef struct ip_address{
     u_char byte1;
     u_char byte2;
@@ -37,7 +37,7 @@ typedef struct ip_address{
     u_char byte4;
 }ip_address;
 
-/* 4字节的IP地址 */
+/*! 4字节的IP地址 */
 typedef struct ip_header{
     u_char  ver_ihl;        // �汾 (4 bits) + �ײ����� (4 bits)
     u_char  tos;            // ��������(Type of service) 
@@ -52,7 +52,7 @@ typedef struct ip_header{
     u_int   op_pad;         // ѡ�������(Option + Padding)
 }ip_header;
 
-/* UDP �ײ�*/
+/*! UDP �ײ�*/
 typedef struct udp_header{
     u_short sport;          // Դ�˿�(Source port)
     u_short dport;          // Ŀ�Ķ˿�(Destination port)

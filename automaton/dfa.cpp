@@ -1,11 +1,11 @@
-/**
-**	@file		dfa.cpp
+/*!*
+* @file		dfa.cpp
 **
-**	@author		Lab 435, Xidian University
+* @author		Lab 435, Xidian University
 **
-**	@brief		 Common classes declaration
+* @brief			 Common classes declaration
 **
-**	Include CUnsignedArray, CDllString
+* Include CUnsignedArray, CDllString
 **
 */
 
@@ -586,7 +586,7 @@ DFAHDR void CDfa::Dump(const char *pFile)
 	fout.close();
 }
 
-/* 	Divide nondistinguishable states and merge equivalent states
+/*! 	Divide nondistinguishable states and merge equivalent states
 
 Arguments:
   inverse table
@@ -658,7 +658,7 @@ ulong CDfa::PartStates(STATEIDARY *pRevTbl)
 		{
 			for (ulong j = 0; j != partSets.size(); ++j)
 			{
-				/*choose partSet[j] and divide partSet[j] for a jump character*/
+				/*!choose partSet[j] and divide partSet[j] for a jump character*/
 				PARTSET *pJSet = &partSets[j];
 				if (SortPartition(pAbleToI, *pJSet) == false)
 				{
@@ -816,24 +816,24 @@ DFAHDR void PrintDfaToGv(CDfa &newdfa, const char* fileName)
 }
 
 
-/*
-**	NAME
-**	 MergeMultipleDfas::
+/*!
+* NAME
+*  MergeMultipleDfas::
 */
-/**
-**	This function merges mutiple dfas into one dfa. And mark the terminal states to 
-**	distinguish which dfas the terminal state belongs to.
+/*!*
+* This function merges mutiple dfas into one dfa. And mark the terminal states to 
+* distinguish which dfas the terminal state belongs to.
 **
-**	In order to speed up, we need one support function:DfaColGroup to group
-**	the lastDfa's columns.
+* In order to speed up, we need one support function:DfaColGroup to group
+* the lastDfa's columns.
 **
-**	@param dfas		a vector contains mutiple CDfa
-**	@param lastDfa	the merged dfa
+* @param dfas		a vector contains mutiple CDfa
+* @param lastDfa	the merged dfa
 **
-**	@return bool
+* @return bool
 **
-**	@retval true function successful
-**	@retval fasle fatal error
+* @retval true function successful
+* @retval fasle fatal error
 */
 DFAHDR bool MergeMultipleDfas(CDfaArray &inputDfas, CDfa &mergedDfa)
 {
@@ -857,10 +857,10 @@ DFAHDR bool MergeMultipleDfas(CDfaArray &inputDfas, CDfa &mergedDfa)
 	ulong finFlag = 0;//terminal state flag, 1: terminal state, 0: normal state
 	std::stack<STATEIDARY> statesStack;
 
-	/*
-	**	use a size of (inputDfas.size() + 2) vector to represent a state of the merged dfa.
-	**	element 0 represents the state of inputDfas[0], ..., element n represents the state of inputDfas[n].
-	**	element n + 1 and element n + 2 are flags which show that whether this state is a start state or terminal state.
+	/*!
+	* use a size of (inputDfas.size() + 2) vector to represent a state of the merged dfa.
+	* element 0 represents the state of inputDfas[0], ..., element n represents the state of inputDfas[n].
+	* element n + 1 and element n + 2 are flags which show that whether this state is a start state or terminal state.
 	*/
 	STATEIDARY startVec;
 	

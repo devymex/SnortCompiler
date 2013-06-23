@@ -1,8 +1,8 @@
-/*************************************************
+/*!************************************************
 *		Perl-Compatible Regular Expressions		 *
 *************************************************/
 
-/* PCRE is a library of functions to support regular expressions whose syntax
+/*! PCRE is a library of functions to support regular expressions whose syntax
 and semantics are as close as possible to those of the Perl 5 language.
 
 							Written by Philip Hazel
@@ -38,7 +38,7 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-/* This module contains some convenience functions for extracting substrings
+/*! This module contains some convenience functions for extracting substrings
 from the subject string after a regex match has succeeded. The original idea
 for these functions came from Scott Wimer. */
 
@@ -50,11 +50,11 @@ for these functions came from Scott Wimer. */
 #include "pcre_internal.h"
 
 
-/*************************************************
+/*!************************************************
 *			Find number for named string			*
 *************************************************/
 
-/* This function is used by the get_first_set() function below, as well
+/*! This function is used by the get_first_set() function below, as well
 as being generally available. It assumes that names are unique.
 
 Arguments:
@@ -128,11 +128,11 @@ return PCRE_ERROR_NOSUBSTRING;
 
 
 
-/*************************************************
+/*!************************************************
 *	  Find (multiple) entries for named string	*
 *************************************************/
 
-/* This is used by the get_first_set() function below, as well as being
+/*! This is used by the get_first_set() function below, as well as being
 generally available. It is used when duplicated names are permitted.
 
 Arguments:
@@ -239,11 +239,11 @@ return PCRE_ERROR_NOSUBSTRING;
 
 
 
-/*************************************************
+/*!************************************************
 *	 Find first set of multiple named strings	 *
 *************************************************/
 
-/* This function allows for duplicate names in the table of named substrings.
+/*! This function allows for duplicate names in the table of named substrings.
 It returns the number of the first one that was set in a pattern match.
 
 Arguments:
@@ -303,11 +303,11 @@ return GET2(entry, 0);
 
 
 
-/*************************************************
+/*!************************************************
 *		Copy captured string to given buffer		*
 *************************************************/
 
-/* This function copies a single captured substring into a given buffer.
+/*! This function copies a single captured substring into a given buffer.
 Note that we use memcpy() rather than strncpy() in case there are binary zeros
 in the string.
 
@@ -357,11 +357,11 @@ return yield;
 
 
 
-/*************************************************
+/*!************************************************
 *	Copy named captured string to given buffer	*
 *************************************************/
 
-/* This function copies a single captured substring into a given buffer,
+/*! This function copies a single captured substring into a given buffer,
 identifying it by name. If the regex permits duplicate names, the first
 substring that is set is chosen.
 
@@ -415,11 +415,11 @@ return pcre32_copy_substring(subject, ovector, stringcount, n, buffer, size);
 
 
 
-/*************************************************
+/*!************************************************
 *		Copy all captured strings to new store	 *
 *************************************************/
 
-/* This function gets one chunk of store and builds a list of pointers and all
+/*! This function gets one chunk of store and builds a list of pointers and all
 of the captured substrings in it. A NULL pointer is put on the end of the list.
 
 Arguments:
@@ -486,11 +486,11 @@ return 0;
 
 
 
-/*************************************************
+/*!************************************************
 *	Free store obtained by get_substring_list	 *
 *************************************************/
 
-/* This function exists for the benefit of people calling PCRE from non-C
+/*! This function exists for the benefit of people calling PCRE from non-C
 programs that can call its functions, but not free() or (PUBL(free))()
 directly.
 
@@ -514,11 +514,11 @@ pcre32_free_substring_list(PCRE_SPTR32 *pointer)
 
 
 
-/*************************************************
+/*!************************************************
 *		Copy captured string to new store			*
 *************************************************/
 
-/* This function copies a single captured substring into a piece of new
+/*! This function copies a single captured substring into a piece of new
 store
 
 Arguments:
@@ -575,11 +575,11 @@ return yield;
 
 
 
-/*************************************************
+/*!************************************************
 *	Copy named captured string to new store		*
 *************************************************/
 
-/* This function copies a single captured substring, identified by name, into
+/*! This function copies a single captured substring, identified by name, into
 new store. If the regex permits duplicate names, the first substring that is
 set is chosen.
 
@@ -633,11 +633,11 @@ return pcre32_get_substring(subject, ovector, stringcount, n, stringptr);
 
 
 
-/*************************************************
+/*!************************************************
 *		 Free store obtained by get_substring	  *
 *************************************************/
 
-/* This function exists for the benefit of people calling PCRE from non-C
+/*! This function exists for the benefit of people calling PCRE from non-C
 programs that can call its functions, but not free() or (PUBL(free))()
 directly.
 
@@ -659,4 +659,4 @@ pcre32_free_substring(PCRE_SPTR32 pointer)
 (PUBL(free))((void *)pointer);
 }
 
-/* End of pcre_get.c */
+/*! End of pcre_get.c */

@@ -113,7 +113,7 @@ class PCRECPP_EXP_DEFN Scanner {
   // that matches the skip pattern is immediately dropped.
   void EnableSkip();
 
-  /***** Special wrappers around SetSkip() for some common idioms *****/
+  /*!**** Special wrappers around SetSkip() for some common idioms *****/
 
   // Arranges to skip whitespace, C comments, C++ comments.
   // The overall RE is a disjunction of the following REs:
@@ -169,4 +169,4 @@ class PCRECPP_EXP_DEFN Scanner {
 
 }	// namespace pcrecpp
 
-#endif /* _PCRE_SCANNER_H */
+#endif /*! _PCRE_SCANNER_H */

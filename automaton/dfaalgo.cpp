@@ -1,11 +1,11 @@
-/**
-**	@file		dfaalgo.h
+/*!*
+* @file		dfaalgo.h
 **
-**	@author		Lab 435, Xidian University
+* @author		Lab 435, Xidian University
 **
-**	@brief		Common classes declaration
+* @brief			Common classes declaration
 **
-**	Include CUnsignedArray, CDllString
+* Include CUnsignedArray, CDllString
 **
 */
 
@@ -301,7 +301,7 @@ void CalcAbleTo(STATEIDARY *pRevTbl, ulong nGrpNum, ulong nStaNum, PARTSET &ps)
 	for (ulong j = 0; j < nGrpNum; ++j)
 	{
 		byte *pAbleTo = pBuf + j * nStaNum;
-		/*AbleTo[j] = {state|state belong to parSet &&
+		/*!AbleTo[j] = {state|state belong to parSet &&
 		pRevTbl[state][j] is not null} */
 		ps.AbleTo[j] = pAbleTo;
 		//遍历PARTSET中的每个状态t，若存在δ(-1)(t,j)≠Φ，AbleTo[t]标记为1
@@ -317,14 +317,14 @@ void CalcAbleTo(STATEIDARY *pRevTbl, ulong nGrpNum, ulong nStaNum, PARTSET &ps)
 	}
 }
 
-/*
-**	This function groups the merged dfa's columns on the ground of
-**	the column groups of dfas to be merged.
+/*!
+* This function groups the merged dfa's columns on the ground of
+* the column groups of dfas to be merged.
 **
-**	We use a hash function to group.
-**	
-**	First of all, merge the dfas's column groups into a table of n*256, n means the size of dfas
-**	Then hash the table columns to get the merged dfa's colums group.
+* We use a hash function to group.
+* 
+* First of all, merge the dfas's column groups into a table of n*256, n means the size of dfas
+* Then hash the table columns to get the merged dfa's colums group.
 */
 void DfaColGroup(CDfaArray &dfas, byte* groups)
 {
@@ -383,18 +383,18 @@ void DfaColGroup(CDfaArray &dfas, byte* groups)
 	}
 }
 
-/*
-**	this function marks the lastDfa's terminal states.
-**	
-**	@param otherSta		the state to be found in other
-**	@param other		 one dfa to be merged
-**	@param lastSta	  the state to be marked
-**	@param lastDfa	  the merged dfa
+/*!
+* this function marks the lastDfa's terminal states.
+* 
+* @param otherSta		the state to be found in other
+* @param other		 one dfa to be merged
+* @param lastSta	  the state to be marked
+* @param lastDfa	  the merged dfa
 **
-**	@return a integer
+* @return a integer
 **
-**	@retval 0 function successful
-**	@retval -1 fatal error
+* @retval 0 function successful
+* @retval -1 fatal error
 */
 void AddTermIntoDFA(STATEID otherSta, const CDfa &other,
 					STATEID lastSta, CDfa &lastDfa)
@@ -558,7 +558,7 @@ void InitPartSet(const CFinalStates &finStas, ulong ulStaNum,
 			pTerm2Dfa[nFinStaId] = finStas.GetDfaIdSet(nFinStaId);
 		}
 
-		/*distinguish between final states and normal states，if map's first is null，
+		/*!distinguish between final states and normal states，if map's first is null，
 		then the PARTSET is the set of normal states,otherwise, it is final states.
 		initBSet is unordered*/
 		std::map<CDfaIdSet, PARTSET> initBSet;

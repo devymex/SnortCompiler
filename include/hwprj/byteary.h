@@ -1,12 +1,8 @@
-/*
-**	@file		byteary.h
-**
-**	@author		Lab 435, Xidian University
-**
-**	@brief		Common string class
-**
-**	Definition of the CDllString class
-**
+/*!
+* @file			byteary.h
+* @author		Lab 435, Xidian University
+* @brief		Common string class
+* @remark		Definition of the CDllString class
 */
 
 #pragma once
@@ -20,17 +16,25 @@ class DLLBYTEARY;
 #define BYTEARYHDR __declspec(dllexport)
 #endif
 
-/* 使用dll封装std::string */
+/*!
+* @brief		封装了vector<unsigned char>，作为该类的代理
+*/
 class BYTEARYHDR CByteArray
 {
 public:
+	/// @brief		构造函数
 	CByteArray();
+
+	/// @brief		拷贝构造函数
+	/// @param[in]	other，指定的另一个对象
 	CByteArray(const CByteArray &other);
+
+	/// @brief		析构函数
 	virtual ~CByteArray();
 
-	CByteArray&		operator =	(const CByteArray &other);
-	byte&			operator []	(ulong ulIdx);
-	const byte&		operator []	(ulong ulIdx) const;
+	CByteArray& operator = (const CByteArray &other);
+	byte& operator [] (ulong ulIdx);
+	const byte& operator [] (ulong ulIdx) const;
 
 	ulong			Size() const;
 	bool			Empty() const;

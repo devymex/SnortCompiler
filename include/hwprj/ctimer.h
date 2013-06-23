@@ -1,13 +1,13 @@
-/*
-**	@file		ctimer.h
+/*!
+* @file		ctimer.h
 **
-**	@author		Devymex, Xidian University
+* @author		Devymex, Xidian University
 **
-**	@brief		High performance timer
+* @brief			High performance timer
 **
-**	@email		devymex@gmail.com
-**	
-**	Extreamly easy to use
+* @email		devymex@gmail.com
+* 
+* Extreamly easy to use
 **
 */
 

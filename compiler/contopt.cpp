@@ -9,22 +9,22 @@
 const BYTE g_MetaChar[256] = {
 	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
 	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-	/*
+	/*!
 	   !  "  #  $  %  &  '  (  )  *  +  ,  -  .  / */
 	0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0,
-	/*
+	/*!
 	0  1  2  3  4  5  6  7  8  9  :  ;  <  =  >  ? */
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-	/*
+	/*!
 	@  A  B  C  D  E  F  G  H  I  J  K  L  M  N  O */
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	/*
+	/*!
 	P  Q  R  S  T  U  V  W  X  Y  Z  [  \  ]  ^  _ */
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0,
-	/*
+	/*!
 	`  a  b  c  d  e  f  g  h  i  j  k  l  m  n  o */
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	/*
+	/*!
 	p  q  r  s  t  u  v  w  x  y  z  {  |  }  ~  */
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 2,
 
@@ -170,16 +170,16 @@ CRuleOption* CContentOption::Clone() const
 	return pNew;
 }
 
-/*
-**	this function transforms content to pcre
-**	based on the content constraints: distance, within, offset, depth, nocase
+/*!
+* this function transforms content to pcre
+* based on the content constraints: distance, within, offset, depth, nocase
 **
-**	@param pContent	 pointer to the original content option
-**	@param pcreStr		the transformed pcre
+* @param pContent	 pointer to the original content option
+* @param pcreStr		the transformed pcre
 **
-**	@return
-**	@retval  0 function successful
-**	@retval -1 fatal error
+* @return
+* @retval  0 function successful
+* @retval -1 fatal error
 */
 void CContentOption::ToPcre(CPcreOption &pcreOpt) const
 {

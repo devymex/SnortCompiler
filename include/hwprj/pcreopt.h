@@ -1,12 +1,12 @@
-/*
-**	@file		pcreopt.h
+/*!
+* @file		pcreopt.h
 **
-**	@author		Lab 435, Xidian University
+* @author		Lab 435, Xidian University
 **
-**	@brief		Declaration of the CRuleOption class
+* @brief			Declaration of the CRuleOption class
 **
-**	Extract relevant attribute of a rule, 
-**	such as "content", "pcre" and "uricontent".
+* Extract relevant attribute of a rule, 
+* such as "content", "pcre" and "uricontent".
 **
 */
 
@@ -54,34 +54,22 @@ public:
 	CPcreOption&			operator = (const CPcreOption &other);
 	void					Append(const CPcreOption &next);
 
-	/*	函数名：FromPattern
-	**	参数：strPat-Snort规则中pcre字符串
-	**	功能：处理Snort规则中pcre字符串内容及其修饰项，
-	**	存入当前处理后的pcre字符串
-	*/
+	/// @brief		处理Snort规则中pcre字符串内容及其修饰项，存入当前处理后的pcre字符串
+	/// @param	strPat-Snort规则中pcre字符串
 	virtual void			FromPattern(const CDllString &strPat);
 
-	/*	函数名：Clone
-	**	功能：拷贝当前pcre字符串
-	*/
+	/// @brief		拷贝当前pcre字符串
 	virtual CRuleOption*	Clone() const;
 
-	/*	函数名：SetPcreString
-	**	参数：strPcre-设置pcre
-	**	功能：设置处理后的pcre字符串
-	*/
+	/// @brief		设置处理后的pcre字符串
+	/// @param	strPcre-设置pcre
 	void					SetPcreString(const CDllString& strPcre);
 
-	/*	函数名：GetPcreString
-	**	功能：获取处理后的pcre字符串
-	*/
+	/// @brief		获取处理后的pcre字符串
 	CDllString&				GetPcreString();
 	const CDllString&		GetPcreString() const;
 
-	/*	函数名：Precompile
-	**	参数：pcResult-PCRE链
-	**	功能：编译及解析处理后的pcre字符串，转换为PCRE链
-	*/
+	/// @param	pcResult-PCRE链
 	void					Precompile(CByteArray &pcResult) const;
 
 protected:

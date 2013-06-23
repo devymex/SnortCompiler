@@ -1,11 +1,11 @@
-/*
-**	@file		pcrechain.h
+/*!
+* @file		pcrechain.h
 **
-**	@author		Lab 435, Xidian University
+* @author		Lab 435, Xidian University
 **
-**	@brief		Construct pcre chain with attribute of snort rules
+* @brief			Construct pcre chain with attribute of snort rules
 **
-**	Declaration of the CPcreChain class
+* Declaration of the CPcreChain class
 **
 */
 
@@ -34,9 +34,7 @@ public:
 	void					PushBack(const CPcreOption &pcreOpt);
 	void					Resize(ulong nSize);
 
-	/*	函数名：GetSigs
-	**	功能：获取PCRE链中的signature
-	*/
+	/// @brief		获取PCRE链中的signature
 	CUnsignedArray&			GetSigs();
 	const CUnsignedArray&	GetSigs() const;
 

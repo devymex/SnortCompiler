@@ -1,8 +1,8 @@
-/*************************************************
+/*!************************************************
 *		Perl-Compatible Regular Expressions		 *
 *************************************************/
 
-/* PCRE is a library of functions to support regular expressions whose syntax
+/*! PCRE is a library of functions to support regular expressions whose syntax
 and semantics are as close as possible to those of the Perl 5 language.
 
 							Written by Philip Hazel
@@ -38,7 +38,7 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-/* This file contains a protected PCRE function that converts an ordinal
+/*! This file contains a protected PCRE function that converts an ordinal
 character value into a UTF8 string. */
 
 #ifdef HAVE_CONFIG_H
@@ -49,11 +49,11 @@ character value into a UTF8 string. */
 
 #include "pcre_internal.h"
 
-/*************************************************
+/*!************************************************
 *		 Convert character value to UTF-8			*
 *************************************************/
 
-/* This function takes an integer value in the range 0 - 0x10ffff
+/*! This function takes an integer value in the range 0 - 0x10ffff
 and encodes it as a UTF-8 character in 1 to 4 pcre_uchars.
 
 Arguments:
@@ -84,11 +84,11 @@ return i + 1;
 
 #else
 
-(void)(cvalue);  /* Keep compiler happy; this function won't ever be */
-(void)(buffer);  /* called when SUPPORT_UTF is not defined. */
+(void)(cvalue);  /*! Keep compiler happy; this function won't ever be */
+(void)(buffer);  /*! called when SUPPORT_UTF is not defined. */
 return 0;
 
 #endif
 }
 
-/* End of pcre_ord2utf8.c */
+/*! End of pcre_ord2utf8.c */

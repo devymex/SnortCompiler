@@ -1,11 +1,11 @@
-/*
-**	@file		regrule.h
+/*!
+* @file		regrule.h
 **
-**	@author		Lab 435, Xidian University
+* @author		Lab 435, Xidian University
 **
-**	@brief		Declaration of the CRegRule class
+* @brief			Declaration of the CRegRule class
 **
-**	A rule includes multiple CPcreChain, all store in CRegRule
+* A rule includes multiple CPcreChain, all store in CRegRule
 **
 */
 

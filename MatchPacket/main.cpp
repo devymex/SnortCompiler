@@ -32,7 +32,7 @@ void main()
 
 
 	/////////////////////////////////////////////////////////////////////
-	/*for(size_t i = 0; i < groupRes.GetSidDfaIds().Size(); ++ i)
+	/*!for(size_t i = 0; i < groupRes.GetSidDfaIds().Size(); ++ i)
 	{
 		if(groupRes.GetSidDfaIds()[i].m_nSid == 467)
 		{

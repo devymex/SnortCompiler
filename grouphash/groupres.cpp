@@ -52,7 +52,7 @@ void WriteNum(std::ofstream &fout, _Ty _num, ulong nBytes = sizeof(_Ty))
 	fout.write((char*)&_num, nBytes);
 }
 
-/* Write the relationship between sid and dfa ids, dfa table and result of grouping
+/*! Write the relationship between sid and dfa ids, dfa table and result of grouping
 to file
 
 Arguments:
@@ -175,7 +175,7 @@ GROUPRESHDR ulong CGroupRes::WriteToFile(const char *filename)
 	return 0;
 }
 
-/* Read the relationship between sid and dfa ids, dfa table and result of grouping
+/*! Read the relationship between sid and dfa ids, dfa table and result of grouping
 from file
 
 Arguments:

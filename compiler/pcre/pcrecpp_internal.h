@@ -1,8 +1,8 @@
-/*************************************************
+/*!************************************************
 *		 Perl-Compatible Regular Expressions		*
 *************************************************/
 
-/*
+/*!
 Copyright (c) 2005, Google Inc.
 All rights reserved.
 
@@ -39,7 +39,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #ifndef PCRECPP_INTERNAL_H
 #define PCRECPP_INTERNAL_H
 
-/* When compiling a DLL for Windows, the exported symbols have to be declared
+/*! When compiling a DLL for Windows, the exported symbols have to be declared
 using some MS magic. I found some useful information on this web page:
 http://msdn2.microsoft.com/en-us/library/y4h7bcy6(VS.80).aspx. According to the
 information there, using __declspec(dllexport) without "extern" we have a
@@ -66,6 +66,6 @@ setting in pcre.h. We use:
 #  endif
 #endif
 
-#endif  /* PCRECPP_INTERNAL_H */
+#endif  /*! PCRECPP_INTERNAL_H */
 
-/* End of pcrecpp_internal.h */
+/*! End of pcrecpp_internal.h */

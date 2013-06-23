@@ -1,15 +1,12 @@
-/**
-**	@file		grouping.cpp
-**
-**	@author		Lab 435, Xidian University
-**
-**	@brief		Support functions for grouping dfa
-**
-**	This implements grouping dfa algorithm, the algorithm has four steps
-**	in general. At first, it groups dfa which has only one signature. Then, 
-**	push the remain dfa into the group. Thirdly, it groups dfa with the same 
-**	signatures. Finally, it merges two groups.
-**
+/*!
+* @file		grouping.cpp
+* @author	Lab 435, Xidian University
+* @brief	Support functions for grouping dfa
+*
+* This implements grouping dfa algorithm, the algorithm has four steps
+* in general. At first, it groups dfa which has only one signature. Then, 
+* push the remain dfa into the group. Thirdly, it groups dfa with the same 
+* signatures. Finally, it merges two groups.
 */
 
 #include "stdafx.h"
@@ -17,7 +14,7 @@
 #include <hwprj\groupres.h>
 #include <hwprj\grouping.h>
 
-/* Extract signatures from res to vecDfaInfo and add all index to vecWaitForGroup
+/*! Extract signatures from res to vecDfaInfo and add all index to vecWaitForGroup
 
 Arguments:
   res					the compile result
@@ -42,7 +39,7 @@ void ExtractSigsVec(const CCompileResults &res, std::vector<CUnsignedArray> &Sig
 	}
 }
 
-/* group dfa which has only one signature by its only signature
+/*! group dfa which has only one signature by its only signature
 
 Arguments:
   vecDfaInfo		signatures correspond to each dfa
@@ -91,7 +88,7 @@ struct DFASIZECOMP
 	}
 };
 
-/* sort dfaids by dfa size
+/*! sort dfaids by dfa size
 
 Arguments:
   res					the compile result, the merged dfa will be pushed into the res's dfa table
@@ -110,7 +107,7 @@ void DfaSizeSort(const CCompileResults &res, CGroups &groups)
 	}
 }
 
-/* try to merge dfa in one group, merge if success, otherwise seperate the group into two
+/*! try to merge dfa in one group, merge if success, otherwise seperate the group into two
 
 Arguments:
   res					the compile result, the merged dfa will be pushed into the res's dfa table
@@ -185,7 +182,7 @@ void Merge(CCompileResults &res, CGroups &groups)
 	}
 }
 
-/* put dfa waiting for grouping into a group, if the dfa has the group's signature and 
+/*! put dfa waiting for grouping into a group, if the dfa has the group's signature and 
 can merge with the group's dfa merged before
 
 Arguments:
@@ -248,7 +245,7 @@ void PutInBySig(const std::vector<CUnsignedArray> &SigsVec, CCompileResults &res
 	}
 }
 
-/* group dfa which has the same signatures by its signatures
+/*! group dfa which has the same signatures by its signatures
 
 Arguments:
   vecDfaInfo		signatures correspond to each dfa
@@ -281,7 +278,7 @@ void BuildGroupBySig(const std::vector<CUnsignedArray> &SigsVec, CGroups &newGro
 	}
 }
 
-/* extract signatures from group with only one signature
+/*! extract signatures from group with only one signature
 
 Arguments:
   groups				the group result, each group has only one signature
@@ -301,7 +298,7 @@ void ExtractUsedSigs(const CGroups &groups, std::vector<SIGNATURE> &vecUsed)
 	vecUsed.erase(std::unique(vecUsed.begin(), vecUsed.end()), vecUsed.end());
 }
 
-/* extract common signatures from two groups
+/*! extract common signatures from two groups
 
 Arguments:
   g1					 the first group
@@ -336,7 +333,7 @@ void ExtractComSigs(const ONEGROUP &g1, const ONEGROUP &g2, const std::vector<SI
 	}
 }
 
-/* the used upper limit of the signatures
+/*! the used upper limit of the signatures
 
 Arguments:
   vecSigs			signatures
@@ -357,7 +354,7 @@ ulong AvailableNum(const std::vector<SIGNATURE> &vecSigs)
 	}
 }
 
-/* try to merge two groups, merge if the two group have common signatures , the used number 
+/*! try to merge two groups, merge if the two group have common signatures , the used number 
 of the common signatures isn't exceed its upper limit and the two groups merged dfa can merge
 
 Arguments:
@@ -498,7 +495,7 @@ void MergeGroup(CCompileResults &res, std::vector<SIGNATURE> &vecUsed, CGroups &
 	}
 }
 
-/* add new group result to group result
+/*! add new group result to group result
 
 Arguments:
   groups				the group result
@@ -517,7 +514,7 @@ void AddNewGroups(CGroups &newGroups, CGroups &groups)
 	newGroups.Clear();
 }
 
-/* clear up the group result
+/*! clear up the group result
 
 Arguments:
   res					the compile result and its dfa table contains the merged dfas
@@ -622,7 +619,7 @@ void outPutGroups(CGroupRes &groupRes, const char* fileName)
 	fout.close();
 }
 
-/* the grouping algorithm
+/*! the grouping algorithm
 
 Arguments:
   res					the compile result

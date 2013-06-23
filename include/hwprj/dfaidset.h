@@ -1,11 +1,11 @@
-/*
-**	@file		dfaidset.h
+/*!
+* @file		dfaidset.h
 **
-**	@author		Lab 435, Xidian University
+* @author		Lab 435, Xidian University
 **
-**	@brief		Declaration of the CDfaIdSet class
+* @brief			Declaration of the CDfaIdSet class
 **
-**	Store the corresponding ID for each CDfa
+* Store the corresponding ID for each CDfa
 **
 */
 
@@ -34,22 +34,16 @@ public:
 	ulong		Size() const;
 	void		Clear();
 
-	/*	函数名：Append
-	**	参数：另一个DfaIdSet
-	**	功能：将另一个DfaIdSet连接到当前的DfaIdSet
-	*/
+	/// @brief		将另一个DfaIdSet连接到当前的DfaIdSet
+	/// @param	other 另一个DfaIdSet
 	void		Append(const CDfaIdSet &other);
 
-	/*	函数名：AddDfaId
-	**	参数：dfaId-DFA编号
-	**	功能：添加DFA ID
-	*/
+	/// @brief		添加DFA ID
+	/// @param	dfaId DFA编号
 	void		AddDfaId(DFAID dfaId);
 
-	/*	函数名：CopyTo
-	**	参数：idAry-DfaIdSet的数组
-	**	功能：将DfaIdSet中的数值复制给DfaIdSet的数组
-	*/
+	/// @brief		将DfaIdSet中的数值复制给DfaIdSet的数组
+	/// @param	idAry DfaIdSet的数组
 	void		CopyTo(CUnsignedArray &idAry) const;
 
 private:

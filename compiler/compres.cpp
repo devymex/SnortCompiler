@@ -39,7 +39,7 @@ COMPRESHDR const CRegRule &CCompileResults::GetRegexTbl() const
 	return m_RegexTbl;
 }
 
-/* Write the relationship between sid and dfa ids, dfa table and option list
+/*! Write the relationship between sid and dfa ids, dfa table and option list
 table to file
 
 Arguments:
@@ -167,7 +167,7 @@ COMPRESHDR ulong CCompileResults::WriteToFile(const char *filename)
 	return 0;
 }
 
-/* read the relationship between sid and dfa ids, dfa table and option list
+/*! read the relationship between sid and dfa ids, dfa table and option list
 table from file
 
 Arguments:

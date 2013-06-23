@@ -1,8 +1,8 @@
-/*************************************************
+/*!************************************************
 *		Perl-Compatible Regular Expressions		 *
 *************************************************/
 
-/* PCRE is a library of functions to support regular expressions whose syntax
+/*! PCRE is a library of functions to support regular expressions whose syntax
 and semantics are as close as possible to those of the Perl 5 language.
 
 							Written by Philip Hazel
@@ -38,7 +38,7 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-/* This module contains a PCRE protected debugging function for printing out the
+/*! This module contains a PCRE protected debugging function for printing out the
 internal form of a compiled regular expression, along with some supporting
 local functions. This source file is used in two places:
 
@@ -55,10 +55,10 @@ asked to print out a compiled regex for debugging purposes. */
 #include "config.h"
 #endif
 
-/* For pcretest program. */
+/*! For pcretest program. */
 #define PRIV(name) name
 
-/* We have to include pcre_internal.h because we need the internal info for
+/*! We have to include pcre_internal.h because we need the internal info for
 displaying the results of pcre_study() and we also need to know about the
 internal macros, structures, and other internal data values; pcretest has
 "inside information" compared to a program that strictly follows the PCRE API.
@@ -70,13 +70,13 @@ appropriately for an application, not for building PCRE. */
 #include "pcre.h"
 #include "pcre_internal.h"
 
-/* These are the funtions that are contained within. It doesn't seem worth
+/*! These are the funtions that are contained within. It doesn't seem worth
 having a separate .h file just for this. */
 
-#endif /* PCRE_INCLUDED */
+#endif /*! PCRE_INCLUDED */
 
 #ifdef PCRE_INCLUDED
-static /* Keep the following function as protected. */
+static /*! Keep the following function as protected. */
 #endif
 
 #if defined COMPILE_PCRE8
@@ -87,7 +87,7 @@ void pcre16_printint(pcre *external_re, FILE *f, BOOL print_lengths);
 void pcre32_printint(pcre *external_re, FILE *f, BOOL print_lengths);
 #endif
 
-/* Macro that decides whether a character should be output as a literal or in
+/*! Macro that decides whether a character should be output as a literal or in
 hexadecimal. We don't use isprint() because that can vary from system to system
 (even without the use of locales) and we want the output always to be the same,
 for testing purposes. */
@@ -98,11 +98,11 @@ for testing purposes. */
 #define PRINTABLE(c) ((c) >= 32 && (c) < 127)
 #endif
 
-/* The table of operator names. */
+/*! The table of operator names. */
 
 static const char *priv_OP_names[] = { OP_NAME_LIST };
 
-/* This table of operator lengths is not actually used by the working code,
+/*! This table of operator lengths is not actually used by the working code,
 but its size is needed for a check that ensures it is the correct size for the
 number of opcodes (thus catching update omissions). */
 
@@ -110,7 +110,7 @@ static const pcre_uint8 priv_OP_lengths[] = { OP_LENGTHS };
 
 
 
-/*************************************************
+/*!************************************************
 *		 Print single- or multi-byte character	 *
 *************************************************/
 
@@ -121,7 +121,7 @@ pcre_uint32 c = *ptr;
 
 #ifndef SUPPORT_UTF
 
-(void)utf;  /* Avoid compiler warning */
+(void)utf;  /*! Avoid compiler warning */
 if (PRINTABLE(c)) fprintf(f, "%c", (char)c);
 else if (c <= 0x80) fprintf(f, "\\x%02x", c);
 else fprintf(f, "\\x{%x}", c);
@@ -141,12 +141,12 @@ if (!utf || (c & 0xc0) != 0xc0)
 else
   {
   int i;
-  int a = PRIV(utf8_table4)[c & 0x3f];  /* Number of additional bytes */
+  int a = PRIV(utf8_table4)[c & 0x3f];  /*! Number of additional bytes */
   int s = 6*a;
   c = (c & PRIV(utf8_table3)[a]) << s;
   for (i = 1; i <= a; i++)
 	 {
-	 /* This is a check for malformed UTF-8; it should only occur if the sanity
+	 /*! This is a check for malformed UTF-8; it should only occur if the sanity
 	 check has been turned off. Rather than swallow random bytes, just stop if
 	 we hit a bad one. Print it with \X instead of \x as an indication. */
 
@@ -156,7 +156,7 @@ else
 		return i - 1;
 		}
 
-	 /* The byte is OK */
+	 /*! The byte is OK */
 
 	 s -= 6;
 	 c |= (ptr[i] & 0x3f) << s;
@@ -176,7 +176,7 @@ if (!utf || (c & 0xfc00) != 0xd800)
   }
 else
   {
-  /* This is a check for malformed UTF-16; it should only occur if the sanity
+  /*! This is a check for malformed UTF-16; it should only occur if the sanity
   check has been turned off. Rather than swallow a low surrogate, just stop if
   we hit a bad one. Print it with \X instead of \x as an indication. */
 
@@ -202,19 +202,19 @@ if (!utf || (c & 0xfffff800u) != 0xd800u)
   }
 else
   {
-  /* This is a check for malformed UTF-32; it should only occur if the sanity
+  /*! This is a check for malformed UTF-32; it should only occur if the sanity
   check has been turned off. Rather than swallow a surrogate, just stop if
   we hit one. Print it with \X instead of \x as an indication. */
   fprintf(f, "\\X{%x}", c);
   return 0;
   }
 
-#endif /* COMPILE_PCRE[8|16|32] */
+#endif /*! COMPILE_PCRE[8|16|32] */
 
-#endif /* SUPPORT_UTF */
+#endif /*! SUPPORT_UTF */
 }
 
-/*************************************************
+/*!************************************************
 *  Print uchar string (regardless of utf)		*
 *************************************************/
 
@@ -228,7 +228,7 @@ while (*ptr != '\0')
   }
 }
 
-/*************************************************
+/*!************************************************
 *			 Find Unicode property name				*
 *************************************************/
 
@@ -243,18 +243,18 @@ for (i = PRIV(utt_size) - 1; i >= 0; i--)
   }
 return (i >= 0)? PRIV(utt_names) + PRIV(utt)[i].name_offset : "??";
 #else
-/* It gets harder and harder to shut off unwanted compiler warnings. */
+/*! It gets harder and harder to shut off unwanted compiler warnings. */
 ptype = ptype * pvalue;
 return (ptype == pvalue)? "??" : "??";
 #endif
 }
 
 
-/*************************************************
+/*!************************************************
 *		 Print Unicode property value				 *
 *************************************************/
 
-/* "Normal" properties can be printed from tables. The PT_CLIST property is a
+/*! "Normal" properties can be printed from tables. The PT_CLIST property is a
 pseudo-property that contains a pointer to a list of case-equivalent
 characters. This is used only when UCP support is available and UTF mode is
 selected. It should never occur otherwise, but just in case it does, have
@@ -285,18 +285,18 @@ else
 
 
 
-/*************************************************
+/*!************************************************
 *			Print compiled regex						 *
 *************************************************/
 
-/* Make this function work for a regex with integers either byte order.
+/*! Make this function work for a regex with integers either byte order.
 However, we assume that what we are passed is a compiled regex. The
 print_lengths flag controls whether offsets and lengths of items are printed.
 They can be turned off from pcretest so that automatic tests on bytecode can be
 written that do not depend on the value of LINK_SIZE. */
 
 #ifdef PCRE_INCLUDED
-static /* Keep the following function as protected. */
+static /*! Keep the following function as protected. */
 #endif
 #if defined COMPILE_PCRE8
 void
@@ -330,7 +330,7 @@ if (re->magic_number != MAGIC_NUMBER)
   }
 
 code = codestart = (pcre_uchar *)re + offset + count * size;
-/* PCRE_UTF(16|32) have the same value as PCRE_UTF8. */
+/*! PCRE_UTF(16|32) have the same value as PCRE_UTF8. */
 utf = (options & PCRE_UTF8) != 0;
 
 for(;;)
@@ -347,8 +347,8 @@ for(;;)
 
   switch(*code)
 	 {
-/* ========================================================================== */
-		/* These cases are never obeyed. This is a fudge that causes a compile-
+/*! ========================================================================== */
+		/*! These cases are never obeyed. This is a fudge that causes a compile-
 		time error if the vectors OP_names or OP_lengths, which are indexed
 		by opcode, are not the correct length. It seems to be the only way to do
 		such a check at compile time, as the sizeof() operator does not work in
@@ -359,7 +359,7 @@ for(;;)
 		((sizeof(priv_OP_names)/sizeof(const char *) == OP_TABLE_LENGTH) &&
 		(sizeof(priv_OP_lengths) == OP_TABLE_LENGTH)):
 		break;
-/* ========================================================================== */
+/*! ========================================================================== */
 
 	 case OP_END:
 	 fprintf(f, "	 %s\n", priv_OP_names[*code]);
@@ -459,7 +459,7 @@ for(;;)
 	 case OP_MINQUERYI:
 	 case OP_POSQUERYI:
 	 flag = "/i";
-	 /* Fall through */
+	 /*! Fall through */
 	 case OP_STAR:
 	 case OP_MINSTAR:
 	 case OP_POSSTAR:
@@ -497,7 +497,7 @@ for(;;)
 	 case OP_MINUPTOI:
 	 case OP_POSUPTOI:
 	 flag = "/i";
-	 /* Fall through */
+	 /*! Fall through */
 	 case OP_EXACT:
 	 case OP_UPTO:
 	 case OP_MINUPTO:
@@ -530,7 +530,7 @@ for(;;)
 
 	 case OP_NOTI:
 	 flag = "/i";
-	 /* Fall through */
+	 /*! Fall through */
 	 case OP_NOT:
 	 fprintf(f, " %s [^", flag);
 	 extra = print_char(f, code + 1, utf);
@@ -547,7 +547,7 @@ for(;;)
 	 case OP_NOTMINQUERYI:
 	 case OP_NOTPOSQUERYI:
 	 flag = "/i";
-	 /* Fall through */
+	 /*! Fall through */
 
 	 case OP_NOTSTAR:
 	 case OP_NOTMINSTAR:
@@ -568,7 +568,7 @@ for(;;)
 	 case OP_NOTMINUPTOI:
 	 case OP_NOTPOSUPTOI:
 	 flag = "/i";
-	 /* Fall through */
+	 /*! Fall through */
 
 	 case OP_NOTEXACT:
 	 case OP_NOTUPTO:
@@ -592,7 +592,7 @@ for(;;)
 
 	 case OP_REFI:
 	 flag = "/i";
-	 /* Fall through */
+	 /*! Fall through */
 	 case OP_REF:
 	 fprintf(f, " %s \\%d", flag, GET2(code,1));
 	 ccode = code + priv_OP_lengths[*code];
@@ -608,7 +608,7 @@ for(;;)
 	 print_prop(f, code, "	 ", "");
 	 break;
 
-	 /* OP_XCLASS can only occur in UTF or PCRE16 modes. However, there's no
+	 /*! OP_XCLASS can only occur in UTF or PCRE16 modes. However, there's no
 	 harm in having this code always here, and it makes it less messy without
 	 all those #ifdefs. */
 
@@ -636,7 +636,7 @@ for(;;)
 		ccode = code + 1;
 		}
 
-		/* Print a bit map */
+		/*! Print a bit map */
 
 		if (printmap)
 		{
@@ -664,7 +664,7 @@ for(;;)
 		ccode += 32 / sizeof(pcre_uchar);
 		}
 
-		/* For an XCLASS there is always some additional data */
+		/*! For an XCLASS there is always some additional data */
 
 		if (*code == OP_XCLASS)
 		{
@@ -695,11 +695,11 @@ for(;;)
 			 }
 		}
 
-		/* Indicate a non-UTF class which was created by negation */
+		/*! Indicate a non-UTF class which was created by negation */
 
 		fprintf(f, "]%s", (*code == OP_NCLASS)? " (neg)" : "");
 
-		/* Handle repeats after a class or a back reference */
+		/*! Handle repeats after a class or a back reference */
 
 		CLASS_REF_REPEAT:
 		switch(*ccode)
@@ -724,7 +724,7 @@ for(;;)
 		extra += priv_OP_lengths[*ccode];
 		break;
 
-		/* Do nothing if it's not a repeat; this code stops picky compilers
+		/*! Do nothing if it's not a repeat; this code stops picky compilers
 		warning about the lack of a default code path. */
 
 		default:
@@ -749,9 +749,9 @@ for(;;)
 	 case OP_CIRCM:
 	 case OP_DOLLM:
 	 flag = "/m";
-	 /* Fall through */
+	 /*! Fall through */
 
-	 /* Anything else is just an item with no data, but possibly a flag. */
+	 /*! Anything else is just an item with no data, but possibly a flag. */
 
 	 default:
 	 fprintf(f, " %s %s", flag, priv_OP_names[*code]);
@@ -763,4 +763,4 @@ for(;;)
   }
 }
 
-/* End of pcre_printint.src */
+/*! End of pcre_printint.src */

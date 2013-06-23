@@ -1,11 +1,11 @@
-/**
-**	@file		rule2nfa.cpp
+/*!*
+* @file		rule2nfa.cpp
 **
-**	@author		Lab 435, Xidian University
+* @author		Lab 435, Xidian University
 **
-**	@brief		Support functions for transforming a rule to a nfa tree
+* @brief			Support functions for transforming a rule to a nfa tree
 **
-**	This nfa tree processing for rule options.
+* This nfa tree processing for rule options.
 **
 */
 
@@ -24,7 +24,7 @@ double pcre2nfatime = 0.0;
 double nfa2dfatime = 0.0;
 double dfamintimetime = 0.0;
 
-/* complie one rule
+/*! complie one rule
 
 Arguments:
 	parseRes		the parse result
@@ -66,7 +66,7 @@ void __stdcall CompileCallback(const PARSERESULT &parseRes, void *lpVoid)
 	}
 }
 
-/*
+/*!
 * read rules from a file
 */
 ulong LoadFile(const char *fileName, std::vector<std::string> &rules)
@@ -273,26 +273,26 @@ void ParseOptions(std::string &ruleOptions, CSnortRule &snortRule)
 	}
 }
 
-/*
-**	NAME
-**	 Rule2PcreList::
+/*!
+* NAME
+*  Rule2PcreList::
 */
-/**
-**	This function converts a CSnortRule to a CRegRule and extract signatures from content option
+/*!*
+* This function converts a CSnortRule to a CRegRule and extract signatures from content option
 **
-**	According to the constraints of rule options, we split a snort rule into some option chains.
-**	For every option chain, the datapacket matchs from the first byte.
-**	Then we transfrom every option into pcre.
+* According to the constraints of rule options, we split a snort rule into some option chains.
+* For every option chain, the datapacket matchs from the first byte.
+* Then we transfrom every option into pcre.
 **
-**	@param rule		 a CSnortRule object which contains the original information
-**					of a snort rule. 
-**	@param regrule	 the transformed CRegRule object which makes up of a number of pcre lists
-**						and the signatures in every pcre list.
+* @param rule		 a CSnortRule object which contains the original information
+* 				of a snort rule. 
+* @param regrule	 the transformed CRegRule object which makes up of a number of pcre lists
+* 					and the signatures in every pcre list.
 **
-**	@return integer
+* @return integer
 **
-**	@retval  0 function successful
-**	@retval <>0 fatal error
+* @retval  0 function successful
+* @retval <>0 fatal error
 */
 
 void Rule2RegRule(const CSnortRule &rule, CRegRule &regRule)
@@ -327,7 +327,7 @@ void Rule2RegRule(const CSnortRule &rule, CRegRule &regRule)
 }
 
 
-/* assign all the signatures of each rule to all its option list
+/*! assign all the signatures of each rule to all its option list
 
 Arguments:
   result		the compile result
@@ -504,7 +504,7 @@ void ProcessRule(CRegRule &regRule, RULECOMPDATA &result)
 	}
 }
 
-/* complie one rule to several dfas
+/*! complie one rule to several dfas
 
 Arguments:
   rule		the snort rule

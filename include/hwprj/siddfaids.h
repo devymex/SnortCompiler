@@ -1,11 +1,11 @@
-/*
-**	@file		siddfas.h
+/*!
+* @file		siddfas.h
 **
-**	@author		Lab 435, Xidian University
+* @author		Lab 435, Xidian University
 **
-**	@brief		Declaration of the CSidDfaIds class
+* @brief			Declaration of the CSidDfaIds class
 **
-**	Store the mapping between SID and DFAID
+* Store the mapping between SID and DFAID
 **
 */
 
