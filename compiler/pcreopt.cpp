@@ -29,32 +29,6 @@ SNORTRULEHDR CPcreOption& CPcreOption::operator = (const CPcreOption &other)
 	return *this;
 }
 
-void CPcreOption::Append(const CPcreOption &next)
-{
-	if (!next.HasFlags(PF_R))
-	{
-		TTHROW(TI_INCOMPATIBLE);
-	}
-	OPTIONFLAG nFlags = next.m_nFlags & (~PF_R);
-	if (m_nFlags != nFlags)
-	{
-		TTHROW(TI_INCOMPATIBLE);
-	}
-	CDllString strOther = next.m_strPcre;
-	if (strOther.Size() != 0)
-	{
-		if (strOther[0] == '^')
-		{
-			strOther.Erase(0);
-		}
-		m_strPcre.Append(strOther);
-	}
-	if (!next.HasFlags(PF_F))
-	{
-		DelFlags(PF_F);
-	}
-}
-
 SNORTRULEHDR void CPcreOption::FromPattern(const CDllString &strPat)
 {
 	CDllString strTemp = strPat;

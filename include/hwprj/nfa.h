@@ -30,27 +30,28 @@ public:
 	CNfa(const CNfa &other);
 	virtual ~CNfa();
 
-	CNfa&			operator =	(const CNfa &other);
-	CNfaRow&		operator []	(ulong ulIdx);
-	const CNfaRow&	operator []	(ulong ulIdx) const;
+	CNfa& operator = (const CNfa &other);
+	CNfaRow& operator [] (ulong ulIdx);
+	const CNfaRow& operator [] (ulong ulIdx) const;
 
-	ulong			Size() const;
-	CNfaRow&		Back();
-	void			Clear();
-	void			Resize(ulong ulSize);
-	void			Reserve(ulong ulSize);
-	void			Shrink();
-	void			PushBack(const CNfaRow &row);
-	void			PopBack();
+	ulong Size() const;
+	CNfaRow& Back();
+	void Clear();
+	void Resize(ulong ulSize);
+	void Reserve(ulong ulSize);
+	void Shrink();
+	void PushBack(const CNfaRow &row);
+	void PopBack();
 
 	/// @brief		将NFA每一个状态中的元素排序。
 	///	
-	void			SortAll();
+	void SortAll();
 
 	/// @brief		将一个NFA输出到文件中。
 	/// @param	pFile 输出文件路径。
-	void			Dump(const char *pFile) const;
+	void Dump(const char *pFile) const;
 
 protected:
+	/// @brief		私有成员，仅供内部使用
 	NFAROWARY*		m_pNfa;
 };

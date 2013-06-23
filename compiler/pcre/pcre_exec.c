@@ -3313,7 +3313,7 @@ for (;;)
 		{
 #ifdef SUPPORT_UCP
 		pcre_uint32 othercase;
-		if (op >= OP_STARI &&	  /*! Caseless */
+		if (op >= OP_STARI &&   /*! Caseless */
 				(othercase = UCD_OTHERCASE(fc)) != fc)
 			 oclength = PRIV(ord2utf)(othercase, occhars);
 		else oclength = 0;
@@ -5037,7 +5037,7 @@ for (;;)
 			 switch(ctype)
 				{
 				case OP_ANY:					/*! This is the non-NL case */
-				if (md->partial != 0 &&	 /*! Take care with CRLF partial */
+				if (md->partial != 0 &&  /*! Take care with CRLF partial */
 					 eptr >= md->end_subject &&
 					 NLBLOCK->nltype == NLTYPE_FIXED &&
 					 NLBLOCK->nllen == 2 &&
@@ -5162,7 +5162,7 @@ for (;;)
 			 switch(ctype)
 				{
 				case OP_ANY:					/*! This is the non-NL case */
-				if (md->partial != 0 &&	 /*! Take care with CRLF partial */
+				if (md->partial != 0 &&  /*! Take care with CRLF partial */
 					 eptr >= md->end_subject &&
 					 NLBLOCK->nltype == NLTYPE_FIXED &&
 					 NLBLOCK->nllen == 2 &&
@@ -5557,7 +5557,7 @@ for (;;)
 					 break;
 					 }
 				if (IS_NEWLINE(eptr)) break;
-				if (md->partial != 0 &&	 /*! Take care with CRLF partial */
+				if (md->partial != 0 &&  /*! Take care with CRLF partial */
 						eptr + 1 >= md->end_subject &&
 						NLBLOCK->nltype == NLTYPE_FIXED &&
 						NLBLOCK->nllen == 2 &&
@@ -5583,7 +5583,7 @@ for (;;)
 					 break;
 					 }
 				if (IS_NEWLINE(eptr)) break;
-				if (md->partial != 0 &&	 /*! Take care with CRLF partial */
+				if (md->partial != 0 &&  /*! Take care with CRLF partial */
 						eptr + 1 >= md->end_subject &&
 						NLBLOCK->nltype == NLTYPE_FIXED &&
 						NLBLOCK->nllen == 2 &&
@@ -5831,7 +5831,7 @@ for (;;)
 				break;
 				}
 				if (IS_NEWLINE(eptr)) break;
-				if (md->partial != 0 &&	 /*! Take care with CRLF partial */
+				if (md->partial != 0 &&  /*! Take care with CRLF partial */
 					 eptr + 1 >= md->end_subject &&
 					 NLBLOCK->nltype == NLTYPE_FIXED &&
 					 NLBLOCK->nllen == 2 &&

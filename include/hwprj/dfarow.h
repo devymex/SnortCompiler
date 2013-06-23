@@ -35,26 +35,29 @@ public:
 	CDfaRow(const CDfaRow &other);
 	virtual ~CDfaRow();
 
-	CDfaRow&		operator =	(const CDfaRow &other);
-	const STATEID&	operator []	(byte nIdx) const;
-	STATEID&		operator []	(byte nIdx);
+	CDfaRow& operator =	(const CDfaRow &other);
+	const STATEID& operator []	(byte nIdx) const;
+	STATEID& operator []	(byte nIdx);
 
 	ulong			Size() const;
-	void			Fill(STATEID nState);
+	void Fill(STATEID nState);
 
 	/// @brief		增加状态属性
 	/// @param nFlags 属性取值
-	void			AddFlags(STATEFLAG nFlags);
+	void AddFlags(STATEFLAG nFlags);
 
 	/// @brief		设置状态属性
 	/// @param	nFlags 属性取值
-	void			SetFlags(STATEFLAG nFlags);
+	void SetFlags(STATEFLAG nFlags);
 
 	/// @brief		获取状态属性
 	STATEFLAG		GetFlags() const;
 
 protected:
+	/// @brief		私有成员，仅供内部使用
 	STATEIDARY*		m_pDest;
+
+	/// @brief		私有成员，仅供内部使用
 	STATEFLAG		m_nFlags;
 };
 

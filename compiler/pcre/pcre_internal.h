@@ -323,7 +323,7 @@ start/end of string field names are. */
 		 &(NLBLOCK->nllen), utf)) \
 	 : \
 	 ((p) >= NLBLOCK->PSSTART + NLBLOCK->nllen && \
-	  RAWUCHARTEST(p - NLBLOCK->nllen) == NLBLOCK->nl[0] &&				\
+	  RAWUCHARTEST(p - NLBLOCK->nllen) == NLBLOCK->nl[0] && \
 	  (NLBLOCK->nllen == 1 || RAWUCHARTEST(p - NLBLOCK->nllen + 1) == NLBLOCK->nl[1]) \
 	 ) \
   )
@@ -2694,11 +2694,11 @@ extern BOOL				PRIV(was_newline)(PCRE_PUCHAR, int, PCRE_PUCHAR,
 extern BOOL				PRIV(xclass)(pcre_uint32, const pcre_uchar *, BOOL);
 
 #ifdef SUPPORT_JIT
-extern void				PRIV(jit_compile)(const REAL_PCRE *,
+extern void PRIV(jit_compile)(const REAL_PCRE *,
 									PUBL(extra) *, int);
 extern int					PRIV(jit_exec)(const PUBL(extra) *,
 									const pcre_uchar *, int, int, int, int *, int);
-extern void				PRIV(jit_free)(void *);
+extern void PRIV(jit_free)(void *);
 extern int					PRIV(jit_get_size)(void *);
 extern const char*		 PRIV(jit_get_target)(void);
 #endif

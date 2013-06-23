@@ -134,13 +134,13 @@ protected:
 
 protected:
 	/// @brief		私有成员，仅供内部调用。
-	ulong*					m_pAry;
+	ulong* m_pAry;
 
 	/// @brief		私有成员，仅供内部调用。
-	ulong					m_ulSize;
+	ulong m_ulSize;
 
 	/// @brief		私有成员，仅供内部调用。
-	size_t					m_ulCap;
+	size_t m_ulCap;
 };
 
 #include <hwprj\unsary.inl>

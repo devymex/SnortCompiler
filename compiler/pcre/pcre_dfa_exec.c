@@ -3007,19 +3007,19 @@ for (;;)
 
   if (new_count <= 0)
 	 {
-	 if (rlevel == 1 &&										 /*! Top level, and */
-		could_continue &&									 /*! Some could go on, and */
-		forced_fail != workspace[1] &&					/*! Not all forced fail & */
+	 if (rlevel == 1 &&  /*! Top level, and */
+		could_continue &&  /*! Some could go on, and */
+		forced_fail != workspace[1] && /*! Not all forced fail & */
 		(														/*! either... */
 		(md->moptions & PCRE_PARTIAL_HARD) != 0		/*! Hard partial */
 		||														 /*! or... */
 		((md->moptions & PCRE_PARTIAL_SOFT) != 0 &&  /*! Soft partial and */
 			match_count < 0)									 /*! no matches */
-		) &&													/*! And... */
+		) && /*! And... */
 		(
 		partial_newline ||									/*! Either partial NL */
 			 (														/*! or ... */
-			 ptr >= end_subject &&					 /*! End of subject and */
+			 ptr >= end_subject &&  /*! End of subject and */
 			 ptr > md->start_used_ptr)				/*! Inspected non-empty string */
 			 )
 		)

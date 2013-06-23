@@ -33,90 +33,102 @@ public:
 	CDfa(const CDfa &other);
 	virtual ~CDfa();
 
-	CDfa&				operator =	(const CDfa &other);
-	CDfaRow&			operator []	(STATEID nIdx);
-	const CDfaRow&		operator []	(STATEID nIdx) const;
+	CDfa& operator =	(const CDfa &other);
+	CDfaRow& operator []	(STATEID nIdx);
+	const CDfaRow& operator []	(STATEID nIdx) const;
 
 	ulong				Size() const;
-	CDfaRow&			Back();
-	void				Reserve(ulong ulSize);
-	void				Resize(ulong ulSize, ulong ulColNum);
-	void				Clear();
-	void				PushBack(CDfaRow &sta);
+	CDfaRow& Back();
+	void Reserve(ulong ulSize);
+	void Resize(ulong ulSize, ulong ulColNum);
+	void Clear();
+	void PushBack(CDfaRow &sta);
 
 	/// @brief		获取DFA的编号。
 	ulong				GetId();
 
 	/// @brief		设置DFA的编号。
 	/// @param[in] ulId DFA编号。
-	void				SetId(ulong ulId);
+	void SetId(ulong ulId);
 
 	/// @brief		获取DFA字符集的大小。
 	ushort				GetGroupCount() const;
 
 	/// @brief		设置一个DFA的跳转字符集合
 	/// @param[in] pGroup 分类后的字符集
-	void				SetGroups(byte *pGroup);
+	void SetGroups(byte *pGroup);
 
 	/// @brief		从标准ANSI字符集映射到DFA的字符集。
 	/// @param[in]	nIdx 标准ANSI字符编码。
 	/// @return		与指定字符编码对应的DFA字符。
-	byte				Char2Group(byte nIdx);
+	byte Char2Group(byte nIdx);
 
 	/// @brief		获取DFA开始状态id
-	STATEID				GetStartState() const;
+	STATEID GetStartState() const;
 
 	/// @brief		设置DFA开始状态id
 	/// @param[in]	id DFA状态编号
-	void				SetStartState(STATEID id);
+	void SetStartState(STATEID id);
 
 	/// @brief		获取DFA终态集合
-	CFinalStates&		GetFinalStates();
+	CFinalStates& GetFinalStates();
 
 	/// @brief		获取DFA终态集合（常量）
-	const CFinalStates&	GetFinalStates() const;
+	const CFinalStates& GetFinalStates() const;
 
 	/// @brief		NFA转化为DFA，采用子集构造算法
 	/// @param[in]	CNfa类型的一个NFA
-	ulong				FromNFA(const CNfa &nfa);
+	ulong FromNFA(const CNfa &nfa);
 
 	/// @brief		最小化DFA的状态数，采用Hopcrof算法（1976）
-	ulong				Minimize();
+	ulong Minimize();
 
 	/// @brief		NFA转化为DFA后，再一次压缩字符集，以减少存储空间
-	void				MergeColumn();
+	void MergeColumn();
 
 	/// @brief		计算一个DFA需要的存储空间大小
-	ulong				CalcStoreSize() const;
+	ulong CalcStoreSize() const;
 
 	/// @brief		将一个DFA以unsigned char*类型存入内存
 	/// @param[in]	beg DFA的二进制字节流
-	void				Save(byte *beg);
+	void Save(byte *beg);
 
 	/// @brief		从内存读取一个DFA，存入unsigned char*类型变量
 	/// @param[in]	beg DFA的二进制字节流
-	void				Load(byte *beg);
+	void Load(byte *beg);
 
 	/// @brief		处理数据包与DFA的匹配过程
 	/// @param[in]	ByteStream 输入数据包的二进制字节流。
 	/// @param[in]	len 数据包长度。
 	/// @param[out]	StaSet CDfa状态数组。
-	ulong				Process(byte *ByteStream, ulong len, STATEARY &StaSet);
+	ulong Process(byte *ByteStream, ulong len, STATEARY &StaSet);
 
 	/// @brief		将一个DFA输出到文件中
 	/// @param[in]	pFile 输出文件路径
-	void				Dump(pcstr pFile);
+	void Dump(pcstr pFile);
 
 protected:
-	ulong				PartStates(STATEIDARY *pRevTbl);
+	/// @brief		私有成员，仅供内部使用
+	ulong PartStates(STATEIDARY *pRevTbl);
 
 protected:
-	ulong				m_nId;
-	ushort				m_usColNum;
-	STATEID				m_nStartId;
-	DFAROWARY*			m_pDfa;
-	CFinalStates		m_FinStas;
-	byte				m_pGroup[SC_DFACOLCNT];
+	/// @brief		私有成员，仅供内部使用
+	ulong m_nId;
+
+	/// @brief		私有成员，仅供内部使用
+	ushort m_usColNum;
+
+	/// @brief		私有成员，仅供内部使用
+	STATEID m_nStartId;
+
+	/// @brief		私有成员，仅供内部使用
+	DFAROWARY* m_pDfa;
+
+	/// @brief		私有成员，仅供内部使用
+	CFinalStates m_FinStas;
+
+	/// @brief		私有成员，仅供内部使用
+	byte m_pGroup[SC_DFACOLCNT];
 };
 
 /// @brief		将分组中多个DFA合并为一个DFA

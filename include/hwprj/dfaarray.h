@@ -27,16 +27,17 @@ public:
 	CDfaArray(const CDfaArray& other);
 	virtual ~CDfaArray();
 
-	CDfaArray&		operator =	(const CDfaArray &other);
-	CDfa&			operator []	(ulong ulIdx);
-	const CDfa&		operator []	(ulong ulIdx) const;
+	CDfaArray& operator =	(const CDfaArray &other);
+	CDfa& operator []	(ulong ulIdx);
+	const CDfa& operator []	(ulong ulIdx) const;
 
 	ulong			Size() const;
-	void			Clear();
-	void			Reserve(ulong ulCount);
-	void			Resize(ulong ulSize);
-	void			PushBack(const CDfa &dfa);
+	void Clear();
+	void Reserve(ulong ulCount);
+	void Resize(ulong ulSize);
+	void PushBack(const CDfa &dfa);
 
 protected:
+	/// @brief		私有成员，仅供内部使用
 	CDFAVEC *m_pdfaTbl;
 };

@@ -20,33 +20,46 @@ class DLLSTRING;
 #define DLLSTRHDR __declspec(dllexport)
 #endif
 
-/*! 使用dll封装std::string*/
+/*!
+* @brief		封装std::string，用于模块之间传递参数
+*/
 class DLLSTRHDR CDllString
 {
 public:
-	// CDCA
+	/// @brief		构造函数
 	CDllString();
-	CDllString(const CDllString &other);
+
+	/// @brief		带参构造函数
+	/// @param[in]	pStr 以'\0'为结尾的ANSI字符串指针
 	explicit CDllString(pcstr pStr);
+
+	/// @brief		拷贝构造函数
+	CDllString(const CDllString &other);
+
+	/// @brief		析构函数
 	virtual ~CDllString();
 
-	CDllString&		operator =	(const CDllString &other);
-	char			operator[]	(ulong nIdx) const;
+	/// @brief		重载的 '=' 运算符。
+	/// @param[in]	other 另一个动态数组对象。
+	/// @return		返回自身对象的引用。
+	CDllString& operator = (const CDllString &other);
 
-	// Overided operators
+
+	char			operator[]	(ulong nIdx) const;
 
 	ulong			Size() const;
 	bool			Empty() const;
-	void			Clear();
-	void			Erase(ulong ulIdx);
-	void			Insert(ulong ulIdx, char nChar);
-	void			Insert(ulong ulIdx, pcstr pChar);
-	void			Assign(const char* pStr);
-	void			Append(const CDllString &other);
+	void Clear();
+	void Erase(ulong ulIdx);
+	void Insert(ulong ulIdx, char nChar);
+	void Insert(ulong ulIdx, pcstr pChar);
+	void Assign(const char* pStr);
+	void Append(const CDllString &other);
 	char			Back() const;
-	void			PushBack(char nChar);
+	void PushBack(char nChar);
 	const char*		Data() const;
 
 protected:
+	/// @brief		私有成员，仅供内部使用
 	DLLSTRING*		m_pString;
 };

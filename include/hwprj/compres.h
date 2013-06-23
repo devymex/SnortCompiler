@@ -46,7 +46,12 @@ public:
 	ulong ReadFromFile(const char *filename);
 
 protected:
+	/// @brief		私有成员，仅供内部使用
 	CDfaArray m_dfaTbl;
+
+	/// @brief		私有成员，仅供内部使用
 	CSidDfaIds m_sidDfaIds;
+
+	/// @brief		私有成员，仅供内部使用
 	CRegRule m_RegexTbl;
 };

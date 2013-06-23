@@ -36,17 +36,17 @@ public:
 	CGroups(const CGroups& other);
 	virtual ~CGroups();
 
-	CGroups&			operator=(const CGroups &other);
-	ONEGROUP&			operator[](ulong nIdx);
-	const ONEGROUP&		operator[](ulong nIdx) const;
+	CGroups& operator=(const CGroups &other);
+	ONEGROUP& operator[](ulong nIdx);
+	const ONEGROUP& operator[](ulong nIdx) const;
 
-	ulong				Size() const;
-	void				Resize(ulong nSize);
-	void				PushBack(ONEGROUP oneGroup);
-	ONEGROUP&			Back();
-	void				Clear();
-	void				Erase(ulong nIdx);
+	ulong Size() const;
+	void Resize(ulong nSize);
+	void PushBack(ONEGROUP oneGroup);
+	ONEGROUP& Back();
+	void Clear();
+	void Erase(ulong nIdx);
 
 protected:
-	GROUPVEC*			m_pGroups;
+	GROUPVEC* m_pGroups;
 };

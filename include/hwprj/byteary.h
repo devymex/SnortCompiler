@@ -26,26 +26,33 @@ public:
 	CByteArray();
 
 	/// @brief		拷贝构造函数
-	/// @param[in]	other，指定的另一个对象
+	/// @param[in]	other 指定的另一个对象
 	CByteArray(const CByteArray &other);
 
 	/// @brief		析构函数
 	virtual ~CByteArray();
 
+	/// @brief		重载的 '=' 运算符。
+	/// @param[in]	other 另一个动态数组对象。
+	/// @return		返回自身对象的引用。
 	CByteArray& operator = (const CByteArray &other);
+
 	byte& operator [] (ulong ulIdx);
 	const byte& operator [] (ulong ulIdx) const;
 
-	ulong			Size() const;
-	bool			Empty() const;
-	void			Clear();
-	void			PushBack(byte byVal);
-	void			PopBack();
-	void			Resize(ulong ulSize);
-	void			Reserve(ulong ulCap);
-	byte*			Data();
-	const byte*		Data() const;
+	/// @brief		返回数组的大小。
+	/// @return		字节的数量。
+	ulong Size() const;
+	bool Empty() const;
+	void Clear();
+	void PushBack(byte byVal);
+	void PopBack();
+	void Resize(ulong ulSize);
+	void Reserve(ulong ulCap);
+	byte* Data();
+	const byte* Data() const;
 
 protected:
-	DLLBYTEARY*		m_pAry;
+	/// @brief		私有成员，仅供内部使用
+	DLLBYTEARY* m_pAry;
 };

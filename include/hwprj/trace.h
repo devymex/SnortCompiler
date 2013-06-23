@@ -7,9 +7,14 @@
 #define TRACEHDR __declspec(dllexport)
 #endif
 
+/*!
+* @brief	异常类
+* @remark	应通过宏来使用此类，用法见相关宏定义的说明。
+*/
 class TRACEHDR CTrace
 {
 public:
+	/// @brief		构造函数。
 	CTrace(pcstr pFile, ulong ulLine, pcstr pMsg)
 		: m_pFile(pFile), m_pMsg(pMsg), m_ulLine(ulLine)
 	{
@@ -27,11 +32,14 @@ public:
 		return m_pFile;
 	}
 
-public:
-
 protected:
+	/// @brief		私有成员，仅供内部使用
 	pcstr m_pFile;
+
+	/// @brief		私有成员，仅供内部使用
 	pcstr m_pMsg;
+
+	/// @brief		私有成员，仅供内部使用
 	ulong m_ulLine;
 };
 
@@ -44,11 +52,13 @@ TRACEHDR extern pcstr TI_UNSUPPORT;
 TRACEHDR extern pcstr TI_NOTALLOW;
 TRACEHDR extern pcstr TI_INCOMPATIBLE;
 
+/// @brief		抛出一个CTrace异常，包括当前的代码文件、行号以及错误信息。
 #define TTHROW(m) throw CTrace(__FILE__, __LINE__, m);
 
-
 #ifdef _DEBUG
+/// @brief		断言宏
 #define TASSERT(s)	if (!(s)) {TTHROW("!("#s")");}
+/// @brief		诊断宏
 #define TVERIFY(s)	if (!(s)) {TTHROW("!("#s")");}
 #else
 #define TASSERT(s)	;

@@ -19,25 +19,26 @@
 class DLLSTRINGARY;
 #endif
 
-/*! Capsulate the std::string for dll using. */
+/*!
+* @brief	封装了std::vector<CDllString>对象，提供字符串动态数组的数据结构。
+*/
 class DLLSTRHDR CStringArray
 {
 public:
-	// CDCA
+	/// @brief		构造函数。
 	CStringArray();
 	CStringArray(const CStringArray &other);
 	virtual ~CStringArray();
 
-	// Overided operators
-	CStringArray&		operator =	(const CStringArray &other);
-	CDllString&			operator[]	(ulong ulIdx);
-	const CDllString&	operator[]	(ulong ulIdx) const;
+	CStringArray& operator = (const CStringArray &other);
+	CDllString& operator[] (ulong ulIdx);
+	const CDllString& operator[] (ulong ulIdx) const;
 
-	// Normal operations
-	ulong				Size() const;
-	void				Clear();
-	void				PushBack(const CDllString &str);
+	ulong Size() const;
+	void Clear();
+	void PushBack(const CDllString &str);
 
 protected:
+	/// @brief		私有成员，仅供内部使用
 	DLLSTRINGARY*		m_pStrAry;
 };
