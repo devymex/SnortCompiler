@@ -1,8 +1,9 @@
 /*!
 * @file			ctimer.h
 * @author		Devymex, Xidian University
-* @brief		High performance timer
+* @brief		定义了高精度计时器类CTimer
 * @warning		本文件将包含windows.h，若出现命名冲突，请在包此本文件之间增加相关宏定义。
+* @copyright	本项目开发组版权所有。未经许可，不得复制、更改、编译、分发。
 */
 
 #pragma once
@@ -45,7 +46,7 @@ public:
 
 		return dCur;
 	}
-protected:
+private:
 	/// @brief		私有成员，仅供内部使用
 	__int64 m_nFreq;
 

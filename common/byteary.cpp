@@ -1,3 +1,10 @@
+/*!
+* @file			byteary.cpp
+* @author		Lab 435, Xidian University
+* @brief		实现了CByteArray的成员函数
+* @copyright	本项目开发组版权所有。未经许可，不得复制、更改、编译、分发。
+*/
+
 #include "stdafx.h"
 #include <hwprj\trace.h>
 #include <hwprj\byteary.h>

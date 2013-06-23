@@ -1,3 +1,10 @@
+/*!
+* @file			trace.h
+* @author		Lab 435, Xidian University
+* @brief		定义了CTrace类及其导出符号
+* @copyright	本项目开发组版权所有。未经许可，不得复制、更改、编译、分发。
+*/
+
 #pragma once
 #include <hwprj\common.h>
 
@@ -32,7 +39,7 @@ public:
 		return m_pFile;
 	}
 
-protected:
+private:
 	/// @brief		私有成员，仅供内部使用
 	pcstr m_pFile;
 

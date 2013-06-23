@@ -53,7 +53,7 @@ public:
 	/// @brief		获取状态属性
 	STATEFLAG		GetFlags() const;
 
-protected:
+private:
 	/// @brief		私有成员，仅供内部使用
 	STATEIDARY*		m_pDest;
 

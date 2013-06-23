@@ -47,5 +47,5 @@ public:
 	void CopyTo(CUnsignedArray &idAry) const;
 
 private:
-	DFAIDSET*	m_pSet;
+	DFAIDSET* m_pSet;
 };
