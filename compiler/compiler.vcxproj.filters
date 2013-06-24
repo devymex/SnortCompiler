@@ -59,13 +59,7 @@
     <ClInclude Include="p2nmain.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\hwprj\signatures.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\hwprj\pcrematch.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="pcre2nfa.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="comprule.h">
@@ -172,13 +166,7 @@
     <ClCompile Include="pcre\pcre_xclass.c">
       <Filter>Source Files\pcre</Filter>
     </ClCompile>
-    <ClCompile Include="pcre2nfa.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="p2nmain.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="signatures.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="pcrematch.cpp">

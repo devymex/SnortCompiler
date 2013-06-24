@@ -1,15 +1,12 @@
-/**
-**	@file		grouping.cpp
-**
-**	@author		Lab 435, Xidian University
-**
-**	@brief		Support functions for grouping dfa
-**
-**	This implements grouping dfa algorithm, the algorithm has four steps
-**	in general. At first, it groups dfa which has only one signature. Then, 
-**	push the remain dfa into the group. Thirdly, it groups dfa with the same 
-**	signatures. Finally, it merges two groups.
-**
+/*!
+* @file		grouping.cpp
+* @author	Lab 435, Xidian University
+* @brief	Support functions for grouping dfa
+*
+* This implements grouping dfa algorithm, the algorithm has four steps
+* in general. At first, it groups dfa which has only one signature. Then, 
+* push the remain dfa into the group. Thirdly, it groups dfa with the same 
+* signatures. Finally, it merges two groups.
 */
 
 #include "stdafx.h"
@@ -17,7 +14,7 @@
 #include <hwprj\groupres.h>
 #include <hwprj\grouping.h>
 
-/* Extract signatures from res to vecDfaInfo and add all index to vecWaitForGroup
+/*! Extract signatures from res to vecDfaInfo and add all index to vecWaitForGroup
 
 Arguments:
   res					the compile result
@@ -28,7 +25,7 @@ Returns:				nothing
 
 */
 
-void ExtractSigsVec(const CCompileResults &res, std::vector<CSignatures> &SigsVec, std::vector<ulong> &vecWaitForGroup)
+void ExtractSigsVec(const CCompileResults &res, std::vector<CUnsignedArray> &SigsVec, std::vector<ulong> &vecWaitForGroup)
 {
 	ulong nSize = res.GetRegexTbl().Size();
 	SigsVec.resize(nSize);
@@ -42,7 +39,7 @@ void ExtractSigsVec(const CCompileResults &res, std::vector<CSignatures> &SigsVe
 	}
 }
 
-/* group dfa which has only one signature by its only signature
+/*! group dfa which has only one signature by its only signature
 
 Arguments:
   vecDfaInfo		signatures correspond to each dfa
@@ -53,7 +50,7 @@ Returns:				nothing
 
 */
 
-void GroupOnlyOneSig(const std::vector<CSignatures> &SigsVec, std::vector<ulong> &vecWaitForGroup, CGroups &groups)
+void GroupOnlyOneSig(const std::vector<CUnsignedArray> &SigsVec, std::vector<ulong> &vecWaitForGroup, CGroups &groups)
 {
 	std::map<SIGNATURE, CUnsignedArray> sigToIdsMap;
 	for (std::vector<ulong>::iterator i = vecWaitForGroup.begin(); i != vecWaitForGroup.end();)
@@ -81,7 +78,17 @@ void GroupOnlyOneSig(const std::vector<CSignatures> &SigsVec, std::vector<ulong>
 	}
 }
 
-/* try to merge dfa in one group, merge if success, otherwise seperate the group into two
+struct DFASIZECOMP
+{
+	const CCompileResults *m_pRes;
+	DFASIZECOMP(const CCompileResults *pRes) : m_pRes(pRes) {}
+	bool operator()(ulong idx1, ulong idx2)
+	{
+		return m_pRes->GetDfaTable()[idx1].Size() < m_pRes->GetDfaTable()[idx2].Size();
+	}
+};
+
+/*! sort dfaids by dfa size
 
 Arguments:
   res					the compile result, the merged dfa will be pushed into the res's dfa table
@@ -91,24 +98,24 @@ Returns:				nothing
 
 */
 
-void Sort(CCompileResults &res, CGroups &groups)
+void DfaSizeSort(const CCompileResults &res, CGroups &groups)
 {
 	for (ulong i = 0; i < groups.Size(); ++i)
 	{
-		for (ulong j = 0; j < groups[i].DfaIds.Size(); ++j)
-		{
-			ulong idx1 = groups[i].DfaIds[j];
-			for (ulong k = j + 1; k < groups[i].DfaIds.Size(); ++k)
-			{
-				ulong idx2 = groups[i].DfaIds[k];
-				if (res.GetDfaTable()[idx1].Size() > res.GetDfaTable()[idx2].Size())
-				{
-					std::swap(idx1, idx2);
-				}
-			}
-		}
+		ulong *pBeg = groups[i].DfaIds.Data();
+		std::sort(pBeg, pBeg + groups[i].DfaIds.Size(), DFASIZECOMP(&res));
 	}
 }
+
+/*! try to merge dfa in one group, merge if success, otherwise seperate the group into two
+
+Arguments:
+  res					the compile result, the merged dfa will be pushed into the res's dfa table
+  groups				the group result
+
+Returns:				nothing
+
+*/
 
 void Merge(CCompileResults &res, CGroups &groups)
 {
@@ -175,7 +182,7 @@ void Merge(CCompileResults &res, CGroups &groups)
 	}
 }
 
-/* put dfa waiting for grouping into a group, if the dfa has the group's signature and 
+/*! put dfa waiting for grouping into a group, if the dfa has the group's signature and 
 can merge with the group's dfa merged before
 
 Arguments:
@@ -188,7 +195,7 @@ Returns:				nothing
 
 */
 
-void PutInBySig(const std::vector<CSignatures> &SigsVec, CCompileResults &res, CGroups &groups, std::vector<ulong> &vecWaitForGroup)
+void PutInBySig(const std::vector<CUnsignedArray> &SigsVec, CCompileResults &res, CGroups &groups, std::vector<ulong> &vecWaitForGroup)
 {
 	std::map<SIGNATURE, std::vector<ulong>> sigToGroupsMap;
 	ulong idx = 0;
@@ -238,7 +245,7 @@ void PutInBySig(const std::vector<CSignatures> &SigsVec, CCompileResults &res, C
 	}
 }
 
-/* group dfa which has the same signatures by its signatures
+/*! group dfa which has the same signatures by its signatures
 
 Arguments:
   vecDfaInfo		signatures correspond to each dfa
@@ -249,9 +256,9 @@ Returns:				nothing
 
 */
 
-void BuildGroupBySig(const std::vector<CSignatures> &SigsVec, CGroups &newGroups, std::vector<ulong> &vecWaitForGroup)
+void BuildGroupBySig(const std::vector<CUnsignedArray> &SigsVec, CGroups &newGroups, std::vector<ulong> &vecWaitForGroup)
 {
-	std::map<CSignatures, CUnsignedArray> sigsToIdsMap;
+	std::map<CUnsignedArray, CUnsignedArray> sigsToIdsMap;
 	for (ulong i = 0; i < vecWaitForGroup.size(); ++i)
 	{
 		sigsToIdsMap[SigsVec[vecWaitForGroup[i]]].PushBack(vecWaitForGroup[i]);
@@ -260,7 +267,7 @@ void BuildGroupBySig(const std::vector<CSignatures> &SigsVec, CGroups &newGroups
 
 	newGroups.Resize(sigsToIdsMap.size());
 	ulong idx = 0;
-	for (std::map<CSignatures, CUnsignedArray>::iterator i = sigsToIdsMap.begin(); i != sigsToIdsMap.end(); ++i, ++idx)
+	for (std::map<CUnsignedArray, CUnsignedArray>::iterator i = sigsToIdsMap.begin(); i != sigsToIdsMap.end(); ++i, ++idx)
 	{
 		for (ulong j = 0; j < i->first.Size(); ++j)
 		{
@@ -271,7 +278,7 @@ void BuildGroupBySig(const std::vector<CSignatures> &SigsVec, CGroups &newGroups
 	}
 }
 
-/* extract signatures from group with only one signature
+/*! extract signatures from group with only one signature
 
 Arguments:
   groups				the group result, each group has only one signature
@@ -291,7 +298,7 @@ void ExtractUsedSigs(const CGroups &groups, std::vector<SIGNATURE> &vecUsed)
 	vecUsed.erase(std::unique(vecUsed.begin(), vecUsed.end()), vecUsed.end());
 }
 
-/* extract common signatures from two groups
+/*! extract common signatures from two groups
 
 Arguments:
   g1					 the first group
@@ -326,7 +333,7 @@ void ExtractComSigs(const ONEGROUP &g1, const ONEGROUP &g2, const std::vector<SI
 	}
 }
 
-/* the used upper limit of the signatures
+/*! the used upper limit of the signatures
 
 Arguments:
   vecSigs			signatures
@@ -337,17 +344,17 @@ Returns:				the used upper limit of the signatures
 
 ulong AvailableNum(const std::vector<SIGNATURE> &vecSigs)
 {
-	if (vecSigs.size() <= 1)
+	if (vecSigs.size() <= 2)
 	{
 		return 0;
 	}
 	else
 	{
-		return vecSigs.size() - 2;
+		return vecSigs.size() - 3;
 	}
 }
 
-/* try to merge two groups, merge if the two group have common signatures , the used number 
+/*! try to merge two groups, merge if the two group have common signatures , the used number 
 of the common signatures isn't exceed its upper limit and the two groups merged dfa can merge
 
 Arguments:
@@ -417,7 +424,6 @@ void MergeGroup(CCompileResults &res, std::vector<SIGNATURE> &vecUsed, CGroups &
 					CDfa MergeDfa;
 					if (MergeMultipleDfas(vecDfas, MergeDfa))
 					{
-
 						//select the fittest group to merge
 						int nReduceSize = vecDfas[0].Size() + vecDfas[1].Size() - MergeDfa.Size();
 						if (nMax < nReduceSize)
@@ -489,7 +495,7 @@ void MergeGroup(CCompileResults &res, std::vector<SIGNATURE> &vecUsed, CGroups &
 	}
 }
 
-/* add new group result to group result
+/*! add new group result to group result
 
 Arguments:
   groups				the group result
@@ -508,7 +514,7 @@ void AddNewGroups(CGroups &newGroups, CGroups &groups)
 	newGroups.Clear();
 }
 
-/* clear up the group result
+/*! clear up the group result
 
 Arguments:
   res					the compile result and its dfa table contains the merged dfas
@@ -613,7 +619,7 @@ void outPutGroups(CGroupRes &groupRes, const char* fileName)
 	fout.close();
 }
 
-/* the grouping algorithm
+/*! the grouping algorithm
 
 Arguments:
   res					the compile result
@@ -628,7 +634,7 @@ GROUPINGHDR void Grouping(CCompileResults &res, CGroupRes &groupRes)
 	CTimer t1, tAll;
 
 	g_log << "Extract Dfa's information..." << g_log.nl;
-	std::vector<CSignatures> SigsVec;
+	std::vector<CUnsignedArray> SigsVec;
 	std::vector<ulong> vecWaitForGroup;
 	ExtractSigsVec(res, SigsVec, vecWaitForGroup);
 	g_log << "Completed in " << t1.Reset() << " Sec." << g_log.nl << g_log.nl;
@@ -640,7 +646,7 @@ GROUPINGHDR void Grouping(CCompileResults &res, CGroupRes &groupRes)
 
 	//Merge dfa with only one signature...
 	g_log << "Merge dfa with only one signature..." << g_log.nl;
-	//Sort(res, groups);
+	DfaSizeSort(res, groups);
 	Merge(res, groups);
 	g_log << "Completed in " << t1.Reset() << " Sec." << g_log.nl << g_log.nl;
 
@@ -653,7 +659,7 @@ GROUPINGHDR void Grouping(CCompileResults &res, CGroupRes &groupRes)
 	g_log << "Build group which has the same signatures..." << g_log.nl;
 	CGroups newGroups;
 	BuildGroupBySig(SigsVec, newGroups, vecWaitForGroup);
-	//Sort(res, newGroups);
+	//DfaSizeSort(res, newGroups);
 	Merge(res, newGroups);
 	g_log << "Completed in " << t1.Reset() << " Sec." << g_log.nl << g_log.nl;
 

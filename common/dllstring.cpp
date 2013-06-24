@@ -1,10 +1,7 @@
-/**
-**	@file		unsary.h
-**
-**	@author	  Lab 435, Xidian University
-**
-**	@brief		Impletation of the CDllString class
-**
+/*!
+* @file			unsary.h
+* @author		Lab 435, Xidian University
+* @brief		实现了CDllString类的成员函数
 */
 
 #include "stdafx.h"
@@ -69,7 +66,7 @@ DLLSTRHDR CDllString& CDllString::operator = (const CDllString &other)
 	return *this;
 }
 
-DLLSTRHDR char CDllString::operator[](ulong nIdx) const
+DLLSTRHDR char& CDllString::operator[](ulong nIdx) const
 {
 	return (*m_pString)[nIdx];
 }
@@ -116,11 +113,6 @@ DLLSTRHDR char CDllString::Back() const
 	return m_pString->back();
 }
 
-DLLSTRHDR const char* CDllString::GetStr() const
-{
-	return m_pString->c_str();
-}
-
 DLLSTRHDR void CDllString::Clear()
 {
 	m_pString->clear();
@@ -138,6 +130,7 @@ DLLSTRHDR bool CDllString::Empty() const
 
 DLLSTRHDR const char* CDllString::Data() const
 {
+	TASSERT(!m_pString->empty());
 	return m_pString->c_str();
 }
 

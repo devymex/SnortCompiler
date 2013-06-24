@@ -29,32 +29,6 @@ SNORTRULEHDR CPcreOption& CPcreOption::operator = (const CPcreOption &other)
 	return *this;
 }
 
-void CPcreOption::Append(const CPcreOption &next)
-{
-	if (!next.HasFlags(PF_R))
-	{
-		TTHROW(TI_INCOMPATIBLE);
-	}
-	OPTIONFLAG nFlags = next.m_nFlags & (~PF_R);
-	if (m_nFlags != nFlags)
-	{
-		TTHROW(TI_INCOMPATIBLE);
-	}
-	CDllString strOther = next.m_strPcre;
-	if (strOther.Size() != 0)
-	{
-		if (strOther[0] == '^')
-		{
-			strOther.Erase(0);
-		}
-		m_strPcre.Append(strOther);
-	}
-	if (!next.HasFlags(PF_F))
-	{
-		DelFlags(PF_F);
-	}
-}
-
 SNORTRULEHDR void CPcreOption::FromPattern(const CDllString &strPat)
 {
 	CDllString strTemp = strPat;
@@ -188,7 +162,7 @@ SNORTRULEHDR const CDllString& CPcreOption::GetPcreString() const
 	return m_strPcre;
 }
 
-SNORTRULEHDR void CPcreOption::PreComp(BYTEARY &compData) const
+SNORTRULEHDR void CPcreOption::Precompile(CByteArray &pcResult) const
 {
 	int options = 0;
 	if (HasFlags(PF_s))
@@ -216,12 +190,13 @@ SNORTRULEHDR void CPcreOption::PreComp(BYTEARY &compData) const
 		TTHROW(TI_INVALIDDATA);
 	}
 
+	pcResult.Clear();
 	unsigned int size;
 	unsigned short name_table_offset;
 	size = *((unsigned int*)re + 1);
 	name_table_offset = *((unsigned short*)re + 12);
 	for (ulong i = 0; i < size - name_table_offset; ++i)
 	{
-		compData.push_back((byte)*((byte*)re + name_table_offset + i));
+		pcResult.PushBack((byte)*((byte*)re + name_table_offset + i));
 	}
 }

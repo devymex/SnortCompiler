@@ -1,8 +1,8 @@
-/*************************************************
+/*!************************************************
 *		Perl-Compatible Regular Expressions		 *
 *************************************************/
 
-/* PCRE is a library of functions to support regular expressions whose syntax
+/*! PCRE is a library of functions to support regular expressions whose syntax
 and semantics are as close as possible to those of the Perl 5 language.
 
 							Written by Philip Hazel
@@ -37,7 +37,7 @@ POSSIBILITY OF SUCH DAMAGE.
 -----------------------------------------------------------------------------
 */
 
-/* This module contains pcre_exec(), the externally visible function that does
+/*! This module contains pcre_exec(), the externally visible function that does
 pattern matching using an NFA algorithm, trying to mimic Perl as closely as
 possible. There are also some static supporting functions. */
 
@@ -45,31 +45,31 @@ possible. There are also some static supporting functions. */
 #include "config.h"
 #endif
 
-#define NLBLOCK md				 /* Block containing newline information */
-#define PSSTART start_subject  /* Field containing processed string start */
-#define PSEND	end_subject	 /* Field containing processed string end */
+#define NLBLOCK md				 /*! Block containing newline information */
+#define PSSTART start_subject  /*! Field containing processed string start */
+#define PSEND	end_subject	 /*! Field containing processed string end */
 
 #include "pcre_internal.h"
 
-/* Undefine some potentially clashing cpp symbols */
+/*! Undefine some potentially clashing cpp symbols */
 
 #undef min
 #undef max
 
-/* Values for setting in md->match_function_type to indicate two special types
+/*! Values for setting in md->match_function_type to indicate two special types
 of call to match(). We do it this way to save on using another stack variable,
 as stack usage is to be discouraged. */
 
-#define MATCH_CONDASSERT	  1  /* Called to check a condition assertion */
-#define MATCH_CBEGROUP		 2  /* Could-be-empty unlimited repeat group */
+#define MATCH_CONDASSERT	  1  /*! Called to check a condition assertion */
+#define MATCH_CBEGROUP		 2  /*! Could-be-empty unlimited repeat group */
 
-/* Non-error returns from the match() function. Error returns are externally
+/*! Non-error returns from the match() function. Error returns are externally
 defined PCRE_ERROR_xxx codes, which are all negative. */
 
 #define MATCH_MATCH		1
 #define MATCH_NOMATCH		0
 
-/* Special internal returns from the match() function. Make them sufficiently
+/*! Special internal returns from the match() function. Make them sufficiently
 negative to avoid the external error codes. */
 
 #define MATCH_ACCEPT		 (-999)
@@ -81,23 +81,23 @@ negative to avoid the external error codes. */
 #define MATCH_SKIP_ARG	  (-993)
 #define MATCH_THEN			(-992)
 
-/* Maximum number of ints of offset to save on the stack for recursive calls.
+/*! Maximum number of ints of offset to save on the stack for recursive calls.
 If the offset vector is bigger, malloc is used. This should be a multiple of 3,
 because the offset vector is always a multiple of 3 long. */
 
 #define REC_STACK_SAVE_MAX 30
 
-/* Min and max values for the common repeats; for the maxima, 0 => infinity */
+/*! Min and max values for the common repeats; for the maxima, 0 => infinity */
 
 static const char rep_min[] = { 0, 0, 1, 1, 0, 0 };
 static const char rep_max[] = { 0, 0, 0, 0, 1, 1 };
 
 #ifdef PCRE_DEBUG
-/*************************************************
+/*!************************************************
 *		Debugging function to print chars		 *
 *************************************************/
 
-/* Print a sequence of chars in printable format, stopping at the end of the
+/*! Print a sequence of chars in printable format, stopping at the end of the
 subject if the requested.
 
 Arguments:
@@ -122,11 +122,11 @@ while (length-- > 0)
 
 
 
-/*************************************************
+/*!************************************************
 *			 Match a back-reference					 *
 *************************************************/
 
-/* Normally, if a back reference hasn't been set, the length that is passed is
+/*! Normally, if a back reference hasn't been set, the length that is passed is
 negative, so the match always fails. However, in JavaScript compatibility mode,
 the length passed is zero. Note that in caseless UTF-8 mode, the number of
 subject bytes matched may be different to the number of reference bytes.
@@ -166,12 +166,12 @@ pchars(p, length, FALSE, md);
 printf("\n");
 #endif
 
-/* Always fail if reference not set (and not JavaScript compatible - in that
+/*! Always fail if reference not set (and not JavaScript compatible - in that
 case the length is passed as zero). */
 
 if (length < 0) return -1;
 
-/* Separate the caseless case for speed. In UTF-8 mode we can only do this
+/*! Separate the caseless case for speed. In UTF-8 mode we can only do this
 properly if Unicode properties are supported. Otherwise, we can check only
 ASCII characters. */
 
@@ -181,7 +181,7 @@ if (caseless)
 #ifdef SUPPORT_UCP
   if (utf)
 	 {
-	 /* Match characters up to the end of the reference. NOTE: the number of
+	 /*! Match characters up to the end of the reference. NOTE: the number of
 	 data units matched may differ, because in UTF-8 there are some characters
 	 whose upper and lower case versions code have different numbers of bytes.
 	 For example, U+023A (2 bytes in UTF-8) is the upper case version of U+2C65
@@ -195,7 +195,7 @@ if (caseless)
 		{
 		pcre_uint32 c, d;
 		const ucd_record *ur;
-		if (eptr >= md->end_subject) return -2;	/* Partial match */
+		if (eptr >= md->end_subject) return -2;	/*! Partial match */
 		GETCHARINC(c, eptr);
 		GETCHARINC(d, p);
 		ur = GET_UCD(d);
@@ -214,13 +214,13 @@ if (caseless)
 #endif
 #endif
 
-  /* The same code works when not in UTF-8 mode and in UTF-8 mode when there
+  /*! The same code works when not in UTF-8 mode and in UTF-8 mode when there
   is no UCP support. */
 	 {
 	 while (length-- > 0)
 		{
 		pcre_uchar cc, cp;
-		if (eptr >= md->end_subject) return -2;	/* Partial match */
+		if (eptr >= md->end_subject) return -2;	/*! Partial match */
 		cc = RAWUCHARTEST(eptr);
 		cp = RAWUCHARTEST(p);
 		if (TABLE_GET(cp, md->lcc, cp) != TABLE_GET(cc, md->lcc, cc)) return -1;
@@ -230,14 +230,14 @@ if (caseless)
 	 }
   }
 
-/* In the caseful case, we can just compare the bytes, whether or not we
+/*! In the caseful case, we can just compare the bytes, whether or not we
 are in UTF-8 mode. */
 
 else
   {
   while (length-- > 0)
 	 {
-	 if (eptr >= md->end_subject) return -2;	/* Partial match */
+	 if (eptr >= md->end_subject) return -2;	/*! Partial match */
 	 if (RAWUCHARINCTEST(p) != RAWUCHARINCTEST(eptr)) return -1;
 	 }
   }
@@ -247,7 +247,7 @@ return (int)(eptr - eptr_start);
 
 
 
-/***************************************************************************
+/*!**************************************************************************
 ****************************************************************************
 						 RECURSION IN THE match() FUNCTION
 
@@ -285,7 +285,7 @@ variable instead of being passed in the frame.
 ****************************************************************************
 ***************************************************************************/
 
-/* Numbers for RMATCH calls. When this list is changed, the code at HEAP_RETURN
+/*! Numbers for RMATCH calls. When this list is changed, the code at HEAP_RETURN
 below must be updated in sync.  */
 
 enum { RM1=1, RM2,  RM3,  RM4,  RM5,  RM6,  RM7,  RM8,  RM9,  RM10,
@@ -296,7 +296,7 @@ enum { RM1=1, RM2,  RM3,  RM4,  RM5,  RM6,  RM7,  RM8,  RM9,  RM10,
 		 RM51,  RM52, RM53, RM54, RM55, RM56, RM57, RM58, RM59, RM60,
 		 RM61,  RM62, RM63, RM64, RM65, RM66, RM67 };
 
-/* These versions of the macros use the stack, as normal. There are debugging
+/*! These versions of the macros use the stack, as normal. There are debugging
 versions and production versions. Note that the "rw" argument of RMATCH isn't
 actually used in this definition. */
 
@@ -324,7 +324,7 @@ actually used in this definition. */
 #else
 
 
-/* These versions of the macros manage a protected stack on the heap. Note that
+/*! These versions of the macros manage a protected stack on the heap. Note that
 the "rd" argument of RMATCH isn't actually used in this definition. It's the md
 argument of match(), which never changes. */
 
@@ -368,13 +368,13 @@ argument of match(), which never changes. */
   }
 
 
-/* Structure for remembering the local variables in a protected frame */
+/*! Structure for remembering the local variables in a protected frame */
 
 typedef struct heapframe {
   struct heapframe *Xprevframe;
   struct heapframe *Xnextframe;
 
-  /* Function arguments that may change */
+  /*! Function arguments that may change */
 
   PCRE_PUCHAR Xeptr;
   const pcre_uchar *Xecode;
@@ -383,7 +383,7 @@ typedef struct heapframe {
   eptrblock *Xeptrb;
   unsigned int Xrdepth;
 
-  /* Function local variables */
+  /*! Function local variables */
 
   PCRE_PUCHAR Xcallpat;
 #ifdef SUPPORT_UTF
@@ -425,7 +425,7 @@ typedef struct heapframe {
 
   eptrblock Xnewptrb;
 
-  /* Where to jump back to */
+  /*! Where to jump back to */
 
   int Xwhere;
 
@@ -434,20 +434,20 @@ typedef struct heapframe {
 #endif
 
 
-/***************************************************************************
+/*!**************************************************************************
 ***************************************************************************/
 
 
 
-/*************************************************
+/*!************************************************
 *			Match from current position				*
 *************************************************/
 
-/* This function is called recursively in many circumstances. Whenever it
+/*! This function is called recursively in many circumstances. Whenever it
 returns a negative (error) response, the outer incarnation must also return the
 same response. */
 
-/* These macros pack up tests that are used for partial matching, and which
+/*! These macros pack up tests that are used for partial matching, and which
 appear several times in the code. We set the "hit end" flag if the pointer is
 at the end of the subject and also past the start of the subject (i.e.
 something has been matched). For hard partial matching, we then return
@@ -470,7 +470,7 @@ the subject. */
 	 }
 
 
-/* Performance note: It might be tempting to extract commonly used fields from
+/*! Performance note: It might be tempting to extract commonly used fields from
 the md structure (e.g. utf, end_subject) into individual variables to improve
 performance. Tests using gcc on a SPARC disproved this; in the first case, it
 made performance worse.
@@ -498,20 +498,20 @@ match(REGISTER PCRE_PUCHAR eptr, REGISTER const pcre_uchar *ecode,
   PCRE_PUCHAR mstart, int offset_top, match_data *md, eptrblock *eptrb,
   unsigned int rdepth)
 {
-/* These variables do not need to be preserved over recursion in this function,
+/*! These variables do not need to be preserved over recursion in this function,
 so they can be ordinary variables in all cases. Mark some of them with
 "register" because they are used a lot in loops. */
 
-register int  rrc;			/* Returns from recursive calls */
-register int  i;			/* Used for loops not involving calls to RMATCH() */
-register pcre_uint32 c;	 /* Character values not kept over RMATCH() calls */
-register BOOL utf;			/* Local copy of UTF flag for speed */
+register int  rrc;			/*! Returns from recursive calls */
+register int  i;			/*! Used for loops not involving calls to RMATCH() */
+register pcre_uint32 c;	 /*! Character values not kept over RMATCH() calls */
+register BOOL utf;			/*! Local copy of UTF flag for speed */
 
-BOOL minimize, possessive; /* Quantifier options */
+BOOL minimize, possessive; /*! Quantifier options */
 BOOL caseless;
 int condcode;
 
-/* When recursion is not being used, all "local" variables that have to be
+/*! When recursion is not being used, all "local" variables that have to be
 preserved over calls to RMATCH() are part of a "frame". We set up the top-level
 frame on the stack here; subsequent instantiations are obtained from the heap
 whenever RMATCH() does a "recursion". See the macro definitions above. Putting
@@ -521,7 +521,7 @@ boost in many cases where there is not much "recursion". */
 #ifdef NO_RECURSE
 heapframe *frame = (heapframe *)md->match_frames_base;
 
-/* Copy in the original argument variables */
+/*! Copy in the original argument variables */
 
 frame->Xeptr = eptr;
 frame->Xecode = ecode;
@@ -530,11 +530,11 @@ frame->Xoffset_top = offset_top;
 frame->Xeptrb = eptrb;
 frame->Xrdepth = rdepth;
 
-/* This is where control jumps back to to effect "recursion" */
+/*! This is where control jumps back to to effect "recursion" */
 
 HEAP_RECURSE:
 
-/* Macros make the argument variables come from the current frame */
+/*! Macros make the argument variables come from the current frame */
 
 #define eptr					frame->Xeptr
 #define ecode				frame->Xecode
@@ -543,7 +543,7 @@ HEAP_RECURSE:
 #define eptrb				frame->Xeptrb
 #define rdepth				 frame->Xrdepth
 
-/* Ditto for the local variables */
+/*! Ditto for the local variables */
 
 #ifdef SUPPORT_UTF
 #define charptr				frame->Xcharptr
@@ -587,15 +587,15 @@ HEAP_RECURSE:
 
 #define newptrb				frame->Xnewptrb
 
-/* When recursion is being used, local variables are allocated on the stack and
+/*! When recursion is being used, local variables are allocated on the stack and
 get preserved during recursion in the normal way. In this environment, fi and
 i, and fc and c, can be the same variables. */
 
-#else			/* NO_RECURSE not defined */
+#else			/*! NO_RECURSE not defined */
 #define fi i
 #define fc c
 
-/* Many of the following variables are used only in small blocks of the code.
+/*! Many of the following variables are used only in small blocks of the code.
 My normal style of coding would have declared them within each of those blocks.
 However, in order to accommodate the version of this code that uses an external
 "stack" implemented on the heap, it is easier to declare them all here, so the
@@ -641,7 +641,7 @@ int stacksave[REC_STACK_SAVE_MAX];
 
 eptrblock newptrb;
 
-/* There is a special fudge for calling match() in a way that causes it to
+/*! There is a special fudge for calling match() in a way that causes it to
 measure the size of its basic stack frame when the stack is being used for
 recursion. The second argument (ecode) being NULL triggers this behaviour. It
 cannot normally ever be NULL. The return is the negated value of the frame
@@ -657,9 +657,9 @@ if (ecode == NULL)
 	 return (len > 0)? -len : len;
 	 }
   }
-#endif	  /* NO_RECURSE */
+#endif	  /*! NO_RECURSE */
 
-/* To save space on the stack and in the heap frame, I have doubled up on some
+/*! To save space on the stack and in the heap frame, I have doubled up on some
 of the local variables that are used only in localised parts of the code, but
 still need to be preserved over recursive calls of match(). These macros define
 the alternative names that are used. */
@@ -672,7 +672,7 @@ the alternative names that are used. */
 #define foc			number
 #define save_mark	  data
 
-/* These statements are here to stop the compiler complaining about unitialized
+/*! These statements are here to stop the compiler complaining about unitialized
 variables. */
 
 #ifdef SUPPORT_UCP
@@ -681,14 +681,14 @@ prop_fail_result = 0;
 #endif
 
 
-/* This label is used for tail recursion, which is used in a few cases even
+/*! This label is used for tail recursion, which is used in a few cases even
 when NO_RECURSE is not defined, in order to reduce the amount of stack that is
 used. Thanks to Ian Taylor for noticing this possibility and sending the
 original patch. */
 
 TAIL_RECURSE:
 
-/* OK, now we can get on with the real code of the function. Recursive calls
+/*! OK, now we can get on with the real code of the function. Recursive calls
 are specified by the macro RMATCH and RRETURN is used to return. When
 NO_RECURSE is *not* defined, these just turn into a recursive call to match()
 and a "return", respectively (possibly with some debugging if PCRE_DEBUG is
@@ -697,18 +697,18 @@ complicated macro. It has to be used in one particular way. This shouldn't,
 however, impact performance when true recursion is being used. */
 
 #ifdef SUPPORT_UTF
-utf = md->utf;		 /* Local copy of the flag */
+utf = md->utf;		 /*! Local copy of the flag */
 #else
 utf = FALSE;
 #endif
 
-/* First check that we haven't called match() too many times, or that we
+/*! First check that we haven't called match() too many times, or that we
 haven't exceeded the recursive call limit. */
 
 if (md->match_call_count++ >= md->match_limit) RRETURN(PCRE_ERROR_MATCHLIMIT);
 if (rdepth >= md->match_limit_recursion) RRETURN(PCRE_ERROR_RECURSIONLIMIT);
 
-/* At the start of a group with an unlimited repeat that may match an empty
+/*! At the start of a group with an unlimited repeat that may match an empty
 string, the variable md->match_function_type is set to MATCH_CBEGROUP. It is
 done this way to save having to use another function argument, which would take
 up space on the stack. See also MATCH_CONDASSERT below.
@@ -728,7 +728,7 @@ if (md->match_function_type == MATCH_CBEGROUP)
   md->match_function_type = 0;
   }
 
-/* Now start processing the opcodes. */
+/*! Now start processing the opcodes. */
 
 for (;;)
   {
@@ -739,13 +739,13 @@ for (;;)
 	 {
 	 case OP_MARK:
 	 md->nomatch_mark = ecode + 2;
-	 md->mark = NULL;	 /* In case previously set by assertion */
+	 md->mark = NULL;	 /*! In case previously set by assertion */
 	 RMATCH(eptr, ecode + PRIV(OP_lengths)[*ecode] + ecode[1], offset_top, md,
 		eptrb, RM55);
 	 if ((rrc == MATCH_MATCH || rrc == MATCH_ACCEPT) &&
 			md->mark == NULL) md->mark = ecode + 2;
 
-	 /* A return of MATCH_SKIP_ARG means that matching failed at SKIP with an
+	 /*! A return of MATCH_SKIP_ARG means that matching failed at SKIP with an
 	 argument, and we must check whether that argument matches this MARK's
 	 argument. It is passed back in md->start_match_ptr (an overloading of that
 	 variable). If it does match, we reset that variable to the current subject
@@ -763,7 +763,7 @@ for (;;)
 	 case OP_FAIL:
 	 RRETURN(MATCH_NOMATCH);
 
-	 /* COMMIT overrides PRUNE, SKIP, and THEN */
+	 /*! COMMIT overrides PRUNE, SKIP, and THEN */
 
 	 case OP_COMMIT:
 	 RMATCH(eptr, ecode + PRIV(OP_lengths)[*ecode], offset_top, md,
@@ -774,7 +774,7 @@ for (;;)
 		RRETURN(rrc);
 	 RRETURN(MATCH_COMMIT);
 
-	 /* PRUNE overrides THEN */
+	 /*! PRUNE overrides THEN */
 
 	 case OP_PRUNE:
 	 RMATCH(eptr, ecode + PRIV(OP_lengths)[*ecode], offset_top, md,
@@ -784,7 +784,7 @@ for (;;)
 
 	 case OP_PRUNE_ARG:
 	 md->nomatch_mark = ecode + 2;
-	 md->mark = NULL;	 /* In case previously set by assertion */
+	 md->mark = NULL;	 /*! In case previously set by assertion */
 	 RMATCH(eptr, ecode + PRIV(OP_lengths)[*ecode] + ecode[1], offset_top, md,
 		eptrb, RM56);
 	 if ((rrc == MATCH_MATCH || rrc == MATCH_ACCEPT) &&
@@ -792,17 +792,17 @@ for (;;)
 	 if (rrc != MATCH_NOMATCH && rrc != MATCH_THEN) RRETURN(rrc);
 	 RRETURN(MATCH_PRUNE);
 
-	 /* SKIP overrides PRUNE and THEN */
+	 /*! SKIP overrides PRUNE and THEN */
 
 	 case OP_SKIP:
 	 RMATCH(eptr, ecode + PRIV(OP_lengths)[*ecode], offset_top, md,
 		eptrb, RM53);
 	 if (rrc != MATCH_NOMATCH && rrc != MATCH_PRUNE && rrc != MATCH_THEN)
 		RRETURN(rrc);
-	 md->start_match_ptr = eptr;	/* Pass back current position */
+	 md->start_match_ptr = eptr;	/*! Pass back current position */
 	 RRETURN(MATCH_SKIP);
 
-	 /* Note that, for Perl compatibility, SKIP with an argument does NOT set
+	 /*! Note that, for Perl compatibility, SKIP with an argument does NOT set
 	 nomatch_mark. There is a flag that disables this opcode when re-matching a
 	 pattern that ended with a SKIP for which there was not a matching MARK. */
 
@@ -817,7 +817,7 @@ for (;;)
 	 if (rrc != MATCH_NOMATCH && rrc != MATCH_PRUNE && rrc != MATCH_THEN)
 		RRETURN(rrc);
 
-	 /* Pass back the current skip name by overloading md->start_match_ptr and
+	 /*! Pass back the current skip name by overloading md->start_match_ptr and
 	 returning the special MATCH_SKIP_ARG return code. This will either be
 	 caught by a matching MARK, or get to the top, where it causes a rematch
 	 with the md->ignore_skip_arg flag set. */
@@ -825,7 +825,7 @@ for (;;)
 	 md->start_match_ptr = ecode + 2;
 	 RRETURN(MATCH_SKIP_ARG);
 
-	 /* For THEN (and THEN_ARG) we pass back the address of the opcode, so that
+	 /*! For THEN (and THEN_ARG) we pass back the address of the opcode, so that
 	 the branch in which it occurs can be determined. Overload the start of
 	 match pointer to do this. */
 
@@ -838,7 +838,7 @@ for (;;)
 
 	 case OP_THEN_ARG:
 	 md->nomatch_mark = ecode + 2;
-	 md->mark = NULL;	 /* In case previously set by assertion */
+	 md->mark = NULL;	 /*! In case previously set by assertion */
 	 RMATCH(eptr, ecode + PRIV(OP_lengths)[*ecode] + ecode[1], offset_top,
 		md, eptrb, RM58);
 	 if ((rrc == MATCH_MATCH || rrc == MATCH_ACCEPT) &&
@@ -847,7 +847,7 @@ for (;;)
 	 md->start_match_ptr = ecode;
 	 RRETURN(MATCH_THEN);
 
-	 /* Handle an atomic group that does not contain any capturing parentheses.
+	 /*! Handle an atomic group that does not contain any capturing parentheses.
 	 This can be handled like an assertion. Prior to 8.13, all atomic groups
 	 were handled this way. In 8.13, the code was changed as below for ONCE, so
 	 that backups pass through the group and thereby reset captured values.
@@ -867,7 +867,7 @@ for (;;)
 	 do
 		{
 		RMATCH(eptr, ecode + 1 + LINK_SIZE, offset_top, md, eptrb, RM64);
-		if (rrc == MATCH_MATCH)  /* Note: _not_ MATCH_ACCEPT */
+		if (rrc == MATCH_MATCH)  /*! Note: _not_ MATCH_ACCEPT */
 		{
 		mstart = md->start_match_ptr;
 		break;
@@ -886,11 +886,11 @@ for (;;)
 		}
 	 while (*ecode == OP_ALT);
 
-	 /* If hit the end of the group (which could be repeated), fail */
+	 /*! If hit the end of the group (which could be repeated), fail */
 
 	 if (*ecode != OP_ONCE_NC && *ecode != OP_ALT) RRETURN(MATCH_NOMATCH);
 
-	 /* Continue as from after the group, updating the offsets high water
+	 /*! Continue as from after the group, updating the offsets high water
 	 mark, since extracts may have been taken. */
 
 	 do ecode += GET(ecode, 1); while (*ecode == OP_ALT);
@@ -898,7 +898,7 @@ for (;;)
 	 offset_top = md->end_offset_top;
 	 eptr = md->end_match_ptr;
 
-	 /* For a non-repeating ket, just continue at this level. This also
+	 /*! For a non-repeating ket, just continue at this level. This also
 	 happens for a repeating ket if no characters were matched in the group.
 	 This is the forcible breaking of infinite loops as implemented in Perl
 	 5.005. */
@@ -909,7 +909,7 @@ for (;;)
 		break;
 		}
 
-	 /* The repeating kets try the rest of the pattern or restart from the
+	 /*! The repeating kets try the rest of the pattern or restart from the
 	 preceding bracket, in the appropriate order. The second "call" of match()
 	 uses tail recursion, to avoid using another stack frame. */
 
@@ -920,16 +920,16 @@ for (;;)
 		ecode = prev;
 		goto TAIL_RECURSE;
 		}
-	 else  /* OP_KETRMAX */
+	 else  /*! OP_KETRMAX */
 		{
 		RMATCH(eptr, prev, offset_top, md, eptrb, RM66);
 		if (rrc != MATCH_NOMATCH) RRETURN(rrc);
 		ecode += 1 + LINK_SIZE;
 		goto TAIL_RECURSE;
 		}
-	 /* Control never gets here */
+	 /*! Control never gets here */
 
-	 /* Handle a capturing bracket, other than those that are possessive with an
+	 /*! Handle a capturing bracket, other than those that are possessive with an
 	 unlimited repeat. If there is space in the offset vector, save the current
 	 subject position in the working slot at the top of the vector. We mustn't
 	 change the current values of the data slot, because they may be set from a
@@ -972,9 +972,9 @@ for (;;)
 		if (op >= OP_SBRA) md->match_function_type = MATCH_CBEGROUP;
 		RMATCH(eptr, ecode + PRIV(OP_lengths)[*ecode], offset_top, md,
 			 eptrb, RM1);
-		if (rrc == MATCH_ONCE) break;  /* Backing up through an atomic group */
+		if (rrc == MATCH_ONCE) break;  /*! Backing up through an atomic group */
 
-		/* If we backed up to a THEN, check whether it is within the current
+		/*! If we backed up to a THEN, check whether it is within the current
 		branch by comparing the address of the THEN that is passed back with
 		the end of the branch. If it is within the current branch, and the
 		branch is one of two or more alternatives (it either starts or ends
@@ -993,7 +993,7 @@ for (;;)
 				rrc = MATCH_NOMATCH;
 			 }
 
-		/* Anything other than NOMATCH is passed back. */
+		/*! Anything other than NOMATCH is passed back. */
 
 		if (rrc != MATCH_NOMATCH) RRETURN(rrc);
 		md->capture_last = save_capture_last;
@@ -1007,23 +1007,23 @@ for (;;)
 		md->offset_vector[offset+1] = save_offset2;
 		md->offset_vector[md->offset_end - number] = save_offset3;
 
-		/* At this point, rrc will be one of MATCH_ONCE or MATCH_NOMATCH. */
+		/*! At this point, rrc will be one of MATCH_ONCE or MATCH_NOMATCH. */
 
 		RRETURN(rrc);
 		}
 
-	 /* FALL THROUGH ... Insufficient room for saving captured contents. Treat
+	 /*! FALL THROUGH ... Insufficient room for saving captured contents. Treat
 	 as a non-capturing bracket. */
 
-	 /* VVVVVVVVVVVVVVVVVVVVVVVVV */
-	 /* VVVVVVVVVVVVVVVVVVVVVVVVV */
+	 /*! VVVVVVVVVVVVVVVVVVVVVVVVV */
+	 /*! VVVVVVVVVVVVVVVVVVVVVVVVV */
 
 	 DPRINTF(("insufficient capture room: treat as non-capturing\n"));
 
-	 /* VVVVVVVVVVVVVVVVVVVVVVVVV */
-	 /* VVVVVVVVVVVVVVVVVVVVVVVVV */
+	 /*! VVVVVVVVVVVVVVVVVVVVVVVVV */
+	 /*! VVVVVVVVVVVVVVVVVVVVVVVVV */
 
-	 /* Non-capturing or atomic group, except for possessive with unlimited
+	 /*! Non-capturing or atomic group, except for possessive with unlimited
 	 repeat and ONCE group with no captures. Loop for all the alternatives.
 
 	 When we get to the final alternative within the brackets, we used to return
@@ -1053,7 +1053,7 @@ for (;;)
 		if (op >= OP_SBRA || op == OP_ONCE)
 		md->match_function_type = MATCH_CBEGROUP;
 
-		/* If this is not a possibly empty group, and there are no (*THEN)s in
+		/*! If this is not a possibly empty group, and there are no (*THEN)s in
 		the pattern, and this is the final alternative, optimize as described
 		above. */
 
@@ -1063,13 +1063,13 @@ for (;;)
 		goto TAIL_RECURSE;
 		}
 
-		/* In all other cases, we have to make another call to match(). */
+		/*! In all other cases, we have to make another call to match(). */
 
 		save_mark = md->mark;
 		RMATCH(eptr, ecode + PRIV(OP_lengths)[*ecode], offset_top, md, eptrb,
 		RM2);
 
-		/* See comment in the code for capturing groups above about handling
+		/*! See comment in the code for capturing groups above about handling
 		THEN. */
 
 		if (rrc == MATCH_THEN)
@@ -1085,7 +1085,7 @@ for (;;)
 		if (rrc == MATCH_ONCE)
 			 {
 			 const pcre_uchar *scode = ecode;
-			 if (*scode != OP_ONCE)			/* If not at start, find it */
+			 if (*scode != OP_ONCE)			/*! If not at start, find it */
 				{
 				while (*scode == OP_ALT) scode += GET(scode, 1);
 				scode -= GET(scode, 1);
@@ -1101,7 +1101,7 @@ for (;;)
 
 	 RRETURN(MATCH_NOMATCH);
 
-	 /* Handle possessive capturing brackets with an unlimited repeat. We come
+	 /*! Handle possessive capturing brackets with an unlimited repeat. We come
 	 here from BRAZERO with allow_zero set TRUE. The offset_vector values are
 	 handled similarly to the normal case above. However, the matching is
 	 different. The end of these brackets will always be OP_KETRPOS, which
@@ -1136,7 +1136,7 @@ for (;;)
 
 		DPRINTF(("saving %d %d %d\n", save_offset1, save_offset2, save_offset3));
 
-		/* Each time round the loop, save the current subject position for use
+		/*! Each time round the loop, save the current subject position for use
 		when the group matches. For MATCH_MATCH, the group has matched, so we
 		restart it with a new subject starting position, remembering that we had
 		at least one match. For MATCH_NOMATCH, carry on with the alternatives, as
@@ -1162,7 +1162,7 @@ for (;;)
 			 continue;
 			 }
 
-		/* See comment in the code for capturing groups above about handling
+		/*! See comment in the code for capturing groups above about handling
 		THEN. */
 
 		if (rrc == MATCH_THEN)
@@ -1195,18 +1195,18 @@ for (;;)
 		RRETURN(MATCH_NOMATCH);
 		}
 
-	 /* FALL THROUGH ... Insufficient room for saving captured contents. Treat
+	 /*! FALL THROUGH ... Insufficient room for saving captured contents. Treat
 	 as a non-capturing bracket. */
 
-	 /* VVVVVVVVVVVVVVVVVVVVVVVVV */
-	 /* VVVVVVVVVVVVVVVVVVVVVVVVV */
+	 /*! VVVVVVVVVVVVVVVVVVVVVVVVV */
+	 /*! VVVVVVVVVVVVVVVVVVVVVVVVV */
 
 	 DPRINTF(("insufficient capture room: treat as non-capturing\n"));
 
-	 /* VVVVVVVVVVVVVVVVVVVVVVVVV */
-	 /* VVVVVVVVVVVVVVVVVVVVVVVVV */
+	 /*! VVVVVVVVVVVVVVVVVVVVVVVVV */
+	 /*! VVVVVVVVVVVVVVVVVVVVVVVVV */
 
-	 /* Non-capturing possessive bracket with unlimited repeat. We come here
+	 /*! Non-capturing possessive bracket with unlimited repeat. We come here
 	 from BRAZERO with allow_zero = TRUE. The code is similar to the above,
 	 without the capturing complication. It is written out separately for speed
 	 and cleanliness. */
@@ -1233,7 +1233,7 @@ for (;;)
 		continue;
 		}
 
-		/* See comment in the code for capturing groups above about handling
+		/*! See comment in the code for capturing groups above about handling
 		THEN. */
 
 		if (rrc == MATCH_THEN)
@@ -1256,9 +1256,9 @@ for (;;)
 		}
 	 RRETURN(MATCH_NOMATCH);
 
-	 /* Control never reaches here. */
+	 /*! Control never reaches here. */
 
-	 /* Conditional group: compilation checked that there are no more than
+	 /*! Conditional group: compilation checked that there are no more than
 	 two branches. If the condition is false, skipping the first branch takes us
 	 past the end if there is only one branch, but that's OK because that is
 	 exactly what going to the ket would do. */
@@ -1267,7 +1267,7 @@ for (;;)
 	 case OP_SCOND:
 	 codelink = GET(ecode, 1);
 
-	 /* Because of the way auto-callout works during compile, a callout item is
+	 /*! Because of the way auto-callout works during compile, a callout item is
 	 inserted between OP_COND and an assertion condition. */
 
 	 if (ecode[LINK_SIZE+1] == OP_CALLOUT)
@@ -1275,7 +1275,7 @@ for (;;)
 		if (PUBL(callout) != NULL)
 		{
 		PUBL(callout_block) cb;
-		cb.version			 = 2;	/* Version 1 of the callout block */
+		cb.version			 = 2;	/*! Version 1 of the callout block */
 		cb.callout_number	= ecode[LINK_SIZE+2];
 		cb.offset_vector	 = md->offset_vector;
 #if defined COMPILE_PCRE8
@@ -1302,21 +1302,21 @@ for (;;)
 
 	 condcode = ecode[LINK_SIZE+1];
 
-	 /* Now see what the actual condition is */
+	 /*! Now see what the actual condition is */
 
-	 if (condcode == OP_RREF || condcode == OP_NRREF)	 /* Recursion test */
+	 if (condcode == OP_RREF || condcode == OP_NRREF)	 /*! Recursion test */
 		{
-		if (md->recursive == NULL)					 /* Not recursing => FALSE */
+		if (md->recursive == NULL)					 /*! Not recursing => FALSE */
 		{
 		condition = FALSE;
 		ecode += GET(ecode, 1);
 		}
 		else
 		{
-		unsigned int recno = GET2(ecode, LINK_SIZE + 2);	/* Recursion group number*/
+		unsigned int recno = GET2(ecode, LINK_SIZE + 2);	/*! Recursion group number*/
 		condition = (recno == RREF_ANY || recno == md->recursive->group_num);
 
-		/* If the test is for recursion into a specific subpattern, and it is
+		/*! If the test is for recursion into a specific subpattern, and it is
 		false, but the test was set up by name, scan the table to see if the
 		name refers to any other numbers, and test them. The condition is true
 		if any one is set. */
@@ -1330,7 +1330,7 @@ for (;;)
 				slotA += md->name_entry_size;
 				}
 
-			 /* Found a name for the number - there can be only one; duplicate
+			 /*! Found a name for the number - there can be only one; duplicate
 			 names for different numbers are allowed, but not vice versa. First
 			 scan down for duplicates. */
 
@@ -1348,7 +1348,7 @@ for (;;)
 				else break;
 				}
 
-				/* Scan up for duplicates */
+				/*! Scan up for duplicates */
 
 				if (!condition)
 				{
@@ -1367,18 +1367,18 @@ for (;;)
 				}
 			 }
 
-		/* Chose branch according to the condition */
+		/*! Chose branch according to the condition */
 
 		ecode += condition? 1 + IMM2_SIZE : GET(ecode, 1);
 		}
 		}
 
-	 else if (condcode == OP_CREF || condcode == OP_NCREF)  /* Group used test */
+	 else if (condcode == OP_CREF || condcode == OP_NCREF)  /*! Group used test */
 		{
-		offset = GET2(ecode, LINK_SIZE+2) << 1;  /* Doubled ref number */
+		offset = GET2(ecode, LINK_SIZE+2) << 1;  /*! Doubled ref number */
 		condition = offset < offset_top && md->offset_vector[offset] >= 0;
 
-		/* If the numbered capture is unset, but the reference was by name,
+		/*! If the numbered capture is unset, but the reference was by name,
 		scan the table to see if the name refers to any other numbers, and test
 		them. The condition is true if any one is set. This is tediously similar
 		to the code above, but not close enough to try to amalgamate. */
@@ -1394,7 +1394,7 @@ for (;;)
 			 slotA += md->name_entry_size;
 			 }
 
-		/* Found a name for the number - there can be only one; duplicate names
+		/*! Found a name for the number - there can be only one; duplicate names
 		for different numbers are allowed, but not vice versa. First scan down
 		for duplicates. */
 
@@ -1414,7 +1414,7 @@ for (;;)
 				else break;
 				}
 
-			 /* Scan up for duplicates */
+			 /*! Scan up for duplicates */
 
 			 if (!condition)
 				{
@@ -1435,18 +1435,18 @@ for (;;)
 			 }
 		}
 
-		/* Chose branch according to the condition */
+		/*! Chose branch according to the condition */
 
 		ecode += condition? 1 + IMM2_SIZE : GET(ecode, 1);
 		}
 
-	 else if (condcode == OP_DEF)	  /* DEFINE - always false */
+	 else if (condcode == OP_DEF)	  /*! DEFINE - always false */
 		{
 		condition = FALSE;
 		ecode += GET(ecode, 1);
 		}
 
-	 /* The condition is an assertion. Call match() to evaluate it - setting
+	 /*! The condition is an assertion. Call match() to evaluate it - setting
 	 md->match_function_type to MATCH_CONDASSERT causes it to stop at the end of
 	 an assertion. */
 
@@ -1457,18 +1457,18 @@ for (;;)
 		if (rrc == MATCH_MATCH)
 		{
 		if (md->end_offset_top > offset_top)
-			 offset_top = md->end_offset_top;  /* Captures may have happened */
+			 offset_top = md->end_offset_top;  /*! Captures may have happened */
 		condition = TRUE;
 		ecode += 1 + LINK_SIZE + GET(ecode, LINK_SIZE + 2);
 		while (*ecode == OP_ALT) ecode += GET(ecode, 1);
 		}
 
-		/* PCRE doesn't allow the effect of (*THEN) to escape beyond an
+		/*! PCRE doesn't allow the effect of (*THEN) to escape beyond an
 		assertion; it is therefore treated as NOMATCH. */
 
 		else if (rrc != MATCH_NOMATCH && rrc != MATCH_THEN)
 		{
-		RRETURN(rrc);			/* Need braces because of following else */
+		RRETURN(rrc);			/*! Need braces because of following else */
 		}
 		else
 		{
@@ -1477,7 +1477,7 @@ for (;;)
 		}
 		}
 
-	 /* We are now at the branch that is to be obeyed. As there is only one, can
+	 /*! We are now at the branch that is to be obeyed. As there is only one, can
 	 use tail recursion to avoid using another stack frame, except when there is
 	 unlimited repeat of a possibly empty group. In the latter case, a recursive
 	 call to match() is always required, unless the second alternative doesn't
@@ -1500,7 +1500,7 @@ for (;;)
 		RRETURN(rrc);
 		}
 
-	  /* Condition false & no alternative; continue after the group. */
+	  /*! Condition false & no alternative; continue after the group. */
 
 	 else
 		{
@@ -1509,7 +1509,7 @@ for (;;)
 	 break;
 
 
-	 /* Before OP_ACCEPT there may be any number of OP_CLOSE opcodes,
+	 /*! Before OP_ACCEPT there may be any number of OP_CLOSE opcodes,
 	 to close any currently open capturing brackets. */
 
 	 case OP_CLOSE:
@@ -1533,13 +1533,13 @@ for (;;)
 	 break;
 
 
-	 /* End of the pattern, either real or forced. */
+	 /*! End of the pattern, either real or forced. */
 
 	 case OP_END:
 	 case OP_ACCEPT:
 	 case OP_ASSERT_ACCEPT:
 
-	 /* If we have matched an empty string, fail if not in an assertion and not
+	 /*! If we have matched an empty string, fail if not in an assertion and not
 	 in a recursion if either PCRE_NOTEMPTY is set, or if PCRE_NOTEMPTY_ATSTART
 	 is set and we have matched at the start of the subject. In both cases,
 	 backtracking will then try other alternatives, if any. */
@@ -1551,19 +1551,19 @@ for (;;)
 				 mstart == md->start_subject + md->start_offset)))
 		RRETURN(MATCH_NOMATCH);
 
-	 /* Otherwise, we have a match. */
+	 /*! Otherwise, we have a match. */
 
-	 md->end_match_ptr = eptr;			/* Record where we ended */
-	 md->end_offset_top = offset_top;	 /* and how many extracts were taken */
-	 md->start_match_ptr = mstart;		 /* and the start (\K can modify) */
+	 md->end_match_ptr = eptr;			/*! Record where we ended */
+	 md->end_offset_top = offset_top;	 /*! and how many extracts were taken */
+	 md->start_match_ptr = mstart;		 /*! and the start (\K can modify) */
 
-	 /* For some reason, the macros don't work properly if an expression is
+	 /*! For some reason, the macros don't work properly if an expression is
 	 given as the argument to RRETURN when the heap is in use. */
 
 	 rrc = (op == OP_END)? MATCH_MATCH : MATCH_ACCEPT;
 	 RRETURN(rrc);
 
-	 /* Assertion brackets. Check the alternative branches in turn - the
+	 /*! Assertion brackets. Check the alternative branches in turn - the
 	 matching won't pass the KET for an assertion. If any one branch matches,
 	 the assertion is true. Lookbehind assertions have an OP_REVERSE item at the
 	 start of each branch to move the current point backwards, so the code at
@@ -1589,17 +1589,17 @@ for (;;)
 		RMATCH(eptr, ecode + 1 + LINK_SIZE, offset_top, md, NULL, RM4);
 		if (rrc == MATCH_MATCH || rrc == MATCH_ACCEPT)
 		{
-		mstart = md->start_match_ptr;	/* In case \K reset it */
+		mstart = md->start_match_ptr;	/*! In case \K reset it */
 		break;
 		}
 		md->mark = save_mark;
 
-		/* A COMMIT failure must fail the entire assertion, without trying any
+		/*! A COMMIT failure must fail the entire assertion, without trying any
 		subsequent branches. */
 
 		if (rrc == MATCH_COMMIT) RRETURN(MATCH_NOMATCH);
 
-		/* PCRE does not allow THEN to escape beyond an assertion; it
+		/*! PCRE does not allow THEN to escape beyond an assertion; it
 		is treated as NOMATCH. */
 
 		if (rrc != MATCH_NOMATCH && rrc != MATCH_THEN) RRETURN(rrc);
@@ -1609,11 +1609,11 @@ for (;;)
 
 	 if (*ecode == OP_KET) RRETURN(MATCH_NOMATCH);
 
-	 /* If checking an assertion for a condition, return MATCH_MATCH. */
+	 /*! If checking an assertion for a condition, return MATCH_MATCH. */
 
 	 if (condassert) RRETURN(MATCH_MATCH);
 
-	 /* Continue from after the assertion, updating the offsets high water
+	 /*! Continue from after the assertion, updating the offsets high water
 	 mark, since extracts may have been taken during the assertion. */
 
 	 do ecode += GET(ecode,1); while (*ecode == OP_ALT);
@@ -1621,7 +1621,7 @@ for (;;)
 	 offset_top = md->end_offset_top;
 	 continue;
 
-	 /* Negative assertion: all branches must fail to match. Encountering SKIP,
+	 /*! Negative assertion: all branches must fail to match. Encountering SKIP,
 	 PRUNE, or COMMIT means we must assume failure without checking subsequent
 	 branches. */
 
@@ -1646,7 +1646,7 @@ for (;;)
 		break;
 		}
 
-		/* PCRE does not allow THEN to escape beyond an assertion; it is treated
+		/*! PCRE does not allow THEN to escape beyond an assertion; it is treated
 		as NOMATCH. */
 
 		if (rrc != MATCH_NOMATCH && rrc != MATCH_THEN) RRETURN(rrc);
@@ -1654,12 +1654,12 @@ for (;;)
 		}
 	 while (*ecode == OP_ALT);
 
-	 if (condassert) RRETURN(MATCH_MATCH);  /* Condition assertion */
+	 if (condassert) RRETURN(MATCH_MATCH);  /*! Condition assertion */
 
 	 ecode += 1 + LINK_SIZE;
 	 continue;
 
-	 /* Move the subject pointer back. This occurs only at the start of
+	 /*! Move the subject pointer back. This occurs only at the start of
 	 each branch of a lookbehind assertion. If we are too close to the start to
 	 move back, this match function fails. When working with UTF-8 we move
 	 back a number of characters, not bytes. */
@@ -1679,20 +1679,20 @@ for (;;)
 	 else
 #endif
 
-	 /* No UTF-8 support, or not in UTF-8 mode: count is byte count */
+	 /*! No UTF-8 support, or not in UTF-8 mode: count is byte count */
 
 		{
 		eptr -= GET(ecode, 1);
 		if (eptr < md->start_subject) RRETURN(MATCH_NOMATCH);
 		}
 
-	 /* Save the earliest consulted character, then skip to next op code */
+	 /*! Save the earliest consulted character, then skip to next op code */
 
 	 if (eptr < md->start_used_ptr) md->start_used_ptr = eptr;
 	 ecode += 1 + LINK_SIZE;
 	 break;
 
-	 /* The callout item calls an external function, if one is provided, passing
+	 /*! The callout item calls an external function, if one is provided, passing
 	 details of the match so far. This is mainly for debugging, though the
 	 function is able to force a failure. */
 
@@ -1700,7 +1700,7 @@ for (;;)
 	 if (PUBL(callout) != NULL)
 		{
 		PUBL(callout_block) cb;
-		cb.version			 = 2;	/* Version 1 of the callout block */
+		cb.version			 = 2;	/*! Version 1 of the callout block */
 		cb.callout_number	= ecode[1];
 		cb.offset_vector	 = md->offset_vector;
 #if defined COMPILE_PCRE8
@@ -1725,7 +1725,7 @@ for (;;)
 	 ecode += 2 + 2*LINK_SIZE;
 	 break;
 
-	 /* Recursion either matches the current regex, or some subexpression. The
+	 /*! Recursion either matches the current regex, or some subexpression. The
 	 offset data is the offset to the starting bracket from the start of the
 	 whole pattern. (This is so that it works from duplicated subpatterns.)
 
@@ -1751,7 +1751,7 @@ for (;;)
 		recno = (callpat == md->start_code)? 0 :
 		GET2(callpat, 1 + LINK_SIZE);
 
-		/* Check for repeating a recursion without advancing the subject pointer.
+		/*! Check for repeating a recursion without advancing the subject pointer.
 		This should catch convoluted mutual recursions. (Some simple cases are
 		caught at compile time.) */
 
@@ -1759,18 +1759,18 @@ for (;;)
 		if (recno == ri->group_num && eptr == ri->subject_position)
 			 RRETURN(PCRE_ERROR_RECURSELOOP);
 
-		/* Add to "recursing stack" */
+		/*! Add to "recursing stack" */
 
 		new_recursive.group_num = recno;
 		new_recursive.subject_position = eptr;
 		new_recursive.prevrec = md->recursive;
 		md->recursive = &new_recursive;
 
-		/* Where to continue from afterwards */
+		/*! Where to continue from afterwards */
 
 		ecode += 1 + LINK_SIZE;
 
-		/* Now save the offset data */
+		/*! Now save the offset data */
 
 		new_recursive.saved_max = md->offset_end;
 		if (new_recursive.saved_max <= REC_STACK_SAVE_MAX)
@@ -1784,7 +1784,7 @@ for (;;)
 		memcpy(new_recursive.offset_save, md->offset_vector,
 				new_recursive.saved_max * sizeof(int));
 
-		/* OK, now we can do the recursion. After processing each alternative,
+		/*! OK, now we can do the recursion. After processing each alternative,
 		restore the offset data. If there were nested recursions, md->recursive
 		might be changed, so reset it before looping. */
 
@@ -1804,16 +1804,16 @@ for (;;)
 			 if (new_recursive.offset_save != stacksave)
 				(PUBL(free))(new_recursive.offset_save);
 
-			 /* Set where we got to in the subject, and reset the start in case
+			 /*! Set where we got to in the subject, and reset the start in case
 			 it was changed by \K. This *is* propagated back out of a recursion,
 			 for Perl compatibility. */
 
 			 eptr = md->end_match_ptr;
 			 mstart = md->start_match_ptr;
-			 goto RECURSION_MATCHED;		/* Exit loop; end processing */
+			 goto RECURSION_MATCHED;		/*! Exit loop; end processing */
 			 }
 
-		/* PCRE does not allow THEN or COMMIT to escape beyond a recursion; it
+		/*! PCRE does not allow THEN or COMMIT to escape beyond a recursion; it
 		is treated as NOMATCH. */
 
 		else if (rrc != MATCH_NOMATCH && rrc != MATCH_THEN &&
@@ -1840,14 +1840,14 @@ for (;;)
 	 RECURSION_MATCHED:
 	 break;
 
-	 /* An alternation is the end of a branch; scan along to find the end of the
+	 /*! An alternation is the end of a branch; scan along to find the end of the
 	 bracketed group and go to there. */
 
 	 case OP_ALT:
 	 do ecode += GET(ecode,1); while (*ecode == OP_ALT);
 	 break;
 
-	 /* BRAZERO, BRAMINZERO and SKIPZERO occur just before a bracket group,
+	 /*! BRAZERO, BRAMINZERO and SKIPZERO occur just before a bracket group,
 	 indicating that it may occur zero times. It may repeat infinitely, or not
 	 at all - i.e. it could be ()* or ()? or even (){0} in the pattern. Brackets
 	 with fixed upper repeat limits are compiled as a number of copies, with the
@@ -1875,7 +1875,7 @@ for (;;)
 	 ecode = next + 1 + LINK_SIZE;
 	 break;
 
-	 /* BRAPOSZERO occurs before a possessive bracket group. Don't do anything
+	 /*! BRAPOSZERO occurs before a possessive bracket group. Don't do anything
 	 here; just jump to the group, with allow_zero set TRUE. */
 
 	 case OP_BRAPOSZERO:
@@ -1884,7 +1884,7 @@ for (;;)
 	 if (op == OP_CBRAPOS || op == OP_SCBRAPOS) goto POSSESSIVE_CAPTURE;
 		goto POSSESSIVE_NON_CAPTURE;
 
-	 /* End of a group, repeated or non-repeating. */
+	 /*! End of a group, repeated or non-repeating. */
 
 	 case OP_KET:
 	 case OP_KETRMIN:
@@ -1892,18 +1892,18 @@ for (;;)
 	 case OP_KETRPOS:
 	 prev = ecode - GET(ecode, 1);
 
-	 /* If this was a group that remembered the subject start, in order to break
+	 /*! If this was a group that remembered the subject start, in order to break
 	 infinite repeats of empty string matches, retrieve the subject start from
 	 the chain. Otherwise, set it NULL. */
 
 	 if (*prev >= OP_SBRA || *prev == OP_ONCE)
 		{
-		saved_eptr = eptrb->epb_saved_eptr;	/* Value at start of group */
-		eptrb = eptrb->epb_prev;				/* Backup to previous group */
+		saved_eptr = eptrb->epb_saved_eptr;	/*! Value at start of group */
+		eptrb = eptrb->epb_prev;				/*! Backup to previous group */
 		}
 	 else saved_eptr = NULL;
 
-	 /* If we are at the end of an assertion group or a non-capturing atomic
+	 /*! If we are at the end of an assertion group or a non-capturing atomic
 	 group, stop matching and return MATCH_MATCH, but record the current high
 	 water mark for use by positive assertions. We also need to record the match
 	 start in case it was changed by \K. */
@@ -1911,13 +1911,13 @@ for (;;)
 	 if ((*prev >= OP_ASSERT && *prev <= OP_ASSERTBACK_NOT) ||
 			*prev == OP_ONCE_NC)
 		{
-		md->end_match_ptr = eptr;		/* For ONCE_NC */
+		md->end_match_ptr = eptr;		/*! For ONCE_NC */
 		md->end_offset_top = offset_top;
 		md->start_match_ptr = mstart;
-		RRETURN(MATCH_MATCH);			/* Sets md->mark */
+		RRETURN(MATCH_MATCH);			/*! Sets md->mark */
 		}
 
-	 /* For capturing groups we have to check the group number back at the start
+	 /*! For capturing groups we have to check the group number back at the start
 	 and if necessary complete handling an extraction by setting the offsets and
 	 bumping the high water mark. Whole-pattern recursion is coded as a recurse
 	 into group 0, so it won't be picked up here. Instead, we catch it when the
@@ -1936,7 +1936,7 @@ for (;;)
 		printf("\n");
 #endif
 
-		/* Handle a recursively called group. */
+		/*! Handle a recursively called group. */
 
 		if (md->recursive != NULL && md->recursive->group_num == number)
 		{
@@ -1945,12 +1945,12 @@ for (;;)
 		RRETURN(MATCH_MATCH);
 		}
 
-		/* Deal with capturing */
+		/*! Deal with capturing */
 
 		md->capture_last = number;
 		if (offset >= md->offset_max) md->offset_overflow = TRUE; else
 		{
-		/* If offset is greater than offset_top, it means that we are
+		/*! If offset is greater than offset_top, it means that we are
 		"skipping" a capturing group, and that group's offsets must be marked
 		unset. In earlier versions of PCRE, all the offsets were unset at the
 		start of matching, but this doesn't work because atomic groups and
@@ -1967,7 +1967,7 @@ for (;;)
 			 while (iptr < iend) *iptr++ = -1;
 			 }
 
-		/* Now make the extraction */
+		/*! Now make the extraction */
 
 		md->offset_vector[offset] =
 			 md->offset_vector[md->offset_end - number];
@@ -1976,7 +1976,7 @@ for (;;)
 		}
 		}
 
-	 /* For an ordinary non-repeating ket, just continue at this level. This
+	 /*! For an ordinary non-repeating ket, just continue at this level. This
 	 also happens for a repeating ket if no characters were matched in the
 	 group. This is the forcible breaking of infinite loops as implemented in
 	 Perl 5.005. For a non-repeating atomic group that includes captures,
@@ -1991,14 +1991,14 @@ for (;;)
 		{
 		RMATCH(eptr, ecode + 1 + LINK_SIZE, offset_top, md, eptrb, RM12);
 		if (rrc != MATCH_NOMATCH) RRETURN(rrc);
-		md->once_target = prev;  /* Level at which to change to MATCH_NOMATCH */
+		md->once_target = prev;  /*! Level at which to change to MATCH_NOMATCH */
 		RRETURN(MATCH_ONCE);
 		}
-		ecode += 1 + LINK_SIZE;	 /* Carry on at this level */
+		ecode += 1 + LINK_SIZE;	 /*! Carry on at this level */
 		break;
 		}
 
-	 /* OP_KETRPOS is a possessive repeating ket. Remember the current position,
+	 /*! OP_KETRPOS is a possessive repeating ket. Remember the current position,
 	 and return the MATCH_KETRPOS. This makes it possible to do the repeats one
 	 at a time from the outer level, thus saving stack. */
 
@@ -2009,7 +2009,7 @@ for (;;)
 		RRETURN(MATCH_KETRPOS);
 		}
 
-	 /* The normal repeating kets try the rest of the pattern or restart from
+	 /*! The normal repeating kets try the rest of the pattern or restart from
 	 the preceding bracket, in the appropriate order. In the second case, we can
 	 use tail recursion to avoid using another stack frame, unless we have an
 	 an atomic group or an unlimited repeat of a group that can match an empty
@@ -2023,10 +2023,10 @@ for (;;)
 		{
 		RMATCH(eptr, prev, offset_top, md, eptrb, RM8);
 		if (rrc != MATCH_NOMATCH) RRETURN(rrc);
-		md->once_target = prev;  /* Level at which to change to MATCH_NOMATCH */
+		md->once_target = prev;  /*! Level at which to change to MATCH_NOMATCH */
 		RRETURN(MATCH_ONCE);
 		}
-		if (*prev >= OP_SBRA)	 /* Could match an empty string */
+		if (*prev >= OP_SBRA)	 /*! Could match an empty string */
 		{
 		RMATCH(eptr, prev, offset_top, md, eptrb, RM50);
 		RRETURN(rrc);
@@ -2034,7 +2034,7 @@ for (;;)
 		ecode = prev;
 		goto TAIL_RECURSE;
 		}
-	 else  /* OP_KETRMAX */
+	 else  /*! OP_KETRMAX */
 		{
 		RMATCH(eptr, prev, offset_top, md, eptrb, RM13);
 		if (rrc == MATCH_ONCE && md->once_target == prev) rrc = MATCH_NOMATCH;
@@ -2049,21 +2049,21 @@ for (;;)
 		ecode += 1 + LINK_SIZE;
 		goto TAIL_RECURSE;
 		}
-	 /* Control never gets here */
+	 /*! Control never gets here */
 
-	 /* Not multiline mode: start of subject assertion, unless notbol. */
+	 /*! Not multiline mode: start of subject assertion, unless notbol. */
 
 	 case OP_CIRC:
 	 if (md->notbol && eptr == md->start_subject) RRETURN(MATCH_NOMATCH);
 
-	 /* Start of subject assertion */
+	 /*! Start of subject assertion */
 
 	 case OP_SOD:
 	 if (eptr != md->start_subject) RRETURN(MATCH_NOMATCH);
 	 ecode++;
 	 break;
 
-	 /* Multiline mode: start of subject unless notbol, or after any newline. */
+	 /*! Multiline mode: start of subject unless notbol, or after any newline. */
 
 	 case OP_CIRCM:
 	 if (md->notbol && eptr == md->start_subject) RRETURN(MATCH_NOMATCH);
@@ -2073,21 +2073,21 @@ for (;;)
 	 ecode++;
 	 break;
 
-	 /* Start of match assertion */
+	 /*! Start of match assertion */
 
 	 case OP_SOM:
 	 if (eptr != md->start_subject + md->start_offset) RRETURN(MATCH_NOMATCH);
 	 ecode++;
 	 break;
 
-	 /* Reset the start of match point */
+	 /*! Reset the start of match point */
 
 	 case OP_SET_SOM:
 	 mstart = eptr;
 	 ecode++;
 	 break;
 
-	 /* Multiline mode: assert before any newline, or before end of subject
+	 /*! Multiline mode: assert before any newline, or before end of subject
 	 unless noteol is set. */
 
 	 case OP_DOLLM:
@@ -2115,16 +2115,16 @@ for (;;)
 	 ecode++;
 	 break;
 
-	 /* Not multiline mode: assert before a terminating newline or before end of
+	 /*! Not multiline mode: assert before a terminating newline or before end of
 	 subject unless noteol is set. */
 
 	 case OP_DOLL:
 	 if (md->noteol) RRETURN(MATCH_NOMATCH);
 	 if (!md->endonly) goto ASSERT_NL_OR_EOS;
 
-	 /* ... else fall through for endonly */
+	 /*! ... else fall through for endonly */
 
-	 /* End of subject assertion (\z) */
+	 /*! End of subject assertion (\z) */
 
 	 case OP_EOD:
 	 if (eptr < md->end_subject) RRETURN(MATCH_NOMATCH);
@@ -2132,7 +2132,7 @@ for (;;)
 	 ecode++;
 	 break;
 
-	 /* End of subject or ending \n assertion (\Z) */
+	 /*! End of subject or ending \n assertion (\Z) */
 
 	 case OP_EODN:
 	 ASSERT_NL_OR_EOS:
@@ -2151,19 +2151,19 @@ for (;;)
 		RRETURN(MATCH_NOMATCH);
 		}
 
-	 /* Either at end of string or \n before end. */
+	 /*! Either at end of string or \n before end. */
 
 	 SCHECK_PARTIAL();
 	 ecode++;
 	 break;
 
-	 /* Word boundary assertions */
+	 /*! Word boundary assertions */
 
 	 case OP_NOT_WORD_BOUNDARY:
 	 case OP_WORD_BOUNDARY:
 		{
 
-		/* Find out if the previous and current characters are "word" characters.
+		/*! Find out if the previous and current characters are "word" characters.
 		It takes a bit more work in UTF-8 mode. Characters > 255 are assumed to
 		be "non-word" characters. Remember the earliest consulted character for
 		partial matching. */
@@ -2171,7 +2171,7 @@ for (;;)
 #ifdef SUPPORT_UTF
 		if (utf)
 		{
-		/* Get status of previous character */
+		/*! Get status of previous character */
 
 		if (eptr == md->start_subject) prev_is_word = FALSE; else
 			 {
@@ -2193,7 +2193,7 @@ for (;;)
 			 prev_is_word = c < 256 && (md->ctypes[c] & ctype_word) != 0;
 			 }
 
-		/* Get status of next character */
+		/*! Get status of next character */
 
 		if (eptr >= md->end_subject)
 			 {
@@ -2220,11 +2220,11 @@ for (;;)
 		else
 #endif
 
-		/* Not in UTF-8 mode, but we may still have PCRE_UCP set, and for
+		/*! Not in UTF-8 mode, but we may still have PCRE_UCP set, and for
 		consistency with the behaviour of \w we do use it in this case. */
 
 		{
-		/* Get status of previous character */
+		/*! Get status of previous character */
 
 		if (eptr == md->start_subject) prev_is_word = FALSE; else
 			 {
@@ -2245,7 +2245,7 @@ for (;;)
 				&& ((md->ctypes[eptr[-1]] & ctype_word) != 0);
 			 }
 
-		/* Get status of next character */
+		/*! Get status of next character */
 
 		if (eptr >= md->end_subject)
 			 {
@@ -2269,7 +2269,7 @@ for (;;)
 			 && ((md->ctypes[*eptr] & ctype_word) != 0);
 		}
 
-		/* Now see if the situation is what we want */
+		/*! Now see if the situation is what we want */
 
 		if ((*ecode++ == OP_WORD_BOUNDARY)?
 			cur_is_word == prev_is_word : cur_is_word != prev_is_word)
@@ -2277,7 +2277,7 @@ for (;;)
 		}
 	 break;
 
-	 /* Match any single character type except newline; have to take care with
+	 /*! Match any single character type except newline; have to take care with
 	 CRLF newlines and partial matching. */
 
 	 case OP_ANY:
@@ -2292,13 +2292,13 @@ for (;;)
 		if (md->partial > 1) RRETURN(PCRE_ERROR_PARTIAL);
 		}
 
-	 /* Fall through */
+	 /*! Fall through */
 
-	 /* Match any single character whatsoever. */
+	 /*! Match any single character whatsoever. */
 
 	 case OP_ALLANY:
-	 if (eptr >= md->end_subject)	/* DO NOT merge the eptr++ here; it must */
-		{									 /* not be updated before SCHECK_PARTIAL. */
+	 if (eptr >= md->end_subject)	/*! DO NOT merge the eptr++ here; it must */
+		{									 /*! not be updated before SCHECK_PARTIAL. */
 		SCHECK_PARTIAL();
 		RRETURN(MATCH_NOMATCH);
 		}
@@ -2309,12 +2309,12 @@ for (;;)
 	 ecode++;
 	 break;
 
-	 /* Match a single byte, even in UTF-8 mode. This opcode really does match
+	 /*! Match a single byte, even in UTF-8 mode. This opcode really does match
 	 any byte, even newline, independent of the setting of PCRE_DOTALL. */
 
 	 case OP_ANYBYTE:
-	 if (eptr >= md->end_subject)	/* DO NOT merge the eptr++ here; it must */
-		{									 /* not be updated before SCHECK_PARTIAL. */
+	 if (eptr >= md->end_subject)	/*! DO NOT merge the eptr++ here; it must */
+		{									 /*! not be updated before SCHECK_PARTIAL. */
 		SCHECK_PARTIAL();
 		RRETURN(MATCH_NOMATCH);
 		}
@@ -2452,7 +2452,7 @@ for (;;)
 #ifndef EBCDIC
 		case 0x2028:
 		case 0x2029:
-#endif  /* Not EBCDIC */
+#endif  /*! Not EBCDIC */
 		if (md->bsr_anycrlf) RRETURN(MATCH_NOMATCH);
 		break;
 		}
@@ -2468,7 +2468,7 @@ for (;;)
 	 GETCHARINCTEST(c, eptr);
 	 switch(c)
 		{
-		HSPACE_CASES: RRETURN(MATCH_NOMATCH);  /* Byte and multibyte cases */
+		HSPACE_CASES: RRETURN(MATCH_NOMATCH);  /*! Byte and multibyte cases */
 		default: break;
 		}
 	 ecode++;
@@ -2483,7 +2483,7 @@ for (;;)
 	 GETCHARINCTEST(c, eptr);
 	 switch(c)
 		{
-		HSPACE_CASES: break;  /* Byte and multibyte cases */
+		HSPACE_CASES: break;  /*! Byte and multibyte cases */
 		default: RRETURN(MATCH_NOMATCH);
 		}
 	 ecode++;
@@ -2520,7 +2520,7 @@ for (;;)
 	 break;
 
 #ifdef SUPPORT_UCP
-	 /* Check the next character by Unicode property. We will get here only
+	 /*! Check the next character by Unicode property. We will get here only
 	 if the support is in the binary; otherwise a compile-time error occurs. */
 
 	 case OP_PROP:
@@ -2563,7 +2563,7 @@ for (;;)
 			 RRETURN(MATCH_NOMATCH);
 		break;
 
-		/* These are specials */
+		/*! These are specials */
 
 		case PT_ALNUM:
 		if ((PRIV(ucp_gentype)[prop->chartype] == ucp_L ||
@@ -2571,14 +2571,14 @@ for (;;)
 			 RRETURN(MATCH_NOMATCH);
 		break;
 
-		case PT_SPACE:	 /* Perl space */
+		case PT_SPACE:	 /*! Perl space */
 		if ((PRIV(ucp_gentype)[prop->chartype] == ucp_Z ||
 				 c == CHAR_HT || c == CHAR_NL || c == CHAR_FF || c == CHAR_CR)
 					== (op == OP_NOTPROP))
 			 RRETURN(MATCH_NOMATCH);
 		break;
 
-		case PT_PXSPACE:  /* POSIX space */
+		case PT_PXSPACE:  /*! POSIX space */
 		if ((PRIV(ucp_gentype)[prop->chartype] == ucp_Z ||
 				 c == CHAR_HT || c == CHAR_NL || c == CHAR_VT ||
 				 c == CHAR_FF || c == CHAR_CR)
@@ -2604,7 +2604,7 @@ for (;;)
 			 }
 		break;
 
-		/* This should never occur */
+		/*! This should never occur */
 
 		default:
 		RRETURN(PCRE_ERROR_INTERNAL);
@@ -2614,7 +2614,7 @@ for (;;)
 		}
 	 break;
 
-	 /* Match an extended Unicode sequence. We will get here only if the support
+	 /*! Match an extended Unicode sequence. We will get here only if the support
 	 is in the binary; otherwise a compile-time error occurs. */
 
 	 case OP_EXTUNI:
@@ -2641,10 +2641,10 @@ for (;;)
 	 CHECK_PARTIAL();
 	 ecode++;
 	 break;
-#endif  /* SUPPORT_UCP */
+#endif  /*! SUPPORT_UCP */
 
 
-	 /* Match a back reference, possibly repeatedly. Look past the end of the
+	 /*! Match a back reference, possibly repeatedly. Look past the end of the
 	 item to see if there is repeat information following. The code is similar
 	 to that for character classes, but repeated for efficiency. Then obey
 	 similar code to character type repeats - written out again for speed.
@@ -2655,10 +2655,10 @@ for (;;)
 	 case OP_REF:
 	 case OP_REFI:
 	 caseless = op == OP_REFI;
-	 offset = GET2(ecode, 1) << 1;					/* Doubled ref number */
+	 offset = GET2(ecode, 1) << 1;					/*! Doubled ref number */
 	 ecode += 1 + IMM2_SIZE;
 
-	 /* If the reference is unset, there are two possibilities:
+	 /*! If the reference is unset, there are two possibilities:
 
 	 (a) In the default, Perl-compatible state, set the length negative;
 	 this ensures that every attempt at a match fails. We can't just fail
@@ -2675,7 +2675,7 @@ for (;;)
 	 else
 		length = md->offset_vector[offset+1] - md->offset_vector[offset];
 
-	 /* Set up for repetition, or handle the non-repeated case */
+	 /*! Set up for repetition, or handle the non-repeated case */
 
 	 switch (*ecode)
 		{
@@ -2687,8 +2687,8 @@ for (;;)
 		case OP_CRMINQUERY:
 		c = *ecode++ - OP_CRSTAR;
 		minimize = (c & 1) != 0;
-		min = rep_min[c];					/* Pick up values from tables; */
-		max = rep_max[c];					/* zero for max => infinity */
+		min = rep_min[c];					/*! Pick up values from tables; */
+		max = rep_max[c];					/*! zero for max => infinity */
 		if (max == 0) max = INT_MAX;
 		break;
 
@@ -2701,18 +2701,18 @@ for (;;)
 		ecode += 1 + 2 * IMM2_SIZE;
 		break;
 
-		default:					/* No repeat follows */
+		default:					/*! No repeat follows */
 		if ((length = match_ref(offset, eptr, length, md, caseless)) < 0)
 		{
-		if (length == -2) eptr = md->end_subject;	/* Partial match */
+		if (length == -2) eptr = md->end_subject;	/*! Partial match */
 		CHECK_PARTIAL();
 		RRETURN(MATCH_NOMATCH);
 		}
 		eptr += length;
-		continue;				/* With the main loop */
+		continue;				/*! With the main loop */
 		}
 
-	 /* Handle repeated back references. If the length of the reference is
+	 /*! Handle repeated back references. If the length of the reference is
 	 zero, just continue with the main loop. If the length is negative, it
 	 means the reference is unset in non-Java-compatible mode. If the minimum is
 	 zero, we can continue at the same level without recursion. For any other
@@ -2721,7 +2721,7 @@ for (;;)
 	 if (length == 0) continue;
 	 if (length < 0 && min == 0) continue;
 
-	 /* First, ensure the minimum number of matches are present. We get back
+	 /*! First, ensure the minimum number of matches are present. We get back
 	 the length of the reference string explicitly rather than passing the
 	 address of eptr, so that eptr can be a register variable. */
 
@@ -2730,19 +2730,19 @@ for (;;)
 		int slength;
 		if ((slength = match_ref(offset, eptr, length, md, caseless)) < 0)
 		{
-		if (slength == -2) eptr = md->end_subject;	/* Partial match */
+		if (slength == -2) eptr = md->end_subject;	/*! Partial match */
 		CHECK_PARTIAL();
 		RRETURN(MATCH_NOMATCH);
 		}
 		eptr += slength;
 		}
 
-	 /* If min = max, continue at the same level without recursion.
+	 /*! If min = max, continue at the same level without recursion.
 	 They are not both allowed to be zero. */
 
 	 if (min == max) continue;
 
-	 /* If minimizing, keep trying and advancing the pointer */
+	 /*! If minimizing, keep trying and advancing the pointer */
 
 	 if (minimize)
 		{
@@ -2754,16 +2754,16 @@ for (;;)
 		if (fi >= max) RRETURN(MATCH_NOMATCH);
 		if ((slength = match_ref(offset, eptr, length, md, caseless)) < 0)
 			 {
-			 if (slength == -2) eptr = md->end_subject;	/* Partial match */
+			 if (slength == -2) eptr = md->end_subject;	/*! Partial match */
 			 CHECK_PARTIAL();
 			 RRETURN(MATCH_NOMATCH);
 			 }
 		eptr += slength;
 		}
-		/* Control never gets here */
+		/*! Control never gets here */
 		}
 
-	 /* If maximizing, find the longest string and work backwards */
+	 /*! If maximizing, find the longest string and work backwards */
 
 	 else
 		{
@@ -2773,7 +2773,7 @@ for (;;)
 		int slength;
 		if ((slength = match_ref(offset, eptr, length, md, caseless)) < 0)
 			 {
-			 /* Can't use CHECK_PARTIAL because we don't want to update eptr in
+			 /*! Can't use CHECK_PARTIAL because we don't want to update eptr in
 			 the soft partial matching case. */
 
 			 if (slength == -2 && md->partial != 0 &&
@@ -2795,9 +2795,9 @@ for (;;)
 		}
 		RRETURN(MATCH_NOMATCH);
 		}
-	 /* Control never gets here */
+	 /*! Control never gets here */
 
-	 /* Match a bit-mapped character class, possibly repeatedly. This op code is
+	 /*! Match a bit-mapped character class, possibly repeatedly. This op code is
 	 used when all the characters in the class have values in the range 0-255,
 	 and either the matching is caseful, or the characters are in the range
 	 0-127 when UTF-8 processing is enabled. The only difference between
@@ -2811,11 +2811,11 @@ for (;;)
 	 case OP_NCLASS:
 	 case OP_CLASS:
 		{
-		/* The data variable is saved across frames, so the byte map needs to
+		/*! The data variable is saved across frames, so the byte map needs to
 		be stored there. */
 #define BYTE_MAP ((pcre_uint8 *)data)
-		data = ecode + 1;					 /* Save for matching */
-		ecode += 1 + (32 / sizeof(pcre_uchar)); /* Advance past the item */
+		data = ecode + 1;					 /*! Save for matching */
+		ecode += 1 + (32 / sizeof(pcre_uchar)); /*! Advance past the item */
 
 		switch (*ecode)
 		{
@@ -2827,8 +2827,8 @@ for (;;)
 		case OP_CRMINQUERY:
 		c = *ecode++ - OP_CRSTAR;
 		minimize = (c & 1) != 0;
-		min = rep_min[c];					/* Pick up values from tables; */
-		max = rep_max[c];					/* zero for max => infinity */
+		min = rep_min[c];					/*! Pick up values from tables; */
+		max = rep_max[c];					/*! zero for max => infinity */
 		if (max == 0) max = INT_MAX;
 		break;
 
@@ -2841,12 +2841,12 @@ for (;;)
 		ecode += 1 + 2 * IMM2_SIZE;
 		break;
 
-		default:					/* No repeat follows */
+		default:					/*! No repeat follows */
 		min = max = 1;
 		break;
 		}
 
-		/* First, ensure the minimum number of matches are present. */
+		/*! First, ensure the minimum number of matches are present. */
 
 #ifdef SUPPORT_UTF
 		if (utf)
@@ -2869,7 +2869,7 @@ for (;;)
 		}
 		else
 #endif
-		/* Not UTF mode */
+		/*! Not UTF mode */
 		{
 		for (i = 1; i <= min; i++)
 			 {
@@ -2890,12 +2890,12 @@ for (;;)
 			 }
 		}
 
-		/* If max == min we can continue with the main loop without the
+		/*! If max == min we can continue with the main loop without the
 		need to recurse. */
 
 		if (min == max) continue;
 
-		/* If minimizing, keep testing the rest of the expression and advancing
+		/*! If minimizing, keep testing the rest of the expression and advancing
 		the pointer while it matches the class. */
 
 		if (minimize)
@@ -2924,7 +2924,7 @@ for (;;)
 			 }
 		else
 #endif
-		/* Not UTF mode */
+		/*! Not UTF mode */
 			 {
 			 for (fi = min;; fi++)
 				{
@@ -2947,10 +2947,10 @@ for (;;)
 				if ((BYTE_MAP[c/8] & (1 << (c&7))) == 0) RRETURN(MATCH_NOMATCH);
 				}
 			 }
-		/* Control never gets here */
+		/*! Control never gets here */
 		}
 
-		/* If maximizing, find the longest possible run, then work backwards. */
+		/*! If maximizing, find the longest possible run, then work backwards. */
 
 		else
 		{
@@ -2980,13 +2980,13 @@ for (;;)
 				{
 				RMATCH(eptr, ecode, offset_top, md, eptrb, RM18);
 				if (rrc != MATCH_NOMATCH) RRETURN(rrc);
-				if (eptr-- == pp) break;		/* Stop if tried at original pos */
+				if (eptr-- == pp) break;		/*! Stop if tried at original pos */
 				BACKCHAR(eptr);
 				}
 			 }
 		else
 #endif
-			 /* Not UTF mode */
+			 /*! Not UTF mode */
 			 {
 			 for (i = min; i < max; i++)
 				{
@@ -3018,18 +3018,18 @@ for (;;)
 		}
 #undef BYTE_MAP
 		}
-	 /* Control never gets here */
+	 /*! Control never gets here */
 
 
-	 /* Match an extended character class. This opcode is encountered only
+	 /*! Match an extended character class. This opcode is encountered only
 	 when UTF-8 mode mode is supported. Nevertheless, we may not be in UTF-8
 	 mode, because Unicode properties are supported in non-UTF-8 mode. */
 
 #if defined SUPPORT_UTF || !defined COMPILE_PCRE8
 	 case OP_XCLASS:
 		{
-		data = ecode + 1 + LINK_SIZE;					 /* Save for matching */
-		ecode += GET(ecode, 1);							 /* Advance past the item */
+		data = ecode + 1 + LINK_SIZE;					 /*! Save for matching */
+		ecode += GET(ecode, 1);							 /*! Advance past the item */
 
 		switch (*ecode)
 		{
@@ -3041,8 +3041,8 @@ for (;;)
 		case OP_CRMINQUERY:
 		c = *ecode++ - OP_CRSTAR;
 		minimize = (c & 1) != 0;
-		min = rep_min[c];					/* Pick up values from tables; */
-		max = rep_max[c];					/* zero for max => infinity */
+		min = rep_min[c];					/*! Pick up values from tables; */
+		max = rep_max[c];					/*! zero for max => infinity */
 		if (max == 0) max = INT_MAX;
 		break;
 
@@ -3055,12 +3055,12 @@ for (;;)
 		ecode += 1 + 2 * IMM2_SIZE;
 		break;
 
-		default:					/* No repeat follows */
+		default:					/*! No repeat follows */
 		min = max = 1;
 		break;
 		}
 
-		/* First, ensure the minimum number of matches are present. */
+		/*! First, ensure the minimum number of matches are present. */
 
 		for (i = 1; i <= min; i++)
 		{
@@ -3073,12 +3073,12 @@ for (;;)
 		if (!PRIV(xclass)(c, data, utf)) RRETURN(MATCH_NOMATCH);
 		}
 
-		/* If max == min we can continue with the main loop without the
+		/*! If max == min we can continue with the main loop without the
 		need to recurse. */
 
 		if (min == max) continue;
 
-		/* If minimizing, keep testing the rest of the expression and advancing
+		/*! If minimizing, keep testing the rest of the expression and advancing
 		the pointer while it matches the class. */
 
 		if (minimize)
@@ -3096,10 +3096,10 @@ for (;;)
 			 GETCHARINCTEST(c, eptr);
 			 if (!PRIV(xclass)(c, data, utf)) RRETURN(MATCH_NOMATCH);
 			 }
-		/* Control never gets here */
+		/*! Control never gets here */
 		}
 
-		/* If maximizing, find the longest possible run, then work backwards. */
+		/*! If maximizing, find the longest possible run, then work backwards. */
 
 		else
 		{
@@ -3124,7 +3124,7 @@ for (;;)
 			 {
 			 RMATCH(eptr, ecode, offset_top, md, eptrb, RM21);
 			 if (rrc != MATCH_NOMATCH) RRETURN(rrc);
-			 if (eptr-- == pp) break;		/* Stop if tried at original pos */
+			 if (eptr-- == pp) break;		/*! Stop if tried at original pos */
 #ifdef SUPPORT_UTF
 			 if (utf) BACKCHAR(eptr);
 #endif
@@ -3132,11 +3132,11 @@ for (;;)
 		RRETURN(MATCH_NOMATCH);
 		}
 
-		/* Control never gets here */
+		/*! Control never gets here */
 		}
-#endif	 /* End of XCLASS */
+#endif	 /*! End of XCLASS */
 
-	 /* Match a single character, casefully */
+	 /*! Match a single character, casefully */
 
 	 case OP_CHAR:
 #ifdef SUPPORT_UTF
@@ -3147,18 +3147,18 @@ for (;;)
 		GETCHARLEN(fc, ecode, length);
 		if (length > md->end_subject - eptr)
 		{
-		CHECK_PARTIAL();				 /* Not SCHECK_PARTIAL() */
+		CHECK_PARTIAL();				 /*! Not SCHECK_PARTIAL() */
 		RRETURN(MATCH_NOMATCH);
 		}
 		while (length-- > 0) if (*ecode++ != RAWUCHARINC(eptr)) RRETURN(MATCH_NOMATCH);
 		}
 	 else
 #endif
-	 /* Not UTF mode */
+	 /*! Not UTF mode */
 		{
 		if (md->end_subject - eptr < 1)
 		{
-		SCHECK_PARTIAL();				/* This one can use SCHECK_PARTIAL() */
+		SCHECK_PARTIAL();				/*! This one can use SCHECK_PARTIAL() */
 		RRETURN(MATCH_NOMATCH);
 		}
 		if (ecode[1] != *eptr++) RRETURN(MATCH_NOMATCH);
@@ -3166,7 +3166,7 @@ for (;;)
 		}
 	 break;
 
-	 /* Match a single character, caselessly. If we are at the end of the
+	 /*! Match a single character, caselessly. If we are at the end of the
 	 subject, give up immediately. */
 
 	 case OP_CHARI:
@@ -3183,7 +3183,7 @@ for (;;)
 		ecode++;
 		GETCHARLEN(fc, ecode, length);
 
-		/* If the pattern character's value is < 128, we have only one byte, and
+		/*! If the pattern character's value is < 128, we have only one byte, and
 		we know that its other case must also be one byte long, so we can use the
 		fast lookup table. We know that there is at least one byte left in the
 		subject. */
@@ -3196,7 +3196,7 @@ for (;;)
 		eptr++;
 		}
 
-		/* Otherwise we must pick up the subject character. Note that we cannot
+		/*! Otherwise we must pick up the subject character. Note that we cannot
 		use the value of "length" to check for sufficient bytes left, because the
 		other case of the character may have more or fewer bytes.  */
 
@@ -3206,7 +3206,7 @@ for (;;)
 		GETCHARINC(dc, eptr);
 		ecode += length;
 
-		/* If we have Unicode property support, we can use it to test the other
+		/*! If we have Unicode property support, we can use it to test the other
 		case of the character, if there is one. */
 
 		if (fc != dc)
@@ -3219,9 +3219,9 @@ for (;;)
 		}
 		}
 	 else
-#endif	/* SUPPORT_UTF */
+#endif	/*! SUPPORT_UTF */
 
-	 /* Not UTF mode */
+	 /*! Not UTF mode */
 		{
 		if (TABLE_GET(ecode[1], md->lcc, ecode[1])
 			 != TABLE_GET(*eptr, md->lcc, *eptr)) RRETURN(MATCH_NOMATCH);
@@ -3230,7 +3230,7 @@ for (;;)
 		}
 	 break;
 
-	 /* Match a single character repeatedly. */
+	 /*! Match a single character repeatedly. */
 
 	 case OP_EXACT:
 	 case OP_EXACTI:
@@ -3241,7 +3241,7 @@ for (;;)
 	 case OP_POSUPTO:
 	 case OP_POSUPTOI:
 	 possessive = TRUE;
-	 /* Fall through */
+	 /*! Fall through */
 
 	 case OP_UPTO:
 	 case OP_UPTOI:
@@ -3291,11 +3291,11 @@ for (;;)
 	 case OP_MINQUERYI:
 	 c = *ecode++ - ((op < OP_STARI)? OP_STAR : OP_STARI);
 	 minimize = (c & 1) != 0;
-	 min = rep_min[c];					/* Pick up values from tables; */
-	 max = rep_max[c];					/* zero for max => infinity */
+	 min = rep_min[c];					/*! Pick up values from tables; */
+	 max = rep_max[c];					/*! zero for max => infinity */
 	 if (max == 0) max = INT_MAX;
 
-	 /* Common code for all repeated single-character matches. */
+	 /*! Common code for all repeated single-character matches. */
 
 	 REPEATCHAR:
 #ifdef SUPPORT_UTF
@@ -3306,18 +3306,18 @@ for (;;)
 		GETCHARLEN(fc, ecode, length);
 		ecode += length;
 
-		/* Handle multibyte character matching specially here. There is
+		/*! Handle multibyte character matching specially here. There is
 		support for caseless matching if UCP support is present. */
 
 		if (length > 1)
 		{
 #ifdef SUPPORT_UCP
 		pcre_uint32 othercase;
-		if (op >= OP_STARI &&	  /* Caseless */
+		if (op >= OP_STARI &&   /*! Caseless */
 				(othercase = UCD_OTHERCASE(fc)) != fc)
 			 oclength = PRIV(ord2utf)(othercase, occhars);
 		else oclength = 0;
-#endif  /* SUPPORT_UCP */
+#endif  /*! SUPPORT_UCP */
 
 		for (i = 1; i <= min; i++)
 			 {
@@ -3327,7 +3327,7 @@ for (;;)
 			 else if (oclength > 0 &&
 						 eptr <= md->end_subject - oclength &&
 						 memcmp(eptr, occhars, IN_UCHARS(oclength)) == 0) eptr += oclength;
-#endif  /* SUPPORT_UCP */
+#endif  /*! SUPPORT_UCP */
 			 else
 				{
 				CHECK_PARTIAL();
@@ -3350,17 +3350,17 @@ for (;;)
 				else if (oclength > 0 &&
 							eptr <= md->end_subject - oclength &&
 							memcmp(eptr, occhars, IN_UCHARS(oclength)) == 0) eptr += oclength;
-#endif  /* SUPPORT_UCP */
+#endif  /*! SUPPORT_UCP */
 				else
 				{
 				CHECK_PARTIAL();
 				RRETURN(MATCH_NOMATCH);
 				}
 				}
-			 /* Control never gets here */
+			 /*! Control never gets here */
 			 }
 
-		else  /* Maximize */
+		else  /*! Maximize */
 			 {
 			 pp = eptr;
 			 for (i = min; i < max; i++)
@@ -3371,7 +3371,7 @@ for (;;)
 				else if (oclength > 0 &&
 							eptr <= md->end_subject - oclength &&
 							memcmp(eptr, occhars, IN_UCHARS(oclength)) == 0) eptr += oclength;
-#endif  /* SUPPORT_UCP */
+#endif  /*! SUPPORT_UCP */
 				else
 				{
 				CHECK_PARTIAL();
@@ -3389,24 +3389,24 @@ for (;;)
 #ifdef SUPPORT_UCP
 				eptr--;
 				BACKCHAR(eptr);
-#else	/* without SUPPORT_UCP */
+#else	/*! without SUPPORT_UCP */
 				eptr -= length;
-#endif  /* SUPPORT_UCP */
+#endif  /*! SUPPORT_UCP */
 				}
 			 }
-		/* Control never gets here */
+		/*! Control never gets here */
 		}
 
-		/* If the length of a UTF-8 character is 1, we fall through here, and
+		/*! If the length of a UTF-8 character is 1, we fall through here, and
 		obey the code as for non-UTF-8 characters below, though in this case the
 		value of fc will always be < 128. */
 		}
 	 else
-#endif  /* SUPPORT_UTF */
-		/* When not in UTF-8 mode, load a single-byte character. */
+#endif  /*! SUPPORT_UTF */
+		/*! When not in UTF-8 mode, load a single-byte character. */
 		fc = *ecode++;
 
-	 /* The value of fc at this point is always one character, though we may
+	 /*! The value of fc at this point is always one character, though we may
 	 or may not be in UTF mode. The code is duplicated for the caseless and
 	 caseful cases, for speed, since matching characters is likely to be quite
 	 common. First, ensure the minimum number of matches are present. If min =
@@ -3418,10 +3418,10 @@ for (;;)
 	 DPRINTF(("matching %c{%d,%d} against subject %.*s\n", fc, min, max,
 		max, (char *)eptr));
 
-	 if (op >= OP_STARI)  /* Caseless */
+	 if (op >= OP_STARI)  /*! Caseless */
 		{
 #ifdef COMPILE_PCRE8
-		/* fc must be < 128 if UTF is enabled. */
+		/*! fc must be < 128 if UTF is enabled. */
 		foc = md->fcc[fc];
 #else
 #ifdef SUPPORT_UTF
@@ -3431,11 +3431,11 @@ for (;;)
 #else
 		if (utf && fc > 127)
 		foc = fc;
-#endif /* SUPPORT_UCP */
+#endif /*! SUPPORT_UCP */
 		else
-#endif /* SUPPORT_UTF */
+#endif /*! SUPPORT_UTF */
 		foc = TABLE_GET(fc, md->fcc, fc);
-#endif /* COMPILE_PCRE8 */
+#endif /*! COMPILE_PCRE8 */
 
 		for (i = 1; i <= min; i++)
 		{
@@ -3469,9 +3469,9 @@ for (;;)
 			 if (fc != cc && foc != cc) RRETURN(MATCH_NOMATCH);
 			 eptr++;
 			 }
-		/* Control never gets here */
+		/*! Control never gets here */
 		}
-		else  /* Maximize */
+		else  /*! Maximize */
 		{
 		pp = eptr;
 		for (i = min; i < max; i++)
@@ -3498,10 +3498,10 @@ for (;;)
 			 }
 		RRETURN(MATCH_NOMATCH);
 		}
-		/* Control never gets here */
+		/*! Control never gets here */
 		}
 
-	 /* Caseful comparisons (includes all multi-byte characters) */
+	 /*! Caseful comparisons (includes all multi-byte characters) */
 
 	 else
 		{
@@ -3531,9 +3531,9 @@ for (;;)
 				}
 			 if (fc != RAWUCHARINCTEST(eptr)) RRETURN(MATCH_NOMATCH);
 			 }
-		/* Control never gets here */
+		/*! Control never gets here */
 		}
-		else  /* Maximize */
+		else  /*! Maximize */
 		{
 		pp = eptr;
 		for (i = min; i < max; i++)
@@ -3557,9 +3557,9 @@ for (;;)
 		RRETURN(MATCH_NOMATCH);
 		}
 		}
-	 /* Control never gets here */
+	 /*! Control never gets here */
 
-	 /* Match a negated single one-byte character. The character we are
+	 /*! Match a negated single one-byte character. The character we are
 	 checking can be multibyte. */
 
 	 case OP_NOT:
@@ -3590,7 +3590,7 @@ for (;;)
 #else
 		if (ch > 127)
 			 och = ch;
-#endif /* SUPPORT_UCP */
+#endif /*! SUPPORT_UCP */
 		else
 			 och = TABLE_GET(ch, md->fcc, ch);
 		if (ch == c || och == c) RRETURN(MATCH_NOMATCH);
@@ -3607,7 +3607,7 @@ for (;;)
 		}
 	 break;
 
-	 /* Match a negated single one-byte character repeatedly. This is almost a
+	 /*! Match a negated single one-byte character repeatedly. This is almost a
 	 repeat of the code for a repeated single character, but I haven't found a
 	 nice way of commoning these up that doesn't require a test of the
 	 positive/negative option for each character match. Maybe that wouldn't add
@@ -3676,16 +3676,16 @@ for (;;)
 	 case OP_NOTMINQUERYI:
 	 c = *ecode++ - ((op >= OP_NOTSTARI)? OP_NOTSTARI: OP_NOTSTAR);
 	 minimize = (c & 1) != 0;
-	 min = rep_min[c];					/* Pick up values from tables; */
-	 max = rep_max[c];					/* zero for max => infinity */
+	 min = rep_min[c];					/*! Pick up values from tables; */
+	 max = rep_max[c];					/*! zero for max => infinity */
 	 if (max == 0) max = INT_MAX;
 
-	 /* Common code for all repeated single-byte matches. */
+	 /*! Common code for all repeated single-byte matches. */
 
 	 REPEATNOTCHAR:
 	 GETCHARINCTEST(fc, ecode);
 
-	 /* The code is duplicated for the caseless and caseful cases, for speed,
+	 /*! The code is duplicated for the caseless and caseful cases, for speed,
 	 since matching characters is likely to be quite common. First, ensure the
 	 minimum number of matches are present. If min = max, continue at the same
 	 level without recursing. Otherwise, if minimizing, keep trying the rest of
@@ -3696,7 +3696,7 @@ for (;;)
 	 DPRINTF(("negative matching %c{%d,%d} against subject %.*s\n", fc, min, max,
 		max, (char *)eptr));
 
-	 if (op >= OP_NOTSTARI)	  /* Caseless */
+	 if (op >= OP_NOTSTARI)	  /*! Caseless */
 		{
 #ifdef SUPPORT_UTF
 #ifdef SUPPORT_UCP
@@ -3705,9 +3705,9 @@ for (;;)
 #else
 		if (utf && fc > 127)
 		foc = fc;
-#endif /* SUPPORT_UCP */
+#endif /*! SUPPORT_UCP */
 		else
-#endif /* SUPPORT_UTF */
+#endif /*! SUPPORT_UTF */
 		foc = TABLE_GET(fc, md->fcc, fc);
 
 #ifdef SUPPORT_UTF
@@ -3727,7 +3727,7 @@ for (;;)
 		}
 		else
 #endif
-		/* Not UTF mode */
+		/*! Not UTF mode */
 		{
 		for (i = 1; i <= min; i++)
 			 {
@@ -3765,7 +3765,7 @@ for (;;)
 			 }
 		else
 #endif
-		/* Not UTF mode */
+		/*! Not UTF mode */
 			 {
 			 for (fi = min;; fi++)
 				{
@@ -3781,10 +3781,10 @@ for (;;)
 				eptr++;
 				}
 			 }
-		/* Control never gets here */
+		/*! Control never gets here */
 		}
 
-		/* Maximize case */
+		/*! Maximize case */
 
 		else
 		{
@@ -3811,13 +3811,13 @@ for (;;)
 				{
 				RMATCH(eptr, ecode, offset_top, md, eptrb, RM30);
 				if (rrc != MATCH_NOMATCH) RRETURN(rrc);
-				if (eptr-- == pp) break;		/* Stop if tried at original pos */
+				if (eptr-- == pp) break;		/*! Stop if tried at original pos */
 				BACKCHAR(eptr);
 				}
 			 }
 		else
 #endif
-		/* Not UTF mode */
+		/*! Not UTF mode */
 			 {
 			 for (i = min; i < max; i++)
 				{
@@ -3840,10 +3840,10 @@ for (;;)
 
 		RRETURN(MATCH_NOMATCH);
 		}
-		/* Control never gets here */
+		/*! Control never gets here */
 		}
 
-	 /* Caseful comparisons */
+	 /*! Caseful comparisons */
 
 	 else
 		{
@@ -3864,7 +3864,7 @@ for (;;)
 		}
 		else
 #endif
-		/* Not UTF mode */
+		/*! Not UTF mode */
 		{
 		for (i = 1; i <= min; i++)
 			 {
@@ -3901,7 +3901,7 @@ for (;;)
 			 }
 		else
 #endif
-		/* Not UTF mode */
+		/*! Not UTF mode */
 			 {
 			 for (fi = min;; fi++)
 				{
@@ -3916,10 +3916,10 @@ for (;;)
 				if (fc == *eptr++) RRETURN(MATCH_NOMATCH);
 				}
 			 }
-		/* Control never gets here */
+		/*! Control never gets here */
 		}
 
-		/* Maximize case */
+		/*! Maximize case */
 
 		else
 		{
@@ -3946,13 +3946,13 @@ for (;;)
 				{
 				RMATCH(eptr, ecode, offset_top, md, eptrb, RM34);
 				if (rrc != MATCH_NOMATCH) RRETURN(rrc);
-				if (eptr-- == pp) break;		/* Stop if tried at original pos */
+				if (eptr-- == pp) break;		/*! Stop if tried at original pos */
 				BACKCHAR(eptr);
 				}
 			 }
 		else
 #endif
-		/* Not UTF mode */
+		/*! Not UTF mode */
 			 {
 			 for (i = min; i < max; i++)
 				{
@@ -3976,9 +3976,9 @@ for (;;)
 		RRETURN(MATCH_NOMATCH);
 		}
 		}
-	 /* Control never gets here */
+	 /*! Control never gets here */
 
-	 /* Match a single character type repeatedly; several different opcodes
+	 /*! Match a single character type repeatedly; several different opcodes
 	 share code. This is very similar to the code for single characters, but we
 	 repeat it in the interests of efficiency. */
 
@@ -4032,16 +4032,16 @@ for (;;)
 	 case OP_TYPEMINQUERY:
 	 c = *ecode++ - OP_TYPESTAR;
 	 minimize = (c & 1) != 0;
-	 min = rep_min[c];					/* Pick up values from tables; */
-	 max = rep_max[c];					/* zero for max => infinity */
+	 min = rep_min[c];					/*! Pick up values from tables; */
+	 max = rep_max[c];					/*! zero for max => infinity */
 	 if (max == 0) max = INT_MAX;
 
-	 /* Common code for all repeated single character type matches. Note that
+	 /*! Common code for all repeated single character type matches. Note that
 	 in UTF-8 mode, '.' matches a character of any length, but for the other
 	 character types, the valid characters are all one-byte long. */
 
 	 REPEATTYPE:
-	 ctype = *ecode++;		/* Code for the character type */
+	 ctype = *ecode++;		/*! Code for the character type */
 
 #ifdef SUPPORT_UCP
 	 if (ctype == OP_PROP || ctype == OP_NOTPROP)
@@ -4053,7 +4053,7 @@ for (;;)
 	 else prop_type = -1;
 #endif
 
-	 /* First, ensure the minimum number of matches are present. Use inline
+	 /*! First, ensure the minimum number of matches are present. Use inline
 	 code for maximizing the speed, and do the type test once at the start
 	 (i.e. keep it out of the loop). Separate the UTF-8 code completely as that
 	 is tidier. Also separate the UCP code, which can be the same for both UTF-8
@@ -4155,7 +4155,7 @@ for (;;)
 				}
 			 break;
 
-			 case PT_SPACE:	 /* Perl space */
+			 case PT_SPACE:	 /*! Perl space */
 			 for (i = 1; i <= min; i++)
 				{
 				if (eptr >= md->end_subject)
@@ -4171,7 +4171,7 @@ for (;;)
 				}
 			 break;
 
-			 case PT_PXSPACE:  /* POSIX space */
+			 case PT_PXSPACE:  /*! POSIX space */
 			 for (i = 1; i <= min; i++)
 				{
 				if (eptr >= md->end_subject)
@@ -4225,14 +4225,14 @@ for (;;)
 				}
 			 break;
 
-			 /* This should not occur */
+			 /*! This should not occur */
 
 			 default:
 			 RRETURN(PCRE_ERROR_INTERNAL);
 			 }
 		}
 
-		/* Match extended Unicode sequences. We will get here only if the
+		/*! Match extended Unicode sequences. We will get here only if the
 		support is in the binary; otherwise a compile-time error occurs. */
 
 		else if (ctype == OP_EXTUNI)
@@ -4264,9 +4264,9 @@ for (;;)
 		}
 
 		else
-#endif	  /* SUPPORT_UCP */
+#endif	  /*! SUPPORT_UCP */
 
-/* Handle all other cases when the coding is UTF-8 */
+/*! Handle all other cases when the coding is UTF-8 */
 
 #ifdef SUPPORT_UTF
 		if (utf) switch(ctype)
@@ -4338,7 +4338,7 @@ for (;;)
 #ifndef EBCDIC
 				case 0x2028:
 				case 0x2029:
-#endif  /* Not EBCDIC */
+#endif  /*! Not EBCDIC */
 				if (md->bsr_anycrlf) RRETURN(MATCH_NOMATCH);
 				break;
 				}
@@ -4356,7 +4356,7 @@ for (;;)
 			 GETCHARINC(c, eptr);
 			 switch(c)
 				{
-				HSPACE_CASES: RRETURN(MATCH_NOMATCH);  /* Byte and multibyte cases */
+				HSPACE_CASES: RRETURN(MATCH_NOMATCH);  /*! Byte and multibyte cases */
 				default: break;
 				}
 			 }
@@ -4373,7 +4373,7 @@ for (;;)
 			 GETCHARINC(c, eptr);
 			 switch(c)
 				{
-				HSPACE_CASES: break;  /* Byte and multibyte cases */
+				HSPACE_CASES: break;  /*! Byte and multibyte cases */
 				default: RRETURN(MATCH_NOMATCH);
 				}
 			 }
@@ -4441,7 +4441,7 @@ for (;;)
 			 if (cc >= 128 || (md->ctypes[cc] & ctype_digit) == 0)
 				RRETURN(MATCH_NOMATCH);
 			 eptr++;
-			 /* No need to skip more bytes - we know it's a 1-byte character */
+			 /*! No need to skip more bytes - we know it's a 1-byte character */
 			 }
 		break;
 
@@ -4477,7 +4477,7 @@ for (;;)
 			 if (cc >= 128 || (md->ctypes[cc] & ctype_space) == 0)
 				RRETURN(MATCH_NOMATCH);
 			 eptr++;
-			 /* No need to skip more bytes - we know it's a 1-byte character */
+			 /*! No need to skip more bytes - we know it's a 1-byte character */
 			 }
 		break;
 
@@ -4513,18 +4513,18 @@ for (;;)
 			 if (cc >= 128 || (md->ctypes[cc] & ctype_word) == 0)
 				RRETURN(MATCH_NOMATCH);
 			 eptr++;
-			 /* No need to skip more bytes - we know it's a 1-byte character */
+			 /*! No need to skip more bytes - we know it's a 1-byte character */
 			 }
 		break;
 
 		default:
 		RRETURN(PCRE_ERROR_INTERNAL);
-		}  /* End switch(ctype) */
+		}  /*! End switch(ctype) */
 
 		else
-#endif	  /* SUPPORT_UTF */
+#endif	  /*! SUPPORT_UTF */
 
-		/* Code for the non-UTF-8 case for minimum matching of operators other
+		/*! Code for the non-UTF-8 case for minimum matching of operators other
 		than OP_PROP and OP_NOTPROP. */
 
 		switch(ctype)
@@ -4770,11 +4770,11 @@ for (;;)
 		}
 		}
 
-	 /* If min = max, continue at the same level without recursing */
+	 /*! If min = max, continue at the same level without recursing */
 
 	 if (min == max) continue;
 
-	 /* If minimizing, we have to test the rest of the pattern before each
+	 /*! If minimizing, we have to test the rest of the pattern before each
 	 subsequent match. Again, separate the UTF-8 case for speed, and also
 	 separate the UCP cases. */
 
@@ -4799,7 +4799,7 @@ for (;;)
 				GETCHARINCTEST(c, eptr);
 				if (prop_fail_result) RRETURN(MATCH_NOMATCH);
 				}
-			 /* Control never gets here */
+			 /*! Control never gets here */
 
 			 case PT_LAMP:
 			 for (fi = min;; fi++)
@@ -4820,7 +4820,7 @@ for (;;)
 					chartype == ucp_Lt) == prop_fail_result)
 				RRETURN(MATCH_NOMATCH);
 				}
-			 /* Control never gets here */
+			 /*! Control never gets here */
 
 			 case PT_GC:
 			 for (fi = min;; fi++)
@@ -4837,7 +4837,7 @@ for (;;)
 				if ((UCD_CATEGORY(c) == prop_value) == prop_fail_result)
 				RRETURN(MATCH_NOMATCH);
 				}
-			 /* Control never gets here */
+			 /*! Control never gets here */
 
 			 case PT_PC:
 			 for (fi = min;; fi++)
@@ -4854,7 +4854,7 @@ for (;;)
 				if ((UCD_CHARTYPE(c) == prop_value) == prop_fail_result)
 				RRETURN(MATCH_NOMATCH);
 				}
-			 /* Control never gets here */
+			 /*! Control never gets here */
 
 			 case PT_SC:
 			 for (fi = min;; fi++)
@@ -4871,7 +4871,7 @@ for (;;)
 				if ((UCD_SCRIPT(c) == prop_value) == prop_fail_result)
 				RRETURN(MATCH_NOMATCH);
 				}
-			 /* Control never gets here */
+			 /*! Control never gets here */
 
 			 case PT_ALNUM:
 			 for (fi = min;; fi++)
@@ -4890,9 +4890,9 @@ for (;;)
 				if ((category == ucp_L || category == ucp_N) == prop_fail_result)
 				RRETURN(MATCH_NOMATCH);
 				}
-			 /* Control never gets here */
+			 /*! Control never gets here */
 
-			 case PT_SPACE:	 /* Perl space */
+			 case PT_SPACE:	 /*! Perl space */
 			 for (fi = min;; fi++)
 				{
 				RMATCH(eptr, ecode, offset_top, md, eptrb, RM60);
@@ -4909,9 +4909,9 @@ for (;;)
 						 == prop_fail_result)
 				RRETURN(MATCH_NOMATCH);
 				}
-			 /* Control never gets here */
+			 /*! Control never gets here */
 
-			 case PT_PXSPACE:  /* POSIX space */
+			 case PT_PXSPACE:  /*! POSIX space */
 			 for (fi = min;; fi++)
 				{
 				RMATCH(eptr, ecode, offset_top, md, eptrb, RM61);
@@ -4928,7 +4928,7 @@ for (;;)
 						 == prop_fail_result)
 				RRETURN(MATCH_NOMATCH);
 				}
-			 /* Control never gets here */
+			 /*! Control never gets here */
 
 			 case PT_WORD:
 			 for (fi = min;; fi++)
@@ -4950,7 +4950,7 @@ for (;;)
 						 == prop_fail_result)
 				RRETURN(MATCH_NOMATCH);
 				}
-			 /* Control never gets here */
+			 /*! Control never gets here */
 
 			 case PT_CLIST:
 			 for (fi = min;; fi++)
@@ -4974,15 +4974,15 @@ for (;;)
 					 { if (prop_fail_result) { RRETURN(MATCH_NOMATCH); } else break; }
 				}
 				}
-			 /* Control never gets here */
+			 /*! Control never gets here */
 
-			 /* This should never occur */
+			 /*! This should never occur */
 			 default:
 			 RRETURN(PCRE_ERROR_INTERNAL);
 			 }
 		}
 
-		/* Match extended Unicode sequences. We will get here only if the
+		/*! Match extended Unicode sequences. We will get here only if the
 		support is in the binary; otherwise a compile-time error occurs. */
 
 		else if (ctype == OP_EXTUNI)
@@ -5016,7 +5016,7 @@ for (;;)
 			 }
 		}
 		else
-#endif	  /* SUPPORT_UCP */
+#endif	  /*! SUPPORT_UCP */
 
 #ifdef SUPPORT_UTF
 		if (utf)
@@ -5036,8 +5036,8 @@ for (;;)
 			 GETCHARINC(c, eptr);
 			 switch(ctype)
 				{
-				case OP_ANY:					/* This is the non-NL case */
-				if (md->partial != 0 &&	 /* Take care with CRLF partial */
+				case OP_ANY:					/*! This is the non-NL case */
+				if (md->partial != 0 &&  /*! Take care with CRLF partial */
 					 eptr >= md->end_subject &&
 					 NLBLOCK->nltype == NLTYPE_FIXED &&
 					 NLBLOCK->nllen == 2 &&
@@ -5069,7 +5069,7 @@ for (;;)
 #ifndef EBCDIC
 				case 0x2028:
 				case 0x2029:
-#endif  /* Not EBCDIC */
+#endif  /*! Not EBCDIC */
 				if (md->bsr_anycrlf) RRETURN(MATCH_NOMATCH);
 				break;
 				}
@@ -5144,7 +5144,7 @@ for (;;)
 		}
 		else
 #endif
-		/* Not UTF mode */
+		/*! Not UTF mode */
 		{
 		for (fi = min;; fi++)
 			 {
@@ -5161,8 +5161,8 @@ for (;;)
 			 c = *eptr++;
 			 switch(ctype)
 				{
-				case OP_ANY:					/* This is the non-NL case */
-				if (md->partial != 0 &&	 /* Take care with CRLF partial */
+				case OP_ANY:					/*! This is the non-NL case */
+				if (md->partial != 0 &&  /*! Take care with CRLF partial */
 					 eptr >= md->end_subject &&
 					 NLBLOCK->nltype == NLTYPE_FIXED &&
 					 NLBLOCK->nllen == 2 &&
@@ -5277,16 +5277,16 @@ for (;;)
 				}
 			 }
 		}
-		/* Control never gets here */
+		/*! Control never gets here */
 		}
 
-	 /* If maximizing, it is worth using inline code for speed, doing the type
+	 /*! If maximizing, it is worth using inline code for speed, doing the type
 	 test once at the start (i.e. keep it out of the loop). Again, keep the
 	 UTF-8 and UCP stuff separate. */
 
 	 else
 		{
-		pp = eptr;  /* Remember where we started */
+		pp = eptr;  /*! Remember where we started */
 
 #ifdef SUPPORT_UCP
 		if (prop_type >= 0)
@@ -5391,7 +5391,7 @@ for (;;)
 				}
 			 break;
 
-			 case PT_SPACE:	 /* Perl space */
+			 case PT_SPACE:	 /*! Perl space */
 			 for (i = min; i < max; i++)
 				{
 				int len = 1;
@@ -5409,7 +5409,7 @@ for (;;)
 				}
 			 break;
 
-			 case PT_PXSPACE:  /* POSIX space */
+			 case PT_PXSPACE:  /*! POSIX space */
 			 for (i = min; i < max; i++)
 				{
 				int len = 1;
@@ -5474,19 +5474,19 @@ for (;;)
 			 RRETURN(PCRE_ERROR_INTERNAL);
 			 }
 
-		/* eptr is now past the end of the maximum run */
+		/*! eptr is now past the end of the maximum run */
 
 		if (possessive) continue;
 		for(;;)
 			 {
 			 RMATCH(eptr, ecode, offset_top, md, eptrb, RM44);
 			 if (rrc != MATCH_NOMATCH) RRETURN(rrc);
-			 if (eptr-- == pp) break;		/* Stop if tried at original pos */
+			 if (eptr-- == pp) break;		/*! Stop if tried at original pos */
 			 if (utf) BACKCHAR(eptr);
 			 }
 		}
 
-		/* Match extended Unicode sequences. We will get here only if the
+		/*! Match extended Unicode sequences. We will get here only if the
 		support is in the binary; otherwise a compile-time error occurs. */
 
 		else if (ctype == OP_EXTUNI)
@@ -5516,7 +5516,7 @@ for (;;)
 			 CHECK_PARTIAL();
 			 }
 
-		/* eptr is now past the end of the maximum run */
+		/*! eptr is now past the end of the maximum run */
 
 		if (possessive) continue;
 
@@ -5524,8 +5524,8 @@ for (;;)
 			 {
 			 RMATCH(eptr, ecode, offset_top, md, eptrb, RM45);
 			 if (rrc != MATCH_NOMATCH) RRETURN(rrc);
-			 if (eptr-- == pp) break;		/* Stop if tried at original pos */
-			 for (;;)								/* Move back over one extended */
+			 if (eptr-- == pp) break;		/*! Stop if tried at original pos */
+			 for (;;)								/*! Move back over one extended */
 				{
 				if (!utf) c = *eptr; else
 				{
@@ -5539,7 +5539,7 @@ for (;;)
 		}
 
 		else
-#endif	/* SUPPORT_UCP */
+#endif	/*! SUPPORT_UCP */
 
 #ifdef SUPPORT_UTF
 		if (utf)
@@ -5557,7 +5557,7 @@ for (;;)
 					 break;
 					 }
 				if (IS_NEWLINE(eptr)) break;
-				if (md->partial != 0 &&	 /* Take care with CRLF partial */
+				if (md->partial != 0 &&  /*! Take care with CRLF partial */
 						eptr + 1 >= md->end_subject &&
 						NLBLOCK->nltype == NLTYPE_FIXED &&
 						NLBLOCK->nllen == 2 &&
@@ -5571,7 +5571,7 @@ for (;;)
 				}
 				}
 
-			 /* Handle unlimited UTF-8 repeat */
+			 /*! Handle unlimited UTF-8 repeat */
 
 			 else
 				{
@@ -5583,7 +5583,7 @@ for (;;)
 					 break;
 					 }
 				if (IS_NEWLINE(eptr)) break;
-				if (md->partial != 0 &&	 /* Take care with CRLF partial */
+				if (md->partial != 0 &&  /*! Take care with CRLF partial */
 						eptr + 1 >= md->end_subject &&
 						NLBLOCK->nltype == NLTYPE_FIXED &&
 						NLBLOCK->nllen == 2 &&
@@ -5614,12 +5614,12 @@ for (;;)
 				}
 			 else
 				{
-				eptr = md->end_subject;	/* Unlimited UTF-8 repeat */
+				eptr = md->end_subject;	/*! Unlimited UTF-8 repeat */
 				SCHECK_PARTIAL();
 				}
 			 break;
 
-			 /* The byte case is the same as non-UTF8 */
+			 /*! The byte case is the same as non-UTF8 */
 
 			 case OP_ANYBYTE:
 			 c = max - min;
@@ -5653,7 +5653,7 @@ for (;;)
 						 (c != CHAR_VT && c != CHAR_FF && c != CHAR_NEL
 #ifndef EBCDIC
 						&& c != 0x2028 && c != 0x2029
-#endif  /* Not EBCDIC */
+#endif  /*! Not EBCDIC */
 						)))
 					 break;
 				eptr += len;
@@ -5799,7 +5799,7 @@ for (;;)
 			 RRETURN(PCRE_ERROR_INTERNAL);
 			 }
 
-		/* eptr is now past the end of the maximum run. If possessive, we are
+		/*! eptr is now past the end of the maximum run. If possessive, we are
 		done (no backing up). Otherwise, match at this position; anything other
 		than no match is immediately returned. For nomatch, back up one
 		character, unless we are matching \R and the last thing matched was
@@ -5810,15 +5810,15 @@ for (;;)
 			 {
 			 RMATCH(eptr, ecode, offset_top, md, eptrb, RM46);
 			 if (rrc != MATCH_NOMATCH) RRETURN(rrc);
-			 if (eptr-- == pp) break;		/* Stop if tried at original pos */
+			 if (eptr-- == pp) break;		/*! Stop if tried at original pos */
 			 BACKCHAR(eptr);
 			 if (ctype == OP_ANYNL && eptr > pp  && RAWUCHAR(eptr) == CHAR_NL &&
 				RAWUCHAR(eptr - 1) == CHAR_CR) eptr--;
 			 }
 		}
 		else
-#endif  /* SUPPORT_UTF */
-		/* Not UTF mode */
+#endif  /*! SUPPORT_UTF */
+		/*! Not UTF mode */
 		{
 		switch(ctype)
 			 {
@@ -5831,7 +5831,7 @@ for (;;)
 				break;
 				}
 				if (IS_NEWLINE(eptr)) break;
-				if (md->partial != 0 &&	 /* Take care with CRLF partial */
+				if (md->partial != 0 &&  /*! Take care with CRLF partial */
 					 eptr + 1 >= md->end_subject &&
 					 NLBLOCK->nltype == NLTYPE_FIXED &&
 					 NLBLOCK->nllen == 2 &&
@@ -6048,7 +6048,7 @@ for (;;)
 			 RRETURN(PCRE_ERROR_INTERNAL);
 			 }
 
-		/* eptr is now past the end of the maximum run. If possessive, we are
+		/*! eptr is now past the end of the maximum run. If possessive, we are
 		done (no backing up). Otherwise, match at this position; anything other
 		than no match is immediately returned. For nomatch, back up one
 		character (byte), unless we are matching \R and the last thing matched
@@ -6065,13 +6065,13 @@ for (;;)
 			 }
 		}
 
-		/* Get here if we can't make it match with any permitted repetitions */
+		/*! Get here if we can't make it match with any permitted repetitions */
 
 		RRETURN(MATCH_NOMATCH);
 		}
-	 /* Control never gets here */
+	 /*! Control never gets here */
 
-	 /* There's been some horrible disaster. Arrival here can only mean there is
+	 /*! There's been some horrible disaster. Arrival here can only mean there is
 	 something seriously wrong in the code above or the OP_xxx definitions. */
 
 	 default:
@@ -6079,15 +6079,15 @@ for (;;)
 	 RRETURN(PCRE_ERROR_UNKNOWN_OPCODE);
 	 }
 
-  /* Do not stick any code in here without much thought; it is assumed
+  /*! Do not stick any code in here without much thought; it is assumed
   that "continue" in the code above comes out to here to repeat the main
   loop. */
 
-  }				 /* End of main loop */
-/* Control never reaches here */
+  }				 /*! End of main loop */
+/*! Control never reaches here */
 
 
-/* When compiling to use the heap rather than the stack for recursive calls to
+/*! When compiling to use the heap rather than the stack for recursive calls to
 match(), the RRETURN() macro jumps here. The number that is saved in
 frame->Xwhere indicates which label we actually want to return to. */
 
@@ -6112,18 +6112,18 @@ switch (frame->Xwhere)
 #ifdef SUPPORT_UCP
   LBL(36) LBL(37) LBL(38) LBL(39) LBL(40) LBL(41) LBL(44) LBL(45)
   LBL(59) LBL(60) LBL(61) LBL(62) LBL(67)
-#endif  /* SUPPORT_UCP */
-#endif  /* SUPPORT_UTF */
+#endif  /*! SUPPORT_UCP */
+#endif  /*! SUPPORT_UTF */
   default:
   DPRINTF(("jump error in pcre match: label %d non-existent\n", frame->Xwhere));
   return PCRE_ERROR_INTERNAL;
   }
 #undef LBL
-#endif  /* NO_RECURSE */
+#endif  /*! NO_RECURSE */
 }
 
 
-/***************************************************************************
+/*!**************************************************************************
 ****************************************************************************
 						 RECURSION IN THE match() FUNCTION
 
@@ -6168,21 +6168,21 @@ Undefine all the macros that were defined above to handle this. */
 
 #endif
 
-/* These two are defined as macros in both cases */
+/*! These two are defined as macros in both cases */
 
 #undef fc
 #undef fi
 
-/***************************************************************************
+/*!**************************************************************************
 ***************************************************************************/
 
 
 #ifdef NO_RECURSE
-/*************************************************
+/*!************************************************
 *			 Release allocated heap frames			*
 *************************************************/
 
-/* This function releases all the allocated frames. The base frame is on the
+/*! This function releases all the allocated frames. The base frame is on the
 machine stack, and so must not be freed.
 
 Argument: the address of the base frame
@@ -6203,11 +6203,11 @@ while (nextframe != NULL)
 #endif
 
 
-/*************************************************
+/*!************************************************
 *			Execute a Regular Expression			*
 *************************************************/
 
-/* This function applies a compiled re to a subject string and picks out
+/*! This function applies a compiled re to a subject string and picks out
 portions of the string if it matches. Two elements in the vector are set for
 each substring: the offsets to the start and end of the substring.
 
@@ -6271,12 +6271,12 @@ const REAL_PCRE *re = (const REAL_PCRE *)argument_re;
 
 #ifdef NO_RECURSE
 heapframe frame_zero;
-frame_zero.Xprevframe = NULL;				/* Marks the top level */
-frame_zero.Xnextframe = NULL;				/* None are allocated yet */
+frame_zero.Xprevframe = NULL;				/*! Marks the top level */
+frame_zero.Xnextframe = NULL;				/*! None are allocated yet */
 md->match_frames_base = &frame_zero;
 #endif
 
-/* Check for the special magic call that measures the size of the stack used
+/*! Check for the special magic call that measures the size of the stack used
 per recursive call of match(). Without the funny casting for sizeof, a Windows
 compiler gave this error: "unary minus operator applied to unsigned type,
 result still unsigned". Hopefully the cast fixes that. */
@@ -6289,7 +6289,7 @@ if (re == NULL && extra_data == NULL && subject == NULL && length == -999 &&
   return match(NULL, NULL, NULL, 0, NULL, NULL, 0);
 #endif
 
-/* Plausibility checks */
+/*! Plausibility checks */
 
 if ((options & ~PUBLIC_EXEC_OPTIONS) != 0) return PCRE_ERROR_BADOPTION;
 if (re == NULL || subject == NULL || (offsets == NULL && offsetcount > 0))
@@ -6298,7 +6298,7 @@ if (offsetcount < 0) return PCRE_ERROR_BADCOUNT;
 if (length < 0) return PCRE_ERROR_BADLENGTH;
 if (start_offset < 0 || start_offset > length) return PCRE_ERROR_BADOFFSET;
 
-/* Check that the first field in the block is the magic number. If it is not,
+/*! Check that the first field in the block is the magic number. If it is not,
 return with PCRE_ERROR_BADMAGIC. However, if the magic number is equal to
 REVERSED_MAGIC_NUMBER we return with PCRE_ERROR_BADENDIANNESS, which
 means that the pattern is likely compiled with different endianness. */
@@ -6308,17 +6308,17 @@ if (re->magic_number != MAGIC_NUMBER)
 	 PCRE_ERROR_BADENDIANNESS:PCRE_ERROR_BADMAGIC;
 if ((re->flags & PCRE_MODE) == 0) return PCRE_ERROR_BADMODE;
 
-/* These two settings are used in the code for checking a UTF-8 string that
+/*! These two settings are used in the code for checking a UTF-8 string that
 follows immediately afterwards. Other values in the md block are used only
 during "normal" pcre_exec() processing, not when the JIT support is in use,
 so they are set up later. */
 
-/* PCRE_UTF16 has the same value as PCRE_UTF8. */
+/*! PCRE_UTF16 has the same value as PCRE_UTF8. */
 utf = md->utf = (re->options & PCRE_UTF8) != 0;
 md->partial = ((options & PCRE_PARTIAL_HARD) != 0)? 2 :
 				((options & PCRE_PARTIAL_SOFT) != 0)? 1 : 0;
 
-/* Check a UTF-8 string if required. Pass back the character offset and error
+/*! Check a UTF-8 string if required. Pass back the character offset and error
 code for an invalid string if a results vector is available. */
 
 #ifdef SUPPORT_UTF
@@ -6344,7 +6344,7 @@ if (utf && (options & PCRE_NO_UTF8_CHECK) == 0)
 #endif
 	 }
 #if defined COMPILE_PCRE8 || defined COMPILE_PCRE16
-  /* Check that a start_offset points to the start of a UTF character. */
+  /*! Check that a start_offset points to the start of a UTF character. */
   if (start_offset > 0 && start_offset < length &&
 		NOT_FIRSTCHAR(((PCRE_PUCHAR)subject)[start_offset]))
 	 return PCRE_ERROR_BADUTF8_OFFSET;
@@ -6352,7 +6352,7 @@ if (utf && (options & PCRE_NO_UTF8_CHECK) == 0)
   }
 #endif
 
-/* If the pattern was successfully studied with JIT support, run the JIT
+/*! If the pattern was successfully studied with JIT support, run the JIT
 executable instead of the rest of this function. Most options must be set at
 compile time for the JIT code to be usable. Fallback to the normal code path if
 an unsupported flag is set. */
@@ -6367,21 +6367,21 @@ if (extra_data != NULL
   rc = PRIV(jit_exec)(extra_data, (const pcre_uchar *)subject, length,
 		 start_offset, options, offsets, offsetcount);
 
-  /* PCRE_ERROR_NULL means that the selected normal or partial matching
+  /*! PCRE_ERROR_NULL means that the selected normal or partial matching
   mode is not compiled. In this case we simply fallback to interpreter. */
 
   if (rc != PCRE_ERROR_JIT_BADOPTION) return rc;
   }
 #endif
 
-/* Carry on with non-JIT matching. This information is for finding all the
+/*! Carry on with non-JIT matching. This information is for finding all the
 numbers associated with a given name, for condition testing. */
 
 md->name_table = (pcre_uchar *)re + re->name_table_offset;
 md->name_count = re->name_count;
 md->name_entry_size = re->name_entry_size;
 
-/* Fish out the optional data from the extra_data structure, first setting
+/*! Fish out the optional data from the extra_data structure, first setting
 the default values. */
 
 study = NULL;
@@ -6389,7 +6389,7 @@ md->match_limit = MATCH_LIMIT;
 md->match_limit_recursion = MATCH_LIMIT_RECURSION;
 md->callout_data = NULL;
 
-/* The table pointer is always in native byte order. */
+/*! The table pointer is always in native byte order. */
 
 tables = re->tables;
 
@@ -6407,19 +6407,19 @@ if (extra_data != NULL)
   if ((flags & PCRE_EXTRA_TABLES) != 0) tables = extra_data->tables;
   }
 
-/* If the exec call supplied NULL for tables, use the inbuilt ones. This
+/*! If the exec call supplied NULL for tables, use the inbuilt ones. This
 is a feature that makes it possible to save compiled regex and re-use them
 in other programs later. */
 
 if (tables == NULL) tables = PRIV(default_tables);
 
-/* Set up other data */
+/*! Set up other data */
 
 anchored = ((re->options | options) & PCRE_ANCHORED) != 0;
 startline = (re->flags & PCRE_STARTLINE) != 0;
 firstline = (re->options & PCRE_FIRSTLINE) != 0;
 
-/* The code starts after the real_pcre block and the capture name table. */
+/*! The code starts after the real_pcre block and the capture name table. */
 
 md->start_code = (const pcre_uchar *)re + re->name_table_offset +
   re->name_count * re->name_entry_size;
@@ -6434,7 +6434,7 @@ md->use_ucp = (re->options & PCRE_UCP) != 0;
 md->jscript_compat = (re->options & PCRE_JAVASCRIPT_COMPAT) != 0;
 md->ignore_skip_arg = FALSE;
 
-/* Some options are unpacked into BOOL variables in the hope that testing
+/*! Some options are unpacked into BOOL variables in the hope that testing
 them will be faster than individual option bits. */
 
 md->notbol = (options & PCRE_NOTBOL) != 0;
@@ -6443,16 +6443,16 @@ md->notempty = (options & PCRE_NOTEMPTY) != 0;
 md->notempty_atstart = (options & PCRE_NOTEMPTY_ATSTART) != 0;
 
 md->hitend = FALSE;
-md->mark = md->nomatch_mark = NULL;	  /* In case never set */
+md->mark = md->nomatch_mark = NULL;	  /*! In case never set */
 
-md->recursive = NULL;						 /* No recursion at top level */
+md->recursive = NULL;						 /*! No recursion at top level */
 md->hasthen = (re->flags & PCRE_HASTHEN) != 0;
 
 md->lcc = tables + lcc_offset;
 md->fcc = tables + fcc_offset;
 md->ctypes = tables + ctypes_offset;
 
-/* Handle different \R options. */
+/*! Handle different \R options. */
 
 switch (options & (PCRE_BSR_ANYCRLF|PCRE_BSR_UNICODE))
   {
@@ -6478,13 +6478,13 @@ switch (options & (PCRE_BSR_ANYCRLF|PCRE_BSR_UNICODE))
   default: return PCRE_ERROR_BADNEWLINE;
   }
 
-/* Handle different types of newline. The three bits give eight cases. If
+/*! Handle different types of newline. The three bits give eight cases. If
 nothing is set at run time, whatever was used at compile time applies. */
 
 switch ((((options & PCRE_NEWLINE_BITS) == 0)? re->options :
 		(pcre_uint32)options) & PCRE_NEWLINE_BITS)
   {
-  case 0: newline = NEWLINE; break;	/* Compile-time default */
+  case 0: newline = NEWLINE; break;	/*! Compile-time default */
   case PCRE_NEWLINE_CR: newline = CHAR_CR; break;
   case PCRE_NEWLINE_LF: newline = CHAR_NL; break;
   case PCRE_NEWLINE_CR+
@@ -6518,14 +6518,14 @@ else
 	 }
   }
 
-/* Partial matching was originally supported only for a restricted set of
+/*! Partial matching was originally supported only for a restricted set of
 regexes; from release 8.00 there are no restrictions, but the bits are still
 defined (though never set). So there's no harm in leaving this code. */
 
 if (md->partial && (re->flags & PCRE_NOPARTIAL) != 0)
   return PCRE_ERROR_BADPARTIAL;
 
-/* If the expression has got more back references than the offsets supplied can
+/*! If the expression has got more back references than the offsets supplied can
 hold, we get a temporary chunk of working store to use during the matching.
 Otherwise, we can use the vector supplied, rounding down its size to a multiple
 of 3. */
@@ -6548,7 +6548,7 @@ md->offset_max = (2*ocount)/3;
 md->offset_overflow = FALSE;
 md->capture_last = -1;
 
-/* Reset the working variable associated with each extraction. These should
+/*! Reset the working variable associated with each extraction. These should
 never be used unless previously set, but they get saved and restored, and so we
 initialize them to avoid reading uninitialized locations. Also, unset the
 offsets for the matched string. This is really just for tidiness with callouts,
@@ -6563,7 +6563,7 @@ if (md->offset_vector != NULL)
   md->offset_vector[0] = md->offset_vector[1] = -1;
   }
 
-/* Set up the first character to match, if available. The first_char value is
+/*! Set up the first character to match, if available. The first_char value is
 never set for an anchored regular expression, but the anchoring may be forced
 at run time, so we have to test for anchoring. The first char may be unset for
 an unanchored pattern, of course. If there's no first char and the pattern was
@@ -6590,7 +6590,7 @@ if (!anchored)
 		start_bits = study->start_bits;
   }
 
-/* For anchored or unanchored matches, there may be a "last known required
+/*! For anchored or unanchored matches, there may be a "last known required
 character" set. */
 
 if ((re->flags & PCRE_REQCHSET) != 0)
@@ -6608,9 +6608,9 @@ if ((re->flags & PCRE_REQCHSET) != 0)
   }
 
 
-/* ==========================================================================*/
+/*! ==========================================================================*/
 
-/* Loop for handling unanchored repeated matching attempts; for anchored regexs
+/*! Loop for handling unanchored repeated matching attempts; for anchored regexs
 the loop runs just once. */
 
 for(;;)
@@ -6618,7 +6618,7 @@ for(;;)
   PCRE_PUCHAR save_end_subject = end_subject;
   PCRE_PUCHAR new_start_match;
 
-  /* If firstline is TRUE, the start of the match is constrained to the first
+  /*! If firstline is TRUE, the start of the match is constrained to the first
   line of a multiline string. That is, the match must be before or at the first
   newline. Implement this by temporarily adjusting end_subject so that we stop
   scanning at a newline. If the match fails at the newline, later code breaks
@@ -6642,7 +6642,7 @@ for(;;)
 	 end_subject = t;
 	 }
 
-  /* There are some optimizations that avoid running the match if a known
+  /*! There are some optimizations that avoid running the match if a known
   starting point is not found, or if a known later character is not present.
   However, there is an option that disables these, for testing and for ensuring
   that all callouts do actually occur. The option can be set in the regex by
@@ -6650,7 +6650,7 @@ for(;;)
 
   if (((options | re->options) & PCRE_NO_START_OPTIMIZE) == 0)
 	 {
-	 /* Advance to a unique first char if there is one. */
+	 /*! Advance to a unique first char if there is one. */
 
 	 if (has_first_char)
 		{
@@ -6665,7 +6665,7 @@ for(;;)
 			 start_match++;
 		}
 
-	 /* Or to just after a linebreak for a multiline match */
+	 /*! Or to just after a linebreak for a multiline match */
 
 	 else if (startline)
 		{
@@ -6686,7 +6686,7 @@ for(;;)
 		while (start_match < end_subject && !WAS_NEWLINE(start_match))
 			 start_match++;
 
-		/* If we have just passed a CR and the newline option is ANY or ANYCRLF,
+		/*! If we have just passed a CR and the newline option is ANY or ANYCRLF,
 		and we are now at a LF, advance the match position by one more character.
 		*/
 
@@ -6698,7 +6698,7 @@ for(;;)
 		}
 		}
 
-	 /* Or to a non-unique first byte after study */
+	 /*! Or to a non-unique first byte after study */
 
 	 else if (start_bits != NULL)
 		{
@@ -6712,7 +6712,7 @@ for(;;)
 			 {
 			 start_match++;
 #if defined SUPPORT_UTF && defined COMPILE_PCRE8
-			 /* In non 8-bit mode, the iteration will stop for
+			 /*! In non 8-bit mode, the iteration will stop for
 			 characters > 255 at the beginning or not stop at all. */
 			 if (utf)
 				ACROSSCHAR(start_match < end_subject, *start_match,
@@ -6722,18 +6722,18 @@ for(;;)
 		else break;
 		}
 		}
-	 }	/* Starting optimizations */
+	 }	/*! Starting optimizations */
 
-  /* Restore fudged end_subject */
+  /*! Restore fudged end_subject */
 
   end_subject = save_end_subject;
 
-  /* The following two optimizations are disabled for partial matching or if
+  /*! The following two optimizations are disabled for partial matching or if
   disabling is explicitly requested. */
 
   if (((options | re->options) & PCRE_NO_START_OPTIMIZE) == 0 && !md->partial)
 	 {
-	 /* If the pattern was studied, a minimum subject length may be set. This is
+	 /*! If the pattern was studied, a minimum subject length may be set. This is
 	 a lower bound; no actual string of that length may actually match the
 	 pattern. Although the value is, strictly, in characters, we treat it as
 	 bytes to avoid spending too much time in this optimization. */
@@ -6745,7 +6745,7 @@ for(;;)
 		break;
 		}
 
-	 /* If req_char is set, we know that that character must appear in the
+	 /*! If req_char is set, we know that that character must appear in the
 	 subject for the match to succeed. If the first character is set, req_char
 	 must be later in the subject; otherwise the test starts at the match point.
 	 This optimization can save a huge amount of backtracking in patterns with
@@ -6763,7 +6763,7 @@ for(;;)
 		{
 		register PCRE_PUCHAR p = start_match + (has_first_char? 1:0);
 
-		/* We don't need to repeat the search if we haven't yet reached the
+		/*! We don't need to repeat the search if we haven't yet reached the
 		place we found it at last time. */
 
 		if (p > req_char_ptr)
@@ -6784,7 +6784,7 @@ for(;;)
 				}
 			 }
 
-		/* If we can't find the required character, break the matching loop,
+		/*! If we can't find the required character, break the matching loop,
 		forcing a match failure. */
 
 		if (p >= end_subject)
@@ -6793,7 +6793,7 @@ for(;;)
 			 break;
 			 }
 
-		/* If we have found the required character, save the point where we
+		/*! If we have found the required character, save the point where we
 		found it, so that we don't search again next time round the loop if
 		the start hasn't passed this character yet. */
 
@@ -6802,13 +6802,13 @@ for(;;)
 		}
 	 }
 
-#ifdef PCRE_DEBUG  /* Sigh. Some compilers never learn. */
+#ifdef PCRE_DEBUG  /*! Sigh. Some compilers never learn. */
   printf(">>>> Match against: ");
   pchars(start_match, end_subject - start_match, TRUE, md);
   printf("\n");
 #endif
 
-  /* OK, we can now run the match. If "hitend" is set afterwards, remember the
+  /*! OK, we can now run the match. If "hitend" is set afterwards, remember the
   first starting point for which a partial match was found. */
 
   md->start_match_ptr = start_match;
@@ -6821,7 +6821,7 @@ for(;;)
 
   switch(rc)
 	 {
-	 /* If MATCH_SKIP_ARG reaches this level it means that a MARK that matched
+	 /*! If MATCH_SKIP_ARG reaches this level it means that a MARK that matched
 	 the SKIP's arg was not found. In this circumstance, Perl ignores the SKIP
 	 entirely. The only way we can do that is to re-do the match at the same
 	 point, with a flag to force SKIP with an argument to be ignored. Just
@@ -6833,7 +6833,7 @@ for(;;)
 	 md->ignore_skip_arg = TRUE;
 	 break;
 
-	 /* SKIP passes back the next starting point explicitly, but if it is the
+	 /*! SKIP passes back the next starting point explicitly, but if it is the
 	 same as the match we have just done, treat it as NOMATCH. */
 
 	 case MATCH_SKIP:
@@ -6842,9 +6842,9 @@ for(;;)
 		new_start_match = md->start_match_ptr;
 		break;
 		}
-	 /* Fall through */
+	 /*! Fall through */
 
-	 /* NOMATCH and PRUNE advance by one character. THEN at this level acts
+	 /*! NOMATCH and PRUNE advance by one character. THEN at this level acts
 	 exactly like PRUNE. Unset the ignore SKIP-with-argument flag. */
 
 	 case MATCH_NOMATCH:
@@ -6859,39 +6859,39 @@ for(;;)
 #endif
 	 break;
 
-	 /* COMMIT disables the bumpalong, but otherwise behaves as NOMATCH. */
+	 /*! COMMIT disables the bumpalong, but otherwise behaves as NOMATCH. */
 
 	 case MATCH_COMMIT:
 	 rc = MATCH_NOMATCH;
 	 goto ENDLOOP;
 
-	 /* Any other return is either a match, or some kind of error. */
+	 /*! Any other return is either a match, or some kind of error. */
 
 	 default:
 	 goto ENDLOOP;
 	 }
 
-  /* Control reaches here for the various types of "no match at this point"
+  /*! Control reaches here for the various types of "no match at this point"
   result. Reset the code to MATCH_NOMATCH for subsequent checking. */
 
   rc = MATCH_NOMATCH;
 
-  /* If PCRE_FIRSTLINE is set, the match must happen before or at the first
+  /*! If PCRE_FIRSTLINE is set, the match must happen before or at the first
   newline in the subject (though it may continue over the newline). Therefore,
   if we have just failed to match, starting at a newline, do not continue. */
 
   if (firstline && IS_NEWLINE(start_match)) break;
 
-  /* Advance to new matching position */
+  /*! Advance to new matching position */
 
   start_match = new_start_match;
 
-  /* Break the loop if the pattern is anchored or if we have passed the end of
+  /*! Break the loop if the pattern is anchored or if we have passed the end of
   the subject. */
 
   if (anchored || start_match > end_subject) break;
 
-  /* If we have just passed a CR and we are now at a LF, and the pattern does
+  /*! If we have just passed a CR and we are now at a LF, and the pattern does
   not contain any explicit matches for \r or \n, and the newline option is CRLF
   or ANY or ANYCRLF, advance the match position by one more character. In
   normal matching start_match will aways be greater than the first position at
@@ -6908,12 +6908,12 @@ for(;;)
 			md->nllen == 2))
 	 start_match++;
 
-  md->mark = NULL;	/* Reset for start of next match attempt */
-  }						/* End of for(;;) "bumpalong" loop */
+  md->mark = NULL;	/*! Reset for start of next match attempt */
+  }						/*! End of for(;;) "bumpalong" loop */
 
-/* ==========================================================================*/
+/*! ==========================================================================*/
 
-/* We reach here when rc is not MATCH_NOMATCH, or if one of the stopping
+/*! We reach here when rc is not MATCH_NOMATCH, or if one of the stopping
 conditions is true:
 
 (1) The pattern is anchored or the match was failed by (*COMMIT);
@@ -6948,13 +6948,13 @@ if (rc == MATCH_MATCH || rc == MATCH_ACCEPT)
 	 (PUBL(free))(md->offset_vector);
 	 }
 
-  /* Set the return code to the number of captured strings, or 0 if there were
+  /*! Set the return code to the number of captured strings, or 0 if there were
   too many to fit into the vector. */
 
   rc = (md->offset_overflow && md->end_offset_top >= arg_offset_max)?
 	 0 : md->end_offset_top/2;
 
-  /* If there is space in the offset vector, set any unused pairs at the end of
+  /*! If there is space in the offset vector, set any unused pairs at the end of
   the pattern to -1 for backwards compatibility. It is documented that this
   happens. In earlier versions, the whole set of potential capturing offsets
   was set to -1 each time round the loop, but this is handled differently now.
@@ -6973,7 +6973,7 @@ if (rc == MATCH_MATCH || rc == MATCH_ACCEPT)
 	 while (iptr < iend) *iptr++ = -1;
 	 }
 
-  /* If there is space, set up the whole thing as substring 0. The value of
+  /*! If there is space, set up the whole thing as substring 0. The value of
   md->start_match_ptr might be modified if \K was encountered on the success
   matching path. */
 
@@ -6983,7 +6983,7 @@ if (rc == MATCH_MATCH || rc == MATCH_ACCEPT)
 	 offsets[1] = (int)(md->end_match_ptr - md->start_subject);
 	 }
 
-  /* Return MARK data if requested */
+  /*! Return MARK data if requested */
 
   if (extra_data != NULL && (extra_data->flags & PCRE_EXTRA_MARK) != 0)
 	 *(extra_data->mark) = (pcre_uchar *)md->mark;
@@ -6994,7 +6994,7 @@ if (rc == MATCH_MATCH || rc == MATCH_ACCEPT)
   return rc;
   }
 
-/* Control gets here if there has been an error, or if the overall match
+/*! Control gets here if there has been an error, or if the overall match
 attempt has failed at all permitted starting positions. */
 
 if (using_temporary_offsets)
@@ -7003,7 +7003,7 @@ if (using_temporary_offsets)
   (PUBL(free))(md->offset_vector);
   }
 
-/* For anything other than nomatch or partial match, just return the code. */
+/*! For anything other than nomatch or partial match, just return the code. */
 
 if (rc != MATCH_NOMATCH && rc != PCRE_ERROR_PARTIAL)
   {
@@ -7014,7 +7014,7 @@ if (rc != MATCH_NOMATCH && rc != PCRE_ERROR_PARTIAL)
   return rc;
   }
 
-/* Handle partial matches - disable any mark data */
+/*! Handle partial matches - disable any mark data */
 
 if (start_partial != NULL)
   {
@@ -7028,7 +7028,7 @@ if (start_partial != NULL)
   rc = PCRE_ERROR_PARTIAL;
   }
 
-/* This is the classic nomatch case */
+/*! This is the classic nomatch case */
 
 else
   {
@@ -7036,7 +7036,7 @@ else
   rc = PCRE_ERROR_NOMATCH;
   }
 
-/* Return the MARK data if it has been requested. */
+/*! Return the MARK data if it has been requested. */
 
 if (extra_data != NULL && (extra_data->flags & PCRE_EXTRA_MARK) != 0)
   *(extra_data->mark) = (pcre_uchar *)md->nomatch_mark;
@@ -7046,4 +7046,4 @@ if (extra_data != NULL && (extra_data->flags & PCRE_EXTRA_MARK) != 0)
 return rc;
 }
 
-/* End of pcre_exec.c */
+/*! End of pcre_exec.c */

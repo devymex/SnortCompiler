@@ -1,8 +1,8 @@
-/*************************************************
+/*!************************************************
 *		Perl-Compatible Regular Expressions		 *
 *************************************************/
 
-/* PCRE is a library of functions to support regular expressions whose syntax
+/*! PCRE is a library of functions to support regular expressions whose syntax
 and semantics are as close as possible to those of the Perl 5 language.
 
 							Written by Philip Hazel
@@ -38,7 +38,7 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-/* This module contains the external function pcre_refcount(), which is an
+/*! This module contains the external function pcre_refcount(), which is an
 auxiliary function that can be used to maintain a reference count in a compiled
 pattern data block. This might be helpful in applications where the block is
 shared by different users. */
@@ -51,11 +51,11 @@ shared by different users. */
 #include "pcre_internal.h"
 
 
-/*************************************************
+/*!************************************************
 *			Maintain reference count				 *
 *************************************************/
 
-/* The reference count is a 16-bit field, initialized to zero. It is not
+/*! The reference count is a 16-bit field, initialized to zero. It is not
 possible to transfer a non-zero count from one host to a different host that
 has a different byte order - though I can't see why anyone in their right mind
 would ever want to do that!
@@ -89,4 +89,4 @@ re->ref_count = (-adjust > re->ref_count)? 0 :
 return re->ref_count;
 }
 
-/* End of pcre_refcount.c */
+/*! End of pcre_refcount.c */

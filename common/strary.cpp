@@ -44,14 +44,16 @@ CStringArray& CStringArray::operator = (const CStringArray &other)
 	return *this;
 }
 
-CDllString& CStringArray::operator [] (ulong nIdx)
+CDllString& CStringArray::operator [] (ulong ulIdx)
 {
-	return (*m_pStrAry)[nIdx];
+	TASSERT(ulIdx < m_pStrAry->size());
+	return (*m_pStrAry)[ulIdx];
 }
 
-const CDllString& CStringArray::operator [] (ulong nIdx) const
+const CDllString& CStringArray::operator [] (ulong ulIdx) const
 {
-	return (*m_pStrAry)[nIdx];
+	TASSERT(ulIdx < m_pStrAry->size());
+	return (*m_pStrAry)[ulIdx];
 }
 
 // Overided operators
@@ -68,5 +70,12 @@ void CStringArray::Clear()
 
 void CStringArray::PushBack(const CDllString &str)
 {
-	m_pStrAry->push_back(str);
+	try
+	{
+		m_pStrAry->push_back(str);
+	}
+	catch (std::exception &e)
+	{
+		throw CTrace(__FILE__, __LINE__, e.what());
+	}
 }

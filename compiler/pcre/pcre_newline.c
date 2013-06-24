@@ -1,8 +1,8 @@
-/*************************************************
+/*!************************************************
 *		Perl-Compatible Regular Expressions		 *
 *************************************************/
 
-/* PCRE is a library of functions to support regular expressions whose syntax
+/*! PCRE is a library of functions to support regular expressions whose syntax
 and semantics are as close as possible to those of the Perl 5 language.
 
 							Written by Philip Hazel
@@ -38,7 +38,7 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-/* This module contains internal functions for testing newlines when more than
+/*! This module contains internal functions for testing newlines when more than
 one kind of newline is to be recognized. When a newline is found, its length is
 returned. In principle, we could implement several newline "types", each
 referring to a different set of newline characters. At present, PCRE supports
@@ -55,11 +55,11 @@ http://unicode.org/unicode/reports/tr18/. */
 
 
 
-/*************************************************
+/*!************************************************
 *		Check for newline at given position		 *
 *************************************************/
 
-/* It is guaranteed that the initial value of ptr is less than the end of the
+/*! It is guaranteed that the initial value of ptr is less than the end of the
 string that is being processed.
 
 Arguments:
@@ -84,10 +84,10 @@ if (utf)
   GETCHAR(c, ptr);
   }
 else
-#endif  /* SUPPORT_UTF */
+#endif  /*! SUPPORT_UTF */
   c = *ptr;
 
-/* Note that this function is called only for ANY or ANYCRLF. */
+/*! Note that this function is called only for ANY or ANYCRLF. */
 
 if (type == NLTYPE_ANYCRLF) switch(c)
   {
@@ -97,7 +97,7 @@ if (type == NLTYPE_ANYCRLF) switch(c)
   default: return FALSE;
   }
 
-/* NLTYPE_ANY */
+/*! NLTYPE_ANY */
 
 else switch(c)
   {
@@ -115,14 +115,14 @@ else switch(c)
 #ifndef EBCDIC
 #ifdef COMPILE_PCRE8
   case CHAR_NEL: *lenptr = utf? 2 : 1; return TRUE;
-  case 0x2028:													/* LS */
-  case 0x2029: *lenptr = 3; return TRUE;				 /* PS */
-#else /* COMPILE_PCRE16 || COMPILE_PCRE32 */
+  case 0x2028:													/*! LS */
+  case 0x2029: *lenptr = 3; return TRUE;				 /*! PS */
+#else /*! COMPILE_PCRE16 || COMPILE_PCRE32 */
   case CHAR_NEL:
-  case 0x2028:													/* LS */
-  case 0x2029: *lenptr = 1; return TRUE;				 /* PS */
-#endif  /* COMPILE_PCRE8 */
-#endif  /* Not EBCDIC */
+  case 0x2028:													/*! LS */
+  case 0x2029: *lenptr = 1; return TRUE;				 /*! PS */
+#endif  /*! COMPILE_PCRE8 */
+#endif  /*! Not EBCDIC */
 
   default: return FALSE;
   }
@@ -130,11 +130,11 @@ else switch(c)
 
 
 
-/*************************************************
+/*!************************************************
 *	  Check for newline at previous position	  *
 *************************************************/
 
-/* It is guaranteed that the initial value of ptr is greater than the start of
+/*! It is guaranteed that the initial value of ptr is greater than the start of
 the string that is being processed.
 
 Arguments:
@@ -161,10 +161,10 @@ if (utf)
   GETCHAR(c, ptr);
   }
 else
-#endif  /* SUPPORT_UTF */
+#endif  /*! SUPPORT_UTF */
   c = *ptr;
 
-/* Note that this function is called only for ANY or ANYCRLF. */
+/*! Note that this function is called only for ANY or ANYCRLF. */
 
 if (type == NLTYPE_ANYCRLF) switch(c)
   {
@@ -176,7 +176,7 @@ if (type == NLTYPE_ANYCRLF) switch(c)
   default: return FALSE;
   }
 
-/* NLTYPE_ANY */
+/*! NLTYPE_ANY */
 
 else switch(c)
   {
@@ -194,17 +194,17 @@ else switch(c)
 #ifndef EBCDIC
 #ifdef COMPILE_PCRE8
   case CHAR_NEL: *lenptr = utf? 2 : 1; return TRUE;
-  case 0x2028:													/* LS */
-  case 0x2029: *lenptr = 3; return TRUE;				 /* PS */
-#else /* COMPILE_PCRE16 || COMPILE_PCRE32 */
+  case 0x2028:													/*! LS */
+  case 0x2029: *lenptr = 3; return TRUE;				 /*! PS */
+#else /*! COMPILE_PCRE16 || COMPILE_PCRE32 */
   case CHAR_NEL:
-  case 0x2028:													/* LS */
-  case 0x2029: *lenptr = 1; return TRUE;				 /* PS */
-#endif  /* COMPILE_PCRE8 */
-#endif  /* NotEBCDIC */
+  case 0x2028:													/*! LS */
+  case 0x2029: *lenptr = 1; return TRUE;				 /*! PS */
+#endif  /*! COMPILE_PCRE8 */
+#endif  /*! NotEBCDIC */
 
   default: return FALSE;
   }
 }
 
-/* End of pcre_newline.c */
+/*! End of pcre_newline.c */

@@ -26,9 +26,24 @@ GROUPRESHDR const CSidDfaIds &CGroupRes::GetSidDfaIds() const
 	return m_sidDfaIds;
 }
 
-GROUPRESHDR const CGroups &CGroupRes::GetGroups() const
+GROUPRESHDR	const CGroups &CGroupRes::GetGroups() const
 {
 	return m_groups;
+}
+
+GROUPRESHDR	ulong &CGroupRes::GetBucketCnt()
+{
+	return nBucketCnt;
+}
+
+GROUPRESHDR const ulong &CGroupRes::GetBucketCnt() const
+{
+	return nBucketCnt;
+}
+
+GROUPRESHDR	void CGroupRes::SetBucketCnt(ulong nBucketSize)
+{
+	nBucketCnt = nBucketSize;
 }
 
 template<typename _Ty>
@@ -37,7 +52,7 @@ void WriteNum(std::ofstream &fout, _Ty _num, ulong nBytes = sizeof(_Ty))
 	fout.write((char*)&_num, nBytes);
 }
 
-/* Write the relationship between sid and dfa ids, dfa table and result of grouping
+/*! Write the relationship between sid and dfa ids, dfa table and result of grouping
 to file
 
 Arguments:
@@ -55,6 +70,9 @@ GROUPRESHDR ulong CGroupRes::WriteToFile(const char *filename)
 		std::cerr << "Open file Failed!" << std::endl;
 		return (ulong)-1;
 	}
+
+	//used by hash function
+	WriteNum(fout, nBucketCnt);
 
 	//mark the position used for file size
 	std::streamoff fileSizePos = fout.tellp();
@@ -157,7 +175,7 @@ GROUPRESHDR ulong CGroupRes::WriteToFile(const char *filename)
 	return 0;
 }
 
-/* Read the relationship between sid and dfa ids, dfa table and result of grouping
+/*! Read the relationship between sid and dfa ids, dfa table and result of grouping
 from file
 
 Arguments:
@@ -175,6 +193,9 @@ GROUPRESHDR ulong CGroupRes::ReadFromFile(const char *filename)
 		std::cerr << "Open file Failed!" << std::endl;
 		return (ulong)-1;
 	}
+
+	//used by hash function
+	fin.read((char*)&nBucketCnt, 4);
 
 	//read the file size
 	ulong fileSize;

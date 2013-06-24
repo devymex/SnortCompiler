@@ -1,17 +1,16 @@
-/**
-**	@file		rule2nfa.cpp
+/*!*
+* @file		rule2nfa.cpp
 **
-**	@author		Lab 435, Xidian University
+* @author		Lab 435, Xidian University
 **
-**	@brief		Support functions for transforming a rule to a nfa tree
+* @brief			Support functions for transforming a rule to a nfa tree
 **
-**	This nfa tree processing for rule options.
+* This nfa tree processing for rule options.
 **
 */
 
 #include "stdafx.h"
 #include <hwprj\ruleoption.h>
-#include "pcre2nfa.h"
 #include "contopt.h"
 #include <hwprj\pcreopt.h>
 #include "comprule.h"
@@ -25,14 +24,7 @@ double pcre2nfatime = 0.0;
 double nfa2dfatime = 0.0;
 double dfamintimetime = 0.0;
 
-typedef std::vector<BYTEARY>			PCRESEQUENCE;
-typedef std::vector<PCRESEQUENCE>		CHAINSEQUENCE;
-typedef std::vector<CHAINSEQUENCE>		RULESEQUENCE;
-typedef std::vector<BYTEARY>			CHAINCOMPDATA;
-typedef std::vector<CHAINCOMPDATA>		RULECOMPDATA;
-
-
-/* complie one rule
+/*! complie one rule
 
 Arguments:
 	parseRes		the parse result
@@ -74,7 +66,7 @@ void __stdcall CompileCallback(const PARSERESULT &parseRes, void *lpVoid)
 	}
 }
 
-/*
+/*!
 * read rules from a file
 */
 ulong LoadFile(const char *fileName, std::vector<std::string> &rules)
@@ -281,26 +273,26 @@ void ParseOptions(std::string &ruleOptions, CSnortRule &snortRule)
 	}
 }
 
-/*
-**	NAME
-**	 Rule2PcreList::
+/*!
+* NAME
+*  Rule2PcreList::
 */
-/**
-**	This function converts a CSnortRule to a CRegRule and extract signatures from content option
+/*!*
+* This function converts a CSnortRule to a CRegRule and extract signatures from content option
 **
-**	According to the constraints of rule options, we split a snort rule into some option chains.
-**	For every option chain, the datapacket matchs from the first byte.
-**	Then we transfrom every option into pcre.
+* According to the constraints of rule options, we split a snort rule into some option chains.
+* For every option chain, the datapacket matchs from the first byte.
+* Then we transfrom every option into pcre.
 **
-**	@param rule		 a CSnortRule object which contains the original information
-**					of a snort rule. 
-**	@param regrule	 the transformed CRegRule object which makes up of a number of pcre lists
-**						and the signatures in every pcre list.
+* @param rule		 a CSnortRule object which contains the original information
+* 				of a snort rule. 
+* @param regrule	 the transformed CRegRule object which makes up of a number of pcre lists
+* 					and the signatures in every pcre list.
 **
-**	@return integer
+* @return integer
 **
-**	@retval  0 function successful
-**	@retval <>0 fatal error
+* @retval  0 function successful
+* @retval <>0 fatal error
 */
 
 void Rule2RegRule(const CSnortRule &rule, CRegRule &regRule)
@@ -332,18 +324,10 @@ void Rule2RegRule(const CSnortRule &rule, CRegRule &regRule)
 	{
 		regRule.PopBack();
 	}
-
-	for(ulong i = 0; i < regRule.Size(); ++i)
-	{
-		if(regRule[i].GetSigs().Size() > 1)
-		{
-			regRule[i].GetSigs().Unique();
-		}
-	}
 }
 
 
-/* assign all the signatures of each rule to all its option list
+/*! assign all the signatures of each rule to all its option list
 
 Arguments:
   result		the compile result
@@ -380,59 +364,13 @@ void AssignSig(CCompileResults &result, ulong BegIdx, ulong EndIdx)
 	}
 }
 
-bool CaselessComp(char a, char b)
-{
-	return tolower(a) == tolower(b);
-}
-
-struct INCLUDESEQUENCE
-{
-	const BYTEARY *m_pSeq;
-	bool m_bCaseless;
-	INCLUDESEQUENCE(const BYTEARY &seq, bool bCaseless = false)
-		: m_pSeq(&seq), m_bCaseless(bCaseless)
-	{
-	}
-	bool operator() (const BYTEARY &seq)
-	{
-		if (m_bCaseless)
-		{
-			return (seq.end() != std::search(seq.begin(), seq.end(),
-				m_pSeq->begin(), m_pSeq->end(), CaselessComp));
-		}
-		else
-		{
-			return (seq.end() != std::search(seq.begin(), seq.end(),
-				m_pSeq->begin(), m_pSeq->end(), CaselessComp));
-		}
-	}
-};
-
-void ExtractSignatures(const std::vector<BYTEARY> &seqAry, CSignatures &sigs)
-{
-	SIGNATURE nCurSig;
-	for (ulong i = 0; i < seqAry.size(); ++i)
-	{
-		const BYTEARY &curSeq = seqAry[i];
-		long ulLen = long(curSeq.size()) - 3;
-		for (long j = 0; j < ulLen; ++j)
-		{
-			for (ulong k = 0; k < 4; ++k)
-			{
-				((byte*)&nCurSig)[k] = byte(tolower(curSeq[j + k]));
-			}
-			sigs.PushBack(nCurSig);
-		}
-	}
-}
-
 bool SeqIncBy(const CRegRule &regRule, const RULESEQUENCE &ruleSeq, ulong ulIdx)
 {
 	TASSERT(ulIdx < ruleSeq.size());
 	TASSERT(ruleSeq[ulIdx].size() == 1);
 	TASSERT(ruleSeq[ulIdx].front().size() == 1);
 
-	const BYTEARY &seq = ruleSeq[ulIdx].front().front();
+	const CByteArray &seq = ruleSeq[ulIdx].front().front();
 	for (ulong i = 0; i < ruleSeq.size(); ++i)
 	{
 		if (ulIdx != i)
@@ -474,7 +412,7 @@ bool SeqIncBy(const CRegRule &regRule, const RULESEQUENCE &ruleSeq, ulong ulIdx)
 					}
 				}
 				if (std::find_if(curPcreSeq.cbegin(), curPcreSeq.cend(),
-					INCLUDESEQUENCE(seq)) != curPcreSeq.cend())
+					INCLUDESEQUENCE(seq, bCaseless)) != curPcreSeq.cend())
 				{
 					return true;
 				}
@@ -505,7 +443,8 @@ bool IsOneContentChain(const CPcreChain &chain, const CHAINSEQUENCE &chainSeq)
 	return true;
 }
 
-void PreCompileRule(const CRegRule &regRule, RULESEQUENCE &ruleSeq,
+void PreCompileRule(const CRegRule &regRule,
+					RULESEQUENCE &ruleSeq,
 					RULECOMPDATA &ruleCompData)
 {
 	for (ulong i = 0; i < regRule.Size(); ++i)
@@ -520,9 +459,9 @@ void PreCompileRule(const CRegRule &regRule, RULESEQUENCE &ruleSeq,
 
 		for (ulong j = 0; j < curPcreChain.Size(); ++j)
 		{
-			chainCompData.push_back(BYTEARY());
+			chainCompData.push_back(CByteArray());
 			chainSeq.push_back(PCRESEQUENCE());
-			curPcreChain[j].PreComp(chainCompData.back());
+			curPcreChain[j].Precompile(chainCompData.back());
 			ExtractSequence(chainCompData.back(), chainSeq.back());
 		}
 	}
@@ -553,14 +492,19 @@ void ProcessRule(CRegRule &regRule, RULECOMPDATA &result)
 		{
 			for (ulong j = 0; j < curChainSeq.size(); ++j)
 			{
-				ExtractSignatures(curChainSeq[j], regRule[i].GetSigs());
+				PCRESEQUENCE &curPcreSeq = curChainSeq[j];
+				for (ulong k = 0; k < curPcreSeq.size(); ++k)
+				{
+					ExtractSignatures(curPcreSeq[k], regRule[i].GetSigs());
+				}
 			}
+			regRule[i].GetSigs().Unique();
 			++i;
 		}
 	}
 }
 
-/* complie one rule to several dfas
+/*! complie one rule to several dfas
 
 Arguments:
   rule		the snort rule
@@ -600,7 +544,7 @@ void Rule2Dfas(const CRegRule &rule, CCompileResults &result)
 			const CPcreOption &curPcre = curPcreChain[j];
 			try
 			{
-				PcreToNFA(ruleCompData[i][j],
+				CodeToNFA(ruleCompData[i][j],
 					curPcre.HasFlags(CPcreOption::PF_A), nfa);
 			}
 			catch (CTrace &e)

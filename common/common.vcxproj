@@ -57,6 +57,7 @@
       <PrecompiledHeaderOutputFile />
       <BrowseInformation>true</BrowseInformation>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -78,6 +79,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <BrowseInformation>true</BrowseInformation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -91,6 +93,7 @@
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\include\hwprj\byteary.h" />
     <ClInclude Include="..\include\hwprj\common.h" />
     <ClInclude Include="..\include\hwprj\ctimer.h" />
     <ClInclude Include="..\include\hwprj\dllstring.h" />
@@ -98,10 +101,11 @@
     <ClInclude Include="..\include\hwprj\strary.h" />
     <ClInclude Include="..\include\hwprj\trace.h" />
     <ClInclude Include="..\include\hwprj\unsary.h" />
-    <ClInclude Include="..\include\hwprj\unsary.inc" />
+    <ClInclude Include="..\include\hwprj\unsary.inl" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="byteary.cpp" />
     <ClCompile Include="dllstring.cpp" />
     <ClCompile Include="logger.cpp" />
     <ClCompile Include="stdafx.cpp">

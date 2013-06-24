@@ -346,7 +346,7 @@ namespace pcrecpp {
 #define PCRE_IS_SET(o)  \
 		(all_options_ & o) == o
 
-/***** Compiling regular expressions: the RE class *****/
+/*!**** Compiling regular expressions: the RE class *****/
 
 // RE_Options allow you to set options to be passed along to pcre,
 // along with other options we put on top of pcre.
@@ -527,7 +527,7 @@ class PCRECPP_EXP_DEFN RE {
   // Else returns the empty string.
   const string& error() const { return *error_; }
 
-  /***** The useful part: the matching interface *****/
+  /*!**** The useful part: the matching interface *****/
 
   // This is provided so one can do pattern.ReplaceAll() just as
   // easily as ReplaceAll(pattern-text, ....)
@@ -626,7 +626,7 @@ class PCRECPP_EXP_DEFN RE {
   static string QuoteMeta(const StringPiece& unquoted);
 
 
-  /***** Generic matching interface *****/
+  /*!**** Generic matching interface *****/
 
   // Type of match (TODO: Should be restructured as part of RE_Options)
   enum Anchor {
@@ -707,4 +707,4 @@ class PCRECPP_EXP_DEFN RE {
 
 }	// namespace pcrecpp
 
-#endif /* _PCRECPP_H */
+#endif /*! _PCRECPP_H */

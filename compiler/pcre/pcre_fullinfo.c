@@ -1,8 +1,8 @@
-/*************************************************
+/*!************************************************
 *		Perl-Compatible Regular Expressions		 *
 *************************************************/
 
-/* PCRE is a library of functions to support regular expressions whose syntax
+/*! PCRE is a library of functions to support regular expressions whose syntax
 and semantics are as close as possible to those of the Perl 5 language.
 
 							Written by Philip Hazel
@@ -38,7 +38,7 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-/* This module contains the external function pcre_fullinfo(), which returns
+/*! This module contains the external function pcre_fullinfo(), which returns
 information about a compiled pattern. */
 
 
@@ -49,11 +49,11 @@ information about a compiled pattern. */
 #include "pcre_internal.h"
 
 
-/*************************************************
+/*!************************************************
 *		Return info about compiled pattern		*
 *************************************************/
 
-/* This is a newer "info" function which has an extensible interface so
+/*! This is a newer "info" function which has an extensible interface so
 that additional items can be added compatibly.
 
 Arguments:
@@ -87,7 +87,7 @@ if (re == NULL || where == NULL) return PCRE_ERROR_NULL;
 if (extra_data != NULL && (extra_data->flags & PCRE_EXTRA_STUDY_DATA) != 0)
   study = (const pcre_study_data *)extra_data->study_data;
 
-/* Check that the first field in the block is the magic number. If it is not,
+/*! Check that the first field in the block is the magic number. If it is not,
 return with PCRE_ERROR_BADMAGIC. However, if the magic number is equal to
 REVERSED_MAGIC_NUMBER we return with PCRE_ERROR_BADENDIANNESS, which
 means that the pattern is likely compiled with different endianness. */
@@ -96,7 +96,7 @@ if (re->magic_number != MAGIC_NUMBER)
   return re->magic_number == REVERSED_MAGIC_NUMBER?
 	 PCRE_ERROR_BADENDIANNESS:PCRE_ERROR_BADMAGIC;
 
-/* Check that this pattern was compiled in the correct bit mode */
+/*! Check that this pattern was compiled in the correct bit mode */
 
 if ((re->flags & PCRE_MODE) == 0) return PCRE_ERROR_BADMODE;
 
@@ -151,7 +151,7 @@ switch (what)
 		((re->flags & PCRE_STARTLINE) != 0) ? 2 : 0;
 	 break;
 
-  /* Make sure we pass back the pointer to the bit vector in the external
+  /*! Make sure we pass back the pointer to the bit vector in the external
   block, not the internal copy (with flipped integer fields). */
 
   case PCRE_INFO_FIRSTTABLE:
@@ -203,7 +203,7 @@ switch (what)
   *((const pcre_uint8 **)where) = (const pcre_uint8 *)(PRIV(default_tables));
   break;
 
-  /* From release 8.00 this will always return TRUE because NOPARTIAL is
+  /*! From release 8.00 this will always return TRUE because NOPARTIAL is
   no longer ever set (the restrictions have been removed). */
 
   case PCRE_INFO_OKPARTIAL:
@@ -228,4 +228,4 @@ switch (what)
 return 0;
 }
 
-/* End of pcre_fullinfo.c */
+/*! End of pcre_fullinfo.c */

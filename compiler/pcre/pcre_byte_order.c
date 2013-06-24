@@ -1,8 +1,8 @@
-/*************************************************
+/*!************************************************
 *		Perl-Compatible Regular Expressions		 *
 *************************************************/
 
-/* PCRE is a library of functions to support regular expressions whose syntax
+/*! PCRE is a library of functions to support regular expressions whose syntax
 and semantics are as close as possible to those of the Perl 5 language.
 
 							Written by Philip Hazel
@@ -38,7 +38,7 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-/* This module contains an internal function that tests a compiled pattern to
+/*! This module contains an internal function that tests a compiled pattern to
 see if it was compiled with the opposite endianness. If so, it uses an
 auxiliary local function to flip the appropriate bytes. */
 
@@ -50,11 +50,11 @@ auxiliary local function to flip the appropriate bytes. */
 #include "pcre_internal.h"
 
 
-/*************************************************
+/*!************************************************
 *				 Swap byte functions					 *
 *************************************************/
 
-/* The following functions swap the bytes of a pcre_uint16
+/*! The following functions swap the bytes of a pcre_uint16
 and pcre_uint32 value.
 
 Arguments:
@@ -79,11 +79,11 @@ return (value >> 8) | (value << 8);
 }
 
 
-/*************************************************
+/*!************************************************
 *		 Test for a byte-flipped compiled regex	*
 *************************************************/
 
-/* This function swaps the bytes of a compiled pattern usually
+/*! This function swaps the bytes of a compiled pattern usually
 loaded form the disk. It also sets the tables pointer, which
 is likely an invalid pointer after reload.
 
@@ -114,8 +114,8 @@ int length;
 #if defined SUPPORT_UTF && defined COMPILE_PCRE16
 BOOL utf;
 BOOL utf16_char;
-#endif /* SUPPORT_UTF && COMPILE_PCRE16 */
-#endif /* !COMPILE_PCRE8 */
+#endif /*! SUPPORT_UTF && COMPILE_PCRE16 */
+#endif /*! !COMPILE_PCRE8 */
 
 if (re == NULL) return PCRE_ERROR_NULL;
 if (re->magic_number == MAGIC_NUMBER)
@@ -165,11 +165,11 @@ length = re->name_count * re->name_entry_size;
 #if defined SUPPORT_UTF && defined COMPILE_PCRE16
 utf = (re->options & PCRE_UTF16) != 0;
 utf16_char = FALSE;
-#endif /* SUPPORT_UTF && COMPILE_PCRE16 */
+#endif /*! SUPPORT_UTF && COMPILE_PCRE16 */
 
 while(TRUE)
   {
-  /* Swap previous characters. */
+  /*! Swap previous characters. */
   while (length-- > 0)
 	 {
 #if defined COMPILE_PCRE16
@@ -184,15 +184,15 @@ while(TRUE)
 	 {
 	 if (HAS_EXTRALEN(ptr[-1]))
 		{
-		/* We know that there is only one extra character in UTF-16. */
+		/*! We know that there is only one extra character in UTF-16. */
 		*ptr = swap_uint16(*ptr);
 		ptr++;
 		}
 	 }
   utf16_char = FALSE;
-#endif /* SUPPORT_UTF */
+#endif /*! SUPPORT_UTF */
 
-  /* Get next opcode. */
+  /*! Get next opcode. */
   length = 0;
 #if defined COMPILE_PCRE16
   *ptr = swap_uint16(*ptr);
@@ -263,7 +263,7 @@ while(TRUE)
 	 case OP_NOTPOSUPTOI:
 	 if (utf) utf16_char = TRUE;
 #endif
-	 /* Fall through. */
+	 /*! Fall through. */
 
 	 default:
 	 length = PRIV(OP_lengths)[*ptr] - 1;
@@ -271,13 +271,13 @@ while(TRUE)
 
 	 case OP_CLASS:
 	 case OP_NCLASS:
-	 /* Skip the character bit map. */
+	 /*! Skip the character bit map. */
 	 ptr += 32/sizeof(pcre_uchar);
 	 length = 0;
 	 break;
 
 	 case OP_XCLASS:
-	 /* Reverse the size of the XCLASS instance. */
+	 /*! Reverse the size of the XCLASS instance. */
 	 ptr++;
 #if defined COMPILE_PCRE16
 	 *ptr = swap_uint16(*ptr);
@@ -287,7 +287,7 @@ while(TRUE)
 #ifndef COMPILE_PCRE32
 	 if (LINK_SIZE > 1)
 		{
-		/* LINK_SIZE can be 1 or 2 in 16 bit mode. */
+		/*! LINK_SIZE can be 1 or 2 in 16 bit mode. */
 		ptr++;
 		*ptr = swap_uint16(*ptr);
 		}
@@ -301,7 +301,7 @@ while(TRUE)
 #endif
 	 if ((*ptr & XCL_MAP) != 0)
 		{
-		/* Skip the character bit map. */
+		/*! Skip the character bit map. */
 		ptr += 32/sizeof(pcre_uchar);
 		length -= 32/sizeof(pcre_uchar);
 		}
@@ -309,10 +309,10 @@ while(TRUE)
 	 }
   ptr++;
   }
-/* Control should never reach here in 16/32 bit mode. */
-#endif /* !COMPILE_PCRE8 */
+/*! Control should never reach here in 16/32 bit mode. */
+#endif /*! !COMPILE_PCRE8 */
 
 return 0;
 }
 
-/* End of pcre_byte_order.c */
+/*! End of pcre_byte_order.c */

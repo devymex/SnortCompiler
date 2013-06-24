@@ -1,11 +1,11 @@
-/*
-**	@file		siddfas.h
+/*!
+* @file		siddfas.h
 **
-**	@author		Lab 435, Xidian University
+* @author		Lab 435, Xidian University
 **
-**	@brief		Declaration of the CSidDfaIds class
+* @brief			Declaration of the CSidDfaIds class
 **
-**	Store the mapping between SID and DFAID
+* Store the mapping between SID and DFAID
 **
 */
 
@@ -51,5 +51,6 @@ public:
 	void PushBack(const COMPILEDINFO &sidDfaIds);
 	COMPILEDINFO& Back();
 protected:
+	/// @brief		私有成员，仅供内部使用
 	std::vector<COMPILEDINFO> *m_ruleResult;
 };

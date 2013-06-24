@@ -1,11 +1,11 @@
-/*
-**	@file		comprule.h
+/*!
+* @file		comprule.h
 **
-**	@author		Lab 435, Xidian University
+* @author		Lab 435, Xidian University
 **
-**	@brief		Functions declaration of rules' processing
+* @brief			Functions declaration of rules' processing
 **
-**	Includes compile rule etc.
+* Includes compile rule etc.
 **
 */
 
@@ -96,7 +96,50 @@ struct ISCONTENT
 	}
 };
 
+inline bool CaselessComp(char a, char b)
+{
+	return tolower(a) == tolower(b);
+}
+
+struct INCLUDESEQUENCE
+{
+	const CByteArray *m_pSeq;
+	bool m_bCaseless;
+	INCLUDESEQUENCE(const CByteArray &seq, bool bCaseless)
+		: m_pSeq(&seq), m_bCaseless(bCaseless)
+	{
+	}
+	bool operator() (const CByteArray &seq)
+	{
+		const byte *pBeg = m_pSeq->Data(), *pEnd = pBeg + m_pSeq->Size();
+
+		const byte *pFBeg = seq.Data(), *pFEnd = pFBeg + seq.Size();
+		if (m_bCaseless)
+		{
+			return (pFEnd != std::search(pFBeg, pFEnd, pBeg, pEnd, CaselessComp));
+		}
+		else
+		{
+			return (pFEnd != std::search(pFBeg, pFEnd, pBeg, pEnd));
+		}
+	}
+};
+
+typedef std::vector<CByteArray>			PCRESEQUENCE;
+typedef std::vector<PCRESEQUENCE>		CHAINSEQUENCE;
+typedef std::vector<CHAINSEQUENCE>		RULESEQUENCE;
+
+typedef std::vector<CByteArray>			CHAINCOMPDATA;
+typedef std::vector<CHAINCOMPDATA>		RULECOMPDATA;
+
+
 void __stdcall CompileCallback(const PARSERESULT &parseRes, void *lpVoid);
+
+bool SeqIncBy(const CRegRule &regRule, const RULESEQUENCE &ruleSeq, ulong ulIdx);
+
+bool IsOneContentChain(const CPcreChain &chain, const CHAINSEQUENCE &chainSeq);
+
+void ProcessRule(CRegRule &regRule, RULECOMPDATA &result);
 
 void ParseOptions(std::string &ruleOptions, CSnortRule &snortRule);
 
@@ -104,9 +147,15 @@ void Rule2RegRule(const CSnortRule &rule, CRegRule &regrule);
 
 void CompileRule(LPCSTR rule, RECIEVER recv, LPVOID lpUser);
 
+void PreCompileRule(const CRegRule &regRule,
+					RULESEQUENCE &ruleSeq,
+					RULECOMPDATA &ruleCompData);
+
 ulong LoadFile(const char *fileName, std::vector<std::string> &rules);
 
-void Rule2Dfas(const CSnortRule &rule, CCompileResults &result, COMPILEDINFO &ruleResult);
+void Rule2Dfas(const CSnortRule &rule,
+			   CCompileResults &result,
+			   COMPILEDINFO &ruleResult);
 
 void AssignSig(CCompileResults &result, ulong BegIdx, ulong EndIdx);
 

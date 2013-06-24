@@ -1,12 +1,7 @@
-/*
-**	@file		dfaalgo.h
-**
-**	@author		Lab 435, Xidian University
-**
-**	@brief		Functions declaration of dfa's algorithms
-**
-**	Includes empty closure etc.
-**
+/*!
+* @file			dfaalgo.h
+* @author		Lab 435, Xidian University
+* @brief		DFA的算法的函数声明
 */
 
 #include <hwprj\common.h>
@@ -144,14 +139,14 @@ void ReleaseAbleTo(PARTSET &ps);
 
 void CalcAbleTo(STATEIDARY *pRevTbl, ulong nGrpNum, ulong nStaNum, PARTSET &ps);
 
-/*
-**	This function groups the merged dfa's columns on the ground of
-**	the column groups of dfas to be merged.
-*/
 //void DfaColGroup(std::vector<CDfa> &dfas, byte* groups);
+/*!
+* This function groups the merged dfa's columns on the ground of
+* the column groups of dfas to be merged.
+*/
 void DfaColGroup(CDfaArray &dfas, byte* groups);
 
-/*	this function marks the lastDfa's terminal states. */
+/*!	this function marks the lastDfa's terminal states. */
 void AddTermIntoDFA(STATEID otherSta, const CDfa &other,
 					STATEID lastSta, CDfa &lastDfa);
 

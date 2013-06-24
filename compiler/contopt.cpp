@@ -6,15 +6,28 @@
 // 0: this char needn't eascape
 // 1: this char need to add a backslash to eascape
 // 2: this char need to add a backslash and convert to hex to eascape
-BYTE g_MetaChar[256] = {
+const BYTE g_MetaChar[256] = {
 	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
 	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-	0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
+	/*!
+	   !  "  #  $  %  &  '  (  )  *  +  ,  -  .  / */
+	0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0,
+	/*!
+	0  1  2  3  4  5  6  7  8  9  :  ;  <  =  >  ? */
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+	/*!
+	@  A  B  C  D  E  F  G  H  I  J  K  L  M  N  O */
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2,
+	/*!
+	P  Q  R  S  T  U  V  W  X  Y  Z  [  \  ]  ^  _ */
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0,
+	/*!
+	`  a  b  c  d  e  f  g  h  i  j  k  l  m  n  o */
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	/*!
+	p  q  r  s  t  u  v  w  x  y  z  {  |  }  ~  */
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 2,
+
 	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
 	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
 	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
@@ -107,7 +120,7 @@ void CContentOption::FromPattern(const CDllString &strPat)
 		return;
 	}
 
-	m_data.clear();
+	m_data.Clear();
 	pcstr pBeg = strTmp.Data();
 	pcstr pEnd = pBeg + strTmp.Size();
 	for (; pBeg != pEnd; ++pBeg)
@@ -131,14 +144,14 @@ void CContentOption::FromPattern(const CDllString &strPat)
 					{
 						TTHROW(TI_INVALIDDATA);
 					}
-					m_data.push_back((Char2HexBit(*pBeg) << 4) | Char2HexBit(*pNext));
+					m_data.PushBack((Char2HexBit(*pBeg) << 4) | Char2HexBit(*pNext));
 					++pBeg;
 				}
 			}
 		}
 		else
 		{
-			m_data.push_back(byte(*pBeg));
+			m_data.PushBack(byte(*pBeg));
 		}
 	}
 }
@@ -157,16 +170,16 @@ CRuleOption* CContentOption::Clone() const
 	return pNew;
 }
 
-/*
-**	this function transforms content to pcre
-**	based on the content constraints: distance, within, offset, depth, nocase
+/*!
+* this function transforms content to pcre
+* based on the content constraints: distance, within, offset, depth, nocase
 **
-**	@param pContent	 pointer to the original content option
-**	@param pcreStr		the transformed pcre
+* @param pContent	 pointer to the original content option
+* @param pcreStr		the transformed pcre
 **
-**	@return
-**	@retval  0 function successful
-**	@retval -1 fatal error
+* @return
+* @retval  0 function successful
+* @retval -1 fatal error
 */
 void CContentOption::ToPcre(CPcreOption &pcreOpt) const
 {
@@ -195,19 +208,19 @@ void CContentOption::ToPcre(CPcreOption &pcreOpt) const
 
 	if (HasFlags(DEPTH))
 	{
-		if (HasFlags(WITHIN) || m_nDepth < int(m_data.size()))
+		if (HasFlags(WITHIN) || m_nDepth < int(m_data.Size()))
 		{
 			TTHROW(TI_INVALIDDATA);
 		}
-		nMaxSkip = m_nDepth - m_data.size();
+		nMaxSkip = m_nDepth - m_data.Size();
 	}
 	if (HasFlags(WITHIN))
 	{
-		if (HasFlags(DEPTH) || m_nWithin < int(m_data.size()))
+		if (HasFlags(DEPTH) || m_nWithin < int(m_data.Size()))
 		{
 			TTHROW(TI_INVALIDDATA);
 		}
-		nMaxSkip = m_nWithin - m_data.size();
+		nMaxSkip = m_nWithin - m_data.Size();
 	}
 
 	if (nMinSkip > 0 && nMaxSkip >= 0)
@@ -242,18 +255,19 @@ void CContentOption::ToPcre(CPcreOption &pcreOpt) const
 	}
 
 	char code[3] = {0};
-	for (BYTEARY_CITER i = m_data.cbegin(); i != m_data.cend(); ++i)
+	for (ulong i = 0; i < m_data.Size(); ++i)
 	{
-		switch (g_MetaChar[*i])
+		byte byCurCode = m_data[i];
+		switch (g_MetaChar[byCurCode])
 		{
 		case 0:
-			ssPcre << char(*i);
+			ssPcre << char(byCurCode);
 			break;
 		case 1:
-			ssPcre << '\\' << char(*i);
+			ssPcre << '\\' << char(byCurCode);
 			break;
 		case 2:
-			Hex2UpperCase(*i, code);
+			Hex2UpperCase(byCurCode, code);
 			ssPcre << "\\x" << code;
 			break;
 		}
@@ -276,20 +290,4 @@ void CContentOption::ToPcre(CPcreOption &pcreOpt) const
 
 	pcreOpt.FromPattern(CDllString(ssPcre.str().c_str()));
 	pcreOpt.AddFlags(CPcreOption::PF_F);
-}
-
-void CContentOption::ExtractSignatures(CSignatures &sigs) const
-{
-	int nBufSize = int(m_data.size());
-	const byte *pBuf = m_data.data();
-	byte sig[4];
-	for (int i = 0; i < nBufSize - 3; ++i)
-	{
-		for (int j = 0; j < 4; ++j)
-		{
-			sig[j] = byte(tolower(pBuf[i + j]));
-		}
-		sigs.PushBack(*(SIGNATURE*)sig);
-	}
-	sigs.Unique();
 }

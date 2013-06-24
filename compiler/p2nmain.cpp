@@ -105,237 +105,237 @@ ulong NUMS[] = {
 
 Fn FUNC[156] = 
 {
-	null,						/* 0 End of pattern */
+	null,						/*! 0 End of pattern */
 
-	/* Values corresponding to backslashed metacharacters */
+	/*! Values corresponding to backslashed metacharacters */
 
-	null,						/* 1 Start of data: \A */
-	null,						/* 2 Start of match (subject + offset): \G */
-	null,						/* 3 Set start of match (\K) */
-	null,						/* 4 \B */
-	null,						/* 5 \b */
-	OP_COMMON_FUNC,				/* 6 \D */
-	OP_COMMON_FUNC,				/* 7 \d */
-	OP_COMMON_FUNC,				/* 8 \S */
-	OP_COMMON_FUNC,				/* 9 \s */
-	OP_COMMON_FUNC,				/* 10 \W */
-	OP_COMMON_FUNC,				/* 11 \w */
+	null,						/*! 1 Start of data: \A */
+	null,						/*! 2 Start of match (subject + offset): \G */
+	null,						/*! 3 Set start of match (\K) */
+	null,						/*! 4 \B */
+	null,						/*! 5 \b */
+	OP_COMMON_FUNC,				/*! 6 \D */
+	OP_COMMON_FUNC,				/*! 7 \d */
+	OP_COMMON_FUNC,				/*! 8 \S */
+	OP_COMMON_FUNC,				/*! 9 \s */
+	OP_COMMON_FUNC,				/*! 10 \W */
+	OP_COMMON_FUNC,				/*! 11 \w */
 
-	OP_COMMON_FUNC,				/* 12 Match any character except newline (\N) */
-	OP_COMMON_FUNC,				/* 13 Match any character */
-	null,						/* 14 Match any byte (\C); different to OP_ANY for UTF-8 */
-	null,						/* 15 \P (not Unicode property) */
-	null,						/* 16 \p (Unicode property) */
-	null,						/* 17 \R (any newline sequence) */
-	null,						/* 18 \H (not horizontal whitespace) */
-	null,						/* 19 \h (horizontal whitespace) */
-	null,						/* 20 \V (not vertical whitespace) */
-	null,						/* 21 \v (vertical whitespace) */
-	null,						/* 22 \X (extended Unicode sequence */
-	null,						/* 23 End of data or \n at end of data (\Z) */
-	null,						/* 24 End of data (\z) */
+	OP_COMMON_FUNC,				/*! 12 Match any character except newline (\N) */
+	OP_COMMON_FUNC,				/*! 13 Match any character */
+	null,						/*! 14 Match any byte (\C); different to OP_ANY for UTF-8 */
+	null,						/*! 15 \P (not Unicode property) */
+	null,						/*! 16 \p (Unicode property) */
+	null,						/*! 17 \R (any newline sequence) */
+	null,						/*! 18 \H (not horizontal whitespace) */
+	null,						/*! 19 \h (horizontal whitespace) */
+	null,						/*! 20 \V (not vertical whitespace) */
+	null,						/*! 21 \v (vertical whitespace) */
+	null,						/*! 22 \X (extended Unicode sequence */
+	null,						/*! 23 End of data or \n at end of data (\Z) */
+	null,						/*! 24 End of data (\z) */
 
-	null,						/* 25 Start of line - not multiline */
-	null,						/* 26 Start of line - multiline */
-	null,						/* 27 End of line - not multiline */
-	null,						/* 28 End of line - multiline */
-	OP_CHAR_FUNC,				/* 29 Match one character, casefully */
-	OP_CHARI_FUNC,				/* 30 Match one character, caselessly */
-	OP_NOT_FUNC,				/* 31 Match one character, not the given one, casefully */
-	OP_NOTI_FUNC,				/* 32 Match one character, not the given one, caselessly */
+	null,						/*! 25 Start of line - not multiline */
+	null,						/*! 26 Start of line - multiline */
+	null,						/*! 27 End of line - not multiline */
+	null,						/*! 28 End of line - multiline */
+	OP_CHAR_FUNC,				/*! 29 Match one character, casefully */
+	OP_CHARI_FUNC,				/*! 30 Match one character, caselessly */
+	OP_NOT_FUNC,				/*! 31 Match one character, not the given one, casefully */
+	OP_NOTI_FUNC,				/*! 32 Match one character, not the given one, caselessly */
 
-	/* The following sets of 13 opcodes must always be kept in step because
+	/*! The following sets of 13 opcodes must always be kept in step because
 	the offset from the first one is used to generate the others. */
 
-	/**** Single characters, caseful, must precede the caseless ones ****/
+	/*!*** Single characters, caseful, must precede the caseless ones ****/
 
-	OP_STAR_FUNC,				/* 33 The maximizing and minimizing versions of */
-	OP_STAR_FUNC,				/* 34 these six opcodes must come in pairs, with */
-	OP_PLUS_FUNC,				/* 35 the minimizing one second. */
-	OP_PLUS_FUNC,				/* 36 */
-	OP_QUERY_FUNC,				/* 37 */
-	OP_QUERY_FUNC,				/* 38 */
+	OP_STAR_FUNC,				/*! 33 The maximizing and minimizing versions of */
+	OP_STAR_FUNC,				/*! 34 these six opcodes must come in pairs, with */
+	OP_PLUS_FUNC,				/*! 35 the minimizing one second. */
+	OP_PLUS_FUNC,				/*! 36 */
+	OP_QUERY_FUNC,				/*! 37 */
+	OP_QUERY_FUNC,				/*! 38 */
 
-	OP_UPTO_FUNC,				/* 39 From 0 to n matches of one character, caseful*/
-	OP_UPTO_FUNC,				/* 40 */
-	OP_EXACT_FUNC,				/* 41 Exactly n matches */
+	OP_UPTO_FUNC,				/*! 39 From 0 to n matches of one character, caseful*/
+	OP_UPTO_FUNC,				/*! 40 */
+	OP_EXACT_FUNC,				/*! 41 Exactly n matches */
 
-	OP_STAR_FUNC,				/* 42 Possessified star, caseful */
-	OP_PLUS_FUNC,				/* 43 Possessified plus, caseful */
-	OP_QUERY_FUNC,				/* 44 Posesssified query, caseful */
-	OP_UPTO_FUNC,				/* 45 Possessified upto, caseful */
+	OP_STAR_FUNC,				/*! 42 Possessified star, caseful */
+	OP_PLUS_FUNC,				/*! 43 Possessified plus, caseful */
+	OP_QUERY_FUNC,				/*! 44 Posesssified query, caseful */
+	OP_UPTO_FUNC,				/*! 45 Possessified upto, caseful */
 
-	/**** Single characters, caseless, must follow the caseful ones */
+	/*!*** Single characters, caseless, must follow the caseful ones */
 
-	OP_STARI_FUNC,				/* 46 */
-	OP_STARI_FUNC,				/* 47 */
-	OP_PLUSI_FUNC,				/* 48 */
-	OP_PLUSI_FUNC,				/* 49 */
-	OP_QUERYI_FUNC,				/* 50 */
-	OP_QUERYI_FUNC,				/* 51 */
+	OP_STARI_FUNC,				/*! 46 */
+	OP_STARI_FUNC,				/*! 47 */
+	OP_PLUSI_FUNC,				/*! 48 */
+	OP_PLUSI_FUNC,				/*! 49 */
+	OP_QUERYI_FUNC,				/*! 50 */
+	OP_QUERYI_FUNC,				/*! 51 */
 
-	OP_UPTOI_FUNC,				/* 52 From 0 to n matches of one character, caseless */
-	OP_UPTOI_FUNC,				/* 53 */
-	OP_EXACTI_FUNC,				/* 54 */
+	OP_UPTOI_FUNC,				/*! 52 From 0 to n matches of one character, caseless */
+	OP_UPTOI_FUNC,				/*! 53 */
+	OP_EXACTI_FUNC,				/*! 54 */
 
-	OP_STARI_FUNC,				/* 55 Possessified star, caseless */
-	OP_PLUSI_FUNC,				/* 56 Possessified plus, caseless */
-	OP_QUERYI_FUNC,				/* 57 Posesssified query, caseless */
-	OP_UPTOI_FUNC,				/* 58 Possessified upto, caseless */
+	OP_STARI_FUNC,				/*! 55 Possessified star, caseless */
+	OP_PLUSI_FUNC,				/*! 56 Possessified plus, caseless */
+	OP_QUERYI_FUNC,				/*! 57 Posesssified query, caseless */
+	OP_UPTOI_FUNC,				/*! 58 Possessified upto, caseless */
 
-	/**** The negated ones must follow the non-negated ones, and match them ****/
-	/**** Negated single character, caseful; must precede the caseless ones ****/
+	/*!*** The negated ones must follow the non-negated ones, and match them ****/
+	/*!*** Negated single character, caseful; must precede the caseless ones ****/
 
-	OP_NOTSTAR_FUNC,			/* 59 The maximizing and minimizing versions of */
-	OP_NOTSTAR_FUNC,			/* 60 these six opcodes must come in pairs, with */
-	OP_NOTPLUS_FUNC,			/* 61 the minimizing one second. They must be in */
-	OP_NOTPLUS_FUNC,			/* 62 exactly the same order as those above. */
-	OP_NOTQUERY_FUNC,			/* 63 */
-	OP_NOTQUERY_FUNC,			/* 64 */
+	OP_NOTSTAR_FUNC,			/*! 59 The maximizing and minimizing versions of */
+	OP_NOTSTAR_FUNC,			/*! 60 these six opcodes must come in pairs, with */
+	OP_NOTPLUS_FUNC,			/*! 61 the minimizing one second. They must be in */
+	OP_NOTPLUS_FUNC,			/*! 62 exactly the same order as those above. */
+	OP_NOTQUERY_FUNC,			/*! 63 */
+	OP_NOTQUERY_FUNC,			/*! 64 */
 
-	OP_NOTUPTO_FUNC,			/* 65 From 0 to n matches, caseful */
-	OP_NOTUPTO_FUNC,			/* 66 */
-	OP_NOTEXACT_FUNC,			/* 67 Exactly n matches */
+	OP_NOTUPTO_FUNC,			/*! 65 From 0 to n matches, caseful */
+	OP_NOTUPTO_FUNC,			/*! 66 */
+	OP_NOTEXACT_FUNC,			/*! 67 Exactly n matches */
 
-	OP_NOTSTAR_FUNC,			/* 68 Possessified versions, caseful */
-	OP_NOTPLUS_FUNC,			/* 69 */
-	OP_NOTQUERY_FUNC,			/* 70 */
-	OP_NOTUPTO_FUNC,			/* 71 */
+	OP_NOTSTAR_FUNC,			/*! 68 Possessified versions, caseful */
+	OP_NOTPLUS_FUNC,			/*! 69 */
+	OP_NOTQUERY_FUNC,			/*! 70 */
+	OP_NOTUPTO_FUNC,			/*! 71 */
 
-	/**** Negated single character, caseless; must follow the caseful ones ****/
+	/*!*** Negated single character, caseless; must follow the caseful ones ****/
 
-	OP_NOTSTARI_FUNC,			/* 72 */
-	OP_NOTSTARI_FUNC,			/* 73 */
-	OP_NOTPLUSI_FUNC,			/* 74 */
-	OP_NOTPLUSI_FUNC,			/* 75 */
-	OP_NOTQUERYI_FUNC,			/* 76 */
-	OP_NOTQUERYI_FUNC,			/* 77 */
+	OP_NOTSTARI_FUNC,			/*! 72 */
+	OP_NOTSTARI_FUNC,			/*! 73 */
+	OP_NOTPLUSI_FUNC,			/*! 74 */
+	OP_NOTPLUSI_FUNC,			/*! 75 */
+	OP_NOTQUERYI_FUNC,			/*! 76 */
+	OP_NOTQUERYI_FUNC,			/*! 77 */
 
-	OP_NOTUPTOI_FUNC,			/* 78 From 0 to n matches, caseless */
-	OP_NOTUPTOI_FUNC,			/* 79 */
-	OP_NOTEXACTI_FUNC,			/* 80 Exactly n matches */
+	OP_NOTUPTOI_FUNC,			/*! 78 From 0 to n matches, caseless */
+	OP_NOTUPTOI_FUNC,			/*! 79 */
+	OP_NOTEXACTI_FUNC,			/*! 80 Exactly n matches */
 
-	OP_NOTSTARI_FUNC,			/* 81 Possessified versions, caseless */
-	OP_NOTPLUSI_FUNC,			/* 82 */
-	OP_NOTQUERYI_FUNC,			/* 83 */
-	OP_NOTUPTOI_FUNC,			/* 84 */
+	OP_NOTSTARI_FUNC,			/*! 81 Possessified versions, caseless */
+	OP_NOTPLUSI_FUNC,			/*! 82 */
+	OP_NOTQUERYI_FUNC,			/*! 83 */
+	OP_NOTUPTOI_FUNC,			/*! 84 */
 
-	/**** Character types ****/
+	/*!*** Character types ****/
 
-	OP_TYPESTAR_FUNC,			/* 85 The maximizing and minimizing versions of */
-	OP_TYPESTAR_FUNC,			/* 86 these six opcodes must come in pairs, with */
-	OP_TYPEPLUS_FUNC,			/* 87 the minimizing one second. These codes must */
-	OP_TYPEPLUS_FUNC,			/* 88 be in exactly the same order as those above. */
-	OP_TYPEQUERY_FUNC,			/* 89 */
-	OP_TYPEQUERY_FUNC,			/* 90 */
+	OP_TYPESTAR_FUNC,			/*! 85 The maximizing and minimizing versions of */
+	OP_TYPESTAR_FUNC,			/*! 86 these six opcodes must come in pairs, with */
+	OP_TYPEPLUS_FUNC,			/*! 87 the minimizing one second. These codes must */
+	OP_TYPEPLUS_FUNC,			/*! 88 be in exactly the same order as those above. */
+	OP_TYPEQUERY_FUNC,			/*! 89 */
+	OP_TYPEQUERY_FUNC,			/*! 90 */
 
-	OP_TYPEUPTO_FUNC,			/* 91 From 0 to n matches */
-	OP_TYPEUPTO_FUNC,			/* 92 */
-	OP_TYPEEXACT_FUNC,			/* 93 Exactly n matches */
+	OP_TYPEUPTO_FUNC,			/*! 91 From 0 to n matches */
+	OP_TYPEUPTO_FUNC,			/*! 92 */
+	OP_TYPEEXACT_FUNC,			/*! 93 Exactly n matches */
 
-	OP_TYPESTAR_FUNC,			/* 94 Possessified versions */
-	OP_TYPEPLUS_FUNC,			/* 95 */
-	OP_TYPEQUERY_FUNC,			/* 96 */
-	OP_TYPEUPTO_FUNC,			/* 97 */
+	OP_TYPESTAR_FUNC,			/*! 94 Possessified versions */
+	OP_TYPEPLUS_FUNC,			/*! 95 */
+	OP_TYPEQUERY_FUNC,			/*! 96 */
+	OP_TYPEUPTO_FUNC,			/*! 97 */
 
-	/* These are used for character classes and back references; only the
+	/*! These are used for character classes and back references; only the
 	first six are the same as the sets above. */
 
-	null,						/* 98 The maximizing and minimizing versions of */
-	null,						/* 99 all these opcodes must come in pairs, with */
-	null,						/* 100 the minimizing one second. These codes must */
-	null,						/* 101 be in exactly the same order as those above. */
-	null,						/* 102 */
-	null,						/* 103 */
+	null,						/*! 98 The maximizing and minimizing versions of */
+	null,						/*! 99 all these opcodes must come in pairs, with */
+	null,						/*! 100 the minimizing one second. These codes must */
+	null,						/*! 101 be in exactly the same order as those above. */
+	null,						/*! 102 */
+	null,						/*! 103 */
 
-	null,						/* 104 These are different to the three sets above. */
-	null,						/* 105 */
+	null,						/*! 104 These are different to the three sets above. */
+	null,						/*! 105 */
 
-	/* End of quantifier opcodes */
+	/*! End of quantifier opcodes */
 
-	null,						/* 106 Match a character class, chars < 256 only */
-	null,						/* 107 Same, but the bitmap was created from a negative
+	null,						/*! 106 Match a character class, chars < 256 only */
+	null,						/*! 107 Same, but the bitmap was created from a negative
 								class - the difference is relevant only when a
 								character > 255 is encountered. */
-	null,						/* 108 Extended class for handling > 255 chars within the
+	null,						/*! 108 Extended class for handling > 255 chars within the
 								class. This does both positive and negative. */
-	null,						/* 109 Match a back reference, casefully */
-	null,						/* 110 Match a back reference, caselessly */
-	null,						/* 111 Match a numbered subpattern (possibly recursive) */
-	null,						/* 112 Call out to external function if provided */
+	null,						/*! 109 Match a back reference, casefully */
+	null,						/*! 110 Match a back reference, caselessly */
+	null,						/*! 111 Match a numbered subpattern (possibly recursive) */
+	null,						/*! 112 Call out to external function if provided */
 
-	null,						/* 113 Start of alternation */
-	null,						/* 114 End of group that doesn't have an unbounded repeat */
-	null,						/* 115 These two must remain together and in this */
-	null,						/* 116 order. They are for groups the repeat for ever. */
-	null,						/* 117 Possessive unlimited repeat. */
+	null,						/*! 113 Start of alternation */
+	null,						/*! 114 End of group that doesn't have an unbounded repeat */
+	null,						/*! 115 These two must remain together and in this */
+	null,						/*! 116 order. They are for groups the repeat for ever. */
+	null,						/*! 117 Possessive unlimited repeat. */
 
-								/* The assertions must come before BRA, CBRA, ONCE, and COND, and the four
+								/*! The assertions must come before BRA, CBRA, ONCE, and COND, and the four
 								asserts must remain in order. */
 
-	null,						/* 118 Move pointer back - used in lookbehind assertions */
-	null,						/* 119 Positive lookahead */
-	null,						/* 120 Negative lookahead */
-	null,						/* 121 Positive lookbehind */
-	null,						/* 122 Negative lookbehind */
+	null,						/*! 118 Move pointer back - used in lookbehind assertions */
+	null,						/*! 119 Positive lookahead */
+	null,						/*! 120 Negative lookahead */
+	null,						/*! 121 Positive lookbehind */
+	null,						/*! 122 Negative lookbehind */
 
-	/* ONCE, ONCE_NC, BRA, BRAPOS, CBRA, CBRAPOS, and COND must come immediately
+	/*! ONCE, ONCE_NC, BRA, BRAPOS, CBRA, CBRAPOS, and COND must come immediately
 	after the assertions, with ONCE first, as there's a test for >= ONCE for a
 	subpattern that isn't an assertion. The POS versions must immediately follow
 	the non-POS versions in each case. */
 
-	null,						/* 123 Atomic group, contains captures */
-	null,						/* 124 Atomic group containing no captures */
-	null,						/* 125 Start of non-capturing bracket */
-	null,						/* 126 Ditto, with unlimited, possessive repeat */
-	null,						/* 127 Start of capturing bracket */
-	null,						/* 128 Ditto, with unlimited, possessive repeat */
-	null,						/* 129 Conditional group */
+	null,						/*! 123 Atomic group, contains captures */
+	null,						/*! 124 Atomic group containing no captures */
+	null,						/*! 125 Start of non-capturing bracket */
+	null,						/*! 126 Ditto, with unlimited, possessive repeat */
+	null,						/*! 127 Start of capturing bracket */
+	null,						/*! 128 Ditto, with unlimited, possessive repeat */
+	null,						/*! 129 Conditional group */
 
-	/* These five must follow the previous five, in the same order. There's a
+	/*! These five must follow the previous five, in the same order. There's a
 	check for >= SBRA to distinguish the two sets. */
 
-	null,						/* 130 Start of non-capturing bracket, check empty */
-	null,						/* 131 Ditto, with unlimited, possessive repeat */
-	null,						/* 132 Start of capturing bracket, check empty */
-	null,						/* 133 Ditto, with unlimited, possessive repeat */
-	null,						/* 134 Conditional group, check empty */
+	null,						/*! 130 Start of non-capturing bracket, check empty */
+	null,						/*! 131 Ditto, with unlimited, possessive repeat */
+	null,						/*! 132 Start of capturing bracket, check empty */
+	null,						/*! 133 Ditto, with unlimited, possessive repeat */
+	null,						/*! 134 Conditional group, check empty */
 
-	/* The next two pairs must (respectively) be kept together. */
+	/*! The next two pairs must (respectively) be kept together. */
 
-	null,						/* 135 Used to hold a capture number as condition */
-	null,						/* 136 Same, but generated by a name reference*/
-	null,						/* 137 Used to hold a recursion number as condition */
-	null,						/* 138 Same, but generated by a name reference*/
-	null,						/* 139 The DEFINE condition */
+	null,						/*! 135 Used to hold a capture number as condition */
+	null,						/*! 136 Same, but generated by a name reference*/
+	null,						/*! 137 Used to hold a recursion number as condition */
+	null,						/*! 138 Same, but generated by a name reference*/
+	null,						/*! 139 The DEFINE condition */
 
-	null,						/* 140 These two must remain together and in this */
-	null,						/* 141 order. */
-	null,						/* 142 */
+	null,						/*! 140 These two must remain together and in this */
+	null,						/*! 141 order. */
+	null,						/*! 142 */
 
-	/* These are backtracking control verbs */
+	/*! These are backtracking control verbs */
 
-	null,						/* 143 always has an argument */
-	null,						/* 144 */
-	null,						/* 145 same, but with argument */
-	null,						/* 146 */
-	null,						/* 147 same, but with argument */
-	null,						/* 148 */
-	null,						/* 149 same, but with argument */
-	null,						/* 150 */
+	null,						/*! 143 always has an argument */
+	null,						/*! 144 */
+	null,						/*! 145 same, but with argument */
+	null,						/*! 146 */
+	null,						/*! 147 same, but with argument */
+	null,						/*! 148 */
+	null,						/*! 149 same, but with argument */
+	null,						/*! 150 */
 
-	/* These are forced failure and success verbs */
+	/*! These are forced failure and success verbs */
 
-	null,						/* 151 */
-	null,						/* 152 */
-	null,						/* 153 Used inside assertions */
-	null,						/* 154 Used before OP_ACCEPT to close open captures */
+	null,						/*! 151 */
+	null,						/*! 152 */
+	null,						/*! 153 Used inside assertions */
+	null,						/*! 154 Used before OP_ACCEPT to close open captures */
 
-	/* This is used to skip a subpattern with a {0} quantifier */
+	/*! This is used to skip a subpattern with a {0} quantifier */
 
-	null						/* 155 */
+	null						/*! 155 */
 
-	/* This is not an opcode, but is used to check that tables indexed by opcode
+	/*! This is not an opcode, but is used to check that tables indexed by opcode
 	are the correct length, in order to catch updating errors - there have been
 	some in the past. */
 };

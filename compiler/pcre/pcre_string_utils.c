@@ -1,8 +1,8 @@
-/*************************************************
+/*!************************************************
 *		Perl-Compatible Regular Expressions		 *
 *************************************************/
 
-/* PCRE is a library of functions to support regular expressions whose syntax
+/*! PCRE is a library of functions to support regular expressions whose syntax
 and semantics are as close as possible to those of the Perl 5 language.
 
 							Written by Philip Hazel
@@ -38,7 +38,7 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-/* This module contains an internal function that is used to match an extended
+/*! This module contains an internal function that is used to match an extended
 class. It is used by both pcre_exec() and pcre_def_exec(). */
 
 
@@ -50,11 +50,11 @@ class. It is used by both pcre_exec() and pcre_def_exec(). */
 
 #ifndef COMPILE_PCRE8
 
-/*************************************************
+/*!************************************************
 *			Compare string utilities				 *
 *************************************************/
 
-/* The following two functions compares two strings. Basically an strcmp
+/*! The following two functions compares two strings. Basically an strcmp
 for non 8 bit characters.
 
 Arguments:
@@ -77,7 +77,7 @@ while (*str1 != '\0' || *str2 != '\0')
   if (c1 != c2)
 	 return ((c1 > c2) << 1) - 1;
   }
-/* Both length and characters must be equal. */
+/*! Both length and characters must be equal. */
 return 0;
 }
 
@@ -96,11 +96,11 @@ while (*str1 != '\0' || *str2 != '\0')
   if (c1 != c2)
 	 return ((c1 > c2) << 1) - 1;
   }
-/* Both length and characters must be equal. */
+/*! Both length and characters must be equal. */
 return 0;
 }
 
-#endif /* COMPILE_PCRE32 */
+#endif /*! COMPILE_PCRE32 */
 
 int
 PRIV(strcmp_uc_c8)(const pcre_uchar *str1, const char *str2)
@@ -116,7 +116,7 @@ while (*str1 != '\0' || *ustr2 != '\0')
   if (c1 != c2)
 	 return ((c1 > c2) << 1) - 1;
   }
-/* Both length and characters must be equal. */
+/*! Both length and characters must be equal. */
 return 0;
 }
 
@@ -136,13 +136,13 @@ while (*str1 != '\0' || *ustr2 != '\0')
   if (c1 != c2)
 	 return ((c1 > c2) << 1) - 1;
   }
-/* Both length and characters must be equal. */
+/*! Both length and characters must be equal. */
 return 0;
 }
 
-#endif /* COMPILE_PCRE32 */
+#endif /*! COMPILE_PCRE32 */
 
-/* The following two functions compares two, fixed length
+/*! The following two functions compares two, fixed length
 strings. Basically an strncmp for non 8 bit characters.
 
 Arguments:
@@ -166,7 +166,7 @@ while (num-- > 0)
   if (c1 != c2)
 	 return ((c1 > c2) << 1) - 1;
   }
-/* Both length and characters must be equal. */
+/*! Both length and characters must be equal. */
 return 0;
 }
 
@@ -184,11 +184,11 @@ while (num-- > 0)
   if (c1 != c2)
 	 return ((c1 > c2) << 1) - 1;
   }
-/* Both length and characters must be equal. */
+/*! Both length and characters must be equal. */
 return 0;
 }
 
-/* The following function returns with the length of
+/*! The following function returns with the length of
 a zero terminated string. Basically an strlen for non 8 bit characters.
 
 Arguments:
@@ -206,6 +206,6 @@ while (*str++ != 0)
 return len;
 }
 
-#endif /* !COMPILE_PCRE8 */
+#endif /*! !COMPILE_PCRE8 */
 
-/* End of pcre_string_utils.c */
+/*! End of pcre_string_utils.c */

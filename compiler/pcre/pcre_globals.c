@@ -1,8 +1,8 @@
-/*************************************************
+/*!************************************************
 *		Perl-Compatible Regular Expressions		 *
 *************************************************/
 
-/* PCRE is a library of functions to support regular expressions whose syntax
+/*! PCRE is a library of functions to support regular expressions whose syntax
 and semantics are as close as possible to those of the Perl 5 language.
 
 							Written by Philip Hazel
@@ -38,7 +38,7 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-/* This module contains global variables that are exported by the PCRE library.
+/*! This module contains global variables that are exported by the PCRE library.
 PCRE is thread-clean and doesn't use any global variables in the normal sense.
 However, it calls memory allocation and freeing functions via the four
 indirections below, and it can optionally do callouts, using the fifth
@@ -81,4 +81,4 @@ PCRE_EXP_DATA_DEFN void  (*PUBL(stack_free))(void *) = free;
 PCRE_EXP_DATA_DEFN int	(*PUBL(callout))(PUBL(callout_block) *) = NULL;
 #endif
 
-/* End of pcre_globals.c */
+/*! End of pcre_globals.c */
