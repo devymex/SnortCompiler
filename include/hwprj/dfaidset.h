@@ -22,9 +22,8 @@ class DFAIDSET;
 */
 
 /*!
-* @brief		实现CDfaIdSet数据结构及相关算法。
-* @remark		存储每一个CDfa对应的ID。实现的算法包括：
-*				添加ID、复制ID集合等。
+* @brief		实现DFA编号集合的数据结构及相关算法
+* @remark		存储每一个DFA的编号，该集合无重无序。实现的算法包括：添加ID、复制ID集合等。
 */
 class DFAIDSETHDR CDfaIdSet
 {

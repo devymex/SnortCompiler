@@ -14,6 +14,10 @@
 #define PCREMATCHHDR __declspec(dllexport)
 #endif
 
+/*! @addtogroup groupCompiler
+*  @{
+*/
+
 /*!
 * @brief		判断PCRE与数据包是否匹配
 * @param[in]	src 输入数据包二进制字节流
@@ -27,3 +31,7 @@ PCREMATCHHDR bool PcreMatch(const char* src,
 							int length,
 							CPcreOption &pcreopt,
 							int &Pos);
+
+/*!
+@}
+*/
