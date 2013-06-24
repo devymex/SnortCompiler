@@ -1,7 +1,7 @@
 /*!
 * @file			dfaalgo.h
 * @author		Lab 435, Xidian University
-* @brief		DFA的算法的函数声明
+* @brief		DFA相关算法的函数声明
 */
 
 #include <hwprj\common.h>

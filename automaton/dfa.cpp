@@ -1,12 +1,7 @@
 /*!*
-* @file		dfa.cpp
-**
+* @file			dfa.cpp
 * @author		Lab 435, Xidian University
-**
-* @brief			 Common classes declaration
-**
-* Include CUnsignedArray, CDllString
-**
+* @brief		CDfa类的实现
 */
 
 #include "stdafx.h"
