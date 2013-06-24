@@ -1,10 +1,12 @@
 /*!
-* @file		stdafx.h
-**
+* @file			stdafx.h
 * @author		Lab 435, Xidian University
-**
-* @brief			Precompile header common library
-**
+* @brief		Precompile header common library
+*/
+
+/*!
+* @defgroup		groupCompiler
+* @remark		编译器模块，定义和实现将Snort规则编译为DFA的相关算法及数据结构。
 */
 
 #pragma once
