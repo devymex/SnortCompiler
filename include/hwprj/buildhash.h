@@ -54,8 +54,10 @@ HASHMAPHDR extern SIGHASH hash;
 
 typedef std::map<ulong, std::vector<HASHNODE>> HASHRES;
 
-/// @brief		每个分组均有能够代表该组的Signature(s)，为每个分组选择代表该组的Signature，建立哈希表
-/// @param		groupRes 分组结果，HashResMap 哈希映射的结果
+/// @brief		每个分组均有能够代表该组的Signature(s)，为每个分组选择
+///				代表该组的Signature，建立哈希表
+/// @param[in]	groupRes 分组结果
+/// @param[in]	HashResMap 哈希映射的结果
 HASHMAPHDR void HashMapping(CGroupRes &groupRes, HASHRES &HashResMap);
 
 /*!

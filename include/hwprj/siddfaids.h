@@ -87,7 +87,7 @@ public:
 	const ulong Size() const;
 
 	/// @brief		添加一个规则的信息
-	/// @param		规则信息
+	/// @param[in]	规则信息
 	void PushBack(const COMPILEDINFO &sidDfaIds);
 
 	/// @brief		获取最后一个规则信息。

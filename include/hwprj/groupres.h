@@ -49,15 +49,15 @@ public:
 	const ulong &GetBucketCnt() const;
 
 	/// @brief		设置hash槽数,便于把hash槽数写入文件
-	/// @param	nBucketSize-hash槽数
+	/// @param[in]	nBucketSize hash槽数
 	void SetBucketCnt(ulong nBucketSize);
 	
 	/// @brief		将分组结果输出文件
-	/// @param	filename-输入包含文件路径的文件名
+	/// @param[in]	filename 输入包含文件路径的文件名
 	ulong WriteToFile(const char *filename);
 
 	/// @brief		将写入文件中的分组结果读入
-	/// @param	filename-输入包含文件路径的文件名
+	/// @param[in]	filename 输入包含文件路径的文件名
 	ulong ReadFromFile(const char *filename);
 private:
 	CDfaArray m_dfaTbl;

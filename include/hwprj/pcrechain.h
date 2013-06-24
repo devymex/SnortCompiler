@@ -60,7 +60,7 @@ public:
 	CPcreOption& Back() const;
 
 	/// @brief		将指定的CPcreOption对象添加为CPcreChain数组的最后一个元素。
-	/// @param		pcreOpt CPcreOption对象。
+	/// @param[in]	pcreOpt CPcreOption对象。
 	void PushBack(const CPcreOption &pcreOpt);
 
 	/// @brief		更改CPcreChain数组的大小。

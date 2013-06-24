@@ -30,10 +30,10 @@ public:
 	/// @brief		获取DFA跳转矩阵
 	CDfaArray& GetDfaTable();
 
-	/// @brief		获取规则sid与DfaId的对应关系
+	/// @brief		获取规则sid与DFA编号的对应关系
 	CSidDfaIds& GetSidDfaIds();
 
-	/// @brief		获取规则sid与DfaId的对应关系
+	/// @brief		获取解析得到的规格化规则集。
 	CRegRule &GetRegexTbl();
 
 	const CDfaArray& GetDfaTable() const;
@@ -41,11 +41,11 @@ public:
 	const CRegRule &GetRegexTbl() const;
 
 	/// @brief		将DFA结果输出文件
-	/// @param	filename-输入包含文件路径的文件名
+	/// @param[in]	filename 输入包含文件路径的文件名
 	ulong WriteToFile(const char *filename);
 
 	/// @brief		读入DFA结果文件
-	/// @param	filename-输入包含文件路径的文件名
+	/// @param[in]	filename 输入包含文件路径的文件名
 	ulong ReadFromFile(const char *filename);
 
 private:

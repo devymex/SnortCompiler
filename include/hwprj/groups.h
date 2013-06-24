@@ -74,7 +74,7 @@ public:
 	void Resize(ulong nSize);
 
 	/// @brief		将指定的一个分组结果添加为CGroups数组的最后一个元素。
-	/// @param		oneGroup 指定的一个分组结果。
+	/// @param[in]	oneGroup 指定的一个分组结果。
 	void PushBack(ONEGROUP oneGroup);
 
 	/// @brief		得到CGroups数组最后一个元素的引用。

@@ -63,9 +63,9 @@ struct PARSERESULT
 typedef void (__stdcall *RECIEVER)(const PARSERESULT &parseRes, void *lpUser);
 
 /// @brief		解析一个Snort规则文件，并通过回调函数给出结果。
-/// @param		pFileName 输入规则文件名。
-/// @param		recv 回调函数的地址。
-///	@param		lpUser 自定义参数，将被传入回调函数。
+/// @param[in]	pFileName 输入规则文件名。
+/// @param[in]	recv 回调函数的地址。
+///	@param[in]	lpUser 自定义参数，将被传入回调函数。
 COMPILERHDR void ParseRuleFile(const char *pFileName, RECIEVER recv, void *lpUser);
 
 /// @brief		编译一个Snort规则文件，生成编译结果集。

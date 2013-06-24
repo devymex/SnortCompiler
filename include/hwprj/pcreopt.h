@@ -64,14 +64,14 @@ public:
 	CPcreOption& operator = (const CPcreOption &other);
 
 	/// @brief		处理Snort规则中pcre字符串内容及其修饰项，存入当前处理后的pcre字符串
-	/// @param		strPat Snort规则中pcre字符串
+	/// @param[in]	strPat Snort规则中pcre字符串
 	virtual void FromPattern(const CDllString &strPat);
 
 	/// @brief		拷贝当前pcre字符串
 	virtual CRuleOption* Clone() const;
 
 	/// @brief		设置处理后的pcre字符串
-	/// @param		strPcre pcre字符串，必须为纯净的正则表达式串，
+	/// @param[in]	strPcre pcre字符串，必须为纯净的正则表达式串，
 	///				不能带有前后的'/'以及后缀等。
 	void SetPcreString(const CDllString& strPcre);
 
@@ -80,7 +80,7 @@ public:
 	const CDllString& GetPcreString() const;
 
 	/// @brief		预编译pcre，生成预编译结果数据。
-	/// @param		pcResult 预编译结果数据
+	/// @param[in]	pcResult 预编译结果数据
 	void Precompile(CByteArray &pcResult) const;
 
 protected:

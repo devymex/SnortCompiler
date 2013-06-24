@@ -18,7 +18,7 @@ class CHAINVEC;
 
 /*!
 * @brief 实现了规格化的snort规则数据结构，提供对一条规则的数据进行管理的功能。
-* @detail 主要数据结构为CPcreChain的动态数组，封装了std::vector<CPcreChain>。
+* @remark 主要数据结构为CPcreChain的动态数组，封装了std::vector<CPcreChain>。
 */
 class SNORTRULEHDR CRegRule
 {

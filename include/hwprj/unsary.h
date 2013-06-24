@@ -23,7 +23,7 @@
 
 /*!
 * @brief	实现(ulong*)的动态数组。
-* @detail	用于替代std::vector<unsigned long>，在模块之间传递参数。
+* @remark	用于替代std::vector<unsigned long>，在模块之间传递参数。
 */
 class UNSARYHDR CUnsignedArray
 {
@@ -82,11 +82,11 @@ public:
 	inline void PopBack();
 
 	/// @brief		将指定的数值添加为数组的最后一个元素。
-	/// @param		ulval 指定的数值。
+	/// @param[in]	ulval 指定的数值。
 	inline void PushBack(ulong ulVal);
 
 	/// @brief		为动态数组预留内存空间。
-	/// @param		ulCap 指定的预留的空间。
+	/// @param[in]	ulCap 指定的预留的空间。
 	inline void Reserve(ulong ulCap);
 
 	/// @brief		更改动态数组的大小。

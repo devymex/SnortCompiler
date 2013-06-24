@@ -65,7 +65,7 @@ public:
 	void Clear();
 
 	/// @brief		在数组的末尾添加一个字节的数据
-	/// @param		byVal 添加的字节值
+	/// @param[in]	byVal 添加的字节值
 	void PushBack(byte byVal);
 
 	/// @brief		删除数组末尾的一个参数

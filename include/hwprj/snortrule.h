@@ -20,8 +20,8 @@ class OPTIONVEC;
 
 /*!
 * @brief	提取Snort规则选项内容。
-* @detail	封装std::vector<class CRuleOption*>对象，
-*			用于记录规则选项内容，标记能够处理的规则和规则对应的sid
+* @remark	封装std::vector<class CRuleOption*>对象，用于记录规则选项内容，
+*			标记能够处理的规则和规则对应的sid
 */
 class SNORTRULEHDR CSnortRule
 {
@@ -65,7 +65,7 @@ public:
 	void Clear();
 
 	/// @brief		将指定的CRuleOption对象添加为CSnortRule最后一个元素。
-	/// @param		pRuleOption 指定的CRuleOption对象。
+	/// @param[in]	pRuleOption 指定的CRuleOption对象。
 	void PushBack(CRuleOption* pRuleOption);
 
 	/// @brief		删除CSnortRule的最后一个元素。
