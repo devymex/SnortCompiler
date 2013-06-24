@@ -23,6 +23,8 @@
 */
 
 /*!
+* @brief		管理一个content选项的数据，包括属于它的修饰选项的值。
+* @remark		提供转换到CPcreOption的功能。
 */
 class CContentOption : public CRuleOption
 {

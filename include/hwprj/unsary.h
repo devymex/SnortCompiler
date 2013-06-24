@@ -125,7 +125,7 @@ public:
 	void Unique();
 
 protected:
-	/// @brief		分非指定大小的内存，用来替换new。
+	/// @brief		分配指定大小的内存，用来替换new。
 	inline ulong* Alloc(ulong ulCap) const;
 
 	/// @brief		释放指定的内存，用来替换delete[]。
