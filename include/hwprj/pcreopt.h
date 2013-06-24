@@ -1,7 +1,7 @@
 /*!
 * @file			pcreopt.h
 * @author		Lab 435, Xidian University
-* @brief		定义了CPcreOption类
+* @brief		定义了CPcreOption类。
 */
 
 #pragma once

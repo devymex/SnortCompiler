@@ -131,7 +131,7 @@ protected:
 	/// @brief		释放指定的内存，用来替换delete[]。
 	inline void Free(ulong *pBuf) const;
 
-	/// @brief		重新分配指定大小。
+	/// @brief		重新分配指定大小的内存。
 	inline void Realloc(ulong ulCap);
 
 	/// @brief		从指定的内存中拷入数据。
