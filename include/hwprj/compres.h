@@ -1,12 +1,7 @@
 /*!
 * @file				compres.h
-**
 * @author			Lab 435, Xidian University
-**
-* @brief			Definition of the CCompileResults class
-**
-* For compiler's result, access member, read and write etc. 
-**
+* @brief			定义CCompileResults类
 */
 
 #pragma once
@@ -21,11 +16,14 @@
 #define COMPRESHDR __declspec(dllexport)
 #endif
 
+/*! @addtogroup groupCompiler
+*  @{
+*/
+
 /*!
 * @brief		保存DFA及PCRE链等信息。
 * @remark		包括所有的DFA、规则处理信息、PCRE链。
 */
-
 class COMPRESHDR CCompileResults
 {
 public:
@@ -60,3 +58,7 @@ private:
 	/// @brief		私有成员，仅供内部使用
 	CRegRule m_RegexTbl;
 };
+
+/*!
+@}
+*/

@@ -75,9 +75,6 @@
 * @{
 */
 
-/*!
-* 通用基本数据类型
-*/
 typedef unsigned char			byte;
 typedef unsigned long			ulong;
 typedef unsigned short			ushort;
@@ -87,9 +84,6 @@ typedef ushort					STATEID;
 typedef ulong					DFAID;
 typedef ulong					SIGNATURE;
 
-/*!
-* 全局常量
-*/
 
 /// 可接受的最大的DFA状态数。
 #define SC_MAXDFASIZE			255
