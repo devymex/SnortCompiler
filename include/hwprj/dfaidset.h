@@ -42,18 +42,18 @@ public:
 	/// @param[in]	other 另一个CDfaIdSet对象。
 	/// @return		两个CDfaIdSet相等时返回true，否则返回false。
 	/// @remark		将会执行逐元素的比较。
-	bool		operator == (const CDfaIdSet &other) const;
+	bool operator == (const CDfaIdSet &other) const;
 
 	/// @brief		重载的 '<' 运算符，判断自身对象是否比所指定的对象小。
 	/// @param[in]	other 另一个CDfaIdSet对象。
 	/// @return		当前CDfaIdSet比另一个CDfaIdSet小时返回true，否则返回false。
 	/// @remark		将会执行逐元素的比较。若二者长短不同，且比较至较短数组的末尾之后，
 	///				较长的数组为大。
-	bool		operator <	(const CDfaIdSet &other) const;
+	bool operator <	(const CDfaIdSet &other) const;
 
 	/// @brief		得到CDfaIdSet当前的大小。
 	/// @return		CDfaIdSet当前的大小（常量）。
-	ulong		Size() const;
+	ulong Size() const;
 
 	/// @brief		清空CDfaIdSet
 	void Clear();

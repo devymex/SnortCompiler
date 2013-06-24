@@ -1,7 +1,7 @@
 /*!
-* @file		comprule.h
+* @file				comprule.h
 **
-* @author		Lab 435, Xidian University
+* @author			Lab 435, Xidian University
 **
 * @brief			Functions declaration of rules' processing
 **

@@ -1,7 +1,7 @@
 /*!*
-* @file		dfa.cpp
+* @file				dfa.cpp
 **
-* @author		Lab 435, Xidian University
+* @author			Lab 435, Xidian University
 **
 * @brief			 Common classes declaration
 **

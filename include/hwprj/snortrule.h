@@ -1,7 +1,7 @@
 /*!
-* @file		snortrule.h
+* @file				snortrule.h
 **
-* @author		Lab 435, Xidian University
+* @author			Lab 435, Xidian University
 **
 * @brief			Declaration of the CSnortRule class
 **

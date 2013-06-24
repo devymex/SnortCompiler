@@ -1,7 +1,7 @@
 /*!
-* @file		stdafx.h
+* @file				stdafx.h
 **
-* @author		Lab 435, Xidian University
+* @author			Lab 435, Xidian University
 **
 * @brief			Precompile header common library
 **

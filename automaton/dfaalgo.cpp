@@ -1,7 +1,7 @@
 /*!*
-* @file		dfaalgo.h
+* @file				dfaalgo.h
 **
-* @author		Lab 435, Xidian University
+* @author			Lab 435, Xidian University
 **
 * @brief			Common classes declaration
 **

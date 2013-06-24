@@ -1,7 +1,7 @@
 /*!
-* @file		ruleoption.h
+* @file				ruleoption.h
 **
-* @author		Lab 435, Xidian University
+* @author			Lab 435, Xidian University
 **
 * @brief			Declaration of the CRuleOption class
 **

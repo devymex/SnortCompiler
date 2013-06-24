@@ -1,7 +1,7 @@
 /*!
-* @file		compiler.h
+* @file				compiler.h
 **
-* @author		Lab 435, Xidian University
+* @author			Lab 435, Xidian University
 **
 * @brief			Primary file of compiler
 **

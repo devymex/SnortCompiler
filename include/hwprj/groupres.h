@@ -1,7 +1,7 @@
 /*!
-* @file		groupres.h
+* @file				groupres.h
 **
-* @author		Lab 435, Xidian University
+* @author			Lab 435, Xidian University
 **
 * @brief			Definition of the CGroupRes class
 **
@@ -22,6 +22,11 @@
 #else
 #define GROUPRESHDR __declspec(dllexport)
 #endif
+
+/*!
+* @brief		保存DFA及分组情况等信息。
+* @remark		包括所有的DFA、规则处理信息、分组信息、hash槽数。
+*/
 
 class GROUPRESHDR CGroupRes
 {
@@ -53,10 +58,10 @@ public:
 	void SetBucketCnt(ulong nBucketSize);
 	
 	/// @brief		将分组结果输出文件
-	/// @param	filename-输出文件路径
+	/// @param	filename-输入包含文件路径的文件名
 	ulong WriteToFile(const char *filename);
 
 	/// @brief		将写入文件中的分组结果读入
-	/// @param	filename-输入文件路径
+	/// @param	filename-输入包含文件路径的文件名
 	ulong ReadFromFile(const char *filename);
 };

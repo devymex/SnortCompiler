@@ -1,7 +1,7 @@
 /*!
-* @file		compres.h
+* @file				compres.h
 **
-* @author		Lab 435, Xidian University
+* @author			Lab 435, Xidian University
 **
 * @brief			Definition of the CCompileResults class
 **
@@ -21,6 +21,11 @@
 #define COMPRESHDR __declspec(dllexport)
 #endif
 
+/*!
+* @brief		保存DFA及PCRE链等信息。
+* @remark		包括所有的DFA、规则处理信息、PCRE链。
+*/
+
 class COMPRESHDR CCompileResults
 {
 public:
@@ -38,11 +43,11 @@ public:
 	const CRegRule &GetRegexTbl() const;
 
 	/// @brief		将DFA结果输出文件
-	/// @param	filename-输入规则文件路径
+	/// @param	filename-输入包含文件路径的文件名
 	ulong WriteToFile(const char *filename);
 
 	/// @brief		读入DFA结果文件
-	/// @param	filename-输入规则文件路径
+	/// @param	filename-输入包含文件路径的文件名
 	ulong ReadFromFile(const char *filename);
 
 protected:
