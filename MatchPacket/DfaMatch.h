@@ -17,6 +17,7 @@ struct DFASIDMAPPING
 
 struct DFAMCH
 {
+	const char* pfilepath;
 	std::string resultFolder;
 	std::string resultPath;
 	HASHRES hashtable;

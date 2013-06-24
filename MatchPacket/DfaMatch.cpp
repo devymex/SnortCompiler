@@ -5,7 +5,9 @@
 #include "DfaMatch.h"
 
 ulong g_dpktnum = 0;
+ulong ucprnum = 0;
 ulong signum = 0;
+ulong usigtime = 0;
 void MatchOnedfa(const unsigned char * &data, ulong len, CDfa &dfa,
 				 std::vector<ulong> &matchedDids)
 {
@@ -121,10 +123,7 @@ void GetMchDfas(const u_char *data, ulong len, HASHRES &hashtable, std::vector<u
 				}
 			}
 		}
-		if (signum > 8)
-		{
-			++signum;
-		}
+
 	}
 }
 
@@ -137,8 +136,26 @@ MATCHPKT void DfaMatchPkt(const u_char *data, ulong len, DFAMCH &dfamch)
 	matchresult << g_dpktnum << " : ";
 	std::vector<ulong> matchdfas;
 	std::vector<ulong> matcheddfaids;
+
 	GetMchDfas(data, len, dfamch.hashtable, matchdfas);
 
+	if (signum > 8)
+	{
+		++usigtime;
+		std::ofstream ofs;
+		if (usigtime == 1)
+		{
+			ofs.open("..\\..\\output\\sigfile.txt");
+		}
+		else
+		{
+			ofs.open("..\\..\\output\\sigfile.txt", std::ofstream::app);
+		}
+
+		ofs << dfamch.pfilepath << " : " << g_pktnum << std::endl;
+
+		signum = 0;
+	}
 	for (std::vector<ulong>::iterator iter = matchdfas.begin(); iter != matchdfas.end(); ++iter)
 	{
 		MatchOnedfa(data, len, dfamch.mergedDfas.GetDfaTable()[*iter], matcheddfaids);
@@ -250,6 +267,8 @@ void __stdcall DPktParam(const ip_header *ih, const byte *data, void* user)
 
 bool DMyLoadCapFile(const char* pFile, PACKETRECV cv, void* pUser)
 {
+	DFAMCH &dfamch = *(DFAMCH*)pUser;
+	dfamch.pfilepath = pFile;
 	pcap_t *mypcap = pcap_open_offline(pFile, null);
 	PACKETPARAM pp;
 	pp.pUser = pUser;
@@ -371,10 +390,18 @@ void ResultFiles(const std::string &path, std::vector<std::string> &resultFiles)
 
 void CompareResult(const char* dpath, const char* ppath)
 {
+	++ucprnum;
 	std::vector<std::string> dresult, presult;
 
 	std::ofstream ofs;
-	ofs.open("D:\\projects\\output\\compare.txt", std::ofstream::app);
+	if (ucprnum == 1)
+	{
+		ofs.open("D:\\projects\\output\\compare.txt");
+	}
+	else
+	{
+		ofs.open("D:\\projects\\output\\compare.txt", std::ofstream::app);
+	}
 
 
 	std::ifstream ifs1(dpath);

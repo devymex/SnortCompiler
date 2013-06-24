@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 
 
 #include <Windows.h>
@@ -32,7 +32,7 @@
 
 extern ulong g_pktnum;
 
-/* 4å­—èŠ‚çš„IPåœ°å€ */
+/* 4×Ö½ÚµÄIPµØÖ· */
 typedef struct ip_address{
     u_char byte1;
     u_char byte2;
@@ -40,50 +40,50 @@ typedef struct ip_address{
     u_char byte4;
 }ip_address;
 
-/* 4å­—èŠ‚çš„IPåœ°å€ */
+/* 4×Ö½ÚµÄIPµØÖ· */
 typedef struct ip_header{
-    u_char  ver_ihl;        // ç‰ˆæœ¬ (4 bits) + é¦–éƒ¨é•¿åº¦ (4 bits)
-    u_char  tos;            // æœåŠ¡ç±»å‹(Type of service) 
-    u_short tlen;           // æ€»é•¿(Total length)  
-    u_short identification; // æ ‡è¯†(Identification)
-    u_short flags_fo;       // æ ‡å¿—ä½(Flags) (3 bits) + æ®µåç§»é‡(Fragment offset) (13 bits)
-    u_char  ttl;            // å­˜æ´»æ—¶é—´(Time to live)
-    u_char  proto;          // åè®®(Protocol)
-    u_short crc;            // é¦–éƒ¨æ ¡éªŒå’Œ(Header checksum)
-    ip_address  saddr;      // æºåœ°å€(Source address)
-    ip_address  daddr;      // ç›®çš„åœ°å€(Destination address)
-    u_int   op_pad;         // é€‰é¡¹ä¸å¡«å……(Option + Padding)
+    u_char  ver_ihl;        // °æ±¾ (4 bits) + Ê×²¿³¤¶È (4 bits)
+    u_char  tos;            // ·şÎñÀàĞÍ(Type of service) 
+    u_short tlen;           // ×Ü³¤(Total length)  
+    u_short identification; // ±êÊ¶(Identification)
+    u_short flags_fo;       // ±êÖ¾Î»(Flags) (3 bits) + ¶ÎÆ«ÒÆÁ¿(Fragment offset) (13 bits)
+    u_char  ttl;            // ´æ»îÊ±¼ä(Time to live)
+    u_char  proto;          // Ğ­Òé(Protocol)
+    u_short crc;            // Ê×²¿Ğ£ÑéºÍ(Header checksum)
+    ip_address  saddr;      // Ô´µØÖ·(Source address)
+    ip_address  daddr;      // Ä¿µÄµØÖ·(Destination address)
+    u_int   op_pad;         // Ñ¡ÏîÓëÌî³ä(Option + Padding)
 }ip_header;
 
-/* UDP é¦–éƒ¨*/
+/* UDP Ê×²¿*/
 typedef struct udp_header{
-    u_short sport;          // æºç«¯å£(Source port)
-    u_short dport;          // ç›®çš„ç«¯å£(Destination port)
-    u_short len;            // UDPæ•°æ®åŒ…é•¿åº¦(Datagram length)
-    u_short crc;            // æ ¡éªŒå’Œ(Checksum)
+    u_short sport;          // Ô´¶Ë¿Ú(Source port)
+    u_short dport;          // Ä¿µÄ¶Ë¿Ú(Destination port)
+    u_short len;            // UDPÊı¾İ°ü³¤¶È(Datagram length)
+    u_short crc;            // Ğ£ÑéºÍ(Checksum)
 }udp_header;
 
-typedef struct tcp_header //å®šä¹‰TCPé¦–éƒ¨
+typedef struct tcp_header //¶¨ÒåTCPÊ×²¿
 
 {
 
-u_short saddr;           //16ä½æºç«¯å£
+u_short saddr;           //16Î»Ô´¶Ë¿Ú
 
-u_short daddr;           //16ä½ç›®çš„ç«¯å£
+u_short daddr;           //16Î»Ä¿µÄ¶Ë¿Ú
 
-u_int seq;               //32ä½åºåˆ—å·
+u_int seq;               //32Î»ĞòÁĞºÅ
 
-u_int ack;               //32ä½ç¡®è®¤å·
+u_int ack;               //32Î»È·ÈÏºÅ
 
-u_char lenres;           //4ä½é¦–éƒ¨é•¿åº¦/6ä½ä¿ç•™å­—
+u_char lenres;           //4Î»Ê×²¿³¤¶È/6Î»±£Áô×Ö
 
-u_char flag;             //6ä½æ ‡å¿—ä½
+u_char flag;             //6Î»±êÖ¾Î»
 
-u_short window;          //16ä½çª—å£å¤§å°
+u_short window;          //16Î»´°¿Ú´óĞ¡
 
-u_short crc;             //16ä½æ ¡éªŒå’Œ
+u_short crc;             //16Î»Ğ£ÑéºÍ
 
-u_short urp;             //16ä½ç´§æ€¥æ•°æ®åç§»é‡
+u_short urp;             //16Î»½ô¼±Êı¾İÆ«ÒÆÁ¿
 
 }tcp_header;
 
@@ -165,7 +165,7 @@ MATCHPKT bool LoadCapFile(const char* pFile, void* pUser);
 
 void __stdcall MyProcess(const CSnortRule &rule, LPVOID lpParam);
 MATCHPKT void MchCompile(const char* filename, LPVOID result);
-MATCHPKT bool TradithinalMatch(std::vector<u_char> &dataSrc, CRegRule &regRule);//ï¿½ï¿½ï¿½ï¿½pcreMATCHPKT 
+MATCHPKT bool TradithinalMatch(std::vector<u_char> &dataSrc, CRegRule &regRule);
 
 void GetMchRule(const u_char *data, ulong len, void* user, std::vector<ulong> &rules);
 void HdlOnePkt(const u_char *data, ulong len, void*user);

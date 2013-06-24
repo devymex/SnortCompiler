@@ -11,7 +11,7 @@
 
 #pragma once
 
-#define OVECCOUNT	30	/* should be a multiple of 3 */
+#define OVECCOUNT	900	/* should be a multiple of 3 */
 #define EBUFLEN		128
 #define BUFLEN		1024
 

@@ -35,7 +35,7 @@ void main()
 	MchCompile("..\\..\\input\\CanCompile.rule", &rulesmap);
 	rulesmap.resultpath = "..\\..\\output\\pmatchresult";
 
-	std::string path = "E:\\allPkt";
+	std::string path = "E:\\allPkt\\temp";
 	PDHandleAllFile(path, &pcredfa);
 
 	system("pause");

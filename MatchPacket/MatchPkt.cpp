@@ -72,10 +72,6 @@ void HdlOnePkt(const u_char *data, size_t len, void*user)
 	rulesmap.mchresult << g_pktnum << " : ";
 	for(size_t i = 0; i < rules.size(); ++i)
 	{
-		//if(rulesmap.result[rules[i]].m_nSid == 12425)
-		//{
-		//	std::cout << std::endl;
-		//}
 		bool flag = MyPcreMatch(data, len, rulesmap.result[rules[i]].regrule);
 
 
