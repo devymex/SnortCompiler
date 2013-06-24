@@ -21,6 +21,11 @@ class DFAROWARY;
 typedef CUnsignedArray STATEARY;
 
 /*!
+* @addtogroup groupAutomaton
+* @{
+*/
+
+/*!
 * @brief		实现DFA数据结构及相关算法
 * @remark		封装了CDfaRow的动态数组、始态编号以及终态集合等。实现的算法包括：
 *				nfa的确定化、dfa的最小化、字符集的压缩等。
@@ -175,3 +180,6 @@ DFAHDR bool MergeMultipleDfas(class CDfaArray &inputDfas, CDfa &mergedDfa);
 /// @param[in] fileName 输出文件路径
 DFAHDR void PrintDfaToGv(CDfa &newdfa, const char* fileName);
 
+/*!
+@}
+*/

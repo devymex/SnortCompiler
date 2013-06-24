@@ -14,9 +14,14 @@ class NFAROWARY;
 #endif
 
 /*!
+* @addtogroup groupAutomaton
+* @{
+*/
+
+/*!
 * @brief		实现NFA的数据结构。
-* NFA结构为矩阵，矩阵行表示NFA状态，矩阵列表示跳转字符，\
-* 矩阵中每一个元素代表经所在列指定的字符跳转到的下一组状态集合。
+* @remark		NFA结构为矩阵，矩阵行表示NFA状态，矩阵列表示跳转字符，
+*				矩阵中每一个元素代表经所在列指定的字符跳转到的下一组状态集合。
 */
 class NFAHDR CNfa
 {
@@ -87,3 +92,7 @@ private:
 	/// @brief		私有成员，仅供内部使用
 	NFAROWARY*		m_pNfa;
 };
+
+/*!
+@}
+*/

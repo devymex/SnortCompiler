@@ -16,6 +16,11 @@
 #endif
 
 /*!
+* @addtogroup groupAutomaton
+* @{
+*/
+
+/*!
 * @brief		封装了std::vector<CUnsignedArray>对象，表示NFA表中一行的数据结构。
 * @remark		NFA表中每一行对应一个状态。行中每个元素对应一个字符，存储一组状态编号
 *				的动态数组，表示该行对应的状态，经过当前字符可以跳转到的一组状态。
@@ -59,3 +64,7 @@ private:
 	/// @brief		私有成员，仅供内部使用。
 	CUnsignedArray* m_pDestSet;
 };
+
+/*!
+@}
+*/

@@ -16,6 +16,11 @@ class DFAIDSET;
 #endif
 
 /*!
+* @addtogroup groupAutomaton
+* @{
+*/
+
+/*!
 * @brief		实现DFAID数据结构及相关算法
 * @remark		存储每一个CDfa对应的ID。实现的算法包括：
 *				添加ID、复制ID集合等。
@@ -74,3 +79,7 @@ private:
 	/// @brief		私有成员，仅供内部使用
 	DFAIDSET* m_pSet;
 };
+
+/*!
+@}
+*/

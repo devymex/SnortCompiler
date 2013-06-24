@@ -15,6 +15,11 @@ class CDFAVEC;
 #define DFAARYHDR __declspec(dllexport)
 #endif
 
+/*!
+* @addtogroup groupAutomaton
+* @{
+*/
+
 class DFAARYHDR CDfaArray
 {
 public:
@@ -68,3 +73,7 @@ private:
 	/// @brief		私有成员，仅供内部使用
 	CDFAVEC *m_pdfaTbl;
 };
+
+/*!
+@}
+*/
