@@ -58,6 +58,7 @@ struct PARSERESULT
 	ulong ulSid;
 
 	/// @brief		解析该规则时产生的标记。
+	/// @see		@ref PARSEFLAG
 	PARSEFLAG::TYPE ulFlag;
 };
 

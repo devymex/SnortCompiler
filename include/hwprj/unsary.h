@@ -23,7 +23,7 @@
 
 /*!
 * @brief	实现(ulong*)的动态数组。
-* @remark	用于替代std::vector<unsigned long>，在模块之间传递参数。
+* @detail	用于替代std::vector<unsigned long>，在模块之间传递参数。
 */
 class UNSARYHDR CUnsignedArray
 {
