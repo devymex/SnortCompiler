@@ -21,6 +21,10 @@ class BYTEARY;
 *  @{
 */
 
+/*!
+* @brief		管理一个PCRE对象的数据，包括正则表达式语句及修饰选项。
+* @remark		从CRuleOption类继承，提供从pcre选项字符串的导入，以及预编译等功能。
+*/
 class SNORTRULEHDR CPcreOption : public CRuleOption
 {
 public:
