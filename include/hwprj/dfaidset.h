@@ -21,9 +21,8 @@ class DFAIDSET;
 */
 
 /*!
-* @brief		实现CDfaIdSet数据结构及相关算法
-* @remark		存储每一个CDfa对应的ID。实现的算法包括：
-*				添加ID、复制ID集合等。
+* @brief		实现DFA编号集合的数据结构及相关算法
+* @remark		存储每一个DFA的编号，该集合无重无序。实现的算法包括：添加ID、复制ID集合等。
 */
 class DFAIDSETHDR CDfaIdSet
 {
@@ -60,23 +59,23 @@ public:
 	/// @return		CDfaIdSet当前的大小（常量）。
 	ulong Size() const;
 
-	/// @brief		清空CDfaIdSet
+	/// @brief		清空CDfaIdSet。
 	void Clear();
 
-	/// @brief		将另一个DfaIdSet连接到当前的DfaIdSet之后
-	/// @param[in]	other 另一个DfaIdSet
+	/// @brief		将另一个DfaIdSet连接到当前的DfaIdSet之后。
+	/// @param[in]	other 另一个DfaIdSet。
 	void Append(const CDfaIdSet &other);
 
-	/// @brief		添加DFA ID
-	/// @param[in]	dfaId DFA编号
+	/// @brief		添加DFA ID。
+	/// @param[in]	dfaId DFA编号。
 	void AddDfaId(DFAID dfaId);
 
-	/// @brief		将DfaIdSet中的value复制给CUnsignedArray类型的数组
-	/// @param[out]	idAry CUnsignedArray类型的数组
+	/// @brief		将DfaIdSet中的value复制给CUnsignedArray类型的数组。
+	/// @param[out]	idAry CUnsignedArray类型的数组。
 	void CopyTo(CUnsignedArray &idAry) const;
 
 private:
-	/// @brief		私有成员，仅供内部使用
+	/// @brief		私有成员，仅供内部使用。
 	DFAIDSET* m_pSet;
 };
 
