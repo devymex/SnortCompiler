@@ -175,7 +175,7 @@ private:
 /// @param[out] mergedDfa 输出一个合并DFA
 DFAHDR bool MergeMultipleDfas(class CDfaArray &inputDfas, CDfa &mergedDfa);
 
-/// @brief		DFA存储为矩阵结构，将DFA输出文件保存
+/// @brief		将一个DFA对象输出为gv格式，以供
 /// @param[in]	newdfa 输入DFA。
 /// @param[in]	fileName 输出文件路径
 DFAHDR void PrintDfaToGv(CDfa &newdfa, const char* fileName);

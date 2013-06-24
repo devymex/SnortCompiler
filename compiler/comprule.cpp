@@ -549,6 +549,7 @@ void Rule2Dfas(const CRegRule &rule, CCompileResults &result)
 			}
 			catch (CTrace &e)
 			{
+				e;
 				ruleResult.m_nResult |= COMPILEDINFO::RES_PCREERROR;
 				nfa.Clear();
 				break;
