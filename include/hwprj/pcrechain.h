@@ -18,8 +18,8 @@ class PCREVEC;
 */
 
 /*!
-* @brief		实现PCRE链的数据结构及相关算法
-* @remark		封装了std::vector<class CPcreOption>对象以及Signature数组
+* @brief		实现PCRE链的数据结构及相关算法。
+* @remark		封装了std::vector<class CPcreOption>对象以及Signature数组。
 */
 class SNORTRULEHDR CPcreChain
 {
