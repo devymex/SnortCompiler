@@ -12,6 +12,10 @@
 class PCREVEC;
 #endif
 
+/*! @addtogroup groupCompiler
+*  @{
+*/
+
 /*!
 * @brief		实现PCRE链的数据结构及相关算法
 * @remark		封装了std::vector<class CPcreOption>对象以及Signature数组
@@ -72,3 +76,7 @@ protected:
 	/// @brief		私有成员，仅供内部使用
 	CUnsignedArray			m_sigs;
 };
+
+/*!
+@}
+*/
