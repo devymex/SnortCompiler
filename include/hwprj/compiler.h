@@ -1,12 +1,7 @@
 /*!
 * @file				compiler.h
-**
 * @author			Lab 435, Xidian University
-**
-* @brief			Primary file of compiler
-**
-* Functions declaration of access enter
-**
+* @brief			定义了编译器接口的相关结构体和函数。
 */
 
 #pragma once

@@ -90,13 +90,21 @@ typedef ulong					SIGNATURE;
 /*!
 * 全局常量
 */
+
+/// 可接受的最大的DFA状态数。
 #define SC_MAXDFASIZE			255
+
+/// DFA默认字符集的大小。
 #define SC_DFACOLCNT			256
+
+/// 编译为DFA时最大的NFA的状态数。
 #define SC_STATELIMIT			500
-#define SC_CHAINRESERV			8
-#define SC_NFAROWRESERV			500
+
+/// 解析规则时每条链预留的大小。
+#define SC_CHAINRESERV			8		
 
 #ifndef null
+/// 空指针。
 #define null					0
 #endif
 

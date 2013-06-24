@@ -145,7 +145,7 @@ void ParseOptions(std::string &ruleOptions, CSnortRule &snortRule);
 
 void Rule2RegRule(const CSnortRule &rule, CRegRule &regrule);
 
-void CompileRule(LPCSTR rule, RECIEVER recv, LPVOID lpUser);
+void CompileRule(pcstr rule, RECIEVER recv, void* lpUser);
 
 void PreCompileRule(const CRegRule &regRule,
 					RULESEQUENCE &ruleSeq,

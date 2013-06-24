@@ -4,11 +4,6 @@
 * @brief		定义了GROUPHASH的数据结构
 */
 
-/*!
-* @addtogroup groupGrouphash
-* @{
-*/
-
 #include <map>
 #include <unordered_map>
 #include <hwprj\common.h>
@@ -24,7 +19,3 @@ struct GROUPHASH
 	ulong mergeDfaId;
 	std::vector<ulong> vecDfaIds;
 };
-
-/*!
-@}
-*/

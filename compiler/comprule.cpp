@@ -533,7 +533,7 @@ void Rule2Dfas(const CRegRule &rule, CCompileResults &result)
 
 	bool bHasSigs = false;
 	CNfa nfa;
-	nfa.Reserve(SC_NFAROWRESERV);
+	nfa.Reserve(SC_STATELIMIT);
 	for (ulong i = 0; i < nCurRuleSize; ++i)
 	{
 		CPcreChain &curPcreChain = regRule[i];
