@@ -63,4 +63,4 @@ typedef std::vector<class CPcreOption>		PCREVEC;
 typedef std::vector<SIGNATURE>              SIGNATUREVEC;
 typedef SIGNATUREVEC::iterator              SIGVEC_ITER;
 
-typedef std::vector<COMPILEDINFO>			COMPILEDINFO;
+typedef std::vector<struct COMPILEDINFO>	COMPILEDINFOARY;

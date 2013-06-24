@@ -15,7 +15,7 @@ class OPTIONVEC;
 #endif
 
 /*! @addtogroup groupCompiler
-*  @{
+* @{
 */
 
 /*!
@@ -28,15 +28,16 @@ class SNORTRULEHDR CSnortRule
 public:
 	typedef ulong PARSE_INFO;
 
-	/// @brief		若Snort规则能够处理，则标记为NORMAL。
+	///@brief		一般规则。
 	static const PARSE_INFO NORMAL		= 0;
 
-	/// @brief		若Snort规则中包含bytetest和bytejump，则标记为HASBYTE。
+	/// @brief		该规则包含byte_test或byte_jump。
 	static const PARSE_INFO HASBYTE		= (1 << 0);
 
-	/// @brief		若Snort规则的选项内容中包含”！“，则标记为HASNOT。
+	/// @brief		 该规则包含'!'（逻辑非）标识。
 	static const PARSE_INFO HASNOT		= (1 << 1);
 
+public:
 	/// @brief		构造函数。
 	CSnortRule();
 
@@ -78,22 +79,22 @@ public:
 	ulong GetSid() const;
 
 	/// @brief		设置规则sid。
-	/// @param		sid 规则编号。
+	/// @param[in]	sid 规则编号。
 	void SetSid(ulong sid);
 
 	/// @brief		获取规则标记。
 	PARSE_INFO GetFlags() const;
 
 	/// @brief		增加规则标记。
-	/// @param		nFlags 规则标记。
+	/// @param[in]	nFlags 规则标记。
 	void AddFlags(PARSE_INFO nFlags);
 
 	/// @brief		设置规则标记，用于标记该规则是否处理，规则选项内容中包含取非运算的。
-	/// @param		nFlags 规则标记。
+	/// @param[in]	nFlags 规则标记。
 	void SetFlags(PARSE_INFO nFlags);
 
 	/// @brief		判断该规则是否包含标记。
-	/// @param		nFlags 规则标记。
+	/// @param[in]	nFlags 规则标记。
 	bool HasFlags(PARSE_INFO nFlags) const;
 
 private:

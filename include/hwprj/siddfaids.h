@@ -14,7 +14,7 @@
 #include <hwprj\unsary.h>
 
 #ifndef SIDDFAHDR_DS
-#define class COMPILEDINFO;
+class COMPILEDINFOARY;
 #define SIDDFAHDR __declspec(dllimport)
 #else
 #define SIDDFAHDR __declspec(dllexport)
@@ -95,7 +95,7 @@ public:
 	COMPILEDINFO& Back();
 private:
 	/// @brief		私有成员，仅供内部使用。
-	COMPILEDINFO *m_ruleResult;
+	COMPILEDINFOARY *m_ruleResult;
 };
 
 /*!

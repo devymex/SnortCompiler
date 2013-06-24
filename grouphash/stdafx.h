@@ -33,7 +33,6 @@
 #define GROUPSHDR_DS
 #define GROUPRESHDR_DS
 #define GROUPINGHDR_DS
-
 #define HASHMAPHDR_DS
 
 typedef std::vector<struct ONEGROUP> GROUPVEC;
