@@ -49,6 +49,7 @@ public:
 	const CDllString& operator [] (ulong ulIdx) const;
 
 	/// @brief		获得所包含的字符串的数量。
+	/// @return		字符串的个数。
 	ulong Size() const;
 
 	/// @brief		删除所包含的所有字符串。
