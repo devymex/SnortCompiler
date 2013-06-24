@@ -1,3 +1,15 @@
+/*!
+* @file			stdafx.h
+* @author		Lab 435, Xidian University
+* @brief		automation包的预编译头
+* @copyright	本项目开发组版权所有。未经许可，不得复制、更改、编译、分发。
+*/
+
+/*!
+* @defgroup		groupAutomaton 公用模块
+* @remark		实现了自动机的相关算法和数据结构。
+*/
+
 #include <iostream>
 #include <vector>
 #include <list>

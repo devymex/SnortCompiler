@@ -14,6 +14,11 @@ class FINSTAMAP;
 #endif
 
 /*!
+* @addtogroup groupAutomaton
+* @{
+*/
+
+/*!
 * @brief		DFA的终态集合以及终态对应的DFAID集合
 */
 class DFAIDSETHDR CFinalStates
@@ -76,3 +81,7 @@ private:
 	/// @brief		私有成员，仅供内部使用
 	FINSTAMAP* m_pDfaIds;
 };
+
+/*!
+@}
+*/

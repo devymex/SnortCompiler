@@ -15,6 +15,15 @@
 #define GROUPINGHDR __declspec(dllexport)
 #endif
 
+/*!
+* @addtogroup groupGrouphash
+* @{
+*/
+
 /// @brief		对DFA进行分组，具有相同signature的DFA分为一组
 /// @param		res 由所有PCRE链编译成功的DFA集，groupRes 分组结果
 GROUPINGHDR void Grouping(class CCompileResults &res, CGroupRes &groupRes);
+
+/*!
+@}
+*/

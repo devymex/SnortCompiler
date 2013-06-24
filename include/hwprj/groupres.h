@@ -17,6 +17,11 @@
 #define GROUPRESHDR __declspec(dllexport)
 #endif
 
+/*!
+* @addtogroup groupGrouphash
+* @{
+*/
+
 class GROUPRESHDR CGroupRes
 {
 protected:
@@ -61,3 +66,7 @@ public:
 	/// @param		filename 输入文件路径
 	ulong ReadFromFile(const char *filename);
 };
+
+/*!
+@}
+*/

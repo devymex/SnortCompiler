@@ -17,6 +17,11 @@
 #define HASHMAPHDR __declspec(dllexport)
 #endif
 
+/*!
+* @addtogroup groupGrouphash
+* @{
+*/
+
 struct HASHNODE
 {
 	SIGNATURE m_sig;
@@ -48,3 +53,7 @@ typedef std::map<ulong, std::vector<HASHNODE>> HASHRES;
 /// @brief		每个分组均有能够代表该组的Signature，为Signature建立哈希表
 /// @param		groupRes 分组结果，HashResMap 哈希映射的结果
 HASHMAPHDR void HashMapping(CGroupRes &groupRes, HASHRES &HashResMap);
+
+/*!
+@}
+*/

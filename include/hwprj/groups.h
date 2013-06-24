@@ -17,6 +17,11 @@
 class GROUPVEC;
 #endif
 
+/*!
+* @addtogroup groupGrouphash
+* @{
+*/
+
 struct ONEGROUP
 {
 	CUnsignedArray	DfaIds;
@@ -78,5 +83,10 @@ public:
 	void Erase(ulong nIdx);
 
 protected:
+	/// @brief		私有成员，仅供内部使用
 	GROUPVEC* m_pGroups;
 };
+
+/*!
+@}
+*/

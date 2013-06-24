@@ -1,10 +1,13 @@
 /*!
-* @file		stdafx.h
-**
-* @author	Lab 435, Xidian University
-**
-* @brief	Precompile header common library
-**
+* @file			stdafx.h
+* @author		Lab 435, Xidian University
+* @brief		grouphash包的预编译头
+* @copyright	本项目开发组版权所有。未经许可，不得复制、更改、编译、分发。
+*/
+
+/*!
+* @defgroup		groupGrouphash 公用模块
+* @remark		实现了分组哈希的相关算法和数据结构。
 */
 
 #include <tchar.h>

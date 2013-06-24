@@ -19,6 +19,11 @@ class STATEIDARY;
 #define DFAHDR __declspec(dllexport)
 #endif
 
+/*!
+* @addtogroup groupAutomaton
+* @{
+*/
+
 class DFAHDR CDfaRow
 {
 public:
@@ -80,3 +85,6 @@ private:
 	STATEFLAG		m_nFlags;
 };
 
+/*!
+@}
+*/
