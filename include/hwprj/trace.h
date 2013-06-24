@@ -15,6 +15,11 @@
 #endif
 
 /*!
+* @addtogroup groupCommon
+* @{
+*/
+
+/*!
 * @brief	异常类
 * @remark	应通过宏来使用此类，用法见相关宏定义的说明。
 */
@@ -72,4 +77,6 @@ TRACEHDR extern pcstr TI_INCOMPATIBLE;
 #define TVERIFY(s)	(s);
 #endif
 
-
+/*!
+@}
+*/

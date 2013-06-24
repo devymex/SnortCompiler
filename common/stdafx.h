@@ -5,6 +5,11 @@
 * @copyright	本项目开发组版权所有。未经许可，不得复制、更改、编译、分发。
 */
 
+/*!
+* @defgroup		groupCommon 公用模块
+* @remark		实现了编译器的相关算法和数据结构。
+*/
+
 #include <Windows.h>
 #include <algorithm>
 #include <vector>
@@ -24,3 +29,4 @@ typedef std::vector<unsigned long>		DLLULONGVEC;
 typedef std::vector<class CDllString>	DLLSTRINGARY;
 typedef std::ostream					LOGFILE;
 typedef std::vector<unsigned char>		DLLBYTEARY;
+

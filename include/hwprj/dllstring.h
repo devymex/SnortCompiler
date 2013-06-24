@@ -17,6 +17,11 @@ class DLLSTRING;
 #endif
 
 /*!
+* @addtogroup groupCommon
+* @{
+*/
+
+/*!
 * @brief		封装std::string，用于模块之间传递参数
 */
 class DLLSTRHDR CDllString
@@ -90,3 +95,7 @@ protected:
 	/// @brief		私有成员，仅供内部使用
 	DLLSTRING* m_pString;
 };
+
+/*!
+@}
+*/
