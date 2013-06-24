@@ -12,7 +12,7 @@
 #include <hwprj\byteary.h>
 
 /*!
-* @addtogroup groupAutomaton
+* @addtogroup groupCompiler
 * @{
 */
 
