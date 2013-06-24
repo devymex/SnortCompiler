@@ -1,13 +1,7 @@
 /*!
 * @file				ruleoption.h
-**
 * @author			Lab 435, Xidian University
-**
-* @brief			Declaration of the CRuleOption class
-**
-* Extract relevant attribute of a rule, 
-* such as "content", "pcre" and "uricontent".
-**
+* @brief			∂®“ÂCRuleOption¿‡°£
 */
 
 #pragma once

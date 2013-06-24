@@ -1,12 +1,8 @@
 /*!
 * @file				siddfas.h
-**
 * @author			Lab 435, Xidian University
-**
-* @brief			Declaration of the CSidDfaIds class
-**
-* Store the mapping between SID and DFAID
-**
+* @brief			定义COMPILEDINFO结构体及CSidDfaIds类。
+* @copyright		本项目开发组版权所有。未经许可，不得复制、更改、编译、分发。
 */
 
 #pragma once

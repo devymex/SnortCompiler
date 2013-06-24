@@ -1,7 +1,7 @@
 /*!
 * @file			pcrechain.h
 * @author		Lab 435, Xidian University
-* @brief		定义了CPcreChain类，根据Snort规则选项的属性，构造PCRE链
+* @brief		定义了CPcreChain类，根据Snort规则选项的属性，构造PCRE链。
 * @copyright	本项目开发组版权所有。未经许可，不得复制、更改、编译、分发。
 */
 

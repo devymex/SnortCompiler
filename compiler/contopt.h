@@ -2,6 +2,7 @@
 * @file				contopt.h
 * @author			Lab 435, Xidian University
 * @brief			定义CContentOption类。
+* @copyright	本项目开发组版权所有。未经许可，不得复制、更改、编译、分发。
 */
 
 #pragma once
