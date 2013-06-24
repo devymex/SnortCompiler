@@ -14,91 +14,29 @@
 
 void main()
 {
-	DFAMCH dfamch;
-	dfamch.resultPath = "..\\..\\output\\dmatchresult";
+	PCREDFA pcredfa;
 
-
+	DFAMCH &dfamch = pcredfa.dfamch;
+	dfamch.resultFolder = "..\\..\\output\\dmatchresult";
 	CGroupRes &groupRes = dfamch.mergedDfas;
-
 	HASHRES &hashResMap = dfamch.hashtable;
 	groupRes.ReadFromFile("..\\..\\output\\FinalResult.cdt");
-
+	hash.nBucketCnt = groupRes.GetBucketCnt();
 	for(size_t i = 0; i < groupRes.GetGroups().Size(); ++i)
 	{
-		//hashResMap[hash(groupRes.GetGroups()[i].currSig)].push_back(HASHNODE(groupRes.GetGroups()[i].currSig, groupRes.GetGroups()[i].mergeDfaId));
+		HASHNODE hashnode;
+		hashnode.m_nDfaId = groupRes.GetGroups()[i].mergeDfaId;
+		hashnode.m_sig = groupRes.GetGroups()[i].currSig;
+		hashResMap[hash(groupRes.GetGroups()[i].currSig)].push_back(hashnode);
 	}
 
 	DfaidSidMap(groupRes, dfamch.dIdSId);
+	REGRULESMAP &rulesmap = pcredfa.rulesmap;
+	MchCompile("..\\..\\input\\CanCompile.rule", &rulesmap);
+	rulesmap.resultpath = "..\\..\\output\\pmatchresult";
 
-
-	/////////////////////////////////////////////////////////////////////
-	/*!for(size_t i = 0; i < groupRes.GetSidDfaIds().Size(); ++ i)
-	{
-		if(groupRes.GetSidDfaIds()[i].m_nSid == 467)
-		{
-			for(size_t j = 0; j < groupRes.GetSidDfaIds()[i].m_dfaIds.Size(); ++j)
-			{
-			std::cout << groupRes.GetSidDfaIds()[i].m_dfaIds[j] << "  ";
-			}
-		}
-	}
-
-	
-
-
-	std::vector<size_t> cvec;
-	std::unordered_map<size_t, GROUPNUM> groupresult;
-	for(size_t i = 0; i < groupRes.GetGroups().Size(); ++i)
-	{
-		if(groupRes.GetGroups()[i].mergeDfaId == 817)
-		{
-			for(size_t n = 0; n < groupRes.GetGroups()[i].DfaIds.Size(); ++n)
-			{
-				cvec.push_back(groupRes.GetGroups()[i].DfaIds[n]);
-			}
-		}
-		for(size_t j = 0; j < groupRes.GetGroups()[i].DfaIds.Size(); ++j)
-		{
-			groupresult[groupRes.GetGroups()[i].DfaIds[j]].ComSigs = groupRes.GetGroups()[i].ComSigs;
-			groupresult[groupRes.GetGroups()[i].DfaIds[j]].mergeDfaId = groupRes.GetGroups()[i].mergeDfaId;
-		}
-	}
-
-	std::vector<size_t> rvec;
-	for(std::vector<size_t>::iterator iter = cvec.begin(); iter != cvec.end(); ++iter)
-	{
-		rvec.push_back(dfamch.dIdSId.dId_sId[*iter]);
-	}
-	std::sort(rvec.begin(), rvec.end());
-	rvec.erase(std::unique(rvec.begin(), rvec.end()), rvec.end());
-
-	GROUPNUM &tmp = groupresult[1243];
-	char a[4] = {0,0,0,0};
-	SIGNATURE sig = *(SIGNATURE *)a;*/
-
-
-
-//////////////////////////////////////////////////////////////////////////////
-
-	//	for(size_t i = 0; i < groupRes.GetGroups().Size(); ++i)
-	//{
-	//	if(groupRes.GetGroups()[i].mergeDfaId == 0)
-	//	{
-	//		size_t n =  groupRes.GetGroups()[i].DfaIds.Size();
-	//		for(size_t j = 0; j < n; ++j)
-	//		{
-	//			std::cout << groupRes.GetGroups()[i].DfaIds[j] << " ";
-	//		}
-	//	}
-
-	//}
-
-	//CDfa dfanew= groupRes.GetDfaTable()[0];
-	//dfanew.Dump("..\\..\\output\\dfanew.txt");
-
-	std::string path = "E:\\allPkt";
-
-	DHandleAllFile(path, &dfamch);
+	std::string path = "E:\\allPkt\\temp";
+	PDHandleAllFile(path, &pcredfa);
 
 	system("pause");
 }

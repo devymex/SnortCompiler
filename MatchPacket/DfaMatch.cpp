@@ -1,18 +1,19 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include <hwprj\compiler.h>
 #include <hwprj\grouping.h>
 #include <hwprj\dfa.h>
 #include "DfaMatch.h"
 
-static ulong dpktnum = 0;
-
+ulong g_dpktnum = 0;
+ulong ucprnum = 0;
+ulong signum = 0;
+ulong usigtime = 0;
 void MatchOnedfa(const unsigned char * &data, ulong len, CDfa &dfa,
 				 std::vector<ulong> &matchedDids)
 {
 	size_t flags[260];
 	size_t size = sizeof(flags);
 	std::memset(flags, 0, sizeof(flags));
-
 
 	std::unordered_map<ulong, CUnsignedArray> dfaids;
 	const CFinalStates &finStas = dfa.GetFinalStates();
@@ -93,13 +94,14 @@ void GetMchDfas(const u_char *data, ulong len, HASHRES &hashtable, std::vector<u
 	if (len > 3)
 	{
 		std::ofstream sigfile;
-		sigfile.open("..\\..\\output\\sigfile.txt");
+		sigfile.open("..\\..\\output\\sigfile.txt", std::ofstream::app);
 		SIGNATURE sig;
 		u_char csig[4];
 		char flags[3000];
 		std::memset(flags, 0, sizeof(flags));
 
-		for (const u_char* iter = data; iter != &data[len - 4]; ++iter)
+		ulong signum = 0;
+		for (const u_char* iter = data; iter != &data[len - 3]; ++iter)
 		{
 			for (size_t i = 0; i < 4; ++i)
 			{
@@ -107,10 +109,10 @@ void GetMchDfas(const u_char *data, ulong len, HASHRES &hashtable, std::vector<u
 			}
 			sig = *(SIGNATURE *)csig;
 
-
 			size_t hashsig = hash(sig);
 			if (hashtable.count(hashsig))
 			{
+				++signum;
 				for (std::vector<HASHNODE>::iterator iter = hashtable[hashsig].begin(); iter != hashtable[hashsig].end(); ++iter)
 				{
 					if ((sig == iter->m_sig) && (flags[iter->m_nDfaId] == 0))
@@ -121,33 +123,39 @@ void GetMchDfas(const u_char *data, ulong len, HASHRES &hashtable, std::vector<u
 				}
 			}
 		}
-		if (matchdfas.size() > 8)
-		{
-			sigfile << dpktnum << "  ";
-		}
-		//std::sort(matchdfas.begin(), matchdfas.end());
-		//matchdfas.erase(std::unique(matchdfas.begin(), matchdfas.end()), matchdfas.end());
+
 	}
 }
 
 MATCHPKT void DfaMatchPkt(const u_char *data, ulong len, DFAMCH &dfamch)
 {
 	std::ofstream matchresult;
-	if (dpktnum == 1)
-	{
-		matchresult.open(dfamch.resultPath);
-		matchresult << "-----------------------" << dfamch.resultPath << "-----------------------" << std::endl;
-	}
-	else
-	{
-		matchresult.open(dfamch.resultPath, std::ofstream::app);
-	}
 
-	matchresult << dpktnum << " : ";
+	matchresult.open(dfamch.resultPath, std::ofstream::app);
+
+	matchresult << g_dpktnum << " : ";
 	std::vector<ulong> matchdfas;
 	std::vector<ulong> matcheddfaids;
+
 	GetMchDfas(data, len, dfamch.hashtable, matchdfas);
 
+	if (signum > 8)
+	{
+		++usigtime;
+		std::ofstream ofs;
+		if (usigtime == 1)
+		{
+			ofs.open("..\\..\\output\\sigfile.txt");
+		}
+		else
+		{
+			ofs.open("..\\..\\output\\sigfile.txt", std::ofstream::app);
+		}
+
+		ofs << dfamch.pfilepath << " : " << g_pktnum << std::endl;
+
+		signum = 0;
+	}
 	for (std::vector<ulong>::iterator iter = matchdfas.begin(); iter != matchdfas.end(); ++iter)
 	{
 		MatchOnedfa(data, len, dfamch.mergedDfas.GetDfaTable()[*iter], matcheddfaids);
@@ -197,9 +205,16 @@ MATCHPKT void DfaMatchPkt(const u_char *data, ulong len, DFAMCH &dfamch)
 
 void __stdcall DPktParam(const ip_header *ih, const byte *data, void* user)
 {
-	++dpktnum;
+	++g_dpktnum;
 	
 	DFAMCH &dfamch = *(DFAMCH *)user;
+
+	std::ofstream matchresult;
+	if (g_dpktnum == 1)
+	{
+		matchresult.open(dfamch.resultPath);
+		matchresult << "-----------------------" << dfamch.resultPath << "-----------------------" << std::endl;
+	}
 	u_short  _ihl = (ih->ver_ihl & 0x0f) * 4;
 	
 	u_short _tlen = ih->tlen;
@@ -243,14 +258,17 @@ void __stdcall DPktParam(const ip_header *ih, const byte *data, void* user)
 		}
 	}
 	
-	if (dpktnum % 100 == 0)
+	if (g_dpktnum % 10000 == 0)
 	{
-		std::cout << dpktnum << std::endl;
+		std::cout << g_dpktnum << std::endl;
 	}
+
 }
 
 bool DMyLoadCapFile(const char* pFile, PACKETRECV cv, void* pUser)
 {
+	DFAMCH &dfamch = *(DFAMCH*)pUser;
+	dfamch.pfilepath = pFile;
 	pcap_t *mypcap = pcap_open_offline(pFile, null);
 	PACKETPARAM pp;
 	pp.pUser = pUser;
@@ -259,6 +277,7 @@ bool DMyLoadCapFile(const char* pFile, PACKETRECV cv, void* pUser)
 	pcap_loop(mypcap, 0, MchDfaHdler, (byte*)&pp);
 	pcap_close(mypcap);
 	return true;
+
 }
 
 MATCHPKT bool DLoadCapFile(const char* pFile, void* pUser)
@@ -266,10 +285,11 @@ MATCHPKT bool DLoadCapFile(const char* pFile, void* pUser)
 	return DMyLoadCapFile(pFile, DPktParam, pUser);
 }
 
-MATCHPKT void DHandleAllFile(const std::string &path, void* user)
+MATCHPKT void PDHandleAllFile(const std::string &path, void* user)
 {
-	DFAMCH &dfamch = *(DFAMCH *)user;
-	std::string dfapath = dfamch.resultPath;
+	PCREDFA &pcredfa = *(PCREDFA*) user; 
+	DFAMCH &dfamch = pcredfa.dfamch;
+	REGRULESMAP &rulesmap = pcredfa.rulesmap;
 
 	WIN32_FIND_DATAA wfda;
 	const std::string ext = "*.*";
@@ -287,7 +307,7 @@ MATCHPKT void DHandleAllFile(const std::string &path, void* user)
 		{
 			if (wfda.cFileName[0] != '.')
 			{
-				DHandleAllFile(str + std::string(wfda.cFileName), user);
+				PDHandleAllFile(str + std::string(wfda.cFileName), user);
 			}
 		}
 		else
@@ -296,11 +316,19 @@ MATCHPKT void DHandleAllFile(const std::string &path, void* user)
 			std::string &ext1 = temp.substr(temp.size() - 4, 4);
 			if(ext1 == ".cap")
 			{
-				dfamch.resultPath = dfapath + "\\" + std::string(wfda.cFileName) + ".txt";
-
+				dfamch.resultPath = dfamch.resultFolder + "\\" + std::string(wfda.cFileName) + ".txt";
 				DLoadCapFile(temp.c_str(), &dfamch);
+
+				std::string pstr = rulesmap.resultpath + "\\" +std::string(wfda.cFileName) +".txt";
+				rulesmap.mchresult.open(rulesmap.resultpath + "\\" +std::string(wfda.cFileName) +".txt");	
+				rulesmap.mchresult << "-----------------------" << pstr << "-----------------------" << std::endl;
+				LoadCapFile(temp.c_str(), &rulesmap);
+				rulesmap.mchresult.close();
+
+				CompareResult(dfamch.resultPath.c_str(), pstr.c_str());
 			}
-			dpktnum = 0;
+			g_dpktnum = 0;
+			g_pktnum = 0;
 		}
 	}
 }
@@ -358,4 +386,40 @@ void ResultFiles(const std::string &path, std::vector<std::string> &resultFiles)
 
 		}
 	}
+}
+
+void CompareResult(const char* dpath, const char* ppath)
+{
+	++ucprnum;
+	std::vector<std::string> dresult, presult;
+
+	std::ofstream ofs;
+	if (ucprnum == 1)
+	{
+		ofs.open("D:\\projects\\output\\compare.txt");
+	}
+	else
+	{
+		ofs.open("D:\\projects\\output\\compare.txt", std::ofstream::app);
+	}
+
+
+	std::ifstream ifs1(dpath);
+	std::ifstream ifs2(ppath);
+
+	std::string dfirline, pfirline;
+	std::getline(ifs1, dfirline);
+	std::getline(ifs2, pfirline);
+
+	ofs << dfirline << std::endl << pfirline << std::endl;
+
+	while (std::getline(ifs1, dfirline), std::getline(ifs2, pfirline))
+	{
+		if( dfirline.compare(pfirline) != 0)
+		{
+			ofs << dfirline << std::endl << pfirline << std::endl << std::endl;
+		}
+	}
+
+	ofs << std::endl;
 }

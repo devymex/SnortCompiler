@@ -1,13 +1,7 @@
 /*!
-* @file				buildhash.h
-**
+* @file			buildhash.h
 * @author			Lab 435, Xidian University
-**
-* @brief			Declaration of GROUPHASH class
-**
-* Store mapping between grouping result and hash table
-* Merge CDfa
-**
+* @brief		定义了GROUPHASH类，存储分组结果和哈希表的映射关系
 */
 
 #pragma once
@@ -61,5 +55,9 @@ HASHMAPHDR extern SIGHASH hash;
 typedef std::map<ulong, std::vector<HASHNODE>> HASHRES;
 
 /// @brief		每个分组均有能够代表该组的Signature(s)，为每个分组选择代表该组的Signature，建立哈希表
-/// @param		groupRes 分组结果，HashResMap-哈希映射的结果
+/// @param		groupRes 分组结果，HashResMap 哈希映射的结果
 HASHMAPHDR void HashMapping(CGroupRes &groupRes, HASHRES &HashResMap);
+
+/*!
+@}
+*/

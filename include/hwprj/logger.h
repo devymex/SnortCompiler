@@ -1,8 +1,8 @@
 /*!
-* @file		dllstring.h
-* @author	Lab 435, Xidian University
-* @brief	Common string class
-* @remark	Definition of the CDllString class
+* @file			logger.h
+* @author		Lab 435, Xidian University
+* @brief		定义了CLogger类及其导出符号
+* @copyright	本项目开发组版权所有。未经许可，不得复制、更改、编译、分发。
 */
 
 #pragma once
@@ -17,15 +17,21 @@ class LOGFILE;
 #endif
 
 /*!
-* @brief	日志类
-* @remark	不可直接构造此类对象，应使用全局变量g_log。用法如同std::cout，
-*			可选择输出到屏幕或文件。
+* @addtogroup groupCommon
+* @{
+*/
+
+/*!
+* @brief		日志类
+* @remark		不应直接使用该类构造对象。应使用全局对象g_log。
 */
 class LOGGERHDR CLogger
 {
 public:
 	/// @brief		构造函数。
 	CLogger();
+
+	/// @brief		析构函数。
 	~CLogger();
 
 	CLogger& operator << (char n);
@@ -49,4 +55,10 @@ private:
 	LOGFILE *m_pLogFile;
 };
 
+/// 日志类的全局对象。
 LOGGERHDR extern CLogger g_log;
+
+
+/*!
+@}
+*/

@@ -1,7 +1,8 @@
 /*!
-* @file		unsary.h
-* @author	Lab 435, Xidian University
-* @brief	Common unsgined long array
+* @file			unsary.h
+* @author		Lab 435, Xidian University
+* @brief		定义了CUnsignedArray类及其导出符号
+* @copyright	本项目开发组版权所有。未经许可，不得复制、更改、编译、分发。
 */
 
 #pragma once
@@ -16,8 +17,13 @@
 #endif
 
 /*!
+* @addtogroup groupCommon
+* @{
+*/
+
+/*!
 * @brief	实现(ulong*)的动态数组。
-* @remark	用于替代std::vector<unsigned long>，在模块之间传递参数。
+* @detail	用于替代std::vector<unsigned long>，在模块之间传递参数。
 */
 class UNSARYHDR CUnsignedArray
 {
@@ -48,13 +54,15 @@ public:
 
 	/// @brief		重载的 '==' 运算符，判断自身对象是否与所指定的对象相同。
 	/// @param[in]	other 另一个动态数组对象。
-	/// @return		两个动态数组相等时返回true，否则返回false。
+	/// @retval		true 两个动态数组相等。
+	/// @retval		false 两个动态数组不相等。
 	/// @remark		将会执行逐元素的比较。
 	inline bool operator == (const CUnsignedArray &other) const;
 
 	/// @brief		重载的 '<' 运算符，判断自身对象是否比所指定的对象小。
 	/// @param[in]	other 另一个动态数组对象。
-	/// @return		当前的动态数组比另一个动态数组小时返回true，否则返回false。
+	/// @retval		true 左边的动态数组小于右边的动态数组。
+	/// @retval		false 左边的动态数组大于或等于右边的动态数组。
 	/// @remark		将会执行逐元素的比较。若二者长短不同，且比较至较短数组的末尾之后，
 	///				较长的数组为大。
 	inline bool operator < (const CUnsignedArray &other) const;
@@ -117,22 +125,19 @@ public:
 	void Unique();
 
 protected:
-	/// @brief		私有成员，仅供内部调用。
-	inline ulong* Alloc(ulong ulCap);
+	/// @brief		分非指定大小的内存，用来替换new。
+	inline ulong* Alloc(ulong ulCap) const;
 
-	/// @brief		私有成员，仅供内部调用。
-	inline void Free(ulong *pBuf);
+	/// @brief		释放指定的内存，用来替换delete[]。
+	inline void Free(ulong *pBuf) const;
 
-	/// @brief		私有成员，仅供内部调用。
-	inline void Increase();
-
-	/// @brief		私有成员，仅供内部调用。
+	/// @brief		重新分配指定大小。
 	inline void Realloc(ulong ulCap);
 
-	/// @brief		私有成员，仅供内部调用。
+	/// @brief		从指定的内存中拷入数据。
 	void CopyFrom(ulong *pBuf);
 
-protected:
+private:
 	/// @brief		私有成员，仅供内部调用。
 	ulong* m_pAry;
 
@@ -142,5 +147,9 @@ protected:
 	/// @brief		私有成员，仅供内部调用。
 	size_t m_ulCap;
 };
+
+/*!
+@}
+*/
 
 #include <hwprj\unsary.inl>

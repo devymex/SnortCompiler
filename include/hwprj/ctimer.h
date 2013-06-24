@@ -1,22 +1,28 @@
 /*!
 * @file			ctimer.h
 * @author		Devymex, Xidian University
-* @brief		High performance timer
+* @brief		定义了高精度计时器类CTimer
 * @warning		本文件将包含windows.h，若出现命名冲突，请在包此本文件之间增加相关宏定义。
+* @copyright	本项目开发组版权所有。未经许可，不得复制、更改、编译、分发。
 */
 
 #pragma once
 #include "windows.h"
 
 /*!
-* @brief		计时器类，极易使用
-* @remark		成员函数均为内联函数，不存在调用开销，计时精度高
+* @addtogroup groupCommon
+* @{
+*/
+
+/*!
+* @brief		小巧方便的计时器类。
+* @remark		成员函数均为内联函数，不存在调用开销，计时精度高。
 */
 class CTimer
 {
 public:
 	/// @brief		构造函数。
-	/// @remark		构造后即启动计时
+	/// @remark		构造后即启动计时。
 	inline CTimer()
 	{
 		QueryPerformanceFrequency((PLARGE_INTEGER)&m_nFreq);
@@ -45,10 +51,14 @@ public:
 
 		return dCur;
 	}
-protected:
-	/// @brief		私有成员，仅供内部使用
+private:
+	/// @brief		私有成员，仅供内部使用。
 	__int64 m_nFreq;
 
-	/// @brief		私有成员，仅供内部使用
+	/// @brief		私有成员，仅供内部使用。
 	__int64 m_nStart;
 };
+
+/*!
+@}
+*/

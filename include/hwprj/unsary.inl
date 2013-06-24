@@ -1,3 +1,10 @@
+/*!
+* @file			unsary.inl
+* @author		Lab 435, Xidian University
+* @brief		实现了CUnsignedArray类的成员函数
+* @copyright	本项目开发组版权所有。未经许可，不得复制、更改、编译、分发。
+*/
+
 inline CUnsignedArray::CUnsignedArray()
 	: m_pAry(null), m_ulSize(0), m_ulCap(0)
 {
@@ -194,7 +201,7 @@ inline ulong CUnsignedArray::Find(ulong _Val) const
 	return ulIdx;
 }
 
-inline ulong* CUnsignedArray::Alloc(ulong ulCap)
+inline ulong* CUnsignedArray::Alloc(ulong ulCap) const
 {
 	ulong *pNewBuf = null;
 	if (ulCap != 0)
@@ -204,7 +211,7 @@ inline ulong* CUnsignedArray::Alloc(ulong ulCap)
 	return pNewBuf;
 }
 
-inline void CUnsignedArray::Free(ulong *pBuf)
+inline void CUnsignedArray::Free(ulong *pBuf) const
 {
 	delete []pBuf;
 }

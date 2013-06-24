@@ -13,6 +13,9 @@ class CNfa;
 typedef DFAROWARY::iterator			DFAROWARY_ITER;
 typedef DFAROWARY::const_iterator	DFAROWARY_CITER;
 
+/*!
+* @brief 表示一个状态的化分的数据结构，仅供最小化算法使用。
+*/
 struct PARTSET
 {
 	STATELIST StaSet;
