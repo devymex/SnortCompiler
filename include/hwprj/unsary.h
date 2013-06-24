@@ -17,6 +17,11 @@
 #endif
 
 /*!
+* @addtogroup groupCommon
+* @{
+*/
+
+/*!
 * @brief	实现(ulong*)的动态数组。
 * @remark	用于替代std::vector<unsigned long>，在模块之间传递参数。
 */
@@ -140,5 +145,9 @@ private:
 	/// @brief		私有成员，仅供内部调用。
 	size_t m_ulCap;
 };
+
+/*!
+@}
+*/
 
 #include <hwprj\unsary.inl>

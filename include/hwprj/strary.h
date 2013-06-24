@@ -15,6 +15,11 @@ class DLLSTRINGARY;
 #endif
 
 /*!
+* @addtogroup groupCommon
+* @{
+*/
+
+/*!
 * @brief	封装了std::vector<CDllString>对象，提供字符串动态数组的数据结构。
 */
 class DLLSTRHDR CStringArray
@@ -37,3 +42,7 @@ private:
 	/// @brief		私有成员，仅供内部使用
 	DLLSTRINGARY*		m_pStrAry;
 };
+
+/*!
+@}
+*/

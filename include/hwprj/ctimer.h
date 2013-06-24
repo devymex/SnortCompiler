@@ -10,6 +10,11 @@
 #include "windows.h"
 
 /*!
+* @addtogroup groupCommon
+* @{
+*/
+
+/*!
 * @brief		计时器类，极易使用
 * @remark		成员函数均为内联函数，不存在调用开销，计时精度高
 */
@@ -53,3 +58,7 @@ private:
 	/// @brief		私有成员，仅供内部使用
 	__int64 m_nStart;
 };
+
+/*!
+@}
+*/

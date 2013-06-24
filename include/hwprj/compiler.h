@@ -38,8 +38,7 @@ struct PARSERESULT
 
 typedef void (__stdcall *RECIEVER)(const PARSERESULT &parseRes, void *lpUser);
 
-/*! @defgroup groupCompiler 编译器模块
-*  实现了编译器的相关算法和数据结构。
+/*! @addtogroup groupCommon
 *  @{
 */
 
@@ -67,5 +66,5 @@ COMPILERHDR void ExtractSignatures(const CByteArray &seqAry, CUnsignedArray &sig
 COMPILERHDR void CodeToNFA(const CByteArray &pcResult, bool bFromBeg, CNfa &nfa);
 
 /*!
-@}  // end of group1
+@}
 */

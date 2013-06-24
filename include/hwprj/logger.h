@@ -17,10 +17,10 @@ class LOGFILE;
 #endif
 
 /*!
-* @brief	日志类
-* @remark	不可直接构造此类对象，应使用全局变量g_log。用法如同std::cout，
-*			可选择输出到屏幕或文件。
+* @addtogroup groupCommon
+* @{
 */
+
 class LOGGERHDR CLogger
 {
 public:
@@ -49,4 +49,10 @@ private:
 	LOGFILE *m_pLogFile;
 };
 
+/// 日志类的全局对象
 LOGGERHDR extern CLogger g_log;
+
+
+/*!
+@}
+*/

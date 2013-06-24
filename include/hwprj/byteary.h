@@ -17,6 +17,11 @@ class DLLBYTEARY;
 #endif
 
 /*!
+* @addtogroup groupCommon
+* @{
+*/
+
+/*!
 * @brief		封装了vector<unsigned char>，用于在模块之间传递参数。
 */
 class BYTEARYHDR CByteArray
@@ -83,3 +88,7 @@ private:
 	/// @brief		私有成员，仅供内部使用
 	DLLBYTEARY* m_pAry;
 };
+
+/*!
+@}
+*/

@@ -8,6 +8,11 @@
 #pragma once
 
 /*!
+* @addtogroup groupCommon
+* @{
+*/
+
+/*!
 * 通用基本数据类型
 */
 typedef unsigned char			byte;
@@ -31,3 +36,7 @@ typedef ulong					SIGNATURE;
 #ifndef null
 #define null					0
 #endif
+
+/*!
+@}
+*/
