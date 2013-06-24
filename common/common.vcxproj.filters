@@ -9,6 +9,9 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
+    <Filter Include="comments">
+      <UniqueIdentifier>{5db10793-6c41-4c43-bfbc-8fc8daadf667}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -40,6 +43,21 @@
     </ClInclude>
     <ClInclude Include="..\include\hwprj\unsary.inl">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="com_usage.h">
+      <Filter>comments</Filter>
+    </ClInclude>
+    <ClInclude Include="com_regex.h">
+      <Filter>comments</Filter>
+    </ClInclude>
+    <ClInclude Include="com_main.h">
+      <Filter>comments</Filter>
+    </ClInclude>
+    <ClInclude Include="com_nfa2dfa.h">
+      <Filter>comments</Filter>
+    </ClInclude>
+    <ClInclude Include="com_rule.h">
+      <Filter>comments</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
