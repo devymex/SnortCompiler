@@ -6,7 +6,7 @@
 */
 
 /*!
-* @defgroup		groupGrouphash 公用模块
+* @defgroup		groupGrouphash 分组与哈希模块
 * @remark		实现了分组哈希的相关算法和数据结构。
 */
 

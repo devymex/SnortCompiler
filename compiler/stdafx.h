@@ -5,8 +5,8 @@
 */
 
 /*!
-* @defgroup		groupCompiler
-* @remark		编译器模块，定义和实现将Snort规则编译为DFA的相关算法及数据结构。
+* @defgroup		groupCompiler 编译器模块
+* @remark		定义和实现将Snort规则编译为DFA的相关算法及数据结构。
 */
 
 #pragma once

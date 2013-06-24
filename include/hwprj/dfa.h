@@ -91,7 +91,7 @@ public:
 	void SetId(ulong ulId);
 
 	/// @brief		获取DFA字符集的大小。
-	ushort				GetGroupCount() const;
+	ushort GetGroupCount() const;
 
 	/// @brief		设置一个DFA的跳转字符集合
 	/// @param[in] pGroup 分类后的字符集

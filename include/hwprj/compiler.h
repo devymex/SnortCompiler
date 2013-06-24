@@ -51,10 +51,12 @@ struct PARSEFLAG {
 */
 struct PARSERESULT
 {
-	/// @brief		规则解析后产生的结构化规则对象
+	/// @brief		规则解析后产生的结构化规则对象。
 	CRegRule regRule;
-	/// @brief		该规则的sid
+
+	/// @brief		该规则的sid。
 	ulong ulSid;
+
 	/// @brief		解析该规则时产生的标记。
 	PARSEFLAG::TYPE ulFlag;
 };

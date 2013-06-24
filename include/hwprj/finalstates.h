@@ -42,7 +42,7 @@ public:
 	/// @brief		重载的 '[]' 运算符，取得指定位置的状态编号。
 	/// @param[in]	nIdx 指定位置的下标。
 	/// @return		返回指定位置的状态编号。
-	STATEID operator [] (ulong nIdx) const;
+	const STATEID& operator [] (ulong nIdx) const;
 
 	/// @brief		得到所包含的元素数量。
 	/// @return		所包含的元素数量。

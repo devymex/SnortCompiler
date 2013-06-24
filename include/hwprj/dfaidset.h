@@ -45,7 +45,8 @@ public:
 
 	/// @brief		重载的 '==' 运算符，判断自身对象是否与所指定的对象相同。
 	/// @param[in]	other 另一个CDfaIdSet对象。
-	/// @return		两个CDfaIdSet相等时返回true，否则返回false。
+	/// @retval		true 两个CDfaIdSet相等。
+	/// @retval		false 两个CDfaIdSet不相等。
 	/// @remark		将会执行逐元素的比较。
 	bool		operator == (const CDfaIdSet &other) const;
 
@@ -72,7 +73,7 @@ public:
 	void AddDfaId(DFAID dfaId);
 
 	/// @brief		将DfaIdSet中的数值复制给DfaIdSet的数组
-	/// @param[out]		idAry DfaIdSet的数组
+	/// @param[out]	idAry DfaIdSet的数组
 	void CopyTo(CUnsignedArray &idAry) const;
 
 private:
