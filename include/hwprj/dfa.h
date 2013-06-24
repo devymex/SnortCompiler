@@ -43,18 +43,18 @@ public:
 	virtual ~CDfa();
 
 	/// @brief		重载的 '=' 运算符。
-	/// @param[in]	other 另一个DFA对象。
+	/// @param[in]	other 另一个CDfa对象。
 	/// @return		返回自身对象的引用。
 	CDfa& operator =	(const CDfa &other);
 
-	/// @brief		重载的 '[]' 运算符，取得指定位置的值的引用。
-	/// @param[in]	nIdx 指定位置的下标
-	/// @return		返回指定位置元素的引用。
+	/// @brief		重载的 '[]' 运算符，取得DFA状态编号相应的CDfaRow对象的引用。
+	/// @param[in]	nIdx DFA状态编号
+	/// @return		返回状态编号对应的CDfaRow对象的引用。
 	CDfaRow& operator [] (STATEID nIdx);
 
-	/// @brief		重载的 '[]' 运算符，取得指定位置的值的引用。
-	/// @param[in]	nIdx 指定位置的下标
-	/// @return		返回指定位置元素的引用（常量）。
+	/// @brief		重载的 '[]' 运算符，取得DFA状态编号相应的CDfaRow对象的引用。
+	/// @param[in]	nIdx DFA状态编号
+	/// @return		返回状态编号对应的CDfaRow对象的引用（常量）。
 	const CDfaRow& operator [] (STATEID nIdx) const;
 
 	/// @brief		得到DFA当前的大小。
@@ -62,7 +62,7 @@ public:
 	ulong Size() const;
 
 	/// @brief		得到DFA最后一个状态的引用。
-	/// @return		最后一个元素的引用。
+	/// @return		最后一个状态编号对应的CDfaRow对象的引用。
 	CDfaRow& Back();
 
 	/// @brief		为DFA预留内存空间。
@@ -90,11 +90,11 @@ public:
 	/// @param[in] ulId DFA编号。
 	void SetId(ulong ulId);
 
-	/// @brief		获取DFA字符集的大小。
+	/// @brief		获取DFA跳转字符集的大小。
 	ushort				GetGroupCount() const;
 
 	/// @brief		设置一个DFA的跳转字符集合
-	/// @param[in] pGroup 分类后的字符集
+	/// @param[in]	pGroup 压缩后的字符集
 	void SetGroups(byte *pGroup);
 
 	/// @brief		从标准ANSI字符集映射到DFA的字符集。
@@ -171,13 +171,13 @@ private:
 };
 
 /// @brief		将分组中多个DFA合并为一个DFA
-/// @param[in] nputDfas 输入多个DFA
+/// @param[in]	nputDfas 输入多个DFA
 /// @param[out] mergedDfa 输出一个合并DFA
 DFAHDR bool MergeMultipleDfas(class CDfaArray &inputDfas, CDfa &mergedDfa);
 
 /// @brief		DFA存储为矩阵结构，将DFA输出文件保存
-/// @param[in] newdfa 输入DFA。
-/// @param[in] fileName 输出文件路径
+/// @param[in]	newdfa 输入DFA。
+/// @param[in]	fileName 输出文件路径
 DFAHDR void PrintDfaToGv(CDfa &newdfa, const char* fileName);
 
 /*!
