@@ -57,12 +57,12 @@ public:
 	CDfaRow& operator =	(const CDfaRow &other);
 
 	/// @brief		重载的 '[]' 运算符，取得指定位置的DFA状态编号的引用。
-	/// @param[in]	nIdx 指定位置的下标
+	/// @param[in]	nIdx 指定位置的下标。
 	/// @return		返回指定位置的DFA状态编号的引用（常量）。
 	const STATEID& operator [] (byte nIdx) const;
 
 	/// @brief		重载的 '[]' 运算符，取得指定位置的DFA状态编号的引用。
-	/// @param[in]	nIdx 指定位置的下标
+	/// @param[in]	nIdx 指定位置的下标。
 	/// @return		返回指定位置的DFA状态编号的引用。
 	STATEID& operator [] (byte nIdx);
 
@@ -79,17 +79,17 @@ public:
 	void AddFlags(STATEFLAG nFlags);
 
 	/// @brief		设置DFA状态的属性。
-	/// @param[in]	nFlags 属性取值
+	/// @param[in]	nFlags 属性取值。
 	void SetFlags(STATEFLAG nFlags);
 
 	/// @brief		获取DFA状态的属性。
 	STATEFLAG GetFlags() const;
 
 private:
-	/// @brief		私有成员，仅供内部使用
+	/// @brief		私有成员，仅供内部使用。
 	STATEIDARY* m_pDest;
 
-	/// @brief		私有成员，仅供内部使用
+	/// @brief		私有成员，仅供内部使用。
 	STATEFLAG m_nFlags;
 };
 

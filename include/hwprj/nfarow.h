@@ -29,7 +29,7 @@
 class NFAHDR CNfaRow
 {
 public:
-	/// @brief		NFA表的列数
+	/// @brief		NFA表的列数。
 	static const ulong COLUMNCNT = 260;
 
 	/// @brief		构造函数。
@@ -42,18 +42,18 @@ public:
 	virtual ~CNfaRow();
 
 	/// @brief		重载的 '=' 运算符。
-	/// @param[in]	other 另一个动态数组对象
+	/// @param[in]	other 另一个动态数组对象。
 	/// @return		返回自身对象的引用。
 	CNfaRow& operator = (const CNfaRow &other);
 
 	/// @brief		重载的 '[]' 运算符，取得指定位置的状态集数组的引用。
-	/// @param[in]	nIdx 指定位置的下标
+	/// @param[in]	nIdx 指定位置的下标。
 	/// @return		返回指定位置的状态集数组的引用。
 	CUnsignedArray& operator [] (ulong ulCol);
 
 
 	/// @brief		重载的 '[]' 运算符，取得指定位置的状态集数组的引用（常量）。
-	/// @param[in]	nIdx 指定位置的下标
+	/// @param[in]	nIdx 指定位置的下标。
 	/// @return		返回指定位置的状态集数组的引用（常量）。
 	const CUnsignedArray& operator [] (ulong ulCol) const;
 	
@@ -62,7 +62,7 @@ public:
 	void SortAll();
 
 private:
-	/// @brief		私有成员，仅供内部使用
+	/// @brief		私有成员，仅供内部使用。
 	CUnsignedArray* m_pDestSet;
 };
 

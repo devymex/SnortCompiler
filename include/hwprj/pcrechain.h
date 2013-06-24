@@ -2,6 +2,7 @@
 * @file			pcrechain.h
 * @author		Lab 435, Xidian University
 * @brief		定义了CPcreChain类，根据Snort规则选项的属性，构造PCRE链
+* @copyright	本项目开发组版权所有。未经许可，不得复制、更改、编译、分发。
 */
 
 #pragma once
@@ -51,16 +52,21 @@ public:
 	/// @return		所包含的元素数量。
 	ulong Size() const;
 
-	/// @brief
+	/// @brief		清空CPcreChain对象。
 	void Clear();
 
-	/// @brief
+	/// @brief		得到CPcreChain数组最后一个CPcreOption对象的引用。
+	/// @return		最后一个CPcreOption对象的引用。
 	CPcreOption& Back() const;
 
-	/// @brief
+	/// @brief		将指定的CPcreOption对象添加为CPcreChain数组的最后一个元素。
+	/// @param		pcreOpt CPcreOption对象。
 	void PushBack(const CPcreOption &pcreOpt);
 
-	/// @brief
+	/// @brief		更改CPcreChain数组的大小。
+	/// @param[in]	nSize 更改的尺寸。
+	/// @remark		如果nSize大于或等于当前数组尺寸，则不会更改现有元素；
+	///				否则会删除多出部分的元素。
 	void Resize(ulong nSize);
 
 	/// @brief		获取PCRE链中的signature。
@@ -69,11 +75,11 @@ public:
 	/// @brief		获取PCRE链中的signature（常量）。
 	const CUnsignedArray& GetSigs() const;
 
-protected:
-	/// @brief		私有成员，仅供内部使用
+private:
+	/// @brief		私有成员，仅供内部使用。
 	PCREVEC*				m_pPcreVec;
 
-	/// @brief		私有成员，仅供内部使用
+	/// @brief		私有成员，仅供内部使用。
 	CUnsignedArray			m_sigs;
 };
 

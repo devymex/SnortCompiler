@@ -1,7 +1,7 @@
 /*!*
-* @file		rule2nfa.cpp
+* @file				rule2nfa.cpp
 **
-* @author		Lab 435, Xidian University
+* @author			Lab 435, Xidian University
 **
 * @brief			Support functions for transforming a rule to a nfa tree
 **

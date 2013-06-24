@@ -38,17 +38,17 @@ public:
 	virtual ~CDfaArray();
 
 	/// @brief		重载的 '=' 运算符。
-	/// @param[in]	other 另一个DFA数组对象
+	/// @param[in]	other 另一个DFA数组对象。
 	/// @return		返回自身对象的引用。
 	CDfaArray& operator = (const CDfaArray &other);
 
 	/// @brief		重载的 '[]' 运算符，取得指定位置的CDfa类对象的引用。
-	/// @param[in]	nIdx 指定位置的下标
+	/// @param[in]	nIdx 指定位置的下标。
 	/// @return		返回指定位置的CDfa类对象的引用。
 	CDfa& operator [] (ulong ulIdx);
 
 	/// @brief		重载的 '[]' 运算符，取得指定位置的CDfa类对象的引用。
-	/// @param[in]	nIdx 指定位置的下标
+	/// @param[in]	nIdx 指定位置的下标。
 	/// @return		返回指定位置的CDfa类对象的引用（常量）。
 	const CDfa& operator [] (ulong ulIdx) const;
 
@@ -60,21 +60,21 @@ public:
 	void Clear();
 
 	/// @brief		为存储DFA数组预留内存空间。
-	/// @param[in]	ulCount 指定的预留的空间
+	/// @param[in]	ulCount 指定的预留的空间。
 	void Reserve(ulong ulCount);
 
 	/// @brief		更改DFA数组的大小。
-	/// @param[in]	ulSize 更改的尺寸
+	/// @param[in]	ulSize 更改的尺寸。
 	/// @remark		如果ulSize大于或等于当前尺寸，则不会更改现有元素；
 	///				否则会删除多出部分的元素。
 	void Resize(ulong ulSize);
 
 	/// @brief		将指定的DFA添加为DFA数组的最后一个元素。
-	/// @param		dfa 指定的DFA
+	/// @param		dfa 指定的DFA。
 	void PushBack(const CDfa &dfa);
 
 private:
-	/// @brief		私有成员，仅供内部使用
+	/// @brief		私有成员，仅供内部使用。
 	CDFAVEC *m_pdfaTbl;
 };
 

@@ -1,7 +1,7 @@
 /*!
-* @file		ruleoption.h
+* @file				ruleoption.h
 **
-* @author		Lab 435, Xidian University
+* @author			Lab 435, Xidian University
 **
 * @brief			Declaration of the CRuleOption class
 **
@@ -76,10 +76,10 @@ public:
 	virtual	CRuleOption* Clone() const = 0;
 
 protected:
-	/// @brief		私有成员，仅供内部使用
+	/// @brief		私有成员，仅供内部使用。
 	virtual void FormatPattern(CDllString &out);
 
 protected:
-	/// @brief		私有成员，仅供内部使用
+	/// @brief		私有成员，仅供内部使用。
 	OPTIONFLAG m_nFlags;
 };

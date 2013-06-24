@@ -20,7 +20,7 @@ class FINSTAMAP;
 */
 
 /*!
-* @brief		DFA的终态集合以及终态对应的DFAID集合
+* @brief		DFA的终态集合以及终态对应的DFAID集合。
 */
 class DFAIDSETHDR CFinalStates
 {
@@ -35,12 +35,12 @@ public:
 	virtual ~CFinalStates();
 
 	/// @brief		重载的 '=' 运算符。
-	/// @param[in]	other 另一个CFinalStates对象
+	/// @param[in]	other 另一个CFinalStates对象。
 	/// @return		返回自身对象的引用。
 	CFinalStates& operator = (const CFinalStates &other);
 
 	/// @brief		重载的 '[]' 运算符，取得指定位置的DFA状态编号。
-	/// @param[in]	nIdx 指定位置的下标
+	/// @param[in]	nIdx 指定位置的下标。
 	/// @return		返回指定位置的DFA状态编号（常量）。
 	const STATEID& operator [] (ulong nIdx) const;
 
@@ -52,7 +52,7 @@ public:
 	void Clear();
 
 	/// @brief		终态集合中增加DFA终态的编号。
-	/// @param[in]	nStaId 终态编号
+	/// @param[in]	nStaId 终态编号。
 	/// @return		新加入的终态所对应的CDfaIdSet对象的引用。
 	CDfaIdSet& AddState(STATEID nStaId);
 
@@ -61,12 +61,12 @@ public:
 	void Swap(CFinalStates &other);
 
 	/// @brief		获取DFA终态对应的CDfaIdSet对象的引用。
-	/// @param[in]	nStaId 状态编号
+	/// @param[in]	nStaId 状态编号。
 	/// @return		CDfaIdSet对象的引用。
 	CDfaIdSet& GetDfaIdSet(STATEID nStaId);
 
 	/// @brief		获取DFA终态对应的CDfaIdSet对象的引用（常量）。
-	/// @param[in]	nStaId 状态编号
+	/// @param[in]	nStaId 状态编号。
 	/// @return		CDfaIdSet对象的引用（常量）。
 	const CDfaIdSet& GetDfaIdSet(STATEID nStaId) const;
 
@@ -75,10 +75,10 @@ public:
 	ulong CountDfaIds() const;
 
 private:
-	/// @brief		私有成员，仅供内部使用
+	/// @brief		私有成员，仅供内部使用。
 	STATEIDARY* m_pStates;
 
-	/// @brief		私有成员，仅供内部使用
+	/// @brief		私有成员，仅供内部使用。
 	FINSTAMAP* m_pDfaIds;
 };
 

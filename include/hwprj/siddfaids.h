@@ -1,7 +1,7 @@
 /*!
-* @file		siddfas.h
+* @file				siddfas.h
 **
-* @author		Lab 435, Xidian University
+* @author			Lab 435, Xidian University
 **
 * @brief			Declaration of the CSidDfaIds class
 **
@@ -19,6 +19,11 @@
 #define SIDDFAHDR __declspec(dllexport)
 #endif
 
+/*!
+* @brief		存储一条规则的处理信息。
+* @remark		包括处理结果、规则id以及DFA。
+*/
+
 struct COMPILEDINFO
 {
 	typedef ulong COMPRETCODE;
@@ -35,6 +40,10 @@ struct COMPILEDINFO
 	CUnsignedArray m_dfaIds;
 };
 
+/*!
+* @brief		存储所有规则的处理信息。
+*/
+
 class SIDDFAHDR CSidDfaIds
 {
 public:
@@ -50,7 +59,7 @@ public:
 	const ulong Size() const;
 	void PushBack(const COMPILEDINFO &sidDfaIds);
 	COMPILEDINFO& Back();
-protected:
-	/// @brief		私有成员，仅供内部使用
+private:
+	/// @brief		私有成员，仅供内部使用。
 	std::vector<COMPILEDINFO> *m_ruleResult;
 };
