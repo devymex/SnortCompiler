@@ -2,6 +2,7 @@
 * @file			nfa.h
 * @author		Lab 435, Xidian University
 * @brief		定义了CNfa类，用以表示NFA的数据结构
+* @copyright	本项目开发组版权所有。未经许可，不得复制、更改、编译、分发。
 */
 
 #pragma once
@@ -41,12 +42,12 @@ public:
 	CNfa& operator = (const CNfa &other);
 
 	/// @brief		重载的 '[]' 运算符，取得指定位置的CNfaRow对象的引用。
-	/// @param[in]	ulIdx 指定位置的下标
+	/// @param[in]	ulIdx 指定位置的下标。
 	/// @return		返回指定位置的CNfaRow对象的引用。
 	CNfaRow& operator [] (ulong ulIdx);
 
 	/// @brief		重载的 '[]' 运算符，取得指定位置的CNfaRow对象的引用。
-	/// @param[in]	ulIdx 指定位置的下标
+	/// @param[in]	ulIdx 指定位置的下标。
 	/// @return		返回指定位置的CNfaRow对象的引用。
 	const CNfaRow& operator [] (ulong ulIdx) const;
 
@@ -58,7 +59,7 @@ public:
 	/// @return		最后一个位置的CNfaRow对象的引用。
 	CNfaRow& Back();
 
-	/// @brief		清空NFA
+	/// @brief		清空NFA。
 	void Clear();
 
 	/// @brief		更改NFA的大小。
@@ -68,14 +69,14 @@ public:
 	void Resize(ulong ulSize);
 
 	/// @brief		为NFA预留内存空间。
-	/// @param		ulSize 指定的预留的空间。
+	/// @param		ulSize 指定的预留的空间
 	void Reserve(ulong ulSize);
 
-	/// @brief		释放CNfa中多余的空间
+	/// @brief		释放CNfa中多余的空间。
 	void Shrink();
 
 	/// @brief		将指定的NFA状态添加为NFA跳转表最后一个元素。
-	/// @param		row 指定的NFA状态。
+	/// @param[in]	row 指定的NFA状态。
 	void PushBack(const CNfaRow &row);
 
 	/// @brief		删除CNfa的最后一个状态。
@@ -85,11 +86,11 @@ public:
 	void SortAll();
 
 	/// @brief		将一个NFA输出到文件中。
-	/// @param		pFile 输出文件路径（常量）。
+	/// @param[in]	pFile 输出文件路径（常量）。
 	void Dump(const char *pFile) const;
 
 private:
-	/// @brief		私有成员，仅供内部使用
+	/// @brief		私有成员，仅供内部使用。
 	NFAROWARY*		m_pNfa;
 };
 

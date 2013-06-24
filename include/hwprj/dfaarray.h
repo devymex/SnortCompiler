@@ -2,6 +2,7 @@
 * @file			dfaarray.h
 * @author		Lab 435, Xidian University
 * @brief		定义了CDfaArray类，用以存储多个CDfa，即DFA数组
+* @copyright	本项目开发组版权所有。未经许可，不得复制、更改、编译、分发。
 */
 
 #pragma once
@@ -42,24 +43,24 @@ public:
 	CDfaArray& operator = (const CDfaArray &other);
 
 	/// @brief		重载的 '[]' 运算符，取得指定位置的CDfa类对象的引用。
-	/// @param[in]	nIdx 指定位置的下标
+	/// @param[in]	nIdx 指定位置的下标。
 	/// @return		返回指定位置的CDfa类对象的引用。
 	CDfa& operator [] (ulong ulIdx);
 
 	/// @brief		重载的 '[]' 运算符，取得指定位置的CDfa类对象的引用。
-	/// @param[in]	nIdx 指定位置的下标
-	/// @return		返回指定位置的CDfa类对象的引用。
+	/// @param[in]	nIdx 指定位置的下标。
+	/// @return		返回指定位置的CDfa类对象的引用（常量）。
 	const CDfa& operator [] (ulong ulIdx) const;
 
 	/// @brief		获得DFA数组当前的个数。
 	/// @return		DFA数组当前的个数（常量）。
 	ulong Size() const;
 
-	/// @brief		清空DFA数组
+	/// @brief		清空DFA数组。
 	void Clear();
 
 	/// @brief		为存储DFA数组预留内存空间。
-	/// @param		ulCount 指定的预留的空间。
+	/// @param[in]	ulCount 指定的预留的空间。
 	void Reserve(ulong ulCount);
 
 	/// @brief		更改DFA数组的大小。
@@ -73,7 +74,7 @@ public:
 	void PushBack(const CDfa &dfa);
 
 private:
-	/// @brief		私有成员，仅供内部使用
+	/// @brief		私有成员，仅供内部使用。
 	CDFAVEC *m_pdfaTbl;
 };
 

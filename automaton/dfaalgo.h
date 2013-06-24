@@ -2,6 +2,7 @@
 * @file			dfaalgo.h
 * @author		Lab 435, Xidian University
 * @brief		DFA相关算法的函数声明
+* @copyright	本项目开发组版权所有。未经许可，不得复制、更改、编译、分发。
 */
 
 #include <hwprj\common.h>

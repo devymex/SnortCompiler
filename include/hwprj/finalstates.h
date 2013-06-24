@@ -2,6 +2,7 @@
 * @file			finalstates.h
 * @author		Lab 435, Xidian University
 * @brief		定义了CFinalStates类，用于存储DFA状态的ID与DFAID的映射关系
+* @copyright	本项目开发组版权所有。未经许可，不得复制、更改、编译、分发。
 */
 
 #pragma once
@@ -19,7 +20,7 @@ class FINSTAMAP;
 */
 
 /*!
-* @brief		DFA的终态集合以及终态对应的DFAID集合
+* @brief		DFA的终态集合以及终态对应的DFAID集合。
 */
 class DFAIDSETHDR CFinalStates
 {
@@ -40,7 +41,7 @@ public:
 
 	/// @brief		重载的 '[]' 运算符，取得指定位置的DFA状态编号。
 	/// @param[in]	nIdx 指定位置的下标。
-	/// @return		返回指定位置的DFA状态编号。
+	/// @return		返回指定位置的DFA状态编号（常量）。
 	const STATEID& operator [] (ulong nIdx) const;
 
 	/// @brief		得到CFinalStates所包含的元素数量。
@@ -74,10 +75,10 @@ public:
 	ulong CountDfaIds() const;
 
 private:
-	/// @brief		私有成员，仅供内部使用
+	/// @brief		私有成员，仅供内部使用。
 	STATEIDARY* m_pStates;
 
-	/// @brief		私有成员，仅供内部使用
+	/// @brief		私有成员，仅供内部使用。
 	FINSTAMAP* m_pDfaIds;
 };
 

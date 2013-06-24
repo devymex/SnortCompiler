@@ -2,6 +2,7 @@
 * @file			snortrule.h
 * @author		Lab 435, Xidian University
 * @brief		定义CSnortRule类
+* @copyright	本项目开发组版权所有。未经许可，不得复制、更改、编译、分发。
 */
 
 #pragma once
@@ -18,18 +19,22 @@ class OPTIONVEC;
 */
 
 /*!
-* @brief
+* @brief	提取Snort规则选项内容。
+* @detail	封装std::vector<class CRuleOption*>对象，
+*			用于记录规则选项内容，标记能够处理的规则和规则对应的sid
 */
 class SNORTRULEHDR CSnortRule
 {
 public:
 	typedef ulong PARSE_INFO;
 
-	/// 一般规则。
+	///@brief		一般规则。
 	static const PARSE_INFO NORMAL		= 0;
-	/// 该规则包含byte_test或byte_jump。
+
+	/// @brief		该规则包含byte_test或byte_jump。
 	static const PARSE_INFO HASBYTE		= (1 << 0);
-	/// 该规则包含'!'（逻辑非）标识。
+
+	/// @brief		 该规则包含'!'（逻辑非）标识。
 	static const PARSE_INFO HASNOT		= (1 << 1);
 
 public:
@@ -47,24 +52,27 @@ public:
 	/// @return		返回自身对象的引用。
 	CSnortRule& operator = (const CSnortRule &other);
 
-	/// @brief
+	/// @brief		重载的 '[]' 运算符，取得指定位置的规则选项的引用。
+	/// @param[in]	nIdx 指定位置的下标
+	/// @return		返回指定位置的规则选项的引用（常量）。
 	CRuleOption* operator[](ulong nIdx) const;
 
-	/// @brief
+	/// @brief		得到CSnortRule当前的大小。
+	/// @return		CSnortRule当前的大小（常量）。
 	ulong Size() const;
 
-	/// @brief		删除数组中所有的规则选项对象，并释放它们的内存。
+	/// @brief		清空CSnortRule。
 	void Clear();
 
-	/// @brief		将一个CRuleOption基类的指针添加到数组的末尾。
-	/// @param		pRuleOption 一个CRuleOption基类的指针，可指向其派生类。
+	/// @brief		将指定的CRuleOption对象添加为CSnortRule最后一个元素。
+	/// @param		pRuleOption 指定的CRuleOption对象。
 	void PushBack(CRuleOption* pRuleOption);
 
-	/// @brief		删除数组中最后一个选项，并释放其内存。
+	/// @brief		删除CSnortRule的最后一个元素。
 	void PopBack();
 
-	/// @brief		获取数组中最后一个选项的指针。
-	/// @return		一个CRuleOption基类的指针。可能指向其派生类。
+	/// @brief		得到CSnortRule数组最后一个pRuleOption对象的引用。
+	/// @return		最后一个pRuleOption对象的引用。
 	CRuleOption* Back();
 
 	/// @brief		获取规则sid。

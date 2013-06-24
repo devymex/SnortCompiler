@@ -2,6 +2,7 @@
 * @file			nfarow.h
 * @author		Lab 435, Xidian University
 * @brief		Declaration of CNfaRow
+* @copyright	本项目开发组版权所有。未经许可，不得复制、更改、编译、分发。
 */
 
 #pragma once
@@ -29,7 +30,7 @@
 class NFAHDR CNfaRow
 {
 public:
-	/// @brief		NFA表的列数
+	/// @brief		NFA表的列数。
 	static const ulong COLUMNCNT = 260;
 
 	/// @brief		构造函数。

@@ -1,7 +1,8 @@
 /*!
 * @file			dfa.h
 * @author		Lab 435, Xidian University
-* @brief		定义了CDfa类，用以表示DFA的数据结构
+* @brief		定义了CDfa类，用以表示DFA的数据结构。
+* @copyright	本项目开发组版权所有。未经许可，不得复制、更改、编译、分发。
 */
 
 #pragma once
@@ -26,7 +27,7 @@ typedef CUnsignedArray STATEARY;
 */
 
 /*!
-* @brief		实现DFA数据结构及相关算法
+* @brief		实现DFA数据结构及相关算法。
 * @remark		封装了CDfaRow的动态数组、始态编号以及终态集合等。实现的算法包括：
 *				nfa的确定化、dfa的最小化、字符集的压缩等。
 */
@@ -48,12 +49,12 @@ public:
 	CDfa& operator =	(const CDfa &other);
 
 	/// @brief		重载的 '[]' 运算符，取得DFA状态编号相应的CDfaRow对象的引用。
-	/// @param[in]	nIdx DFA状态编号
+	/// @param[in]	nIdx DFA状态编号。
 	/// @return		返回状态编号对应的CDfaRow对象的引用。
 	CDfaRow& operator [] (STATEID nIdx);
 
 	/// @brief		重载的 '[]' 运算符，取得DFA状态编号相应的CDfaRow对象的引用。
-	/// @param[in]	nIdx DFA状态编号
+	/// @param[in]	nIdx DFA状态编号。
 	/// @return		返回状态编号对应的CDfaRow对象的引用（常量）。
 	const CDfaRow& operator [] (STATEID nIdx) const;
 
@@ -66,21 +67,21 @@ public:
 	CDfaRow& Back();
 
 	/// @brief		为DFA预留内存空间。
-	/// @param		ulSize 指定的预留的空间。
+	/// @param[in]	ulSize 指定的预留的空间。
 	void Reserve(ulong ulSize);
 
 	/// @brief		更改DFA的大小。
 	/// @param[in]	ulSize 更改的尺寸。
-	/// @param[in]	ulColNum DFA跳转字符集的长度
+	/// @param[in]	ulColNum DFA跳转字符集的长度。
 	/// @remark		如果ulSize大于或等于当前尺寸，则不会更改现有元素；
 	///				否则会删除多出部分的元素。
 	void Resize(ulong ulSize, ulong ulColNum);
 
-	/// @brief		清空DFA
+	/// @brief		清空DFA。
 	void Clear();
 
 	/// @brief		将指定的DFA状态添加为DFA跳转表最后一个元素。
-	/// @param		sta 指定的DFA状态。
+	/// @param[in]	sta 指定的DFA状态。
 	void PushBack(CDfaRow &sta);
 
 	/// @brief		获取DFA的编号。
@@ -90,11 +91,11 @@ public:
 	/// @param[in]	ulId DFA编号。
 	void SetId(ulong ulId);
 
-	/// @brief		获取DFA跳转字符集的大小。
+	/// @brief		获取DFA跳转字符集的大小（常量）。
 	ushort GetGroupCount() const;
 
-	/// @brief		设置一个DFA的跳转字符集合
-	/// @param[in]	pGroup 压缩后的字符集
+	/// @brief		设置一个DFA的跳转字符集合。
+	/// @param[in]	pGroup 压缩后的字符集。
 	void SetGroups(byte *pGroup);
 
 	/// @brief		从标准ANSI字符集映射到DFA的字符集。
@@ -102,17 +103,17 @@ public:
 	/// @return		与指定字符编码对应的DFA字符。
 	byte Char2Group(byte nIdx);
 
-	/// @brief		获取DFA开始状态id
+	/// @brief		获取DFA开始状态id。
 	STATEID GetStartState() const;
 
-	/// @brief		设置DFA开始状态id
-	/// @param[in]	id DFA状态编号
+	/// @brief		设置DFA开始状态id。
+	/// @param[in]	id DFA状态编号。
 	void SetStartState(STATEID id);
 
-	/// @brief		获取DFA终态集合
+	/// @brief		获取DFA终态集合。
 	CFinalStates& GetFinalStates();
 
-	/// @brief		获取DFA终态集合（常量）
+	/// @brief		获取DFA终态集合（常量）。
 	const CFinalStates& GetFinalStates() const;
 
 	/// @brief		NFA转化为DFA，执行确定化操作，采用子集构造算法。
@@ -130,11 +131,11 @@ public:
 	ulong CalcStoreSize() const;
 
 	/// @brief		将一个DFA以unsigned char*类型存入内存。
-	/// @param[in]	beg DFA的二进制字节流
+	/// @param[in]	beg DFA的二进制字节流。
 	void Save(byte *beg);
 
 	/// @brief		从内存读取一个DFA，存入unsigned char*类型变量。
-	/// @param[in]	beg DFA的二进制字节流
+	/// @param[in]	beg DFA的二进制字节流。
 	void Load(byte *beg);
 
 	/// @brief		处理数据包与DFA的匹配过程。

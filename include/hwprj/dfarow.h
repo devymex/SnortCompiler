@@ -5,6 +5,7 @@
 * @remark		CDfaRow为一个一维数组，数组中的每个元素所在列表示
 *				DFA字符集中的一个跳转字符，数组中的每个元素表示当前DFA状态
 *				经过跳转字符到达的下一个状态的编号。
+* @copyright	本项目开发组版权所有。未经许可，不得复制、更改、编译、分发。
 */
 
 #pragma once
@@ -56,12 +57,12 @@ public:
 	CDfaRow& operator =	(const CDfaRow &other);
 
 	/// @brief		重载的 '[]' 运算符，取得指定位置的DFA状态编号的引用。
-	/// @param[in]	nIdx 指定位置的下标
-	/// @return		返回指定位置的DFA状态编号的引用。
+	/// @param[in]	nIdx 指定位置的下标。
+	/// @return		返回指定位置的DFA状态编号的引用（常量）。
 	const STATEID& operator [] (byte nIdx) const;
 
 	/// @brief		重载的 '[]' 运算符，取得指定位置的DFA状态编号的引用。
-	/// @param[in]	nIdx 指定位置的下标
+	/// @param[in]	nIdx 指定位置的下标。
 	/// @return		返回指定位置的DFA状态编号的引用。
 	STATEID& operator [] (byte nIdx);
 
@@ -69,26 +70,26 @@ public:
 	/// @return		CDfaRow当前的大小（常量）。
 	ulong Size() const;
 
-	/// @brief		将CDfaRow中的所有元素赋值为指定DFA状态
+	/// @brief		将CDfaRow中的所有元素赋值为指定DFA状态。
 	/// @param[in]	nState 指定的DFA状态。
 	void Fill(STATEID nState);
 
-	/// @brief		增加DFA状态的属性
-	/// @param[in]	nFlags 属性取值
+	/// @brief		增加DFA状态的属性。
+	/// @param[in]	nFlags 属性取值。
 	void AddFlags(STATEFLAG nFlags);
 
-	/// @brief		设置DFA状态的属性
-	/// @param[in]	nFlags 属性取值
+	/// @brief		设置DFA状态的属性。
+	/// @param[in]	nFlags 属性取值。
 	void SetFlags(STATEFLAG nFlags);
 
-	/// @brief		获取DFA状态的属性
+	/// @brief		获取DFA状态的属性。
 	STATEFLAG GetFlags() const;
 
 private:
-	/// @brief		私有成员，仅供内部使用
+	/// @brief		私有成员，仅供内部使用。
 	STATEIDARY* m_pDest;
 
-	/// @brief		私有成员，仅供内部使用
+	/// @brief		私有成员，仅供内部使用。
 	STATEFLAG m_nFlags;
 };
 
