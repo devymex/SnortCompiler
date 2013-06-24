@@ -1,12 +1,7 @@
 /*!
 * @file				comprule.h
-**
 * @author			Lab 435, Xidian University
-**
 * @brief			Functions declaration of rules' processing
-**
-* Includes compile rule etc.
-**
 */
 
 #pragma once
