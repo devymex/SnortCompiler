@@ -65,7 +65,7 @@ public:
 	/// @brief		获取PCRE链中的signature（常量）。
 	const CUnsignedArray& GetSigs() const;
 
-protected:
+private:
 	/// @brief		私有成员，仅供内部使用
 	PCREVEC*				m_pPcreVec;
 

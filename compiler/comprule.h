@@ -64,7 +64,7 @@ struct ISSPACE
 	{
 		return g_map[c] == 1;
 	}
-protected:
+private:
 	char g_map[256];
 };
 

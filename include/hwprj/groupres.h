@@ -30,11 +30,6 @@
 
 class GROUPRESHDR CGroupRes
 {
-protected:
-	CDfaArray m_dfaTbl;
-	CSidDfaIds m_sidDfaIds; 
-	CGroups m_groups;
-	ulong nBucketCnt;
 public:
 	/// @brief		获取DFA集合
 	CDfaArray &GetDfaTable();
@@ -64,4 +59,9 @@ public:
 	/// @brief		将写入文件中的分组结果读入
 	/// @param	filename-输入包含文件路径的文件名
 	ulong ReadFromFile(const char *filename);
+private:
+	CDfaArray m_dfaTbl;
+	CSidDfaIds m_sidDfaIds; 
+	CGroups m_groups;
+	ulong nBucketCnt;
 };

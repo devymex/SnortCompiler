@@ -88,7 +88,7 @@ public:
 	/// @param[in]	nIdx 数组下标索引。
 	void Erase(ulong nIdx);
 
-protected:
+private:
 	/// @brief		私有成员，仅供内部使用
 	GROUPVEC* m_pGroups;
 };

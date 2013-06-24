@@ -50,7 +50,7 @@ public:
 	/// @param	filename-输入包含文件路径的文件名
 	ulong ReadFromFile(const char *filename);
 
-protected:
+private:
 	/// @brief		私有成员，仅供内部使用
 	CDfaArray m_dfaTbl;
 

@@ -72,7 +72,7 @@ public:
 	/// @param		nFlags 规则标记。
 	bool HasFlags(PARSE_INFO nFlags) const;
 
-protected:
+private:
 	/// @brief		私有成员，仅供内部使用。
 	ulong m_nSid;
 
