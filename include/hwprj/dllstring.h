@@ -52,7 +52,8 @@ public:
 	ulong Size() const;
 
 	/// @brief		ÅÐ¶Ï×Ö·û´®ÊÇ·ñÎª¿Õ¡£
-	/// @return		·µ»Øtrue±íÊ¾×Ö·û´®Îª¿Õ£¬·µ»Øfalse±íÊ¾×Ö·û´®·Ç¿Õ¡£
+	/// @retval		true ×Ö·û´®Îª¿Õ¡£
+	/// @retval		false ×Ö·û´®·Ç¿Õ¡£
 	bool Empty() const;
 
 	/// @brief		Çå¿Õ×Ö·û´®¡£

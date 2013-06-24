@@ -38,11 +38,11 @@ public:
 	const CRegRule &GetRegexTbl() const;
 
 	/// @brief		将DFA结果输出文件
-	/// @param	filename-输入规则文件路径
+	/// @param		filename 输入规则文件路径
 	ulong WriteToFile(const char *filename);
 
 	/// @brief		读入DFA结果文件
-	/// @param	filename-输入规则文件路径
+	/// @param		filename 输入规则文件路径
 	ulong ReadFromFile(const char *filename);
 
 protected:

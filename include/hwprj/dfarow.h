@@ -32,14 +32,12 @@ class STATEIDARY;
 class DFAHDR CDfaRow
 {
 public:
-	//标记该状态/行的属性：NORMAL、START、FINAL
 	typedef byte STATEFLAG;
 
 	/// @brief		若DFA中的某个状态为常规状态，则标记为NORMAL。
-	static const STATEFLAG NORMAL	= 0;
+	static const STATEFLAG NORMAL	= 0;			/// 一般状态
 
 	/// @brief		若DFA中的某个状态为终止状态，则标记为FINAL。
-	static const STATEFLAG FINAL	= (1 << 1);
 
 	/// @brief		构造函数。
 	/// @param[in]	ulColCnt DFA跳转字符集的长度。
@@ -59,38 +57,38 @@ public:
 	/// @brief		重载的 '[]' 运算符，取得指定位置的DFA状态编号的引用。
 	/// @param[in]	nIdx 指定位置的下标
 	/// @return		返回指定位置的DFA状态编号的引用。
-	const STATEID& operator []	(byte nIdx) const;
+	const STATEID& operator [] (byte nIdx) const;
 
 	/// @brief		重载的 '[]' 运算符，取得指定位置的DFA状态编号的引用。
 	/// @param[in]	nIdx 指定位置的下标
 	/// @return		返回指定位置的DFA状态编号的引用。
-	STATEID& operator []	(byte nIdx);
+	STATEID& operator [] (byte nIdx);
 
 	/// @brief		得到CDfaRow当前的大小。
 	/// @return		CDfaRow当前的大小（常量）。
-	ulong			Size() const;
+	ulong Size() const;
 
 	/// @brief		将CDfaRow中的所有元素赋值为指定DFA状态
 	/// @param[in]	nState 指定的DFA状态。
 	void Fill(STATEID nState);
 
 	/// @brief		增加DFA状态的属性
-	/// @param		nFlags 属性取值
+	/// @param[in]	nFlags 属性取值
 	void AddFlags(STATEFLAG nFlags);
 
 	/// @brief		设置DFA状态的属性
-	/// @param		nFlags 属性取值
+	/// @param[in]	nFlags 属性取值
 	void SetFlags(STATEFLAG nFlags);
 
 	/// @brief		获取DFA状态的属性
-	STATEFLAG		GetFlags() const;
+	STATEFLAG GetFlags() const;
 
 private:
 	/// @brief		私有成员，仅供内部使用
-	STATEIDARY*		m_pDest;
+	STATEIDARY* m_pDest;
 
 	/// @brief		私有成员，仅供内部使用
-	STATEFLAG		m_nFlags;
+	STATEFLAG m_nFlags;
 };
 
 /*!

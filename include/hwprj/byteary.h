@@ -57,7 +57,8 @@ public:
 	ulong Size() const;
 
 	/// @brief		判断数组是否为空
-	/// @return		返回true表示数组为空，返回false表示数组非空。
+	/// @retval		true 数组为空
+	/// @retval		false 数组非空。
 	bool Empty() const;
 
 	/// @brief		清空数组

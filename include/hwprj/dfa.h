@@ -87,11 +87,11 @@ public:
 	ulong GetId();
 
 	/// @brief		设置DFA的编号。
-	/// @param[in] ulId DFA编号。
+	/// @param[in]	ulId DFA编号。
 	void SetId(ulong ulId);
 
 	/// @brief		获取DFA跳转字符集的大小。
-	ushort				GetGroupCount() const;
+	ushort GetGroupCount() const;
 
 	/// @brief		设置一个DFA的跳转字符集合
 	/// @param[in]	pGroup 压缩后的字符集

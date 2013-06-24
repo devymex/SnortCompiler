@@ -57,7 +57,7 @@ DFAIDSETHDR CFinalStates& CFinalStates::operator = (const CFinalStates &other)
 	return *this;
 }
 
-DFAIDSETHDR STATEID CFinalStates::operator[](ulong nIdx) const
+DFAIDSETHDR const STATEID& CFinalStates::operator[](ulong nIdx) const
 {
 	TASSERT(nIdx < m_pStates->size());
 	return (*m_pStates)[nIdx];
