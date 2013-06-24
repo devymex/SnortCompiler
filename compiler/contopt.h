@@ -1,7 +1,7 @@
 /*!
 * @file				contopt.h
 * @author			Lab 435, Xidian University
-* @brief			定义CContentOption类
+* @brief			定义CContentOption类。
 */
 
 #pragma once
@@ -23,11 +23,11 @@
 class CContentOption : public CRuleOption
 {
 public:
-	static const OPTIONFLAG NOCASE		= (1 << 2);		/// 忽略大小写
-	static const OPTIONFLAG OFFSET		= (1 << 3);		/// 带有offset修饰项
-	static const OPTIONFLAG DEPTH		= (1 << 4);		/// 带有depth修饰项
-	static const OPTIONFLAG DISTANCE	= (1 << 5);		/// 带有distance修饰项
-	static const OPTIONFLAG WITHIN		= (1 << 6);		/// 带有within修饰项
+	static const OPTIONFLAG NOCASE		= (1 << 2);		/// 忽略大小写。
+	static const OPTIONFLAG OFFSET		= (1 << 3);		/// 带有offset修饰项。
+	static const OPTIONFLAG DEPTH		= (1 << 4);		/// 带有depth修饰项。
+	static const OPTIONFLAG DISTANCE	= (1 << 5);		/// 带有distance修饰项。
+	static const OPTIONFLAG WITHIN		= (1 << 6);		/// 带有within修饰项。
 
 public:
 	/// @brief		构造函数。
@@ -56,16 +56,16 @@ public:
 	virtual CRuleOption* Clone() const;
 
 public:
-	/// @brief		offset修饰项的值
+	/// @brief		offset修饰项的值。
 	int m_nOffset;
 
-	/// @brief		depth修饰项的值
+	/// @brief		depth修饰项的值。
 	int m_nDepth;
 
-	/// @brief		brief修饰项的值
+	/// @brief		brief修饰项的值。
 	int m_nDistance;
 
-	/// @brief		within修饰项的值
+	/// @brief		within修饰项的值。
 	int m_nWithin;
 
 private:
