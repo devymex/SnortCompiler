@@ -173,8 +173,8 @@ private:
 };
 
 /// @brief		将分组中多个DFA合并为一个DFA。
-/// @param[in]	nputDfas 输入多个DFA。
-/// @param[out] mergedDfa 输出一个合并DFA。
+/// @param[in]	inputDfas 包含多个DFA的CDfaArray对象。
+/// @param[out] mergedDfa 一个合并后DFA。
 DFAHDR bool MergeMultipleDfas(class CDfaArray &inputDfas, CDfa &mergedDfa);
 
 /// @brief		将一个DFA对象输出为gv格式，以供GraphVis软件显示之用。

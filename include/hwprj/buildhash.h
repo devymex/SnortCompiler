@@ -18,6 +18,10 @@
 #define HASHMAPHDR __declspec(dllexport)
 #endif
 
+/*! @addtogroup groupGrouphash
+*  @{
+*/
+
 /*!
 * @brief		hash表的结点信息。
 * @remark		包括采用的分组采用的Signature和分组合并后的DFA。

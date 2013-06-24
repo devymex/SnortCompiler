@@ -18,6 +18,10 @@
 #define GROUPRESHDR __declspec(dllexport)
 #endif
 
+/*! @addtogroup groupGrouphash
+*  @{
+*/
+
 /*!
 * @brief		保存DFA及分组情况等信息。
 * @remark		包括所有的DFA、规则处理信息、分组信息、hash槽数。
@@ -60,3 +64,7 @@ private:
 	CGroups m_groups;
 	ulong nBucketCnt;
 };
+
+/*!
+@}
+*/

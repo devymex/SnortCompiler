@@ -19,6 +19,10 @@
 class GROUPVEC;
 #endif
 
+/*! @addtogroup groupGrouphash
+*  @{
+*/
+
 /*!
 * @brief		分为一组的DFA信息。
 * @remark		该组包括哪些DFA、这些DFA的公共Signature、当前采用哪个Signature
