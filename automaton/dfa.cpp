@@ -817,23 +817,22 @@ DFAHDR void PrintDfaToGv(CDfa &newdfa, const char* fileName)
 
 
 /*!
-* NAME
+* 函数名：
 *  MergeMultipleDfas::
 */
 /*!*
-* This function merges mutiple dfas into one dfa. And mark the terminal states to 
-* distinguish which dfas the terminal state belongs to.
+* 该函数将多个DFA合并为一个DFA，并记录终态集合，
+* 用于区分合并后的DFA终态包含哪些合并前的DFA终态。
 **
-* In order to speed up, we need one support function:DfaColGroup to group
-* the lastDfa's columns.
+* 为了提升该函数执行速度，调用函数DfaColGroup，确定合并后的DFA的跳转字符集
 **
-* @param dfas		a vector contains mutiple CDfa
-* @param lastDfa	the merged dfa
+* @param dfas		DFA数组
+* @param lastDfa	合并后的DFA
 **
 * @return bool
 **
-* @retval true function successful
-* @retval fasle fatal error
+* @retval true 函数执行成功
+* @retval fasle 函数执行失败
 */
 DFAHDR bool MergeMultipleDfas(CDfaArray &inputDfas, CDfa &mergedDfa)
 {
@@ -857,7 +856,7 @@ DFAHDR bool MergeMultipleDfas(CDfaArray &inputDfas, CDfa &mergedDfa)
 	ulong finFlag = 0;//terminal state flag, 1: terminal state, 0: normal state
 	std::stack<STATEIDARY> statesStack;
 
-	/*!
+	/*
 	* use a size of (inputDfas.size() + 2) vector to represent a state of the merged dfa.
 	* element 0 represents the state of inputDfas[0], ..., element n represents the state of inputDfas[n].
 	* element n + 1 and element n + 2 are flags which show that whether this state is a start state or terminal state.

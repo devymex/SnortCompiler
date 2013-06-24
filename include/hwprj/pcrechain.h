@@ -1,8 +1,7 @@
 /*!
 * @file			pcrechain.h
 * @author		Lab 435, Xidian University
-* @brief		Construct pcre chain with attribute of snort rules
-* @remark		Declaration of the CPcreChain class
+* @brief		定义了CPcreChain类，根据Snort规则选项的属性，构造PCRE链
 */
 
 #pragma once
@@ -13,6 +12,10 @@
 class PCREVEC;
 #endif
 
+/*!
+* @brief		实现PCRE链的数据结构及相关算法
+* @remark		封装了std::vector<class CPcreOption>对象以及Signature数组
+*/
 class SNORTRULEHDR CPcreChain
 {
 public:
