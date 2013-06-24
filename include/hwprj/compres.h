@@ -31,17 +31,17 @@ public:
 	/// @brief		获取所有编译好的CDfa对象集合。
 	CDfaArray& GetDfaTable();
 
-	/// @brief		获得所有CDfa对象所对应的sid的集合。
-	CSidDfaIds& GetSidDfaIds();
-
-	/// @brief		获得所有解析得到的规格化规则集合。
-	CRegRule &GetRegexTbl();
-
 	/// @brief		获取所有编译好的CDfa对象集合（常量）。
 	const CDfaArray& GetDfaTable() const;
 
+	/// @brief		获得所有CDfa对象所对应的sid的集合。
+	CSidDfaIds& GetSidDfaIds();
+
 	/// @brief		获取规则sid与DFA编号的对应关系（常量）。
 	const CSidDfaIds& GetSidDfaIds() const;
+
+	/// @brief		获得所有解析得到的规格化规则集合。
+	CRegRule &GetRegexTbl();
 
 	/// @brief		获得所有解析得到的规格化规则集合（常量）。
 	const CRegRule &GetRegexTbl() const;

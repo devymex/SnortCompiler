@@ -1,7 +1,8 @@
 /*!
 * @file			buildhash.h
-* @author			Lab 435, Xidian University
-* @brief		定义了GROUPHASH类，存储分组结果和哈希表的映射关系
+* @author		Lab 435, Xidian University
+* @brief		定义了GROUPHASH类，存储分组结果和哈希表的映射关系。
+* @copyright	本项目开发组版权所有。未经许可，不得复制、更改、编译、分发。
 */
 
 #pragma once
@@ -16,6 +17,10 @@
 #else
 #define HASHMAPHDR __declspec(dllexport)
 #endif
+
+/*! @addtogroup groupGrouphash
+*  @{
+*/
 
 /*!
 * @brief		hash表的结点信息。

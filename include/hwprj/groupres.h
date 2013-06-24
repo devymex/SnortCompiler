@@ -1,13 +1,8 @@
 /*!
-* @file				groupres.h
-**
-* @author			Lab 435, Xidian University
-**
-* @brief			Definition of the CGroupRes class
-**
-* log the result of sectionalization,include DFA set,
-* mapping relation between DfaId and sid and group set
-**
+* @file			groupres.h
+* @author		Lab 435, Xidian University
+* @brief		定义了CGroupRes类及其导出符号。
+* @copyright	本项目开发组版权所有。未经许可，不得复制、更改、编译、分发。
 */
 
 #pragma once
@@ -22,6 +17,10 @@
 #else
 #define GROUPRESHDR __declspec(dllexport)
 #endif
+
+/*! @addtogroup groupGrouphash
+*  @{
+*/
 
 /*!
 * @brief		保存DFA及分组情况等信息。
@@ -65,3 +64,7 @@ private:
 	CGroups m_groups;
 	ulong nBucketCnt;
 };
+
+/*!
+@}
+*/
