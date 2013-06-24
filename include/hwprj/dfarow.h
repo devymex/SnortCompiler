@@ -35,9 +35,10 @@ public:
 	typedef byte STATEFLAG;
 
 	/// @brief		若DFA中的某个状态为常规状态，则标记为NORMAL。
-	static const STATEFLAG NORMAL	= 0;			/// 一般状态
+	static const STATEFLAG NORMAL	= 0;			
 
 	/// @brief		若DFA中的某个状态为终止状态，则标记为FINAL。
+	static const STATEFLAG FINAL	= (1 << 0);		
 
 	/// @brief		构造函数。
 	/// @param[in]	ulColCnt DFA跳转字符集的长度。

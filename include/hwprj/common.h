@@ -20,9 +20,9 @@
 * @section module_sec 使用方法
 
 * @subsection requirement 一、要求
-* @li 操作系统：只能在Microsoft Windows XP及以上版本的操作系统中中编译和运行。
+* @li 操作系统：只能在Microsoft Windows XP及以上版本的操作系统中编译和运行。
 * @li 开发环境：只能在Microsoft Visual Studio 2012开发环境中执行编译。
-* @li 运行要求：运行要求至少具有2.0GHz以上的中央处理器，以及1GiB以上的可用内存空间
+* @li 运行要求：运行要求具有至少2.0GHz以上的中央处理器，以及1GiB以上的可用内存空间。
 * @li 存储要求：支持将结果数据写入硬盘，但需保证硬盘的剩余空间大于需要写入的数据大小。
 
 * @subsection directory 二、目录结构
