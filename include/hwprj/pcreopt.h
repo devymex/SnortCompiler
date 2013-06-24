@@ -1,9 +1,7 @@
 /*!
 * @file			pcreopt.h
 * @author		Lab 435, Xidian University
-* @brief		Declaration of the CRuleOption class
-* @remark		Extract relevant attribute of a rule, 
-*				such as "content", "pcre" and "uricontent".
+* @brief		定义了CPcreOption类
 */
 
 #pragma once

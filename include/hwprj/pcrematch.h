@@ -1,13 +1,12 @@
-/*
-**	@file		pcrematch.h
-**
-**	@author		Lab 435, Xidian University
-**
-**	@brief		Match the packet and pcre library
-**
+/*!
+* @file			pcrematch.h
+* @author		Lab 435, Xidian University
+* @brief		定义了PCRE匹配函数。
 */
 
 #pragma once
+
+#include <hwprj\pcreopt.h>
 
 #ifndef PCREMATCHHDR_DS
 #define PCREMATCHHDR __declspec(dllimport)
@@ -24,4 +23,7 @@
 * @retval		true PCRE与数据包匹配成功
 * @retval		false PCRE与数据包匹配失败
 */
-PCREMATCHHDR bool PcreMatch(const char* src, int length, CPcreOption &pcreopt, int &Pos);
+PCREMATCHHDR bool PcreMatch(const char* src,
+							int length,
+							CPcreOption &pcreopt,
+							int &Pos);
