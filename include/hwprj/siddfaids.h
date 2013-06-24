@@ -14,10 +14,15 @@
 #include <hwprj\unsary.h>
 
 #ifndef SIDDFAHDR_DS
+#define class COMPILEDINFO;
 #define SIDDFAHDR __declspec(dllimport)
 #else
 #define SIDDFAHDR __declspec(dllexport)
 #endif
+
+/*! @addtogroup groupCompiler
+*  @{
+*/
 
 /*!
 * @brief		存储一条规则的处理信息。
@@ -61,5 +66,9 @@ public:
 	COMPILEDINFO& Back();
 private:
 	/// @brief		私有成员，仅供内部使用。
-	std::vector<COMPILEDINFO> *m_ruleResult;
+	COMPILEDINFO *m_ruleResult;
 };
+
+/*!
+@}
+*/
