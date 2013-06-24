@@ -17,6 +17,10 @@
 class BYTEARY;
 #endif
 
+/*! @addtogroup groupCompiler
+*  @{
+*/
+
 class SNORTRULEHDR CPcreOption : public CRuleOption
 {
 public:
@@ -81,3 +85,7 @@ protected:
 	///	@brief		私有成员，仅供内部使用
 	CDllString m_strPcre;
 };
+
+/*!
+@}
+*/
