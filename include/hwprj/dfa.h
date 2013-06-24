@@ -115,69 +115,70 @@ public:
 	/// @brief		获取DFA终态集合（常量）
 	const CFinalStates& GetFinalStates() const;
 
-	/// @brief		NFA转化为DFA，采用子集构造算法
-	/// @param[in]	CNfa类型的一个NFA
+	/// @brief		NFA转化为DFA，执行确定化操作，采用子集构造算法。
+	/// @param[in]	一个CNfa对象。
 	ulong FromNFA(const CNfa &nfa);
 
-	/// @brief		最小化DFA的状态数，采用Hopcrof算法（1976）
+	/// @brief		最小化DFA的状态数，采用Hopcrof算法（Hopcrof1976）
 	ulong Minimize();
 
-	/// @brief		NFA转化为DFA后，再一次压缩字符集，以减少存储空间
+	/// @brief		NFA转化为DFA后，再一次压缩字符集，以减少存储空间。
+	///	@todo		此函数未完成。
 	void MergeColumn();
 
-	/// @brief		计算一个DFA需要的存储空间大小
+	/// @brief		计算一个DFA需要的存储空间大小。
 	ulong CalcStoreSize() const;
 
-	/// @brief		将一个DFA以unsigned char*类型存入内存
+	/// @brief		将一个DFA以unsigned char*类型存入内存。
 	/// @param[in]	beg DFA的二进制字节流
 	void Save(byte *beg);
 
-	/// @brief		从内存读取一个DFA，存入unsigned char*类型变量
+	/// @brief		从内存读取一个DFA，存入unsigned char*类型变量。
 	/// @param[in]	beg DFA的二进制字节流
 	void Load(byte *beg);
 
-	/// @brief		处理数据包与DFA的匹配过程
+	/// @brief		处理数据包与DFA的匹配过程。
 	/// @param[in]	ByteStream 输入数据包的二进制字节流。
 	/// @param[in]	len 数据包长度。
 	/// @param[out]	StaSet CDfa状态数组。
 	ulong Process(byte *ByteStream, ulong len, STATEARY &StaSet);
 
-	/// @brief		将一个DFA输出到文件中
-	/// @param[in]	pFile 输出文件路径
+	/// @brief		将一个DFA输出到文件中。
+	/// @param[in]	pFile 输出文件路径。
 	void Dump(pcstr pFile);
 
 private:
-	/// @brief		私有成员，仅供内部使用
+	/// @brief		私有成员，仅供内部使用。
 	ulong PartStates(STATEIDARY *pRevTbl);
 
 private:
-	/// @brief		私有成员，仅供内部使用
+	/// @brief		私有成员，仅供内部使用。
 	ulong m_nId;
 
-	/// @brief		私有成员，仅供内部使用
+	/// @brief		私有成员，仅供内部使用。
 	ushort m_usColNum;
 
-	/// @brief		私有成员，仅供内部使用
+	/// @brief		私有成员，仅供内部使用。
 	STATEID m_nStartId;
 
-	/// @brief		私有成员，仅供内部使用
+	/// @brief		私有成员，仅供内部使用。
 	DFAROWARY* m_pDfa;
 
-	/// @brief		私有成员，仅供内部使用
+	/// @brief		私有成员，仅供内部使用。
 	CFinalStates m_FinStas;
 
-	/// @brief		私有成员，仅供内部使用
+	/// @brief		私有成员，仅供内部使用。
 	byte m_pGroup[SC_DFACOLCNT];
 };
 
-/// @brief		将分组中多个DFA合并为一个DFA
-/// @param[in]	nputDfas 输入多个DFA
-/// @param[out] mergedDfa 输出一个合并DFA
+/// @brief		将分组中多个DFA合并为一个DFA。
+/// @param[in]	nputDfas 输入多个DFA。
+/// @param[out] mergedDfa 输出一个合并DFA。
 DFAHDR bool MergeMultipleDfas(class CDfaArray &inputDfas, CDfa &mergedDfa);
 
-/// @brief		将一个DFA对象输出为gv格式，以供
-/// @param[in]	newdfa 输入DFA。
-/// @param[in]	fileName 输出文件路径
+/// @brief		将一个DFA对象输出为gv格式，以供GraphVis软件显示之用。
+/// @param[in]	newdfa 输入的CDfa对象。
+/// @param[in]	fileName 输出文件名，以'\0'为结尾的字符串指针。
 DFAHDR void PrintDfaToGv(CDfa &newdfa, const char* fileName);
 
 /*!
