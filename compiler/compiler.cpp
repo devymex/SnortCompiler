@@ -127,18 +127,18 @@ COMPILERHDR void ExtractSequence(const CByteArray &pcResult,
 			str.Empty();
 			return;
 
-		case OP_ALT:				/*! 113 Start of alternation */
+		case OP_ALT:				/* 113 Start of alternation */
 			strs.clear();
 			return;
 
-		case OP_CHARI:				/*! 30 Match one character: caselessly */
-		case OP_CHAR:				/*! 29 Match one character: casefully */
+		case OP_CHARI:				/* 30 Match one character: caselessly */
+		case OP_CHAR:				/* 29 Match one character: casefully */
 			str.PushBack(pcResult[cur +1]);
 			cur = cur + Steps[curCode];
 			curCode = pcResult[cur];
 			break;
 
-		case OP_CBRA:				/*! 127 Start of capturing bracket */
+		case OP_CBRA:				/* 127 Start of capturing bracket */
 			bra = cur;
 			bra += myget(bra);
 			if(pcResult[bra] == OP_ALT)
@@ -164,7 +164,7 @@ COMPILERHDR void ExtractSequence(const CByteArray &pcResult,
 			}
 			break;
 
-		case OP_POSPLUS:			/*! 43 Possessified plus: caseful */
+		case OP_POSPLUS:			/* 43 Possessified plus: caseful */
 			str.PushBack(pcResult[cur + 1]);
 			strs.push_back(str);
 
@@ -175,13 +175,13 @@ COMPILERHDR void ExtractSequence(const CByteArray &pcResult,
 			curCode = pcResult[cur];
 			break;
 
-		case OP_KET:				/*! 114 End of group that doesn't have an unbounded repeat */
+		case OP_KET:				/* 114 End of group that doesn't have an unbounded repeat */
 			cur = cur + Steps[curCode];
 			curCode = pcResult[cur];
 			break;
 
-		case OP_EXACT:				/*! 41 Exactly n matches */
-		case OP_EXACTI:				/*! 54 */
+		case OP_EXACT:				/* 41 Exactly n matches */
+		case OP_EXACTI:				/* 54 */
 
 			times = myget(cur);
 			for(ulong i = 0; i < times; ++i)
@@ -210,7 +210,7 @@ COMPILERHDR void ExtractSequence(const CByteArray &pcResult,
 			}
 			break;
 
-		case OP_PLUS:				/*! 35 the minimizing one second. */
+		case OP_PLUS:				/* 35 the minimizing one second. */
 			str.PushBack(pcResult[cur + 1]);
 			strs.push_back(str);
 			str.Clear();
@@ -220,7 +220,7 @@ COMPILERHDR void ExtractSequence(const CByteArray &pcResult,
 			curCode = pcResult[cur];
 			break;
 
-		case OP_BRAZERO:			/*! 140 These two must remain together and in this */
+		case OP_BRAZERO:			/* 140 These two must remain together and in this */
 
 			if(!str.Empty())
 			{

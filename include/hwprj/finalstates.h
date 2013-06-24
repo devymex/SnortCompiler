@@ -1,12 +1,7 @@
 /*!
-* @file		finalstates.h
-**
+* @file			finalstates.h
 * @author		Lab 435, Xidian University
-**
-* @brief			Declaration of the CFinalStates class
-**
-* Store the mapping between STATEID and DFAID
-**
+* @brief		定义了CFinalStates类，用于存储DFA状态的ID与DFAID的映射关系
 */
 
 #pragma once
@@ -19,7 +14,7 @@ class FINSTAMAP;
 #endif
 
 /*!
-* @brief
+* @brief		DFA的终态集合以及终态对应的DFAID集合
 */
 class DFAIDSETHDR CFinalStates
 {
@@ -28,13 +23,14 @@ public:
 	CFinalStates();
 
 	/// @brief		拷贝构造函数。
+	/// @param[in]	other 另一个CFinalStates对象。
 	CFinalStates(const CFinalStates &other);
 
 	/// @brief		析构函数。
 	virtual ~CFinalStates();
 
 	/// @brief		重载的 '=' 运算符。
-	/// @param[in]	other 另一个动态数组对象。
+	/// @param[in]	other 另一个CFinalStates对象。
 	/// @return		返回自身对象的引用。
 	CFinalStates& operator = (const CFinalStates &other);
 

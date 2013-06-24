@@ -28,19 +28,54 @@ typedef CUnsignedArray STATEARY;
 class DFAHDR CDfa
 {
 public:
+	/// @brief		构造函数。
 	CDfa();
+
+	/// @brief		拷贝构造函数。
 	CDfa(const CDfa &other);
+
+	/// @brief		析构函数。
 	virtual ~CDfa();
 
+	/// @brief		重载的 '=' 运算符。
+	/// @param[in]	other 另一个DFA对象。
+	/// @return		返回自身对象的引用。
 	CDfa& operator =	(const CDfa &other);
+
+	/// @brief		重载的 '[]' 运算符，取得指定位置的值的引用。
+	/// @param[in]	nIdx 指定位置的下标
+	/// @return		返回指定位置元素的引用。
 	CDfaRow& operator [] (STATEID nIdx);
+
+	/// @brief		重载的 '[]' 运算符，取得指定位置的值的引用。
+	/// @param[in]	nIdx 指定位置的下标
+	/// @return		返回指定位置元素的引用（常量）。
 	const CDfaRow& operator [] (STATEID nIdx) const;
 
+	/// @brief		得到DFA当前的大小。
+	/// @return		DFA当前的大小（常量）。
 	ulong Size() const;
+
+	/// @brief		得到DFA最后一个状态的引用。
+	/// @return		最后一个元素的引用。
 	CDfaRow& Back();
+
+	/// @brief		为DFA预留内存空间。
+	/// @param		ulSize 指定的预留的空间。
 	void Reserve(ulong ulSize);
+
+	/// @brief		更改DFA的大小。
+	/// @param[in]	ulSize 更改的尺寸。
+	/// @param[in]	ulColNum DFA跳转字符集的长度
+	/// @remark		如果ulSize大于或等于当前尺寸，则不会更改现有元素；
+	///				否则会删除多出部分的元素。
 	void Resize(ulong ulSize, ulong ulColNum);
+
+	/// @brief		清空DFA
 	void Clear();
+
+	/// @brief		将指定的DFA状态添加为DFA跳转表最后一个元素。
+	/// @param		sta 指定的DFA状态。
 	void PushBack(CDfaRow &sta);
 
 	/// @brief		获取DFA的编号。
