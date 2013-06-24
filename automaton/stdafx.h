@@ -7,7 +7,7 @@
 
 /*!
 * @defgroup		groupAutomaton 自动机模块
-* @remark		实现了自动机的相关算法和数据结构。
+* @brief		实现了自动机的相关算法和数据结构。
 */
 
 #include <iostream>

@@ -22,22 +22,22 @@ class DLLSTRING;
 */
 
 /*!
-* @brief		封装std::string，用于模块之间传递参数
+* @brief		封装std::string，用于模块之间传递参数。
 */
 class DLLSTRHDR CDllString
 {
 public:
-	/// @brief		构造函数
+	/// @brief		构造函数。
 	CDllString();
 
-	/// @brief		带参构造函数
-	/// @param[in]	pStr 以'\0'为结尾的ANSI字符串指针
+	/// @brief		带参构造函数。
+	/// @param[in]	pStr 以'\0'为结尾的ANSI字符串指针。
 	explicit CDllString(pcstr pStr);
 
-	/// @brief		拷贝构造函数
+	/// @brief		拷贝构造函数。
 	CDllString(const CDllString &other);
 
-	/// @brief		析构函数
+	/// @brief		析构函数。
 	virtual ~CDllString();
 
 	/// @brief		重载的 '=' 运算符。
@@ -93,7 +93,7 @@ public:
 	const char* Data() const;
 
 protected:
-	/// @brief		私有成员，仅供内部使用
+	/// @brief		私有成员，仅供内部使用。
 	DLLSTRING* m_pString;
 };
 
