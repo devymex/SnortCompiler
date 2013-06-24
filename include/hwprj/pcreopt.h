@@ -82,7 +82,7 @@ public:
 	void Precompile(CByteArray &pcResult) const;
 
 protected:
-	///	@brief		私有成员，仅供内部使用
+	///	@brief		私有成员，仅供内部使用。
 	CDllString m_strPcre;
 };
 
