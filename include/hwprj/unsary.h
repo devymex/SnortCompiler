@@ -23,7 +23,7 @@
 
 /*!
 * @brief	实现(ulong*)的动态数组。
-* @remark	用于替代std::vector<unsigned long>，在模块之间传递参数。
+* @detail	用于替代std::vector<unsigned long>，在模块之间传递参数。
 */
 class UNSARYHDR CUnsignedArray
 {
@@ -54,13 +54,15 @@ public:
 
 	/// @brief		重载的 '==' 运算符，判断自身对象是否与所指定的对象相同。
 	/// @param[in]	other 另一个动态数组对象。
-	/// @return		两个动态数组相等时返回true，否则返回false。
+	/// @retval		true 两个动态数组相等。
+	/// @retval		false 两个动态数组不相等。
 	/// @remark		将会执行逐元素的比较。
 	inline bool operator == (const CUnsignedArray &other) const;
 
 	/// @brief		重载的 '<' 运算符，判断自身对象是否比所指定的对象小。
 	/// @param[in]	other 另一个动态数组对象。
-	/// @return		当前的动态数组比另一个动态数组小时返回true，否则返回false。
+	/// @retval		true 左边的动态数组小于右边的动态数组。
+	/// @retval		false 左边的动态数组大于或等于右边的动态数组。
 	/// @remark		将会执行逐元素的比较。若二者长短不同，且比较至较短数组的末尾之后，
 	///				较长的数组为大。
 	inline bool operator < (const CUnsignedArray &other) const;
@@ -123,7 +125,7 @@ public:
 	void Unique();
 
 protected:
-	/// @brief		分非指定大小的内存，用来替换new。
+	/// @brief		分配指定大小的内存，用来替换new。
 	inline ulong* Alloc(ulong ulCap) const;
 
 	/// @brief		释放指定的内存，用来替换delete[]。

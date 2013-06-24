@@ -2,6 +2,7 @@
 * @file			nfarow.h
 * @author		Lab 435, Xidian University
 * @brief		Declaration of CNfaRow
+* @copyright	本项目开发组版权所有。未经许可，不得复制、更改、编译、分发。
 */
 
 #pragma once
@@ -21,14 +22,15 @@
 */
 
 /*!
-* @brief		封装了std::vector<CUnsignedArray>对象，表示NFA表中一行的数据结构。
-* @remark		NFA表中每一行对应一个状态。行中每个元素对应一个字符，存储一组状态编号
-*				的动态数组，表示该行对应的状态，经过当前字符可以跳转到的一组状态。
+* @brief		实现了NFA表中一行的数据结构，用于存储NFA中一个状态的数据。
+* @remark		主要数据结构为std::vector<CUnsignedArray>对象。NFA表中每一行
+*				对应一个状态。行中每个元素对应一个字符，存储一组状态编号的动态数组，
+*				表示该行对应的状态，经过当前字符可以跳转到的一组状态。
 */
 class NFAHDR CNfaRow
 {
 public:
-	/// @brief		NFA表的列数
+	/// @brief		NFA表的列数。
 	static const ulong COLUMNCNT = 260;
 
 	/// @brief		构造函数。

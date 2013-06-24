@@ -1,7 +1,7 @@
 /*!
-* @file		contopt.h
+* @file				contopt.h
 **
-* @author		Lab 435, Xidian University
+* @author			Lab 435, Xidian University
 **
 * @brief			Declaration of the CContentOption class
 **
@@ -17,6 +17,15 @@
 #include <hwprj\pcreopt.h>
 #include <hwprj\byteary.h>
 
+/*!
+* @addtogroup groupAutomaton
+* @{
+*/
+
+/*!
+* @brief		管理一个content选项的数据，包括属于它的修饰选项的值。
+* @remark		提供转换到CPcreOption的功能。
+*/
 class CContentOption : public CRuleOption
 {
 public:
@@ -41,31 +50,35 @@ public:
 	/// @return		返回自身对象的引用。
 	CContentOption& operator = (const CContentOption &other);
 
-	/// @brief		将content及其修饰选项转换为PCRE链
-	/// @param		pcreOpt PCRE链类型
+	/// @brief		将content及其修饰选项转换为PCRE链。
+	/// @param[out]	pcreOpt 一个CPcreOption的选项。
 	void ToPcre(CPcreOption &pcreOpt) const;
 
-	/// @brief		解析Snort规则中的content选项及其属性
-	/// @param		strPat Snort规则中content及其属性字符串
+	/// @brief		解析Snort规则中的content选项及其属性。
+	/// @param[in]	strPat Snort规则中content及其属性字符串。
 	virtual void FromPattern(const CDllString &strPat);
 
-	/// @brief		复制当前content选项中内容
+	/// @brief		复制当前content选项中内容。
 	virtual CRuleOption* Clone() const;
 
 public:
-	/// @brief		私有成员，仅供内部使用
+	/// @brief		
 	int m_nOffset;
 
-	/// @brief		私有成员，仅供内部使用
+	/// @brief		
 	int m_nDepth;
 
-	/// @brief		私有成员，仅供内部使用
+	/// @brief		
 	int m_nDistance;
 
-	/// @brief		私有成员，仅供内部使用
+	/// @brief		
 	int m_nWithin;
 
-protected:
-	/// @brief		私有成员，仅供内部使用
+private:
+	/// @brief		私有成员，仅供内部使用。
 	CByteArray m_data;
 };
+
+/*!
+@}
+*/

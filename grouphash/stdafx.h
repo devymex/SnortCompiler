@@ -6,8 +6,8 @@
 */
 
 /*!
-* @defgroup		groupGrouphash 公用模块
-* @remark		实现了分组哈希的相关算法和数据结构。
+* @defgroup		groupGrouphash 分组与哈希模块
+* @brief		实现了分组哈希的相关算法和数据结构。
 */
 
 #include <tchar.h>
@@ -33,7 +33,6 @@
 #define GROUPSHDR_DS
 #define GROUPRESHDR_DS
 #define GROUPINGHDR_DS
-
 #define HASHMAPHDR_DS
 
 typedef std::vector<struct ONEGROUP> GROUPVEC;

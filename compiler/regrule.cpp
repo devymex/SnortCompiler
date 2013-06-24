@@ -68,7 +68,12 @@ SNORTRULEHDR void CRegRule::Erase(ulong ulIdx)
 	m_pRegVec->erase(m_pRegVec->begin() + ulIdx);
 }
 
-SNORTRULEHDR CPcreChain& CRegRule::Back() const
+SNORTRULEHDR CPcreChain& CRegRule::Back()
+{
+	return m_pRegVec->back();
+}
+
+SNORTRULEHDR const CPcreChain& CRegRule::Back() const
 {
 	return m_pRegVec->back();
 }

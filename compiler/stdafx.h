@@ -1,10 +1,12 @@
 /*!
-* @file		stdafx.h
-**
+* @file			stdafx.h
 * @author		Lab 435, Xidian University
-**
-* @brief			Precompile header common library
-**
+* @brief		Precompile header common library
+*/
+
+/*!
+* @defgroup		groupCompiler 编译器模块
+* @brief		定义和实现将Snort规则编译为DFA的相关算法及数据结构。
 */
 
 #pragma once
@@ -60,3 +62,5 @@ typedef std::vector<class CPcreOption>		PCREVEC;
 
 typedef std::vector<SIGNATURE>              SIGNATUREVEC;
 typedef SIGNATUREVEC::iterator              SIGVEC_ITER;
+
+typedef std::vector<struct COMPILEDINFO>	COMPILEDINFOARY;

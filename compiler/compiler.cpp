@@ -1,7 +1,7 @@
 /*!*
-* @file		compilernew.cpp
+* @file				compilernew.cpp
 **
-* @author		Lab 435, Xidian University
+* @author			Lab 435, Xidian University
 **
 * @brief			Support functions for compile rule to dfa
 **

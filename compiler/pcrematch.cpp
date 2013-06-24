@@ -2,8 +2,9 @@
 #include "pcre\pcre.h"
 #include "p2nmain.h"
 #include <hwprj\pcrematch.h>
+#include <hwprj\pcreopt.h>
 
-PCREMATCHHDR bool PcreMatch(const char* src, int length, std::string Regex, int &Pos)
+PCREMATCHHDR bool PcreMatch(const char* src, int length,  CPcreOption &pcreopt, int &Pos)
 {
 	pcre *re;
 	const char *error;
@@ -11,31 +12,24 @@ PCREMATCHHDR bool PcreMatch(const char* src, int length, std::string Regex, int 
 	int ovector[OVECCOUNT];
 	int rc, i;
 
-	int iBegPos;
-	int iEndPos;
-	std::string Pcre;
-	std::string Behind;
-
-	iBegPos = Regex.find("/", 0);
-	iEndPos = Regex.find_last_of("/");
-	Pcre = Regex.substr(iBegPos + 1, iEndPos - iBegPos - 1);
-	Behind = Regex.substr(iEndPos + 1, Regex.find_last_of("\"") - iEndPos - 1);
-
 	int options = 0;
-	if (Behind.find("s", 0) != -1)
+	if (pcreopt.HasFlags(CPcreOption::PF_s))
 	{
 		options |= PCRE_DOTALL;
 	}
-	if (Behind.find("m", 0) != -1)
+	if (pcreopt.HasFlags(CPcreOption::PF_m))
 	{
 		options |= PCRE_MULTILINE;
 	}
-	if (Behind.find("i", 0) != -1)
+	if (pcreopt.HasFlags(CPcreOption::PF_i))
 	{
 		options |= PCRE_CASELESS;
 	}
-
-	const char* pattern = Pcre.c_str();
+	if(pcreopt.HasFlags(CPcreOption::PF_x))
+	{
+		options |= PCRE_EXTENDED;
+	}
+	const char* pattern = pcreopt.GetPcreString().Data();
 
 	//printf("string : %s\n", src);
 	//printf("pattern: \"%s\"\n", pattern);
@@ -48,7 +42,7 @@ PCREMATCHHDR bool PcreMatch(const char* src, int length, std::string Regex, int 
 		return false;
 	}
 
-	int wscount = 100;
+	int wscount = 10000;
 	int *workspace = null;
 	try
 	{

@@ -7,7 +7,7 @@
 
 /*!
 * @defgroup		groupCommon 公用模块
-* @remark		实现了编译器的相关算法和数据结构。
+* @brief		定义了公用的基本的数据结构、数据类型以及全局变量等。
 */
 
 #include <Windows.h>
