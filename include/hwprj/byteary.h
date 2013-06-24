@@ -27,14 +27,13 @@ class DLLBYTEARY;
 class BYTEARYHDR CByteArray
 {
 public:
-	/// @brief		构造函数
+	/// @brief		构造函数。
 	CByteArray();
 
-	/// @brief		拷贝构造函数
-	/// @param[in]	other 指定的另一个对象
+	/// @brief		拷贝构造函数。
 	CByteArray(const CByteArray &other);
 
-	/// @brief		析构函数
+	/// @brief		析构函数。
 	virtual ~CByteArray();
 
 	/// @brief		重载的 '=' 运算符。
@@ -43,12 +42,12 @@ public:
 	CByteArray& operator = (const CByteArray &other);
 
 	/// @brief		重载的 '[]' 运算符，取得指定位置的值的引用。
-	/// @param[in]	nIdx 指定位置的下标
+	/// @param[in]	nIdx 指定位置的下标。
 	/// @return		返回指定位置元素的引用。
 	byte& operator [] (ulong ulIdx);
 
 	/// @brief		重载的 '[]' 运算符，取得指定位置的值的引用（常量）。
-	/// @param[in]	nIdx 指定位置的下标
+	/// @param[in]	nIdx 指定位置的下标。
 	/// @return		返回指定位置元素的引用（常量）。
 	const byte& operator [] (ulong ulIdx) const;
 
@@ -56,19 +55,19 @@ public:
 	/// @return		字节的数量。
 	ulong Size() const;
 
-	/// @brief		判断数组是否为空
-	/// @retval		true 数组为空
+	/// @brief		判断数组是否为空。
+	/// @retval		true 数组为空。
 	/// @retval		false 数组非空。
 	bool Empty() const;
 
-	/// @brief		清空数组
+	/// @brief		清空数组。
 	void Clear();
 
-	/// @brief		在数组的末尾添加一个字节的数据
-	/// @param[in]	byVal 添加的字节值
+	/// @brief		在数组的末尾添加一个字节的数据。
+	/// @param[in]	byVal 添加的字节值。
 	void PushBack(byte byVal);
 
-	/// @brief		删除数组末尾的一个参数
+	/// @brief		删除数组末尾的一个参数。
 	void PopBack();
 
 	/// @brief		更改数组的大小，执行std::vector::resize操作。
@@ -86,7 +85,7 @@ public:
 	const byte* Data() const;
 
 private:
-	/// @brief		私有成员，仅供内部使用
+	/// @brief		私有成员，仅供内部使用。
 	DLLBYTEARY* m_pAry;
 };
 

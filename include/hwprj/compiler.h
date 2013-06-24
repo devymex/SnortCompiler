@@ -2,6 +2,7 @@
 * @file				compiler.h
 * @author			Lab 435, Xidian University
 * @brief			定义了编译器接口的相关结构体和函数。
+* @copyright	本项目开发组版权所有。未经许可，不得复制、更改、编译、分发。
 */
 
 #pragma once
@@ -19,7 +20,7 @@
 */
 
 /*!
-* @brief		定义了解析SNORT规则时的标记
+* @brief		定义了解析SNORT规则时的标记。
 */
 struct PARSEFLAG {
 	typedef ulong TYPE;
@@ -42,7 +43,7 @@ struct PARSEFLAG {
 
 
 /*!
-* @brief		解析SNORT规则后产生的结果数据结构
+* @brief		解析SNORT规则后产生的结果数据结构。
 */
 struct PARSERESULT
 {

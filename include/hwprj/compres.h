@@ -2,6 +2,7 @@
 * @file				compres.h
 * @author			Lab 435, Xidian University
 * @brief			定义CCompileResults类
+* @copyright	本项目开发组版权所有。未经许可，不得复制、更改、编译、分发。
 */
 
 #pragma once
@@ -27,10 +28,10 @@
 class COMPRESHDR CCompileResults
 {
 public:
-	/// @brief		获取DFA跳转矩阵
+	/// @brief		获取DFA跳转矩阵。
 	CDfaArray& GetDfaTable();
 
-	/// @brief		获取规则sid与DFA编号的对应关系
+	/// @brief		获取规则sid与DFA编号的对应关系。
 	CSidDfaIds& GetSidDfaIds();
 
 	/// @brief		获取解析得到的规格化规则集。
@@ -40,22 +41,22 @@ public:
 	const CSidDfaIds& GetSidDfaIds() const;
 	const CRegRule &GetRegexTbl() const;
 
-	/// @brief		将DFA结果输出文件
-	/// @param[in]	filename 输入包含文件路径的文件名
+	/// @brief		将DFA结果输出文件。
+	/// @param[in]	filename 输入包含文件路径的文件名。
 	ulong WriteToFile(const char *filename);
 
-	/// @brief		读入DFA结果文件
-	/// @param[in]	filename 输入包含文件路径的文件名
+	/// @brief		读入DFA结果文件。
+	/// @param[in]	filename 输入包含文件路径的文件名。
 	ulong ReadFromFile(const char *filename);
 
 private:
-	/// @brief		私有成员，仅供内部使用
+	/// @brief		私有成员，仅供内部使用。
 	CDfaArray m_dfaTbl;
 
-	/// @brief		私有成员，仅供内部使用
+	/// @brief		私有成员，仅供内部使用。
 	CSidDfaIds m_sidDfaIds;
 
-	/// @brief		私有成员，仅供内部使用
+	/// @brief		私有成员，仅供内部使用。
 	CRegRule m_RegexTbl;
 };
 

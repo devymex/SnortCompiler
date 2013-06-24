@@ -43,12 +43,12 @@ public:
 	inline CUnsignedArray& operator = (const CUnsignedArray &other);
 
 	/// @brief		重载的 '[]' 运算符，取得指定位置的值的引用。
-	/// @param[in]	nIdx 指定位置的下标
+	/// @param[in]	nIdx 指定位置的下标。
 	/// @return		返回指定位置元素的引用。
 	inline ulong& operator [] (ulong nIdx);
 
 	/// @brief		重载的 '[]' 运算符，取得指定位置的值的引用。
-	/// @param[in]	nIdx 指定位置的下标
+	/// @param[in]	nIdx 指定位置的下标。
 	/// @return		返回指定位置元素的引用（常量）。
 	inline const ulong& operator [] (ulong nIdx) const;
 
@@ -101,15 +101,15 @@ public:
 	///				否则会删除多出部分的元素。
 	inline void Resize(ulong ulSize, ulong ulVal);
 
-	/// @brief		返回数组的数据指针
-	/// @return		数组的数据指针，指向第一个元素
+	/// @brief		返回数组的数据指针。
+	/// @return		数组的数据指针，指向第一个元素。
 	inline ulong* Data();
 
-	/// @brief		返回数组的数据指针
-	/// @return		数组的数据指针（常量），指向第一个元素
+	/// @brief		返回数组的数据指针。
+	/// @return		数组的数据指针（常量），指向第一个元素。
 	inline const ulong* Data() const;
 
-	/// @brief		将数组中的所有元素赋值为指定数值
+	/// @brief		将数组中的所有元素赋值为指定数值。
 	/// @param[in]	ulVal 指定的数值。
 	inline void Fill(ulong ulVal);
 
@@ -118,10 +118,10 @@ public:
 	/// @return		若找到，则返回找到的元素的下标，否则返回ulong(-1)。
 	inline ulong Find(ulong ulVal) const;
 
-	/// @brief		排序数组中的所有元素，利用std::sort
+	/// @brief		排序数组中的所有元素，利用std::sort()。
 	void Sort();
 
-	/// @brief		使数组中的所有元素唯一化，利用std::unique
+	/// @brief		使数组中的所有元素唯一化，利用std::unique()。
 	void Unique();
 
 protected:
