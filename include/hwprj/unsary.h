@@ -1,7 +1,8 @@
 /*!
-* @file		unsary.h
-* @author	Lab 435, Xidian University
-* @brief	Common unsgined long array
+* @file			unsary.h
+* @author		Lab 435, Xidian University
+* @brief		定义了CUnsignedArray类及其导出符号
+* @copyright	本项目开发组版权所有。未经许可，不得复制、更改、编译、分发。
 */
 
 #pragma once
@@ -117,22 +118,19 @@ public:
 	void Unique();
 
 protected:
-	/// @brief		私有成员，仅供内部调用。
-	inline ulong* Alloc(ulong ulCap);
+	/// @brief		分非指定大小的内存，用来替换new。
+	inline ulong* Alloc(ulong ulCap) const;
 
-	/// @brief		私有成员，仅供内部调用。
-	inline void Free(ulong *pBuf);
+	/// @brief		释放指定的内存，用来替换delete[]。
+	inline void Free(ulong *pBuf) const;
 
-	/// @brief		私有成员，仅供内部调用。
-	inline void Increase();
-
-	/// @brief		私有成员，仅供内部调用。
+	/// @brief		重新分配指定大小。
 	inline void Realloc(ulong ulCap);
 
-	/// @brief		私有成员，仅供内部调用。
+	/// @brief		从指定的内存中拷入数据。
 	void CopyFrom(ulong *pBuf);
 
-protected:
+private:
 	/// @brief		私有成员，仅供内部调用。
 	ulong* m_pAry;
 

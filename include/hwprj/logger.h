@@ -1,8 +1,8 @@
 /*!
-* @file		dllstring.h
-* @author	Lab 435, Xidian University
-* @brief	Common string class
-* @remark	Definition of the CDllString class
+* @file			logger.h
+* @author		Lab 435, Xidian University
+* @brief		定义了CLogger类及其导出符号
+* @copyright	本项目开发组版权所有。未经许可，不得复制、更改、编译、分发。
 */
 
 #pragma once

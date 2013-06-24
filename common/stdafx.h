@@ -1,10 +1,8 @@
 /*!
-* @file		stdafx.h
-**
+* @file			stdafx.h
 * @author		Lab 435, Xidian University
-**
-* @brief			Precompile header common library
-**
+* @brief		common包的预编译头
+* @copyright	本项目开发组版权所有。未经许可，不得复制、更改、编译、分发。
 */
 
 #include <Windows.h>

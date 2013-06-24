@@ -83,7 +83,7 @@ public:
 	/// @param	pFile 输出文件路径。
 	void Dump(const char *pFile) const;
 
-protected:
+private:
 	/// @brief		私有成员，仅供内部使用
 	NFAROWARY*		m_pNfa;
 };

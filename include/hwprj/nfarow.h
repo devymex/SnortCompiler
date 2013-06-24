@@ -55,7 +55,7 @@ public:
 	/// @todo		是否需要增加Unique函数？
 	void SortAll();
 
-protected:
+private:
 	/// @brief		私有成员，仅供内部使用。
 	CUnsignedArray* m_pDestSet;
 };
