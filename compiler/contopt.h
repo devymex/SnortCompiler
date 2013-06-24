@@ -1,13 +1,7 @@
 /*!
 * @file				contopt.h
-**
 * @author			Lab 435, Xidian University
-**
-* @brief			Declaration of the CContentOption class
-**
-* inherit CRuleOption class
-* process “content” attribute in a Snort rule
-**
+* @brief			定义CContentOption类
 */
 
 #pragma once
@@ -62,16 +56,16 @@ public:
 	virtual CRuleOption* Clone() const;
 
 public:
-	/// @brief		
+	/// @brief		offset修饰项的值
 	int m_nOffset;
 
-	/// @brief		
+	/// @brief		depth修饰项的值
 	int m_nDepth;
 
-	/// @brief		
+	/// @brief		brief修饰项的值
 	int m_nDistance;
 
-	/// @brief		
+	/// @brief		within修饰项的值
 	int m_nWithin;
 
 private:
