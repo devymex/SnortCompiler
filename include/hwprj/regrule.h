@@ -1,12 +1,7 @@
 /*!
-* @file		regrule.h
-**
+* @file			regrule.h
 * @author		Lab 435, Xidian University
-**
-* @brief			Declaration of the CRegRule class
-**
-* A rule includes multiple CPcreChain, all store in CRegRule
-**
+* @brief		定义CRegRule类
 */
 
 #pragma once
@@ -16,6 +11,10 @@
 #ifndef SNORTRULEHDR_DS
 class CHAINVEC;
 #endif
+
+/*! @addtogroup groupCompiler
+*  @{
+*/
 
 /*!
 * @brief 实现了规格化的snort规则数据结构，提供对一条规则的数据进行管理的功能。
@@ -82,3 +81,7 @@ protected:
 	/// 私有成员，仅供内部使用。
 	CHAINVEC* m_pRegVec;
 };
+
+/*!
+@}
+*/
