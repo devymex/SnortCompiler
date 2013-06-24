@@ -1,3 +1,9 @@
+/*!
+* @file			groups.h
+* @author		Lab 435, Xidian University
+* @brief		定义了GROUPHASH的数据结构
+*/
+
 #include <map>
 #include <unordered_map>
 #include <hwprj\common.h>
