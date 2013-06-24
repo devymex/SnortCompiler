@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include <hwprj\compiler.h>
 #include <hwprj\grouping.h>
 #include <hwprj\dfa.h>
