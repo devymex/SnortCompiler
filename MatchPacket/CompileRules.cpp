@@ -1,33 +1,37 @@
 #include "stdafx.h"
-#include <hwprj\compiler.h>
-
 #include "MatchPkt.h"
+
+typedef std::vector<BYTEARY>			CHAINCOMPDATA;
+typedef std::vector<CHAINCOMPDATA>		RULECOMPDATA;
 
 void __stdcall MyProcess(const PARSERESULT &parseRes, void *lpParam)
 {
-	REGRULESMAP &rulesmap = *(REGRULESMAP*)lpParam;
-	PARSEFLAG::TYPE nFlag = parseRes.ulFlag;
-
-	if (parseRes.regRule.Size() == 0)
+	CByteArray byteary;
+	if (parseRes.ulFlag == PARSEFLAG::PARSE_SUCCESS)
 	{
-		return;
-	}
-	else if (nFlag & PARSEFLAG::PARSE_HASNOT)
-	{
-		return;
-	}
-	else if (nFlag & PARSEFLAG::PARSE_HASBYTE)
-	{
-		return;
-	}
-
-	else
-	{
-		rulesmap.result.resize(rulesmap.result.size() + 1);
-		rulesmap.result.back().m_nSid = parseRes.ulSid;
+		REGRULESMAP &rulesmap = *(REGRULESMAP*)lpParam;
+		rulesmap.result.push_back(REGRULES());
 		rulesmap.result.back().regrule = parseRes.regRule;
+		rulesmap.result.back().m_nSid = parseRes.ulSid;
+		CRegRule &rrule = rulesmap.result.back().regrule;
+
+		for(size_t i = 0; i < rrule.Size(); ++i)
+		{
+			for(size_t j = 0; j < rrule[i].Size(); ++j)
+			{
+				std::vector<CByteArray> seqAry;
+				rrule[i][j].Precompile(byteary);
+				ExtractSequence(byteary, seqAry);
+				for(size_t k = 0; k < seqAry.size(); ++k)
+				{
+					ExtractSignatures(seqAry[k], rrule[i].GetSigs());
+				}
+			}
+			rrule[i].GetSigs().Unique();
+		}
 	}
 }
+
 
 MATCHPKT void MchCompile(const char* filename, LPVOID lpVoid)
 {
@@ -46,6 +50,7 @@ MATCHPKT void MchCompile(const char* filename, LPVOID lpVoid)
 		{
 			SIGNATURE sig;
 			ulong sigcnt = (iter->regrule)[chainsize].GetSigs().Size();
+
 			if (sigcnt > 0)
 			{
 				flag |= (1 << 1);
@@ -55,6 +60,7 @@ MATCHPKT void MchCompile(const char* filename, LPVOID lpVoid)
 				for (ulong cursig = 0; cursig < sigcnt; ++cursig)
 				{
 					sig = (iter->regrule)[chainsize].GetSigs()[cursig];
+					char *csig = (char*)&sig;
 
 					if (rulesmap.sigmap.count(sig) != 0)
 					{
