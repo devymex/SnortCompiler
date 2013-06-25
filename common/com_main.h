@@ -14,4 +14,18 @@
 * @li @b 查看软件类库的参考文档请点击上方导航栏的“模块”链接。
 * @li @b 查看软件算法的相关文档请点击上方导航栏的“相关页面”链接。
 *
+* @section secProcess 工作流程
+*
+* 本软件可以将Snort规则编译为正则表达式，以便在硬件上实现对网络数据包的快速预匹配。
+*
+* @subsection subCompProc 编译流程
+* - 解析规则：读入文件，过滤规则头，提取选项等
+* - 处理规则：分链，删链，提取SIG
+* - 编译规则：
+* - 分组：
+* - 哈希：
+*
+* @subsection subMatchProc 匹配流程
+*
+* @subsection subImplement 部署流程
 */

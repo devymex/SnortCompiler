@@ -12,6 +12,7 @@
 * @li 存储要求：支持将结果数据写入硬盘，但需保证硬盘的剩余空间大于需要写入的数据大小。
 *
 * @section module 二、模块结构
+*
 * @dot
 * digraph module {
 * node [shape=record, fontname="Microsoft YaHei", fontsize=11];
