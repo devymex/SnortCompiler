@@ -522,14 +522,14 @@ void ProcessPcre(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa)
 	Process(Beg, End, nfa, CurState, PreStates, ALTPreBeg, ALTBeg, ulong(-1), false, false, false, vecPath, bHasEnd);
 	if (!bHasEnd)
 	{
-		ulong nLastRow = nfa.Size();
-		nfa.PushBack(CNfaRow());
-		CNfaRow &row = nfa.Back();
-		for (ulong i = 0; i < EMPTY; ++i)
-		{
-			row[i].PushBack(nLastRow);
-		}
-		row[EMPTY].PushBack(nLastRow + 1);
+		//ulong nLastRow = nfa.Size();
+		//nfa.PushBack(CNfaRow());
+		//CNfaRow &row = nfa.Back();
+		//for (ulong i = 0; i < EMPTY; ++i)
+		//{
+		//	row[i].PushBack(nLastRow);
+		//}
+		//row[EMPTY].PushBack(nLastRow + 1);
 	}
 }
 
