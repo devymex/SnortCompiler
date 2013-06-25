@@ -35,7 +35,7 @@ public:
 	virtual ~CStringArray();
 
 	/// @brief		重载的赋值运算符。
-	/// @param[in]	other 另一个CStringArray对象
+	/// @param[in]	other 另一个CStringArray对象。
 	CStringArray& operator = (const CStringArray &other);
 
 	/// @brief		返回指定位置的字符串。
@@ -55,12 +55,12 @@ public:
 	/// @brief		删除所包含的所有字符串。
 	void Clear();
 
-	/// @brief		将指定的字符串对象添加到数组
+	/// @brief		将指定的字符串对象添加到数组。
 	/// @param[in]	str 待添加进入的字符串对象。
 	void PushBack(const CDllString &str);
 
 private:
-	/// @brief		私有成员，仅供内部使用
+	/// @brief		私有成员，仅供内部使用。
 	DLLSTRINGARY* m_pStrAry;
 };
 

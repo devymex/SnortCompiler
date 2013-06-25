@@ -46,22 +46,22 @@ public:
 	/// @brief		获得所有解析得到的规格化规则集合（常量）。
 	const CRegRule &GetRegexTbl() const;
 
-	/// @brief		将DFA结果输出文件
-	/// @param[in]	filename 输入包含文件路径的文件名
+	/// @brief		将DFA结果输出文件。
+	/// @param[in]	filename 输入包含文件路径的文件名。
 	ulong WriteToFile(const char *filename);
 
-	/// @brief		读入DFA结果文件
-	/// @param[in]	filename 输入包含文件路径的文件名
+	/// @brief		读入DFA结果文件。
+	/// @param[in]	filename 输入包含文件路径的文件名。
 	ulong ReadFromFile(const char *filename);
 
 private:
-	/// @brief		私有成员，仅供内部使用
+	/// @brief		私有成员，仅供内部使用。
 	CDfaArray m_dfaTbl;
 
-	/// @brief		私有成员，仅供内部使用
+	/// @brief		私有成员，仅供内部使用。
 	CSidDfaIds m_sidDfaIds;
 
-	/// @brief		私有成员，仅供内部使用
+	/// @brief		私有成员，仅供内部使用。
 	CRegRule m_RegexTbl;
 };
 

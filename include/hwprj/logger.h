@@ -50,8 +50,13 @@ public:
 	const char* nl;
 
 private:
+	/// @brief		私有成员，仅供内部使用。
 	CLogger(const CLogger &other);
+
+	/// @brief		私有成员，仅供内部使用。
 	CLogger& operator = (const CLogger &other);
+
+	/// @brief		私有成员，仅供内部使用。
 	LOGFILE *m_pLogFile;
 };
 

@@ -120,7 +120,7 @@ public:
 	/// @param[in]	一个CNfa对象。
 	ulong FromNFA(const CNfa &nfa);
 
-	/// @brief		最小化DFA的状态数，采用Hopcrof算法（Hopcrof1976）
+	/// @brief		最小化DFA的状态数，采用Hopcrof算法（Hopcrof1971）
 	ulong Minimize();
 
 	/// @brief		NFA转化为DFA后，再一次压缩字符集，以减少存储空间。
