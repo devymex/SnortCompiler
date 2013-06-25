@@ -20,7 +20,7 @@
 */
 
 /*!
-* @brief		定义了解析SNORT规则时的标记
+* @brief		定义了解析SNORT规则时的标记。
 */
 struct PARSEFLAG {
 	typedef ulong TYPE;
@@ -43,7 +43,7 @@ struct PARSEFLAG {
 
 
 /*!
-* @brief		解析SNORT规则后产生的结果数据结构
+* @brief		解析SNORT规则后产生的结果数据结构。
 */
 struct PARSERESULT
 {
