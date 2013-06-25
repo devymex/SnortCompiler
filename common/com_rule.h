@@ -7,7 +7,9 @@
 * 
 * @section secSnortOption Snort规则选项
 * 
-* 以下为可以处理的Snort规则选项列表
+* Snort规则语法的语义非常丰富，能够以很多种方式精确的描述一个数据包的匹配方式，
+* 并对匹配后的处理做出规定。由于状态机理论本身的局限性，以状态机的方式来编译数据包
+* 无法支持全部的Snort规则选项，以下列出所有可以处理的Snort规则选项列表。
 * @li <b>content</b>：Snort规则模式选项。
 * @li <b>nocase</b>：content及uricontent选项的修饰选项。
 * @li <b>offset</b>：content及uricontent选项的修饰选项。
@@ -19,37 +21,39 @@
 *
 * @subsection subContentOption content选项
 * 
-* content选项包含混合的文本和二进制数据。二进制数据通常用管道(|)符号括起来并以十六进制表示的字节码的方式指定。@n
-* content选项带有多个修饰项。这些修饰选项如下：@n
-* @b nocase：
-* 修饰紧接自身之前的content选项，使其在匹配时忽略大小写。@n
-* 示例：alert tcp any any -> any 21 (msg:"FTP ROOT"; content:"USER"; nocase;)，
-*		表示数据包匹配时，"user"或"USER"或"uSER"等均能匹配该content内容。@n
+* content选项包含混合的文本和二进制数据。二进制数据通常用管道“|”符号括起来并以十六进制
+* 表示的字节码的方式指定。@n
 *
-* @b offset：
-* 修饰紧接自身之前的content选项，允许指定从数据包净载的第几个字节开始进行匹配。@n
-* 示例：alert tcp any any -> any 80 (content: "cgi-bin/phf"; offset:4;)，
+* content选项带有多个修饰项。这些修饰选项如下：@n
+* <b>nocase</b>：修饰紧接自身之前的content选项，使其在匹配时忽略大小写。@n
+* <b>示例</b>：alert tcp any any -> any 21 (msg:"FTP ROOT"; content:"USER";
+* nocase;)，表示数据包匹配时，"user"或"USER"或"uSER"等均能匹配该content内容。@n
+*
+* <b>offset</b>：修饰紧接自身之前的content选项，允许指定从数据包净载的第几个字节
+* 开始进行匹配。@n
+* <b>示例</b>：alert tcp any any -> any 80 (content: "cgi-bin/phf"; offset:4;)，
 *		表示从数据包净载的第5个字节开始查找"cgi-bin/phf"字符串。@n
 *
-* @b depth：
+* <b>depth</b>：
 * 修饰紧接自身之前的content选项，允许指定在数据区中搜索特定模式的深度。@n
-* 示例：alert tcp any any -> any 80 (content: "root"; depth:10;)，
+* <b>示例</b>：alert tcp any any -> any 80 (content: "root"; depth:10;)，
 *		表示从数据包净载的起始位置的10个字节中查找"root"字符串。@n
 *
-* @b distance：
+* <b>distance</b>：
 * 修饰紧接自身之前的content选项，允许指定相对于上一个content选项匹配成功的串尾再加
 * 几个字节开始搜索distance修饰的content选项指定的匹配内容。@n
-* 示例：alert tcp any any -> any any (content:"ABC"; content: "DEF";distance:1;)，
-*		表示从数据包中已经匹配到"ABC"的位置开始，跳过1个字节，再开始查找"DEF"字符串。@n
+* <b>示例</b>：alert tcp any any -> any any (content:"ABC"; content: "DEF";
+* distance:1;)，表示从数据包中已经匹配到"ABC"的位置开始，跳过1个字节，
+* 再开始查找"DEF"字符串。@n
 *
-* @b within：
+* <b>within</b>：
 * 修饰紧接自身之前的content选项，允许指定相对于上一个content选项匹配成功的串尾开始，
 * 特定的数据区内搜索within修饰的content选项指定的匹配内容。@n
-* 示例：alert tcp any any -> any any (content:"ABC"; content: "EFG"; within:10;)，
-*		表示从数据包中已经匹配到"ABC"的位置开始的10个字节内查找"EFG"字符串。@n
+* <b>示例</b>：alert tcp any any -> any any (content:"ABC"; content: "EFG";
+* within:10;)，表示从数据包中已经匹配到"ABC"的位置开始的10个字节内查找"EFG"字符串。@n
 *
-* 注：content选项内容之前放置了“!”字符，表示在数据中不包含选项内容时引发报警。对于包含此类content的
-* 规则不作处理。@n
+* 注：content选项内容之前放置了“!”字符，表示在数据中不包含选项内容时引发报警。
+* 对于包含此类content的规则不作处理。@n
 *
 * @subsection subUriOption uricontent选项
 * 
@@ -93,17 +97,20 @@
 *
 * @subsection subChainCompress 选项链的删除
 * 
-* 根据对Snort规则的分析发现：一些包含content选项和pcre选项的规则中，会出现content内容与pcre内容部分重复的情况。@n
+* 根据对Snort规则的分析发现：一些包含content选项和pcre选项的规则中，会出现content内容
+* 与pcre内容部分重复的情况。@n
 * 对于该情况的处理，在保证规则含义不改变的前提下，剔除重复内容。@n
 *
 * @subsection subRuleSig 规则的特征字符串
 *
-* 分组后每一组要选出一个或多个全局唯一的特征字符串（Signature）来代表该组，因此从选项链中提取Signature是分组的前提。
+* 分组后每一组要选出一个或多个全局唯一的特征字符串（Signature）来代表该组，因此从选项链
+* 中提取Signature是分组的前提。
 * - 从content和uricontent中提取Signature的方法：@n
 *
 * 从Snort规则的content和uricontent字段中提取出的连续的4Byte的字符串，
 * 一个长度为n的选项，可提出n-4个Signautre。@n
-* 例如：某一规则中的content为“NetBus”，则最多可提出3个初始的Signature：“NetB”、“etBu”和“tBus”。@n
+* 例如：某一规则中的content为“NetBus”，则最多可提出3个初始的Signature：“NetB”、
+* “etBu”和“tBus”。@n
 *
 * - subPcreSig 从pcre中提取Signature的方法：@n
 * 
