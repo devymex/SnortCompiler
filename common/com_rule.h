@@ -106,15 +106,16 @@
 *
 * @subsection subRuleSig 规则的特征字符串
 *
-* 分组后每一组要选出一个或多个全局唯一的特征字符串（Signature）来代表该组，因此从选项链
-* 中提取Signature是分组的前提。
-* - 从content和uricontent中提取Signature的方法：@n
+* 分组后每一组要选出一个或多个全局唯一的特征字符串（SIG）来代表该组，因此从选项链
+* 中提取SIG是分组的前提。
+* - 从content和uricontent中提取SIG的方法：@n
 *
 * 从Snort规则的content和uricontent字段中提取出的连续的4Byte的字符串，
-* 一个长度为n的选项，可提出n-4个Signautre。@n
-* 例如：某一规则中的content为“NetBus”，则最多可提出3个初始的Signature：“NetB”、
+* 一个长度为 n > 4 的选项，可提出n-4个SIG。@n
+* 例如：某一规则中的content为“NetBus”，则最多可提出3个初始的SIG：“NetB”、
 * “etBu”和“tBus”。@n
 *
-* - subPcreSig 从pcre中提取Signature的方法：@n
+* - subPcreSig 从pcre中提取SIG的方法：@n
 * 
+* 通过pcre库将pcre进行解析，然后在pcre中提取必定出现的字符串，并在字符串中提取SIG。
 */
