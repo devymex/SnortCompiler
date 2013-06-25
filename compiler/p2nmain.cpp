@@ -392,6 +392,8 @@ bool CanProcess(BYTEARY_ITER &Beg, const BYTEARY_ITER &End)
 			case OP_END:
 			case OP_CIRC:
 			case OP_CIRCM:
+			case OP_DOLL:
+			case OP_DOLLM:
 				Beg += Steps[*Beg];
 				break;
 			case OP_CLASS:
@@ -516,10 +518,22 @@ void ProcessPcre(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa)
 	std::vector<PCRESIGN> vecPath;
 	std::vector<ulong> PreStates;
 	ulong ALTPreBeg = CurState;
-	Process(Beg, End, nfa, CurState, PreStates, ALTPreBeg, ALTBeg, ulong(-1), false, false, false, vecPath);
+	bool bHasEnd = false;
+	Process(Beg, End, nfa, CurState, PreStates, ALTPreBeg, ALTBeg, ulong(-1), false, false, false, vecPath, bHasEnd);
+	if (!bHasEnd)
+	{
+		ulong nLastRow = nfa.Size();
+		nfa.PushBack(CNfaRow());
+		CNfaRow &row = nfa.Back();
+		for (ulong i = 0; i < EMPTY; ++i)
+		{
+			row[i].PushBack(nLastRow);
+		}
+		row[EMPTY].PushBack(nLastRow + 1);
+	}
 }
 
-void Process(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, std::vector<ulong> &PreStates, ulong ALTPreBeg, bool &ALTBeg, ulong ALTBeginState, bool bCBRA, bool bALT, bool bBRAZERO, std::vector<PCRESIGN> &vecPath)
+void Process(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, std::vector<ulong> &PreStates, ulong ALTPreBeg, bool &ALTBeg, ulong ALTBeginState, bool bCBRA, bool bALT, bool bBRAZERO, std::vector<PCRESIGN> &vecPath, bool &bHasEnd)
 {
 	BYTEARY_ITER start, end;
 	ulong CurPreState;
@@ -535,6 +549,8 @@ void Process(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurSt
 	bool IsCBRA = bCBRA;
 	bool IsALT = bALT;
 	bool IsBRAZERO = bBRAZERO;
+	bool bDoll = false;
+	bool bDollm = false;
 	ulong ALTBegState = ALTBeginState;
 	for (;Beg != End;)
 	{
@@ -548,12 +564,20 @@ void Process(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurSt
 			switch (*Beg)
 			{
 			case OP_END:
-				Beg += Steps[*Beg];
-				break;
 			case OP_CIRC:
+			case OP_CIRCM:
 				Beg += Steps[*Beg];
 				break;
-			case OP_CIRCM:
+			case OP_DOLL:
+				bHasEnd = true;
+				bDoll = true;
+				OP_DOLL_FUNC(nfa, CurState, ALTPreState, ALTBeg, ALTBegState, IsALT);
+				Beg += Steps[*Beg];
+				break;
+			case OP_DOLLM:
+				bHasEnd = true;
+				bDollm = true;
+				OP_DOLLM_FUNC(nfa, CurState, ALTPreState, ALTBeg, ALTBegState, IsALT);
 				Beg += Steps[*Beg];
 				break;
 			case OP_CLASS:
@@ -572,7 +596,7 @@ void Process(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurSt
 				end = Beg + GET(Beg + 1);
 				start = Beg + Steps[OP_ALT];
 				OP_ALT_FUNC(start, end, nfa, ALTPreState, CurState);
-				Process(start, end, nfa, CurState, PreStates, ALTPreState, ALTBeg, ALTBegState, IsCBRA, IsALT, IsBRAZERO, vecPath);
+				Process(start, end, nfa, CurState, PreStates, ALTPreState, ALTBeg, ALTBegState, IsCBRA, IsALT, IsBRAZERO, vecPath, bHasEnd);
 				Beg = end;
 				break;
 			case OP_KET:
@@ -664,7 +688,7 @@ void Process(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurSt
 				{
 					TTHROW(TI_INVALIDDATA);
 				}
-				OP_KET_FUNC(nfa, CurPreState, CurState, IsALT, IsBRAZERO);
+				OP_KET_FUNC(nfa, CurPreState, CurState, IsALT, IsBRAZERO, bDoll, bDollm);
 				Beg += Steps[OP_KET];
 				break;
 			case OP_KETRMAX:
@@ -713,7 +737,7 @@ void Process(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurSt
 				vecPath.push_back(ONCE);
 				PreStates.push_back(CurState);
 				AddEMPTY(nfa, CurState);
-				Process(start, end, nfa, CurState, PreStates, ALTPreState, ALTBeg, ALTBegState, IsCBRA, IsALT, IsBRAZERO, vecPath);
+				Process(start, end, nfa, CurState, PreStates, ALTPreState, ALTBeg, ALTBegState, IsCBRA, IsALT, IsBRAZERO, vecPath, bHasEnd);
 				Beg = end;
 				break;
 			case OP_BRA:
@@ -729,7 +753,7 @@ void Process(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurSt
 				PreStates.push_back(CurState);
 				AddEMPTY(nfa, CurState);
 				OP_BRA_FUNC(start, end, nfa, CurState);
-				Process(start, end, nfa, CurState, PreStates, ALTPreState, ALTBeg, ALTBegState, IsCBRA, IsALT, IsBRAZERO, vecPath);
+				Process(start, end, nfa, CurState, PreStates, ALTPreState, ALTBeg, ALTBegState, IsCBRA, IsALT, IsBRAZERO, vecPath, bHasEnd);
 				Beg = end;
 				break;
 			case OP_CBRA:
@@ -743,7 +767,7 @@ void Process(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurSt
 				PreStates.push_back(CurState);
 				AddEMPTY(nfa, CurState);
 				OP_CBRA_FUNC(start, end, nfa, CurState);
-				Process(start, end, nfa, CurState, PreStates, ALTPreState, ALTBeg, ALTBegState, IsCBRA, IsALT, IsBRAZERO, vecPath);
+				Process(start, end, nfa, CurState, PreStates, ALTPreState, ALTBeg, ALTBegState, IsCBRA, IsALT, IsBRAZERO, vecPath, bHasEnd);
 				Beg = end;
 				break;
 			case OP_SCBRA:
@@ -757,7 +781,7 @@ void Process(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurSt
 				}
 				PreStates.push_back(CurState);
 				AddEMPTY(nfa, CurState);
-				Process(start, end, nfa, CurState, PreStates, ALTPreState, ALTBeg, ALTBegState, IsCBRA, IsALT, IsBRAZERO, vecPath);
+				Process(start, end, nfa, CurState, PreStates, ALTPreState, ALTBeg, ALTBegState, IsCBRA, IsALT, IsBRAZERO, vecPath, bHasEnd);
 				Beg = end;
 				break;
 			case OP_BRAZERO:
@@ -770,7 +794,7 @@ void Process(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurSt
 				}
 				PreStates.push_back(CurState);
 				AddEMPTY(nfa, CurState);
-				Process(start, end, nfa, CurState, PreStates, ALTPreState, ALTBeg, ALTBegState, IsCBRA, IsALT, IsBRAZERO, vecPath);
+				Process(start, end, nfa, CurState, PreStates, ALTPreState, ALTBeg, ALTBegState, IsCBRA, IsALT, IsBRAZERO, vecPath, bHasEnd);
 				Beg = end;
 				break;
 			}
@@ -837,6 +861,30 @@ void OP_CIRCM_FUNC(CNfa &nfa, ulong &CurState)
 	nfa[nCursize]['\n'].PushBack(CurState);
 }
 
+void OP_DOLL_FUNC(CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState, bool IsALT)
+{
+	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
+}
+
+void OP_DOLLM_FUNC(CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState, bool IsALT)
+{
+	ProcessALT(nfa, PreState, ALTBegin, ALTBegState);
+	if (!IsALT)
+	{
+		++CurState;
+		ulong nCursize = nfa.Size();
+		nfa.Resize(nCursize + 1);
+		nfa.Back()['\n'].PushBack(CurState);
+		nfa.Back()[EMPTY].PushBack(CurState + 1);
+		nfa.Resize(nCursize + 2);
+		++CurState;
+		for (ulong i = 0; i < EMPTY; ++i)
+		{
+			nfa.Back()[i].PushBack(CurState);
+		}
+		nfa.Back()[EMPTY].PushBack(CurState);
+	}
+}
 
 void OP_CHAR_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState)
 {
@@ -1613,7 +1661,7 @@ void OP_ALT_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong Pr
 	}
 }
 
-void OP_KET_FUNC(CNfa &nfa, ulong PreState, ulong &CurState, bool IsALT, bool IsBRAZERO)
+void OP_KET_FUNC(CNfa &nfa, ulong PreState, ulong &CurState, bool IsALT, bool IsBRAZERO, bool &bDoll, bool &bDollm)
 {
 	if (IsBRAZERO)
 	{
@@ -1632,10 +1680,45 @@ void OP_KET_FUNC(CNfa &nfa, ulong PreState, ulong &CurState, bool IsALT, bool Is
 					ulong &nSta = row[j][k];
 					if (nSta == MAX)
 					{
-						nSta = CurState;
+						if (bDoll)
+						{
+							if (i + 1 == CurState)
+							{
+								nSta = CurState + 1;
+							}
+							else
+							{
+								nSta = CurState;
+							}
+						}
+						else if (bDollm)
+						{
+							if (i + 1 == CurState)
+							{
+								nSta = CurState + 1;
+								row['\n'].PushBack(CurState);
+							}
+							else
+							{
+								nSta = CurState;
+							}
+						}
+						else
+						{
+							nSta = CurState;
+						}
 					}
 				}
 			}
+		}
+		if (bDoll || bDollm)
+		{
+			bDoll = false;
+			bDollm = false;
+			++CurState;
+			ulong nCursize = nfa.Size();
+			nfa.Resize(nCursize + 1);
+			nfa.Back()[EMPTY].PushBack(CurState);
 		}
 	}
 }

@@ -102,6 +102,7 @@ int main()
 
 	//CGroupRes groupRes;
 	//groupRes.ReadFromFile("..\\FinalResult.cdt");
+<<<<<<< develop
 
 
 	//for (ulong i = 0; i < groupRes.GetDfaTable().Size(); ++i)
@@ -115,6 +116,103 @@ int main()
 	//		}
 	//	}
 	//}
+=======
+
+	//ulong nSuccess = 0;
+	//ulong nPcreError = 0;
+	//ulong nOptionError = 0;
+	//ulong nHasByte = 0;
+	//ulong nHasNot = 0;
+	//ulong nEmpty = 0;
+	//ulong nHasNoSig = 0;
+	//ulong nExceedLimit = 0;
+	//std::cout << groupRes.GetSidDfaIds().Size() << std::endl;
+	//std::ofstream fout("..\\test.txt");
+	//for (ulong i = 0; i < groupRes.GetSidDfaIds().Size(); ++i)
+	//{
+	//	if (groupRes.GetSidDfaIds()[i].m_nResult == COMPILEDINFO::RES_SUCCESS)
+	//	{
+	//		++nSuccess;
+	//	}
+	//	if (groupRes.GetSidDfaIds()[i].m_nResult & COMPILEDINFO::RES_PCREERROR)
+	//	{
+	//		++nPcreError;
+	//	}
+	//	if (groupRes.GetSidDfaIds()[i].m_nResult & COMPILEDINFO::RES_OPTIONERROR)
+	//	{
+	//		++nOptionError;
+	//		fout << groupRes.GetSidDfaIds()[i].m_nSid << std::endl;
+	//	}
+	//	if (groupRes.GetSidDfaIds()[i].m_nResult & COMPILEDINFO::RES_HASBYTE)
+	//	{
+	//		++nHasByte;
+	//	}
+	//	if (groupRes.GetSidDfaIds()[i].m_nResult & COMPILEDINFO::RES_HASNOT)
+	//	{
+	//		++nHasNot;
+	//	}
+	//	if (groupRes.GetSidDfaIds()[i].m_nResult & COMPILEDINFO::RES_EMPTY)
+	//	{
+	//		++nEmpty;
+	//	}
+	//	if (groupRes.GetSidDfaIds()[i].m_nResult & COMPILEDINFO::RES_HASNOSIG)
+	//	{
+	//		++nHasNoSig;
+	//	}
+	//	if (groupRes.GetSidDfaIds()[i].m_nResult & COMPILEDINFO::RES_EXCEEDLIMIT)
+	//	{
+	//		++nExceedLimit;
+	//	}
+	//}
+	//std::cout << nSuccess << std::endl;
+	//std::cout << nPcreError << std::endl;
+	//std::cout << nOptionError << std::endl;
+	//std::cout << nHasByte << std::endl;
+	//std::cout << nHasNot << std::endl;
+	//std::cout << nEmpty << std::endl;
+	//std::cout << nHasNoSig << std::endl;
+	//std::cout << nExceedLimit << std::endl;
+
+	//CGroupRes groupRes;
+	//groupRes.ReadFromFile("..\\FinalResult.cdt");
+
+	//ulong nReduce = 0;
+	//ulong nAll = 0;
+	//int* occurCnt = new int[256];
+	//for (ulong i = 0; i < groupRes.GetDfaTable().Size(); ++i)
+	//{
+	//	for (ulong j = 0; j < groupRes.GetDfaTable()[i].Size(); ++j)
+	//	{
+	//		std::fill(occurCnt, occurCnt + 256, 0);
+	//		for (ulong k = 0; k < groupRes.GetDfaTable()[i].GetGroupCount(); ++k)
+	//		{
+	//			ushort nVal = groupRes.GetDfaTable()[i][j][k];
+	//			if (nVal == ushort(-1))
+	//			{
+	//				++occurCnt[255];
+	//			}
+	//			else
+	//			{
+	//				++occurCnt[nVal];
+	//			}
+	//		}
+	//		int max = -1;
+	//		for (ulong k = 0; k < 256; ++k)
+	//		{
+	//			if (max < occurCnt[k])
+	//			{
+	//				max = occurCnt[k];
+	//			}
+	//		}
+	//		nReduce += groupRes.GetDfaTable()[i].GetGroupCount() - 2 * (groupRes.GetDfaTable()[i].GetGroupCount() - max + 1);
+	//		nAll += groupRes.GetDfaTable()[i].GetGroupCount();
+	//	}
+	//}
+	//delete[] occurCnt;
+	//std::cout << nReduce << std::endl;
+	//std::cout << nAll << std::endl;
+	//std::cout << nReduce / double(nAll) << std::endl;
+>>>>>>> local
 
 	CTimer ctime;
 	CCompileResults result;
