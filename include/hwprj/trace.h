@@ -61,8 +61,6 @@ private:
 	ulong m_ulLine;
 };
 
-
-/// @breif		通用异常信息字符串的宏定义。
 TRACEHDR extern pcstr TI_BADALLOC;		/// 内存分配错误。
 TRACEHDR extern pcstr TI_NOTFOUND;		/// 指定的内容未找到。
 TRACEHDR extern pcstr TI_OUTOFRANGE;	/// 越界访问。
