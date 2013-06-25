@@ -102,7 +102,7 @@
 * s -> 1 [label="ε"];
 * s -> 2 [label="ε"];
 * 1 -> 1 [label="Any"];
-* 1 -> 2 [label="\n"];
+* 1 -> 2 [label="\\n"];
 * 2 -> 3 [label="a"];
 * 3 -> 4 [label="b"];
 * 4 -> 5 [label="c"];
@@ -111,8 +111,8 @@
 * 
 * @subsection subMetaE 元字符“$”
 * $	代表目标字符串的末尾位置(在多行模式下为行尾)
-* 在多行模式下构建nfa的方式举例如下：
-* 1、“/abc$/m”
+* 在多行模式下构建nfa的方式举例如下：@n
+* - “/abc$/m”
 * 
 * @dot
 * digraph onedfa {
@@ -123,14 +123,14 @@
 * s -> 1 [label="a"];
 * 1 -> 2 [label="b"];
 * 2 -> 3 [label="c"];
-* 3 -> 4 [label="\n"];
+* 3 -> 4 [label="\\n"];
 * 3 -> 5 [label="ε"];
 * 4 -> 4 [label="Any"];
 * 4 -> 5 [label="ε"];
 * }
 * @enddot
 * 
-* 2、“/ab(c|$)/m”
+* - “/ab(c|$)/m”
 * 
 * @dot
 * digraph onedfa {
@@ -141,14 +141,14 @@
 * s -> 1 [label="a"];
 * 1 -> 2 [label="b"];
 * 2 -> 3 [label="c"];
-* 2 -> 3 [label="\n"];
+* 2 -> 3 [label="\\n"];
 * 3 -> 3 [label="Any"];
 * 3 -> 4 [label="ε"];
 * 2 -> 4 [label="ε"];
 * }
 * @enddot
 * 
-* @subsection subRepeat 元字符“?”
+* @subsection subMetaQuest 元字符“?”
 * ?	0个或1个
 * 构建nfa的方式举例如下：
 * “/ab?c/”
@@ -166,7 +166,7 @@
 * }
 * @enddot
 *
-* @subsection subRepeat 元字符“*”
+* @subsection subMetaStar 元字符“*”
 * *	0个或任意多个
 * 构建nfa的方式举例如下：
 * “/ab*c/”
@@ -184,7 +184,7 @@
 * }
 * @enddot
 *
-* @subsection subRepeat 元字符“+”
+* @subsection subMetaPlus 元字符“+”
 * +	1个或任意多个
 * 构建nfa的方式举例如下：
 * “/ab+c/”	==>	“/abb*c/”
@@ -203,8 +203,8 @@
 * }
 * @enddot
 *
-* @subsection subRepeat 元字符“{}”
-* 1、{m} 出现m次
+* @subsection subMetaBrace 元字符“{}”
+* - {m} 出现m次
 * 构建nfa的方式举例如下：
 * “/ab{2}c/”	==>	“/abbc/”
 * 
@@ -221,7 +221,7 @@
 * }
 * @enddot
 *
-* 2、{m,n} 至少出现m次,至多出现n次
+* - {m,n} 至少出现m次,至多出现n次
 * 构建nfa的方式举例如下：
 * “/ab{2,4}c/”	==>	“/abbb?b?c/”
 * 
@@ -242,7 +242,7 @@
 * }
 * @enddot
 *
-* 3、{m,} 至少出现m次
+* - {m,} 至少出现m次
 * 构建nfa的方式举例如下：
 * “/ab{2,}c/”	==>	“/abbb*c/”
 * 
@@ -258,20 +258,6 @@
 * 3 -> 3 [label="b"];
 * 3 -> 4 [label="ε"];
 * 4 -> 5 [label="c"];
-* }
-* @enddot
-*
-*
-* @dot
-* digraph onedfa {
-* graph [rankdir="LR"];
-* node [shape=record];
-* node [shape="circle"];
-* 4 [peripheries=2];
-* s -> 1 [label="a"];
-* 1 -> 2 [label="b"];
-* 2 -> 3 [label="c"];
-* 3 -> 4 [label="任意"];
 * }
 * @enddot
 *
