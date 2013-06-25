@@ -100,49 +100,49 @@ int main()
 	//foutMerge.clear();
 	//foutMerge.close();
 
-	CGroupRes groupRes;
-	groupRes.ReadFromFile("..\\FinalResult.cdt");
+	//CGroupRes groupRes;
+	//groupRes.ReadFromFile("..\\FinalResult.cdt");
 
-	ulong nReduce = 0;
-	ulong nAll = 0;
-	for (ulong i = 0; i < groupRes.GetDfaTable().Size(); ++i)
+	//ulong nReduce = 0;
+	//ulong nAll = 0;
+	//for (ulong i = 0; i < groupRes.GetDfaTable().Size(); ++i)
+	//{
+	//	for (ulong j = 0; j < groupRes.GetDfaTable()[i].Size(); ++j)
+	//	{
+	//		int occurCnt[256] = {0};
+	//		for (ulong k = 0; k < groupRes.GetDfaTable()[i].GetGroupCount(); ++k)
+	//		{
+	//			++occurCnt[groupRes.GetDfaTable()[i][j][k]];
+	//		}
+	//		int max = -1;
+	//		int idx = -1;
+	//		for (ulong k = 0; k < 256; ++k)
+	//		{
+	//			if (max < occurCnt[k])
+	//			{
+	//				max = occurCnt[k];
+	//				idx = k;
+	//			}
+	//		}
+	//		nReduce += groupRes.GetDfaTable()[i].GetGroupCount() - 2 * (groupRes.GetDfaTable()[i].GetGroupCount() - max + 1);
+	//		nAll += groupRes.GetDfaTable()[i].GetGroupCount();
+	//	}
+	//}
+	//std::cout << nReduce << std::endl;
+	//std::cout << nAll << std::endl;
+
+	CTimer ctime;
+	CCompileResults result;
+	try
 	{
-		for (ulong j = 0; j < groupRes.GetDfaTable()[i].Size(); ++j)
-		{
-			int occurCnt[256] = {0};
-			for (ulong k = 0; k < groupRes.GetDfaTable()[i].GetGroupCount(); ++k)
-			{
-				++occurCnt[groupRes.GetDfaTable()[i][j][k]];
-			}
-			int max = -1;
-			int idx = -1;
-			for (ulong k = 0; k < 256; ++k)
-			{
-				if (max < occurCnt[k])
-				{
-					max = occurCnt[k];
-					idx = k;
-				}
-			}
-			nReduce += groupRes.GetDfaTable()[i].GetGroupCount() - 2 * (groupRes.GetDfaTable()[i].GetGroupCount() - max + 1);
-			nAll += groupRes.GetDfaTable()[i].GetGroupCount();
-		}
+		CompileRuleFile("..\\allrules.rule", result);
 	}
-	std::cout << nReduce << std::endl;
-	std::cout << nAll << std::endl;
-
-	//CTimer ctime;
-	//CCompileResults result;
-	//try
-	//{
-	//	CompileRuleFile("..\\allrules.rule", result);
-	//}
-	//catch (CTrace &e)
-	//{
-	//	std::cout << e.File() << " - " << e.Line() << ": " << e.What() << std::endl;
-	//	system("pause");
-	//}
-	//result.WriteToFile("..\\result.cdt");
+	catch (CTrace &e)
+	{
+		std::cout << e.File() << " - " << e.Line() << ": " << e.What() << std::endl;
+		system("pause");
+	}
+	result.WriteToFile("..\\result.cdt");
 
 	////result.ReadFromFile("..\\result.cdt");
 
