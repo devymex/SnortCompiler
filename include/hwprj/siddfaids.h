@@ -63,20 +63,22 @@ public:
 	virtual ~CSidDfaIds();
 
 	/// @brief		重载的 '[]' 运算符，取得指定位置的值的引用。
-	/// @param[in]	nIdx 指定位置的下标
+	/// @param[in]	ulIdx 指定位置的下标
 	/// @return		返回指定位置元素的引用。
-	COMPILEDINFO& operator[](ulong index);
+	COMPILEDINFO& operator[](ulong ulIdx);
 
 	/// @brief		重载的 '[]' 运算符，取得指定位置的值的引用（常量）。
-	/// @param[in]	nIdx 指定位置的下标
+	/// @param[in]	ulIdx 指定位置的下标
 	/// @return		返回指定位置元素的引用（常量）。
-	const COMPILEDINFO& operator[](ulong index) const;
+	const COMPILEDINFO& operator[](ulong ulIdx) const;
 
 	/// @brief		更改vector预留空间的大小，执行std::vector::reserve操作。
-	void Reserve(ulong nCount);
+	/// @param[in]	ulCap 指定预留的空间大小。
+	void Reserve(ulong ulCap);
 
 	/// @brief		更改vector的大小，执行std::vector::resize操作。
-	void Resize(ulong nSize);
+	/// @brief		ulSize 指定数组更改后的大小。
+	void Resize(ulong ulSize);
 
 	/// @brief		返回vector的大小。
 	/// @return		规则信息的数量。
