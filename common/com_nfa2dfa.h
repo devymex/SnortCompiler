@@ -13,10 +13,13 @@
 *
 * 在软件中，NFA跳转表的每一行数据由@ref CNfaRow 类封装，并由@ref CNfa 类封装
 * 一组@CNfaRow，并提供了相关操作。
-
+*
 * @section secDfaData DFA的表示
 * 
 * @subsection subDfaFin DFA的终态
+* 
+* @ref CFinalStates
+*
 * @subsection subDfaFlags DFA的标记
 *
 * @section secDeterm NFA的确定化
