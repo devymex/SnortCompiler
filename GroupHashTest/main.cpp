@@ -102,7 +102,6 @@ int main()
 
 	//CGroupRes groupRes;
 	//groupRes.ReadFromFile("..\\FinalResult.cdt");
-<<<<<<< develop
 
 
 	//for (ulong i = 0; i < groupRes.GetDfaTable().Size(); ++i)
@@ -116,7 +115,6 @@ int main()
 	//		}
 	//	}
 	//}
-=======
 
 	//ulong nSuccess = 0;
 	//ulong nPcreError = 0;
@@ -212,13 +210,12 @@ int main()
 	//std::cout << nReduce << std::endl;
 	//std::cout << nAll << std::endl;
 	//std::cout << nReduce / double(nAll) << std::endl;
->>>>>>> local
 
 	CTimer ctime;
 	CCompileResults result;
 	try
 	{
-		CompileRuleFile("..\\allrules.rule", result);
+		CompileRuleFile("..\\CanCompile.rule", result);
 	}
 	catch (CTrace &e)
 	{

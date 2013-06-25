@@ -369,6 +369,10 @@ void OP_COMMON_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong
 
 void OP_CIRCM_FUNC(CNfa &nfa, ulong &CurState);
 
+void OP_DOLL_FUNC(CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState, bool IsALT);
+
+void OP_DOLLM_FUNC(CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState, bool IsALT);
+
 void OP_CHAR_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState);
 
 void OP_CHARI_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong &CurState, ulong PreState, bool &ALTBegin, ulong ALTBegState);
@@ -433,7 +437,7 @@ void OP_NCLASS_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong
 
 void OP_ALT_FUNC(BYTEARY_ITER &Beg, const BYTEARY_ITER &End, CNfa &nfa, ulong PreState, ulong &CurState);
 
-void OP_KET_FUNC(CNfa &nfa, ulong PreState, ulong &CurState, bool IsALT, bool IsBRAZERO);
+void OP_KET_FUNC(CNfa &nfa, ulong PreState, ulong &CurState, bool IsALT, bool IsBRAZERO, bool &bDoll, bool &bDollm);
 
 void OP_KETRMAX_FUNC(CNfa &nfa, ulong PreState, ulong &CurState, bool IsBRAZERO, bool IsALT);
 
