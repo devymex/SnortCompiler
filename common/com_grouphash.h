@@ -7,11 +7,12 @@
 *
 * @section secGroup 分组
 *
+*下文所述的“SIG”是指DFA所具有的特征字符串，即Signature。
+*
 * @subsection subGroupFlow 分组流程图
 *
-* 注：下文所述的“SIG”是指DFA所具有的特征字符串，即Signature。
 * @dot
-* digraph module {
+* digraph groupProc {
 *	node [shape=record, fontname="Microsoft YaHei", fontsize=11];
 *	1 [label="合并具有唯一SIG的DFA"];
 *	2 [label="将具有多个SIG的DFA合并到已有分组"];
@@ -47,8 +48,48 @@
 * 若合并过程中分组的DFA总状态数超限，则构造一个新的分组，并从超限的DFA开始继续合并。
 *
 * @subsection subGroupStep4 第四步、对分组进行再合并
-* 经过步一步之后，各分组都已合并为一个DFA，且不存在尚为进入分组的孤立DFA。将各分组的DFA尝试合并。若两个分组具有共同的特征字符串集且它们合并后的状态数未超限，则将它们合并为新的分组，新组的特征字符串集为原两个分组的特征字符串集的交集。
+* 经过上一步之后，各分组都已合并为一个DFA，且不存在尚为进入分组的孤立DFA。接下来，
+* 尝试将具有共同SIG的分组进行合并，若它们合并后的状态数未超限则将它们合并为新的分组。
+* 新组的SIG集为原两个分组的SIG集的交集。
 *
-* @section secHash 压缩
+* @section secHash 哈希
+*
+* @subsection subHashFlow 哈希流程图
+*
+* @dot
+* digraph hashProc {
+*	node [shape=record, fontname="Microsoft YaHei", fontsize=11];
+*	1 [label="将具有唯一SIG的分组映射入哈希表"];
+*	2 [label="将具有多个SIG的分组映射入哈希表"];
+*	3 [label="调整哈希表中代表各分组的SIG以减少冲突"];
+*	4 [label="对哈希表中的分组进行再合并"];
+*	1 -> 2;
+*	2 -> 3;
+*	3 -> 4;
+* }
+* @enddot
+*
+* @subsection subHashStep1 第一步、将具有唯一SIG的分组映射入哈希表
+* 
+* 每个SIG均计算为一个整数值，与特征字符串一一对应，用以下公式计算
+* 采用的哈希函数为：
+* 
+* @subsection subHashStep2 第二步、将具有多个SIG的分组映射入哈希表
+* 在具有多个SIG的分组中选取与当前哈希表产生冲突最小的SIG，代表该分组，并通过第一步中的
+* 哈希函数映射到哈希表中。
+*
+* @subsection subHashStep3 第三步、调整哈希表中代表各分组的SIG以减少冲突
+* 对哈希表中存在冲突的分组做如下处理：
+* - (1) 若代表分组A的SIG @f$s_1@f$ 与其它分组的SIG产生了冲突，则尝试选用分组A的
+* 另一个SIG @f$s_2@f$ 来代表分组。
+* - (2) 将@f$s_2@f$映射到槽@f$S=hash(s_2)@f$中，若@f$s_2@f$亦产生冲突，
+* 则以（1）的方式做递归调整。
+* 
+* @subsection subHashStep4 第四步、对哈希表中的分组进行再合并
+* - (1) 若哈希表中的一个槽内具有多个分组，且代表这些分组的SIG相同，则尝试合并这些分组。
+* 合并后不改变代表分组的SIG。
+* - (2) 若两个分组A和B位于哈希表中不同的槽内，若他们具有共同的SIG，并且这些共同的SIG中
+* 的某个SIG s可以映射到哈希表中的一个空槽内或A、B所在的槽内，则尝试将A和B进行合并。
+* 合并后的分组由s代表。
 *
 */
