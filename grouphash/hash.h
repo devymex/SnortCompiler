@@ -2,11 +2,7 @@
 * @file			groups.h
 * @author		Lab 435, Xidian University
 * @brief		定义了GROUPHASH的数据结构
-*/
-
-/*!
-* @addtogroup groupGrouphash
-* @{
+* @copyright	本项目开发组版权所有。未经许可，不得复制、更改、编译、分发。
 */
 
 #include <map>
@@ -24,7 +20,3 @@ struct GROUPHASH
 	ulong mergeDfaId;
 	std::vector<ulong> vecDfaIds;
 };
-
-/*!
-@}
-*/

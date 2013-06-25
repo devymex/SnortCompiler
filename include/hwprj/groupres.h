@@ -1,13 +1,8 @@
 /*!
-* @file				groupres.h
-**
-* @author			Lab 435, Xidian University
-**
-* @brief			Definition of the CGroupRes class
-**
-* log the result of sectionalization,include DFA set,
-* mapping relation between DfaId and sid and group set
-**
+* @file			groupres.h
+* @author		Lab 435, Xidian University
+* @brief		定义了CGroupRes类及其导出符号。
+* @copyright	本项目开发组版权所有。未经许可，不得复制、更改、编译、分发。
 */
 
 #pragma once
@@ -22,6 +17,10 @@
 #else
 #define GROUPRESHDR __declspec(dllexport)
 #endif
+
+/*! @addtogroup groupGrouphash
+*  @{
+*/
 
 /*!
 * @brief		保存DFA及分组情况等信息。
@@ -49,15 +48,15 @@ public:
 	const ulong &GetBucketCnt() const;
 
 	/// @brief		设置hash槽数,便于把hash槽数写入文件
-	/// @param	nBucketSize-hash槽数
+	/// @param[in]	nBucketSize hash槽数
 	void SetBucketCnt(ulong nBucketSize);
 	
 	/// @brief		将分组结果输出文件
-	/// @param	filename-输入包含文件路径的文件名
+	/// @param[in]	filename 输入包含文件路径的文件名
 	ulong WriteToFile(const char *filename);
 
 	/// @brief		将写入文件中的分组结果读入
-	/// @param	filename-输入包含文件路径的文件名
+	/// @param[in]	filename 输入包含文件路径的文件名
 	ulong ReadFromFile(const char *filename);
 private:
 	CDfaArray m_dfaTbl;
@@ -65,3 +64,7 @@ private:
 	CGroups m_groups;
 	ulong nBucketCnt;
 };
+
+/*!
+@}
+*/

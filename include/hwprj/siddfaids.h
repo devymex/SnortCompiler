@@ -1,12 +1,8 @@
 /*!
 * @file				siddfas.h
-**
 * @author			Lab 435, Xidian University
-**
-* @brief			Declaration of the CSidDfaIds class
-**
-* Store the mapping between SID and DFAID
-**
+* @brief			定义COMPILEDINFO结构体及CSidDfaIds类。
+* @copyright		本项目开发组版权所有。未经许可，不得复制、更改、编译、分发。
 */
 
 #pragma once
@@ -87,7 +83,7 @@ public:
 	const ulong Size() const;
 
 	/// @brief		添加一个规则的信息
-	/// @param		规则信息
+	/// @param[in]	规则信息
 	void PushBack(const COMPILEDINFO &sidDfaIds);
 
 	/// @brief		获取最后一个规则信息。

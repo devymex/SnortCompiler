@@ -1,12 +1,8 @@
 /*!
 * @file				compiler.h
-**
 * @author			Lab 435, Xidian University
-**
-* @brief			Primary file of compiler
-**
-* Functions declaration of access enter
-**
+* @brief			定义了编译器接口的相关结构体和函数。
+* @copyright	本项目开发组版权所有。未经许可，不得复制、更改、编译、分发。
 */
 
 #pragma once
@@ -68,9 +64,9 @@ struct PARSERESULT
 typedef void (__stdcall *RECIEVER)(const PARSERESULT &parseRes, void *lpUser);
 
 /// @brief		解析一个Snort规则文件，并通过回调函数给出结果。
-/// @param		pFileName 输入规则文件名。
-/// @param		recv 回调函数的地址。
-///	@param		lpUser 自定义参数，将被传入回调函数。
+/// @param[in]	pFileName 输入规则文件名。
+/// @param[in]	recv 回调函数的地址。
+///	@param[in]	lpUser 自定义参数，将被传入回调函数。
 COMPILERHDR void ParseRuleFile(const char *pFileName, RECIEVER recv, void *lpUser);
 
 /// @brief		编译一个Snort规则文件，生成编译结果集。

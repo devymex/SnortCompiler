@@ -70,7 +70,7 @@ public:
 	void Resize(ulong ulSize);
 
 	/// @brief		将指定的DFA添加为DFA数组的最后一个元素。
-	/// @param		dfa 指定的DFA。
+	/// @param[in]	dfa 指定的DFA。
 	void PushBack(const CDfa &dfa);
 
 private:

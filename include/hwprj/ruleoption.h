@@ -1,13 +1,7 @@
 /*!
 * @file				ruleoption.h
-**
 * @author			Lab 435, Xidian University
-**
-* @brief			Declaration of the CRuleOption class
-**
-* Extract relevant attribute of a rule, 
-* such as "content", "pcre" and "uricontent".
-**
+* @brief			定义CRuleOption类。
 */
 
 #pragma once
@@ -22,12 +16,22 @@ class STRING;
 #define SNORTRULEHDR __declspec(dllexport)
 #endif
 
+/*! @addtogroup groupCompiler
+*  @{
+*/
+
+/*!
+* @brief Snort规则选项的基类，用来表示一个选项及其相关修饰项的数据。
+*/
 class SNORTRULEHDR CRuleOption
 {
 public:
 	typedef ulong OPTIONFLAG;
 
+	/// 没有修饰项
 	static const OPTIONFLAG NOFLAG = 0;
+
+	/// 包含'!'（逻辑非）修饰项
 	static const OPTIONFLAG HASNOT = (1 << 0);
 
 public:
@@ -83,3 +87,7 @@ protected:
 	/// @brief		私有成员，仅供内部使用。
 	OPTIONFLAG m_nFlags;
 };
+
+/*!
+@}
+*/

@@ -1,7 +1,8 @@
 /*!
 * @file			regrule.h
 * @author		Lab 435, Xidian University
-* @brief		定义CRegRule类
+* @brief		定义CRegRule类。
+* @copyright	本项目开发组版权所有。未经许可，不得复制、更改、编译、分发。
 */
 
 #pragma once
@@ -18,7 +19,7 @@ class CHAINVEC;
 
 /*!
 * @brief 实现了规格化的snort规则数据结构，提供对一条规则的数据进行管理的功能。
-* @detail 主要数据结构为CPcreChain的动态数组，封装了std::vector<CPcreChain>。
+* @remark 主要数据结构为CPcreChain的动态数组，封装了std::vector<CPcreChain>。
 */
 class SNORTRULEHDR CRegRule
 {

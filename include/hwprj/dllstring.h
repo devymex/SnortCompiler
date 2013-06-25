@@ -88,8 +88,10 @@ public:
 	char Back() const;
 
 	/// @brief		将指定字符添加到字符串的末尾。
-	/// @param		
+	/// @param[in]	指定的字符
 	void PushBack(char nChar);
+
+	/// @brief		获得字符串的数据指针。
 	const char* Data() const;
 
 protected:

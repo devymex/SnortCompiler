@@ -1,10 +1,7 @@
 /*!
 * @file			dfarow.h
 * @author		Lab 435, Xidian University
-* @brief		定义了CDfaRow类，用以存储DFA的一个状态
-* @remark		CDfaRow为一个一维数组，数组中的每个元素所在列表示
-*				DFA字符集中的一个跳转字符，数组中的每个元素表示当前DFA状态
-*				经过跳转字符到达的下一个状态的编号。
+* @brief		定义了CDfaRow类，用以存储DFA的一个状态。
 * @copyright	本项目开发组版权所有。未经许可，不得复制、更改、编译、分发。
 */
 
@@ -26,9 +23,10 @@ class STATEIDARY;
 */
 
 /*!
-* @brief		封装了std::vector<STATEID>对象，表示DFA跳转表中一行的数据结构。
-* @remark		DFA跳转表中每一行对应一个状态。行中每个元素对应一个字符，存储一个状态编号，
-*				表示该行对应的状态，经过当前字符可以跳转到的下一个状态。
+* @brief		定义了DFA表中一个状态所对应的一行数据的数据结构。
+* @remark		封装了std::vector<STATEID>对象。DFA跳转表中每一行对应一个状态。
+*				行中每个元素对应一个字符，存储一个状态编号，表示该行对应的状态，
+*				经过当前字符可以跳转到的下一个状态。
 */
 class DFAHDR CDfaRow
 {

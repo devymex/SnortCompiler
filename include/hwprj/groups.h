@@ -1,7 +1,8 @@
 /*!
 * @file			groups.h
 * @author		Lab 435, Xidian University
-* @brief		定义了CGroups类
+* @brief		定义了CGroups类。
+* @copyright	本项目开发组版权所有。未经许可，不得复制、更改、编译、分发。
 */
 
 #pragma once
@@ -17,6 +18,10 @@
 #ifndef GROUPSHDR_DS
 class GROUPVEC;
 #endif
+
+/*! @addtogroup groupGrouphash
+*  @{
+*/
 
 /*!
 * @brief		分为一组的DFA信息。
@@ -74,7 +79,7 @@ public:
 	void Resize(ulong nSize);
 
 	/// @brief		将指定的一个分组结果添加为CGroups数组的最后一个元素。
-	/// @param		oneGroup 指定的一个分组结果。
+	/// @param[in]	oneGroup 指定的一个分组结果。
 	void PushBack(ONEGROUP oneGroup);
 
 	/// @brief		得到CGroups数组最后一个元素的引用。

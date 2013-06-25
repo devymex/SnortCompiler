@@ -1,7 +1,7 @@
 /*!
 * @file			pcrechain.h
 * @author		Lab 435, Xidian University
-* @brief		定义了CPcreChain类，根据Snort规则选项的属性，构造PCRE链
+* @brief		定义了CPcreChain类，根据Snort规则选项的属性，构造PCRE链。
 * @copyright	本项目开发组版权所有。未经许可，不得复制、更改、编译、分发。
 */
 
@@ -60,7 +60,7 @@ public:
 	CPcreOption& Back() const;
 
 	/// @brief		将指定的CPcreOption对象添加为CPcreChain数组的最后一个元素。
-	/// @param		pcreOpt CPcreOption对象。
+	/// @param[in]	pcreOpt CPcreOption对象。
 	void PushBack(const CPcreOption &pcreOpt);
 
 	/// @brief		更改CPcreChain数组的大小。

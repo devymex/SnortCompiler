@@ -22,7 +22,7 @@ class LOGFILE;
 */
 
 /*!
-* @brief		日志类
+* @brief		日志类。
 * @remark		不应直接使用该类构造对象。应使用全局对象g_log。
 */
 class LOGGERHDR CLogger
