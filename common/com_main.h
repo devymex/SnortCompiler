@@ -19,12 +19,12 @@
 * 本软件可以将Snort规则编译为正则表达式，以便在硬件上实现对网络数据包的快速预匹配。
 *
 * @subsection subCompProc 编译流程
-* - 解析规则：读入文件，过滤规则头，提取选项等。
-* - 处理规则：分链，删链，提取SIG。
-* - 编译规则：将链转为NFA，然后将NFA转为DFA。
-* - 分组：根据DFA的SIG进行分组合并，使得合并后的DFA状态数不超过255。
+* - 解析规则：读入文件，过滤规则头，提取选项等。见@ref pageRule
+* - 处理规则：分链，删链，提取SIG。见@ref pageRule
+* - 编译规则：将链转为NFA，然后将NFA转为DFA。见@ref pageNfa2dfa
+* - 分组：根据DFA的SIG进行分组合并，使得合并后的DFA状态数不超过255。见@ref pageGrouphash
 * - 哈希：从能代表一组的SIG中选取一个SIG代表该分组，将该SIG通过哈希函数映射到哈希表中的一个槽，
-*        将该SIG和其对应的DFA存入该槽，使得冲突率尽可能低，不超过3‰。
+*        将该SIG和其对应的DFA存入该槽，使得冲突率尽可能低，不超过3‰。见@ref pageGrouphash
 *
 * @subsection subMatchProc 匹配流程
 *
@@ -32,5 +32,5 @@
 * 匹配结果为多个链的DfaId。若某条规则的所有链均被匹配到，则该规则被该数据包匹配。
 *
 * @subsection subImplement 部署流程
-* 见使用说明书@ref pageUsage
+* 见@ref pageUsage
 */
