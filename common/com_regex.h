@@ -58,7 +58,7 @@
 *
 * @li 字符转义@n
 * 反斜线后跟一个没有特殊含义的字符会以该字符原意解释。@n
-* 例：“deerchao\.net”匹配“deerchao.net”，“C:\\\\Windows”匹配“C:\\Windows”。
+* 例：“deerchao\\.net”匹配“deerchao.net”，“C:\\\\Windows”匹配“C:\\Windows”。
 *
 * @li 重复@n
 * “*”：重复零次或多次@n
