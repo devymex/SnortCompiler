@@ -98,16 +98,15 @@
 * 以下将针对不同的语法结构说明正则表达式编译为NFA的方法。
 * 
 * @subsection subMetaF 元字符“^”
-* ^	代表目标字符串的开始位置(在多行模式下为行首)
+* <b>含义：</b>代表目标字符串的开始位置(在多行模式下为行首)
 * 在多行模式下构建nfa的方式举例如下：
 * “/^abc/m”
 * 
 * @dot
 * digraph onedfa {
 * graph [rankdir="LR"];
-* node [shape=record];
-* node [shape="circle"];
-* 5 [peripheries=2];
+* node [shape="circle", width=0.4, fontsize=14, fixedsize=true];
+* 5 [peripheries=2, width=0.3];
 * s -> 1 [label="ε"];
 * s -> 2 [label="ε"];
 * 1 -> 1 [label="Any"];
@@ -119,16 +118,15 @@
 * @enddot
 * 
 * @subsection subMetaE 元字符“$”
-* $	代表目标字符串的末尾位置(在多行模式下为行尾)
+* <b>含义：</b>代表目标字符串的末尾位置(在多行模式下为行尾)
 * 在多行模式下构建nfa的方式举例如下：@n
 * - “/abc$/m”
 * 
 * @dot
 * digraph onedfa {
 * graph [rankdir="LR"];
-* node [shape=record];
-* node [shape="circle"];
-* 5 [peripheries=2];
+* node [shape="circle", width=0.4, fontsize=14, fixedsize=true];
+* 5 [peripheries=2, width=0.3];
 * s -> 1 [label="a"];
 * 1 -> 2 [label="b"];
 * 2 -> 3 [label="c"];
@@ -144,9 +142,8 @@
 * @dot
 * digraph onedfa {
 * graph [rankdir="LR"];
-* node [shape=record];
-* node [shape="circle"];
-* 4 [peripheries=2];
+* node [shape="circle", width=0.4, fontsize=14, fixedsize=true];
+* 4 [peripheries=2, width=0.3];
 * s -> 1 [label="a"];
 * 1 -> 2 [label="b"];
 * 2 -> 3 [label="c"];
@@ -158,16 +155,15 @@
 * @enddot
 * 
 * @subsection subMetaQuest 元字符“?”
-* ?	0个或1个
+* <b>含义：</b>0个或1个
 * 构建nfa的方式举例如下：
 * “/ab?c/”
 * 
 * @dot
 * digraph onedfa {
 * graph [rankdir="LR"];
-* node [shape=record];
-* node [shape="circle"];
-* 3 [peripheries=2];
+* node [shape="circle", width=0.4, fontsize=14, fixedsize=true];
+* 3 [peripheries=2, width=0.3];
 * s -> 1 [label="a"];
 * 1 -> 2 [label="b"];
 * 1 -> 2 [label="ε"];
@@ -175,17 +171,16 @@
 * }
 * @enddot
 *
-* @subsection subMetaStar 元字符“*”
-* *	0个或任意多个
+* @subsection subMetaStar 重复“*”
+* <b>含义：</b>0个或任意多个
 * 构建nfa的方式举例如下：
 * “/ab*c/”
 * 
 * @dot
 * digraph onedfa {
 * graph [rankdir="LR"];
-* node [shape=record];
-* node [shape="circle"];
-* 3 [peripheries=2];
+* node [shape="circle", width=0.4, fontsize=14, fixedsize=true];
+* 3 [peripheries=2, width=0.3];
 * s -> 1 [label="a"];
 * 1 -> 1 [label="b"];
 * 1 -> 2 [label="ε"];
@@ -193,17 +188,16 @@
 * }
 * @enddot
 *
-* @subsection subMetaPlus 元字符“+”
-* +	1个或任意多个
+* @subsection subMetaPlus 重复“+”
+* <b>含义：</b>1个或任意多个
 * 构建nfa的方式举例如下：
 * “/ab+c/”	==>	“/abb*c/”
 * 
 * @dot
 * digraph onedfa {
 * graph [rankdir="LR"];
-* node [shape=record];
-* node [shape="circle"];
-* 4 [peripheries=2];
+* node [shape="circle", width=0.4, fontsize=14, fixedsize=true];
+* 4 [peripheries=2, width=0.3];
 * s -> 1 [label="a"];
 * 1 -> 2 [label="b"];
 * 2 -> 2 [label="b"];
@@ -212,17 +206,16 @@
 * }
 * @enddot
 *
-* @subsection subMetaBrace 元字符“{}”
-* - {m} 出现m次
+* @subsection subMetaBrace 重复“{}”
+* - {m} <b>含义：</b>出现m次
 * 构建nfa的方式举例如下：
 * “/ab{2}c/”	==>	“/abbc/”
 * 
 * @dot
 * digraph onedfa {
 * graph [rankdir="LR"];
-* node [shape=record];
-* node [shape="circle"];
-* 4 [peripheries=2];
+* node [shape="circle", width=0.4, fontsize=14, fixedsize=true];
+* 4 [peripheries=2, width=0.3];
 * s -> 1 [label="a"];
 * 1 -> 2 [label="b"];
 * 2 -> 3 [label="b"];
@@ -230,16 +223,15 @@
 * }
 * @enddot
 *
-* - {m,n} 至少出现m次,至多出现n次
+* - {m,n} <b>含义：</b>至少出现m次,至多出现n次
 * 构建nfa的方式举例如下：
 * “/ab{2,4}c/”	==>	“/abbb?b?c/”
 * 
 * @dot
 * digraph onedfa {
 * graph [rankdir="LR"];
-* node [shape=record];
-* node [shape="circle"];
-* 6 [peripheries=2];
+* node [shape="circle", width=0.4, fontsize=14, fixedsize=true];
+* 6 [peripheries=2, width=0.3];
 * s -> 1 [label="a"];
 * 1 -> 2 [label="b"];
 * 2 -> 3 [label="b"];
@@ -251,16 +243,15 @@
 * }
 * @enddot
 *
-* - {m,} 至少出现m次
+* - {m,} <b>含义：</b>至少出现m次
 * 构建nfa的方式举例如下：
 * “/ab{2,}c/”	==>	“/abbb*c/”
 * 
 * @dot
 * digraph onedfa {
 * graph [rankdir="LR"];
-* node [shape=record];
-* node [shape="circle"];
-* 5 [peripheries=2];
+* node [shape="circle", width=0.4, fontsize=14, fixedsize=true];
+* 5 [peripheries=2, width=0.3];
 * s -> 1 [label="a"];
 * 1 -> 2 [label="b"];
 * 2 -> 3 [label="b"];

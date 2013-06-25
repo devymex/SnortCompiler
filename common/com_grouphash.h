@@ -7,11 +7,12 @@
 *
 * @section secGroup 分组
 *
+*下文所述的“SIG”是指DFA所具有的特征字符串，即Signature。
+*
 * @subsection subGroupFlow 分组流程图
 *
-* 注：下文所述的“SIG”是指DFA所具有的特征字符串，即Signature。
 * @dot
-* digraph module {
+* digraph groupProc {
 *	node [shape=record, fontname="Microsoft YaHei", fontsize=11];
 *	1 [label="合并具有唯一SIG的DFA"];
 *	2 [label="将具有多个SIG的DFA合并到已有分组"];
@@ -54,5 +55,18 @@
 * @section secHash 哈希
 *
 * @subsection subHashFlow 哈希流程图
+*
+* @dot
+* digraph hashProc {
+*	node [shape=record, fontname="Microsoft YaHei", fontsize=11];
+*	1 [label="将具有唯一SIG的分组映射入哈希表"];
+*	2 [label="将具有多个SIG的DFA合并到已有分组"];
+*	3 [label="对未分组的DFA进行聚组"];
+*	4 [label="对分组进行再合并"];
+*	1 -> 2;
+*	2 -> 3;
+*	3 -> 4;
+* }
+* @enddot
 *
 */
