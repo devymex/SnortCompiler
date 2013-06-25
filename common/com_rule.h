@@ -80,29 +80,41 @@
 *称为@b 连续匹配。@n
 *
 * 根据Snort规则语法的规定可知：不带有修饰选项的content和uricontent模式选项以及不包括“/R”
-*约束的pcre为起点匹配；含有distance或within约束的content、uricontent以及包括“/R”约束
-*的pcre则是连续匹配。将规则中需要从数据包净载的起始位置开始匹配的一个选项，以及该选项之后的
-*多个连续匹配选项按顺序连接在一起，称为<b>选项链</b>。一条选项链可能只有一个选项，
-*也可能包含多个具有连续匹配关系的选项。选项链之间的连接关系可由正则表达式表达。@n
+* 约束的pcre为起点匹配；含有distance或within约束的content、uricontent以及包括“/R”约束
+* 的pcre则是连续匹配。将规则中需要从数据包净载的起始位置开始匹配的一个选项，以及该选项之后的
+* 多个连续匹配选项按顺序连接在一起，称为<b>选项链</b>。一条选项链可能只有一个选项，
+* 也可能包含多个具有连续匹配关系的选项。选项链之间的连接关系可由正则表达式表达。@n
 *
 * @subsection subChainClass 规则的类与对象
 *
-* @li CRuleOption： Snort规则选项的基类，用来表示一个选项及其相关修饰项的数据。
-*相关结构定义请参见@ref CRuleOption　@n
+* @li @ref CRuleOption ： Snort规则选项的基类，用来表示一个选项及其相关修饰项的数据。
 *
-* @li CContentOption：从CRuleOption类继承，管理一个content选项的数据及其修饰选项的值，并
-*将转换为CPcreOption。相关结构定义请参见@ref CContentOption　@n
+* @li @ref CContentOption ：从CRuleOption类继承，管理一个content选项的数据
+* 及其修饰选项的值，并转换为@ref CPcreOption。
 *
-* @li CPcreOption：从CRuleOption类继承，管理一个pcre选项的数据，包括正则表达式语句及修饰选项。
-*相关结构定义请参见@ref CPcreOption　@n
+* @li @ref CPcreOption ：从CRuleOption类继承，管理一个pcre选项的数据，包括正则
+* 表达式语句及修饰选项。
 *
 * @section secRuleProc 规则的处理
 *
-* @subsection subChainCompress 选项链的删除
+* @subsection subContentProc content选项的处理
+*
+* 由于content选项的语义简单，可由pcre完全代替。因此在处理规则时所有的content选项
+* 及其修饰项都被转换为了pcre选项。转换的逻辑如下：
+* - content转换为pcre后，均添加pcre后缀"/s"。
+* - content中若包含有pcre的元字符或非ANSI字符，则对这些字符进行转义处理。如：@n
+* "a^b"转换为："/a\^b/s"，"a|00 01|b"转换为："/a\x00\x01b/s"。
+* - 若content指定了offset或distance修饰项，则在pcre的首部添加"^{m,n}"，如：@n
+* "abc"; distance:5; 转换为："/^{5,}abc/"。
+* - 若content指定了depth或within，则在pcre首部的^后添加重复"{m,n}"，如：@n
+* "abc"; depth:4; 转换为："/^{1,2}abc/"。
+* - 若content指定了nocase，则添加pcre后缀"/i"，如：@n
+* "abc"; nocase; 转换为："/abc/i"。
+*
+* @subsection subChainCompress 选项链的剔除
 * 
 * 根据对Snort规则的分析发现：一些包含content选项和pcre选项的规则中，会出现content内容
-* 与pcre内容部分重复的情况。@n
-* 对于该情况的处理，在保证规则含义不改变的前提下，剔除重复内容。@n
+* 与pcre内容部分重复的情况。对于该情况的处理，在保证规则含义不改变的前提下，剔除重复内容。@n
 *
 * @subsection subRuleSig 规则的特征字符串
 *
