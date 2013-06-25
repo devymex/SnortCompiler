@@ -21,7 +21,7 @@
 * @subsection subCompProc 编译流程
 * - 解析规则：读入文件，过滤规则头，提取选项等。见@ref pageRule
 * - 处理规则：分链，删链，提取SIG。见@ref pageRule
-* - 编译规则：将链转为NFA，然后将NFA转为DFA。见@ref pageNfa2dfa
+* - 编译规则：将链转为NFA，然后将NFA转为DFA。见@ref pageRegex 和@ref pageNfa2dfa
 * - 分组：根据DFA的SIG进行分组合并，使得合并后的DFA状态数不超过255。见@ref pageGrouphash
 * - 哈希：从能代表一组的SIG中选取一个SIG代表该分组，将该SIG通过哈希函数映射到哈希表中的一个槽，
 *        将该SIG和其对应的DFA存入该槽，使得冲突率尽可能低，不超过3‰。见@ref pageGrouphash
