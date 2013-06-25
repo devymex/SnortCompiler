@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <algorithm>
+#include <functional>
 #include <sstream>
 #include <tchar.h>
 #include <filesystem>
@@ -132,6 +133,110 @@ int main()
 
 	CGroupRes groupRes;
 	groupRes.ReadFromFile("..\\FinalResult.cdt");
+
+	//std::ofstream fout1("F:\\cppProject\\huawei\\PreciseMatch\\CompressTest\\ori_size.txt");
+	//if(!fout1)
+	//{
+	//	std::cout << "" << std::endl;
+	//	return 0;
+	//}
+	//ulong ori_size = 0;//原始大小
+	//for(ulong i = 0; i < groupRes.GetDfaTable().Size(); ++i)
+	//{
+	//	ulong dfa_size = 0;
+	//	dfa_size += 256;//m_pGroup的大小
+	//	ulong gCnt = groupRes.GetDfaTable()[i].GetGroupCount();
+	//	ulong size = groupRes.GetDfaTable()[i].Size() * gCnt;
+	//	dfa_size += size;//dfa表中元素的个数
+	//	dfa_size += gCnt;
+
+	//	fout1 << i << "\t" << dfa_size << std::endl;
+	//	ori_size += dfa_size;
+	//}
+
+	//fout1 << std::endl << ori_size << std::endl;
+	//fout1.close();
+
+	std::ofstream fout2("F:\\cppProject\\huawei\\PreciseMatch\\CompressTest\\new_size_1.txt");
+	if(!fout2)
+	{
+		std::cout << "" << std::endl;
+		return 0;
+	}
+	ulong new_size = 0;
+	for(ulong i = 0; i < groupRes.GetDfaTable().Size(); ++i)
+	{
+		ulong tmpSize = 0;
+
+		CDfa &dfa = groupRes.GetDfaTable()[i];
+		ulong colCnt = dfa.GetGroupCount();
+		ulong dfasize = dfa.Size();
+		for(ulong j = 0; j < dfasize; ++j)
+		{
+			std::vector<STATEID> tmp(SC_DFACOLCNT + 1, 0);
+			for(STATEID k = 0; k < colCnt; ++k)
+			{
+				STATEID tmpk = dfa[j][k];
+				if(tmpk == (STATEID)-1)
+				{
+					++tmp[SC_DFACOLCNT];//-1的个数
+				}
+				else
+				{
+					++tmp[tmpk];
+				}
+			}
+
+			ulong max = 0;//出现最多的列数
+			STATEID maxid = 0;
+			for(STATEID k = 0; k <= SC_DFACOLCNT; ++k)
+			{
+				if(tmp[k] > max)
+				{
+					max = tmp[k];//中存的是k出现的个数
+					if(k == SC_DFACOLCNT)
+					{
+						maxid = STATEID(-1);
+					}
+					else
+					{
+						maxid = k;
+					}
+				}
+			}
+
+			//tmpSize += 2;//1个字节存放colCnt - max(用于写入和读出文件),1字节存放maxid(default值)
+			//for(STATEID k = 0; k < colCnt; ++k)
+			//{
+			//	if(dfa[j][k] != maxid)
+			//	{
+			//		//如果这个元素不是maxid，那么求出k列对应了哪些字符集合
+			//		for(STATEID m = 0; m < SC_DFACOLCNT; ++m)
+			//		{
+			//			if(dfa.Char2Group(m) == k)
+			//			{
+			//				tmpSize += 2;//表示存储一个<k, char>对
+			//			}
+			//		}
+			//	}
+			//}
+			tmpSize += 2;
+			for(STATEID k = 0; k < colCnt; ++k)
+			{
+				if(dfa[j][k] != maxid)
+				{
+					tmpSize += 2;
+				}
+			}
+		}
+		tmpSize += 256;
+		fout2 << i << "\t" << tmpSize << std::endl;
+		new_size += tmpSize;
+	}
+
+	fout2 << std::endl << new_size << std::endl;
+	fout2.close();
+
 	//std::string str = "F:\\cppProject\\huawei\\PreciseMatch\\CompressTest\\";
 	//std::ofstream fout;
 	//for(ulong i = 0; i < groupRes.GetDfaTable().Size(); ++i)
@@ -151,19 +256,20 @@ int main()
 	//}
 
 	//输出每个dfa的大小
-	std::ofstream fout("F:\\cppProject\\huawei\\PreciseMatch\\CompressTest\\dfasize.txt");
-	if(!fout)
-	{
-		std::cout << "Open File Failure!" << std::endl;
-		return 0;
-	}
-	fout << "序号\t" << "dfa大小(B)" << std::endl; 
-	for(ulong i = 0; i < groupRes.GetDfaTable().Size(); ++i)
-	{
-		fout << i << "\t" << groupRes.GetDfaTable()[i].CalcStoreSize() << std::endl;
-	}
-	fout.close();
-
+	//std::ofstream fout("F:\\cppProject\\huawei\\PreciseMatch\\CompressTest\\dfasize.txt");
+	//if(!fout)
+	//{
+	//	std::cout << "Open File Failure!" << std::endl;
+	//	return 0;
+	//}
+	//fout << "序号\t" << "dfa大小(B)" << std::endl; 
+	//for(ulong i = 0; i < groupRes.GetDfaTable().Size(); ++i)
+	//{
+	//	fout << i << "\t" << groupRes.GetDfaTable()[i].CalcStoreSize() << std::endl;
+	//}
+	//fout.close();
+	
+	//std::vector<byte> v(5);
 
 	//CCompileResults result;
 	//result.ReadFromFile("..\\result.cdt");
