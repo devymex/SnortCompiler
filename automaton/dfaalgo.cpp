@@ -1,12 +1,7 @@
 /*!*
-* @file		dfaalgo.h
-**
+* @file			dfaalgo.h
 * @author		Lab 435, Xidian University
-**
-* @brief			Common classes declaration
-**
-* Include CUnsignedArray, CDllString
-**
+* @brief		DFA相关算法和数据结构的实现
 */
 
 #include "stdafx.h"

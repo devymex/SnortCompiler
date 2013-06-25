@@ -22,22 +22,22 @@ class DLLSTRING;
 */
 
 /*!
-* @brief		封装std::string，用于模块之间传递参数
+* @brief		封装std::string，用于模块之间传递参数。
 */
 class DLLSTRHDR CDllString
 {
 public:
-	/// @brief		构造函数
+	/// @brief		构造函数。
 	CDllString();
 
-	/// @brief		带参构造函数
-	/// @param[in]	pStr 以'\0'为结尾的ANSI字符串指针
+	/// @brief		带参构造函数。
+	/// @param[in]	pStr 以'\0'为结尾的ANSI字符串指针。
 	explicit CDllString(pcstr pStr);
 
-	/// @brief		拷贝构造函数
+	/// @brief		拷贝构造函数。
 	CDllString(const CDllString &other);
 
-	/// @brief		析构函数
+	/// @brief		析构函数。
 	virtual ~CDllString();
 
 	/// @brief		重载的 '=' 运算符。
@@ -52,7 +52,8 @@ public:
 	ulong Size() const;
 
 	/// @brief		判断字符串是否为空。
-	/// @return		返回true表示字符串为空，返回false表示字符串非空。
+	/// @retval		true 字符串为空。
+	/// @retval		false 字符串非空。
 	bool Empty() const;
 
 	/// @brief		清空字符串。
@@ -87,12 +88,14 @@ public:
 	char Back() const;
 
 	/// @brief		将指定字符添加到字符串的末尾。
-	/// @param		
+	/// @param[in]	指定的字符
 	void PushBack(char nChar);
+
+	/// @brief		获得字符串的数据指针。
 	const char* Data() const;
 
 protected:
-	/// @brief		私有成员，仅供内部使用
+	/// @brief		私有成员，仅供内部使用。
 	DLLSTRING* m_pString;
 };
 

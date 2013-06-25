@@ -1,12 +1,8 @@
 /*!
-* @file		comprule.h
-**
-* @author		Lab 435, Xidian University
-**
+* @file				comprule.h
+* @author			Lab 435, Xidian University
 * @brief			Functions declaration of rules' processing
-**
-* Includes compile rule etc.
-**
+* @copyright	本项目开发组版权所有。未经许可，不得复制、更改、编译、分发。
 */
 
 #pragma once
@@ -64,7 +60,7 @@ struct ISSPACE
 	{
 		return g_map[c] == 1;
 	}
-protected:
+private:
 	char g_map[256];
 };
 
@@ -145,7 +141,7 @@ void ParseOptions(std::string &ruleOptions, CSnortRule &snortRule);
 
 void Rule2RegRule(const CSnortRule &rule, CRegRule &regrule);
 
-void CompileRule(LPCSTR rule, RECIEVER recv, LPVOID lpUser);
+void CompileRule(pcstr rule, RECIEVER recv, void* lpUser);
 
 void PreCompileRule(const CRegRule &regRule,
 					RULESEQUENCE &ruleSeq,

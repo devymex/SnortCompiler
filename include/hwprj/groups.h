@@ -1,3 +1,10 @@
+/*!
+* @file			groups.h
+* @author		Lab 435, Xidian University
+* @brief		定义了CGroups类。
+* @copyright	本项目开发组版权所有。未经许可，不得复制、更改、编译、分发。
+*/
+
 #pragma once
 
 #include <hwprj\unsary.h>
@@ -7,21 +14,20 @@
 #else
 #define GROUPSHDR __declspec(dllexport)
 #endif
-/*!
-* @file			groups.h
-* @author		Lab 435, Xidian University
-* @brief		定义了CGroups类
-*/
 
 #ifndef GROUPSHDR_DS
 class GROUPVEC;
 #endif
 
-/*!
-* @addtogroup groupGrouphash
-* @{
+/*! @addtogroup groupGrouphash
+*  @{
 */
 
+/*!
+* @brief		分为一组的DFA信息。
+* @remark		该组包括哪些DFA、这些DFA的公共Signature、当前采用哪个Signature
+*				代表该分组、合并后的DFA。
+*/
 struct ONEGROUP
 {
 	CUnsignedArray	DfaIds;
@@ -30,6 +36,11 @@ struct ONEGROUP
 	ulong			mergeDfaId;
 };
 
+/*!
+* @brief		存储DFA的所有分组情况。
+* @remark		包括哪些DFA分为一组、这些DFA的公共Signature、当前采用哪个
+*				Signature代表该分组、合并后的DFA。
+*/
 class GROUPSHDR CGroups
 {
 public:
@@ -68,7 +79,7 @@ public:
 	void Resize(ulong nSize);
 
 	/// @brief		将指定的一个分组结果添加为CGroups数组的最后一个元素。
-	/// @param		oneGroup 指定的一个分组结果。
+	/// @param[in]	oneGroup 指定的一个分组结果。
 	void PushBack(ONEGROUP oneGroup);
 
 	/// @brief		得到CGroups数组最后一个元素的引用。
@@ -82,8 +93,8 @@ public:
 	/// @param[in]	nIdx 数组下标索引。
 	void Erase(ulong nIdx);
 
-protected:
-	/// @brief		私有成员，仅供内部使用
+private:
+	/// @brief		私有成员，仅供内部使用。
 	GROUPVEC* m_pGroups;
 };
 

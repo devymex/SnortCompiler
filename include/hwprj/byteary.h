@@ -57,14 +57,15 @@ public:
 	ulong Size() const;
 
 	/// @brief		判断数组是否为空
-	/// @return		返回true表示数组为空，返回false表示数组非空。
+	/// @retval		true 数组为空
+	/// @retval		false 数组非空。
 	bool Empty() const;
 
 	/// @brief		清空数组
 	void Clear();
 
 	/// @brief		在数组的末尾添加一个字节的数据
-	/// @param		byVal 添加的字节值
+	/// @param[in]	byVal 添加的字节值
 	void PushBack(byte byVal);
 
 	/// @brief		删除数组末尾的一个参数

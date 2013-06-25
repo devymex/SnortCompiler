@@ -21,11 +21,17 @@ class LOGFILE;
 * @{
 */
 
+/*!
+* @brief		日志类。
+* @remark		不应直接使用该类构造对象。应使用全局对象g_log。
+*/
 class LOGGERHDR CLogger
 {
 public:
 	/// @brief		构造函数。
 	CLogger();
+
+	/// @brief		析构函数。
 	~CLogger();
 
 	CLogger& operator << (char n);
@@ -49,7 +55,7 @@ private:
 	LOGFILE *m_pLogFile;
 };
 
-/// 日志类的全局对象
+/// 日志类的全局对象。
 LOGGERHDR extern CLogger g_log;
 
 

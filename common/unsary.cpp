@@ -1,7 +1,7 @@
 /*!*
-* @file		unsary.h
+* @file				unsary.h
 **
-* @author		Lab 435, Xidian University
+* @author			Lab 435, Xidian University
 **
 * @brief			impletation of the CUnsignedArray class
 **

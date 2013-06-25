@@ -1,7 +1,7 @@
 /*!*
-* @file		rule2nfa.cpp
+* @file				rule2nfa.cpp
 **
-* @author		Lab 435, Xidian University
+* @author			Lab 435, Xidian University
 **
 * @brief			Support functions for transforming a rule to a nfa tree
 **
@@ -533,7 +533,7 @@ void Rule2Dfas(const CRegRule &rule, CCompileResults &result)
 
 	bool bHasSigs = false;
 	CNfa nfa;
-	nfa.Reserve(SC_NFAROWRESERV);
+	nfa.Reserve(SC_STATELIMIT);
 	for (ulong i = 0; i < nCurRuleSize; ++i)
 	{
 		CPcreChain &curPcreChain = regRule[i];
@@ -549,6 +549,7 @@ void Rule2Dfas(const CRegRule &rule, CCompileResults &result)
 			}
 			catch (CTrace &e)
 			{
+				e;
 				ruleResult.m_nResult |= COMPILEDINFO::RES_PCREERROR;
 				nfa.Clear();
 				break;

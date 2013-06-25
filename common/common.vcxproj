@@ -102,6 +102,12 @@
     <ClInclude Include="..\include\hwprj\trace.h" />
     <ClInclude Include="..\include\hwprj\unsary.h" />
     <ClInclude Include="..\include\hwprj\unsary.inl" />
+    <ClInclude Include="com_grouphash.h" />
+    <ClInclude Include="com_main.h" />
+    <ClInclude Include="com_nfa2dfa.h" />
+    <ClInclude Include="com_regex.h" />
+    <ClInclude Include="com_rule.h" />
+    <ClInclude Include="com_usage.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
