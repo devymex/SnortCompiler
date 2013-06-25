@@ -80,18 +80,21 @@
 * 称为@b 连续匹配。@n
 *
 * 根据Snort规则语法的规定可知：不带有修饰选项的content和uricontent模式选项以及不包括“/R”
-* 约束的pcre为起点匹配；含有distance或within约束的content、uricontent以及包括“/R”约束
-* 的pcre则是连续匹配。将规则中需要从数据包净载的起始位置开始匹配的一个选项，以及该选项之后的
-* 多个连续匹配选项按顺序连接在一起，称为<b>选项链</b>。一条选项链可能只有一个选项，
-* 也可能包含多个具有连续匹配关系的选项。选项链之间的连接关系可由正则表达式表达。@n
+*约束的pcre为起点匹配；含有distance或within约束的content、uricontent以及包括“/R”约束
+*的pcre则是连续匹配。将规则中需要从数据包净载的起始位置开始匹配的一个选项，以及该选项之后的
+*多个连续匹配选项按顺序连接在一起，称为<b>选项链</b>。一条选项链可能只有一个选项，
+*也可能包含多个具有连续匹配关系的选项。选项链之间的连接关系可由正则表达式表达。@n
 *
 * @subsection subChainClass 规则的类与对象
 *
-* @li CRuleOption： @ref CRuleOption
+* @li CRuleOption： Snort规则选项的基类，用来表示一个选项及其相关修饰项的数据。
+*相关结构定义请参见@ref CRuleOption　@n
 *
-* @li CContentOption：
+* @li CContentOption：从CRuleOption类继承，管理一个content选项的数据及其修饰选项的值，并
+*将转换为CPcreOption。相关结构定义请参见@ref CContentOption　@n
 *
-* @li CPcreOption：
+* @li CPcreOption：从CRuleOption类继承，管理一个pcre选项的数据，包括正则表达式语句及修饰选项。
+*相关结构定义请参见@ref CPcreOption　@n
 *
 * @section secRuleProc 规则的处理
 *
