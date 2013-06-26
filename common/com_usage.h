@@ -25,6 +25,7 @@
 * compiler -> automaton;
 * grouphash -> common;
 * grouphash -> automaton;
+* grouphash -> compiler;
 * }
 * @enddot
 *

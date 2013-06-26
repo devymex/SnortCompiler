@@ -13,8 +13,6 @@
 #include <hwprj\finalstates.h>
 #include <hwprj\unsary.h>
 
-#include <vector>
-
 #ifndef DFAHDR_DS
 class DFAROWARY;
 #endif
