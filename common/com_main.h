@@ -19,13 +19,22 @@
 * 本软件可以将Snort规则编译为正则表达式，以便在硬件上实现对网络数据包的快速预匹配。
 *
 * @subsection subCompProc 编译流程
-* - 解析规则：读入规则集文件，过滤规则头，提取选项等。详见@ref pageRule 。
-* - 处理规则：根据规则选项建立匹配链结构，删除冗余链，提取匹配链的SIG。详见@ref pageRule 。
-* - 编译规则：将匹配链转为NFA，然后将NFA转为DFA。详见@ref pageRegex 和
+*
+* - 解析规则：读入规则集文件，过滤规则头，提取选项等。详见@ref secSnortOption 。
+*
+* - 规则的规格化：根据规则选项建立匹配链结构，删除冗余链，提取匹配链的SIG。
+* 详见@ref subRuleLogic 。
+*
+* - 编译pcre：将匹配链转为NFA，然后将NFA转为DFA。详见@ref pageRegex 和
 * @ref pageNfa2dfa 。
-* - 分组：根据DFA的SIG进行分组合并，使得合并后的DFA状态数不超过255。详见@ref secGroup 。
-* - 哈希：从能代表一组的SIG中选取一个SIG代表该分组，将该SIG通过哈希函数映射到哈希表中
+*
+* - DFA分组：根据DFA的SIG进行分组合并，使得合并后的DFA状态数不超过255。
+* 详见@ref secGroup 。
+*
+* - 哈希映射：从能代表一组的SIG中选取一个SIG代表该分组，将该SIG通过哈希函数映射到哈希表中
 * 的一个槽，将该SIG和其对应的DFA存入该槽，以降低冲突率。详见@ref secHash 。
+*
+* - 优化分组结果：详见@ref secOptimize 。
 *
 * @subsection subMatchProc 匹配流程
 *

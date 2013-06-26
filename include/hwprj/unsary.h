@@ -97,8 +97,9 @@ public:
 
 	/// @brief		更改动态数组的大小。
 	/// @param[in]	ulSize 更改的尺寸。
-	/// @remark		如果ulSize大于或等于当前数组尺寸，则不会更改现有元素并为新增元素赋值为ulVal；
-	///				否则会删除多出部分的元素。
+	/// @param[in]	ulVal 指定新增元素的值。
+	/// @remark		如果ulSize大于或等于当前数组尺寸，则不会更改现有元素，
+	///				并为新增元素赋值为ulVal；否则会删除多出部分的元素。
 	inline void Resize(ulong ulSize, ulong ulVal);
 
 	/// @brief		返回数组的数据指针。

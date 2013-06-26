@@ -104,10 +104,10 @@
 * - content转换为pcre后，均添加pcre后缀"/s"。
 * - content中若包含有pcre的元字符或非ANSI字符，则对这些字符进行转义处理。如：@n
 * "a^b"转换为："/a\^b/s"，"a|00 01|b"转换为："/a\x00\x01b/s"。
-* - 若content指定了offset或distance修饰项，则在pcre的首部添加"^{m,n}"，如：@n
-* "abc"; distance:5; 转换为："/^{5,}abc/"。
-* - 若content指定了depth或within，则在pcre首部的^后添加重复"{m,n}"，如：@n
-* "abc"; depth:4; 转换为："/^{1,2}abc/"。
+* - 若content指定了offset或distance修饰项，则在pcre的首部添加"^.{m,n}"，如：@n
+* "abc"; distance:5; 转换为："/^.{5,}abc/"。
+* - 若content指定了depth或within，则在pcre首部的^后添加重复".{m,n}"，如：@n
+* "abc"; depth:4; 转换为："/^.{0,1}abc/"。
 * - 若content指定了nocase，则添加pcre后缀"/i"，如：@n
 * "abc"; nocase; 转换为："/abc/i"。
 *
