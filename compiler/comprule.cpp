@@ -169,7 +169,12 @@ void ParseOptions(std::string &ruleOptions, CSnortRule &snortRule)
 
 		if (0 == stricmp("sid", iOp->name.c_str()))
 		{
-			snortRule.SetSid(atoi(&*opValueBeg));
+			long lSid = atoi(&*opValueBeg);
+			if (lSid <= 0)
+			{
+				TTHROW(TI_INVALIDDATA);
+			}
+			snortRule.SetSid(ulong(lSid));
 		}
 		else if (0 == stricmp("pcre", iOp->name.c_str()))
 		{
@@ -533,7 +538,7 @@ void Rule2Dfas(const CRegRule &rule, CCompileResults &result)
 
 	bool bHasSigs = false;
 	CNfa nfa;
-	nfa.Reserve(SC_STATELIMIT);
+	nfa.Reserve(5000);
 	for (ulong i = 0; i < nCurRuleSize; ++i)
 	{
 		CPcreChain &curPcreChain = regRule[i];

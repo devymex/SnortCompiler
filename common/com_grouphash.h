@@ -1,15 +1,15 @@
 /*!
-* @page pageGrouphash 分组与哈希
+* @page pageGrouphash 分组、哈希与优化
 *
 * @tableofcontents
 *
-* 此页面介绍了分组与哈希的算法步骤以及相关数据结构。
+* 此页面介绍了分组、哈希与优化的算法步骤以及相关数据结构。
 *
-* @section secGroup 分组
+* @section secGroup DFA分组
 *
 *下文所述的“SIG”是指DFA所具有的特征字符串，即Signature。
 *
-* @subsection subGroupFlow 分组流程图
+* @subsection subGroupFlow DFA分组流程图
 *
 * @dot
 * digraph groupProc {
@@ -52,9 +52,9 @@
 * 尝试将具有共同SIG的分组进行合并，若它们合并后的状态数未超限则将它们合并为新的分组。
 * 新组的SIG集为原两个分组的SIG集的交集。
 *
-* @section secHash 哈希
+* @section secHash 哈希映射
 *
-* @subsection subHashFlow 哈希流程图
+* @subsection subHashFlow 哈希映射流程图
 *
 * @dot
 * digraph hashProc {
@@ -62,10 +62,8 @@
 *	1 [label="将具有唯一SIG的分组映射入哈希表"];
 *	2 [label="将具有多个SIG的分组映射入哈希表"];
 *	3 [label="调整哈希表中代表各分组的SIG以减少冲突"];
-*	4 [label="对哈希表中的分组进行再合并"];
 *	1 -> 2;
 *	2 -> 3;
-*	3 -> 4;
 * }
 * @enddot
 *
@@ -88,11 +86,30 @@
 * - (2) 将@f$s_2@f$映射到槽@f$S=hash(s_2)@f$中，若@f$s_2@f$亦产生冲突，
 * 则以（1）的方式做递归调整。
 * 
-* @subsection subHashStep4 第四步、对哈希表中的分组进行再合并
+* @section secOptimize 优化分组结果
+*
+* @subsection subOptimizeFlow 优化分组流程图
+*
+* @dot
+* digraph optimizeProc {
+*	node [shape=record, fontname="Microsoft YaHei", fontsize=11];
+*	1 [label="对哈希表中的分组进行再合并"];
+*	2 [label="对哈希表中所有DFA进行最小化"];
+*	3 [label="压缩所有DFA的字符集"];
+*	1 -> 2;
+*	2 -> 3;
+* }
+* @enddot
+*
+* @subsection subOptimizeStep1 第一步、对哈希表中的分组进行再合并
 * - (1) 若哈希表中的一个槽内具有多个分组，且代表这些分组的SIG相同，则尝试合并这些分组。
 * 合并后不改变代表分组的SIG。
 * - (2) 若两个分组A和B位于哈希表中不同的槽内，若他们具有共同的SIG，并且这些共同的SIG中
 * 的某个SIG s可以映射到哈希表中的一个空槽内或A、B所在的槽内，则尝试将A和B进行合并。
 * 合并后的分组由s代表。
+*
+* @subsection subOptimizeStep2 第二步、对哈希表中所有DFA进行最小化
+*
+* @subsection subOptimizeStep3 第三步、压缩所有DFA的字符集
 *
 */

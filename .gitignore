@@ -45,6 +45,7 @@ input/*
 output/*
 ipch/*
 doxygen/*
+rules/*
 
 */Debug/*
 */Release/*
