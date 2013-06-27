@@ -537,7 +537,7 @@ void Rule2Dfas(const CRegRule &rule, CCompileResults &result)
 	result.GetRegexTbl().Resize(nOldRegexSize + nCurRuleSize);
 
 	bool bHasSigs = false;
-	CNfa nfa;
+	static CNfa nfa;
 	nfa.Reserve(5000);
 	for (ulong i = 0; i < nCurRuleSize; ++i)
 	{

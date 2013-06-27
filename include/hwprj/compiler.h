@@ -8,6 +8,7 @@
 #pragma once
 
 #include <hwprj\compres.h>
+#include <vector>
 
 #ifndef COMPILERHDR_DS
 #define COMPILERHDR __declspec(dllimport)

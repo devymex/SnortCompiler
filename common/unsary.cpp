@@ -14,14 +14,7 @@
 
 UNSARYHDR void CUnsignedArray::CopyFrom(ulong *pBuf)
 {
-	if (m_ulSize == 1)
-	{
-		*m_pAry = *pBuf;
-	}
-	else
-	{
-		memcpy(m_pAry, pBuf, m_ulSize * sizeof(m_pAry[0]));
-	}
+	memcpy(m_pAry, pBuf, m_ulSize * sizeof(m_pAry[0]));
 }
 
 UNSARYHDR void CUnsignedArray::Sort()
