@@ -14,15 +14,11 @@
 #include "contopt.h"
 #include <hwprj\pcreopt.h>
 #include "comprule.h"
+#include <hwprj\compiler.h>
 
 #pragma warning(disable:4996)
 
 ISSPACE g_isSpace;
-
-double rule2pcretime = 0.0;
-double pcre2nfatime = 0.0;
-double nfa2dfatime = 0.0;
-double dfamintimetime = 0.0;
 
 /*! complie one rule
 
@@ -521,10 +517,14 @@ Returns:		nothing
 */
 void Rule2Dfas(const CRegRule &rule, CCompileResults &result)
 {
+	CTimer t;
+
 	CRegRule regRule = rule;
 
 	RULECOMPDATA ruleCompData;
+	t.Reset();
 	ProcessRule(regRule, ruleCompData);
+	rule2pcretime += t.Cur();
 
 	COMPILEDINFO &ruleResult = result.GetSidDfaIds().Back();
 
@@ -536,7 +536,6 @@ void Rule2Dfas(const CRegRule &rule, CCompileResults &result)
 	const ulong nOldRegexSize = result.GetRegexTbl().Size();
 	result.GetRegexTbl().Resize(nOldRegexSize + nCurRuleSize);
 
-	bool bHasSigs = false;
 	static CNfa nfa;
 	nfa.Reserve(5000);
 	for (ulong i = 0; i < nCurRuleSize; ++i)
@@ -544,6 +543,7 @@ void Rule2Dfas(const CRegRule &rule, CCompileResults &result)
 		CPcreChain &curPcreChain = regRule[i];
 
 		nfa.Clear();
+		t.Reset();
 		for (ulong j = 0; j < curPcreChain.Size(); ++j)
 		{
 			const CPcreOption &curPcre = curPcreChain[j];
@@ -560,13 +560,11 @@ void Rule2Dfas(const CRegRule &rule, CCompileResults &result)
 				break;
 			}
 		}
+		pcre2nfatime += t.Cur();
+
 		if (ruleResult.m_nResult != COMPILEDINFO::RES_SUCCESS)
 		{
 			break;
-		}
-		if (regRule[i].GetSigs().Size() > 0)
-		{
-			bHasSigs = true;
 		}
 
 		ulong nDfaId = nOldDfaSize + i;
@@ -575,7 +573,9 @@ void Rule2Dfas(const CRegRule &rule, CCompileResults &result)
 		CDfa &dfa = result.GetDfaTable()[nDfaId];
 
 		dfa.SetId(nDfaId);
+		t.Reset();
 		ulong nToDFAFlag = dfa.FromNFA(nfa);
+		nfa2dfatime += t.Cur();
 
 		if (nToDFAFlag == -1)
 		{
@@ -586,7 +586,10 @@ void Rule2Dfas(const CRegRule &rule, CCompileResults &result)
 
 		TASSERT(dfa.GetFinalStates().Size() != 0);
 
+		t.Reset();
 		ulong nr = dfa.Minimize();
+		dfamintimetime += t.Cur();
+
 		if (0 != nr || dfa.Size() > SC_MAXDFASIZE)
 		{
 			ruleResult.m_nResult |= COMPILEDINFO::RES_EXCEEDLIMIT;
@@ -596,6 +599,16 @@ void Rule2Dfas(const CRegRule &rule, CCompileResults &result)
 
 		ruleResult.m_dfaIds.PushBack(nDfaId);
 		result.GetRegexTbl()[nChainId] = regRule[i];
+	}
+
+	bool bHasSigs = false;
+	for (ulong i = 0; i < nCurRuleSize; ++i)
+	{
+		if (regRule[i].GetSigs().Size() > 0)
+		{
+			bHasSigs = true;
+			break;
+		}
 	}
 
 	if (!bHasSigs)

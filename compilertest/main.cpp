@@ -6,6 +6,8 @@
 #include <hwprj\compiler.h>
 #include <hwprj\compres.h>
 #include <hwprj\trace.h>
+#include <hwprj\pcreopt.h>
+#include <hwprj\ruleoption.h>
 
 bool CompareFileExt(const std::string &strFile, const std::string &strExt)
 {
@@ -84,6 +86,12 @@ void main(int nArgs, char **pArgs)
 			}
 		}
 	}
+
+	std::cout << "规则转PCRE链用时： " << rule2pcretime << std::endl;
+	std::cout << "PCRE链转nfa用时： " << pcre2nfatime << std::endl;
+	std::cout << "nfa转dfa用时： " << nfa2dfatime << std::endl;
+	std::cout << "dfa最小化用时： " << dfamintimetime << std::endl;
+
 	if (bCompSuc == true)
 	{
 		//编译结果文件
@@ -96,4 +104,81 @@ void main(int nArgs, char **pArgs)
 
 	std::cout << "Total time: " << dTimeCnt << std::endl;
 	system("pause");
+
+	//if (nArgs != 2)
+	//{
+	//	return;
+	//}
+	//
+	////std::string strFile = pArgs[1];
+	////编译结果文件
+
+	//CCompileResults result;
+	////读入编译结果文件
+	//int contCnt = 0;
+	//int pcreCnt = 0;
+	//if (0 == result.ReadFromFile("..\\rulesresult.cdt"))
+	//{
+	//	CSidDfaIds sidDfaIds = result.GetSidDfaIds();
+	//	CRegRule regrules = result.GetRegexTbl();
+	//	ulong sidSize = sidDfaIds.Size();
+	//	for (size_t i = 0; i < sidSize; ++i)
+	//	{
+	//		struct COMPILEDINFO &curIds = sidDfaIds[i];
+	//		if (curIds.m_nResult == COMPILEDINFO::RES_SUCCESS)
+	//		{
+	//			CUnsignedArray &curIdx = curIds.m_dfaIds;
+	//			for (size_t j = 0; j < curIdx.Size(); ++j)
+	//			{
+	//				CPcreChain &curchains = regrules[curIdx[j]];
+	//				for (size_t k = 0; k < curchains.Size(); ++k)
+	//				{
+	//					if (curchains[k].HasFlags(CPcreOption::PF_F))
+	//					{
+	//						++contCnt;
+	//					}
+	//					else
+	//					{
+	//						++pcreCnt;
+	//					}
+	//				}
+	//			}
+	//		}
+	//	}
+	//}
+
+	//std::cout << contCnt << std::endl;
+	//std::cout << pcreCnt << std::endl;
+
+	//ulong nSuccess = 0;
+	//ulong nFailure = 0;
+	//ulong nExceed = 0;
+	//for (ulong i = 0; i < result.GetSidDfaIds().Size(); ++i)
+	//{
+	//	if (result.GetSidDfaIds()[i].m_nResult == COMPILEDINFO::RES_SUCCESS)
+	//	{
+	//		CDfaArray dfas;
+	//		for (ulong j = 0; j < result.GetSidDfaIds()[i].m_dfaIds.Size(); ++j)
+	//		{
+	//			dfas.PushBack(result.GetDfaTable()[result.GetSidDfaIds()[i].m_dfaIds[j]]);
+	//		}
+	//		CDfa mergeDfa;
+	//		if (MergeMultipleDfas(dfas, mergeDfa))
+	//		{
+	//			++nSuccess;
+	//			if (mergeDfa.Size() > 150)
+	//			{
+	//				++nExceed;
+	//			}
+	//		}
+	//		else
+	//		{
+	//			++nFailure;
+	//		}
+	//	}
+	//}
+	//std::cout << "Success: " << nSuccess << std::endl;
+	//std::cout << "Failure: " << nFailure << std::endl;
+	//std::cout << "Exceed: " << nExceed << std::endl;
+	//system("pause");
 }

@@ -13,11 +13,6 @@
 #include <hwprj\nfa.h>
 #include <hwprj\compiler.h>
 
-extern double rule2pcretime;
-extern double pcre2nfatime;
-extern double nfa2dfatime;
-extern double dfamintimetime;
-
 struct RULEOPTIONRAW
 {
 	std::string name;

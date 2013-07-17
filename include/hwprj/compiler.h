@@ -90,3 +90,8 @@ COMPILERHDR void CodeToNFA(const CByteArray &pcResult, bool bFromBeg, CNfa &nfa)
 /*!
 @}
 */
+
+COMPILERHDR extern double rule2pcretime;
+COMPILERHDR extern double pcre2nfatime;
+COMPILERHDR extern double nfa2dfatime;
+COMPILERHDR extern double dfamintimetime;

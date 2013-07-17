@@ -622,6 +622,7 @@ Returns:				nothing
 
 HASHMAPHDR void HashMapping(CGroupRes &groupRes, HASHRES &HashResMap)
 {
+	CTimer t;
 	std::vector<GROUPHASH> vecGroups;
 	vecGroups.resize(groupRes.GetGroups().Size());
 	for (ulong i = 0; i < groupRes.GetGroups().Size(); ++i)
@@ -663,11 +664,14 @@ HASHMAPHDR void HashMapping(CGroupRes &groupRes, HASHRES &HashResMap)
 		}
 	}
 	hash.nBucketCnt = 4 * nRuleCnt;
+	hash.nSigCnt = groupRes.GetGroups().Size();
 
 	RESULTMAP result;
 	Mapping(vecGroups, gmap, dmap, result);
+	g_log << "哈希用时： " << t.Reset() << g_log.nl << g_log.nl; 
 
 	Combine(groupRes, vecGroups, result);
+	g_log << "哈希表内合并用时： " << t.Reset() << g_log.nl << g_log.nl;
 
 	ClearUpHashRes(vecGroups, result, groupRes, HashResMap);
 }

@@ -15,6 +15,11 @@
 #include "p2nmain.h"
 #include <hwprj\compiler.h>
 
+COMPILERHDR double rule2pcretime = 0.0;
+COMPILERHDR double pcre2nfatime = 0.0;
+COMPILERHDR double nfa2dfatime = 0.0;
+COMPILERHDR double dfamintimetime = 0.0;
+
 /*!
 * read rules from a file
 * then process the rules to CSnortRule
