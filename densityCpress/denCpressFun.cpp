@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include <hwprj/dfa.h>
 #include "densityCpress.h"
 
@@ -46,13 +47,12 @@ double Distance (ushort row1, ushort row2, double *disMatrix)
 	if (row1 > row2)
 	{
 		pos = (row1 * (row1 - 1)) / 2 + row2;
-		return disMatrix[pos];
 	}
 	else if (row1 < row2)
 	{
 		pos = (row2 * (row2 - 1)) / 2 + row1;
-		return disMatrix[pos];
 	}
+	return disMatrix[pos];
 }
 
 template <typename T>
@@ -94,8 +94,9 @@ void Update(std::vector<ushort> &neighbors, ROWOBJ &curobj, byte *pProcessed,
 	}
 }
 
-ushort GetNextObj(std::vector<ROWOBJ> &orderSeeds, ROWOBJ &curobj)
+ushort GetNextObj(std::vector<ushort> &orderSeeds, ROWOBJ &curobj)
 {
+	return 1;
 }
 
 void ExpandClusterOrder(ROWOBJ &obj, double eps, ushort minPts,byte *pProcessed, double *disMatrix, double *coreDis, 
@@ -107,8 +108,8 @@ void ExpandClusterOrder(ROWOBJ &obj, double eps, ushort minPts,byte *pProcessed,
 	{
 		std::vector<ushort> &curNeis = neighbors[obj.dfaRowInd];
 
-		std::vector<ROWOBJ> orderSeeds;
-		Update(curNeis, obj, pProcessed, disMatrix, orderSeeds);
+		std::vector<ushort> orderSeeds;
+		Update(curNeis, obj, pProcessed, disMatrix, allObjs, orderSeeds);
 
 		while (!orderSeeds.empty())
 		{
@@ -120,7 +121,7 @@ void ExpandClusterOrder(ROWOBJ &obj, double eps, ushort minPts,byte *pProcessed,
 			{
 				curobj.coreDis = coreDis[curobj.dfaRowInd];
 				curNeis = neighbors[curobj.dfaRowInd];
-				Update(curNeis, curobj, pProcessed, disMatrix, orderSeeds);
+				Update(curNeis, curobj, pProcessed, disMatrix, allObjs, orderSeeds);
 			}
 		}
 	}
@@ -152,6 +153,6 @@ void OPTICS(CDfa &dfa, double *disMatrix, double eps, ushort minPts, std::vector
 
 		ROWOBJ &obj = allObjs[rownum];
 		obj.coreDis = coreDis[rownum];
-		ExpandClusterOrder(obj, eps, minPts, pProcessed, coreDis, allObjs, neighbors, orderObj);
+		ExpandClusterOrder(obj, eps, minPts, pProcessed, disMatrix, coreDis, allObjs, neighbors, orderObj);
 	}
 }
