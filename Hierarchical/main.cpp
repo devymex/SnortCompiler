@@ -16,16 +16,14 @@ void main(int nArgs, char **cArgs)
 			{
 				rows.push_back(j);
 			}
-			rows.pop_back();
-			size_t n_size = StatisticVitualCore(CDfaSet[i], rows);
-	/*	GRAPH graph;
+			GRAPH graph;
 
 			BuildGraph(CDfaSet[i], rows, graph);
 
 			VECROWSET vecRows;
 
 			SearchConnectSubgraph(graph, vecRows);
-		HierarchicalCluster(CDfaSet[i], vecRows);*/
+			HierarchicalCluster(CDfaSet[i], vecRows);
 		}
 	}
 
