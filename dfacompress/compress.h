@@ -7,4 +7,4 @@
 #define DFACOMPRESS __declspec(dllexport)
 #endif
 
-DFACOMPRESS void DfaCompress();
+DFACOMPRESS void DfaCompress(CDfa &olddfa);
