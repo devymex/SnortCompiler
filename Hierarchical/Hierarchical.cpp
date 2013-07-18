@@ -3,29 +3,90 @@
 void BuildGraph(const CDfa &oneDfa, const ROWSET &rows, GRAPH &graph)
 {
 	size_t nRow = rows.size();
-	size_t nCol = oneDfa.GetGroupCount();
-	graph.resize(nRow * nCol);
+	graph.resize(nRow * nRow);
+	std::fill(graph.begin(), graph.end(), 0.0);
 
 	for (size_t i = 0; i < nRow; ++i)
 	{
 		for (size_t j = i + 1; j < nRow; ++j)
 		{
 			size_t nEqualCnt = 0;
-			for (size_t k = 0; k < nCol; ++k)
+			for (size_t k = 0; k < oneDfa.GetGroupCount(); ++k)
 			{
 				if (oneDfa[rows[i]][k] == oneDfa[rows[j]][k])
 				{
 					++nEqualCnt;
 				}
 			}
-			graph[i * nCol + j] = graph[j * nCol + i] = nEqualCnt / nRow;			 
+			double radio = (double)nEqualCnt / (double)nRow;
+			if (radio > 0.5)
+			{
+				graph[i * nRow + j] = graph[j * nRow + i] = radio;			 
+			}
 		}
 	}
 }
 
-
-void SearchConSubGraph(const GRAPH &graph, VECROWSET &vecRows)
+int DFS_Visit(const GRAPH &graph, ROWSET &row, size_t vertex, ROWSET &flag)
 {
+	if (flag[vertex] == 0)
+	{
+		flag[vertex] = 1;
+	}
+	else
+	{
+		return 0;
+	}
+
+	for (size_t i = 0; i < row.size(); ++i)
+	{
+		if (graph[vertex * row.size() + i] > 0 &&
+			flag[i] == 0)
+		{
+			DFS_Visit(graph, row, i, flag);
+		}
+	}
+
+	return 1;
+}
+
+void SearchConnectSubgraph(const GRAPH &graph, ROWSET &curRow, VECROWSET &vecRows)
+{
+	ROWSET visit;
+	visit.resize(curRow.size());
+	std::fill(visit.begin(), visit.end(), 0);
+
+	ROWSET nextRow;
+
+	if (DFS_Visit(graph, curRow, 0, visit))
+	{
+		vecRows.push_back(ROWSET());
+		for (size_t i = 0; i < visit.size(); ++i)
+		{
+			if (visit[i] != 0)
+			{
+				vecRows.back().push_back(curRow[i]);
+			}
+			else
+			{
+				nextRow.push_back(curRow[i]);
+			}
+		}
+	}
+
+	if (!nextRow.empty())
+	{
+		size_t nSize = nextRow.size();
+		GRAPH newGraph(nSize * nSize);
+		for (size_t i = 0; i < nSize; ++i)
+		{
+			for (size_t j = 0; j < nSize; ++j)
+			{
+				newGraph[i * nSize + j] = graph[nextRow[i] * curRow.size() + nextRow[j]];
+			}
+		}
+		SearchConnectSubgraph(newGraph, nextRow, vecRows);
+	}
 }
 size_t maxn(size_t* bary,int size)
 {
