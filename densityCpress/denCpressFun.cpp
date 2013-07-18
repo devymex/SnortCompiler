@@ -36,9 +36,48 @@ void SetDistance(CDfa dfa, double *disMatrix)
 
 //求得各个对象的邻居，并标记该对象是否为核心对象
 void GetNeighbors(ushort dfasize, double *disMatrix, double eps, ushort minPts,
-	double *coreDis, std::vector<std::vector<ushort>> &neighbors)
-{
-
+				double *coreDis, std::vector<std::vector<ushort>> &neighbors)
+{	
+	for(size_t i = 1; i < dfasize; ++i)
+	{
+		for(size_t j = 0; j < i; ++j)
+		{
+			size_t temp = (i - 1) * i / 2 + j;
+			if(disMatrix[temp] < eps)
+			{
+				neighbors[i].push_back(j);
+				neighbors[j].push_back(i);
+			}
+		}
+	}
+	std::vector<double> order; 
+	for(size_t i = 0; i < neighbors.size(); ++i)
+	{
+		order.clear();
+		if(neighbors[i].size() >= minPts - 1)
+		{
+			for(size_t j = 0; j < neighbors[i].size(); ++j)
+			{
+				size_t temp;
+				if(i > neighbors[i][j])
+				{
+					temp = i * (i - 1) / 2 + neighbors[i][j];
+				}
+				else if(i < neighbors[i][j])
+				{
+					temp = neighbors[i][j] * (neighbors[i][j] - 1) / 2 + i;
+				}
+				
+				order.push_back(disMatrix[i]);
+			}
+			std::sort(order.begin(), order.end());
+			coreDis[i] = order[minPts - 2];
+		}
+		else
+		{
+			coreDis[i] = 0;
+		}
+	}
 }
 
 double Distance (ushort row1, ushort row2, double *disMatrix)
@@ -120,8 +159,8 @@ void ExpandClusterOrder(ROWOBJ &obj, double eps, ushort minPts,byte *pProcessed,
 			if (coreDis[curobj.dfaRowInd] != 0)
 			{
 				curobj.coreDis = coreDis[curobj.dfaRowInd];
-				curNeis = neighbors[curobj.dfaRowInd];
-				Update(curNeis, curobj, pProcessed, disMatrix, allObjs, orderSeeds);
+				std::vector<ushort> &neis = neighbors[curobj.dfaRowInd];
+				Update(neis, curobj, pProcessed, disMatrix, allObjs, orderSeeds);
 			}
 		}
 	}
