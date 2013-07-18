@@ -21,7 +21,7 @@ struct ROWOBJ
 	double reachDis;
 
 	// 该行所属的DFA
-	byte dfaRowInd;
+	ushort dfaRowInd;
 };
 
 typedef std::vector<std::map<byte,STATEID>>  ROWDIF;

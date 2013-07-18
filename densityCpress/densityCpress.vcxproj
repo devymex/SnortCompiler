@@ -80,6 +80,7 @@
     <ClCompile Include="denCpressFun.cpp" />
     <ClCompile Include="densityCpress.cpp" />
     <ClCompile Include="getnext.cpp" />
+    <ClCompile Include="main.cpp" />
     <ClCompile Include="neighbor.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

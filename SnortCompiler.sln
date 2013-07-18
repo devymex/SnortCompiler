@@ -41,6 +41,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "compilertest", "compilertes
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "densityCpress", "densityCpress\densityCpress.vcxproj", "{531A8FBF-A53D-4EE2-A6B9-5BE989D0746B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{673B9C32-B6AA-4451-80DE-93DF369B64DC} = {673B9C32-B6AA-4451-80DE-93DF369B64DC}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
