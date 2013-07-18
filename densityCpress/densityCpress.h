@@ -2,15 +2,15 @@
 #include <utility>
 #include <vector>
 #include <map>
-#include "dfaarray.h"
-
+#include <hwprj/dfaarray.h>
 #ifndef DENCPRESSHDR_DS
 #define DENCPRESSHDR __declspec(dllimport)
 #else
 #define DENCPRESSHDR __declspec(dllexport)
 #endif
 
-
+typedef CDfa CCluster;
+typedef CDfaRow CClusterRow;
 // 用于存储每一行的参数
 struct ROWOBJ
 {
@@ -50,18 +50,19 @@ public:
 	CDfaRow& getCurCluster(byte Cluster);
 
 	// 返回区别
-	std::map<byte,STATEID> getDif(byte row);
+	std::map<byte,STATEID>& getDif(byte row);
 
 private:
+	// 记录对应的DFAID
+	ulong m_nDfaID;
 
 	// 每一行对应的簇
-	byte m_bClusterNum; 
+	std::map<STATEID, ushort> staId2CluId; 
 
-	// 记录对应的DFAID
-	ulong m_nID;
+	//存放所有簇的特征值
+	CCluster m_Cluster;
 
 	// 记录与代表行的不同处及相应不同的值
-	ROWDIF  m_Dif;
-
+	ROWDIF m_Dif;
 
 };
