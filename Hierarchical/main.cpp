@@ -8,7 +8,7 @@ void main(int nArgs, char **cArgs)
 
 	for (size_t i = 0; i < CDfaSet.Size(); ++i)
 	{
-		if (i == 33)
+		if (i == 2)
 		{
 			ROWSET rows;
 			std::cout << CDfaSet[i].Size();
@@ -22,7 +22,7 @@ void main(int nArgs, char **cArgs)
 
 			VECROWSET vecRows;
 
-			SearchConnectSubgraph(graph, rows, vecRows);
+			SearchConnectSubgraph(graph, vecRows);
 			HierarchicalCluster(CDfaSet[i], vecRows);
 		}
 	}

@@ -5,6 +5,7 @@
 #include <vector>
 #include <Windows.h>
 #include <algorithm>
+#include <cmath>
 
 typedef std::vector<BYTE> ROWSET;
 typedef std::vector<double> GRAPH;
@@ -14,7 +15,7 @@ typedef std::vector<ROWSET> VECROWSET;
 void BuildGraph(const CDfa &oneDfa, const ROWSET &rows, GRAPH &graph);
 
 //查找连通子图
-void SearchConnectSubgraph(const GRAPH &graph, ROWSET &curRow, VECROWSET &vecRows);
+void SearchConnectSubgraph(const GRAPH &graph, VECROWSET &vecRows);
 
 //层次聚类算法
 void HierarchicalCluster(const CDfa &oneDfa, VECROWSET &vecRows);

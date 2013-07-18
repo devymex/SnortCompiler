@@ -13,12 +13,12 @@ void BuildGraph(const CDfa &oneDfa, const ROWSET &rows, GRAPH &graph)
 			size_t nEqualCnt = 0;
 			for (size_t k = 0; k < oneDfa.GetGroupCount(); ++k)
 			{
-				if (oneDfa[rows[i]][k] == oneDfa[rows[j]][k])
+				if ((oneDfa[rows[i]][k] == oneDfa[rows[j]][k]))
 				{
 					++nEqualCnt;
 				}
 			}
-			double radio = (double)nEqualCnt / (double)nRow;
+			double radio = (double)nEqualCnt / (double)oneDfa.GetGroupCount();
 			if (radio > 0.5)
 			{
 				graph[i * nRow + j] = graph[j * nRow + i] = radio;			 
@@ -27,65 +27,46 @@ void BuildGraph(const CDfa &oneDfa, const ROWSET &rows, GRAPH &graph)
 	}
 }
 
-int DFS_Visit(const GRAPH &graph, ROWSET &row, size_t vertex, ROWSET &flag)
+int DFS_Visit(const GRAPH &graph, size_t vex, ROWSET &flag, ROWSET &curRow)
 {
-	if (flag[vertex] == 0)
+	if (flag[vex] == 0)
 	{
-		flag[vertex] = 1;
+		flag[vex] = 1;
+		curRow.push_back(vex);
 	}
 	else
 	{
 		return 0;
 	}
 
-	for (size_t i = 0; i < row.size(); ++i)
+	size_t nVexCnt = sqrt(graph.size());
+	for (size_t i = 0; i < nVexCnt; ++i)
 	{
-		if (graph[vertex * row.size() + i] > 0 &&
+		if (graph[vex * nVexCnt + i] > 0 &&
 			flag[i] == 0)
 		{
-			DFS_Visit(graph, row, i, flag);
+			DFS_Visit(graph, i, flag, curRow);
 		}
 	}
 
 	return 1;
 }
 
-void SearchConnectSubgraph(const GRAPH &graph, ROWSET &curRow, VECROWSET &vecRows)
+void SearchConnectSubgraph(const GRAPH &graph, VECROWSET &vecRows)
 {
+	size_t nVexCnt = sqrt(graph.size());
+
 	ROWSET visit;
-	visit.resize(curRow.size());
+	visit.resize(nVexCnt);
 	std::fill(visit.begin(), visit.end(), 0);
 
-	ROWSET nextRow;
-
-	if (DFS_Visit(graph, curRow, 0, visit))
+	for (size_t i = 0; i < nVexCnt; ++i)
 	{
-		vecRows.push_back(ROWSET());
-		for (size_t i = 0; i < visit.size(); ++i)
+		if (visit[i] == 0)
 		{
-			if (visit[i] != 0)
-			{
-				vecRows.back().push_back(curRow[i]);
-			}
-			else
-			{
-				nextRow.push_back(curRow[i]);
-			}
+			vecRows.push_back(ROWSET());
+			DFS_Visit(graph, i, visit, vecRows.back());
 		}
-	}
-
-	if (!nextRow.empty())
-	{
-		size_t nSize = nextRow.size();
-		GRAPH newGraph(nSize * nSize);
-		for (size_t i = 0; i < nSize; ++i)
-		{
-			for (size_t j = 0; j < nSize; ++j)
-			{
-				newGraph[i * nSize + j] = graph[nextRow[i] * curRow.size() + nextRow[j]];
-			}
-		}
-		SearchConnectSubgraph(newGraph, nextRow, vecRows);
 	}
 }
 
