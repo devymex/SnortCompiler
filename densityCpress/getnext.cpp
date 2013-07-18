@@ -5,5 +5,6 @@
 void GetNextObj(std::vector<ushort> &orderSeeds, ROWOBJ *allObj, ROWOBJ &curobj)
 {
 	std::cout << std::endl;
+	std::cout << "haoweichen is so stupid!!!";
 }
 //////////
