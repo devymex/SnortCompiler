@@ -9,9 +9,7 @@ DenCpressDfa::DenCpressDfa()
 DenCpressDfa::DenCpressDfa(const DenCpressDfa &other)
 {
 	m_bClusterNum = other.m_bClusterNum;
-	m_nID = other.m_nID;
-	m_Dif = other.m_Dif;
-	
+	m_nDfaID = other.m_nDfaID;
 }
 
 DenCpressDfa::~DenCpressDfa()
