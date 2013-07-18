@@ -32,5 +32,11 @@
     <ClCompile Include="denCpressFun.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="getnext.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="neighbor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
