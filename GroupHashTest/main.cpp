@@ -5,6 +5,9 @@
 #include <hwprj\groupres.h>
 #include <hwprj\grouping.h>
 #include <hwprj\buildhash.h>
+#include <hwprj\dfaarray.h>
+
+#include <sstream>
 
 void main(int nArgs, char **pArgs)
 {
@@ -29,6 +32,19 @@ void main(int nArgs, char **pArgs)
 		HASHRES HashResMap;
 		//哈希
 		HashMapping(groupRes, HashResMap);
+
+		//std::stringstream ss;
+
+		//for(size_t i = 0; i < groupRes.GetDfaTable().Size(); ++i)
+		//{
+		//	std::string fileName = "F:\\cppProject\\huawei\\PreciseMatch\\CompressTest\\retDfa\\";
+		//	ss.clear();
+		//	ss.str("");
+		//	ss << i;
+		//	fileName += ss.str() + ".txt";
+		//	groupRes.GetDfaTable()[i].Dump(fileName.c_str());
+		//}
+
 
 		//存储最终结果的文件
 		std::string strWriteFileName(pArgs[1]);
