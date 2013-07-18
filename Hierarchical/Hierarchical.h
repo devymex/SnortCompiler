@@ -8,6 +8,8 @@
 typedef std::vector<BYTE> ROWSET;
 typedef std::vector<double> GRAPH;
 typedef std::vector<ROWSET> VECROWSET;
+typedef std::vector<BYTE> VISUALROW;  
+typedef std::vector<VISUALROW> VISUALSET;
 
 //½¨Í¼
 void BuildGraph(const CDfa &oneDfa, const ROWSET &rows, GRAPH &graph);

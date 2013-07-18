@@ -13,14 +13,15 @@ void main(int nArgs, char **cArgs)
 		{
 			rows.push_back(j);
 		}
-		GRAPH graph;
+
+	/*	GRAPH graph;
 
 		BuildGraph(CDfaSet[i], rows, graph);
 
 		VECROWSET vecRows;
 
 		SearchConSubGraph(graph, vecRows);
-		HierarchicalCluster(CDfaSet[i], vecRows);
+		HierarchicalCluster(CDfaSet[i], vecRows);*/
 	}
 
 	system("pause");
