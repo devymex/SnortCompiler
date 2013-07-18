@@ -88,14 +88,16 @@ void SearchConnectSubgraph(const GRAPH &graph, ROWSET &curRow, VECROWSET &vecRow
 		SearchConnectSubgraph(newGraph, nextRow, vecRows);
 	}
 }
+
+
 size_t maxn(size_t* bary,int size)
 {
-	size_t n_max = bary[0]; 
+	size_t n_max = 0; 
 	for (int i = 1; i < size; i++)
 	{
-		if (n_max < bary[i])
+		if (bary[n_max] < bary[i])
 		{
-			n_max = bary[i];
+			n_max = i;
 		}
 	}
 	return n_max;
@@ -104,36 +106,37 @@ size_t maxn(size_t* bary,int size)
 
 
 //统计虚拟核 ,计算存储空间,每次一个行集
-size_t StatisticVitualCore(const CDfa oneDfa,ROWSET rs)
+size_t StatisticVitualCore(const CDfa &oneDfa,ROWSET &rs)
 {
 	size_t n_size = rs.size(); 
 	size_t n_statenum = oneDfa.Size();
 	size_t* bary = new size_t[n_statenum];
 	size_t* bcountary = new size_t[n_statenum];
-	for (size_t b = 0; b < n_statenum; b++)
+	for (size_t bcount = 0; bcount < n_statenum; bcount++)
 		{
-			bary[b] = 0;
+			bcountary[bcount] = 0;
 		}
 	size_t n_dfacol = oneDfa[0].Size();//colnum
 	VISUALROW visrow;
-	for (size_t c = 0; c < n_dfacol; c++)
+	for (size_t col = 0; col < n_dfacol; col++)
 	{
-		for (size_t b = 0; b < n_statenum; b++)
+		for (size_t ba = 0; ba < n_statenum; ba++)
 		{
-			bary[b] = 0;
+			bary[ba] = 0;
 		}
 		for (size_t i = 0; i< n_size; i++)
 		{
-			BYTE bt = oneDfa[(size_t)(rs[i])][c];
+			BYTE bt = oneDfa[(size_t)(rs[i])][col];
 			bary[size_t(bt)]++;
-			size_t maxnum = maxn(bary, n_statenum);
-			visrow.push_back((BYTE)maxnum);
-			for (size_t bc = 0; bc < n_size; bc++)
+		}
+		size_t maxindex = maxn(bary, n_statenum);
+		visrow.push_back((BYTE)(maxindex));
+		for (size_t i = 0; i< n_size; i++)
+		{
+			BYTE bt = oneDfa[(size_t)(rs[i])][col];
+			if (visrow[col] != bt)
 			{
-				if (maxnum != bt)
-				{
-					bcountary[bc]++;
-				}
+				bcountary[i]++;
 			}
 		}
 	}

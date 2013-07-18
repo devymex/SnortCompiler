@@ -18,5 +18,8 @@ void BuildGraph(const CDfa &oneDfa, const ROWSET &rows, GRAPH &graph);
 //查找连通子图
 void SearchConnectSubgraph(const GRAPH &graph, ROWSET &curRow, VECROWSET &vecRows);
 
+//统计虚拟核 ,计算存储空间,每次一个行集
+size_t StatisticVitualCore(const CDfa &oneDfa,ROWSET &rs);
+
 //层次聚类算法
 void HierarchicalCluster(const CDfa &oneDfa, VECROWSET &vecRows);
