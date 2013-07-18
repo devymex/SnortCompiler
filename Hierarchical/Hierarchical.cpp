@@ -70,7 +70,7 @@ void SearchConnectSubgraph(const GRAPH &graph, VECROWSET &vecRows)
 	}
 }
 
-
+//返回出现次数最多的下表
 size_t maxn(size_t* bary,int size)
 {
 	size_t n_max = 0; 
@@ -89,30 +89,30 @@ size_t maxn(size_t* bary,int size)
 //统计虚拟核 ,计算存储空间,每次一个行集
 size_t StatisticVitualCore(const CDfa &oneDfa,ROWSET &rs)
 {
-	size_t n_size = rs.size(); 
-	size_t n_statenum = oneDfa.Size();
-	size_t* bary = new size_t[n_statenum];
-	size_t* bcountary = new size_t[n_statenum];
-	for (size_t bcount = 0; bcount < n_statenum; bcount++)
+	size_t n_size = rs.size();   //行集大小
+	size_t n_statenum = oneDfa.Size();  //dfa状态数
+	size_t* bary = new size_t[n_statenum]; //统计次数
+	size_t* bcountary = new size_t[n_statenum]; //存储跳转状态不同的个数
+	for (size_t bcount = 0; bcount < n_statenum; bcount++) //init
 		{
 			bcountary[bcount] = 0;
 		}
 	size_t n_dfacol = oneDfa[0].Size();//colnum
 	VISUALROW visrow;
-	for (size_t col = 0; col < n_dfacol; col++)
+	for (size_t col = 0; col < n_dfacol; col++) //dfa列
 	{
-		for (size_t ba = 0; ba < n_statenum; ba++)
+		for (size_t ba = 0; ba < n_statenum; ba++) //init
 		{
 			bary[ba] = 0;
 		}
-		for (size_t i = 0; i< n_size; i++)
+		for (size_t i = 0; i< n_size; i++) //统计出现次数
 		{
 			BYTE bt = oneDfa[(size_t)(rs[i])][col];
 			bary[size_t(bt)]++;
 		}
-		size_t maxindex = maxn(bary, n_statenum);
-		visrow.push_back((BYTE)(maxindex));
-		for (size_t i = 0; i< n_size; i++)
+		size_t maxindex = maxn(bary, n_statenum); //最多次数下标
+		visrow.push_back((BYTE)(maxindex)); //该列虚拟核
+		for (size_t i = 0; i< n_size; i++)   //存储跳转状态不同的个数
 		{
 			BYTE bt = oneDfa[(size_t)(rs[i])][col];
 			if (visrow[col] != bt)
@@ -121,6 +121,7 @@ size_t StatisticVitualCore(const CDfa &oneDfa,ROWSET &rs)
 			}
 		}
 	}
+	//计算内存大小
 	size_t vsmem = n_size;
 	for(size_t i = 0; i < n_size; i++)
 	{
