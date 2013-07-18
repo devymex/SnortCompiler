@@ -24,12 +24,18 @@
     <ClInclude Include="..\include\hwprj\dfacompress.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\hwprj\newdfa.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="dfacompress.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="newdfa.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
