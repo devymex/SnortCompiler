@@ -40,13 +40,13 @@ void SetDistance(CDfa dfa, std::vector<std::vector<double>> &disMatrix)
 }
 
 //求得各个对象的邻居，并标记该对象是否为核心对象
-void GetNeighbors(std::vector<std::vector<double>> &disMatrix, double eps, byte minPts,
-	byte *coreDis, std::vector<std::vector<byte>> &neighbors)
+void GetNeighbors(std::vector<std::vector<double>> &disMatrix, double eps, ushort minPts,
+	double *coreDis, std::vector<std::vector<ushort>> &neighbors)
 {
 
 }
 
-void Update(std::vector<byte> &neignbors, ROWOBJ obj, std::vector<ROWOBJ>)
+void Update(std::vector<ushort> &neignbors, ROWOBJ obj, std::vector<ROWOBJ>)
 {
 }
 
@@ -54,13 +54,13 @@ void GetNextObj(std::vector<ROWOBJ> &orderSeeds, ROWOBJ &curobj)
 {
 }
 
-void ExpandClusterOrder(ROWOBJ &obj, double eps, byte minPts,byte *pProcessed, 
-						byte *coreDis, std::vector<std::vector<byte>> &neighbors, std::vector<ROWOBJ> &orderObj)
+void ExpandClusterOrder(ROWOBJ &obj, double eps, ushort minPts,byte *pProcessed, 
+						double *coreDis, std::vector<std::vector<ushort>> &neighbors, std::vector<ROWOBJ> &orderObj)
 {
 	pProcessed[obj.dfaRowInd] = 1;
 	if (coreDis[obj.dfaRowInd] == 1)
 	{
-		std::vector<byte> &curNeis = neighbors[obj.dfaRowInd];
+		std::vector<ushort> &curNeis = neighbors[obj.dfaRowInd];
 		orderObj.push_back(obj);
 		obj.coreDis = coreDis[obj.dfaRowInd];
 
@@ -76,12 +76,12 @@ void ExpandClusterOrder(ROWOBJ &obj, double eps, byte minPts,byte *pProcessed,
 }
 
 void OPTICS(CDfa &dfa, std::vector<std::vector<double>> &disMatrix,
-	double eps, byte minPts, std::vector<ROWOBJ> &orderObj)
+	double eps, ushort minPts, std::vector<ROWOBJ> &orderObj)
 {
-	byte coreDis[256];
+	double coreDis[256];
 	std::memset(coreDis, 0, sizeof(coreDis));
 
-	std::vector<std::vector<byte>> neighbors;
+	std::vector<std::vector<ushort>> neighbors;
 	GetNeighbors(disMatrix, eps, minPts, coreDis, neighbors);
 
 	byte pProcessed[256];
