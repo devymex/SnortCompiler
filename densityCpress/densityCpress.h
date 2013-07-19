@@ -42,7 +42,6 @@ public:
 	// 重载操作符“=”
 	DenCpressDfa& operator = (const DenCpressDfa &other);
 
-
 	// 计算当行属于所属的簇
 	byte getClusterNum(byte row);
 

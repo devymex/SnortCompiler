@@ -11,6 +11,7 @@
 //
 void SetDistance(CDfa dfa, double *disMatrix)
 {
+	// len∏……∂”√£ø
 	ushort len = 0;
 	for (size_t i = 0; i < dfa.Size(); ++i)
 	{
