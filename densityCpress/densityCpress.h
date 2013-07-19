@@ -32,7 +32,7 @@ public:
 	SeedsSort (ROWOBJ *p ) : parrobj(p)
 	{}
 	
-	// µ›ºı≈≈–Ú
+	// µ›‘ˆ≈≈–Ú
 	bool operator () (ushort arg1, ushort arg2)
 	{
 		return parrobj[arg1].reachDis < parrobj[arg2].reachDis;
