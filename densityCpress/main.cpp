@@ -18,5 +18,6 @@ void main()
 		SetDistance(dfa, disMatrix);
 		std::vector<ushort> orderObj;
 		OPTICS(dfa, disMatrix, 0.5, 5, orderObj);
+		std::cout << std::endl;
 	}
 }
