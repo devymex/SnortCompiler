@@ -2,13 +2,6 @@
 #include <hwprj/dfa.h>
 #include "densityCpress.h"
 
-//struct ROWOBJ
-//{
-//	double coreDis;
-//	double reachDis;
-//	byte dfaRowInd;
-//};
-//
 void SetDistance(CDfa dfa, double *disMatrix)
 {
 	ushort len = 0;
@@ -133,9 +126,18 @@ void Update(std::vector<ushort> &neighbors, ROWOBJ &curobj, byte *pProcessed,
 	}
 }
 
-ushort GetNextObj(std::vector<ushort> &orderSeeds, ROWOBJ &curobj)
-{
-	return 1;
+ushort GetNextObj(std::vector<ushort> &orderSeeds, ROWOBJ *arrObj)
+{		
+	
+	// 存储allObj数组的大小,此大小与orderSeeds大小等价
+	size_t sizeArr = orderSeeds.size();
+
+	// 递减排序
+	std::sort(orderSeeds.begin(), orderSeeds.end(), SeedsSort(arrObj));
+
+	ushort minIdx = *orderSeeds.begin();
+	orderSeeds.erase(orderSeeds.begin());
+	return minIdx;
 }
 
 void ExpandClusterOrder(ROWOBJ &obj, double eps, ushort minPts,byte *pProcessed, double *disMatrix, double *coreDis, 
@@ -152,7 +154,7 @@ void ExpandClusterOrder(ROWOBJ &obj, double eps, ushort minPts,byte *pProcessed,
 
 		while (!orderSeeds.empty())
 		{
-			ROWOBJ &curobj = allObjs[GetNextObj(orderSeeds, curobj)];
+			ROWOBJ &curobj = allObjs[GetNextObj(orderSeeds, allObjs)];
 			pProcessed[curobj.dfaRowInd] = 1;
 			orderObj.push_back(curobj.dfaRowInd);
 
@@ -172,6 +174,8 @@ void OPTICS(CDfa &dfa, double *disMatrix, double eps, ushort minPts, std::vector
 	std::memset(coreDis, 0, sizeof(coreDis));
 
 	std::vector<std::vector<ushort>> neighbors;
+	neighbors.resize(dfa.Size());
+
 	GetNeighbors(dfa.Size(), disMatrix, eps, minPts, coreDis, neighbors);
 
 	byte pProcessed[256];
