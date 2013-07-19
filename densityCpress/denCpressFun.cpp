@@ -134,6 +134,9 @@ void Update(std::vector<ushort> &neighbors, ROWOBJ &curobj, byte *pProcessed,
 	}
 }
 
+void ExtractCoreSta(CDfa &dfa, std::vector<ushort> &orderObj, CClusterRow &coreRow)
+{}
+
 ushort GetNextObj(std::vector<ushort> &orderSeeds, ROWOBJ *allObj)
 {		
 	

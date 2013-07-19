@@ -10,7 +10,7 @@ double Distance (ushort row1, ushort row2, double *disMatrix);
 template <typename T>
 double Max(T d1, T d2);
 
-void ExtractCoreSta(CDfa &dfa, std::vector<ushort> &orderObj, CClusterRow &cluRow);
+void ExtractCoreSta(CDfa &dfa, std::vector<ushort> &orderObj, CClusterRow &coreRow);
 
 void Update(std::vector<ushort> &neighbors, ROWOBJ &curobj, byte *pProcessed, 
 			double *disMatrix, ROWOBJ *allObjs, std::vector<ushort> &orderSeeds);
