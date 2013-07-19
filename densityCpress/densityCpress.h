@@ -24,6 +24,23 @@ struct ROWOBJ
 	ushort dfaRowInd;
 };
 
+
+struct SeedsSort
+{
+public:
+	ROWOBJ *parrobj;
+	SeedsSort (ROWOBJ *p ) : parrobj(p)
+	{}
+	
+	// µ›ºı≈≈–Ú
+	bool operator () (ushort arg1, ushort arg2)
+	{
+		return parrobj[arg1].reachDis < parrobj[arg2].reachDis;
+	}
+};
+
+
+
 typedef std::vector<std::map<byte,STATEID>>  ROWDIF;
 
 class DENCPRESSHDR DenCpressDfa
