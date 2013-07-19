@@ -21,7 +21,8 @@ void SetDistance(CDfa dfa, double *disMatrix)
 				}
 			}
 
-			disMatrix[len] = diffnum / dfa.Size();
+			ushort size = dfa.GetGroupCount();
+			disMatrix[len] = (double)diffnum / dfa.GetGroupCount();
 			++len;
 		}
 	}
@@ -61,7 +62,7 @@ void GetNeighbors(ushort dfasize, double *disMatrix, double eps, ushort minPts,
 					temp = neighbors[i][j] * (neighbors[i][j] - 1) / 2 + i;
 				}
 				
-				order.push_back(disMatrix[i]);
+				order.push_back(disMatrix[temp]);
 			}
 			std::sort(order.begin(), order.end());
 			coreDis[i] = order[minPts - 2];
