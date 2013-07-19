@@ -178,7 +178,7 @@ void ExpandClusterOrder(ROWOBJ &obj, double eps, ushort minPts,byte *pProcessed,
 	}
 }
 
-void OPTICS(CDfa &dfa, double *disMatrix, double eps, ushort minPts, CCluster &clusters)
+void OPTICS(CDfa &dfa, double *disMatrix, double eps, ushort minPts, DenCpressDfa &clusters)
 {
 
 	double coreDis[256];
@@ -200,6 +200,7 @@ void OPTICS(CDfa &dfa, double *disMatrix, double eps, ushort minPts, CCluster &c
 		allObjs[i].dfaRowInd = i;
 	}
 
+	ushort countClu = 0;
 	for (size_t rownum = 0; rownum < dfa.Size(); ++rownum)
 	{
 		if (pProcessed[rownum] == 1)
@@ -211,5 +212,17 @@ void OPTICS(CDfa &dfa, double *disMatrix, double eps, ushort minPts, CCluster &c
 		std::vector<ushort> orderObj;
 		ExpandClusterOrder(obj, eps, minPts, pProcessed, disMatrix, coreDis, allObjs, neighbors, orderObj);
 		std::cout << std::endl;
+
+		CClusterRow coreRow(dfa[rownum]);
+		ExtractCoreSta(dfa, orderObj, coreRow);
+		clusters.AddCluRow(coreRow);
+
+		for (size_t i = 0; i < orderObj.size(); ++i)
+		{
+			clusters.SetStaID2CluID(orderObj[i], countClu);
+			
+			clusters.SetDif(coreRow, dfa[orderObj[i]]);
+		}
+		++countClu;
 	}
 }

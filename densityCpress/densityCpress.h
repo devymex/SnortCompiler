@@ -69,7 +69,7 @@ public:
 	void SetDfaID(ulong ID);
 	
 	// 设置staId2CluId
-	void SetStaID2CluID();
+	void SetStaID2CluID(STATEID stateID, ushort cluId);
 
 	//添加一个特征行
 	void AddCluRow(CClusterRow& cluRow);

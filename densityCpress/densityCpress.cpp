@@ -48,7 +48,7 @@ void DenCpressDfa::SetDfaID(ulong ID)
 	m_nDfaID = ID;
 }
 
-void DenCpressDfa::SetStaID2CluID()
+void DenCpressDfa::SetStaID2CluID(STATEID stateID, ushort cluId)
 {
 	for (ushort index = 0; index < 256; index++)
 	{
