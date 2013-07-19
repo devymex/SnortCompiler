@@ -135,7 +135,31 @@ void Update(std::vector<ushort> &neighbors, ROWOBJ &curobj, byte *pProcessed,
 }
 
 void ExtractCoreSta(CDfa &dfa, std::vector<ushort> &orderObj, CClusterRow &coreRow)
-{}
+{
+	ushort flag[256];
+	std::memset(flag, 0, sizeof(flag));
+
+	for (ushort i = 0; i < dfa.GetGroupCount(); ++i)
+	{
+		for (std::vector<ushort>::iterator iter = orderObj.begin(); iter != orderObj.end(); ++iter)
+		{
+			ushort sta = dfa[*iter][i];
+			++flag[sta];
+		}
+		ushort max = 0;
+		ushort core;
+		for (ushort i = 0; i < 256; ++i)
+		{
+			if (flag[i] > max)
+			{
+				max = flag[i];
+				core = i;
+			}
+		}
+		coreRow[i] = core;
+		std::memset(flag, 0, sizeof(flag));
+	}
+}
 
 ushort GetNextObj(std::vector<ushort> &orderSeeds, ROWOBJ *allObj)
 {		
