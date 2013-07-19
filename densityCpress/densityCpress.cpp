@@ -48,15 +48,25 @@ void DenCpressDfa::SetDfaID(ulong ID)
 	m_nDfaID = ID;
 }
 
-void DenCpressDfa::SetStaID2CluID()
+void DenCpressDfa::SetStaID2CluID(STATEID staID, ushort CluID)
 {
-	for (ushort index = 0; index < 256; index++)
-	{
-
-	}
+	
+	staId2CluId.insert(std::make_pair(staID, CluID));
+	
 }
 
+void DenCpressDfa::AddCluRow(CClusterRow& cluRow)
+{
+	m_Cluster.PushBack(cluRow);
+}
 
 void DenCpressDfa::SetDif(CClusterRow& coreRow, CDfaRow& dfaRow)
 {
+	for (ulong index = 0; index < dfaRow.Size(); ++index)
+	{
+		if (dfaRow[index] != coreRow[index])
+		{
+			m_Dif[m_nDfaID].insert(std::make_pair(dfaRow[index],index));
+		}
+	}
 }
