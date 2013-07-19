@@ -20,4 +20,4 @@ ushort GetNextObj(std::vector<ushort> &orderSeeds, ROWOBJ *arrObj);
 void ExpandClusterOrder(ROWOBJ &obj, double eps, ushort minPts,byte *pProcessed, double *disMatrix, double *coreDis, 
 						ROWOBJ *allObjs, std::vector<std::vector<ushort>> &neighbors, std::vector<ushort> &orderObj);
 
-void OPTICS(CDfa &dfa, double *disMatrix, double eps, ushort minPts, CCluster &clusters);
+void OPTICS(CDfa &dfa, double *disMatrix, double eps, ushort minPts, DenCpressDfa &clusters);

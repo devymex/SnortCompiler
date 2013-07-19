@@ -48,10 +48,10 @@ void DenCpressDfa::SetDfaID(ulong ID)
 	m_nDfaID = ID;
 }
 
-void DenCpressDfa::SetStaID2CluID(STATEID staID, ushort CluID)
+void DenCpressDfa::SetStaID2CluID(STATEID stateID, ushort cluId)
 {
 	
-	staId2CluId.insert(std::make_pair(staID, CluID));
+	staId2CluId.insert(std::make_pair(stateID, cluId));
 	
 }
 
