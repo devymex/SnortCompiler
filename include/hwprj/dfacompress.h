@@ -20,4 +20,4 @@ void UpdateMatrix(CDfa &olddfa, std::vector<CUnsignedArray> &clusterVec,
 
 //对dfaMatrix进行行合并压缩
 void RowMergeCompress(std::vector<CDfaRow> &dfaMatrix, std::vector<CDfaRow> &FinalMatrix,
-					  std::vector<STATEID> &rowGroup, std::vector<byte> &colGroup, ulong &colNum);
+					  std::vector<STATEID> &rowGroup, std::vector<byte> &colGroup, ulong &rowNum, ulong &colNum);

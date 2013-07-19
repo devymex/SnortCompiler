@@ -19,11 +19,12 @@ DFACOMPRESS void DfaCompress(CDfa &olddfa, ulong &sumBytes)
 	std::vector<STATEID> rowGroup(dfaSize, 0);
 	std::vector<byte> colGroup;
 	ulong colNum;
+	ulong rowNum;
 
 	UpdateMatrix(olddfa, clusterVec, stateCluster, dfaMatrix, base, sparseMatrix);
 
 	//对dfaMatrix进行行合并压缩
-	RowMergeCompress(dfaMatrix, FinalMatrix, rowGroup, colGroup, colNum);
+	 RowMergeCompress(dfaMatrix, FinalMatrix, rowGroup, colGroup, rowNum, colNum);
 
 	//对稀疏矩阵进行压缩，使用二维表存储
 	//SparseMatrixCompress(sparseMatrix); 
@@ -41,7 +42,43 @@ DFACOMPRESS void DfaCompress(CDfa &olddfa, ulong &sumBytes)
 		}
 	}
 
-	sumBytes += 256 * 2;//行和列的映射表
+	//sumBytes += 256 * 2;
+	//行和列的映射表,将映射最多的存为default值
+	sumBytes += 2;//一个字节存行的映射个数，一个字节存default行映射值
+	sumBytes += 2;//一个字节存列映射个数，一个字节存default列映射值
+	std::vector<ulong> rowVec(rowNum, 0);
+	for(ulong i = 0; i < rowGroup.size(); ++i)
+	{
+		++rowVec[rowGroup[i]];
+	}
+
+	ulong maxRowNum = 0;
+	for(ulong i = 0; i < rowVec.size(); ++i)
+	{
+		if(maxRowNum < rowVec[i])
+		{
+			maxRowNum = rowVec[i];
+		}
+	}
+	sumBytes += maxRowNum * 2;//存放其他行的映射关系
+
+	std::vector<ulong> colVec(colNum, 0);
+
+	for(ulong i = 0; i < colGroup.size(); ++i)
+	{
+		++colVec[i];
+	}
+
+	ulong maxColNum = 0;
+	for(ulong i = 0; i < colNum; ++i)
+	{
+		if(maxColNum < colVec[i])
+		{
+			maxColNum = colVec[i];
+		}
+	}
+	sumBytes += maxColNum * 2;//存放其他列的映射关系
+
 	sumBytes += 1;//该字节表示矩阵中状态个数
 	sumBytes += 1;//该字节表示列数
 	sumBytes += FinalMatrix.size() * colNum;//矩阵中的元素个数，每个元素占用1字节
@@ -91,7 +128,7 @@ void UpdateMatrix(CDfa &olddfa, std::vector<CUnsignedArray> &clusterVec,
 		CDfaRow &dfaMatrixRow = dfaMatrix.back();
 		sparseMatrix.push_back(CDfaRow(col));
 		CDfaRow &sparseMatrixRow = sparseMatrix.back();
-
+		 
 		clusterVec[maxCluster].Sort();
 		base.push_back(clusterVec[maxCluster][0]);
 
@@ -113,7 +150,7 @@ void UpdateMatrix(CDfa &olddfa, std::vector<CUnsignedArray> &clusterVec,
 
 //对dfaMatrix进行行合并压缩
 void RowMergeCompress(std::vector<CDfaRow> &dfaMatrix, std::vector<CDfaRow> &FinalMatrix,
-					  std::vector<STATEID> &rowGroup, std::vector<byte> &colGroup, ulong &colNum)
+					  std::vector<STATEID> &rowGroup, std::vector<byte> &colGroup, ulong &rowNum, ulong &colNum)
 {
 
 }
