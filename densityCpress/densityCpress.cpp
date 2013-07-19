@@ -41,3 +41,22 @@ std::map<byte,STATEID>& DenCpressDfa::getDif(byte row)
 {
 	return m_Dif[row];
 }
+
+
+void DenCpressDfa::SetDfaID(ulong ID)
+{
+	m_nDfaID = ID;
+}
+
+void DenCpressDfa::SetStaID2CluID()
+{
+	for (ushort index = 0; index < 256; index++)
+	{
+
+	}
+}
+
+
+void DenCpressDfa::SetDif(CClusterRow& coreRow, CDfaRow& dfaRow)
+{
+}
