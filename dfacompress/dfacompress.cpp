@@ -29,7 +29,7 @@ DFACOMPRESS void DfaCompress(CDfa &olddfa, ulong &sumBytes)
 	//OutputMatrix(base, dfaMatrix, sparseMatrix);//输出提取base后的两个矩阵
 
 	//对dfaMatrix进行行合并压缩
-	 RowMergeCompress(dfaMatrix, FinalMatrix, rowGroup, colGroup, rowNum, colNum);
+		 RowMergeCompress(dfaMatrix, FinalMatrix, rowGroup, colGroup, rowNum, colNum);
 
 	 //对dfaMatrix进行列压缩
 
@@ -90,7 +90,7 @@ DFACOMPRESS void DfaCompress(CDfa &olddfa, ulong &sumBytes)
 	sumBytes += 1;//该字节表示矩阵中状态个数
 	sumBytes += 1;//该字节表示列数
 	sumBytes += FinalMatrix.size() * colNum;//矩阵中的元素个数，每个元素占用1字节
-	sumBytes += 1;//该字节表示startId
+	sumBytes += 1;//该字节表示状态个数
 	sumBytes += 1 + olddfa.GetFinalStates().CountDfaIds() * 2;//第一字节表示终态和dfaId对应关系的对数，后面的字节是具体的终态和dfaId对应关系
 }
 
