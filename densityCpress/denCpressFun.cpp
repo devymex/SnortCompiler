@@ -34,6 +34,11 @@ void GetNeighbors(ushort dfasize, double *disMatrix, double eps, ushort minPts,
 {	
 	for(size_t i = 1; i < dfasize; ++i)
 	{
+		if (i == 119)
+		{
+			std::cout << std::endl;
+		}
+		double *dis = &disMatrix[119 * 118 / 2];
 		for(size_t j = 0; j < i; ++j)
 		{
 			size_t temp = (i - 1) * i / 2 + j;
@@ -44,6 +49,7 @@ void GetNeighbors(ushort dfasize, double *disMatrix, double eps, ushort minPts,
 			}
 		}
 	}
+
 	std::vector<double> order; 
 	for(size_t i = 0; i < neighbors.size(); ++i)
 	{
