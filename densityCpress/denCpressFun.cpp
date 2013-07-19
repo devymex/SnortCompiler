@@ -38,7 +38,7 @@ void GetNeighbors(ushort dfasize, double *disMatrix, double eps, ushort minPts,
 		for(size_t j = 0; j < i; ++j)
 		{
 			size_t temp = (i - 1) * i / 2 + j;
-			if(disMatrix[temp] < eps)
+			if(disMatrix[temp] <= eps)
 			{
 				neighbors[i].push_back(j);
 				neighbors[j].push_back(i);

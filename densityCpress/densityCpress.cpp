@@ -24,19 +24,20 @@ DenCpressDfa& DenCpressDfa::operator = (const DenCpressDfa &other)
 	m_Cluster = other.m_Cluster;
 	staId2CluId = other.staId2CluId;
 	m_Dif = other.m_Dif;
+	return *this;
 }
 
 byte DenCpressDfa::getClusterNum(byte row)
 {
-
+	return staId2CluId[row];
 }
 
-CDfaRow& DenCpressDfa::getCurCluster(byte Cluster)
+CDfaRow& DenCpressDfa::getCurCluster(byte cluster)
 {
-
+	return m_Cluster[cluster];
 }
 
-std::map<byte,STATEID> getDif(byte row)
+std::map<byte,STATEID>& DenCpressDfa::getDif(byte row)
 {
-	
+	return m_Dif[row];
 }
