@@ -12,4 +12,4 @@
 #endif
 
 DFACOMPRESS void DfaCompress(CDfa &olddfa);
-void GetDfaCluster(CDfa &olddfa, std::vector<CUnsignedArray> &clusterVec, STATEID *stateCluster);//获得dfa的簇信息
+void GetDfaCluster(CDfa &olddfa, std::vector<CUnsignedArray> &clusterVec, ulong *stateCluster, ulong *codeMap);//获得dfa的簇信息

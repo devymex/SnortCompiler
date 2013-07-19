@@ -6,9 +6,10 @@
 int main()
 {
 	CGroupRes groupRes;
-	groupRes.ReadFromFile("F:\\cppProject\\huawei\\PreciseMatch\\CompressTest\\FinalResult.cdt");
-	
-	DfaCompress(groupRes.GetDfaTable()[5]);
+	groupRes.ReadFromFile("F:\\huawei\\date\\FinalResult.cdt");
+	std::cout << groupRes.GetDfaTable()[48].GetStartState()<<std::endl;
+	DfaCompress(groupRes.GetDfaTable()[48]);
+	groupRes.GetDfaTable()[48].Dump("F:\\sun.txt");
 	system("pause");
 	return 0;
 }
