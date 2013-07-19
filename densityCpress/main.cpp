@@ -17,6 +17,6 @@ void main()
 		double *disMatrix = new double[dfasize * (dfasize - 1)/2];
 		SetDistance(dfa, disMatrix);
 		std::vector<ushort> orderObj;
-		OPTICS(dfa, disMatrix, 0.7, 5, orderObj);
+		OPTICS(dfa, disMatrix, 0.5, 5, orderObj);
 	}
 }
