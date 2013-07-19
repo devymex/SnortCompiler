@@ -35,6 +35,11 @@ void GetNeighbors(ushort dfasize, double *disMatrix, double eps, ushort minPts,
 {	
 	for(size_t i = 1; i < dfasize; ++i)
 	{
+		if (i == 119)
+		{
+			std::cout << std::endl;
+		}
+		double *dis = &disMatrix[119 * 118 / 2];
 		for(size_t j = 0; j < i; ++j)
 		{
 			size_t temp = (i - 1) * i / 2 + j;
@@ -45,6 +50,7 @@ void GetNeighbors(ushort dfasize, double *disMatrix, double eps, ushort minPts,
 			}
 		}
 	}
+
 	std::vector<double> order; 
 	for(size_t i = 0; i < neighbors.size(); ++i)
 	{
@@ -162,7 +168,6 @@ void ExpandClusterOrder(ROWOBJ &obj, double eps, ushort minPts,byte *pProcessed,
 
 			if (coreDis[curobj.dfaRowInd] != 0)
 			{
-				curobj.coreDis = coreDis[curobj.dfaRowInd];
 				std::vector<ushort> &neis = neighbors[curobj.dfaRowInd];
 				Update(neis, curobj, pProcessed, disMatrix, allObjs, orderSeeds);
 			}
@@ -181,10 +186,12 @@ void OPTICS(CDfa &dfa, double *disMatrix, double eps, ushort minPts, std::vector
 	GetNeighbors(dfa.Size(), disMatrix, eps, minPts, coreDis, neighbors);
 
 	byte pProcessed[256];
+	std::memset(pProcessed, 0, sizeof(pProcessed));
+
 	ROWOBJ allObjs[256];
 	for (ushort i= 0; i < 256; ++i)
 	{
-		allObjs[i].coreDis = 0;
+		allObjs[i].coreDis = coreDis[i];
 		allObjs[i].reachDis = 0;
 		allObjs[i].dfaRowInd = i;
 	}
@@ -198,7 +205,6 @@ void OPTICS(CDfa &dfa, double *disMatrix, double eps, ushort minPts, std::vector
 		}
 
 		ROWOBJ &obj = allObjs[rownum];
-		obj.coreDis = coreDis[rownum];
 		ExpandClusterOrder(obj, eps, minPts, pProcessed, disMatrix, coreDis, allObjs, neighbors, orderObj);
 	}
 }
