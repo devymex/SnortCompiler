@@ -134,7 +134,7 @@ ushort GetNextObj(std::vector<ushort> &orderSeeds, ROWOBJ *allObj)
 	// 存储allObj数组的大小,此大小与orderSeeds大小等价
 	size_t sizeArr = orderSeeds.size();
 
-	// 递减排序
+	// 递增排序
 	std::sort(orderSeeds.begin(), orderSeeds.end(), SeedsSort(allObj));
 
 	ushort minIdx = *orderSeeds.begin();
