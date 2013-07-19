@@ -59,11 +59,21 @@ public:
 	// 重载操作符“=”
 	DenCpressDfa& operator = (const DenCpressDfa &other);
 
-	// 计算当行属于所属的簇
+	// 计算当行所属的簇
 	byte getClusterNum(byte row);
 
 	// 返回所属簇的特征行引用
 	CDfaRow& getCurCluster(byte Cluster);
+
+	// 设置m_nDfaID
+	void SetDfaID(ulong ID);
+	
+
+	// 设置staId2CluId
+	void SetStaID2CluID();
+	
+	// 设置m_Dif
+	void SetDif(CClusterRow& coreRow, CDfaRow& dfaRow);
 
 	// 返回区别
 	std::map<byte,STATEID>& getDif(byte row);
