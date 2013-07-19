@@ -6,8 +6,8 @@
 int main()
 {
 	CGroupRes groupRes;
-	groupRes.ReadFromFile("F:\\cppProject\\huawei\\PreciseMatch\\CompressTest\\FinalResult.cdt");
-	
+	groupRes.ReadFromFile("F:\\huawei\\date\\FinalResult.cdt");
+	std::cout << groupRes.GetDfaTable()[48].GetStartState()<<std::endl;
 	ulong sumBytes = 0;
 	for(int i = 0; i < groupRes.GetDfaTable().Size(); ++i)
 	{

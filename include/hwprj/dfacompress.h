@@ -12,7 +12,7 @@
 #endif
 
 DFACOMPRESS void DfaCompress(CDfa &olddfa, ulong &sumBytes);
-void GetDfaCluster(CDfa &olddfa, std::vector<CUnsignedArray> &clusterVec, ulong *stateCluster);//获得dfa的簇信息
+void GetDfaCluster(CDfa &olddfa, std::vector<CUnsignedArray> &clusterVec, ulong *stateCluster, ulong *codeMap);//获得dfa的簇信息
 //根据簇，更新dfa矩阵，得到簇矩阵dfaMatrix，稀疏矩阵sparseMatrix以及簇矩阵的base
 void UpdateMatrix(CDfa &olddfa, std::vector<CUnsignedArray> &clusterVec,
 				  ulong *stateCluster, std::vector<CDfaRow> &dfaMatrix, 
