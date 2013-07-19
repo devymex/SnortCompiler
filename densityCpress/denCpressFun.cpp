@@ -213,7 +213,7 @@ void OPTICS(CDfa &dfa, double *disMatrix, double eps, ushort minPts, DenCpressDf
 		ExpandClusterOrder(obj, eps, minPts, pProcessed, disMatrix, coreDis, allObjs, neighbors, orderObj);
 		std::cout << std::endl;
 
-		CClusterRow coreRow(dfa[rownum]);
+		CClusterRow &coreRow = dfa[rownum];
 		ExtractCoreSta(dfa, orderObj, coreRow);
 		clusters.AddCluRow(coreRow);
 
