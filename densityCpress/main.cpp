@@ -16,7 +16,8 @@ void main()
 		ulong dfasize = dfa.Size();
 		double *disMatrix = new double[dfasize * (dfasize - 1)/2];
 		SetDistance(dfa, disMatrix);
-		std::vector<ushort> orderObj;
-		OPTICS(dfa, disMatrix, 0.4, 5, orderObj);
+		//std::vector<ushort> orderObj;
+		CCluster clusters;
+		OPTICS(dfa, disMatrix, 0.5, 5, clusters);
 	}
 }
