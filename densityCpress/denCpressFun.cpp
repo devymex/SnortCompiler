@@ -22,7 +22,8 @@ void SetDistance(CDfa dfa, double *disMatrix)
 				}
 			}
 
-			disMatrix[len] = diffnum / dfa.Size();
+			ushort size = dfa.GetGroupCount();
+			disMatrix[len] = (double)diffnum / dfa.GetGroupCount();
 			++len;
 		}
 	}
