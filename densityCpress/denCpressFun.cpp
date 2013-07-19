@@ -4,6 +4,7 @@
 
 void SetDistance(CDfa dfa, double *disMatrix)
 {
+	// len干啥用？
 	ushort len = 0;
 	for (size_t i = 0; i < dfa.Size(); ++i)
 	{
@@ -42,7 +43,7 @@ void GetNeighbors(ushort dfasize, double *disMatrix, double eps, ushort minPts,
 		for(size_t j = 0; j < i; ++j)
 		{
 			size_t temp = (i - 1) * i / 2 + j;
-			if(disMatrix[temp] < eps)
+			if(disMatrix[temp] <= eps)
 			{
 				neighbors[i].push_back(j);
 				neighbors[j].push_back(i);
@@ -133,14 +134,14 @@ void Update(std::vector<ushort> &neighbors, ROWOBJ &curobj, byte *pProcessed,
 	}
 }
 
-ushort GetNextObj(std::vector<ushort> &orderSeeds, ROWOBJ *arrObj)
+ushort GetNextObj(std::vector<ushort> &orderSeeds, ROWOBJ *allObj)
 {		
 	
 	// 存储allObj数组的大小,此大小与orderSeeds大小等价
 	size_t sizeArr = orderSeeds.size();
 
-	// 递减排序
-	std::sort(orderSeeds.begin(), orderSeeds.end(), SeedsSort(arrObj));
+	// 递增排序
+	std::sort(orderSeeds.begin(), orderSeeds.end(), SeedsSort(allObj));
 
 	ushort minIdx = *orderSeeds.begin();
 	orderSeeds.erase(orderSeeds.begin());
@@ -194,6 +195,7 @@ void OPTICS(CDfa &dfa, double *disMatrix, double eps, ushort minPts, std::vector
 		allObjs[i].dfaRowInd = i;
 	}
 
+	// 
 	for (size_t rownum = 0; rownum < dfa.Size(); ++rownum)
 	{
 		if (pProcessed[rownum] == 1)
