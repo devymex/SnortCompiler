@@ -41,3 +41,32 @@ std::map<byte,STATEID>& DenCpressDfa::getDif(byte row)
 {
 	return m_Dif[row];
 }
+
+
+void DenCpressDfa::SetDfaID(ulong ID)
+{
+	m_nDfaID = ID;
+}
+
+void DenCpressDfa::SetStaID2CluID(STATEID staID, ushort CluID)
+{
+	
+	staId2CluId.insert(std::make_pair(staID, CluID));
+	
+}
+
+void DenCpressDfa::AddCluRow(CClusterRow& cluRow)
+{
+	m_Cluster.PushBack(cluRow);
+}
+
+void DenCpressDfa::SetDif(CClusterRow& coreRow, CDfaRow& dfaRow)
+{
+	for (ulong index = 0; index < dfaRow.Size(); ++index)
+	{
+		if (dfaRow[index] != coreRow[index])
+		{
+			m_Dif[m_nDfaID].insert(std::make_pair(dfaRow[index],index));
+		}
+	}
+}

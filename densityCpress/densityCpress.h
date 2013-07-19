@@ -68,9 +68,11 @@ public:
 	// 设置m_nDfaID
 	void SetDfaID(ulong ID);
 	
-
 	// 设置staId2CluId
-	void SetStaID2CluID();
+	void SetStaID2CluID(STATEID staID, ushort CluID);
+
+	//添加一个特征行
+	void AddCluRow(CClusterRow& cluRow);
 	
 	// 设置m_Dif
 	void SetDif(CClusterRow& coreRow, CDfaRow& dfaRow);
