@@ -175,8 +175,9 @@ void ExpandClusterOrder(ROWOBJ &obj, double eps, ushort minPts,byte *pProcessed,
 	}
 }
 
-void OPTICS(CDfa &dfa, double *disMatrix, double eps, ushort minPts, std::vector<ushort> &orderObj)
+void OPTICS(CDfa &dfa, double *disMatrix, double eps, ushort minPts, CCluster &clusters)
 {
+
 	double coreDis[256];
 	std::memset(coreDis, 0, sizeof(coreDis));
 
@@ -196,7 +197,6 @@ void OPTICS(CDfa &dfa, double *disMatrix, double eps, ushort minPts, std::vector
 		allObjs[i].dfaRowInd = i;
 	}
 
-	// 
 	for (size_t rownum = 0; rownum < dfa.Size(); ++rownum)
 	{
 		if (pProcessed[rownum] == 1)
@@ -205,6 +205,8 @@ void OPTICS(CDfa &dfa, double *disMatrix, double eps, ushort minPts, std::vector
 		}
 
 		ROWOBJ &obj = allObjs[rownum];
+		std::vector<ushort> orderObj;
 		ExpandClusterOrder(obj, eps, minPts, pProcessed, disMatrix, coreDis, allObjs, neighbors, orderObj);
+		std::cout << std::endl;
 	}
 }
