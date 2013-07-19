@@ -6,13 +6,13 @@
 int main()
 {
 	CGroupRes groupRes;
-	groupRes.ReadFromFile("F:\\huawei\\date\\FinalResult.cdt");
-	std::cout << groupRes.GetDfaTable()[48].GetStartState()<<std::endl;
+	groupRes.ReadFromFile("F:\\cppProject\\huawei\\PreciseMatch\\CompressTest\\FinalResult.cdt");
 	ulong sumBytes = 0;
-	for(int i = 0; i < groupRes.GetDfaTable().Size(); ++i)
-	{
-		DfaCompress(groupRes.GetDfaTable()[i], sumBytes);
-	}
+	DfaCompress(groupRes.GetDfaTable()[1529], sumBytes);
+	//for(int i = 0; i < groupRes.GetDfaTable().Size(); ++i)
+	//{
+	//	DfaCompress(groupRes.GetDfaTable()[i], sumBytes);
+	//}
 	system("pause");
 	return 0;
 }

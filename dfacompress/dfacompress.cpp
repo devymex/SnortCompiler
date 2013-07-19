@@ -4,6 +4,7 @@
 
 #define STATEMAX 500
 
+
 DFACOMPRESS void DfaCompress(CDfa &olddfa, ulong &sumBytes)
 {
 	ulong dfaSize = olddfa.Size();
@@ -11,20 +12,27 @@ DFACOMPRESS void DfaCompress(CDfa &olddfa, ulong &sumBytes)
 	std::vector<CUnsignedArray> clusterVec;//表示簇，每个元素每个簇中的状态编号
 	ulong stateCluster[STATEMAX];//标记每个状态属于哪个簇,假设最多500个状态
 	std::fill(stateCluster, stateCluster + STATEMAX, STATEMAX);
-	ulong codeMap[STATEMAX];
-	std::fill(codeMap, codeMap + STATEMAX, STATEMAX);
+	ulong codeMap[STATEMAX] = {0};//对olddfa的状态进行重新编号
 	GetDfaCluster(olddfa, clusterVec, stateCluster, codeMap);
-	std::vector<CDfaRow> dfaMatrix, sparseMatrix, FinalMatrix;//更新后的dfa矩阵和稀疏矩阵
-	std::vector<STATEID> base(dfaSize, 0);
+
+	//OutPutCluster(olddfa, clusterVec, stateCluster, codeMap);//输出簇
+
+	std::vector<CDfaRow> dfaMatrix, sparseMatrix, FinalMatrix;//更新后的dfa矩阵和稀疏矩阵,无效元素用STATEMAX表示
+	std::vector<STATEID> base(dfaSize, 0);//里面如果有STATEID(-1),在存文件的时候会存成byte(-1),读入内存后展开成STATEID(-1)
 	std::vector<STATEID> rowGroup(dfaSize, 0);
 	std::vector<byte> colGroup;
 	ulong colNum;
 	ulong rowNum;
 
-	UpdateMatrix(olddfa, clusterVec, stateCluster, dfaMatrix, base, sparseMatrix);
+	UpdateMatrix(olddfa, clusterVec, stateCluster, codeMap, dfaMatrix, base, sparseMatrix);
+
+	//OutputMatrix(base, dfaMatrix, sparseMatrix);//输出提取base后的两个矩阵
 
 	//对dfaMatrix进行行合并压缩
 	 RowMergeCompress(dfaMatrix, FinalMatrix, rowGroup, colGroup, rowNum, colNum);
+
+	 //对dfaMatrix进行列压缩
+
 
 	//对稀疏矩阵进行压缩，使用二维表存储
 	//SparseMatrixCompress(sparseMatrix); 
@@ -89,9 +97,11 @@ DFACOMPRESS void DfaCompress(CDfa &olddfa, ulong &sumBytes)
 //获得dfa的簇信息
 void GetDfaCluster(CDfa &olddfa, std::vector<CUnsignedArray> &clusterVec, ulong *stateCluster, ulong *codeMap)
 {
-	CUnsignedArray stateVec;
+	clusterVec.reserve(STATEMAX);
+
 	ulong text = 0;
 	ulong label[STATEMAX] = {0};
+
 	std::stack<CUnsignedArray> stateStack;
 	STATEID sstate = olddfa.GetStartState();
 	label[sstate] =1;
@@ -103,6 +113,8 @@ void GetDfaCluster(CDfa &olddfa, std::vector<CUnsignedArray> &clusterVec, ulong 
 	cua.Clear();
 	stateCluster[sstate] = 0;
 	bool temp = false;
+
+	CUnsignedArray stateVec;
 	while(!stateStack.empty())
 	{
 		stateVec=stateStack.top();   
@@ -113,7 +125,7 @@ void GetDfaCluster(CDfa &olddfa, std::vector<CUnsignedArray> &clusterVec, ulong 
 			for(ulong i = 0; i < olddfa[stateVec[k]].Size(); i++)
 			{
 				STATEID toState = olddfa[stateVec[k]][i];
-				if(label[toState] != 1 && toState != (STATEID)-1)
+				if(toState != (STATEID)-1 && label[toState] != 1)
 				{
 					cua.PushBack(toState);
 					codeMap[toState] = ++text;
@@ -121,9 +133,9 @@ void GetDfaCluster(CDfa &olddfa, std::vector<CUnsignedArray> &clusterVec, ulong 
 					stateCluster[toState] = clusterVec.size();
 					temp = true;
 				}
-				if(label[toState] != 1&&toState == (STATEID)-1)
+				if((STATEID)-1 == toState)
 				{
-					label[256] = 1;
+					label[STATEMAX - 1] = 1;
 				}
 			}
 			if(temp)
@@ -135,22 +147,25 @@ void GetDfaCluster(CDfa &olddfa, std::vector<CUnsignedArray> &clusterVec, ulong 
 			}
 		}
 	}
-	if(label[256] == 1)
+	if(1 == label[STATEMAX - 1])
 	{
-		cua.PushBack((STATEID)256);
+		cua.PushBack((STATEID)-1);
 		clusterVec.push_back(cua);
-		stateCluster[256] = clusterVec.size() - 1;
+		stateCluster[olddfa.Size()] = clusterVec.size() - 1;
 	}
 }
 
 
 //根据簇，更新dfa矩阵，得到簇矩阵dfaMatrix，稀疏矩阵sparseMatrix以及簇矩阵的base
-void UpdateMatrix(CDfa &olddfa, std::vector<CUnsignedArray> &clusterVec,
-				  ulong *stateCluster, std::vector<CDfaRow> &dfaMatrix, 
+void UpdateMatrix(CDfa &olddfa, std::vector<CUnsignedArray> &clusterVec,  ulong *stateCluster, 
+				  ulong *codeMap, std::vector<CDfaRow> &dfaMatrix, 
 				  std::vector<STATEID> &base, std::vector<CDfaRow> &sparseMatrix)
 {
 	ulong dfaSize = olddfa.Size();
 	ulong col = olddfa.GetGroupCount();
+	dfaMatrix.resize(dfaSize, CDfaRow(col));
+	base.resize(dfaSize);
+	sparseMatrix.resize(dfaSize, CDfaRow(col));
 
 	for(ulong i = 0; i < olddfa.Size(); ++i)
 	{
@@ -161,7 +176,15 @@ void UpdateMatrix(CDfa &olddfa, std::vector<CUnsignedArray> &clusterVec,
 		memset(cFlag, 0, sizeof(ulong) * STATEMAX);
 		for(ulong j = 0; j < row.Size(); ++j)
 		{
-			ulong clusterTmp = stateCluster[row[j]];
+			ulong clusterTmp = 0;
+			if(STATEID(-1) == row[j])
+			{
+				clusterTmp = stateCluster[dfaSize];
+			}
+			else
+			{
+				clusterTmp = stateCluster[row[j]];
+			}
 			++cFlag[clusterTmp];
 		}
 
@@ -176,25 +199,63 @@ void UpdateMatrix(CDfa &olddfa, std::vector<CUnsignedArray> &clusterVec,
 			}
 		}
 
-		//将输入maxCluster簇的元素存入dfaMatrix矩阵，其余的元素存入sparseMatrix矩阵
-		dfaMatrix.push_back(CDfaRow(col));
-		CDfaRow &dfaMatrixRow = dfaMatrix.back();
-		sparseMatrix.push_back(CDfaRow(col));
-		CDfaRow &sparseMatrixRow = sparseMatrix.back();
+		//将输入maxCluster簇的元素存入dfaMatrix矩阵，其余的元素存入sparseMatrix矩阵,重新标号后
+		STATEID state = codeMap[i];
+		CDfaRow &dfaMatrixRow = dfaMatrix[state];
+		CDfaRow &sparseMatrixRow = sparseMatrix[state];
 		 
-		clusterVec[maxCluster].Sort();
-		base.push_back(clusterVec[maxCluster][0]);
+		base[state] = 0;
+		STATEID shift = 0;
+		//最大簇不是STATEID(-1)对应的簇
+		CUnsignedArray &tmp = clusterVec[maxCluster];
+		if(tmp[0] != STATEID(-1))
+		{
+			CUnsignedArray maxClusterArray;
+			for(ulong k = 0; k < tmp.Size(); ++k)
+			{
+				maxClusterArray.PushBack(codeMap[tmp[k]]);
+			}
+			maxClusterArray.Sort();
+			STATEID oribaseid = maxClusterArray[0];
+			base[state] = oribaseid;
+			shift = base[state];
+		}
+		else
+		{
+			//最大簇是dfaSize，即STATEID(-1)对应的簇
+			base[state] = STATEID(-1);//这里如果是STATEID(-1)，在存文件的时候会存成byte(-1)
+			shift = STATEID(-1);
+		}
 
 		for(ulong j = 0; j < row.Size(); ++j)
 		{
-			if(stateCluster[row[j]] == maxCluster)
+			STATEID id = row[j];
+			if(STATEID(-1) == row[j])
 			{
-				dfaMatrixRow[j] = row[j] - base.back();
+				id = dfaSize;
+			}
+			if(stateCluster[id] == maxCluster)
+			{
+				if(id == dfaSize)
+				{
+					dfaMatrixRow[j] = 0;
+				}
+				else
+				{
+					dfaMatrixRow[j] = codeMap[id] - shift;
+				}
 				sparseMatrixRow[j] = STATEMAX;//因为STATEID(-1)在sparseMatrixRow中可能是有效元素
 			}
 			else
 			{
-				sparseMatrixRow[j] = row[j];
+				if(id == dfaSize)
+				{
+					sparseMatrixRow[j] = row[j];
+				}
+				else
+				{
+					sparseMatrixRow[j] = codeMap[id];
+				}
 				dfaMatrixRow[j] = STATEMAX;
 			}
 		}
@@ -209,3 +270,103 @@ void RowMergeCompress(std::vector<CDfaRow> &dfaMatrix, std::vector<CDfaRow> &Fin
 }
 
 
+void OutPutCluster(CDfa &olddfa, std::vector<CUnsignedArray> &clusterVec, ulong *stateCluster, ulong *codeMap)
+{
+	ulong dfaSize = olddfa.Size();
+	std::ofstream fout("F:\\cppProject\\huawei\\PreciseMatch\\CompressTest\\cluster.txt");
+	if(!fout)
+	{
+		std::cout << "Open file failure!" << std::endl;
+		return;
+	}
+
+	fout << "重新编号后的DFA" << std::endl;
+	for(ulong i = 0; i < dfaSize; ++i)
+	{
+		STATEID j = codeMap[i];
+		fout << j << "\t";
+		//std::cout << j << " ";
+		CDfaRow &rowTmp = olddfa[i];
+		for(ulong k = 0; k < rowTmp.Size(); ++k)
+		{
+			STATEID tmp = rowTmp[k];
+			if(STATEID(-1) == tmp)
+			{
+				fout << tmp << "\t";
+				//std::cout << tmp << " ";
+			}
+			else
+			{
+				fout << codeMap[tmp] << "\t";
+				//std::cout << codeMap[tmp] << " ";
+			}
+		}
+		fout << std::endl;
+		//std::cout << std::endl;
+	}
+
+	fout << "codeMap" << std::endl;
+	fout << "原始编号\t重新编号后" << std::endl;
+	for(ulong i = 0; i < olddfa.Size(); ++i)
+	{
+		fout << i << "\t" << codeMap[i] << std::endl;
+	}
+	
+	fout << std::endl << "stateCluster" << std::endl;
+	fout << "原始编号\t簇号" << std::endl;
+	for(ulong i = 0; i <= olddfa.Size(); ++i)
+	{
+		fout << i << "\t" << stateCluster[i] << std::endl;
+	}
+
+	fout << std::endl << "clusterVec" << std::endl;
+	fout << "簇号\t原始编号" << std::endl;
+	for(ulong i = 0; i < clusterVec.size(); ++i)
+	{
+		fout << i << "\t";
+		for(ulong j = 0; j < clusterVec[i].Size(); ++j)
+		{
+			fout << clusterVec[i][j] << ",";
+		}
+		fout << std::endl;
+	}
+	fout.close();
+}
+
+void OutputMatrix(std::vector<STATEID> &base, std::vector<CDfaRow> &dfaMatrix, std::vector<CDfaRow> &sparseMatrix)
+{
+	std::ofstream fout1("F:\\cppProject\\huawei\\PreciseMatch\\CompressTest\\matrix.txt");
+	if(!fout1)
+	{
+		std::cout << "Open file failure!" << std::endl;
+		return;
+	}
+	fout1 << "base, 重新编号后" << std::endl;
+	fout1 << "重新编号后\t偏移量" << std::endl;
+	for(ulong i = 0; i < base.size(); ++i)
+	{
+		fout1 << i << "\t" << base[i] << std::endl;
+	}
+	fout1 << "dfaMatrix, 重新编号后" << std::endl;
+	for(ulong i = 0; i < dfaMatrix.size(); ++i)
+	{
+		fout1 << i << "\t";
+		for(ulong j = 0; j < dfaMatrix[i].Size(); ++j)
+		{
+			fout1 << dfaMatrix[i][j] << "\t";
+		}
+		fout1 << std::endl;
+	}
+
+	fout1 << std::endl << "sparseMatrix，重新编号后" << std::endl;
+	for(ulong i = 0; i < sparseMatrix.size(); ++i)
+	{
+		fout1 << i << "\t";
+		for(ulong j = 0; j < sparseMatrix[i].Size(); ++j)
+		{
+			fout1 << sparseMatrix[i][j] << "\t";
+		}
+		fout1 << std::endl;
+	}
+	fout1.close();
+}
