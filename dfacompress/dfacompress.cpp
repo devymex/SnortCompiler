@@ -17,10 +17,10 @@ DFACOMPRESS void DfaCompress(CDfa &olddfa, ulong &sumBytes)
 
 	OutPutCluster(olddfa, clusterVec, stateCluster, codeMap);//输出簇
 
-	std::vector<CDfaRow> dfaMatrix, sparseMatrix, FinalMatrix;//更新后的dfa矩阵和稀疏矩阵,无效元素用STATEMAX表示
+	std::vector<CDfaRow> dfaMatrix, sparseMatrix, MatrixAfterRowMerge, FinalMatrix;//更新后的dfa矩阵和稀疏矩阵,无效元素用STATEMAX表示
 	std::vector<STATEID> base(dfaSize, 0);//里面如果有STATEID(-1),在存文件的时候会存成byte(-1),读入内存后展开成STATEID(-1)
 	std::vector<STATEID> rowGroup(dfaSize, 0);
-	std::vector<byte> colGroup;
+	byte colGroup[256] = {0};
 	ulong colNum = 0;
 	ulong rowNum = 0;
 
@@ -29,10 +29,12 @@ DFACOMPRESS void DfaCompress(CDfa &olddfa, ulong &sumBytes)
 	OutputMatrix(base, dfaMatrix, sparseMatrix);//输出提取base后的两个矩阵
 
 	//对dfaMatrix进行行合并压缩
-	RowMergeCompress(dfaMatrix, rowGroup, FinalMatrix);
-	rowNum = FinalMatrix.size();
-	OutPutClusterFinalMatrix(dfaMatrix, rowGroup, FinalMatrix);  //输出行压缩后的DFA 映射关系
-	 //对dfaMatrix进行列压缩
+	RowMergeCompress(dfaMatrix, rowGroup, MatrixAfterRowMerge);
+	rowNum = MatrixAfterRowMerge.size();
+	//OutPutClusterFinalMatrix(dfaMatrix, rowGroup, FinalMatrix);  //输出行压缩后的DFA 映射关系
+
+	//对dfaMatrix进行列压缩
+	ColMergeCompress(olddfa, colGroup, colNum, FinalMatrix);
 
 
 	//对稀疏矩阵进行压缩，使用二维表存储
@@ -73,9 +75,9 @@ DFACOMPRESS void DfaCompress(CDfa &olddfa, ulong &sumBytes)
 
 	std::vector<ulong> colVec(colNum, 0);
 
-	for(ulong i = 0; i < colGroup.size(); ++i)
+	for(ulong i = 0; i < 256; ++i)
 	{
-		++colVec[i];
+		++colVec[(ulong)colGroup[i]];
 	}
 
 	ulong maxColNum = 0;
@@ -265,18 +267,18 @@ void UpdateMatrix(CDfa &olddfa, std::vector<CUnsignedArray> &clusterVec,  ulong 
 
 //对dfaMatrix进行行合并压缩
 void RowMergeCompress(std::vector<CDfaRow> &dfaMatrix, std::vector<STATEID> &rowGroup, 
-					   std::vector<CDfaRow> &FinalMatrix)
+					   std::vector<CDfaRow> &MatrixAfterRowMerge)
 {
 	bool label = false;
-	FinalMatrix.push_back( dfaMatrix[0]);
+	MatrixAfterRowMerge.push_back( dfaMatrix[0]);
 	rowGroup[0] = 0;
 	for(ulong i = 1; i < dfaMatrix.size(); i++)
 	{
 		CDfaRow &dfaRow = dfaMatrix[i];
 		label = false;
-		for(ulong j = 0; j < FinalMatrix.size(); j++)
+		for(ulong j = 0; j < MatrixAfterRowMerge.size(); j++)
 		{
-				CDfaRow &finalRow = FinalMatrix[j];
+				CDfaRow &finalRow = MatrixAfterRowMerge[j];
 				ulong k = 0;
 				for(; k <dfaRow.Size(); k++)
 				{
@@ -303,10 +305,16 @@ void RowMergeCompress(std::vector<CDfaRow> &dfaMatrix, std::vector<STATEID> &row
 		}
 		if(!label)
 		{
-			rowGroup[i] = FinalMatrix.size();
-			FinalMatrix.push_back( dfaRow);				
+			rowGroup[i] = MatrixAfterRowMerge.size();
+			MatrixAfterRowMerge.push_back( dfaRow);				
 		}
 	}	
+}
+
+
+//对MatrixAfterRowMerge进行列压缩
+void ColMergeCompress(CDfa &olddfa, byte* colGroup, ulong &colNum, std::vector<CDfaRow> &FinalMatrix)
+{
 }
 
 void OutPutClusterFinalMatrix(std::vector<CDfaRow> &dfaMatrix, std::vector<STATEID> &rowGroup, 
