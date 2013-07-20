@@ -29,7 +29,7 @@ void BuildGraph(const CDfa &oneDfa, const ROWSET &rows, GRAPH &graph)
 
 			//相同元素占的比率，比率大于0.5，则认为无向图中对应两个结点有一条边，边权值为比率值
 			float radio = (float)nEqualCnt / (float)nCol;
-			if (radio > 0.5)
+			if (radio >= limit)
 			{
 				graph[i * nRow + j] = graph[j * nRow + i] = radio;			 
 			}

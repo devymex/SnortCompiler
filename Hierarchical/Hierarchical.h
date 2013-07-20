@@ -7,6 +7,8 @@
 #include <algorithm>
 #include <cmath>
 
+#define limit 0.5
+
 typedef std::vector<BYTE> ROWSET;
 typedef std::vector<float> GRAPH;
 typedef std::vector<ROWSET> VECROWSET;
