@@ -68,7 +68,7 @@ void DenCpressDfa::SetDif(CClusterRow& coreRow, CDfaRow& dfaRow, ushort rowNum)
 	{
 		if (dfaRow[index] != coreRow[index])
 		{
-			m_Dif[rowNum].insert(std::make_pair(dfaRow[index],index));
+			m_Dif[rowNum].insert(std::make_pair(index, dfaRow[index]));
 		}
 	}
 }
