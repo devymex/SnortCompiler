@@ -1,5 +1,6 @@
 #include "Hierarchical.h"
 
+
 void main(int nArgs, char **cArgs)
 {
 	CGroupRes groupRes;
@@ -8,7 +9,7 @@ void main(int nArgs, char **cArgs)
 
 	for (size_t i = 0; i < CDfaSet.Size(); ++i)
 	{
-		if (i == 3)
+		if (i == 2)
 		{
 			ROWSET rows;
 			for (size_t j = 0; j < CDfaSet[i].Size(); ++j)
@@ -24,6 +25,8 @@ void main(int nArgs, char **cArgs)
 			HierarchicalCluster(CDfaSet[i], vecRows);
 		}
 	}
+
+	std::cout << g_TotalMem << std::endl;
 
 	system("pause");
 }

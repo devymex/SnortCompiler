@@ -1,5 +1,7 @@
 #include "Hierarchical.h"
 
+ulong g_TotalMem = 0;
+
 //由DFA表中的行集建无向图，每一行代表图中的一个结点，边的权值为DFA表中两行中相同元素占的比率
 void BuildGraph(const CDfa &oneDfa, const ROWSET &rows, GRAPH &graph)
 {
@@ -348,6 +350,10 @@ void HierarchicalCluster(const CDfa &oneDfa, VECROWSET &vecRows)
 			vecRows.push_back(partRow1);
 			vecRows.push_back(partRow2);
 			--i;
+		}
+		else
+		{
+			g_TotalMem += curRowval;
 		}
 	}
 
