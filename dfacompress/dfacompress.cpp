@@ -29,7 +29,7 @@ DFACOMPRESS void DfaCompress(CDfa &olddfa, ulong &sumBytes)
 	//OutputMatrix(base, dfaMatrix, sparseMatrix);//输出提取base后的两个矩阵
 
 	//对dfaMatrix进行行合并压缩
-		 RowMergeCompress(dfaMatrix, FinalMatrix, rowGroup, colGroup, rowNum, colNum);
+	RowMergeCompress(dfaMatrix, rowGroup,rowNum);
 
 	 //对dfaMatrix进行列压缩
 
@@ -263,8 +263,7 @@ void UpdateMatrix(CDfa &olddfa, std::vector<CUnsignedArray> &clusterVec,  ulong 
 }
 
 //对dfaMatrix进行行合并压缩
-void RowMergeCompress(std::vector<CDfaRow> &dfaMatrix, std::vector<CDfaRow> &FinalMatrix,
-					  std::vector<STATEID> &rowGroup, std::vector<byte> &colGroup, ulong &rowNum, ulong &colNum)
+void RowMergeCompress(std::vector<CDfaRow> &dfaMatrix, std::vector<STATEID> &rowGroup, ulong &rowNum)
 {
 
 }
