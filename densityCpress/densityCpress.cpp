@@ -2,8 +2,10 @@
 
 #include "densityCpress.h"
 
-DenCpressDfa::DenCpressDfa()
+DenCpressDfa::DenCpressDfa(ushort rowSize)
 {
+	m_usRowSize = rowSize;
+	m_Dif.resize(rowSize);
 }
 
 DenCpressDfa::DenCpressDfa(const DenCpressDfa &other)
@@ -70,3 +72,13 @@ void DenCpressDfa::SetDif(CClusterRow& coreRow, CDfaRow& dfaRow)
 		}
 	}
 }
+
+//void DenCpressDfa::SetStaSize(ushort size)
+//{
+//	m_usRowSize = size;
+//}
+//
+//void DenCpressDfa::InitRowDIf()
+//{
+//	m_Dif.resize(m_usRowSize);
+//}

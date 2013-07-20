@@ -148,12 +148,12 @@ void ExtractCoreSta(CDfa &dfa, std::vector<ushort> &orderObj, CClusterRow &coreR
 		}
 		ushort max = 0;
 		ushort core;
-		for (ushort i = 0; i < 256; ++i)
+		for (ushort j = 0; j < dfa.Size(); ++j)
 		{
-			if (flag[i] > max)
+			if (flag[j] > max)
 			{
-				max = flag[i];
-				core = i;
+				max = flag[j];
+				core = j;
 			}
 		}
 		coreRow[i] = core;
@@ -237,7 +237,7 @@ void OPTICS(CDfa &dfa, double *disMatrix, double eps, ushort minPts, DenCpressDf
 		ExpandClusterOrder(obj, eps, minPts, pProcessed, disMatrix, coreDis, allObjs, neighbors, orderObj);
 		std::cout << std::endl;
 
-		CClusterRow &coreRow = dfa[rownum];
+		CClusterRow coreRow(dfa.GetGroupCount());
 		ExtractCoreSta(dfa, orderObj, coreRow);
 		clusters.AddCluRow(coreRow);
 

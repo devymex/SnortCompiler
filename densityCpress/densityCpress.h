@@ -48,7 +48,7 @@ class DENCPRESSHDR DenCpressDfa
 public:
 
 	// 构造函数
-	DenCpressDfa();
+	DenCpressDfa(ushort rowSize);
 
 	// 复制构造函数
 	DenCpressDfa(const DenCpressDfa &other);
@@ -80,9 +80,17 @@ public:
 	// 返回区别
 	std::map<byte,STATEID>& getDif(byte row);
 
+	////设置对应的大小
+	//void SetStaSize(ushort size);
+
+	//void InitRowDIf();
+
 private:
 	// 记录对应的DFAID
 	ulong m_nDfaID;
+
+	//
+	ushort m_usRowSize;
 
 	// 每一行对应的簇
 	std::map<STATEID, ushort> staId2CluId; 
