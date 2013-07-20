@@ -8,8 +8,10 @@
 #include <cmath>
 
 typedef std::vector<BYTE> ROWSET;
-typedef std::vector<double> GRAPH;
+typedef std::vector<float> GRAPH;
 typedef std::vector<ROWSET> VECROWSET;
+typedef VECROWSET::iterator NODEARRAY_ITER;
+
 
 //½¨Í¼
 void BuildGraph(const CDfa &oneDfa, const ROWSET &rows, GRAPH &graph);
