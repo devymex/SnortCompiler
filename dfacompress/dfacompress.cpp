@@ -87,9 +87,9 @@ DFACOMPRESS void DfaCompress(CDfa &olddfa, ulong &sumBytes)
 	}
 	sumBytes += maxColNum * 2;//存放其他列的映射关系
 
-	sumBytes += 1;//该字节表示矩阵中状态个数
+	sumBytes += 1;//该字节表示原始状态个数
 	sumBytes += 1;//该字节表示列数
-	sumBytes += FinalMatrix.size() * colNum;//矩阵中的元素个数，每个元素占用1字节
+	sumBytes += rowNum * colNum;//矩阵中的元素个数，每个元素占用1字节
 	sumBytes += 1;//该字节表示状态个数
 	sumBytes += 1 + olddfa.GetFinalStates().CountDfaIds() * 2;//第一字节表示终态和dfaId对应关系的对数，后面的字节是具体的终态和dfaId对应关系
 }
