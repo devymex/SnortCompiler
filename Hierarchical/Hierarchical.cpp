@@ -115,7 +115,7 @@ size_t StatisticVitualCore(const CDfa &oneDfa, ROWSET &rs)
 	size_t n_statenum = oneDfa.Size();  //dfa状态数
 	size_t n_dfacol = oneDfa.GetGroupCount();//colnum
 
-	size_t *bary = new size_t[n_statenum]; //统计次数
+	size_t *bary = new size_t[n_statenum + 1]; //统计次数
 	size_t *bcountary = new size_t[n_statenum]; //存储跳转状态不同的个数
 	std::fill(bcountary, bcountary + n_statenum, 0);
 
@@ -123,21 +123,29 @@ size_t StatisticVitualCore(const CDfa &oneDfa, ROWSET &rs)
 	ROWSET visrow;
 	for (size_t col = 0; col < n_dfacol; col++) //dfa列
 	{
-		std::fill(bary, bary + n_statenum, 0);
+		std::fill(bary, bary + n_statenum + 1, 0);
 
 		for (size_t i = 0; i< n_size; i++) //统计出现次数
 		{
 			size_t bt = oneDfa[(STATEID)(rs[i])][col];
+			if (bt == 65535)
+			{
+				bt = n_statenum;
+			}
 			bary[bt]++;
 		}
 
-		BYTE maxindex = BYTE(maxn(bary, n_statenum)); //最多次数下标
+		BYTE maxindex = BYTE(maxn(bary, n_statenum + 1)); //最多次数下标
 
 		visrow.push_back(maxindex); //该列虚拟核
 
 		for (size_t i = 0; i < n_size; i++)   //存储跳转状态不同的个数
 		{
-			BYTE bt = (BYTE)oneDfa[(STATEID)(rs[i])][col];
+			size_t bt = oneDfa[(STATEID)(rs[i])][col];
+			if (bt == 65535)
+			{
+				bt = n_statenum;
+			}
 			if (visrow[col] != bt)
 			{
 				bcountary[i]++;
