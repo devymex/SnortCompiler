@@ -15,22 +15,23 @@ DFACOMPRESS void DfaCompress(CDfa &olddfa, ulong &sumBytes)
 	ulong codeMap[STATEMAX] = {0};//对olddfa的状态进行重新编号
 	GetDfaCluster(olddfa, clusterVec, stateCluster, codeMap);
 
-	//OutPutCluster(olddfa, clusterVec, stateCluster, codeMap);//输出簇
+	OutPutCluster(olddfa, clusterVec, stateCluster, codeMap);//输出簇
 
 	std::vector<CDfaRow> dfaMatrix, sparseMatrix, FinalMatrix;//更新后的dfa矩阵和稀疏矩阵,无效元素用STATEMAX表示
 	std::vector<STATEID> base(dfaSize, 0);//里面如果有STATEID(-1),在存文件的时候会存成byte(-1),读入内存后展开成STATEID(-1)
 	std::vector<STATEID> rowGroup(dfaSize, 0);
 	std::vector<byte> colGroup;
-	ulong colNum;
-	ulong rowNum;
+	ulong colNum = 0;
+	ulong rowNum = 0;
 
 	UpdateMatrix(olddfa, clusterVec, stateCluster, codeMap, dfaMatrix, base, sparseMatrix);
 
-	//OutputMatrix(base, dfaMatrix, sparseMatrix);//输出提取base后的两个矩阵
+	OutputMatrix(base, dfaMatrix, sparseMatrix);//输出提取base后的两个矩阵
 
 	//对dfaMatrix进行行合并压缩
-	RowMergeCompress(dfaMatrix, rowGroup,rowNum, FinalMatrix);
-
+	RowMergeCompress(dfaMatrix, rowGroup, FinalMatrix);
+	rowNum = FinalMatrix.size();
+	OutPutClusterFinalMatrix(dfaMatrix, rowGroup, FinalMatrix);  //输出行压缩后的DFA 映射关系
 	 //对dfaMatrix进行列压缩
 
 
@@ -39,9 +40,9 @@ DFACOMPRESS void DfaCompress(CDfa &olddfa, ulong &sumBytes)
 
 	//计算该压缩后的DFA占用的字节数
 	sumBytes += 2;//2字节表示稀疏表中有效元素个数
-	for(int i = 0; i < sparseMatrix.size(); ++i)
+	for(ulong i = 0; i < sparseMatrix.size(); ++i)
 	{
-		for(int j = 0; j < sparseMatrix[i].Size(); ++j)
+		for(ulong j = 0; j < sparseMatrix[i].Size(); ++j)
 		{
 			if(sparseMatrix[i][j] != STATEMAX)
 			{
@@ -264,16 +265,90 @@ void UpdateMatrix(CDfa &olddfa, std::vector<CUnsignedArray> &clusterVec,  ulong 
 
 //对dfaMatrix进行行合并压缩
 void RowMergeCompress(std::vector<CDfaRow> &dfaMatrix, std::vector<STATEID> &rowGroup, 
-					  ulong &rowNum, std::vector<CDfaRow> &FinalMatrix)
+					   std::vector<CDfaRow> &FinalMatrix)
 {
-
+	bool label = false;
+	FinalMatrix.push_back( dfaMatrix[0]);
+	rowGroup[0] = 0;
+	for(ulong i = 1; i < dfaMatrix.size(); i++)
+	{
+		CDfaRow &dfaRow = dfaMatrix[i];
+		label = false;
+		for(ulong j = 0; j < FinalMatrix.size(); j++)
+		{
+				CDfaRow &finalRow = FinalMatrix[j];
+				ulong k = 0;
+				for(; k <dfaRow.Size(); k++)
+				{
+					if(dfaRow[k] == finalRow[k] || STATEMAX == dfaRow[k] || STATEMAX == finalRow[k])
+					{
+						continue;
+					}
+					else
+					{
+						break;
+					}
+				}
+				if(dfaRow.Size() == k)
+				{
+					label = true;
+					for(ulong g = 0; g < dfaRow.Size(); g++)
+					{
+						if(STATEMAX ==finalRow[g])
+							finalRow[g] = dfaRow[g];
+					}
+					rowGroup[i] = j;
+					break;
+				}
+		}
+		if(!label)
+		{
+			rowGroup[i] = FinalMatrix.size();
+			FinalMatrix.push_back( dfaRow);				
+		}
+	}	
 }
 
-
+void OutPutClusterFinalMatrix(std::vector<CDfaRow> &dfaMatrix, std::vector<STATEID> &rowGroup, 
+					   std::vector<CDfaRow> &FinalMatrix)
+{
+	std::ofstream fout("F:\\finalDfa.txt");
+	if(!fout)
+	{
+		std::cout << "Open file failure" << std::endl;
+		return;
+	}
+	fout << "映射关系" << "\n";
+	for(ulong i = 0; i < dfaMatrix.size(); i++)
+	{
+		fout << i << "\t" << rowGroup[i] << "\n";
+	}
+	fout << "行压缩前的DFA" << "\n";
+	for(ulong i = 0; i < dfaMatrix.size(); ++i)
+	{
+		fout << i << "\t";
+		for(ulong j = 0; j < dfaMatrix[i].Size(); ++j)
+		{
+			fout << dfaMatrix[i][j] << "\t";
+		}
+		fout << "\n";
+	}
+	fout << "行压缩后的DFA" << "\n";
+	for(ulong i = 0; i < FinalMatrix.size(); ++i)
+	{
+		fout << i << "\t";
+		for(ulong j = 0; j < FinalMatrix[i].Size(); ++j)
+		{
+			fout << FinalMatrix[i][j] << "\t";
+		}
+		fout << "\n";
+	}
+	fout.close();
+}
 void OutPutCluster(CDfa &olddfa, std::vector<CUnsignedArray> &clusterVec, ulong *stateCluster, ulong *codeMap)
 {
 	ulong dfaSize = olddfa.Size();
-	std::ofstream fout("F:\\cppProject\\huawei\\PreciseMatch\\CompressTest\\cluster.txt");
+	std::ofstream fout("F:\\cluster.txt");
 	if(!fout)
 	{
 		std::cout << "Open file failure!" << std::endl;
@@ -335,7 +410,7 @@ void OutPutCluster(CDfa &olddfa, std::vector<CUnsignedArray> &clusterVec, ulong 
 
 void OutputMatrix(std::vector<STATEID> &base, std::vector<CDfaRow> &dfaMatrix, std::vector<CDfaRow> &sparseMatrix)
 {
-	std::ofstream fout1("F:\\cppProject\\huawei\\PreciseMatch\\CompressTest\\matrix.txt");
+	std::ofstream fout1("F:\\matrix.txt");
 	if(!fout1)
 	{
 		std::cout << "Open file failure!" << std::endl;
