@@ -62,13 +62,13 @@ void DenCpressDfa::AddCluRow(CClusterRow& cluRow)
 	m_Cluster.PushBack(cluRow);
 }
 
-void DenCpressDfa::SetDif(CClusterRow& coreRow, CDfaRow& dfaRow)
+void DenCpressDfa::SetDif(CClusterRow& coreRow, CDfaRow& dfaRow, ushort rowNum)
 {
 	for (ulong index = 0; index < dfaRow.Size(); ++index)
 	{
 		if (dfaRow[index] != coreRow[index])
 		{
-			m_Dif[m_nDfaID].insert(std::make_pair(dfaRow[index],index));
+			m_Dif[rowNum].insert(std::make_pair(dfaRow[index],index));
 		}
 	}
 }

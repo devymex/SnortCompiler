@@ -75,7 +75,7 @@ public:
 	void AddCluRow(CClusterRow& cluRow);
 	
 	// 设置m_Dif
-	void SetDif(CClusterRow& coreRow, CDfaRow& dfaRow);
+	void SetDif(CClusterRow& coreRow, CDfaRow& dfaRow, ushort rowNum);
 
 	// 返回区别
 	std::map<byte,STATEID>& getDif(byte row);

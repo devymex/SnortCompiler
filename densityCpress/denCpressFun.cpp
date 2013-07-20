@@ -245,7 +245,7 @@ void OPTICS(CDfa &dfa, double *disMatrix, double eps, ushort minPts, DenCpressDf
 		{
 			clusters.SetStaID2CluID(orderObj[i], countClu);
 			
-			clusters.SetDif(coreRow, dfa[orderObj[i]]);
+			clusters.SetDif(coreRow, dfa[orderObj[i]], orderObj[i]);
 		}
 		++countClu;
 	}
