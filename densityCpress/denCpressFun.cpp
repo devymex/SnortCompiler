@@ -2,6 +2,7 @@
 #include <hwprj/dfa.h>
 #include "densityCpress.h"
 
+size_t curdfa = 0;
 void SetDistance(CDfa dfa, double *disMatrix)
 {
 	
@@ -133,6 +134,7 @@ void Update(std::vector<ushort> &neighbors, ROWOBJ &curobj, byte *pProcessed,
 void ExtractCoreSta(CDfa &dfa, std::vector<ushort> &orderObj, CClusterRow &coreRow)
 {
 	ushort flag[256];
+	ushort empty = 0;
 	std::memset(flag, 0, sizeof(flag));
 
 	for (ushort i = 0; i < dfa.GetGroupCount(); ++i)
@@ -140,7 +142,14 @@ void ExtractCoreSta(CDfa &dfa, std::vector<ushort> &orderObj, CClusterRow &coreR
 		for (std::vector<ushort>::iterator iter = orderObj.begin(); iter != orderObj.end(); ++iter)
 		{
 			ushort sta = dfa[*iter][i];
-			++flag[sta];
+			if (sta == 65535)
+			{
+				++empty;
+			}
+			else
+			{
+				++flag[sta];
+			}
 		}
 		ushort max = 0;
 		ushort core;
@@ -151,6 +160,12 @@ void ExtractCoreSta(CDfa &dfa, std::vector<ushort> &orderObj, CClusterRow &coreR
 				max = flag[j];
 				core = j;
 			}
+		}
+
+		if (empty > max)
+		{
+			max = empty;
+			core = 65535;
 		}
 		coreRow[i] = core;
 		std::memset(flag, 0, sizeof(flag));
@@ -192,10 +207,26 @@ void ExpandClusterOrder(ROWOBJ &obj, double eps, ushort minPts,byte *pProcessed,
 			if (coreDis[curobj.dfaRowInd] != -1)
 			{
 				std::vector<ushort> &neis = neighbors[curobj.dfaRowInd];
+				if (curobj.dfaRowInd == 2)
+				{
+					std::cout << std::endl;
+				}
 				Update(neis, curobj, pProcessed, disMatrix, allObjs, orderSeeds);
 			}
 		}
 	}
+}
+
+int Cost(std::vector<ushort> &orderObj, CDfa &dfa, DenCpressDfa &clusters)
+{
+	int cost = orderObj.size();
+
+	for (std::vector<ushort>::iterator iter = orderObj.begin(); iter != orderObj.end(); ++iter)
+	{
+		size_t size = clusters.getDif(*iter).size();
+		cost += size * 2;
+	}
+	return cost;
 }
 
 void OPTICS(CDfa &dfa, double *disMatrix, double eps, ushort minPts, DenCpressDfa &clusters)
@@ -221,6 +252,10 @@ void OPTICS(CDfa &dfa, double *disMatrix, double eps, ushort minPts, DenCpressDf
 	}
 
 	ushort countClu = 0;
+
+	//ø’º‰—πÀı¥Û–°
+	int reduction = 0;
+
 	for (size_t rownum = 0; rownum < dfa.Size(); ++rownum)
 	{
 		if (pProcessed[rownum] == 1)
@@ -231,8 +266,7 @@ void OPTICS(CDfa &dfa, double *disMatrix, double eps, ushort minPts, DenCpressDf
 		ROWOBJ &obj = allObjs[rownum];
 		std::vector<ushort> orderObj;
 		ExpandClusterOrder(obj, eps, minPts, pProcessed, disMatrix, coreDis, allObjs, neighbors, orderObj);
-		std::cout << std::endl;
-
+        
 		CClusterRow coreRow(dfa.GetGroupCount());
 		ExtractCoreSta(dfa, orderObj, coreRow);
 		clusters.AddCluRow(coreRow);
@@ -243,6 +277,33 @@ void OPTICS(CDfa &dfa, double *disMatrix, double eps, ushort minPts, DenCpressDf
 			
 			clusters.SetDif(coreRow, dfa[orderObj[i]], orderObj[i]);
 		}
+
+		int curRedu = 0;
+
+		if (orderObj.size() == 1)
+		{
+			curRedu = 0;
+		}
+		else
+		{
+			int temp = dfa.GetGroupCount() * (orderObj.size() - 1);
+			curRedu = temp - Cost(orderObj, dfa, clusters);
+		}
+		reduction += curRedu;
 		++countClu;
 	}
+
+	size_t d = dfa.GetGroupCount() * dfa.Size();
+	double percent = (double)reduction / d;
+	std::ofstream ofs;
+	if (curdfa == 0)
+	{
+		ofs.open("..\\..\\output\\reduction.txt");
+	}
+	else
+	{
+		ofs.open("..\\..\\output\\reduction.txt", std::ofstream::app);
+	}
+	ofs << curdfa << " : " << d << " "<< reduction << "  " << std::setprecision(2) << percent <<";" << std::endl;
+	++curdfa;
 }
