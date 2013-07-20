@@ -6,9 +6,9 @@
 int main()
 {
 	CGroupRes groupRes;
-	groupRes.ReadFromFile("F:\\cppProject\\huawei\\PreciseMatch\\CompressTest\\FinalResult.cdt");
+	groupRes.ReadFromFile("F:\\huawei\\date\\FinalResult.cdt");
 	ulong sumBytes = 0;
-	DfaCompress(groupRes.GetDfaTable()[1529], sumBytes);
+	DfaCompress(groupRes.GetDfaTable()[65], sumBytes);
 	//for(int i = 0; i < groupRes.GetDfaTable().Size(); ++i)
 	//{
 	//	DfaCompress(groupRes.GetDfaTable()[i], sumBytes);
