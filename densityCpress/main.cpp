@@ -21,6 +21,6 @@ void main()
 	//	cpressDfa.SetStaSize(dfasize);
 	//	cpressDfa.InitRowDIf();
 
-		OPTICS(dfa, disMatrix, 0.5, 5, cpressDfa);
+		OPTICS(dfa, disMatrix, 0.5, 2, cpressDfa);
 	}
 }
