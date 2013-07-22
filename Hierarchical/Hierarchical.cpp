@@ -113,35 +113,46 @@ size_t maxn(size_t *bary, int size)
 }
 
 //统计虚拟核,计算存储空间,每次一个行集
-size_t StatisticVitualCore(const CDfa &oneDfa, ROWSET &rs)
+size_t StatisticVitualCore(const CDfa &oneDfa, ROWSET &rs, ROWSET &virtualRow)
 {
 	size_t n_size = rs.size();   //行集大小
 	size_t n_statenum = oneDfa.Size();  //dfa状态数
 	size_t n_dfacol = oneDfa.GetGroupCount();//colnum
 
-	size_t *bary = new size_t[n_statenum + 1]; //统计次数
+	//size_t *bary = new size_t[n_statenum + 1]; //统计次数
 	size_t *bcountary = new size_t[n_statenum]; //存储跳转状态不同的个数
 	std::fill(bcountary, bcountary + n_statenum, 0);
 
+	std::map<STATEID, size_t> bary;
 
-	ROWSET visrow;
 	for (size_t col = 0; col < n_dfacol; col++) //dfa列
 	{
-		std::fill(bary, bary + n_statenum + 1, 0);
+		//std::fill(bary, bary + n_statenum + 1, 0);
 
 		for (size_t i = 0; i< n_size; i++) //统计出现次数
 		{
-			size_t bt = oneDfa[(STATEID)(rs[i])][col];
-			if (bt == 65535)
-			{
-				bt = n_statenum;
-			}
-			bary[bt]++;
+			//size_t bt = oneDfa[(STATEID)(rs[i])][col];
+			//if (bt == 65535)
+			//{
+			//	bt = n_statenum;
+			//}
+			//bary[bt]++;
+			++bary[oneDfa[STATEID(rs[i])][col]];
 		}
 
-		BYTE maxindex = BYTE(maxn(bary, n_statenum + 1)); //最多次数下标
+		STATEID maxindex = bary.begin()->first;
+		size_t max = bary.begin()->second;
+		for (std::map<STATEID, size_t>::iterator i = bary.begin(); i != bary.end(); ++i)
+		{
+			if (i->second > max)
+			{
+				max = i->second;
+				maxindex = i->first;
+			}
+		}
+		//BYTE maxindex = BYTE(maxn(bary, n_statenum + 1)); //最多次数下标
 
-		visrow.push_back(maxindex); //该列虚拟核
+		virtualRow.push_back(maxindex); //该列虚拟核
 
 		for (size_t i = 0; i < n_size; i++)   //存储跳转状态不同的个数
 		{
@@ -150,7 +161,7 @@ size_t StatisticVitualCore(const CDfa &oneDfa, ROWSET &rs)
 			{
 				bt = n_statenum;
 			}
-			if (visrow[col] != bt)
+			if (virtualRow[col] != bt)
 			{
 				bcountary[i]++;
 			}
@@ -163,7 +174,7 @@ size_t StatisticVitualCore(const CDfa &oneDfa, ROWSET &rs)
 		vsmem += 2 * bcountary[i];
 	}
 
-	delete[] bary;
+	//delete[] bary;
 	delete[] bcountary;
 
 	return vsmem;
@@ -310,13 +321,15 @@ void StoreWagner(GRAPH &adjMat, ROWSET &part)
 }
 
 //层次聚类过程，存储空间减少则将图划分（最小割方法），自适应划分
-void HierarchicalCluster(const CDfa &oneDfa, VECROWSET &vecRows)
+size_t HierarchicalCluster(const CDfa &oneDfa, VECROWSET &vecRows, VECROWSET &vecVirtual)
 {
+	ulong TotalMem = 0;
 	//遍历每个连通子图
 	for (NODEARRAY_ITER i = vecRows.begin(); i != vecRows.end();)
 	{
 		//计算当前连通子图的DFA表存储空间
-		size_t curRowval = StatisticVitualCore(oneDfa, *i);
+		ROWSET virtualRow;
+		size_t curRowval = StatisticVitualCore(oneDfa, *i, virtualRow);
 		
 		//由连通子图的节点编号建无向图
 		GRAPH curGraph;
@@ -329,7 +342,7 @@ void HierarchicalCluster(const CDfa &oneDfa, VECROWSET &vecRows)
 		//StoreWagner(curGraph, partIdx);
 
 		//得到连通子图的划分节点编号，对应于行集的下标，将对应行集安下标划分
-		ROWSET partRow1, partRow2;
+		ROWSET partRow1, partRow2, virtualRow1, virtualRow2;
 		for (size_t j = 0, k = 0; j < i->size(); ++j)
 		{
 			if (k < partIdx.size() && j == partIdx[k] )
@@ -344,8 +357,8 @@ void HierarchicalCluster(const CDfa &oneDfa, VECROWSET &vecRows)
 		}
 
 		//计算划分后的DFA表存储空间
-		size_t partRowval = StatisticVitualCore(oneDfa, partRow1)
-			+ StatisticVitualCore(oneDfa, partRow2);
+		size_t partRowval = StatisticVitualCore(oneDfa, partRow1, virtualRow1)
+			+ StatisticVitualCore(oneDfa, partRow2, virtualRow1);
 
 		//如果划分后存储空间减少，则用划分行集替换当前行集
 		if (curRowval > partRowval)
@@ -359,9 +372,12 @@ void HierarchicalCluster(const CDfa &oneDfa, VECROWSET &vecRows)
 		else
 		{
 			++i;
-			g_TotalMem += curRowval;
+			TotalMem += curRowval;
+			vecVirtual.push_back(virtualRow);
+			//g_TotalMem += curRowval;
 		}
 	}
+	return TotalMem;
 }
 
 ////标记函数，用来标记该状态是否在状态集中出现

@@ -6,15 +6,17 @@
 #include <Windows.h>
 #include <algorithm>
 #include <cmath>
+#include <map>
+#include <fstream>
 
-#define limit 0.5
+#define limit 0.7
 
-typedef std::vector<BYTE> ROWSET;
+typedef std::vector<size_t> ROWSET;
 typedef std::vector<float> GRAPH;
 typedef std::vector<ROWSET> VECROWSET;
 typedef VECROWSET::iterator NODEARRAY_ITER;
 
-extern ulong g_TotalMem;
+//extern ulong g_TotalMem;
 
 //建图
 void BuildGraph(const CDfa &oneDfa, const ROWSET &rows, GRAPH &graph);
@@ -23,10 +25,10 @@ void BuildGraph(const CDfa &oneDfa, const ROWSET &rows, GRAPH &graph);
 void SearchConnectSubgraph(const GRAPH &graph, VECROWSET &vecRows);
 
 //统计虚拟核 ,计算存储空间,每次一个行集
-size_t StatisticVitualCore(const CDfa &oneDfa,ROWSET &rs);
+size_t StatisticVitualCore(const CDfa &oneDfa, ROWSET &rs, ROWSET &visrow);
 
 //层次聚类算法
-void HierarchicalCluster(const CDfa &oneDfa, VECROWSET &vecRows);
+size_t HierarchicalCluster(const CDfa &oneDfa, VECROWSET &vecRows, VECROWSET &vecVirtual);
 
 ////标记函数，用来标记该状态是否在状态集中出现
 //int SignState(byte state, ROWSET stateSet);
