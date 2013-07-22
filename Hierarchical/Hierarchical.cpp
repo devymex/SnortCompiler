@@ -1,4 +1,7 @@
 #include "Hierarchical.h"
+#include <map>
+#include <algorithm>
+#include <fstream>
 
 ulong g_TotalMem = 0;
 
@@ -95,7 +98,6 @@ void SearchConnectSubgraph(const GRAPH &graph, VECROWSET &vecRows)
 		}
 	}
 }
-
 //返回出现次数最多的下表
 size_t maxn(size_t *bary, int size)
 {
@@ -167,8 +169,8 @@ size_t StatisticVitualCore(const CDfa &oneDfa, ROWSET &rs)
 	return vsmem;
 }
 
-/// 执行MA排序。adjMat为节点的赋权邻接矩阵，nodes为合并节点的集合。
-/// 每一个合并节点包括构成的所有原节点的编号，第一个元素为该合并节点在矩阵中的行号。
+// 执行MA排序。adjMat为节点的赋权邻接矩阵，nodes为合并节点的集合。
+// 每一个合并节点包括构成的所有原节点的编号，第一个元素为该合并节点在矩阵中的行号。
 float MaxAdjSort(const GRAPH &adjMat, std::vector<ROWSET> &nodes)
 {
 	/// 检查输入的参数是否为空，否则抛出异常
@@ -323,6 +325,8 @@ void HierarchicalCluster(const CDfa &oneDfa, VECROWSET &vecRows)
 		//最小割方法将连通子图划分，划分的子图节点编号存于partIdx
 		ROWSET partIdx;
 		StoreWagner(curGraph, partIdx);
+		//VECROWSET partIdx;
+		//StoreWagner(curGraph, partIdx);
 
 		//得到连通子图的划分节点编号，对应于行集的下标，将对应行集安下标划分
 		ROWSET partRow1, partRow2;
@@ -358,6 +362,173 @@ void HierarchicalCluster(const CDfa &oneDfa, VECROWSET &vecRows)
 			g_TotalMem += curRowval;
 		}
 	}
-
 }
 
+////标记函数，用来标记该状态是否在状态集中出现
+//int SignState(byte state, ROWSET stateSet)
+//{
+//	int sign = 0;											//sign用来标记该状态是否在状态集中
+//	for(ROWSET::size_type i= 0; i != stateSet.size(); ++i)					//循环遍历状态集
+//	{
+//		if(state == stateSet[i])							//如果该点在状态集中
+//		{
+//			sign = 1;										//标记位置为1
+//		}
+//	}
+//	return sign;											//返回标记，1代表出现，0代表未出现
+//}
+////MA排序,removeSet为已移除的状态集，matrix为带全矩阵，oriSet为输出的排序状态集
+//void MinArray(ROWSET removeSet, GRAPH matrix, ROWSET &oriSet)
+//{
+//	const int N = sqrt(matrix.size());											//N表示总状态数
+//	ROWSET termiSet;															//termiSet为终态集
+//	for(int i = 0; i != N; ++i)													//对termiSet初始化，将状态放入其中
+//	{
+//		int sign = 0;															//sign为标记位
+//		if(removeSet.size() != 0)												//判断removeSet是否为空
+//		{
+//			sign = SignState(i, removeSet);										//若存在，则标记该状态是否已经被移除
+//		}
+//		if(sign == 0)															//如果未在removeSet中，即未移除，则放入终态集
+//		{
+//			termiSet.push_back(i);
+//		}
+//	}
+//	int n = termiSet.size();													//n表示矩阵的维数
+//	byte startState = termiSet.front();											//startState为初始状态
+//	oriSet.push_back(startState);												//将初始状态放入oriSet
+//	termiSet.erase(termiSet.begin());
+//	ROWSET::iterator signState;
+//	while (oriSet.size() != n)													//循环，直到所有的点都放入初态集中
+//	{										
+//		double weight = 0;														//result表示最大的权值
+//		ROWSET::iterator i = termiSet.begin();									//signState用来标记最大的权值点
+//		for (; i != termiSet.end(); ++i)										//循环遍历终态集
+//		{
+//			double tmp = 0;														//tmp为临时变量，表示当前权值
+//			for (ROWSET::iterator j = oriSet.begin(); j != oriSet.end(); ++j)	//循环遍历初态集
+//			{
+//				if(matrix[(*i) * N + *j] != 0)								//如果标记为0并且边存在，则相加并保存在tmp
+//				{
+//					tmp += matrix[(*i) * N + *j];
+//				}
+//			}
+//			if(tmp > weight)													//如果tmp大于result，则更新
+//			{
+//				weight = tmp;
+//				signState = i;
+//			}
+//		}
+//		oriSet.push_back(*signState);											//将该状态放入初态集中，作为最终的排序
+//		termiSet.erase(signState);
+//	}
+//}
+////状态合并，removeSet表示移除的状态集，需要更新，s和t状态为最后两个状态，brokenMartix记录带权矩阵的更新，vecSets记录状态集的更新
+//int MergeState(byte s, byte t, ROWSET &removeSet, GRAPH &matrix, VECROWSET &sets)
+//{
+//	const int N = sqrt(matrix.size());						//n表示状态个数
+//	int tCount = (int)t, sCount = (int)s;					//tCount表示t的行列号，sCount表示s的行列号
+//	double minCutTmp = 0;									//minCutTmp用来表示当前的最小割权值
+//	//更新带权矩阵，只需要更新s状态的行和列
+//	for(int i = 0; i != N; ++i)
+//	{
+//		int sign = SignState(i, removeSet);					//sign用来标记该状态是否在removeSet里面
+//		int tNumber = (tCount) * N + i;					//tNumber表示t行i列的元素
+//		if(sign == 0 && matrix[tNumber] != 0)			//如果该状态在当前状态集中，并且t行i列元素不为0，则更新s行i列元素
+//		{
+//			minCutTmp += matrix[tNumber];				//累加求最小割权值
+//			if(i != sCount)
+//			{
+//				matrix[sCount * N + i] += matrix[tNumber];							//更新s行
+//				matrix[i * N + sCount] = matrix[sCount * N + i];					//更新s列
+//			}
+//		}
+//	}
+//	removeSet.push_back(t);									//更新removeSet，将t状态放入其中
+//	//更新vecSets状态集，只需要更新s和t状态
+//	ROWSET tmpVec;											//tmpVec表示临时变量
+//	tmpVec.push_back(s);									//将s放入tmpVec
+//	tmpVec.push_back(t);									//将t放入tmpVec
+//	if(sets.size() == 0)									//如果vecSets为空，则初始化
+//	{
+//		sets.push_back(tmpVec);
+//	}
+//	else
+//	{
+//		VECROWSET::size_type i = 0;								//i为计数器
+//		for(; i != sets.size(); ++i)							//遍历vecSets
+//		{
+//			if(s == sets[i].front())							//如果s在vecSets中，表示s之前代表过其他状态
+//			{
+//				sets[i].push_back(t);							//将t放入s所在的数组中
+//				break;
+//			}
+//		}
+//		if(i == sets.size())									//如果s之前没有代表过其他状态
+//		{
+//			sets.push_back(tmpVec);								//则将s，t放入vecSets
+//		}
+//	}
+//	return minCutTmp;
+//}
+////最大流最小割算法
+//void StoreWagner(GRAPH matrix, VECROWSET &result)
+//{
+//	ROWSET removeSet;								//removeSet表示已经移除的状态集
+//	VECROWSET sets;									//vecSets用来表示状态的聚类集，result用来存储最终结果
+//	double minCutTmp, minCutResult = sqrt(matrix.size());	//minCutTmp用来表示当前的最小割权值，minCutResult表示当前为止的最小割的最小值
+//	const int N = sqrt(matrix.size());						//n为状态个数
+//	while(removeSet.size() != N - 1)							//循环对图进行分割
+//	{
+//		ROWSET arySet;
+//		MinArray(removeSet, matrix, arySet);			//MA算法，对状态进行排序
+//		byte t = arySet.back();							//t表示最后一个状态，是要删除的状态
+//		byte s = *(arySet.end()-2);						//s表示倒数第二个状态，是要代表的状态
+//		double minCutTmp = MergeState(s, t, removeSet, matrix, sets);			//最小割算法，输出最小割权值，并对图进行更新
+//		//输出结果，如果t状态出现在vecSets.front()，表示该t状态为一个状态集，而该列数组为其状态的集合
+//		if(minCutTmp < minCutResult)					//如果当前的最小割权值为极小值
+//		{
+//			result.clear();
+//			minCutResult = minCutTmp;
+//			ROWSET first, second;
+//			VECROWSET::size_type i = 0;
+//			while(i != sets.size())											//循环遍历vecSets状态集
+//			{
+//				if(t == sets[i].front())									//如果t出现在vecSets.front()
+//				{
+//					first.assign(sets[i].begin(), sets[i].end());			//则将结果保存在result[1]中，即第一个行集
+//					break;
+//				}
+//				++i;
+//			}
+//			if(i == sets.size())
+//			{
+//				first.push_back(t);
+//			}
+//			ROWSET::size_type m = first.size();
+//			for(ROWSET::size_type j = 1; j != m; ++j)
+//			{
+//				for(ROWSET::size_type k = 0; k != sets.size(); ++k)
+//				{
+//					if(first[j] == sets[k].front())
+//					{
+//						first.insert(first.end(), sets[k].begin() + 1, sets[k].end());
+//						break;
+//					}
+//				}
+//			}
+//			for(int i = 0; i != N; ++i)					//循环保存result[2]，即第二个行集
+//			{
+//				int sign = SignState(i, first);			//sign标记该状态是否出现在第一个行集中
+//				if(sign == 0)							//如果没有出现，则保存在第二行集中
+//				{
+//					second.push_back(i);
+//				}
+//			}
+//			result.push_back(first);
+//			result.push_back(second);
+//			++i;
+//			g_TotalMem += curRowval;
+//		}
+//	}
+//}
