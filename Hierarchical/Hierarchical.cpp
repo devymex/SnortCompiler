@@ -311,7 +311,7 @@ void StoreWagner(GRAPH &adjMat, ROWSET &part)
 void HierarchicalCluster(const CDfa &oneDfa, VECROWSET &vecRows)
 {
 	//遍历每个连通子图
-	for (NODEARRAY_ITER i = vecRows.begin(); i != vecRows.end(); ++i)
+	for (NODEARRAY_ITER i = vecRows.begin(); i != vecRows.end();)
 	{
 		//计算当前连通子图的DFA表存储空间
 		size_t curRowval = StatisticVitualCore(oneDfa, *i);
@@ -346,13 +346,15 @@ void HierarchicalCluster(const CDfa &oneDfa, VECROWSET &vecRows)
 		//如果划分后存储空间减少，则用划分行集替换当前行集
 		if (curRowval > partRowval)
 		{
+			size_t nIdx = i - vecRows.begin();
 			vecRows.erase(i);
 			vecRows.push_back(partRow1);
 			vecRows.push_back(partRow2);
-			--i;
+			i = vecRows.begin() + nIdx;
 		}
 		else
 		{
+			++i;
 			g_TotalMem += curRowval;
 		}
 	}
