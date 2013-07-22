@@ -39,8 +39,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\wpdpack\Include;..\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\wpdpack\Lib;..\bin\$(Configuration)\;$(LibraryPath)</LibraryPath>
+    <IncludePath>D:\Program Files (x86)\wpdpack\Include;..\include;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\Program Files (x86)\wpdpack\lib;..\bin\$(Configuration)\;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
