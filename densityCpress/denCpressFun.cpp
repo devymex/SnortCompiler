@@ -229,7 +229,7 @@ int Cost(std::vector<ushort> &orderObj, CDfa &dfa, DenCpressDfa &clusters)
 	return cost;
 }
 
-void OPTICS(CDfa &dfa, double *disMatrix, double eps, ushort minPts, DenCpressDfa &clusters)
+int OPTICS(CDfa &dfa, double *disMatrix, double eps, ushort minPts, DenCpressDfa &clusters)
 {
 
 	double coreDis[256];
@@ -254,7 +254,7 @@ void OPTICS(CDfa &dfa, double *disMatrix, double eps, ushort minPts, DenCpressDf
 	ushort countClu = 0;
 
 	//ø’º‰—πÀı¥Û–°
-	int reduction = 0;
+	int cost = 0;
 
 	for (size_t rownum = 0; rownum < dfa.Size(); ++rownum)
 	{
@@ -278,32 +278,32 @@ void OPTICS(CDfa &dfa, double *disMatrix, double eps, ushort minPts, DenCpressDf
 			clusters.SetDif(coreRow, dfa[orderObj[i]], orderObj[i]);
 		}
 
-		int curRedu = 0;
+		int curCost = 0;
 
 		if (orderObj.size() == 1)
 		{
-			curRedu = 0;
+			curCost = 1;
 		}
 		else
 		{
-			int temp = dfa.GetGroupCount() * (orderObj.size() - 1);
-			curRedu = temp - Cost(orderObj, dfa, clusters);
+			//int temp = dfa.GetGroupCount() * (orderObj.size() - 1);
+			curCost = Cost(orderObj, dfa, clusters);
 		}
-		reduction += curRedu;
+		cost += curCost;
 		++countClu;
 	}
-
-	size_t d = dfa.GetGroupCount() * dfa.Size();
-	double percent = (double)reduction / d;
-	std::ofstream ofs;
-	if (curdfa == 0)
-	{
-		ofs.open("..\\..\\output\\reduction.txt");
-	}
-	else
-	{
-		ofs.open("..\\..\\output\\reduction.txt", std::ofstream::app);
-	}
-	ofs << curdfa << " : " << d << " "<< reduction << "  " << std::setprecision(2) << percent <<";" << std::endl;
+	//size_t d = dfa.GetGroupCount() * dfa.Size();
+	//double percent = (double)reduction / d;
+	//std::ofstream ofs;
+	//if (curdfa == 0)
+	//{
+	//	ofs.open("..\\..\\output\\reduction.txt");
+	//}
+	//else
+	//{
+	//	ofs.open("..\\..\\output\\reduction.txt", std::ofstream::app);
+	//}
+	//ofs << curdfa << " : " << d << " "<< reduction << "  " << std::setprecision(2) << percent <<";" << std::endl;
 	++curdfa;
+	return cost;
 }

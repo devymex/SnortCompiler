@@ -80,6 +80,9 @@ public:
 	// 返回区别
 	std::map<byte,STATEID>& getDif(byte row);
 
+	ushort Size();
+
+	void Dump(char* file);
 	////设置对应的大小
 	//void SetStaSize(ushort size);
 

@@ -73,6 +73,16 @@ void DenCpressDfa::SetDif(CClusterRow& coreRow, CDfaRow& dfaRow, ushort rowNum)
 	}
 }
 
+ushort DenCpressDfa::Size()
+{
+	return m_Cluster.Size();
+}
+
+void DenCpressDfa::Dump(char* file)
+{
+	m_Cluster.Dump(file);
+}
+
 //void DenCpressDfa::SetStaSize(ushort size)
 //{
 //	m_usRowSize = size;
