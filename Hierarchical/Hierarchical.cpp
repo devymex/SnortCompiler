@@ -101,19 +101,19 @@ void SearchConnectSubgraph(const GRAPH &graph, VECROWSET &vecRows)
 		}
 	}
 }
-//返回出现次数最多的下表
-size_t maxn(size_t *bary, int size)
-{
-	size_t n_max = 0; 
-	for (int i = 1; i < size; i++)
-	{
-		if (bary[n_max] < bary[i])
-		{
-			n_max = i;
-		}
-	}
-	return n_max;	
-}
+////返回出现次数最多的下表
+//size_t maxn(size_t *bary, int size)
+//{
+//	size_t n_max = 0; 
+//	for (int i = 1; i < size; i++)
+//	{
+//		if (bary[n_max] < bary[i])
+//		{
+//			n_max = i;
+//		}
+//	}
+//	return n_max;	
+//}
 
 //统计虚拟核,计算存储空间,每次一个行集
 size_t StatisticVitualCore(const CDfa &oneDfa, ROWSET &rs, ROWSET &virtualRow)
@@ -128,17 +128,10 @@ size_t StatisticVitualCore(const CDfa &oneDfa, ROWSET &rs, ROWSET &virtualRow)
 
 	for (size_t col = 0; col < n_dfacol; col++) //dfa列
 	{
-		//std::fill(bary, bary + n_statenum + 1, 0);
 		std::map<STATEID, size_t> bary;
 
 		for (size_t i = 0; i< n_size; i++) //统计出现次数
 		{
-			//size_t bt = oneDfa[(STATEID)(rs[i])][col];
-			//if (bt == 65535)
-			//{
-			//	bt = n_statenum;
-			//}
-			//bary[bt]++;
 			++bary[oneDfa[STATEID(rs[i])][col]];
 		}
 
@@ -152,8 +145,6 @@ size_t StatisticVitualCore(const CDfa &oneDfa, ROWSET &rs, ROWSET &virtualRow)
 				maxindex = i->first;
 			}
 		}
-		//BYTE maxindex = BYTE(maxn(bary, n_statenum + 1)); //最多次数下标
-
 		virtualRow.push_back(maxindex); //该列虚拟核
 
 		for (size_t i = 0; i < n_size; i++)   //存储跳转状态不同的个数
@@ -355,14 +346,16 @@ size_t HierarchicalCluster(const CDfa &oneDfa, VECROWSET &vecRows, VECROWSET &ve
 
 		//计算划分后的DFA表存储空间
 		size_t partRowval = 0;
+		bool flag = false;
 		if (!partRow1.empty() && !partRow2.empty())
 		{
 			partRowval = StatisticVitualCore(oneDfa, partRow1, virtualRow1)
 				+ StatisticVitualCore(oneDfa, partRow2, virtualRow1);
+			flag = true;
 		}
 
 		//如果划分后存储空间减少，则用划分行集替换当前行集
-		if (curRowval > partRowval)
+		if ((curRowval > partRowval) && flag)
 		{
 			size_t nIdx = i - vecRows.begin();
 			vecRows.erase(i);
