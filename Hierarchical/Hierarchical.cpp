@@ -17,17 +17,9 @@ void BuildGraph(const CDfa &oneDfa, const ROWSET &rows, GRAPH &graph)
 	graph.resize(nRow * nRow);
 	std::fill(graph.begin(), graph.end(), (float)0.0);
 
-	size_t nThreshold = 0;
-	if (nRow < 10)
-	{
-		nThreshold = 0.5 * nCol;
-		for (; nThreshold < (float(nCol) / 2.0f); ++nThreshold);
-	}
-	else
-	{
-		nThreshold = limit * nCol;
-		for (; nThreshold < (float(nCol) / 2.0f); ++nThreshold);
-	}
+	
+	size_t	nThreshold = limit * nCol;
+	for (; nThreshold < (float(nCol) / 2.0f); ++nThreshold);
 
 	//任意两行都需要计算相似比率，无向图只需计算下（上）三角
 	for (size_t i = 0; i < nRow; ++i)
