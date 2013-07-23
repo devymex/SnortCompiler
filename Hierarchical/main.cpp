@@ -28,27 +28,32 @@ void main(int nArgs, char **cArgs)
 
 	for (size_t i = 0; i < CDfaSet.Size(); ++i)
 	{
-		ulong nExtraMem = 0;
-		std::cout << i << std::endl;
-		ROWSET rows;
-		for (size_t j = 0; j < CDfaSet[i].Size(); ++j)
+		if (i == 0)
 		{
-			rows.push_back(j);
+			CDfaSet[i].Dump("DFA1586.txt");
+			ulong nExtraMem = 0;
+			std::cout << i << std::endl;
+			ROWSET rows;
+			for (size_t j = 0; j < CDfaSet[i].Size(); ++j)
+			{
+				rows.push_back(j);
+			}
+			GRAPH graph;
+			BuildGraph(CDfaSet[i], rows, graph);
+
+			VECROWSET vecRows;
+			SearchConnectSubgraph(graph, vecRows);
+
+			VECROWSET vecVirtual;
+			size_t memSize = HierarchicalCluster(CDfaSet[i], vecRows, vecVirtual);
+
+			nExtraMem = (8 + 2 * Charset(CDfaSet[i]) + 2 * CDfaSet[i].GetFinalStates().CountDfaIds());
+
 		}
-		GRAPH graph;
-		BuildGraph(CDfaSet[i], rows, graph);
 
-		VECROWSET vecRows;
-		SearchConnectSubgraph(graph, vecRows);
-
-		VECROWSET vecVirtual;
-		size_t memSize = HierarchicalCluster(CDfaSet[i], vecRows, vecVirtual);
-
-		nExtraMem = (8 + 2 * Charset(CDfaSet[i]) + 2 * CDfaSet[i].GetFinalStates().CountDfaIds());
-
-		std::ofstream fout("storesize.txt", std::ios::app);
-		fout << i << '\t' << memSize << '\t' << nExtraMem << std::endl;
-		fout.close();
+		//std::ofstream fout("storesize.txt", std::ios::app);
+		//fout << i << '\t' << memSize << '\t' << nExtraMem << std::endl;
+		//fout.close();
 		//std::ofstream fout("core.txt", std::ios::app);
 		//fout << i << " :" << std::endl;
 		//for (NODEARRAY_ITER j = vecVirtual.begin(); j != vecVirtual.end(); ++j)

@@ -9,7 +9,7 @@
 #include <map>
 #include <fstream>
 
-#define limit 0.7
+#define limit 0.5
 
 typedef std::vector<size_t> ROWSET;
 typedef std::vector<float> GRAPH;
