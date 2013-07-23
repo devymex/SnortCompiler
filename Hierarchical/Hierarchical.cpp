@@ -17,6 +17,18 @@ void BuildGraph(const CDfa &oneDfa, const ROWSET &rows, GRAPH &graph)
 	graph.resize(nRow * nRow);
 	std::fill(graph.begin(), graph.end(), (float)0.0);
 
+	size_t nThreshold = 0;
+	if (nRow < 10)
+	{
+		nThreshold = 0.5 * nCol;
+		for (; nThreshold < (float(nCol) / 2.0f); ++nThreshold);
+	}
+	else
+	{
+		nThreshold = limit * nCol;
+		for (; nThreshold < (float(nCol) / 2.0f); ++nThreshold);
+	}
+
 	//任意两行都需要计算相似比率，无向图只需计算下（上）三角
 	for (size_t i = 0; i < nRow; ++i)
 	{
@@ -33,10 +45,9 @@ void BuildGraph(const CDfa &oneDfa, const ROWSET &rows, GRAPH &graph)
 			}
 
 			//相同元素占的比率，比率大于0.5，则认为无向图中对应两个结点有一条边，边权值为比率值
-			float radio = (float)nEqualCnt / (float)nCol;
-			if (radio >= limit)
+			if (nEqualCnt >= nThreshold)
 			{
-				graph[i * nRow + j] = graph[j * nRow + i] = radio;			 
+				graph[i * nRow + j] = graph[j * nRow + i] = (float)nEqualCnt / (float)nCol;			 
 			}
 		}
 	}
@@ -123,11 +134,10 @@ size_t StatisticVitualCore(const CDfa &oneDfa, ROWSET &rs, ROWSET &virtualRow)
 	size_t *bcountary = new size_t[n_statenum]; //存储跳转状态不同的个数
 	std::fill(bcountary, bcountary + n_statenum, 0);
 
-	std::map<STATEID, size_t> bary;
-
 	for (size_t col = 0; col < n_dfacol; col++) //dfa列
 	{
 		//std::fill(bary, bary + n_statenum + 1, 0);
+		std::map<STATEID, size_t> bary;
 
 		for (size_t i = 0; i< n_size; i++) //统计出现次数
 		{
@@ -157,10 +167,6 @@ size_t StatisticVitualCore(const CDfa &oneDfa, ROWSET &rs, ROWSET &virtualRow)
 		for (size_t i = 0; i < n_size; i++)   //存储跳转状态不同的个数
 		{
 			size_t bt = oneDfa[(STATEID)(rs[i])][col];
-			if (bt == 65535)
-			{
-				bt = n_statenum;
-			}
 			if (virtualRow[col] != bt)
 			{
 				bcountary[i]++;
@@ -174,7 +180,6 @@ size_t StatisticVitualCore(const CDfa &oneDfa, ROWSET &rs, ROWSET &virtualRow)
 		vsmem += 2 * bcountary[i];
 	}
 
-	//delete[] bary;
 	delete[] bcountary;
 
 	return vsmem;

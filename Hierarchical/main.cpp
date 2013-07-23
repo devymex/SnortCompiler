@@ -46,21 +46,21 @@ void main(int nArgs, char **cArgs)
 
 		nExtraMem = (8 + 2 * Charset(CDfaSet[i]) + 2 * CDfaSet[i].GetFinalStates().CountDfaIds());
 
-		//std::ofstream fout("storesize.txt", std::ios::app);
-		//fout << i << '\t' << memSize << '\t' << nExtraMem << std::endl;
-		//fout.close();
-		std::ofstream fout("core.txt", std::ios::app);
-		fout << i << " :" << std::endl;
-		for (NODEARRAY_ITER j = vecVirtual.begin(); j != vecVirtual.end(); ++j)
-		{
-			for (ROWSET::iterator k = j->begin(); k != j->end(); ++k)
-			{
-				fout << (size_t)*k << "\t";
-			}
-			fout << std::endl;
-		}
-		fout << std::endl;
+		std::ofstream fout("storesize.txt", std::ios::app);
+		fout << i << '\t' << memSize << '\t' << nExtraMem << std::endl;
 		fout.close();
+		//std::ofstream fout("core.txt", std::ios::app);
+		//fout << i << " :" << std::endl;
+		//for (NODEARRAY_ITER j = vecVirtual.begin(); j != vecVirtual.end(); ++j)
+		//{
+		//	for (ROWSET::iterator k = j->begin(); k != j->end(); ++k)
+		//	{
+		//		fout << (size_t)*k << "\t";
+		//	}
+		//	fout << std::endl;
+		//}
+		//fout << std::endl;
+		//fout.close();
 	}
 
 	//std::cout << "核矩阵和状态跳转表大小：	" << g_TotalMem << " Byte" << std::endl;
