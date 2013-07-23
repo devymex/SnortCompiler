@@ -64,6 +64,7 @@ public:
 
 	// 返回所属簇的特征行引用
 	CDfaRow& getCurCluster(byte Cluster);
+	CDfa& GetCoreMatrix();
 
 	// 设置m_nDfaID
 	void SetDfaID(ulong ID);

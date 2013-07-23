@@ -21,3 +21,5 @@ void ExpandClusterOrder(ROWOBJ &obj, double eps, ushort minPts,byte *pProcessed,
 						ROWOBJ *allObjs, std::vector<std::vector<ushort>> &neighbors, std::vector<ushort> &orderObj);
 
 int OPTICS(CDfa &dfa, double *disMatrix, double eps, ushort minPts, DenCpressDfa &clusters);
+
+void ColMergeCompress(DenCpressDfa &cpressDfa, ulong colCnt, byte* colGroup, ulong &colNum, std::vector<CDfaRow> &FinalMatrix);

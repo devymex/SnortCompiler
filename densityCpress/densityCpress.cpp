@@ -83,6 +83,10 @@ void DenCpressDfa::Dump(char* file)
 	m_Cluster.Dump(file);
 }
 
+CDfa& DenCpressDfa::GetCoreMatrix()
+{
+	return m_Cluster;
+}
 //void DenCpressDfa::SetStaSize(ushort size)
 //{
 //	m_usRowSize = size;

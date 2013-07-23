@@ -27,12 +27,15 @@ size_t Charset(CDfa &dfa)
 
 void main()
 {
+	ulong sumBytes = 0;
+	ulong cnt = 0;
 	CGroupRes groupRes;
-	groupRes.ReadFromFile("..\\..\\output\\FinalResult2.cdt");
+	groupRes.ReadFromFile("..\\..\\output\\FinalResult.cdt");
 	CDfaArray &dfaary = groupRes.GetDfaTable();
 
 	for (ulong dfanum = 0; dfanum < dfaary.Size(); ++dfanum)
 	{
+		std::cout << dfanum << std::endl;
 		CDfa &dfa = dfaary[dfanum];
 		ulong dfasize = dfa.Size();
 		double *disMatrix = new double[dfasize * (dfasize - 1)/2];
@@ -41,13 +44,29 @@ void main()
 		DenCpressDfa cpressDfa(dfasize);
 	//	cpressDfa.SetStaSize(dfasize);
 	//	cpressDfa.InitRowDIf();
-		int cost, parCost;
+		int cost, parCost, cost1, cost2;
 		parCost = OPTICS(dfa, disMatrix, 0.5, 2, cpressDfa);
-		CFinalStates &finalSta = dfa.GetFinalStates();
-		cost = parCost + 8 + 2 * Charset(dfa) + dfa.GetGroupCount() * cpressDfa.Size() + 2 * finalSta.CountDfaIds();
 
-		size_t c1 = parCost + dfa.GetGroupCount() * cpressDfa.Size();
-		size_t c2 = 8 + 2 * Charset(dfa) + 2 * finalSta.CountDfaIds();
+		//½øÐÐÁÐÑ¹Ëõ
+		ulong colNum = 0;
+		byte colGroup[256] = {0};
+		ulong colCnt = dfa.GetGroupCount();
+		std::vector<CDfaRow> FinalMatrix;
+		ColMergeCompress(cpressDfa, colCnt, colGroup, colNum, FinalMatrix);
+
+		CFinalStates &finalSta = dfa.GetFinalStates();
+		cost1 = parCost + 8 + 2 * Charset(dfa) + dfa.GetGroupCount() * cpressDfa.Size() + 2 * finalSta.CountDfaIds();
+		cost2 = parCost + 8 + 2 * Charset(dfa) + colNum * cpressDfa.Size() + 2 * finalSta.CountDfaIds() + colCnt;
+		cost = cost1;
+		if(cost2 < cost1)
+		{
+			cost = cost2;
+			++cnt;
+		}
+		sumBytes += cost;
+
+		//size_t c1 = parCost + dfa.GetGroupCount() * cpressDfa.Size();
+		//size_t c2 = 8 + 2 * Charset(dfa) + 2 * finalSta.CountDfaIds();
 
 		//if (dfanum == 97)
 		//{
@@ -99,12 +118,18 @@ void main()
 		if (dfanum == 0)
 		{
 			ofs.open("..\\..\\output\\reduction.txt");
-			ofs << dfanum << " : " << c1 << "\t" << c2 << "\t" << cost << std::endl;
+			//ofs << dfanum << " : " << c1 << "\t" << c2 << "\t" << cost << std::endl;
+			ofs << dfanum << "\t" << cost << std::endl;
 		}
 		else
 		{
 			ofs.open("..\\..\\output\\reduction.txt", std::ofstream::app);
-			ofs << dfanum << " : " << c1 << "\t" << c2 << "\t" << cost << std::endl;
+			//ofs << dfanum << " : " << c1 << "\t" << c2 << "\t" << cost << std::endl;
+			ofs << dfanum << "\t" << cost << std::endl;
 		}
 	}
+
+	std::cout << sumBytes << std::endl;
+	std::cout << cnt << std::endl;
+	system("pause");
 }

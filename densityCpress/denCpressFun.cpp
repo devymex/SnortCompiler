@@ -307,3 +307,81 @@ int OPTICS(CDfa &dfa, double *disMatrix, double eps, ushort minPts, DenCpressDfa
 	++curdfa;
 	return cost;
 }
+
+
+
+struct COLUMNKEYHASH
+{
+	ulong operator()(const std::vector<STATEID> &ary)
+	{
+		const ulong _FNV_offset_basis = 2166136261U;
+		const ulong _FNV_prime = 16777619U;
+
+		ulong hash = _FNV_offset_basis;
+		for (std::vector<STATEID>::const_iterator i = ary.cbegin(); i != ary.cend(); ++i)
+		{
+			hash ^= *i;
+			hash *= _FNV_prime;
+		}
+		return hash;
+	}
+};
+
+bool operator == (const std::vector<STATEID> &key1, const std::vector<STATEID> &key2)
+{
+	if(key1.size() != key2.size())
+		return false;
+	for (int i = 0; i < key1.size(); i++)
+	{
+		if(key1[i] != key2[i])
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+
+void ColMergeCompress(DenCpressDfa &cpressDfa, ulong colCnt, byte* colGroup, ulong &colNum, std::vector<CDfaRow> &FinalMatrix)
+{
+	typedef std::unordered_map<std::vector<STATEID>, STATEID, COLUMNKEYHASH> STATESETHASH;
+	STATESETHASH ssh;
+
+	CDfa &CoreMatrix = cpressDfa.GetCoreMatrix();
+	ulong row = CoreMatrix.Size();
+	ulong col = colCnt;
+	std::vector<STATEID> key;
+	STATESETHASH::iterator p;
+	for(ulong j = 0; j < col; ++j)
+	{
+		for(ulong i = 0; i < row; ++i)
+		{
+			key.push_back(CoreMatrix[i][j]);
+		}
+		 p = ssh.find(key);
+		if(p == ssh.end())
+		{
+			ulong keyID = ssh.size();
+			ssh[key] = keyID;
+			colGroup[j] = keyID;	
+			++colNum;
+		}
+		else
+		{
+			colGroup[j] = p->second;
+		}
+		key.clear();
+	}
+	CDfaRow CDrow(ssh.size());
+	for(ulong i = 0; i < row; i++)
+	{
+		FinalMatrix.push_back(CDrow);
+	}
+	for(STATESETHASH::iterator q = ssh.begin(); q != ssh.end(); ++q)
+	{
+		for(ulong i = 0; i < row; ++i)
+		{
+			FinalMatrix[i][q->second] = q->first[i];
+		}
+	}
+}
