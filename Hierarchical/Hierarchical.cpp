@@ -354,9 +354,10 @@ size_t HierarchicalCluster(const CDfa &oneDfa, VECROWSET &vecRows, VECROWSET &ve
 		}
 
 		//计算划分后的DFA表存储空间
-		if (partRow1.size() >= 1 && partRow2.size() >= 1)
+		size_t partRowval = 0;
+		if (!partRow1.empty() && !partRow2.empty())
 		{
-			size_t partRowval = StatisticVitualCore(oneDfa, partRow1, virtualRow1)
+			partRowval = StatisticVitualCore(oneDfa, partRow1, virtualRow1)
 				+ StatisticVitualCore(oneDfa, partRow2, virtualRow1);
 		}
 
