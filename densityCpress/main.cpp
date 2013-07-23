@@ -68,28 +68,6 @@ void main()
 		//size_t c1 = parCost + dfa.GetGroupCount() * cpressDfa.Size();
 		//size_t c2 = 8 + 2 * Charset(dfa) + 2 * finalSta.CountDfaIds();
 
-		//if (dfanum == 97)
-		//{
-		//	std::cout << cpressDfa.Size() << std::endl;
-
-		//	size_t dif = 0;
-		//	for (size_t i = 0; i< dfa.Size(); ++i)
-		//	{
-		//		dif += cpressDfa.getDif(i).size();
-		//	}
-		//	std::cout << dif << std::endl;
-		//	
-		//	for (size_t i = 0; i < cpressDfa.Size(); ++i)
-		//	{
-		//		CDfaRow &row = cpressDfa.getCurCluster(i);
-		//		for (size_t j = 0; j < row.Size(); ++j)
-		//		{
-		//			std::cout << row[j] << " ";
-		//		}
-		//		std::cout << std::endl;
-		//	}
-		//}
-
 		std::ofstream ofscore;
 		if (dfanum == 0)
 		{
