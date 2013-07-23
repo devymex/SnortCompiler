@@ -4,7 +4,6 @@
 
 #define STATEMAX 500
 
-
 DFACOMPRESS void DfaCompress(CDfa &olddfa, ulong &sumBytes)
 {
 	ulong dfaSize = olddfa.Size();
@@ -14,13 +13,13 @@ DFACOMPRESS void DfaCompress(CDfa &olddfa, ulong &sumBytes)
 	std::fill(stateCluster, stateCluster + STATEMAX, STATEMAX);
 	ulong codeMap[STATEMAX] = {0};//对olddfa的状态进行重新编号
 	GetDfaCluster(olddfa, clusterVec, stateCluster, codeMap);
-
+	byte colGroup[256] = {0};
 	OutPutCluster(olddfa, clusterVec, stateCluster, codeMap);//输出簇
 
 	std::vector<CDfaRow> dfaMatrix, sparseMatrix, MatrixAfterRowMerge, FinalMatrix;//更新后的dfa矩阵和稀疏矩阵,无效元素用STATEMAX表示
 	std::vector<STATEID> base(dfaSize, 0);//里面如果有STATEID(-1),在存文件的时候会存成byte(-1),读入内存后展开成STATEID(-1)
 	std::vector<STATEID> rowGroup(dfaSize, 0);
-	byte colGroup[256] = {0};
+	
 	ulong colNum = 0;
 	ulong rowNum = 0;
 
@@ -31,10 +30,10 @@ DFACOMPRESS void DfaCompress(CDfa &olddfa, ulong &sumBytes)
 	//对dfaMatrix进行行合并压缩
 	RowMergeCompress(dfaMatrix, rowGroup, MatrixAfterRowMerge);
 	rowNum = MatrixAfterRowMerge.size();
-	//OutPutClusterFinalMatrix(dfaMatrix, rowGroup, FinalMatrix);  //输出行压缩后的DFA 映射关系
-
+	ulong nowCol = MatrixAfterRowMerge[0].Size();
+	OutPutClusterFinalMatrix(dfaMatrix, rowGroup, MatrixAfterRowMerge);  //输出行压缩后的DFA 映射关系
 	//对dfaMatrix进行列压缩
-	ColMergeCompress(olddfa, colGroup, colNum, FinalMatrix);
+	ColMergeCompress(MatrixAfterRowMerge, colGroup, colNum, FinalMatrix);
 
 
 	//对稀疏矩阵进行压缩，使用二维表存储
@@ -313,8 +312,74 @@ void RowMergeCompress(std::vector<CDfaRow> &dfaMatrix, std::vector<STATEID> &row
 
 
 //对MatrixAfterRowMerge进行列压缩
-void ColMergeCompress(CDfa &olddfa, byte* colGroup, ulong &colNum, std::vector<CDfaRow> &FinalMatrix)
+void ColMergeCompress( std::vector<CDfaRow> &MatrixAfterRowMerge, byte* colGroup, ulong &colNum, std::vector<CDfaRow> &FinalMatrix)
 {
+	typedef std::unordered_map<std::vector<STATEID>, STATEID, COLUMNKEYHASH> STATESETHASH;
+	STATESETHASH ssh;
+	ulong row = MatrixAfterRowMerge.size();
+	ulong col = MatrixAfterRowMerge[0].Size();
+	std::vector<STATEID> key;
+	STATESETHASH::iterator p;
+	for(ulong j = 0; j < col; ++j)
+	{
+		for(ulong i = 0; i < MatrixAfterRowMerge.size(); ++i)
+		{
+			key.push_back(MatrixAfterRowMerge[i][j]);
+		}
+		 p = ssh.find(key);
+		if(p == ssh.end())
+		{
+			ulong keyID = ssh.size();
+			ssh[key] = keyID;
+			colGroup[j] = keyID;	
+			++colNum;
+		}
+		else
+		{
+			colGroup[j] = p->second;
+		}
+		key.clear();
+	}
+	CDfaRow CDrow(ssh.size());
+	for(ulong i = 0; i < row; i++)
+	{
+		FinalMatrix.push_back(CDrow);
+	}
+	for(STATESETHASH::iterator q = ssh.begin(); q != ssh.end(); ++q)
+	{
+		for(ulong i = 0; i < row; ++i)
+		{
+			FinalMatrix[i][q->second] = q->first[i];
+		}
+	}
+}
+
+bool operator == (const std::vector<STATEID> &key1, const std::vector<STATEID> &key2)
+{
+	if(key1.size() != key2.size())
+		return false;
+	for (int i = 0; i < key1.size(); i++)
+	{
+		if(key1[i] != key2[i])
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+ulong CalcFNV(const std::vector<STATEID> &ary)
+{
+	const ulong _FNV_offset_basis = 2166136261U;
+	const ulong _FNV_prime = 16777619U;
+
+	ulong hash = _FNV_offset_basis;
+	for (std::vector<STATEID>::const_iterator i = ary.cbegin(); i != ary.cend(); ++i)
+	{
+		hash ^= *i;
+		hash *= _FNV_prime;
+	}
+	return hash;
 }
 
 void OutPutClusterFinalMatrix(std::vector<CDfaRow> &dfaMatrix, std::vector<STATEID> &rowGroup, 

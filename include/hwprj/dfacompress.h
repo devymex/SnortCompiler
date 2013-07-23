@@ -22,11 +22,19 @@ void UpdateMatrix(CDfa &olddfa, std::vector<CUnsignedArray> &clusterVec, ulong *
 void RowMergeCompress(std::vector<CDfaRow> &dfaMatrix, std::vector<STATEID> &rowGroup, 
 					   std::vector<CDfaRow> &MatrixAfterRowMerge);
 //对MatrixAfterRowMerge进行列压缩
-void ColMergeCompress(CDfa &olddfa, byte* colGroup, ulong &colNum, std::vector<CDfaRow> &FinalMatrix);
-
+void ColMergeCompress(std::vector<CDfaRow> &MatrixAfterRowMerge, byte* colGroup, ulong &colNum, std::vector<CDfaRow> &FinalMatrix);
 void OutPutCluster(CDfa &olddfa, std::vector<CUnsignedArray> &clusterVec, ulong *stateCluster, ulong *codeMap);//输出测试
 
 void OutputMatrix(std::vector<STATEID> &base, std::vector<CDfaRow> &dfaMatrix, std::vector<CDfaRow> &sparseMatrix);//输出提取base后的矩阵以及稀疏矩阵
 
 void OutPutClusterFinalMatrix(std::vector<CDfaRow> &dfaMatrix, std::vector<STATEID> &rowGroup, 
 					   std::vector<CDfaRow> &FinalMatrix);
+bool operator == (const std::vector<STATEID> &key1, const std::vector<STATEID> &key2);
+ulong CalcFNV(const std::vector<STATEID> &ary);//计算unordered_map中key所所对应的hash值
+struct COLUMNKEYHASH
+{
+	inline ulong operator ()(const std::vector<STATEID> &column)
+	{
+		return CalcFNV(column);
+	}
+};

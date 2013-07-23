@@ -2,7 +2,7 @@
 
 #include <vector>
 #include <algorithm>
-
+#include <unordered_map>
 #include <hwprj\dfa.h>
 #include <hwprj\dfa.h>
 #include <hwprj\unsary.h>
