@@ -101,6 +101,9 @@ void main(int nArgs, char **cArgs)
 	groupRes.ReadFromFile(cArgs[1]);
 	CDfaArray &CDfaSet = groupRes.GetDfaTable();
 
+	ulong sumBytes = 0;
+	ulong cnt = 0;
+
 	for (size_t i = 0; i < CDfaSet.Size(); ++i)
 	{
 		//ulong nExtraMem = 0;
@@ -137,6 +140,14 @@ void main(int nArgs, char **cArgs)
 
 		ColMergeCompress(vecCores, colCnt, colGroup, colNum, FinalMatrix);
 
+		size_t cost = memSize;
+		size_t cost2 = memSize  - CDfaSet[i].GetGroupCount() * vecCores.size() + colNum * vecCores.size();
+		if (cost > cost2)
+		{
+			cost = cost2;
+			++cnt;
+		}
+		sumBytes += cost;
 		//nExtraMem = (8 + 2 * Charset(CDfaSet[i]) + 2 * CDfaSet[i].GetFinalStates().CountDfaIds());
 
 		//std::ofstream fout("storesize2.txt", std::ios::app);
@@ -157,5 +168,7 @@ void main(int nArgs, char **cArgs)
 		//ofile.close();
 	}
 
+	std::cout << sumBytes << std::endl;
+	std::cout << cnt << std::endl;
 	system("pause");
 }
