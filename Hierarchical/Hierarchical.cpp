@@ -1,5 +1,7 @@
 #include "Hierarchical.h"
 
+size_t maxVal = 0;
+
 ////由DFA表中的行集建无向图，每一行代表图中的一个结点，边的权值为DFA表中两行中相同元素占的比率
 //void BuildGraph(const CDfa &oneDfa, const ROWSET &rows, GRAPH &graph)
 //{
@@ -537,6 +539,31 @@
 //	}
 //}
 
+//将DFA字符映射表展开至256列
+void UnflodDFA(CDfa &flodDfa, CDfa &unflodDfa)
+{
+	BYTE group[SC_DFACOLCNT];
+	for (int i = 0; i < SC_DFACOLCNT; ++i)
+	{
+		group[i] = (BYTE)i;
+	}
+	unflodDfa.SetGroups(group);
+
+	unflodDfa.Resize(flodDfa.Size(), SC_DFACOLCNT);
+	for (ULONG i = 0; i < flodDfa.Size(); ++i)
+	{
+		for (ULONG j = 0; j < SC_DFACOLCNT; ++j)
+		{
+			BYTE z = flodDfa.Char2Group((BYTE)j);
+			unflodDfa[i][j] = flodDfa[i][z];
+		}
+	}
+
+	unflodDfa.SetId(flodDfa.GetId());
+	unflodDfa.SetStartState(flodDfa.GetStartState());
+	unflodDfa.GetFinalStates() = flodDfa.GetFinalStates();
+}
+
 
 //由DFA表中的行集建无向图，每一行代表图中的一个结点，边的权值为DFA表中两行中相同元素占的比率
 void BuildGraph(const CDfa &oneDfa, GRAPH &graph, ROWSET &weightArg)
@@ -658,22 +685,22 @@ void StatisticVitualCore(const CDfa &oneDfa, const ROWSET &rs, ROWSET &virtualRo
 }
 
 //计算存储空间,每次一行
-size_t CalculateMemory(const CDfa &oneDFA, const ROWSET &core, const ROWSET &row)
+size_t CalculateMemory(const CDfa &oneDFA, const ROWSET &core, const ROWSET &row, ROWSET &bCntary)
 {
 	size_t n_size = row.size();
-	size_t n_dfacol = oneDFA.GetGroupCount();
+	size_t n_dfacol = oneDFA.GetGroupCount(); //dfa列
 
-	size_t *bcountary = new size_t[n_size]; //存储跳转状态不同的个数
-	std::fill(bcountary, bcountary + n_size, 0);
+	bCntary.resize(n_size);
+	std::fill(bCntary.begin(), bCntary.end(), 0);
 
-	for (size_t col = 0; col < n_dfacol; col++) //dfa列
+	for (size_t col = 0; col < n_dfacol; col++) 
 	{
 		for (size_t i = 0; i < n_size; i++)   //存储跳转状态不同的个数
 		{
 			size_t bt = oneDFA[(STATEID)(row[i])][col];
 			if (core[col] != bt)
 			{
-				bcountary[i]++;
+				bCntary[i]++;
 			}
 		}
 	}
@@ -682,13 +709,13 @@ size_t CalculateMemory(const CDfa &oneDFA, const ROWSET &core, const ROWSET &row
 	size_t vsmem = n_size + n_dfacol;
 	for(size_t i = 0; i < n_size; i++)
 	{
-		vsmem += 2 * bcountary[i];
+		vsmem += 2 * bCntary[i];
 	}
 
-	delete[] bcountary;
 	return vsmem;
 }
 
+//根据不同权值划分图，若划分后的存储空间小于划分前，则进行划分，并限制“特殊跳转”个数 < 8
 void SplitGraph(CDfa &oneDFA, GRAPH &graph, ROWSET &weightArg, std::vector<BLOCK> &blocks)
 {
 	for (std::vector<BLOCK>::iterator i = blocks.begin(); i != blocks.end(); )
@@ -696,23 +723,47 @@ void SplitGraph(CDfa &oneDFA, GRAPH &graph, ROWSET &weightArg, std::vector<BLOCK
 		if (i->weightIdx < weightArg.size())
 		{
 			ROWSET curCore;
+			ROWSET bCntary;
 			StatisticVitualCore(oneDFA, i->nodes, curCore);
-			size_t curMem = CalculateMemory(oneDFA, curCore, i->nodes);
+			//计算当前图的存储空间
+			size_t curMem = CalculateMemory(oneDFA, curCore, i->nodes, bCntary);
 
+			//划分子图，partRows中保存与子图对应的状态集合
 			VECROWSET partRows;
 			SearchConnectSubgraph(graph, i->nodes, weightArg[i->weightIdx], partRows);
 
+			//计算所有划分子图的存储空间
 			size_t partMem = 0;
+			VECROWSET partCnt;
 			for (NODEARRAY_ITER j = partRows.begin(); j != partRows.end() && !j->empty(); ++j)
 			{
 				ROWSET partCore;
+				partCnt.push_back(ROWSET());
 				StatisticVitualCore(oneDFA, *j, partCore);
-				partMem += CalculateMemory(oneDFA, partCore, *j);
+				partMem += CalculateMemory(oneDFA, partCore, *j, partCnt.back());
 			}
 
+			//获取下一个用于划分子图的权值
 			++i->weightIdx;
 
-			if (curMem > partMem)
+			//统计划分子图中“特殊跳转”的最大个数
+			size_t partMax = 0;
+			for (NODEARRAY_ITER j = partCnt.begin(); j != partCnt.end(); ++j)
+			{
+				size_t tmp = *(std::max_element(j->begin(),j->end()));
+				if (partMax < tmp)
+				{
+					partMax = tmp;
+				}
+			}
+
+			//统计当前图中“特殊跳转”的最大个数
+			size_t curMax = *(std::max_element(bCntary.begin(),bCntary.end()));
+
+			//判断条件：当划分的存储空间比当前存储空间小，
+			//或者划分的“特殊跳转”个数比当前的个数少且少于8个，则进行划分
+			if (curMem > partMem ||
+				(curMax > partMax && curMax >= 8))
 			{
 				std::vector<BLOCK> partBlocks;
 				for (NODEARRAY_ITER j = partRows.begin(); j != partRows.end(); ++j)
@@ -730,11 +781,13 @@ void SplitGraph(CDfa &oneDFA, GRAPH &graph, ROWSET &weightArg, std::vector<BLOCK
 		}
 		else
 		{
+			//直到每一个划分都遍历完所有的权值，再进行下一个子图的划分
 			++i;
 		}
 	}
 }
 
+//计算跳转表和核矩阵存储空间大小
 size_t StatisticMemory(const CDfa &oneDFA, const std::vector<BLOCK> &blocks, VECROWSET &vecCore)
 {
 	size_t nOneMem = 0;
@@ -743,7 +796,21 @@ size_t StatisticMemory(const CDfa &oneDFA, const std::vector<BLOCK> &blocks, VEC
 	{
 		vecCore.push_back(ROWSET());
 		StatisticVitualCore(oneDFA, i->nodes, vecCore.back());
-		nOneMem += CalculateMemory(oneDFA, vecCore.back(), i->nodes);
+		
+		//用于存储每个状态“特殊跳转”的个数
+		VECROWSET vecCnt;
+		vecCnt.push_back(ROWSET());
+		nOneMem += CalculateMemory(oneDFA, vecCore.back(), i->nodes, vecCnt.back());
+		
+		//for (ROWSET::iterator i = vecCnt.back().begin(); i != vecCnt.back().end(); ++i)
+		//{
+		//	maxVal += *i;
+		//}
+		//size_t maxTmp = *(std::max_element(vecCnt.back().begin(), vecCnt.back().end()));
+		//if (max > maxVal)
+		//{
+		//	maxVal = max;
+		//}
 	}
 
 	return nOneMem;

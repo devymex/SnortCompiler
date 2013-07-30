@@ -1,5 +1,6 @@
 #include "Hierarchical.h"
 
+//非默认字符个数
 size_t Charset(CDfa &dfa)
 {
 	std::map<byte, size_t> mapCharset;
@@ -51,7 +52,7 @@ bool operator == (const std::vector<STATEID> &key1, const std::vector<STATEID> &
 	return true;
 }
 
-
+//核矩阵列字符集压缩
 void ColMergeCompress(VECROWSET &vecCores, ulong colCnt, byte* colGroup, ulong &colNum, std::vector<CDfaRow> &FinalMatrix)
 {
 	typedef std::unordered_map<std::vector<STATEID>, STATEID, COLUMNKEYHASH> STATESETHASH;
@@ -95,66 +96,97 @@ void ColMergeCompress(VECROWSET &vecCores, ulong colCnt, byte* colGroup, ulong &
 	}
 }
 
+void Hierarchical(CDfa &dfa, ulong &memSize, VECROWSET &coreMatrix)
+{
+	ROWSET rows;
+	for (size_t j = 0; j <dfa.Size(); ++j)
+	{
+		rows.push_back(j);
+	}
+
+	GRAPH graph;
+	ROWSET weightArg;
+	BuildGraph(dfa, graph, weightArg);
+
+	std::vector<BLOCK> blocks;
+	blocks.push_back(BLOCK());
+	blocks.back().weightIdx = 0;
+	blocks.back().nodes = rows;
+	SplitGraph(dfa, graph, weightArg, blocks);
+
+	memSize = StatisticMemory(dfa, blocks, coreMatrix);
+}
+
 void main(int nArgs, char **cArgs)
 {
 	CGroupRes groupRes;
 	groupRes.ReadFromFile(cArgs[1]);
 	CDfaArray &CDfaSet = groupRes.GetDfaTable();
 
+	//核矩阵列映射后，跳转表与核矩阵的存储空间之和
 	ulong sumBytes = 0;
+	//能够进行列压缩的组数
 	ulong cnt = 0;
+	//字符集映射表大小
+	ulong charBytes = 0;
+	//跳转表大小
+	ulong skiptblBytes = 0;
+	//核心矩阵大小
+	ulong coreBytes = 0;
+	//终态集合大小
+	ulong finalBytes = 0;
 
 	for (size_t i = 0; i < CDfaSet.Size(); ++i)
 	{
-		//ulong nExtraMem = 0;
+		ulong nExtraMem = 0;
 		std::cout << i << std::endl;
-		ROWSET rows;
-		for (size_t j = 0; j < CDfaSet[i].Size(); ++j)
-		{
-			rows.push_back(j);
-		}
 
-		GRAPH graph;
-		ROWSET weightArg;
-		BuildGraph(CDfaSet[i], graph, weightArg);
+		////展开DFA为256列
+		//CDfa unflodDfa;
+		//UnflodDFA(CDfaSet[i],unflodDfa);
 
-		std::vector<BLOCK> blocks;
-		blocks.push_back(BLOCK());
-		blocks.back().weightIdx = 0;
-		blocks.back().nodes = rows;
-		SplitGraph(CDfaSet[i], graph, weightArg, blocks);
+		ulong memSize;
+		VECROWSET coreMatrix;
+		//层次聚类方法，输入一个DFA，给出压缩后跳转表和核矩阵的存储空间大小以及核矩阵内容
+		Hierarchical(CDfaSet[i], memSize, coreMatrix);
 
 		//VECROWSET vecRows;
 		//SearchConnectSubgraph(graph, vecRows);
-
 		//VECROWSET vecVirtual;
 		//size_t memSize = HierarchicalCluster(CDfaSet[i], vecRows, vecVirtual);
 
-		VECROWSET vecCores;
-		size_t memSize = StatisticMemory(CDfaSet[i], blocks, vecCores);
+		//skiptblBytes += (memSize - CDfaSet[i].GetGroupCount() * coreMatrix.size());
+		//coreBytes += CDfaSet[i].GetGroupCount() * coreMatrix.size();
+		//finalBytes += 2 * CDfaSet[i].GetFinalStates().CountDfaIds();
+		//charBytes += 2 * Charset(CDfaSet[i]);
 
-		ulong colNum = 0;
-		byte colGroup[256] = {0};
-		ulong colCnt = CDfaSet[i].GetGroupCount();
-		std::vector<CDfaRow> FinalMatrix;
+		//ulong colNum = 0;
+		//byte colGroup[256] = {0};
+		//ulong colCnt = unflodDfa.GetGroupCount();
+		//std::vector<CDfaRow> FinalMatrix;
+		////核矩阵列压缩
+		//ColMergeCompress(coreMatrix, colCnt, colGroup, colNum, FinalMatrix);
 
-		ColMergeCompress(vecCores, colCnt, colGroup, colNum, FinalMatrix);
+		////核矩阵列压缩后存储的空间大小
+		//size_t cost = memSize;
+		//size_t cost2 = memSize - unflodDfa.GetGroupCount() * coreMatrix.size() + colNum * coreMatrix.size();
+		//if (cost > cost2)
+		//{
+		//	cost = cost2;
+		//	++cnt;
+		//}
+		//sumBytes += cost;
 
-		size_t cost = memSize;
-		size_t cost2 = memSize  - CDfaSet[i].GetGroupCount() * vecCores.size() + colNum * vecCores.size();
-		if (cost > cost2)
-		{
-			cost = cost2;
-			++cnt;
-		}
-		sumBytes += cost;
-		//nExtraMem = (8 + 2 * Charset(CDfaSet[i]) + 2 * CDfaSet[i].GetFinalStates().CountDfaIds());
+		////额外的存储空间大小，包括8个字节固定相关信息，字符集大小（不包括列映射大小），终态集大小
+		//nExtraMem = 8 + 2 * Charset(CDfaSet[i]) + 2 * CDfaSet[i].GetFinalStates().CountDfaIds();
 
-		//std::ofstream fout("storesize2.txt", std::ios::app);
-		//fout << i << '\t' << memSize << '\t' << nExtraMem << std::endl;
+		////输出存储空间相关信息
+		//std::ofstream fout("storesize.txt", std::ios::app);
+		//fout << i << '\t' << memSize << std::endl;
 		//fout.close();
 
-		//std::ofstream ofile("core2.txt", std::ios::app);
+		////输出核矩阵相关信息
+		//std::ofstream ofile("core.txt", std::ios::app);
 		//ofile << i << " :" << std::endl;
 		//for (NODEARRAY_ITER j = vecCores.begin(); j != vecCores.end(); ++j)
 		//{
@@ -168,7 +200,13 @@ void main(int nArgs, char **cArgs)
 		//ofile.close();
 	}
 
-	std::cout << sumBytes << std::endl;
-	std::cout << cnt << std::endl;
+	//std::cout << sumBytes << std::endl;
+	//std::cout << cnt << std::endl;
+	//std::cout << charBytes << std::endl;
+	//std::cout << skiptblBytes << std::endl;
+	//std::cout << coreBytes << std::endl;
+	//std::cout << finalBytes << std::endl;
+	//std::cout << maxVal << std::endl;
+
 	system("pause");
 }

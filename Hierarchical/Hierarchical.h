@@ -24,6 +24,8 @@ struct BLOCK
 	std::vector<size_t> nodes;
 };
 
+extern size_t maxVal;
+
 ////建图
 //void BuildGraph(const CDfa &oneDfa, const ROWSET &rows, GRAPH &graph);
 //
@@ -35,6 +37,9 @@ struct BLOCK
 //
 ////层次聚类算法
 //size_t HierarchicalCluster(const CDfa &oneDfa, VECROWSET &vecRows, VECROWSET &vecVirtual);
+
+//展开DFA
+void UnflodDFA(CDfa &flodDfa, CDfa &unflodDfa);
 
 //建无向图
 void BuildGraph(const CDfa &oneDfa, GRAPH &graph, ROWSET &weightArg);
