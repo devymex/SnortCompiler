@@ -5,11 +5,11 @@
 void CreateNewMap(CDfa &CharMapDfa, CDfa &NewChMapDfa, std::vector<std::map<size_t, size_t>> &mapv)
 {
 	std::map<size_t,size_t>::iterator iter;
-
 	for (ulong i = 0; i < CharMapDfa.Size(); ++i)
 	{
 		std::map<size_t,size_t> m;
-		size_t cnt = 0;		
+		size_t cnt = 0;	
+
 		for (ulong j = 0; j < SC_DFACOLCNT; ++j)
 		{
 			BYTE z = CharMapDfa.Char2Group((BYTE)j);
@@ -21,6 +21,7 @@ void CreateNewMap(CDfa &CharMapDfa, CDfa &NewChMapDfa, std::vector<std::map<size
 			}			
 			NewChMapDfa[i][z] = cnt;
 		}
+
 		mapv.push_back(m);
 		m.erase(m.begin(), m.end());
 	}
@@ -183,6 +184,7 @@ void main(int nArgs, char **cArgs)
 	//终态集合大小
 	ulong finalBytes = 0;
 
+	
 	for (size_t i = 0; i < CDfaSet.Size(); ++i)
 	{
 		ulong nExtraMem = 0;
@@ -246,6 +248,8 @@ void main(int nArgs, char **cArgs)
 		//ofile << std::endl;
 		//ofile.close();
 	}
+
+	
 
 	//std::cout << sumBytes << std::endl;
 	//std::cout << cnt << std::endl;
