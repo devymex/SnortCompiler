@@ -117,6 +117,21 @@ void Hierarchical(CDfa &dfa, ulong &memSize, VECROWSET &coreMatrix)
 	memSize = StatisticMemory(dfa, blocks, coreMatrix);
 }
 
+void SortCharset(VECROWSET &allCharset, size_t threshold)
+{
+	VECROWSET lastCharset;
+	for (NODEARRAY_ITER i = allCharset.begin(); i != allCharset.end(); ++i)
+	{
+		lastCharset.push_back(ROWSET());
+		lastCharset.back().assign(i->begin() + threshold, i->end());
+	}
+
+	std::sort(lastCharset.begin(), lastCharset.end());
+	lastCharset.erase(std::unique(lastCharset.begin(), lastCharset.end()), lastCharset.end());
+
+	std::cout << lastCharset.size() << std::endl;
+}
+
 void main(int nArgs, char **cArgs)
 {
 	CGroupRes groupRes;
@@ -136,10 +151,18 @@ void main(int nArgs, char **cArgs)
 	//终态集合大小
 	ulong finalBytes = 0;
 
+	ulong maxCost = 0;
+	VECROWSET allCharset;
 	for (size_t i = 0; i < CDfaSet.Size(); ++i)
 	{
-		ulong nExtraMem = 0;
+		//ulong nExtraMem = 0;
 		std::cout << i << std::endl;
+
+		//allCharset.push_back(ROWSET());
+		//for (size_t j = 0; j < SC_DFACOLCNT; ++j)
+		//{
+		//	allCharset.back().push_back(size_t(CDfaSet[i].Char2Group(j)));
+		//}
 
 		////展开DFA为256列
 		//CDfa unflodDfa;
@@ -149,6 +172,12 @@ void main(int nArgs, char **cArgs)
 		VECROWSET coreMatrix;
 		//层次聚类方法，输入一个DFA，给出压缩后跳转表和核矩阵的存储空间大小以及核矩阵内容
 		Hierarchical(CDfaSet[i], memSize, coreMatrix);
+
+		ulong cost = memSize - CDfaSet[i].GetGroupCount() * coreMatrix.size();
+		if (maxCost < cost)
+		{
+			maxCost = cost;
+		}
 
 		//VECROWSET vecRows;
 		//SearchConnectSubgraph(graph, vecRows);
@@ -199,7 +228,7 @@ void main(int nArgs, char **cArgs)
 		//ofile << std::endl;
 		//ofile.close();
 	}
-
+	//SortCharset(allCharset, 96);
 	//std::cout << sumBytes << std::endl;
 	//std::cout << cnt << std::endl;
 	//std::cout << charBytes << std::endl;
@@ -207,6 +236,6 @@ void main(int nArgs, char **cArgs)
 	//std::cout << coreBytes << std::endl;
 	//std::cout << finalBytes << std::endl;
 	//std::cout << maxVal << std::endl;
-
+	std::cout << maxCost << std::endl;
 	system("pause");
 }
