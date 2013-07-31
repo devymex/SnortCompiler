@@ -1,5 +1,52 @@
 #include "Hierarchical.h"
 
+
+//建立新的映射
+void CreateNewMap(CDfa &CharMapDfa, CDfa &NewChMapDfa, std::vector<std::map<size_t, size_t>> &mapv)
+{
+	std::map<size_t,size_t>::iterator iter;
+
+	for (ulong i = 0; i < CharMapDfa.Size(); ++i)
+	{
+		std::map<size_t,size_t> m;
+		size_t cnt = 0;		
+		for (ulong j = 0; j < SC_DFACOLCNT; ++j)
+		{
+			BYTE z = CharMapDfa.Char2Group((BYTE)j);
+			iter = m.find(CharMapDfa[i][z]);
+			if (iter == m.end())
+			{
+				m.insert(std::map<size_t, size_t>::value_type(CharMapDfa[i][z], cnt));
+				cnt++;
+			}			
+			NewChMapDfa[i][z] = cnt;
+		}
+		mapv.push_back(m);
+		m.erase(m.begin(), m.end());
+	}
+}
+
+//根据新的映射调整DFA表的列
+void AdjustDfa(CDfaArray &DfaArr, std::vector<std::map<size_t, size_t>> &mapv)
+{
+	CDfaArray tempArr = DfaArr;
+	std::map<size_t,size_t>::iterator iter;
+	for (size_t i = 0; i < DfaArr.Size(); ++i)
+	{
+		for (std::map<size_t, size_t>::iterator itr = mapv[i].begin(); itr != mapv[i].end(); ++itr)
+		{
+			size_t preCol = itr->first;
+			size_t sufCol = itr->second;
+			for (size_t j = 0; j < DfaArr[i].Size(); ++j)
+			{
+				tempArr[i][j][sufCol] = DfaArr[i][j][preCol];
+			}
+		}
+	}
+	DfaArr = tempArr;
+}
+
+
 //非默认字符个数
 size_t Charset(CDfa &dfa)
 {
@@ -17,7 +64,7 @@ size_t Charset(CDfa &dfa)
 			max = i->second;
 		}
 	}
-	
+
 	return (256 - max);
 }
 
@@ -68,7 +115,7 @@ void ColMergeCompress(VECROWSET &vecCores, ulong colCnt, byte* colGroup, ulong &
 		{
 			key.push_back(vecCores[i][j]);
 		}
-		 p = ssh.find(key);
+		p = ssh.find(key);
 		if(p == ssh.end())
 		{
 			ulong keyID = ssh.size();
