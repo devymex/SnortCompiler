@@ -2,26 +2,27 @@
 
 
 //建立新的映射
-void CreateNewMap(CDfa &CharMapDfa, CDfa &NewChMapDfa, std::vector<std::map<size_t, size_t>> &mapv)
+void CreateNewMap(VECROWSET &allCharset, VECROWSET &newCharset, std::vector<std::map<size_t, size_t>> &mapv)
 {
-	std::map<size_t,size_t>::iterator iter;
-	for (ulong i = 0; i < CharMapDfa.Size(); ++i)
-	{
-		std::map<size_t,size_t> m;
-		size_t cnt = 0;	
 
-		for (ulong j = 0; j < SC_DFACOLCNT; ++j)
+	std::map<size_t,size_t>::iterator iter;
+	for (ulong i = 0; i < allCharset.size(); ++i)
+	{
+		std::map<size_t, size_t> m;
+		size_t cnt = 0;	
+		for (ulong j = allCharset[i].size() - 1; j != 0; --j)
 		{
-			BYTE z = CharMapDfa.Char2Group((BYTE)j);
-			iter = m.find(CharMapDfa[i][z]);
+			iter = m.find(allCharset[i][j]);
 			if (iter == m.end())
 			{
-				m.insert(std::map<size_t, size_t>::value_type(CharMapDfa[i][z], cnt));
+				m.insert(std::map<size_t, size_t>::value_type(allCharset[i][j], cnt));
+				newCharset[i][j] = cnt;
 				cnt++;
+			}else 
+			{
+				newCharset[i][j] = iter->second;
 			}			
-			NewChMapDfa[i][z] = cnt;
-		}
-
+		}			
 		mapv.push_back(m);
 		m.erase(m.begin(), m.end());
 	}
@@ -34,14 +35,25 @@ void AdjustDfa(CDfaArray &DfaArr, std::vector<std::map<size_t, size_t>> &mapv)
 	std::map<size_t,size_t>::iterator iter;
 	for (size_t i = 0; i < DfaArr.Size(); ++i)
 	{
-		for (std::map<size_t, size_t>::iterator itr = mapv[i].begin(); itr != mapv[i].end(); ++itr)
+		std::map<size_t, size_t> m = mapv[i];
+	
+		for (size_t j = 0; j < DfaArr[i].GetGroupCount(); ++j)
 		{
-			size_t preCol = itr->first;
-			size_t sufCol = itr->second;
-			for (size_t j = 0; j < DfaArr[i].Size(); ++j)
+			std::map<size_t,size_t>::iterator iter;
+			iter = m.find(DfaArr[i].Char2Group(j));
+			if (iter != m.end())
 			{
-				tempArr[i][j][sufCol] = DfaArr[i][j][preCol];
+				size_t preCol = iter->first;
+				size_t sufCol = iter->second;
+				if (preCol <  DfaArr[i].GetGroupCount() && sufCol < DfaArr[i].GetGroupCount())
+				{
+					for (size_t k = 0; k < DfaArr[i].Size(); ++k)
+					{
+						tempArr[i][k][sufCol] = DfaArr[i][k][preCol];
+					}
+				}
 			}
+
 		}
 	}
 	DfaArr = tempArr;
@@ -199,33 +211,28 @@ void main(int nArgs, char **cArgs)
 	//终态集合大小
 	ulong finalBytes = 0;
 
-	
+
 	VECROWSET allCharset;
 	for (size_t i = 0; i < CDfaSet.Size(); ++i)
 	{
 		//ulong nExtraMem = 0;
 		std::cout << i << std::endl;
 
-		//allCharset.push_back(ROWSET());
-		//for (size_t j = 0; j < SC_DFACOLCNT; ++j)
-		//{
-		//	allCharset.back().push_back(size_t(CDfaSet[i].Char2Group(j)));
-		//}
+		allCharset.push_back(ROWSET());
+		for (size_t j = 0; j < SC_DFACOLCNT; ++j)
+		{
+			allCharset.back().push_back(size_t(CDfaSet[i].Char2Group(j)));
+		}
 
 		////展开DFA为256列
 		//CDfa unflodDfa;
 		//UnflodDFA(CDfaSet[i],unflodDfa);
 
-		ulong memSize;
-		VECROWSET coreMatrix;
-		//层次聚类方法，输入一个DFA，给出压缩后跳转表和核矩阵的存储空间大小以及核矩阵内容
-		Hierarchical(CDfaSet[i], memSize, coreMatrix);
+		//ulong memSize;
+		//VECROWSET coreMatrix;
+		////层次聚类方法，输入一个DFA，给出压缩后跳转表和核矩阵的存储空间大小以及核矩阵内容
+		//Hierarchical(CDfaSet[i], memSize, coreMatrix);
 
-		ulong cost = memSize - CDfaSet[i].GetGroupCount() * coreMatrix.size();
-		if (maxCost < cost)
-		{
-			maxCost = cost;
-		}
 
 		//VECROWSET vecRows;
 		//SearchConnectSubgraph(graph, vecRows);
@@ -276,8 +283,56 @@ void main(int nArgs, char **cArgs)
 		//ofile << std::endl;
 		//ofile.close();
 	}
-	//SortCharset(allCharset, 96);
-	
+
+	std::ofstream fout1("op1.txt");
+	std::ofstream fout2("op2.txt");
+	SortCharset(allCharset, 96);
+	VECROWSET newCharset = allCharset;
+	std::vector<std::map<size_t, size_t>> mapv;
+	fout1 << "原字符映射表:" << std::endl; 
+	for (ulong i = 0; i < 1; i++)
+	{
+		for (ulong j = 0; j < allCharset[i].size(); j++)
+		{
+			fout1 << allCharset[i][j] << "\t";
+		}
+		fout1 << std::endl;
+	}
+
+	fout1 << "原来的DFA:" << std::endl;
+	for (ulong i = 0; i < 1; ++i)
+	{
+		for(ulong j = 0; j < CDfaSet[i].Size(); ++j)
+		{
+			for(ulong k = 0; k < CDfaSet[i][j].Size(); ++k)
+				fout1 << CDfaSet[i][j][k] << "\t" ;
+			fout1 << std::endl;
+		}
+
+	}
+	CreateNewMap(allCharset, newCharset, mapv);	
+	AdjustDfa(CDfaSet, mapv);
+
+	fout2 << "新字符映射表:" << std::endl;
+	for (ulong i = 0; i < 1; i++)
+	{
+		for (ulong j = 0; j < newCharset[i].size(); j++)
+		{
+			fout2 << newCharset[i][j] << "\t" ;
+		}
+		fout2 << std::endl;
+	}
+	fout2 << "DFA列修改之后：" << std::endl;
+	for (ulong i = 0; i < 1; ++i)
+	{
+		for(ulong j = 0; j < CDfaSet[i].Size(); ++j)
+		{
+			for(ulong k = 0; k < CDfaSet[i][j].Size(); ++k)
+				fout2 << CDfaSet[i][j][k] << "\t";
+			fout2 << std::endl;
+		}
+
+	}
 	//std::cout << sumBytes << std::endl;
 	//std::cout << cnt << std::endl;
 	//std::cout << charBytes << std::endl;
@@ -285,6 +340,5 @@ void main(int nArgs, char **cArgs)
 	//std::cout << coreBytes << std::endl;
 	//std::cout << finalBytes << std::endl;
 	//std::cout << maxVal << std::endl;
-	std::cout << maxCost << std::endl;
 	system("pause");
 }
