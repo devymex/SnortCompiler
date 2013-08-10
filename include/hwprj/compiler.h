@@ -90,3 +90,73 @@ COMPILERHDR void CodeToNFA(const CByteArray &pcResult, bool bFromBeg, CNfa &nfa)
 /*!
 @}
 */
+
+
+
+
+/// @brief		2013.8.8，分两遍处理正则表达式的算法
+
+#define INTER			0
+#define UNION			1 
+#define OVER			2
+#define CHARTONUM		48
+
+typedef struct {
+	/// @brief		构造一个NODE对象
+	void Init(ulong size, std::string str = null)
+	{
+		regex.clear();
+		regex = str;
+		pChar = new char[size];
+		isMeta = new bool[size];
+		deepth = new ulong[size];
+		deep = 0;
+	}
+
+	/// @brief		正则表达式字符串
+	std::string regex;
+
+	/// @brief		正则表达式字符串的每一个字符依次放入
+	char *pChar;  
+
+	/// @brief		判断对应字符是否为元字符，普通字符为0， 元字符为1
+	bool *isMeta;   
+
+	/// @brief		记录对应字符深度
+	ulong *deepth; 
+
+	/// @brief		记录当前字符深度
+	ulong deep;
+
+}NODE;
+
+/// @brief		将一个正则表达式初始化成一个NODE对象
+COMPILERHDR void InitNode(std::string &fstr, NODE &fnode);  
+
+/// @brief		如果正则表达式中有深度为0的"|"，则从该位置分成两组
+COMPILERHDR void splitNodeOr( NODE &rnode, ulong divide, std::vector<NODE> &rGroup);
+
+/// @brief		如果正则表达式有深度为0的"*"、"?"字符，则从该位置分成两个
+COMPILERHDR void splitNodeStar( NODE &rnode, ulong divide, std::vector<NODE> &rGroup);
+
+/// @brief		如果正则表达式有深度为0的"+"字符，则从该位置分成两个
+COMPILERHDR void splitNodePlus( NODE &rnode, ulong divide, std::vector<NODE> &rGroup ); 
+
+/// @brief		如果正则表达式有深度为0的"{"和"}"字符，则从该位置分成两个
+COMPILERHDR void splitNodeBrace( NODE &rnode, ulong divide, std::vector<NODE> &rGroup );
+
+/// @brief		如果将正则表达式中有深度为1的小括号且对应的小括号中有深度为1的"|"，则将其从"|"处分成两个
+COMPILERHDR void splitNodeBraket( NODE &rnode, ulong divide, std::vector<NODE> &rGroup );
+
+/// @brief		遍历正则表达式，进行分裂操作
+COMPILERHDR ulong split( NODE &fnode, std::vector<NODE> &resultGroup);
+
+/// @brief		对两组Signatures求交集
+COMPILERHDR CUnsignedArray InterOp(CUnsignedArray &r1, CUnsignedArray &r2);
+
+/// @brief		对两组Signatures求并集
+COMPILERHDR CUnsignedArray UnionOp(CUnsignedArray &r1, CUnsignedArray &r2);
+
+/// @brief		对一个初始化成NODE对象的字符串递归的提取Signatures
+COMPILERHDR CUnsignedArray ExtrSig(NODE nodeOrigin);
+

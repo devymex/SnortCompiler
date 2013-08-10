@@ -170,7 +170,7 @@ COMPILERHDR void ExtractSequence(const CByteArray &pcResult,
 
 			str.Clear();
 			str.PushBack(pcResult[cur + 1]);
-			
+
 			cur = cur + Steps[curCode];
 			curCode = pcResult[cur];
 			break;
@@ -296,3 +296,512 @@ COMPILERHDR void CodeToNFA(const CByteArray &pcResult, bool bFromBeg, CNfa &nfa)
 
 	ProcessPcre(Beg, End, nfa);
 }
+
+
+
+
+// 2013.8.8
+
+/// @brief		将一个正则表达式初始化成一个NODE对象
+COMPILERHDR void InitNode(std::string &fstr, NODE &fnode)       
+{
+	fnode.Init(fstr.size(), fstr);
+
+	for (ulong idx = 0; idx != fstr.size(); )
+	{
+
+		/// @brief		遇到转义字符"\"则将后边的所有字符按普通字符处理
+		if ('\\' == fstr[idx])
+		{
+			fnode.pChar[idx] =  fstr[idx];
+			fnode.isMeta[idx] = false;
+			fnode.deepth[idx] = fnode.deep;
+			++idx;
+			fnode.pChar[idx] =  fstr[idx];
+			fnode.isMeta[idx] = false;
+			fnode.deepth[idx] = fnode.deep;
+			++idx;
+		}
+		/// @brief		遇到以下字符按元字符处理
+		else if ( '+' == fstr[idx] || '*' == fstr[idx] || '?' == fstr[idx]  || '{' == fstr[idx] || '}' == fstr[idx] || '|' == fstr[idx])
+		{
+			fnode.pChar[idx] = fstr[idx];
+			fnode.isMeta[idx] = true;
+			fnode.deepth[idx] = fnode.deep;
+			++idx;
+		}
+		/// @brief		遇到"("按元字符处理，并且深度加1
+		else if( '(' == fstr[idx] )
+		{
+			++fnode.deep;
+			fnode.pChar[idx] = fstr[idx];
+			fnode.isMeta[idx] = true;
+			fnode.deepth[idx] = fnode.deep;
+			++idx;
+		}
+		/// @brief		遇到")"按元字符处理，并且深度减1
+		else if( ')' == fstr[idx] )
+		{
+			fnode.pChar[idx] = fstr[idx];
+			fnode.isMeta[idx] = true;
+			fnode.deepth[idx] = fnode.deep;
+			--fnode.deep;
+			++idx;
+		}
+		/// @brief		遇到除去以上字符意外的字符，按普通字符处理
+		else
+		{
+			fnode.pChar[idx] = fstr[idx];
+			fnode.isMeta[idx] = false;
+			fnode.deepth[idx] = fnode.deep;
+			++idx;
+		}
+	}
+}
+
+
+/// @brief		如果正则表达式中有深度为0的"|"，则从该位置分成两组
+COMPILERHDR void splitNodeOr( NODE &rnode, ulong divide, std::vector<NODE> &rGroup)
+{
+	NODE node;
+	std::string strPrev;
+	std::string strNext;
+
+	strPrev.assign(rnode.regex.begin(), rnode.regex.begin() + divide);
+	InitNode(strPrev, node);
+	rGroup.push_back(node);
+
+	strNext.assign(rnode.regex.begin() + divide + 1, rnode.regex.end());
+	InitNode(strNext,node);
+	rGroup.push_back(node);
+}
+
+
+/// @brief		如果正则表达式有深度为0的"*"、"?"字符，则从该位置分成两个
+COMPILERHDR void splitNodeStar( NODE &rnode, ulong divide, std::vector<NODE> &rGroup)
+{
+	NODE node;
+	std::string strPrev;
+	std::string strNext;
+
+	strPrev.assign(rnode.regex.begin(), rnode.regex.begin() + divide - 1);
+	InitNode(strPrev, node);
+	rGroup.push_back(node);
+
+	strNext.assign(rnode.regex.begin() + divide + 1, rnode.regex.end());
+	if (!strNext.empty())
+	{
+		InitNode(strNext,node);
+		rGroup.push_back(node);
+	}
+}
+
+
+/// @brief		如果正则表达式有深度为0的"+"字符，则从该位置分成两个
+COMPILERHDR void splitNodePlus( NODE &rnode, ulong divide, std::vector<NODE> &rGroup )   // 分开深度为0的+
+{
+	NODE node;
+	std::string strPrev;
+	std::string strNext;
+	std::string strTemp;
+
+	if ( ')'!= rnode.regex[divide - 1])
+	{
+		strPrev.assign(rnode.regex.begin(), rnode.regex.begin() + divide);
+		InitNode(strPrev, node);
+		rGroup.push_back(node);
+
+		strNext += rnode.regex[divide - 1];
+		strTemp.assign(rnode.regex.begin() + divide + 1, rnode.regex.end());
+		strNext += strTemp;
+		InitNode(strNext, node);
+		rGroup.push_back(node);
+	}
+	else 
+	{
+		strPrev.assign(rnode.regex.begin(), rnode.regex.begin() + divide);
+		InitNode(strPrev, node);
+		rGroup.push_back(node);
+
+		/// @brief		向前查找与之对应的"("位置，注意小括号的嵌套情况
+		ulong flag = 1;                                           
+		ulong preBracket = 0;
+		for ( ulong idx2 = divide - 1; idx2 != 0; --idx2)
+		{
+			if ( ')' == rnode.regex[idx2] )
+			{
+				++flag;
+			}
+			else if ( '(' == rnode.regex[idx2] )
+			{
+				--flag;
+				if (1 == flag)
+				{
+					preBracket = idx2;
+					break;
+				}
+			}
+		}
+
+		strNext.assign(rnode.regex.begin() + preBracket, rnode.regex.begin() + divide);
+		strTemp.assign(rnode.regex.begin() + divide + 1, rnode.regex.end());
+		strNext += strTemp;
+		InitNode(strNext, node);
+		rGroup.push_back(node);
+	}
+}
+
+
+/// @brief		如果正则表达式有深度为0的"{"和"}"字符，则从该位置分成两个
+COMPILERHDR void splitNodeBrace( NODE &rnode, ulong divide, std::vector<NODE> &rGroup )
+{
+	NODE node;
+	std::string strPrev;
+	std::string strNext;
+	std::string strTemp;
+
+	/// @brief		将字符转化为数字
+	ulong times = rnode.regex[divide + 1] - CHARTONUM;             
+
+	/// @brief		寻找下一个'}'的位置
+	ulong nextBrace;
+	for(ulong idx7 = divide; ;++idx7)
+	{
+		if ( '}' == rnode.regex[idx7])
+		{
+			nextBrace = idx7;
+			break;
+		}
+	}
+
+	/// @brief		如果大括号前不是小括号则进行以下操作
+	if (  ')' != rnode.regex[divide -1])
+	{
+		strPrev.assign(rnode.regex.begin(), rnode.regex.begin() + divide - 1);
+		std::string strTemp(times, rnode.regex[divide - 1]);
+		strPrev += strTemp;
+		InitNode(strPrev, node);
+		rGroup.push_back(node);
+
+		strTemp.clear();
+		strNext += rnode.regex[divide - 1];
+		strTemp.assign(rnode.regex.begin() + nextBrace + 1, rnode.regex.end());
+		strNext += strTemp;
+		InitNode(strNext, node);
+		rGroup.push_back(node);
+	}
+
+	// @brief		如果大括号前是小括号则进行以下操作
+	else
+	{
+		NODE node;
+
+		// @brief		 查找与之匹配的"("，注意嵌套情况
+		ulong preBracket;
+		ulong flag = 1;
+		for (ulong idx9 = divide - 2; ; --idx9 )
+		{
+			if ( ')' == rnode.regex[idx9])
+			{
+				++flag;
+			}
+			else if ( '(' == rnode.regex[idx9])
+			{
+				if (1 == flag)
+				{
+					preBracket = idx9;
+					break;
+				}
+				--flag;
+			}
+		}
+
+		strPrev.assign(rnode.regex.begin(), rnode.regex.begin() + preBracket);
+		strTemp.assign(rnode.regex.begin() + preBracket, rnode.regex.begin() + divide);
+		for (ulong cnt = 0; cnt != times; ++cnt)
+		{
+			strPrev += strTemp;
+		}
+		InitNode(strPrev, node);
+		rGroup.push_back(node);
+
+		strNext.assign(rnode.regex.begin() + nextBrace + 1, rnode.regex.end());
+		strNext = strTemp + strNext;
+		InitNode(strNext, node);
+		rGroup.push_back(node);
+	}
+}
+
+
+/// @brief		如果将正则表达式中有深度为1的小括号且对应的小括号中有深度为1的"|"，则将其从"|"处分成两个
+COMPILERHDR void splitNodeBraket( NODE &rnode, ulong divide, std::vector<NODE> &rGroup )
+{
+	NODE node;
+	std::string strPrev;
+	std::string strNext;
+	std::string strTemp1;
+	std::string strTemp2;
+
+	// @brief		 查找与之匹配的")"，注意嵌套情况
+	ulong flag = 1;
+	ulong nextBracket;
+	for (ulong idx = divide + 1; ; ++idx)
+	{
+		if ('(' == rnode.regex[idx])
+		{
+			++flag;
+		}
+		else if (')' == rnode.regex[idx])
+		{
+			if (1 == flag)
+			{
+				nextBracket = idx;
+				break;
+			}
+			--flag;
+		}
+	}
+
+	flag = 1;
+	ulong idx;
+	for (idx = divide + 1; idx != nextBracket ; ++idx)
+	{
+		if ( '(' == rnode.regex[idx])
+		{
+			++flag;
+		}
+		else if ( ')' == rnode.regex[idx])
+		{
+			--flag;
+		}
+		else if ( '|' == rnode.regex[idx] && 1 == flag)
+		{
+			strPrev.assign(rnode.regex.begin(), rnode.regex.begin() + divide);
+			strTemp1.assign(rnode.regex.begin() + divide, rnode.regex.begin() + idx);
+			strTemp1 += ')';
+
+			strTemp2 += '(';
+			std::string str(rnode.regex.begin() + idx + 1, rnode.regex.begin() + nextBracket + 1);
+			strTemp2 += str;
+
+			strNext.assign(rnode.regex.begin() + nextBracket + 1, rnode.regex.end());
+
+			std::string strPart1;
+			std::string strPart2;
+			strPart1 = strPrev + strTemp1 + strNext;
+			strPart2 = strPrev +strTemp2 + strNext;
+
+			InitNode(strPart1, node);
+			rGroup.push_back(node);
+
+			InitNode(strPart2, node);
+			rGroup.push_back(node);
+			return;
+		}
+	}
+	if (idx == nextBracket)
+	{
+		std::string str = rnode.regex;
+		str.erase(nextBracket, 1);
+		str.erase(divide, 1);
+		InitNode(str, node);
+		rGroup.push_back(node);
+	}
+}
+
+
+/// @brief		遍历正则表达式，进行分裂操作
+COMPILERHDR ulong split( NODE &fnode, std::vector<NODE> &resultGroup)
+{
+	// @brief		 查找深度为0的"|"，如果存在则进行相应处理后返回，否则继续向下执行
+	for (ulong idx = 0; idx != fnode.regex.size(); ++idx)
+	{
+		char ch = fnode.regex[idx];
+		bool isM = fnode.isMeta[idx];
+		ulong dp = fnode.deepth[idx];
+		if( '|' == ch && true == isM && 0 == dp)                       
+		{
+			splitNodeOr(fnode, idx, resultGroup);
+			return INTER;                                                    
+		}
+	}
+
+	// @brief		查找深度为0的"*"和"?"，如果存在则进行相应处理后返回，否则继续向下执行
+	for (ulong idx = 0; idx != fnode.regex.size(); ++idx)
+	{
+		char ch = fnode.regex[idx];
+		bool isM = fnode.isMeta[idx];
+		ulong dp = fnode.deepth[idx];
+		if( ('?' == ch || '*' == ch) && true == isM && 0 == dp )          
+		{
+			splitNodeStar(fnode, idx, resultGroup);
+			return UNION;                                                     
+		}
+	}
+
+	// @brief		查找深度为0的"+"，如果存在则进行相应处理后返回，否则继续向下执行
+	for (ulong idx = 0; idx != fnode.regex.size(); ++idx)
+	{
+		char ch = fnode.regex[idx];
+		bool isM = fnode.isMeta[idx];
+		ulong dp = fnode.deepth[idx];
+		if( '+' == ch && true == isM && 0 == dp)                        
+		{
+			splitNodePlus(fnode, idx, resultGroup);
+			return UNION;                                                 
+
+		}
+	}
+
+	// @brief		查找深度为0的"{"，如果存在则进行相应处理后返回，否则继续向下执行
+	for (ulong idx = 0; idx != fnode.regex.size(); ++idx)
+	{
+		char ch = fnode.regex[idx];
+		bool isM = fnode.isMeta[idx];
+		ulong dp = fnode.deepth[idx];
+		if( '{' == ch && true == isM && 0 == dp)                         
+		{
+			splitNodeBrace(fnode, idx, resultGroup);
+			return UNION;
+		}
+	}
+
+	// @brief		查找深度为1的"（"，如果存在则进行相应处理后返回，否则继续向下执行
+	for (ulong idx = 0; idx != fnode.regex.size(); ++idx)
+	{
+		char ch = fnode.regex[idx];
+		bool isM = fnode.isMeta[idx];
+		ulong dp = fnode.deepth[idx];
+		if ( '(' == ch && true == isM && 1 == dp)                                                   
+		{
+			splitNodeBraket(fnode, idx, resultGroup);
+			return INTER;
+		}
+	}
+
+	// @brief		不存在以上字符，说明该字符串第一遍处理已经完成，返回OVER
+	return OVER;
+}
+
+
+/// @brief		对两组Signatures求交集
+COMPILERHDR CUnsignedArray InterOp(CUnsignedArray &r1, CUnsignedArray &r2)
+{
+	CUnsignedArray r;
+	ulong idx;
+	ulong idx1;
+	r1.Unique();
+	r2.Unique();
+	for (idx = 0; idx != r1.Size(); ++idx)
+	{
+		for (idx1 = 0; idx1 != r2.Size(); ++idx1)
+		{
+			if (r1[idx] == r2[idx1])
+			{
+				r.PushBack(r1[idx]);
+			}
+		}
+	}
+	return r;
+}
+
+
+/// @brief		对两组Signatures求并集
+COMPILERHDR CUnsignedArray UnionOp(CUnsignedArray &r1, CUnsignedArray &r2)
+{
+	CUnsignedArray r;
+	ulong idx;
+	r1.Unique();
+	r2.Unique();
+	for (idx = 0; idx != r1.Size(); ++idx)
+	{
+		r.PushBack(r1[idx]);
+	}
+	for (idx = 0; idx != r2.Size(); ++idx)
+	{
+		r.PushBack(r2[idx]);
+	}
+	return r;
+}
+
+
+/// @brief		对一个初始化成NODE对象的字符串递归的提取Signatures
+COMPILERHDR CUnsignedArray ExtrSig(NODE nodeOrigin)                   
+{
+	ulong m;
+	CUnsignedArray r;
+	CUnsignedArray r1;
+	CUnsignedArray r2;
+	std::vector<NODE> nodeSplit;
+	m = split(nodeOrigin, nodeSplit);
+
+	/// @brief		递归终止条件 
+	if (OVER == m)                                                   
+	{ 
+
+		/// @brief		根据编译需要，前后要分别要有"/和/"字符, 而在split()操作后对中间截断的位置加入这些字符
+		ulong len = nodeOrigin.regex.size();
+		if (nodeOrigin.regex[0] != '"'  || nodeOrigin.regex[1] != '/' )
+		{
+			nodeOrigin.regex.insert(nodeOrigin.regex.begin(), '/');
+			nodeOrigin.regex.insert(nodeOrigin.regex.begin(), '"');
+		}
+		if (nodeOrigin.regex[len - 2] != '/'  || nodeOrigin.regex[len - 1] != '"' )
+		{
+			nodeOrigin.regex.insert(nodeOrigin.regex.end(), '/');
+			nodeOrigin.regex.insert(nodeOrigin.regex.end(), '"');
+		}
+
+		CDllString dllstr(nodeOrigin.regex.c_str());                             
+		CPcreOption pcreOption;
+		pcreOption.FromPattern(dllstr);
+
+		/// @brief		编译pcre并将中间结果放入pcRes
+		CByteArray pcRes;                             
+		pcreOption.Precompile(pcRes);
+
+		/// @brief		将剔除元字符后的结果放入strResult
+		std::vector<CByteArray> strResult;
+		ExtractSequence(pcRes, strResult);
+
+		for (std::vector<CByteArray>::iterator iter = strResult.begin(); iter != strResult.end(); ++iter)
+		{
+			ExtractSignatures(*iter, r);
+		}
+
+		// 测试结果
+		//char *pChar = (char *)(&r[0]);
+		//std::cout << r.Size() << std::endl;
+
+		return r;
+
+	}
+	else
+	{
+		r1 = ExtrSig(nodeSplit[0]);
+		if ( 2 == nodeSplit.size() )
+		{
+			r2 = ExtrSig(nodeSplit[1]);
+		}
+		if ( INTER == m)
+		{
+			if (2 == nodeSplit.size())
+			{
+				r = InterOp(r1, r2);
+			}
+			else r = r1;
+			return r;
+		}
+		else
+		{
+			if (2 == nodeSplit.size())
+			{
+				r = UnionOp(r1, r2);
+			}
+			else r = r1;
+			return r;
+		}
+	}
+}
+
+
