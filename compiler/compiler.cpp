@@ -124,7 +124,7 @@ COMPILERHDR void ExtractSequence(const CByteArray &pcResult,
 			{
 				strs.push_back(str);
 			}
-			str.Empty();
+			str.Clear();
 			return;
 
 		case OP_ALT:				/* 113 Start of alternation */
@@ -165,6 +165,7 @@ COMPILERHDR void ExtractSequence(const CByteArray &pcResult,
 			break;
 
 		case OP_POSPLUS:			/* 43 Possessified plus: caseful */
+		case OP_POSPLUSI:
 			str.PushBack(pcResult[cur + 1]);
 			strs.push_back(str);
 
