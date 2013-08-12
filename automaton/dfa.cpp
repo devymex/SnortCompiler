@@ -877,10 +877,6 @@ DFAHDR bool MergeMultipleDfas(CDfaArray &inputDfas, CDfa &mergedDfa)
 			//this is a terminal state
 			finFlag = 1;
 			AddTermIntoDFA(nSta, inputDfas[i], 0, mergedDfa);
-			CFinalStates &newFinSta = mergedDfa.GetFinalStates();
-			newFinSta.AddState(0).Append(
-				inputDfas[i].GetFinalStates().GetDfaIdSet(nSta));
-
 		}
 		startVec[i] = nSta;
 	}

@@ -44,7 +44,7 @@ SNORTRULEHDR void CPcreOption::FromPattern(const CDllString &strPat)
 	STRING_ITER iEnd = str.end();
 	STRING_ITER iBeg = std::find(str.begin(), iEnd, '/');
 
-	for(--iEnd; *iEnd != '/'; --iEnd);
+	for(--iEnd; *iEnd != '/' && iEnd != str.begin(); --iEnd);
 
 	if (iBeg >= iEnd)
 	{

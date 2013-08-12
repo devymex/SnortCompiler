@@ -523,10 +523,18 @@ void Rule2Dfas(const CRegRule &rule, CCompileResults &result)
 {
 	CRegRule regRule = rule;
 
-	RULECOMPDATA ruleCompData;
-	ProcessRule(regRule, ruleCompData);
-
 	COMPILEDINFO &ruleResult = result.GetSidDfaIds().Back();
+
+	RULECOMPDATA ruleCompData;
+	try
+	{
+		ProcessRule(regRule, ruleCompData);
+	}
+	catch (CTrace &)
+	{
+		ruleResult.m_nResult |= COMPILEDINFO::RES_PCREERROR;
+		return;
+	}
 
 	const ulong nOldDfaSize = result.GetDfaTable().Size();
 
