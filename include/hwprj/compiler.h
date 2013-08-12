@@ -9,6 +9,7 @@
 
 #include <hwprj\compres.h>
 #include <vector>
+#include <set>
 
 #ifndef COMPILERHDR_DS
 #define COMPILERHDR __declspec(dllimport)
@@ -100,7 +101,7 @@ COMPILERHDR void CodeToNFA(const CByteArray &pcResult, bool bFromBeg, CNfa &nfa)
 #define UNION			1 
 #define OVER			2
 #define CHARTONUM		48
-
+#define K               4
 typedef struct {
 	/// @brief		构造一个NODE对象
 	void Init(ulong size, std::string str = null)
