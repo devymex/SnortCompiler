@@ -14,29 +14,19 @@
 
 void main()
 {
-	PCREDFA pcredfa;
-
-	DFAMCH &dfamch = pcredfa.dfamch;
-	dfamch.resultFolder = "..\\..\\output\\dmatchresult";
-	CGroupRes &groupRes = dfamch.mergedDfas;
-	HASHRES &hashResMap = dfamch.hashtable;
-	groupRes.ReadFromFile("..\\..\\output\\FinalResult.cdt");
-	hash.nBucketCnt = groupRes.GetBucketCnt();
+	CGroupRes groupRes;
+	groupRes.ReadFromFile("F:\\Rules\\FinalResult.cdt");
+	std::map<SIGNATURE, size_t> SigNumMap;
 	for(size_t i = 0; i < groupRes.GetGroups().Size(); ++i)
 	{
-		HASHNODE hashnode;
-		hashnode.m_nDfaId = groupRes.GetGroups()[i].mergeDfaId;
-		hashnode.m_sig = groupRes.GetGroups()[i].currSig;
-		hashResMap[hash(groupRes.GetGroups()[i].currSig)].push_back(hashnode);
+		++SigNumMap[groupRes.GetGroups()[i].currSig];
 	}
 
-	DfaidSidMap(groupRes, dfamch.dIdSId);
-	REGRULESMAP &rulesmap = pcredfa.rulesmap;
-	MchCompile("..\\..\\input\\CanCompile.rule", &rulesmap);
-	rulesmap.resultpath = "..\\..\\output\\pmatchresult";
+	//DfaidSidMap(groupRes, dfamch.dIdSId);
+	//MchCompile("..\\..\\input\\CanCompile.rule", &rulesmap);
 
-	std::string path = "E:\\allPkt\\temp";
-	PDHandleAllFile(path, &pcredfa);
+	std::string path = "F:\\haha";
+	PDHandleAllFile(path, &SigNumMap);
 
 	system("pause");
 }

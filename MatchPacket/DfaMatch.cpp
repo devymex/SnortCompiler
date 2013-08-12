@@ -89,116 +89,145 @@ void MchDfaHdler(u_char *param, const struct pcap_pkthdr *header, const u_char *
 	pParam->pFunc(ih, pkt_data, pParam->pUser);
 }
 
-void GetMchDfas(const u_char *data, ulong len, HASHRES &hashtable, std::vector<ulong> &matchdfas)
+void GetMchDfas(const u_char *data, ulong len, std::map<SIGNATURE, size_t> &SigNumMap)
 {
 	if (len > 3)
 	{
-		std::ofstream sigfile;
-		sigfile.open("..\\..\\output\\sigfile.txt", std::ofstream::app);
+		//std::ofstream sigfile;
+		//sigfile.open("..\\..\\output\\sigfile.txt", std::ofstream::app);
 		SIGNATURE sig;
-		u_char csig[4];
-		char flags[3000];
-		std::memset(flags, 0, sizeof(flags));
+		std::vector<SIGNATURE> sigsSet;
 
-		ulong signum = 0;
 		for (const u_char* iter = data; iter != &data[len - 3]; ++iter)
 		{
 			for (size_t i = 0; i < 4; ++i)
 			{
-				csig[i] = tolower(*(iter + i));
+				((byte*)&sig)[i] = tolower(*(iter + i));
 			}
-			sig = *(SIGNATURE *)csig;
+			sigsSet.push_back(sig);
+		}
 
-			size_t hashsig = hash(sig);
-			if (hashtable.count(hashsig))
+		std::sort(sigsSet.begin(), sigsSet.end());
+		sigsSet.erase(std::unique(sigsSet.begin(), sigsSet.end()), sigsSet.end());
+
+		size_t nNum = 0;
+		for (std::vector<SIGNATURE>::iterator i = sigsSet.begin(); i != sigsSet.end(); ++i)
+		{
+			if (SigNumMap.count(*i))
 			{
-				++signum;
-				for (std::vector<HASHNODE>::iterator iter = hashtable[hashsig].begin(); iter != hashtable[hashsig].end(); ++iter)
-				{
-					if ((sig == iter->m_sig) && (flags[iter->m_nDfaId] == 0))
-					{
-						matchdfas.push_back(iter->m_nDfaId);
-						flags[iter->m_nDfaId] = 1;
-					}
-				}
+				nNum += SigNumMap[*i];
 			}
 		}
 
+		std::ofstream fpkt8("F:\\pkt8.txt", std::ios::app);
+		if (nNum > 8)
+		{
+			fpkt8 << nNum << std::endl;
+			//fpkt << g_dpktnum << "\t" << nNum << "\t";
+			//for (std::vector<SIGNATURE>::iterator i = sigsSet.begin(); i != sigsSet.end(); ++i)
+			//{
+			//	if (SigNumMap.count(*i))
+			//	{
+			//		fpkt << ((byte*)&(*i))[0] << ((byte*)&(*i))[1] << ((byte*)&(*i))[2] << ((byte*)&(*i))[3] << "\t";
+			//	}
+			//}
+			//fpkt << std::endl;
+		}
+		fpkt8.clear();
+		fpkt8.close();
+
+		//std::ofstream fout("F:\\result.txt", std::ios::app);
+		//fout << nNum << " ";
+		//fout.clear();
+		//fout.close();
+
+		std::ofstream fpkt16("F:\\pkt16.txt", std::ios::app);
+		if (nNum > 16)
+		{
+			fpkt16 << nNum << std::endl;
+		}
+		fpkt16.clear();
+		fpkt16.close();
+
+		std::ofstream fout("F:\\TotalNum.txt");
+		fout << g_dpktnum << std::endl;
+		fout.clear();
+		fout.close();
 	}
 }
 
-MATCHPKT void DfaMatchPkt(const u_char *data, ulong len, DFAMCH &dfamch)
+MATCHPKT void DfaMatchPkt(const u_char *data, ulong len, std::map<SIGNATURE, size_t> &SigNumMap)
 {
-	std::ofstream matchresult;
+	//std::ofstream matchresult;
 
-	matchresult.open(dfamch.resultPath, std::ofstream::app);
+	//matchresult.open(dfamch.resultPath, std::ofstream::app);
 
-	matchresult << g_dpktnum << " : ";
-	std::vector<ulong> matchdfas;
-	std::vector<ulong> matcheddfaids;
+	//matchresult << g_dpktnum << " : ";
+	//std::vector<ulong> matchdfas;
+	//std::vector<ulong> matcheddfaids;
+	
+	GetMchDfas(data, len, SigNumMap);
+	
+	//if (signum > 8)
+	//{
+	//	++usigtime;
+	//	std::ofstream ofs;
+	//	if (usigtime == 1)
+	//	{
+	//		ofs.open("..\\..\\output\\sigfile.txt");
+	//	}
+	//	else
+	//	{
+	//		ofs.open("..\\..\\output\\sigfile.txt", std::ofstream::app);
+	//	}
 
-	GetMchDfas(data, len, dfamch.hashtable, matchdfas);
+	//	ofs << dfamch.pfilepath << " : " << g_pktnum << std::endl;
 
-	if (signum > 8)
-	{
-		++usigtime;
-		std::ofstream ofs;
-		if (usigtime == 1)
-		{
-			ofs.open("..\\..\\output\\sigfile.txt");
-		}
-		else
-		{
-			ofs.open("..\\..\\output\\sigfile.txt", std::ofstream::app);
-		}
+	//	signum = 0;
+	//}
+	//for (std::vector<ulong>::iterator iter = matchdfas.begin(); iter != matchdfas.end(); ++iter)
+	//{
+	//	MatchOnedfa(data, len, dfamch.mergedDfas.GetDfaTable()[*iter], matcheddfaids);
+	//}
 
-		ofs << dfamch.pfilepath << " : " << g_pktnum << std::endl;
+	//if (!matcheddfaids.empty())
+	//{
+	//	std::unordered_map<ulong, ulong> &dId_sId = dfamch.dIdSId.dId_sId;
+	//	std::unordered_map<ulong, CUnsignedArray> &sId_dIdVec = dfamch.dIdSId.sId_dIdVec;
 
-		signum = 0;
-	}
-	for (std::vector<ulong>::iterator iter = matchdfas.begin(); iter != matchdfas.end(); ++iter)
-	{
-		MatchOnedfa(data, len, dfamch.mergedDfas.GetDfaTable()[*iter], matcheddfaids);
-	}
+	//	std::unordered_map<ulong, CUnsignedArray> resultmap;
+	//	for(std::vector<ulong>::iterator iter = matcheddfaids.begin(); iter != matcheddfaids.end(); ++iter)
+	//	{
+	//		ulong &csid = dId_sId[*iter];
+	//		if (resultmap.count(csid) == 0)
+	//		{
+	//			resultmap[csid].Reserve(20);
+	//			resultmap[csid].PushBack(*iter);
+	//		}
+	//		else
+	//		{
+	//			resultmap[csid].PushBack(*iter);
+	//		}
+	//	}
 
-	if (!matcheddfaids.empty())
-	{
-		std::unordered_map<ulong, ulong> &dId_sId = dfamch.dIdSId.dId_sId;
-		std::unordered_map<ulong, CUnsignedArray> &sId_dIdVec = dfamch.dIdSId.sId_dIdVec;
+	//	std::vector<ulong> matchvec;
+	//	for(std::unordered_map<ulong, CUnsignedArray>::iterator iter = resultmap.begin(); iter != resultmap.end(); ++iter)
+	//	{
+	//		if(iter->second.Size() == sId_dIdVec[iter->first].Size())
+	//		{
+	//			matchvec.push_back(iter->first);
+	//		}
+	//	}
 
-		std::unordered_map<ulong, CUnsignedArray> resultmap;
-		for(std::vector<ulong>::iterator iter = matcheddfaids.begin(); iter != matcheddfaids.end(); ++iter)
-		{
-			ulong &csid = dId_sId[*iter];
-			if (resultmap.count(csid) == 0)
-			{
-				resultmap[csid].Reserve(20);
-				resultmap[csid].PushBack(*iter);
-			}
-			else
-			{
-				resultmap[csid].PushBack(*iter);
-			}
-		}
+	//	std::sort(matchvec.begin(), matchvec.end());
+	//	for(std::vector<ulong>::iterator iter = matchvec.begin(); iter != matchvec.end(); ++iter)
+	//	{
+	//		matchresult << *iter << "  ";
+	//	}
+	//}
 
-		std::vector<ulong> matchvec;
-		for(std::unordered_map<ulong, CUnsignedArray>::iterator iter = resultmap.begin(); iter != resultmap.end(); ++iter)
-		{
-			if(iter->second.Size() == sId_dIdVec[iter->first].Size())
-			{
-				matchvec.push_back(iter->first);
-			}
-		}
-
-		std::sort(matchvec.begin(), matchvec.end());
-		for(std::vector<ulong>::iterator iter = matchvec.begin(); iter != matchvec.end(); ++iter)
-		{
-			matchresult << *iter << "  ";
-		}
-	}
-
-	matchresult << std::endl;
-	matchresult.close();
+	//matchresult << std::endl;
+	//matchresult.close();
 }
 
 
@@ -207,14 +236,14 @@ void __stdcall DPktParam(const ip_header *ih, const byte *data, void* user)
 {
 	++g_dpktnum;
 	
-	DFAMCH &dfamch = *(DFAMCH *)user;
+	std::map<SIGNATURE, size_t> &SigNumMap = *(std::map<SIGNATURE, size_t>*)user;
 
-	std::ofstream matchresult;
-	if (g_dpktnum == 1)
-	{
-		matchresult.open(dfamch.resultPath);
-		matchresult << "-----------------------" << dfamch.resultPath << "-----------------------" << std::endl;
-	}
+	//std::ofstream matchresult;
+	//if (g_dpktnum == 1)
+	//{
+	//	matchresult.open(dfamch.resultPath);
+	//	matchresult << "-----------------------" << dfamch.resultPath << "-----------------------" << std::endl;
+	//}
 	u_short  _ihl = (ih->ver_ihl & 0x0f) * 4;
 	
 	u_short _tlen = ih->tlen;
@@ -236,7 +265,7 @@ void __stdcall DPktParam(const ip_header *ih, const byte *data, void* user)
 			ulong tcpdatalen = _tlen - _ihl - tcpHdrLen;
 			if (_tlen > (_ihl + tcpHdrLen))
 			{
-				DfaMatchPkt(data, tcpdatalen, dfamch);
+				DfaMatchPkt(data, tcpdatalen, SigNumMap);
 			}
 
 			break;
@@ -251,7 +280,7 @@ void __stdcall DPktParam(const ip_header *ih, const byte *data, void* user)
 			ulong udpdatalen = _tlen - _ihl - UDPHDRLEN;
 			if(udpdatalen > 0)
 			{
-				DfaMatchPkt(data, udpdatalen, dfamch);
+				DfaMatchPkt(data, udpdatalen, SigNumMap);
 			}
 
 			break;
@@ -267,8 +296,9 @@ void __stdcall DPktParam(const ip_header *ih, const byte *data, void* user)
 
 bool DMyLoadCapFile(const char* pFile, PACKETRECV cv, void* pUser)
 {
-	DFAMCH &dfamch = *(DFAMCH*)pUser;
-	dfamch.pfilepath = pFile;
+
+	//DFAMCH &dfamch = *(DFAMCH*)pUser;
+	//dfamch.pfilepath = pFile;
 	pcap_t *mypcap = pcap_open_offline(pFile, null);
 	PACKETPARAM pp;
 	pp.pUser = pUser;
@@ -287,10 +317,6 @@ MATCHPKT bool DLoadCapFile(const char* pFile, void* pUser)
 
 MATCHPKT void PDHandleAllFile(const std::string &path, void* user)
 {
-	PCREDFA &pcredfa = *(PCREDFA*) user; 
-	DFAMCH &dfamch = pcredfa.dfamch;
-	REGRULESMAP &rulesmap = pcredfa.rulesmap;
-
 	WIN32_FIND_DATAA wfda;
 	const std::string ext = "*.*";
 	std::string str = path + std::string("\\");
@@ -316,19 +342,19 @@ MATCHPKT void PDHandleAllFile(const std::string &path, void* user)
 			std::string &ext1 = temp.substr(temp.size() - 4, 4);
 			if(ext1 == ".cap")
 			{
-				dfamch.resultPath = dfamch.resultFolder + "\\" + std::string(wfda.cFileName) + ".txt";
-				DLoadCapFile(temp.c_str(), &dfamch);
+				DLoadCapFile(temp.c_str(), user);
 
-				std::string pstr = rulesmap.resultpath + "\\" +std::string(wfda.cFileName) +".txt";
-				rulesmap.mchresult.open(rulesmap.resultpath + "\\" +std::string(wfda.cFileName) +".txt");	
-				rulesmap.mchresult << "-----------------------" << pstr << "-----------------------" << std::endl;
-				LoadCapFile(temp.c_str(), &rulesmap);
-				rulesmap.mchresult.close();
+				//std::string pstr = rulesmap.resultpath + "\\" +std::string(wfda.cFileName) +".txt";
+				//rulesmap.mchresult.open(rulesmap.resultpath + "\\" +std::string(wfda.cFileName) +".txt");	
+				//rulesmap.mchresult << "-----------------------" << pstr << "-----------------------" << std::endl;
+				//rulesmap.mchresult.open("F:\\test\\result.txt", std::ios::app);
+				//LoadCapFile(temp.c_str(), &rulesmap);
+				//rulesmap.mchresult.close();
 
-				CompareResult(dfamch.resultPath.c_str(), pstr.c_str());
+				//CompareResult(dfamch.resultPath.c_str(), pstr.c_str());
 			}
-			g_dpktnum = 0;
-			g_pktnum = 0;
+			//g_dpktnum = 0;
+			//g_pktnum = 0;
 		}
 	}
 }

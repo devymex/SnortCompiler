@@ -497,11 +497,14 @@ void ProcessRule(CRegRule &regRule, RULECOMPDATA &result)
 		{
 			for (ulong j = 0; j < curChainSeq.size(); ++j)
 			{
+				//if (curChain[j].HasFlags(CPcreOption::PF_F))
+				//{
 				PCRESEQUENCE &curPcreSeq = curChainSeq[j];
 				for (ulong k = 0; k < curPcreSeq.size(); ++k)
 				{
 					ExtractSignatures(curPcreSeq[k], regRule[i].GetSigs());
 				}
+				//}
 			}
 			regRule[i].GetSigs().Unique();
 			++i;
@@ -536,7 +539,6 @@ void Rule2Dfas(const CRegRule &rule, CCompileResults &result)
 	const ulong nOldRegexSize = result.GetRegexTbl().Size();
 	result.GetRegexTbl().Resize(nOldRegexSize + nCurRuleSize);
 
-	bool bHasSigs = false;
 	static CNfa nfa;
 	nfa.Reserve(5000);
 	for (ulong i = 0; i < nCurRuleSize; ++i)
@@ -551,6 +553,7 @@ void Rule2Dfas(const CRegRule &rule, CCompileResults &result)
 			{
 				CodeToNFA(ruleCompData[i][j],
 					curPcre.HasFlags(CPcreOption::PF_A), nfa);
+				nfa.Dump("F:\\nfa.txt");
 			}
 			catch (CTrace &e)
 			{
@@ -563,10 +566,6 @@ void Rule2Dfas(const CRegRule &rule, CCompileResults &result)
 		if (ruleResult.m_nResult != COMPILEDINFO::RES_SUCCESS)
 		{
 			break;
-		}
-		if (regRule[i].GetSigs().Size() > 0)
-		{
-			bHasSigs = true;
 		}
 
 		ulong nDfaId = nOldDfaSize + i;
@@ -596,6 +595,16 @@ void Rule2Dfas(const CRegRule &rule, CCompileResults &result)
 
 		ruleResult.m_dfaIds.PushBack(nDfaId);
 		result.GetRegexTbl()[nChainId] = regRule[i];
+	}
+
+	bool bHasSigs = false;
+	for (ulong i = 0; i < nCurRuleSize; ++i)
+	{
+		if (regRule[i].GetSigs().Size() > 0)
+		{
+			bHasSigs = true;
+			break;
+		}
 	}
 
 	if (!bHasSigs)

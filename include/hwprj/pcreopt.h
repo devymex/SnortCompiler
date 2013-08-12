@@ -47,7 +47,7 @@ public:
 	static const OPTIONFLAG PF_K = (1 << 19);	/// PCRE后缀'K'。
 	static const OPTIONFLAG PF_S = (1 << 20);	/// PCRE后缀'S'。
 	static const OPTIONFLAG PF_Y = (1 << 21);	/// PCRE后缀'Y'。
-	static const OPTIONFLAG PF_F = (1 << 22); 	/// PCRE后缀'F'。
+	static const OPTIONFLAG PF_F = (1 << 22); 	/// 由content转的PCRE。
 
 public:
 	/// @brief		构造函数。
