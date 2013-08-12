@@ -553,7 +553,7 @@ void Rule2Dfas(const CRegRule &rule, CCompileResults &result)
 			{
 				CodeToNFA(ruleCompData[i][j],
 					curPcre.HasFlags(CPcreOption::PF_A), nfa);
-				nfa.Dump("F:\\nfa.txt");
+				nfa.Dump("F:\\test.txt");
 			}
 			catch (CTrace &e)
 			{
