@@ -393,16 +393,52 @@ COMPILERHDR void splitNodeStar( NODE &rnode, ulong divide, std::vector<NODE> &rG
 	std::string strPrev;
 	std::string strNext;
 
-	strPrev.assign(rnode.regex.begin(), rnode.regex.begin() + divide - 1);
-	InitNode(strPrev, node);
-	rGroup.push_back(node);
-
-	strNext.assign(rnode.regex.begin() + divide + 1, rnode.regex.end());
-	if (!strNext.empty())
+	if(')'!= rnode.regex[divide - 1] && false == rnode.isMeta[divide - 1])
 	{
-		InitNode(strNext,node);
+		strPrev.assign(rnode.regex.begin(), rnode.regex.begin() + divide - 1);
+		InitNode(strPrev, node);
 		rGroup.push_back(node);
+
+		strNext.assign(rnode.regex.begin() + divide + 1, rnode.regex.end());
+		if (!strNext.empty())
+		{
+			InitNode(strNext,node);
+			rGroup.push_back(node);
+		}
 	}
+	else if (')' == rnode.regex[divide - 1] && true == rnode.isMeta[divide - 1])
+	{
+		ulong flag = 1;                                           
+		ulong preBracket = 0;
+		for ( ulong idx2 = divide - 1; idx2 != 0; --idx2)
+		{
+			if ( ')' == rnode.regex[idx2] && true == rnode.isMeta[idx2 - 1])
+			{
+				++flag;
+			}
+			else if ( '(' == rnode.regex[idx2] && true == rnode.isMeta[idx2 - 1])
+			{
+				if (1 == flag)
+				{
+					preBracket = idx2;
+					break;
+				}
+				--flag;
+			}
+		}
+
+		strPrev.assign(rnode.regex.begin(), rnode.regex.begin() + preBracket);
+		InitNode(strPrev, node);
+		rGroup.push_back(node);
+
+		strNext.assign(rnode.regex.begin() + divide + 1, rnode.regex.end());
+		if (!strNext.empty())
+		{
+			InitNode(strNext,node);
+			rGroup.push_back(node);
+		}
+	}
+	
 }
 
 
@@ -414,7 +450,7 @@ COMPILERHDR void splitNodePlus( NODE &rnode, ulong divide, std::vector<NODE> &rG
 	std::string strNext;
 	std::string strTemp;
 
-	if ( ')'!= rnode.regex[divide - 1])
+	if ( ')'!= rnode.regex[divide - 1] && false == rnode.isMeta[divide - 1])
 	{
 		strPrev.assign(rnode.regex.begin(), rnode.regex.begin() + divide);
 		InitNode(strPrev, node);
@@ -426,35 +462,38 @@ COMPILERHDR void splitNodePlus( NODE &rnode, ulong divide, std::vector<NODE> &rG
 		InitNode(strNext, node);
 		rGroup.push_back(node);
 	}
-	else 
+	else if (')' == rnode.regex[divide - 1] && true == rnode.isMeta[divide - 1])
 	{
-		strPrev.assign(rnode.regex.begin(), rnode.regex.begin() + divide);
-		InitNode(strPrev, node);
-		rGroup.push_back(node);
-
 		/// @brief		向前查找与之对应的"("位置，注意小括号的嵌套情况
 		ulong flag = 1;                                           
 		ulong preBracket = 0;
 		for ( ulong idx2 = divide - 1; idx2 != 0; --idx2)
 		{
-			if ( ')' == rnode.regex[idx2] )
+			if ( ')' == rnode.regex[idx2] && true == rnode.isMeta[idx2 - 1] )
 			{
 				++flag;
 			}
-			else if ( '(' == rnode.regex[idx2] )
+			else if ( '(' == rnode.regex[idx2] && true == rnode.isMeta[idx2 - 1] )
 			{
-				--flag;
 				if (1 == flag)
 				{
 					preBracket = idx2;
 					break;
 				}
+				--flag;
 			}
 		}
 
-		strNext.assign(rnode.regex.begin() + preBracket, rnode.regex.begin() + divide);
-		strTemp.assign(rnode.regex.begin() + divide + 1, rnode.regex.end());
-		strNext += strTemp;
+		strTemp.assign(rnode.regex.begin() + preBracket + 1, rnode.regex.begin() + divide);
+
+		strPrev.assign(rnode.regex.begin(), rnode.regex.begin() + preBracket);
+		strPrev += strTemp;
+		InitNode(strPrev, node);
+		rGroup.push_back(node);
+
+		strNext.assign(rnode.regex.begin() + divide + 1, rnode.regex.end());
+		
+		strNext = strTemp + strNext;
 		InitNode(strNext, node);
 		rGroup.push_back(node);
 	}
