@@ -668,11 +668,13 @@ COMPILERHDR void splitNodeBrace( NODE &rnode, ulong divide, std::vector<NODE> &r
 	}
 
 	/// @brief		如果大括号前不是小括号则进行以下操作
-		strPrev.assign(rnode.regex.begin(), rnode.regex.begin() + divide - 1);
+		
 	if (  ')' != rnode.regex[divide -1])
 	{
+		
 		if ((rnode.isMeta[divide - 1]) == false)
 		{
+			strPrev.assign(rnode.regex.begin(), rnode.regex.begin() + divide - 1);
 			std::string strTemp;
 			if (times >= K)
 			{
@@ -689,9 +691,11 @@ COMPILERHDR void splitNodeBrace( NODE &rnode, ulong divide, std::vector<NODE> &r
 		}
 		else
 		{
+			strPrev.assign(rnode.regex.begin(), rnode.regex.begin() + divide - 2);
 			if (('s' == rnode.regex[divide -1] || 't' == rnode.regex[divide -1]) && true == rnode.isMeta[divide - 1])
 			{
-				std::string strTemp(rnode.regex[divide - 2], rnode.regex[divide - 1]);
+				
+				std::string strTemp(rnode.regex.begin() + divide - 2, rnode.regex.begin() + divide);
 				if (times >= K)
 				{
 					for (ulong i = 0; i < K - 1; ++i)
@@ -714,6 +718,7 @@ COMPILERHDR void splitNodeBrace( NODE &rnode, ulong divide, std::vector<NODE> &r
 			}
 			else
 			{
+				
 				strNext.assign(rnode.regex.begin() + nextBrace + 1, rnode.regex.end());
 			}
 		}
