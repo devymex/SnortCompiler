@@ -659,8 +659,8 @@ COMPILERHDR void splitNodeBrace( NODE &rnode, ulong divide, std::vector<NODE> &r
 		}
 	}
 	std::string strtime;
-	strtime.assign(rnode.regex.begin() + divide + 1, rnode.regex.begin() + timePos + 1);
-	ulong times = rnode.regex[divide + 1] - CHARTONUM;             
+	strtime.assign(rnode.regex.begin() + divide + 1, rnode.regex.begin() + timePos);
+	ulong times = 0;             
 	for (ulong i = strtime.size() - 1; i >= 0; --i)
 	{
 		ulong temp = strtime[i] - CHARTONUM;
