@@ -552,18 +552,6 @@ COMPILERHDR void splitNodePlus( NODE &rnode, ulong divide, std::vector<NODE> &rG
 			rGroup.push_back(node);
 		}
 	}
-	else if ( ')'!= rnode.regex[divide - 1] && false == rnode.isMeta[divide - 1])
-	{
-		strPrev.assign(rnode.regex.begin(), rnode.regex.begin() + divide);
-		InitNode(strPrev, node);
-		rGroup.push_back(node);
-
-		strNext += rnode.regex[divide - 1];
-		strTemp.assign(rnode.regex.begin() + divide + 1, rnode.regex.end());
-		strNext += strTemp;
-		InitNode(strNext, node);
-		rGroup.push_back(node);
-	}
 	else if (')' == rnode.regex[divide - 1] && true == rnode.isMeta[divide - 1])
 	{
 		/// @brief		向前查找与之对应的"("位置，注意小括号的嵌套情况
