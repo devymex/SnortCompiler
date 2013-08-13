@@ -6,14 +6,14 @@ LOGGERHDR CLogger g_log;
 LOGGERHDR CLogger::CLogger()
 	: nl("\r\n")
 {
-	m_pLogFile = &std::cout;
-	//m_pLogFile = new std::ofstream("compile.log");
+	//m_pLogFile = &std::cout;
+	m_pLogFile = new std::ofstream("compile.log");
 	//m_pLogFile->set_rdbuf(std::cout.rdbuf());
 }
 
 LOGGERHDR CLogger::~CLogger()
 {
-	//delete m_pLogFile;
+	delete m_pLogFile;
 }
 
 LOGGERHDR CLogger::CLogger(const CLogger&)

@@ -156,3 +156,5 @@ void Rule2Dfas(const CSnortRule &rule,
 void AssignSig(CCompileResults &result, ulong BegIdx, ulong EndIdx);
 
 void Rule2Dfas(const CRegRule &rule, CCompileResults &result);
+
+bool EstimateOption (std::string strName, std::string strValue);

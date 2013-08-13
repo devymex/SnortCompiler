@@ -88,37 +88,85 @@ ulong LoadFile(const char *fileName, std::vector<std::string> &rules)
 	return 0;
 }
 
+bool EstimateOption (std::string strName, std::string strValue)
+{
+	if (strValue.empty())
+	{
+		return true;
+	}
+
+	std::string::reverse_iterator i = strValue.rbegin();
+	for(; g_isSpace(*i); ++i);
+	strValue.erase(i.base(), strValue.end());
+
+	std::string::iterator iterBeg;
+	std::string::reverse_iterator riterEnd;
+	iterBeg = std::find(strValue.begin(), strValue.end(), '\"');
+	riterEnd = std::find(strValue.rbegin(), strValue.rend(), '\"');
+
+	if(0 == strcmp("msg", strName.c_str()) || 0 == strcmp("content", strName.c_str()) || 0 == strcmp("uricontent", strName.c_str()))
+	{		
+		if(riterEnd == strValue.rbegin())
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	else if(0 == strcmp("pcre", strName.c_str()))
+	{
+		if(riterEnd == strValue.rbegin() && *(riterEnd + 1) != '\\')
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	else
+	{
+		return true;
+	}
+}
+
 void SplitOption(std::string &ruleOptions, std::vector<RULEOPTIONRAW> &options)
 {
 	// Split the options of rule with semicolon and extract related options 
-	for (std::string::iterator i = ruleOptions.begin(); ;)
+	STRING_ITER temp = ruleOptions.begin();
+	for (STRING_ITER i = ruleOptions.begin(); ;)
 	{
-		std::string::iterator iComma = std::find(i, ruleOptions.end(), ';');
+		STRING_ITER iComma = std::find(temp, ruleOptions.end(), ';');
 		if (iComma == ruleOptions.end())
 		{
 			break;
 		}
-		if (*(iComma - 1) != '\\')
-		{
-			RULEOPTIONRAW or;
-			STRING_ITER iNameBeg = std::find_if(i, iComma, isalpha);
-			STRING_ITER iValueBeg = std::find(iNameBeg + 1, iComma, ':');
+		RULEOPTIONRAW or;
+		STRING_ITER iNameBeg = std::find_if(i, iComma, isalpha);
+		STRING_ITER iValueBeg = std::find(iNameBeg + 1, iComma, ':');
+		STRING_ITER iNameEnd = iValueBeg;
+		for (; g_isSpace(*--iNameEnd););
 
-			// Get the end position of option name and assign into RULEOPTIONRAW
-			STRING_ITER iNameEnd = iValueBeg;
-			for (; g_isSpace(*iNameEnd); --iNameEnd);
-			or.name.assign(iNameBeg,iNameEnd);
-			if (iValueBeg == iComma)
-			{
-				or.value.assign(iValueBeg,iComma);
-			}
-			else
-			{
-				or.value.assign(iValueBeg + 1,iComma);
-			}			
-			options.push_back(or);
+		std::string strName, strValue;
+		strName.assign(iNameBeg, iNameEnd + 1);
+		if(iValueBeg == iComma)
+		{
+			strValue.assign(iValueBeg, iComma);
 		}
-		i = iComma + 1;
+		else
+		{
+			strValue.assign(iValueBeg + 1,iComma);
+		}
+		temp = iComma + 1;
+		if(EstimateOption(strName, strValue))
+		{
+			or.name.swap(strName);
+			or.value.swap(strValue);
+			options.push_back(or);
+			i = temp;
+		}
 	}
 }
 
