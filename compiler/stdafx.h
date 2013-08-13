@@ -27,6 +27,7 @@
 #include <fstream>
 #include <map>
 #include <set>
+#include <math.h>
 
 #include <hwprj\common.h>
 #include <hwprj\dfa.h>

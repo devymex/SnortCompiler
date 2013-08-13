@@ -470,7 +470,24 @@ COMPILERHDR void splitNodeBrace( NODE &rnode, ulong divide, std::vector<NODE> &r
 	std::string strTemp;
 
 	/// @brief		将字符转化为数字
+	ulong timePos;
+	for (ulong i = divide + 1; ; ++i)
+	{
+		timePos = i;
+		if ((',' == rnode.regex[i] || '}' == rnode.regex[i]) && true == rnode.isMeta[i])
+		{
+			break;
+		}
+	}
+	std::string strtime;
+	strtime.assign(rnode.regex.begin() + divide + 1, rnode.regex.begin() + timePos + 1);
 	ulong times = rnode.regex[divide + 1] - CHARTONUM;             
+	for (ulong i = strtime.size() - 1; i >= 0; --i)
+	{
+		ulong temp = strtime[i] - CHARTONUM;
+		
+		times += temp * (std::pow(10, strtime.size()- 1 - i));
+	}
 
 	/// @brief		寻找下一个'}'的位置
 	ulong nextBrace;
