@@ -34,6 +34,9 @@ public:
 	/// @brief		析构函数。
 	~CLogger();
 
+	/// @brief		设置日志文件
+	void SetLogFile(const char *pStrFile);
+
 	CLogger& operator << (char n);
 	CLogger& operator << (unsigned char n);
 	CLogger& operator << (short n);
@@ -47,6 +50,7 @@ public:
 	CLogger& operator << (const void *p);
 	CLogger& operator << (const char *p);
 	CLogger& operator << (const CLogger &l);
+
 	const char* nl;
 
 private:

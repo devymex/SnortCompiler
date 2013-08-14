@@ -20,6 +20,12 @@ LOGGERHDR CLogger::CLogger(const CLogger&)
 {
 }
 
+void CLogger::SetLogFile(const char *pStrFile)
+{
+	delete m_pLogFile;
+	m_pLogFile = new std::ofstream(pStrFile);
+}
+
 LOGGERHDR CLogger& CLogger::operator = (const CLogger&)
 {
 	return *this;

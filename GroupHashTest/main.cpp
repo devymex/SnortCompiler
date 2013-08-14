@@ -8,6 +8,7 @@
 #include <hwprj\groupres.h>
 #include <hwprj\grouping.h>
 #include <hwprj\buildhash.h>
+#include <hwprj\logger.h>
 
 bool CompareFileExt(const std::string &strFile, const std::string &strExt)
 {
@@ -45,6 +46,9 @@ void main(int nArgs, char **pArgs)
 	{
 		strPath.push_back('\\');
 	}
+	std::string strLogFile = strPath + "compile.log";
+	g_log.SetLogFile(strLogFile.c_str());
+
 	// Defina a path object to express a directory
 	std::tr2::sys::path rulePath(strPath);
 	// Construct a directory iterator for visit this path.
