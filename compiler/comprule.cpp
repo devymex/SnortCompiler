@@ -145,6 +145,10 @@ void SplitOption(std::string &ruleOptions, std::vector<RULEOPTIONRAW> &options)
 		}
 		RULEOPTIONRAW or;
 		STRING_ITER iNameBeg = std::find_if(i, iComma, isalpha);
+		if (iNameBeg == ruleOptions.end())
+		{
+			break;
+		}
 		STRING_ITER iValueBeg = std::find(iNameBeg + 1, iComma, ':');
 		STRING_ITER iNameEnd = iValueBeg;
 		for (; g_isSpace(*--iNameEnd););

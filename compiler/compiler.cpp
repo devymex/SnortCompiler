@@ -39,14 +39,18 @@ COMPILERHDR void ParseRuleFile(const char *pFileName, RECIEVER recv, void *lpUse
 				STRING_ITER iBra = std::find(i->begin(), i->end(), '(');
 				if (iBra == i->end())
 				{
-					TTHROW(TI_INVALIDDATA);
+					g_log << "Compile error!" << g_log.nl;
+					continue;
+					//TTHROW(TI_INVALIDDATA);
 				}
 				i->erase(i->begin(), iBra + 1);
 
 				iBra = std::find(i->rbegin(), i->rend(), ')').base();
 				if (iBra == i->rend().base())
 				{
-					TTHROW(TI_INVALIDDATA);
+					g_log << "Compile error!" << g_log.nl;
+					continue;
+					//TTHROW(TI_INVALIDDATA);
 				}
 				i->erase(iBra - 1, i->end());
 
@@ -58,7 +62,8 @@ COMPILERHDR void ParseRuleFile(const char *pFileName, RECIEVER recv, void *lpUse
 				catch (CTrace &e)
 				{
 					g_log << "ParseOptions error: " << e.What() << g_log.nl;
-					throw;
+					continue;
+					//throw;
 				}
 				PARSERESULT pr;
 				pr.ulSid = snortRule.GetSid();
