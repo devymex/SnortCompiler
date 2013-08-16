@@ -410,7 +410,37 @@ COMPILERHDR void splitNodeStar( NODE &rnode, ulong divide, std::vector<NODE> &rG
 	}
 	else if(']' != rnode.regex[divide - 1] && ')'!= rnode.regex[divide - 1] && false == rnode.isMeta[divide - 1])
 	{
-		strPrev.assign(rnode.regex.begin(), rnode.regex.begin() + divide);
+		if ('(' != rnode.regex[divide - 1] && '[' != rnode.regex[divide - 1] && '{' != rnode.regex[divide - 1] && '}' != rnode.regex[divide - 1] &&
+		'*' != rnode.regex[divide - 1] && '?' != rnode.regex[divide - 1] && '+' != rnode.regex[divide - 1] && '|' != rnode.regex[divide - 1] )
+		{
+			strPrev.assign(rnode.regex.begin(), rnode.regex.begin() + divide - 1);
+			InitNode(strPrev, node);
+			rGroup.push_back(node);
+
+			strNext.assign(rnode.regex.begin() + divide + 1, rnode.regex.end());
+			if (!strNext.empty())
+			{
+				InitNode(strNext,node);
+				rGroup.push_back(node);
+			}
+		}
+		else
+		{
+			strPrev.assign(rnode.regex.begin(), rnode.regex.begin() + divide - 2);
+			InitNode(strPrev, node);
+			rGroup.push_back(node);
+
+			strNext.assign(rnode.regex.begin() + divide + 1, rnode.regex.end());
+			if (!strNext.empty())
+			{
+				InitNode(strNext,node);
+				rGroup.push_back(node);
+			}
+		}
+	}
+	else if ( ( ')' == rnode.regex[divide - 1] || ']' == rnode.regex[divide - 1]) && false == rnode.isMeta[divide - 1] )
+	{
+		strPrev.assign(rnode.regex.begin(), rnode.regex.begin() + divide - 2);
 		InitNode(strPrev, node);
 		rGroup.push_back(node);
 
@@ -425,7 +455,7 @@ COMPILERHDR void splitNodeStar( NODE &rnode, ulong divide, std::vector<NODE> &rG
 	{
 		ulong flag = 1;                                           
 		ulong preBracket = 0;
-		for ( ulong idx2 = divide - 1; idx2 >= 0; --idx2)
+		for ( ulong idx2 = divide - 2; idx2 >= 0; --idx2)
 		{
 			if ( ')' == rnode.regex[idx2] && true == rnode.isMeta[idx2])
 			{
@@ -460,7 +490,7 @@ COMPILERHDR void splitNodeStar( NODE &rnode, ulong divide, std::vector<NODE> &rG
 	{
 		ulong flag = 1;                                           
 		ulong preBracket = 0;
-		for ( ulong idx2 = divide - 1; idx2 >= 0; --idx2)
+		for ( ulong idx2 = divide - 2; idx2 >= 0; --idx2)
 		{
 			if ( ']' == rnode.regex[idx2] && true == rnode.isMeta[idx2])
 			{
@@ -501,6 +531,7 @@ COMPILERHDR void splitNodePlus( NODE &rnode, ulong divide, std::vector<NODE> &rG
 	std::string strNext;
 	std::string strTemp;
 
+	
 	if ( ('x' == rnode.regex[divide - 1] ||'A' == rnode.regex[divide - 1] || 'Z' == rnode.regex[divide - 1] || 'b' == rnode.regex[divide - 1] || 'B' == rnode.regex[divide - 1] || 'd' == rnode.regex[divide - 1] || 
 				'D' == rnode.regex[divide - 1] || 'w' == rnode.regex[divide - 1] || 'W' == rnode.regex[divide - 1] ||
 				'f' == rnode.regex[divide - 1] || 'v' == rnode.regex[divide - 1] || 'o' == rnode.regex[divide - 1] || 'c' ==rnode.regex[divide - 1]) && true == rnode.isMeta[divide - 1] )
@@ -541,11 +572,46 @@ COMPILERHDR void splitNodePlus( NODE &rnode, ulong divide, std::vector<NODE> &rG
 	}
 	else if (']'!= rnode.regex[divide - 1] && ')'!= rnode.regex[divide - 1] && false == rnode.isMeta[divide - 1])
 	{
+		if ('(' != rnode.regex[divide - 1] && '[' != rnode.regex[divide - 1] && '{' != rnode.regex[divide - 1] && '}' != rnode.regex[divide - 1] &&
+			'*' != rnode.regex[divide - 1] && '?' != rnode.regex[divide - 1] && '+' != rnode.regex[divide - 1] && '|' != rnode.regex[divide - 1] )
+		{
+			strPrev.assign(rnode.regex.begin(), rnode.regex.begin() + divide);
+			InitNode(strPrev, node);
+			rGroup.push_back(node);
+
+			strNext.assign(rnode.regex.begin() + divide + 1, rnode.regex.end());
+			strNext = rnode.regex[divide - 1] + strNext;
+			if (!strNext.empty())
+			{
+				InitNode(strNext,node);
+				rGroup.push_back(node);
+			}
+		}
+		else
+		{
+			strPrev.assign(rnode.regex.begin(), rnode.regex.begin() + divide);
+			InitNode(strPrev, node);
+			rGroup.push_back(node);
+
+			strNext.assign(rnode.regex.begin() + divide + 1, rnode.regex.end());
+			strTemp.assign(rnode.regex.begin() + divide - 2, rnode.regex.begin() + divide);
+			strNext = strTemp + strNext;
+			if (!strNext.empty())
+			{
+				InitNode(strNext,node);
+				rGroup.push_back(node);
+			}
+		}
+	}
+	else if ( ( ')' == rnode.regex[divide - 1] || ']' == rnode.regex[divide - 1]) && false == rnode.isMeta[divide - 1] )
+	{
 		strPrev.assign(rnode.regex.begin(), rnode.regex.begin() + divide);
 		InitNode(strPrev, node);
 		rGroup.push_back(node);
 
 		strNext.assign(rnode.regex.begin() + divide + 1, rnode.regex.end());
+		strTemp.assign(rnode.regex.begin() + divide - 2, rnode.regex.begin() + divide);
+		strNext = strTemp + strNext;
 		if (!strNext.empty())
 		{
 			InitNode(strNext,node);
@@ -557,7 +623,7 @@ COMPILERHDR void splitNodePlus( NODE &rnode, ulong divide, std::vector<NODE> &rG
 		/// @brief		向前查找与之对应的"("位置，注意小括号的嵌套情况
 		ulong flag = 1;                                           
 		ulong preBracket = 0;
-		for ( ulong idx2 = divide - 1; idx2 >= 0; --idx2)
+		for ( ulong idx2 = divide - 2; idx2 >= 0; --idx2)
 		{
 			if ( ')' == rnode.regex[idx2] && true == rnode.isMeta[idx2] )
 			{
@@ -594,7 +660,7 @@ COMPILERHDR void splitNodePlus( NODE &rnode, ulong divide, std::vector<NODE> &rG
 	{
 		ulong flag = 1;                                           
 		ulong preBracket = 0;
-		for ( ulong idx2 = divide - 1; idx2 >= 0; --idx2)
+		for ( ulong idx2 = divide - 2; idx2 >= 0; --idx2)
 		{
 			if ( ']' == rnode.regex[idx2] && true == rnode.isMeta[idx2])
 			{
@@ -638,10 +704,10 @@ COMPILERHDR void splitNodeBrace( NODE &rnode, ulong divide, std::vector<NODE> &r
 
 	/// @brief		将字符转化为数字
 	ulong timePos;
-	for (ulong i = divide + 1; ; ++i)
+	for (ulong i = divide + 1; i < rnode.regex.size(); ++i)
 	{
 		timePos = i;
-		if ((',' == rnode.regex[i] || '}' == rnode.regex[i]) && true == rnode.isMeta[i])
+		if (',' == rnode.regex[i] || ('}' == rnode.regex[i] && true == rnode.isMeta[i]) )
 		{
 			break;
 		}
@@ -649,11 +715,11 @@ COMPILERHDR void splitNodeBrace( NODE &rnode, ulong divide, std::vector<NODE> &r
 	std::string strtime;
 	strtime.assign(rnode.regex.begin() + divide + 1, rnode.regex.begin() + timePos);
 	ulong times = 0;             
-	for (ulong i = strtime.size() - 1; i >= 0; --i)
+	for (ulong i = strtime.size(); i > 0; --i)
 	{
-		ulong temp = strtime[i] - CHARTONUM;
+		ulong temp = strtime[i - 1] - CHARTONUM;
 		
-		times += temp * (std::pow(10, strtime.size()- 1 - i));
+		times += temp * (std::pow(10, strtime.size() - i));
 	}
 
 	/// @brief		寻找下一个'}'的位置
@@ -668,26 +734,47 @@ COMPILERHDR void splitNodeBrace( NODE &rnode, ulong divide, std::vector<NODE> &r
 	}
 
 	/// @brief		如果大括号前不是小括号则进行以下操作
-		
-	if (  ')' != rnode.regex[divide -1])
+	
+	if (  ')' != rnode.regex[divide - 1])
 	{
 		
-		if ((rnode.isMeta[divide - 1]) == false)
+		if (rnode.isMeta[divide - 1] == false)
 		{
-			strPrev.assign(rnode.regex.begin(), rnode.regex.begin() + divide - 1);
-			std::string strTemp;
-			if (times >= K)
+			if ('(' != rnode.regex[divide - 1] && '[' != rnode.regex[divide - 1] && ']' != rnode.regex[divide - 1] && '{' != rnode.regex[divide - 1] && '}' != rnode.regex[divide - 1] &&
+				'*' != rnode.regex[divide - 1] && '?' != rnode.regex[divide - 1] && '+' != rnode.regex[divide - 1] && '|' != rnode.regex[divide - 1] )
 			{
-			strTemp.assign(K, rnode.regex[divide - 1]);
+				strPrev.assign(rnode.regex.begin(), rnode.regex.begin() + divide - 1);
+				std::string strTemp;
+				if (times >= K)
+				{
+					strTemp.assign(K, rnode.regex[divide - 1]);
+				}
+				else
+				{
+					strTemp.assign(times, rnode.regex[divide - 1]);
+				}
+				strPrev += strTemp;
+
+				strNext.assign(rnode.regex.begin() + nextBrace + 1, rnode.regex.end());
+				strNext = strTemp + strNext;
 			}
 			else
 			{
-				strTemp.assign(times, rnode.regex[divide - 1]);
+				strPrev.assign(rnode.regex.begin(), rnode.regex.begin() + divide - 2);
+				std::string strTemp;
+				strTemp.assign(rnode.regex.begin() + divide - 2, rnode.regex.begin() + divide);
+				strNext.assign(rnode.regex.begin() + nextBrace + 1, rnode.regex.end());
+				if (times >= K)
+				{
+					times = K;
+				}
+		
+				for (ulong i = 0; i < times; ++i)
+				{
+					strPrev += strTemp;
+					strNext = strTemp + strNext;
+				}
 			}
-			strPrev += strTemp;
-
-			strNext.assign(rnode.regex.begin() + nextBrace + 1, rnode.regex.end());
-			strNext = strTemp + strNext;
 		}
 		else
 		{
@@ -696,29 +783,20 @@ COMPILERHDR void splitNodeBrace( NODE &rnode, ulong divide, std::vector<NODE> &r
 			{
 				
 				std::string strTemp(rnode.regex.begin() + divide - 2, rnode.regex.begin() + divide);
+				strNext.assign(rnode.regex.begin() + nextBrace + 1, rnode.regex.end());
 				if (times >= K)
 				{
-					for (ulong i = 0; i < K - 1; ++i)
-					{
-						strTemp += strTemp;
-					}
+					times = K;
 				}
-				else
+				
+				for (ulong i = 0; i < times; ++i)
 				{
-					for (ulong i = 0; i < times - 1; ++i)
-					{
-						strTemp += strTemp;
-					}
+					strPrev += strTemp;
+					strNext = strTemp + strNext;
 				}
-
-				strPrev += strTemp;
-
-				strNext.assign(rnode.regex.begin() + nextBrace + 1, rnode.regex.end());
-				strNext = strTemp + strNext;
 			}
 			else
 			{
-				
 				strNext.assign(rnode.regex.begin() + nextBrace + 1, rnode.regex.end());
 			}
 		}
@@ -728,7 +806,29 @@ COMPILERHDR void splitNodeBrace( NODE &rnode, ulong divide, std::vector<NODE> &r
 		InitNode(strNext, node);
 		rGroup.push_back(node);
 	}
+	else if ((rnode.isMeta[divide - 1]) == false)
+	{
+		strPrev.assign(rnode.regex.begin(), rnode.regex.begin() + divide - 2);
+		std::string strTemp;
+		strTemp.assign(rnode.regex.begin() + divide - 2, rnode.regex.begin() + divide);
+		strNext.assign(rnode.regex.begin() + nextBrace + 1, rnode.regex.end());
+		if (times >= K)
+		{
+			times = K;
+		}
+		
+		for (ulong i = 0; i < times; ++i)
+		{
+			strPrev += strTemp;
+			strNext = strTemp + strNext;
+		}
+	
+		InitNode(strPrev, node);
+		rGroup.push_back(node);
 
+		InitNode(strNext, node);
+		rGroup.push_back(node);
+	}
 	// @brief		如果大括号前是小括号则进行以下操作
 	else if(true == rnode.isMeta[divide - 1])
 	{
@@ -737,7 +837,7 @@ COMPILERHDR void splitNodeBrace( NODE &rnode, ulong divide, std::vector<NODE> &r
 		// @brief		 查找与之匹配的"("，注意嵌套情况
 		ulong preBracket;
 		ulong flag = 1;
-		for (ulong idx9 = divide - 2; ; --idx9 )
+		for (ulong idx9 = divide - 2; idx9 >=0; --idx9 )
 		{
 			if ( ')' == rnode.regex[idx9] && true == rnode.isMeta[idx9])
 			{
@@ -755,17 +855,22 @@ COMPILERHDR void splitNodeBrace( NODE &rnode, ulong divide, std::vector<NODE> &r
 		}
 
 		strPrev.assign(rnode.regex.begin(), rnode.regex.begin() + preBracket);
-		strTemp.assign(rnode.regex.begin() + preBracket, rnode.regex.begin() + divide);
-		for (ulong cnt = 0; cnt != times - 1; ++cnt)
+		strTemp.assign(rnode.regex.begin() + preBracket + 1, rnode.regex.begin() + divide - 1);
+		strNext.assign(rnode.regex.begin() + nextBrace + 1, rnode.regex.end());
+		if (times > K)
 		{
-			strTemp += strTemp;
+			times = K;
 		}
-		strPrev = strTemp + strPrev;
+
+		for (ulong cnt = 0; cnt != times; ++cnt)
+		{
+			strPrev = strPrev + strTemp;
+			strNext = strTemp + strNext;
+		}
+		
 		InitNode(strPrev, node);
 		rGroup.push_back(node);
-
-		strNext.assign(rnode.regex.begin() + nextBrace + 1, rnode.regex.end());
-		strNext = strTemp + strNext;
+		
 		InitNode(strNext, node);
 		rGroup.push_back(node);
 	}
@@ -985,6 +1090,7 @@ COMPILERHDR CUnsignedArray ExtrSig(NODE nodeOrigin)
 			nodeOrigin.regex.insert(nodeOrigin.regex.begin(), '/');
 			nodeOrigin.regex.insert(nodeOrigin.regex.begin(), '"');
 		}
+		len = nodeOrigin.regex.size();
 		if (nodeOrigin.regex[len - 2] != '/'  || nodeOrigin.regex[len - 1] != '"' )
 		{
 			nodeOrigin.regex.insert(nodeOrigin.regex.end(), '/');
@@ -995,6 +1101,13 @@ COMPILERHDR CUnsignedArray ExtrSig(NODE nodeOrigin)
 		CPcreOption pcreOption;
 		pcreOption.FromPattern(dllstr);
 
+		//const char *strtemp = dllstr.Data();
+		//for (ulong i = 0; i < dllstr.Size(); ++i)
+		//{
+		//	std::cout << strtemp[i];
+		//}
+		//std::cout << std::endl;
+
 		/// @brief		编译pcre并将中间结果放入pcRes
 		CByteArray pcRes;                             
 		pcreOption.Precompile(pcRes);
@@ -1002,6 +1115,12 @@ COMPILERHDR CUnsignedArray ExtrSig(NODE nodeOrigin)
 		/// @brief		将剔除元字符后的结果放入strResult
 		std::vector<CByteArray> strResult;
 		ExtractSequence(pcRes, strResult);
+
+		for (std::vector<CByteArray>::iterator iter = strResult.begin(); iter != strResult.end(); ++iter)
+		{
+			std::cout << iter->Data();
+			std::cout << std::endl;
+		}
 
 		for (std::vector<CByteArray>::iterator iter = strResult.begin(); iter != strResult.end(); ++iter)
 		{

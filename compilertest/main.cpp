@@ -21,7 +21,7 @@ void main(int nArgs, char **pArgs)
 	CUnsignedArray sigs;
 	std::vector<CByteArray> strResult;
 	// ¼ì²âÎÄ¼þ
-	std::ifstream ifile("..\\test\\pcre\\pcreSource.txt");
+	std::ifstream ifile("pcreSource.txt");
 	
 	std::getline(ifile, strSource);
 	InitNode(strSource, node);
