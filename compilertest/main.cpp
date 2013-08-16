@@ -3,6 +3,7 @@
 #include <filesystem>
 #include <algorithm>
 #include <sstream>
+#include <string>
 
 #include <hwprj\pcreopt.h>
 #include <hwprj\dllstring.h>
@@ -21,10 +22,27 @@ void main(int nArgs, char **pArgs)
 	CUnsignedArray sigs;
 	std::vector<CByteArray> strResult;
 	// 检测文件
-	std::ifstream ifile("pcreSource.txt");
+	std::ifstream ifile("D:\\projects\\input\\CanProcessPcres.txt");
 	
 	std::getline(ifile, strSource);
-	InitNode(strSource, node);
+
+	std::string::size_type pos1 = strSource.find_last_of('"');
+	std::string::size_type pos2 = 0;
+	for (size_t pos2 = pos1; pos2 >= 0; --pos2)
+	{
+		if (strSource[pos2] == '/')
+		{
+			break;
+		}
+	}
+
+	std::string realStr(strSource);
+	if (pos1 > pos2 + 1)
+	{
+		realStr.erase(pos2 + 1, pos1 - 1);
+	}
+
+	InitNode(realStr, node);
 	sigs = ExtrSig(node);
 
 	// 打印结果
