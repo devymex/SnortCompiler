@@ -96,7 +96,7 @@ bool EstimateOption (std::string strName, std::string strValue)
 	}
 
 	std::string::reverse_iterator i = strValue.rbegin();
-	for(; g_isSpace(*i); ++i);
+	for(; i != strValue.rend() && g_isSpace(*i); ++i);
 	strValue.erase(i.base(), strValue.end());
 
 	std::string::iterator iterBeg;
@@ -144,10 +144,16 @@ void SplitOption(std::string &ruleOptions, std::vector<RULEOPTIONRAW> &options)
 			break;
 		}
 		RULEOPTIONRAW or;
-		STRING_ITER iNameBeg = std::find_if(i, iComma, isalpha);
+		STRING_ITER iNameBeg = std::find_if_not(i, iComma, g_isSpace);
 		if (iNameBeg == ruleOptions.end())
 		{
 			break;
+		}
+		if (iNameBeg == iComma)
+		{
+			temp = iComma + 1;
+			i = temp;
+			continue;
 		}
 		STRING_ITER iValueBeg = std::find(iNameBeg + 1, iComma, ':');
 		STRING_ITER iNameEnd = iValueBeg;
