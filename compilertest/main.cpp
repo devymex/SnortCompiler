@@ -17,8 +17,6 @@
 
 void main(int nArgs, char **pArgs)
 {
-	std::string temp = "abcdefg";
-	temp.erase(1,3);
 	std::string strSource;
 	NODE node;
 	CUnsignedArray sigs;
