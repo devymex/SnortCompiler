@@ -392,8 +392,20 @@ COMPILERHDR void splitNodeStar( NODE &rnode, ulong divide, std::vector<NODE> &rG
 	NODE node;
 	std::string strPrev;
 	std::string strNext;
+	if ('x' == rnode.regex[divide - 3] && true == rnode.isMeta[divide - 3])
+	{
+		strPrev.assign(rnode.regex.begin(), rnode.regex.begin() + divide - 4);
+		InitNode(strPrev, node);
+		rGroup.push_back(node);
 
-	if ( ('x' == rnode.regex[divide - 1] ||'A' == rnode.regex[divide - 1] || 'Z' == rnode.regex[divide - 1] || 'b' == rnode.regex[divide - 1] || 'B' == rnode.regex[divide - 1] || 'd' == rnode.regex[divide - 1] || 
+		strNext.assign(rnode.regex.begin() + divide + 1, rnode.regex.end());
+		if (!strNext.empty())
+		{
+			InitNode(strNext,node);
+			rGroup.push_back(node);
+		}
+	}
+	else if ( ('x' == rnode.regex[divide - 1] ||'A' == rnode.regex[divide - 1] || 'Z' == rnode.regex[divide - 1] || 'b' == rnode.regex[divide - 1] || 'B' == rnode.regex[divide - 1] || 'd' == rnode.regex[divide - 1] || 
 				'D' == rnode.regex[divide - 1] || 'w' == rnode.regex[divide - 1] || 'W' == rnode.regex[divide - 1] || 's' == rnode.regex[divide - 1] || 'S' == rnode.regex[divide - 1] || 
 				'f' == rnode.regex[divide - 1] || 't' == rnode.regex[divide - 1] || 'v' == rnode.regex[divide - 1] || 'o' == rnode.regex[divide - 1] || 'c' ==rnode.regex[divide - 1]) && true == rnode.isMeta[divide - 1] )
 	{
@@ -531,8 +543,22 @@ COMPILERHDR void splitNodePlus( NODE &rnode, ulong divide, std::vector<NODE> &rG
 	std::string strNext;
 	std::string strTemp;
 
-	
-	if ( ('x' == rnode.regex[divide - 1] ||'A' == rnode.regex[divide - 1] || 'Z' == rnode.regex[divide - 1] || 'b' == rnode.regex[divide - 1] || 'B' == rnode.regex[divide - 1] || 'd' == rnode.regex[divide - 1] || 
+	if ('x' == rnode.regex[divide - 3] && true == rnode.isMeta[divide - 3])
+	{
+		strPrev.assign(rnode.regex.begin(), rnode.regex.begin() + divide);
+		InitNode(strPrev, node);
+		rGroup.push_back(node);
+
+		strTemp.assign(rnode.regex.begin() + divide - 4, rnode.regex.begin() + divide);
+		strNext.assign(rnode.regex.begin() + divide + 1, rnode.regex.end());
+		strNext = strTemp + strNext;
+		if (!strNext.empty())
+		{
+			InitNode(strNext,node);
+			rGroup.push_back(node);
+		}
+	}
+	else if ( ('x' == rnode.regex[divide - 1] ||'A' == rnode.regex[divide - 1] || 'Z' == rnode.regex[divide - 1] || 'b' == rnode.regex[divide - 1] || 'B' == rnode.regex[divide - 1] || 'd' == rnode.regex[divide - 1] || 
 				'D' == rnode.regex[divide - 1] || 'w' == rnode.regex[divide - 1] || 'W' == rnode.regex[divide - 1] ||
 				'f' == rnode.regex[divide - 1] || 'v' == rnode.regex[divide - 1] || 'o' == rnode.regex[divide - 1] || 'c' ==rnode.regex[divide - 1]) && true == rnode.isMeta[divide - 1] )
 	{
@@ -733,9 +759,35 @@ COMPILERHDR void splitNodeBrace( NODE &rnode, ulong divide, std::vector<NODE> &r
 		}
 	}
 
-	/// @brief		如果大括号前不是小括号则进行以下操作
-	
-	if (  ')' != rnode.regex[divide - 1])
+
+	if ('x' == rnode.regex[divide - 3] && true == rnode.isMeta[divide - 3])
+	{
+		strPrev.assign(rnode.regex.begin(), rnode.regex.begin() + divide - 4);
+		strNext.assign(rnode.regex.begin() + nextBrace + 1, rnode.regex.end());
+		strTemp.assign(rnode.regex.begin() + divide - 4, rnode.regex.begin() + divide);
+
+		if (times >= K)
+		{
+			times = K;
+		}
+		
+		for (ulong i = 0; i < times; ++i)
+		{
+			strPrev += strTemp;
+			strNext = strTemp + strNext;
+		}
+		
+		InitNode(strPrev, node);
+		rGroup.push_back(node);
+		
+		if (!strNext.empty())
+		{
+			InitNode(strNext,node);
+			rGroup.push_back(node);
+		}
+	}
+		/// @brief		如果大括号前不是小括号则进行以下操作
+	else if (  ')' != rnode.regex[divide - 1])
 	{
 		
 		if (rnode.isMeta[divide - 1] == false)
