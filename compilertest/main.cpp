@@ -17,6 +17,8 @@
 
 void main(int nArgs, char **pArgs)
 {
+	std::string temp = "abcdefg";
+	temp.erase(1,3);
 	std::string strSource;
 	NODE node;
 	CUnsignedArray sigs;
@@ -26,9 +28,9 @@ void main(int nArgs, char **pArgs)
 	
 	std::getline(ifile, strSource);
 
-	std::string::size_type pos1 = strSource.find_last_of('"');
-	std::string::size_type pos2 = 0;
-	for (size_t pos2 = pos1; pos2 >= 0; --pos2)
+	size_t pos1 = strSource.find_last_of('"');
+	size_t pos2 = 0;
+	for (pos2 = pos1; pos2 >= 0; --pos2)
 	{
 		if (strSource[pos2] == '/')
 		{
@@ -39,7 +41,7 @@ void main(int nArgs, char **pArgs)
 	std::string realStr(strSource);
 	if (pos1 > pos2 + 1)
 	{
-		realStr.erase(pos2 + 1, pos1 - 1);
+		realStr.erase(realStr.begin() + pos2 + 1, realStr.begin() + pos1);
 	}
 
 	InitNode(realStr, node);
