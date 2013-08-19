@@ -22,35 +22,40 @@ void main(int nArgs, char **pArgs)
 	CUnsignedArray sigs;
 	std::vector<CByteArray> strResult;
 	// 检测文件
-	std::ifstream ifile("D:\\projects\\input\\CanProcessPcres.txt");
+	std::ifstream ifile("CanProcessPcres.txt");
 	
-	std::getline(ifile, strSource);
-
-	size_t pos1 = strSource.find_last_of('"');
-	size_t pos2 = 0;
-	for (pos2 = pos1; pos2 >= 0; --pos2)
+	while (!ifile.eof())
 	{
-		if (strSource[pos2] == '/')
+		strSource.clear();
+		std::getline(ifile, strSource);
+
+		size_t pos1 = strSource.find_last_of('"');
+		size_t pos2 = 0;
+		for (pos2 = pos1; pos2 >= 0; --pos2)
 		{
-			break;
+			if (strSource[pos2] == '/')
+			{
+				break;
+			}
 		}
-	}
 
-	std::string realStr(strSource);
-	if (pos1 > pos2 + 1)
-	{
-		realStr.erase(realStr.begin() + pos2 + 1, realStr.begin() + pos1);
-	}
+		std::string realStr(strSource);
+		if (pos1 > pos2 + 1)
+		{
+			realStr.erase(realStr.begin() + pos2 + 1, realStr.begin() + pos1);
+		}
 
-	InitNode(realStr, node);
-	sigs = ExtrSig(node);
+		InitNode(realStr, node);
+		sigs = ExtrSig(node);
 
-	// 打印结果
-	for (ulong idx = 0; idx != sigs.Size(); ++idx)
-	{
-		std::cout << sigs[idx] << std::endl;
+		// 打印结果
+		for (ulong idx = 0; idx != sigs.Size(); ++idx)
+		{
+			std::cout << sigs[idx] << std::endl;
+		}
+		std::cout << sigs.Size() << std::endl;
 	}
-	std::cout << sigs.Size() << std::endl;
+	
 
 	system("pause");
 }
