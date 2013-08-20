@@ -105,6 +105,22 @@ bool myFind(std::vector<GROUPHASH> &vecGroups, RESULTMAP &result, SIGNATURE &cur
 	}
 }
 
+bool hasNotCircuit(const std::deque<STATION> &seqPath)
+{
+	for (std::deque<STATION>::const_iterator i = seqPath.begin(); i != seqPath.end(); ++i)
+	{
+		for (std::deque<STATION>::const_iterator j = i + 1; j != seqPath.end(); ++j)
+		{
+			if (hash(i->sig) == hash(j->sig))
+			{
+				return false;
+			}
+		}
+	}
+
+	return true;
+}
+
 /*! recursive adjust for conflict hash slot.
 
 Arguments:
@@ -142,7 +158,7 @@ void RecursiveAdjust(std::vector<GROUPHASH> &vecGroups, RESULTMAP &result)
 						seqPath.push_front(STATION());
 						seqPath.front().dfaId = *j;
 						seqPath.front().sig = *k;
-						if (myFind(vecGroups, result, *k, seqPath, depth))
+						if (myFind(vecGroups, result, *k, seqPath, depth) && hasNotCircuit(seqPath))
 						{
 							flag = true;
 							change = true;
