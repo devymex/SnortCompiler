@@ -285,7 +285,11 @@ void ParseOptions(std::string &ruleOptions, CSnortRule &snortRule)
 			snortRule.PushBack(&contOpt);
 		}
 		else if (0 == stricmp("nocase", iOp->name.c_str()))
-		{			
+		{
+			if (snortRule.Size() == 0)
+			{
+				TTHROW(TI_INVALIDDATA);
+			}
 			CContentOption *pCont = dynamic_cast<CContentOption*>(snortRule.Back());
 			if (null == pCont)
 			{
@@ -295,6 +299,10 @@ void ParseOptions(std::string &ruleOptions, CSnortRule &snortRule)
 		}
 		else if (0 == stricmp("offset", iOp->name.c_str()))
 		{
+			if (snortRule.Size() == 0)
+			{
+				TTHROW(TI_INVALIDDATA);
+			}
 			CContentOption *pCont = dynamic_cast<CContentOption*>(snortRule.Back());
 			if (null == pCont)
 			{
@@ -305,6 +313,10 @@ void ParseOptions(std::string &ruleOptions, CSnortRule &snortRule)
 		}
 		else if (0 == stricmp("depth", iOp->name.c_str()))
 		{
+			if (snortRule.Size() == 0)
+			{
+				TTHROW(TI_INVALIDDATA);
+			}
 			CContentOption *pCont = dynamic_cast<CContentOption*>(snortRule.Back());
 			if (NULL == pCont)
 			{
@@ -315,6 +327,10 @@ void ParseOptions(std::string &ruleOptions, CSnortRule &snortRule)
 		}
 		else if (0 == stricmp("distance", iOp->name.c_str()))
 		{
+			if (snortRule.Size() == 0)
+			{
+				TTHROW(TI_INVALIDDATA);
+			}
 			CContentOption *pCont = dynamic_cast<CContentOption*>(snortRule.Back());
 			if (NULL == pCont)
 			{
@@ -325,6 +341,10 @@ void ParseOptions(std::string &ruleOptions, CSnortRule &snortRule)
 		}
 		else if (0 == stricmp("within", iOp->name.c_str()))
 		{
+			if (snortRule.Size() == 0)
+			{
+				TTHROW(TI_INVALIDDATA);
+			}
 			CContentOption *pCont = dynamic_cast<CContentOption*>(snortRule.Back());
 			if (NULL == pCont)
 			{
