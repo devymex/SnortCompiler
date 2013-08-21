@@ -28,6 +28,18 @@ COMPILERHDR void ParseRuleFile(const char *pFileName, RECIEVER recv, void *lpUse
 	{
 		throw 0;
 	}
+
+	std::ofstream fCompileError("CompileError.txt");
+	std::ofstream fParseError("ParseError.txt");
+	std::ofstream fSuccess("Sucess.txt");
+	std::ofstream fPcreError("PcreError.txt");
+	std::ofstream fOptionError("OptionError.txt");
+	std::ofstream fHasByte("HasByte.txt");
+	std::ofstream fHasNot("HasNot.txt");
+	std::ofstream fEmpty("Empty.txt");
+	std::ofstream fHasNoSig("HasNotSig.txt");
+	std::ofstream fExceedLimit("ExceedLimit.txt");
+
 	STRINGVEC rules;
 	if(0 == LoadFile(pFileName, rules))
 	{
@@ -36,10 +48,12 @@ COMPILERHDR void ParseRuleFile(const char *pFileName, RECIEVER recv, void *lpUse
 			for(STRINGVEC_ITER i = rules.begin(); i != rules.end(); ++i)
 			{
 				g_log << "Compiling: " << i - rules.begin() + 1 << g_log.nl;
+				std::string ruleStr = *i;
 				STRING_ITER iBra = std::find(i->begin(), i->end(), '(');
 				if (iBra == i->end())
 				{
 					g_log << "Compile error!" << g_log.nl;
+					fCompileError << ruleStr << std::endl;
 					continue;
 					//TTHROW(TI_INVALIDDATA);
 				}
@@ -49,6 +63,7 @@ COMPILERHDR void ParseRuleFile(const char *pFileName, RECIEVER recv, void *lpUse
 				if (iBra == i->rend().base())
 				{
 					g_log << "Compile error!" << g_log.nl;
+					fCompileError << ruleStr << std::endl;
 					continue;
 					//TTHROW(TI_INVALIDDATA);
 				}
@@ -62,6 +77,7 @@ COMPILERHDR void ParseRuleFile(const char *pFileName, RECIEVER recv, void *lpUse
 				catch (CTrace &e)
 				{
 					g_log << "ParseOptions error: " << e.What() << g_log.nl;
+					fParseError << ruleStr << std::endl;
 					continue;
 					//throw;
 				}
@@ -89,10 +105,62 @@ COMPILERHDR void ParseRuleFile(const char *pFileName, RECIEVER recv, void *lpUse
 				{
 					pr.ulFlag |= PARSEFLAG::PARSE_EMPTY;
 				}
-				recv(pr, lpUser);
+
+				ulong nr = recv(pr, lpUser);
+
+				if (nr == COMPILEDINFO::RES_SUCCESS)
+				{
+					fSuccess << ruleStr << std::endl;
+				}
+
+				if (nr & COMPILEDINFO::RES_PCREERROR)
+				{
+					fPcreError << ruleStr << std::endl;
+				}
+
+				if (nr & COMPILEDINFO::RES_OPTIONERROR)
+				{
+					fOptionError << ruleStr << std::endl;
+				}
+
+				if (nr & COMPILEDINFO::RES_HASBYTE)
+				{
+					fHasByte << ruleStr << std::endl;
+				}
+
+				if (nr & COMPILEDINFO::RES_HASNOT)
+				{
+					fHasNot << ruleStr << std::endl;
+				}
+
+				if (nr & COMPILEDINFO::RES_EMPTY)
+				{
+					fEmpty << ruleStr << std::endl;
+				}
+
+				if (nr & COMPILEDINFO::RES_HASNOSIG)
+				{
+					fHasNoSig << ruleStr << std::endl;
+				}
+
+				if (nr & COMPILEDINFO::RES_EXCEEDLIMIT)
+				{
+					fExceedLimit << ruleStr << std::endl;
+				}
 			}
 		}
 	}
+
+	fCompileError.close();
+	fParseError.close();
+	fSuccess.close();
+	fPcreError.close();
+	fOptionError.close();
+	fHasByte.close();
+	fHasNot.close();
+	fEmpty.close();
+	fHasNoSig.close();
+	fExceedLimit.close();
 }
 
 COMPILERHDR void CompileRuleFile(const char *pFileName, CCompileResults &compRes)

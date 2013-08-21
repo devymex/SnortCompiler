@@ -61,6 +61,7 @@ void main(int nArgs, char **pArgs)
 	bool bCompSuc = true;
 	CTimer compTimer;
 	double dCompTime = 0;
+	std::vector<std::string> allRules;
 	for (; iDirCur != iDirEnd; ++iDirCur)
 	{
 		const std::tr2::sys::path &curPath = *iDirCur;
@@ -89,7 +90,6 @@ void main(int nArgs, char **pArgs)
 			}
 		}
 	}
-
 
 	if (bCompSuc == true)
 	{
@@ -127,26 +127,27 @@ void main(int nArgs, char **pArgs)
 	//写最终结果文件
 	groupRes.WriteToFile(strWriteFileName.c_str());
 
-	std::cout << std::endl << std::endl;
-	std::cout << "Successed compiled rule: " << nRules << std::endl;
-	std::cout << "Total compiled chain: " << result.GetRegexTbl().Size() << std::endl;
-	std::cout << "Compile time: " << dCompTime << std::endl;
+	std::ofstream fout("RunResult.log");
+
+	fout << "Successed compiled rule: " << nRules << std::endl;
+	fout << "Total compiled chain: " << result.GetRegexTbl().Size() << std::endl;
+	fout << "Compile time: " << dCompTime << std::endl;
 
 	//总分组数
 	size_t nGrounSize = groupRes.GetGroups().Size();
-	std::cout << "Groups: " << nGrounSize << std::endl;
+	fout << "Groups: " << nGrounSize << std::endl;
 
-	std::cout << "Hash size: " << groupRes.GetBucketCnt() << std::endl;
+	fout << "Hash size: " << groupRes.GetBucketCnt() << std::endl;
 
 	//使用到的哈希槽数
-	std::cout << "Used hash buckets: " << HashResMap.size() << std::endl;
+	fout << "Used hash buckets: " << HashResMap.size() << std::endl;
 
 	// 冲突率
-	std::cout << "Conflict rate: " <<
+	fout << "Conflict rate: " <<
 		(nGrounSize - HashResMap.size()) / (float)nGrounSize << std::endl;	
-	std::cout << "Group and hash time: " << compTimer.Reset() << std::endl;
+	fout << "Group and hash time: " << compTimer.Reset() << std::endl;
 
-	std::cout << std::endl;
+	fout.close();
 
 	system("pause");
 }
