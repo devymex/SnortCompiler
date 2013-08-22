@@ -597,6 +597,13 @@ ulong CDfa::PartStates(STATEIDARY *pRevTbl)
 
 	PARTSETVEC partSets;
 	InitPartSet(m_FinStas, ulStaNum, partSets);
+	for (std::vector<PARTSET>::iterator i = partSets.begin(); i != partSets.end(); ++i)
+	{
+		if (i->StaSet.empty())
+		{
+			return 0;
+		}
+	}
 
 	for (PARTSETVEC_ITER i = partSets.begin(); i != partSets.end(); ++i)
 	{
