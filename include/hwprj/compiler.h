@@ -62,7 +62,7 @@ struct PARSERESULT
 /// @brief		解析规则使用的回调函数。
 /// @param[in]	parseRes 解析结果数据。
 /// @param[in]	lpUser 调用者指定的自定义参数。
-typedef void (__stdcall *RECIEVER)(const PARSERESULT &parseRes, void *lpUser);
+typedef ulong (__stdcall *RECIEVER)(const PARSERESULT &parseRes, void *lpUser);
 
 /// @brief		解析一个Snort规则文件，并通过回调函数给出结果。
 /// @param[in]	pFileName 输入规则文件名。

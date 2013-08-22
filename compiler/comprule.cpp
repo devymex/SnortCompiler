@@ -33,7 +33,7 @@ Arguments:
 Returns:		nothing
 
 */
-void __stdcall CompileCallback(const PARSERESULT &parseRes, void *lpVoid)
+ulong __stdcall CompileCallback(const PARSERESULT &parseRes, void *lpVoid)
 {
 	CCompileResults &result = *(CCompileResults*)lpVoid;
 	
@@ -64,6 +64,8 @@ void __stdcall CompileCallback(const PARSERESULT &parseRes, void *lpVoid)
 	{
 		Rule2Dfas(parseRes.regRule, result);
 	}
+
+	return ruleResult.m_nResult;
 }
 
 /*!

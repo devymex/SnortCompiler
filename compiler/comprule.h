@@ -129,7 +129,7 @@ typedef std::vector<CByteArray>			CHAINCOMPDATA;
 typedef std::vector<CHAINCOMPDATA>		RULECOMPDATA;
 
 
-void __stdcall CompileCallback(const PARSERESULT &parseRes, void *lpVoid);
+ulong __stdcall CompileCallback(const PARSERESULT &parseRes, void *lpVoid);
 
 bool SeqIncBy(const CRegRule &regRule, const RULESEQUENCE &ruleSeq, ulong ulIdx);
 
