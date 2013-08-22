@@ -223,6 +223,66 @@ bool EstimateOption (std::string strName, std::string strValue)
 	}
 }
 
+size_t FindEndContent(const std::string &rule, size_t nBeg)
+{
+	std::string::const_iterator iBeg = rule.begin() + nBeg;
+	std::string::const_iterator iEnd = std::find(iBeg, rule.end(), "\"");
+	if (iEnd == rule.end())
+	{
+		TTHROW(TI_INVALIDDATA);
+	}
+	std::string::const_iterator iEnd = std::find(iBeg, rule.end(), "\"");
+	if (iEnd == rule.end())
+	{
+		TTHROW(TI_INVALIDDATA);
+	}
+	std::string::const_iterator iEnd = std::find(iBeg, rule.end(), ";");
+	if (iEnd == rule.end())
+	{
+		TTHROW(TI_INVALIDDATA);
+	}
+	return iEnd - rule.begin();
+}
+
+size_t FindEndPcre(const std::string &rule, size_t nBeg)
+{
+	std::string::const_iterator iBeg = rule.begin() + nBeg;
+	std::string::const_iterator iEnd = std::find(iBeg, rule.end(), "\"");
+	if (iEnd == rule.end())
+	{
+		TTHROW(TI_INVALIDDATA);
+	}
+	for (; ;)
+	{
+		std::string::const_iterator iEnd = std::find(iBeg, rule.end(), "\"");
+		if (iEnd == rule.end())
+		{
+			TTHROW(TI_INVALIDDATA);
+		}
+		if (*(iEnd - 1) != '\\')
+		{
+			break;
+		}
+	}
+	std::string::const_iterator iEnd = std::find(iBeg, rule.end(), ";");
+	if (iEnd == rule.end())
+	{
+		TTHROW(TI_INVALIDDATA);
+	}
+	return iEnd - rule.begin();
+}
+
+size_t FindEndOther(const std::string &rule, size_t nBeg)
+{
+	std::string::const_iterator iBeg = rule.begin() + nBeg;
+	std::string::const_iterator iEnd = std::find(iBeg, rule.end(), ";");
+	if (iEnd == rule.end())
+	{
+		TTHROW(TI_INVALIDDATA);
+	}
+	return iEnd - rule.begin();
+}
+
 void SplitOption(std::string &ruleOptions, std::vector<RULEOPTIONRAW> &options)
 {
 	if (KeyTypeMap.empty())
