@@ -111,6 +111,17 @@ std::string type3Strs[] = //合法的格式为;
 	"sameip",
 	"stream_reassemble",
 	"stream_size",
+	"logto",
+	"session",
+	"resp",
+	"react",
+	"tag",
+	"activates",
+	"activated_by",
+	"count",
+	"replace",
+	"detection_filter",
+	"threshold"
 };
 
 /*! complie one rule
@@ -179,6 +190,24 @@ ulong LoadFile(const char *fileName, std::vector<std::string> &rules)
 	return 0;
 }
 
+std::string::iterator FindEndOther(std::string &rule, std::string::iterator iBeg)
+{
+	for (; ; ++iBeg)
+	{
+		iBeg = std::find(iBeg, rule.end(), ';');
+		if (iBeg == rule.end())
+		{
+			TTHROW(TI_INVALIDDATA);
+		}
+		if (*(iBeg - 1) != '\\')
+		{
+			break;
+		}
+	}
+
+	return iBeg;
+}
+
 std::string::iterator FindEndContent(std::string &rule, std::string::iterator iBeg)
 {
 	std::string::iterator iEnd = std::find(iBeg, rule.end(), '\"');
@@ -191,12 +220,8 @@ std::string::iterator FindEndContent(std::string &rule, std::string::iterator iB
 	{
 		TTHROW(TI_INVALIDDATA);
 	}
-	iEnd = std::find(iEnd + 1, rule.end(), ';');
-	if (iEnd == rule.end())
-	{
-		TTHROW(TI_INVALIDDATA);
-	}
-	return iEnd;
+
+	return FindEndOther(rule, iEnd + 1);
 }
 
 std::string::iterator FindEndPcre(std::string &rule, std::string::iterator iBeg)
@@ -218,22 +243,8 @@ std::string::iterator FindEndPcre(std::string &rule, std::string::iterator iBeg)
 			break;
 		}
 	}
-	iEnd = std::find(iEnd + 1, rule.end(), ';');
-	if (iEnd == rule.end())
-	{
-		TTHROW(TI_INVALIDDATA);
-	}
-	return iEnd;
-}
-
-std::string::iterator FindEndOther(std::string &rule, std::string::iterator iBeg)
-{
-	std::string::iterator iEnd = std::find(iBeg, rule.end(), ';');
-	if (iEnd == rule.end())
-	{
-		TTHROW(TI_INVALIDDATA);
-	}
-	return iEnd;
+	
+	return FindEndOther(rule, iEnd + 1);
 }
 
 void SplitOption(std::string &ruleOptions, std::vector<RULEOPTIONRAW> &options)
@@ -281,8 +292,24 @@ void SplitOption(std::string &ruleOptions, std::vector<RULEOPTIONRAW> &options)
 		std::string strName;
 		for (std::string::iterator i = iBeg; i != iEnd; ++i)
 		{
-			strName.push_back(tolower(*i));
+			strName.push_back(char(tolower(*i)));
 		}
+
+		iEnd = std::find_if_not(iEnd, ruleOptions.end(), ISSPACE());
+		if (iEnd == ruleOptions.end())
+		{
+			TTHROW(TI_INVALIDDATA);
+		}
+
+		if (*iEnd == ':')
+		{
+			++iEnd;
+		}
+		else if (*iEnd != ';')
+		{
+			TTHROW(TI_INVALIDDATA);
+		}
+
 		iBeg = iEnd;
 		switch (KeyTypeMap[strName])
 		{

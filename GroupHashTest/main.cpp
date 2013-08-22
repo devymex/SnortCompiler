@@ -49,7 +49,7 @@ void main(int nArgs, char **pArgs)
 	std::string strLogFile = strPath + "compile.log";
 	g_log.SetLogFile(strLogFile.c_str());
 
-	// Defina a path object to express a directory
+	// Define a path object to express a directory
 	std::tr2::sys::path rulePath(strPath);
 	// Construct a directory iterator for visit this path.
 	std::tr2::sys::directory_iterator iDirCur(rulePath);

@@ -84,14 +84,17 @@ COMPILERHDR void ParseRuleFile(const char *pFileName, RECIEVER recv, void *lpUse
 				PARSERESULT pr;
 				pr.ulSid = snortRule.GetSid();
 				pr.ulFlag = PARSEFLAG::PARSE_SUCCESS;
-				try
+				if (snortRule.GetFlags() == CSnortRule::NORMAL)
 				{
-					Rule2RegRule(snortRule, pr.regRule);
-				}
-				catch (CTrace &e)
-				{
-					pr.ulFlag |= PARSEFLAG::PARSE_ERROR;
-					g_log << "Rule2RegRule error: " << e.What() << g_log.nl;
+					try
+					{
+						Rule2RegRule(snortRule, pr.regRule);
+					}
+					catch (CTrace &e)
+					{
+						pr.ulFlag |= PARSEFLAG::PARSE_ERROR;
+						g_log << "Rule2RegRule error: " << e.What() << g_log.nl;
+					}
 				}
 				if (snortRule.GetFlags() & CSnortRule::HASBYTE)
 				{
