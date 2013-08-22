@@ -179,82 +179,36 @@ ulong LoadFile(const char *fileName, std::vector<std::string> &rules)
 	return 0;
 }
 
-bool EstimateOption (std::string strName, std::string strValue)
+std::string::iterator FindEndContent(std::string &rule, std::string::iterator iBeg)
 {
-	if (strValue.empty())
+	std::string::iterator iEnd = std::find(iBeg, rule.end(), '\"');
+	if (iEnd == rule.end())
 	{
-		return true;
+		TTHROW(TI_INVALIDDATA);
 	}
-
-	std::string::reverse_iterator i = strValue.rbegin();
-	for(; i != strValue.rend() && g_isSpace(*i); ++i);
-	strValue.erase(i.base(), strValue.end());
-
-	std::string::iterator iterBeg;
-	std::string::reverse_iterator riterEnd;
-	iterBeg = std::find(strValue.begin(), strValue.end(), '\"');
-	riterEnd = std::find(strValue.rbegin(), strValue.rend(), '\"');
-
-	if(0 == strcmp("msg", strName.c_str()) || 0 == strcmp("content", strName.c_str()) || 0 == strcmp("uricontent", strName.c_str()))
-	{		
-		if(riterEnd == strValue.rbegin())
-		{
-			return true;
-		}
-		else
-		{
-			return false;
-		}
-	}
-	else if(0 == strcmp("pcre", strName.c_str()))
+	iEnd = std::find(iEnd + 1, rule.end(), '\"');
+	if (iEnd == rule.end())
 	{
-		if(riterEnd == strValue.rbegin() && *(riterEnd + 1) != '\\')
-		{
-			return true;
-		}
-		else
-		{
-			return false;
-		}
+		TTHROW(TI_INVALIDDATA);
 	}
-	else
+	iEnd = std::find(iEnd + 1, rule.end(), ';');
+	if (iEnd == rule.end())
 	{
-		return true;
+		TTHROW(TI_INVALIDDATA);
 	}
+	return iEnd;
 }
 
-size_t FindEndContent(const std::string &rule, size_t nBeg)
+std::string::iterator FindEndPcre(std::string &rule, std::string::iterator iBeg)
 {
-	std::string::const_iterator iBeg = rule.begin() + nBeg;
-	std::string::const_iterator iEnd = std::find(iBeg, rule.end(), "\"");
-	if (iEnd == rule.end())
-	{
-		TTHROW(TI_INVALIDDATA);
-	}
-	std::string::const_iterator iEnd = std::find(iBeg, rule.end(), "\"");
-	if (iEnd == rule.end())
-	{
-		TTHROW(TI_INVALIDDATA);
-	}
-	std::string::const_iterator iEnd = std::find(iBeg, rule.end(), ";");
-	if (iEnd == rule.end())
-	{
-		TTHROW(TI_INVALIDDATA);
-	}
-	return iEnd - rule.begin();
-}
-
-size_t FindEndPcre(const std::string &rule, size_t nBeg)
-{
-	std::string::const_iterator iBeg = rule.begin() + nBeg;
-	std::string::const_iterator iEnd = std::find(iBeg, rule.end(), "\"");
+	std::string::iterator iEnd = std::find(iBeg, rule.end(), '\"');
 	if (iEnd == rule.end())
 	{
 		TTHROW(TI_INVALIDDATA);
 	}
 	for (; ;)
 	{
-		std::string::const_iterator iEnd = std::find(iBeg, rule.end(), "\"");
+		iEnd = std::find(iEnd + 1, rule.end(), '\"');
 		if (iEnd == rule.end())
 		{
 			TTHROW(TI_INVALIDDATA);
@@ -264,23 +218,22 @@ size_t FindEndPcre(const std::string &rule, size_t nBeg)
 			break;
 		}
 	}
-	std::string::const_iterator iEnd = std::find(iBeg, rule.end(), ";");
+	iEnd = std::find(iEnd + 1, rule.end(), ';');
 	if (iEnd == rule.end())
 	{
 		TTHROW(TI_INVALIDDATA);
 	}
-	return iEnd - rule.begin();
+	return iEnd;
 }
 
-size_t FindEndOther(const std::string &rule, size_t nBeg)
+std::string::iterator FindEndOther(std::string &rule, std::string::iterator iBeg)
 {
-	std::string::const_iterator iBeg = rule.begin() + nBeg;
-	std::string::const_iterator iEnd = std::find(iBeg, rule.end(), ";");
+	std::string::iterator iEnd = std::find(iBeg, rule.end(), ';');
 	if (iEnd == rule.end())
 	{
 		TTHROW(TI_INVALIDDATA);
 	}
-	return iEnd - rule.begin();
+	return iEnd;
 }
 
 void SplitOption(std::string &ruleOptions, std::vector<RULEOPTIONRAW> &options)
@@ -301,6 +254,56 @@ void SplitOption(std::string &ruleOptions, std::vector<RULEOPTIONRAW> &options)
 		{
 			KeyTypeMap[type3Strs[i]] = 3;
 		}
+	}
+
+	struct ISKEYNAME
+	{
+		bool operator()(char c)
+		{
+			return isalnum(c) || c == '_';
+		}
+	};
+
+	std::string::iterator iBeg = ruleOptions.begin();
+	for (;;)
+	{
+		iBeg = std::find_if(iBeg, ruleOptions.end(), ISKEYNAME());
+		if (iBeg == ruleOptions.end())
+		{
+			break;
+		}
+		std::string::iterator iEnd = std::find_if_not(iBeg, ruleOptions.end(), ISKEYNAME());
+		if (iEnd == ruleOptions.end())
+		{
+			TTHROW(TI_INVALIDDATA);
+		}
+
+		std::string strName;
+		for (std::string::iterator i = iBeg; i != iEnd; ++i)
+		{
+			strName.push_back(tolower(*i));
+		}
+		iBeg = iEnd;
+		switch (KeyTypeMap[strName])
+		{
+		case 1:
+			iEnd = FindEndContent(ruleOptions, iEnd);
+			break;
+		case 2:
+			iEnd = FindEndPcre(ruleOptions, iEnd);
+			break;
+		case 3:
+			iEnd = FindEndOther(ruleOptions, iEnd);
+			break;
+		default:
+			TTHROW(TI_INVALIDDATA);
+		}
+
+		RULEOPTIONRAW pr;
+		pr.name = strName;
+		pr.value = std::string(iBeg, iEnd);
+		options.push_back(pr);
+		iBeg = iEnd + 1;
 	}
 }
 
