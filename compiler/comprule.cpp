@@ -24,6 +24,95 @@ double pcre2nfatime = 0.0;
 double nfa2dfatime = 0.0;
 double dfamintimetime = 0.0;
 
+std::map<std::string, std::size_t> KeyTypeMap;
+
+std::string type1Strs[] = //合法的格式"abc";
+{
+	"msg",
+	"content",
+	"uricontent"
+};
+
+std::string type2Strs[] = //合法的格式"ab\"c";
+{
+	"pcre"
+};
+
+std::string type3Strs[] = //合法的格式为;
+{
+	"reference",
+	"gid",
+	"sid",
+	"rev",
+	"classtype",
+	"priority",
+	"metadata",
+	"nocase",
+	"rawbytes",
+	"depth",
+	"offset",
+	"distance",
+	"within",
+	"http_client_body",
+	"http_cookie",
+	"http_raw_cookie",
+	"http_header",
+	"http_raw_header",
+	"http_method",
+	"http_uri",
+	"http_raw_uri",
+	"http_stat_code",
+	"http_stat_msg",
+	"http_encode",
+	"fast_pattern",
+	"urilen",
+	"isdataat",
+	"pkt_data",
+	"file_data",
+	"base64_decode",
+	"base64_data",
+	"byte_test",
+	"byte_jump",
+	"byte_extract",
+	"ftpbounce",
+	"asn1",
+	"cvs",
+	"dce_iface",
+	"dce_opnum",
+	"dce_stub_data",
+	"sip_method",
+	"sip_stat_code",
+	"sip_header",
+	"sip_body",
+	"gtp_type",
+	"gtp_info",
+	"gtp_version",
+	"ssl_version",
+	"ssl_state",
+	"fragoffset",
+	"ttl",
+	"tos",
+	"id",
+	"ipopts",
+	"fragbits",
+	"dsize",
+	"flags",
+	"flow",
+	"flowbits",
+	"seq",
+	"ack",
+	"window",
+	"itype",
+	"icode",
+	"icmp_id",
+	"icmp_seq",
+	"rpc",
+	"ip_proto",
+	"sameip",
+	"stream_reassemble",
+	"stream_size",
+};
+
 /*! complie one rule
 
 Arguments:
@@ -136,48 +225,21 @@ bool EstimateOption (std::string strName, std::string strValue)
 
 void SplitOption(std::string &ruleOptions, std::vector<RULEOPTIONRAW> &options)
 {
-	// Split the options of rule with semicolon and extract related options 
-	STRING_ITER temp = ruleOptions.begin();
-	for (STRING_ITER i = ruleOptions.begin(); ;)
+	if (KeyTypeMap.empty())
 	{
-		STRING_ITER iComma = std::find(temp, ruleOptions.end(), ';');
-		if (iComma == ruleOptions.end())
+		for (size_t i = 0; i < sizeof(type1Strs)/sizeof(type1Strs[0]); ++i)
 		{
-			break;
+			KeyTypeMap[type1Strs[i]] = 1;
 		}
-		RULEOPTIONRAW or;
-		STRING_ITER iNameBeg = std::find_if_not(i, iComma, g_isSpace);
-		if (iNameBeg == ruleOptions.end())
-		{
-			break;
-		}
-		if (iNameBeg == iComma)
-		{
-			temp = iComma + 1;
-			i = temp;
-			continue;
-		}
-		STRING_ITER iValueBeg = std::find(iNameBeg + 1, iComma, ':');
-		STRING_ITER iNameEnd = iValueBeg;
-		for (; g_isSpace(*--iNameEnd););
 
-		std::string strName, strValue;
-		strName.assign(iNameBeg, iNameEnd + 1);
-		if(iValueBeg == iComma)
+		for (size_t i = 0; i < sizeof(type2Strs)/sizeof(type2Strs[0]); ++i)
 		{
-			strValue.assign(iValueBeg, iComma);
+			KeyTypeMap[type2Strs[i]] = 2;
 		}
-		else
+
+		for (size_t i = 0; i < sizeof(type3Strs)/sizeof(type3Strs[0]); ++i)
 		{
-			strValue.assign(iValueBeg + 1,iComma);
-		}
-		temp = iComma + 1;
-		if(EstimateOption(strName, strValue))
-		{
-			or.name.swap(strName);
-			or.value.swap(strValue);
-			options.push_back(or);
-			i = temp;
+			KeyTypeMap[type3Strs[i]] = 3;
 		}
 	}
 }
