@@ -10,12 +10,49 @@ void CreateNewMap(VECROWSET &allCharset, VECROWSET &newCharset, std::vector<std:
 	{
 		std::map<size_t, size_t> m;
 		size_t cnt = 0;	
-		ulong mm = allCharset[i][0];
-		size_t j = 255;
-		for (ROWSET::reverse_iterator ritr = allCharset[i].rbegin(); ritr != allCharset[i].rend(); ++ritr, j--)
+		size_t j = 0;
+		for (size_t index = 0; index < 32; index++)
+		{
+			iter = m.find(allCharset[i][index]);
+			if (iter == m.end())
+			{
+				m.insert(std::map<size_t, size_t>::value_type(allCharset[i][index], cnt));
+				newCharset[i][index] = cnt;
+				cnt++;
+			}else 
+			{
+				newCharset[i][index] = iter->second;
+			}			
+		}
+		for (size_t index = 128; index < 256; index++)
+		{
+			iter = m.find(allCharset[i][index]);
+			if (iter == m.end())
+			{
+				m.insert(std::map<size_t, size_t>::value_type(allCharset[i][index], cnt));
+				newCharset[i][index] = cnt;
+				cnt++;
+			}else 
+			{
+				newCharset[i][index] = iter->second;
+			}			
+		}
+		for (size_t index = 32; index < 127; index++)
+		{
+			iter = m.find(allCharset[i][index]);
+			if (iter == m.end())
+			{
+				m.insert(std::map<size_t, size_t>::value_type(allCharset[i][index], cnt));
+				newCharset[i][index] = cnt;
+				cnt++;
+			}else 
+			{
+				newCharset[i][index] = iter->second;
+			}			
+		}
+		/*for (ROWSET::reverse_iterator ritr = allCharset[i].rbegin(); ritr != allCharset[i].rend(); ++ritr, j--)
 		{
 			iter = m.find(*ritr);
-			//size_t j = ritr - allCharset[i].rbegin();
 			if (iter == m.end())
 			{
 				m.insert(std::map<size_t, size_t>::value_type(*ritr, cnt));
@@ -25,7 +62,7 @@ void CreateNewMap(VECROWSET &allCharset, VECROWSET &newCharset, std::vector<std:
 			{
 				newCharset[i][j] = iter->second;
 			}			
-		}			
+		}		*/	
 	
 		mapv.push_back(m);
 		
@@ -38,8 +75,6 @@ void AdjustDfa(CDfaArray &DfaArr, std::vector<std::map<size_t, size_t>> &mapv)
 	CDfaArray tempArr = DfaArr;
 	std::map<size_t,size_t>::iterator iter;
 	std::map<size_t, size_t> mCnt = mapv[0];
-	std::cout << "原来DFA的列数" << DfaArr[0].GetGroupCount() << std::endl;
-	std::cout << "map的大小" << mCnt.size() << std::endl;
 	for (ulong i = 0; i < DfaArr.Size(); ++i)
 	{		
 		std::map<size_t, size_t> m = mapv[i];
@@ -314,9 +349,10 @@ void main(int nArgs, char **cArgs)
 		}
 
 	}
-	//CreateNewMap(allCharset, newCharset, mapv);	
-	SortCharset(allCharset, 32);
-	//AdjustDfa(CDfaSet, mapv);
+
+	CreateNewMap(allCharset, newCharset, mapv);	
+	SortCharset(newCharset, 32);
+	AdjustDfa(CDfaSet, mapv);
 
 	fout2 << "新字符映射表:" << std::endl;
 	for (ulong i = 0; i < 1; i++)

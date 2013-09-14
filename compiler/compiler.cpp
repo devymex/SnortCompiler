@@ -132,6 +132,7 @@ COMPILERHDR void ExtractSequence(const CByteArray &pcResult,
 			str.Empty();
 			return;
 
+			//这是什么情况？
 		case OP_ALT:				/* 113 Start of alternation */
 			strs.clear();
 			return;
@@ -194,7 +195,8 @@ COMPILERHDR void ExtractSequence(const CByteArray &pcResult,
 				str.PushBack(pcResult[cur + 3]);
 			}
 			temp = pcResult[cur + Steps[curCode]];
-			if(((temp == OP_UPTO) || (temp == OP_MINUPTO) || (temp == OP_UPTOI) || (temp == OP_MINUPTOI)) && (pcResult[cur + 3] == pcResult[cur + Steps[curCode] + 3]))
+			if(((temp == OP_UPTO) || (temp == OP_MINUPTO) || (temp == OP_UPTOI) || (temp == OP_MINUPTOI)) 
+				&& (pcResult[cur + 3] == pcResult[cur + Steps[curCode] + 3]))
 			{
 				if(!str.Empty() && (str.Size() >= 4))
 				{
