@@ -763,13 +763,13 @@ void SplitGraph(CDfa &oneDFA, GRAPH &graph, ROWSET &weightArg, std::vector<BLOCK
 			//判断条件：当划分的存储空间比当前存储空间小，
 			//或者划分的“特殊跳转”个数比当前的个数少且少于8个，则进行划分
 			if (curMem > partMem ||
-				(curMax > partMax && curMax >= 8))
+				(curMax > partMax && curMax >= 8))   //yww (curMax > partMax && 8 > partMax)
 			{
 				std::vector<BLOCK> partBlocks;
 				for (NODEARRAY_ITER j = partRows.begin(); j != partRows.end(); ++j)
 				{
 					partBlocks.push_back(BLOCK());
-					partBlocks.back().weightIdx = i->weightIdx;
+					partBlocks.back().weightIdx = i->weightIdx; 
 					partBlocks.back().nodes = *j;
 				}
 

@@ -52,20 +52,20 @@ void CreateNewMap(VECROWSET &allCharset, VECROWSET &newCharset, std::vector<std:
 		}
 		/*for (ROWSET::reverse_iterator ritr = allCharset[i].rbegin(); ritr != allCharset[i].rend(); ++ritr, j--)
 		{
-			iter = m.find(*ritr);
-			if (iter == m.end())
-			{
-				m.insert(std::map<size_t, size_t>::value_type(*ritr, cnt));
-				newCharset[i][j] = cnt;
-				cnt++;
-			}else 
-			{
-				newCharset[i][j] = iter->second;
-			}			
+		iter = m.find(*ritr);
+		if (iter == m.end())
+		{
+		m.insert(std::map<size_t, size_t>::value_type(*ritr, cnt));
+		newCharset[i][j] = cnt;
+		cnt++;
+		}else 
+		{
+		newCharset[i][j] = iter->second;
+		}			
 		}		*/	
-	
+
 		mapv.push_back(m);
-		
+
 	}
 }
 
@@ -80,16 +80,16 @@ void AdjustDfa(CDfaArray &DfaArr, std::vector<std::map<size_t, size_t>> &mapv)
 		std::map<size_t, size_t> m = mapv[i];
 		/*for (ulong j = 0; j < DfaArr[i].GetGroupCount(); ++j)
 		{*/
-			for (iter = m.begin(); iter != m.end(); iter++)
+		for (iter = m.begin(); iter != m.end(); iter++)
+		{
+			size_t preCol = iter->first;
+			size_t sufCol = iter->second;
+			// 将DfaArr[i]的第preCOl列复制至tempArr[i]的第sufCol列
+			for (ulong k = 0; k < DfaArr[i].Size(); ++k)
 			{
-				size_t preCol = iter->first;
-				size_t sufCol = iter->second;
-				// 将DfaArr[i]的第preCOl列复制至tempArr[i]的第sufCol列
-				for (ulong k = 0; k < DfaArr[i].Size(); ++k)
-				{
-					tempArr[i][k][sufCol] = DfaArr[i][k][preCol];
-				}		
-			}
+				tempArr[i][k][sufCol] = DfaArr[i][k][preCol];
+			}		
+		}
 		//}
 	}
 	DfaArr = tempArr;
@@ -195,7 +195,7 @@ void ColMergeCompress(VECROWSET &vecCores, ulong colCnt, byte* colGroup, ulong &
 void Hierarchical(CDfa &dfa, ulong &memSize, VECROWSET &coreMatrix)
 {
 	ROWSET rows;
-	for (size_t j = 0; j <dfa.Size(); ++j)
+	for (size_t j = 0; j < dfa.Size(); ++j)
 	{
 		rows.push_back(j);
 	}
@@ -213,6 +213,7 @@ void Hierarchical(CDfa &dfa, ulong &memSize, VECROWSET &coreMatrix)
 	memSize = StatisticMemory(dfa, blocks, coreMatrix);
 }
 
+// 测试
 void SortCharset(VECROWSET &allCharset, size_t threshold)
 {
 	VECROWSET lastCharset;
@@ -233,10 +234,6 @@ void SortCharset(VECROWSET &allCharset, size_t threshold)
 
 void main(int nArgs, char **cArgs)
 {
-	CGroupRes groupRes;
-	groupRes.ReadFromFile(cArgs[1]);
-	CDfaArray &CDfaSet = groupRes.GetDfaTable();
-
 	//核矩阵列映射后，跳转表与核矩阵的存储空间之和
 	ulong sumBytes = 0;
 	//能够进行列压缩的组数
@@ -249,7 +246,9 @@ void main(int nArgs, char **cArgs)
 	ulong coreBytes = 0;
 	//终态集合大小
 	ulong finalBytes = 0;
-
+	CGroupRes groupRes;
+	groupRes.ReadFromFile(cArgs[1]);
+	CDfaArray &CDfaSet = groupRes.GetDfaTable();
 
 	VECROWSET allCharset;
 	for (size_t i = 0; i < CDfaSet.Size(); ++i)
@@ -261,125 +260,56 @@ void main(int nArgs, char **cArgs)
 		for (size_t j = 0; j < SC_DFACOLCNT; ++j)
 		{
 			allCharset.back().push_back(size_t(CDfaSet[i].Char2Group(j)));
-		}
-
-		////展开DFA为256列
-		//CDfa unflodDfa;
-		//UnflodDFA(CDfaSet[i],unflodDfa);
-
-		//ulong memSize;
-		//VECROWSET coreMatrix;
-		////层次聚类方法，输入一个DFA，给出压缩后跳转表和核矩阵的存储空间大小以及核矩阵内容
-		//Hierarchical(CDfaSet[i], memSize, coreMatrix);
-
-
-		//VECROWSET vecRows;
-		//SearchConnectSubgraph(graph, vecRows);
-		//VECROWSET vecVirtual;
-		//size_t memSize = HierarchicalCluster(CDfaSet[i], vecRows, vecVirtual);
-
-		//skiptblBytes += (memSize - CDfaSet[i].GetGroupCount() * coreMatrix.size());
-		//coreBytes += CDfaSet[i].GetGroupCount() * coreMatrix.size();
-		//finalBytes += 2 * CDfaSet[i].GetFinalStates().CountDfaIds();
-		//charBytes += 2 * Charset(CDfaSet[i]);
-
-		//ulong colNum = 0;
-		//byte colGroup[256] = {0};
-		//ulong colCnt = unflodDfa.GetGroupCount();
-		//std::vector<CDfaRow> FinalMatrix;
-		////核矩阵列压缩
-		//ColMergeCompress(coreMatrix, colCnt, colGroup, colNum, FinalMatrix);
-
-		////核矩阵列压缩后存储的空间大小
-		//size_t cost = memSize;
-		//size_t cost2 = memSize - unflodDfa.GetGroupCount() * coreMatrix.size() + colNum * coreMatrix.size();
-		//if (cost > cost2)
-		//{
-		//	cost = cost2;
-		//	++cnt;
-		//}
-		//sumBytes += cost;
-
-		////额外的存储空间大小，包括8个字节固定相关信息，字符集大小（不包括列映射大小），终态集大小
-		//nExtraMem = 8 + 2 * Charset(CDfaSet[i]) + 2 * CDfaSet[i].GetFinalStates().CountDfaIds();
-
-		////输出存储空间相关信息
-		//std::ofstream fout("storesize.txt", std::ios::app);
-		//fout << i << '\t' << memSize << std::endl;
-		//fout.close();
-
-		////输出核矩阵相关信息
-		//std::ofstream ofile("core.txt", std::ios::app);
-		//ofile << i << " :" << std::endl;
-		//for (NODEARRAY_ITER j = vecCores.begin(); j != vecCores.end(); ++j)
-		//{
-		//	for (ROWSET::iterator k = j->begin(); k != j->end(); ++k)
-		//	{
-		//		ofile << *k << "\t";
-		//	}
-		//	ofile << std::endl;
-		//}
-		//ofile << std::endl;
-		//ofile.close();
+		}		
 	}
 
-	std::ofstream fout1("op1.txt");
-	std::ofstream fout2("op2.txt");
-	
 	VECROWSET newCharset = allCharset;
-	std::vector<std::map<size_t, size_t>> mapv;
-	fout1 << "原字符映射表:" << std::endl; 
-	for (ulong i = 0; i < 1; i++)
-	{
-		for (ulong j = 0; j < allCharset[i].size(); j++)
-		{
-			fout1 << allCharset[i][j] << "\t";
-		}
-		fout1 << std::endl;
-	}
-
-	fout1 << "原来的DFA:" << std::endl;
-	for (ulong i = 0; i < 1; ++i)
-	{
-		for(ulong j = 0; j < CDfaSet[i].Size(); ++j)
-		{
-			for(ulong k = 0; k < CDfaSet[i][j].Size(); ++k)
-				fout1 << CDfaSet[i][j][k] << "\t" ;
-			fout1 << std::endl;
-		}
-
-	}
-
+	std::vector<std::map<size_t, size_t>> mapv;	
 	CreateNewMap(allCharset, newCharset, mapv);	
 	SortCharset(newCharset, 32);
 	AdjustDfa(CDfaSet, mapv);
 
-	fout2 << "新字符映射表:" << std::endl;
-	for (ulong i = 0; i < 1; i++)
+	for (size_t i = 0; i < CDfaSet.Size(); ++i)
 	{
-		for (ulong j = 0; j < newCharset[i].size(); j++)
+		////展开DFA为256列
+		CDfa unflodDfa;
+		UnflodDFA(CDfaSet[i],unflodDfa);
+
+
+		CDfa dfa = CDfaSet[i];
+		ulong memSize;
+		VECROWSET coreMatrix;
+		Hierarchical(dfa, memSize, coreMatrix);
+
+		skiptblBytes += (memSize - CDfaSet[i].GetGroupCount() * coreMatrix.size());
+		coreBytes += CDfaSet[i].GetGroupCount() * coreMatrix.size();
+		finalBytes += 2 * CDfaSet[i].GetFinalStates().CountDfaIds();
+		charBytes += 2 * Charset(CDfaSet[i]);
+
+		ulong colNum = 0;
+		byte colGroup[256] = {0};
+		ulong colCnt = unflodDfa.GetGroupCount();
+		std::vector<CDfaRow> FinalMatrix;
+		//核矩阵列压缩
+		ColMergeCompress(coreMatrix, colCnt, colGroup, colNum, FinalMatrix);
+
+		//核矩阵列压缩后存储的空间大小
+		size_t cost = memSize;
+		size_t cost2 = memSize - unflodDfa.GetGroupCount() * coreMatrix.size() + colNum * coreMatrix.size();
+		if (cost > cost2)
 		{
-			fout2 << newCharset[i][j] << "\t" ;
+			cost = cost2;
+			++cnt;
 		}
-		fout2 << std::endl;
-	}
-	fout2 << "DFA列修改之后：" << std::endl;
-	for (ulong i = 0; i < 1; ++i)
-	{
-		for(ulong j = 0; j < CDfaSet[i].Size(); ++j)
-		{
-			for(ulong k = 0; k < CDfaSet[i][j].Size(); ++k)
-				fout2 << CDfaSet[i][j][k] << "\t";
-			fout2 << std::endl;
-		}
+		sumBytes += cost;
 
 	}
-	//std::cout << sumBytes << std::endl;
-	//std::cout << cnt << std::endl;
-	//std::cout << charBytes << std::endl;
-	//std::cout << skiptblBytes << std::endl;
-	//std::cout << coreBytes << std::endl;
-	//std::cout << finalBytes << std::endl;
-	//std::cout << maxVal << std::endl;
+	
+	std::cout << "跳转表与核矩阵的存储空间之和: " << sumBytes << std::endl;
+	std::cout << "能够进行列压缩的组数: " << cnt << std::endl;
+	std::cout << "字符集映射表大小: " << charBytes << std::endl;
+	std::cout << "跳转表大小: " << skiptblBytes << std::endl;
+	std::cout << "核心矩阵大小: " << coreBytes << std::endl;
+	std::cout << "终态集大小: " << finalBytes << std::endl;
 	system("pause");
 }

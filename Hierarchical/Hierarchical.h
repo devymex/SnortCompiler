@@ -50,4 +50,18 @@ void SplitGraph(CDfa &oneDFA, GRAPH &graph, ROWSET &weightArg, std::vector<BLOCK
 //统计占用的内存空间及虚拟核
 size_t StatisticMemory(const CDfa &oneDfa, const std::vector<BLOCK> &blocks, VECROWSET &vecCore);
 
+//建立新的映射
+void CreateNewMap(VECROWSET &allCharset, VECROWSET &newCharset, std::vector<std::map<size_t, size_t>> &mapv);
+
+//根据新的映射调整DFA表的列
+void AdjustDfa(CDfaArray &DfaArr, std::vector<std::map<size_t, size_t>> &mapv);
+
+//非默认字符个数
+size_t Charset(CDfa &dfa);
+
+//核矩阵列字符集压缩
+void ColMergeCompress(VECROWSET &vecCores, ulong colCnt, byte* colGroup, ulong &colNum, std::vector<CDfaRow> &FinalMatrix);
+
+void SortCharset(VECROWSET &allCharset, size_t threshold);
+
 
