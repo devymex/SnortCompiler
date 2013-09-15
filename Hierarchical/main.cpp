@@ -272,37 +272,37 @@ void main(int nArgs, char **cArgs)
 	for (size_t i = 0; i < CDfaSet.Size(); ++i)
 	{
 		////展开DFA为256列
-		CDfa unflodDfa;
-		UnflodDFA(CDfaSet[i],unflodDfa);
-
+		/*CDfa dfa;
+		UnflodDFA(CDfaSet[i], dfa);*/
 
 		CDfa dfa = CDfaSet[i];
+
 		ulong memSize;
 		VECROWSET coreMatrix;
 		Hierarchical(dfa, memSize, coreMatrix);
 
-		skiptblBytes += (memSize - CDfaSet[i].GetGroupCount() * coreMatrix.size());
-		coreBytes += CDfaSet[i].GetGroupCount() * coreMatrix.size();
-		finalBytes += 2 * CDfaSet[i].GetFinalStates().CountDfaIds();
+		skiptblBytes += (memSize - dfa.GetGroupCount() * coreMatrix.size());
+		coreBytes += dfa.GetGroupCount() * coreMatrix.size();
+		finalBytes += 2 *dfa.GetFinalStates().CountDfaIds();
 		charBytes += 2 * Charset(CDfaSet[i]);
 
 		ulong colNum = 0;
 		byte colGroup[256] = {0};
-		ulong colCnt = unflodDfa.GetGroupCount();
+		ulong colCnt = dfa.GetGroupCount();
 		std::vector<CDfaRow> FinalMatrix;
 		//核矩阵列压缩
 		ColMergeCompress(coreMatrix, colCnt, colGroup, colNum, FinalMatrix);
 
 		//核矩阵列压缩后存储的空间大小
 		size_t cost = memSize;
-		size_t cost2 = memSize - unflodDfa.GetGroupCount() * coreMatrix.size() + colNum * coreMatrix.size();
+		size_t cost2 = memSize - dfa.GetGroupCount() * coreMatrix.size() + colNum * coreMatrix.size();
 		if (cost > cost2)
 		{
 			cost = cost2;
 			++cnt;
 		}
 		sumBytes += cost;
-
+		std::cout << "id" << i << std::endl;
 	}
 	
 	std::cout << "跳转表与核矩阵的存储空间之和: " << sumBytes << std::endl;
