@@ -88,3 +88,22 @@ DFAHDR void CDfaRow::SetFlags(STATEFLAG nFlag)
 {
 	m_nFlags = nFlag;
 }
+
+
+/////////////////////////////////////////////////////////////
+DFAHDR bool CDfaRow::operator==(CDfaRow &rhs)
+{
+	if(m_pDest->size() != rhs.Size())
+	{
+		return false;
+	}
+	else
+	{
+		for(size_t i = 0; i < m_pDest->size(); ++i)
+		{
+			if((*m_pDest)[i] != rhs[i])
+				return false;
+		}
+	}
+	return true;
+}

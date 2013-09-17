@@ -49,6 +49,12 @@ DFAHDR CDfa::~CDfa()
 	delete m_pDfa;
 }
 
+//////////////////////////////////////////////////////
+DFAHDR ushort CDfa::GetColumnNum()
+{
+	return m_usColNum;
+}
+//////////////////////////////////////////////////////
 DFAHDR CDfa& CDfa::operator=(const CDfa &other)
 {
 	TASSERT(other.m_pDfa != null);

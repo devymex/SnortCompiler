@@ -20,6 +20,18 @@ typedef std::vector<size_t> GRAPH;
 typedef std::vector<ROWSET> VECROWSET;
 typedef VECROWSET::iterator NODEARRAY_ITER;
 
+///////////////////////////////////////////////////////////////////////
+typedef std::vector<ushort> rowMatch;
+typedef struct
+{
+	bool pushed;
+	/*std::vector<ulong> dfaID;
+	CDfa rowMatch;*/
+	//std::map<ulong, CDfaRow> id_rowMatch;
+	std::map<ulong, rowMatch> id_rowMatch;
+} Attribute;
+///////////////////////////////////////////////////////////////////////
+
 struct BLOCK
 {
 	size_t weightIdx;
@@ -67,3 +79,4 @@ void ColMergeCompress(VECROWSET &vecCores, ulong colCnt, byte* colGroup, ulong &
 size_t SortCharset(VECROWSET &allCharset, size_t threshold);
 
 
+void SameColDfaCombine(CDfaArray &SameColDfa, std::map<ushort, Attribute> &columnNum);

@@ -815,3 +815,104 @@ size_t StatisticMemory(const CDfa &oneDFA, const std::vector<BLOCK> &blocks, VEC
 
 	return nOneMem;
 }
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+////////
+void SameColDfaCombine(CDfaArray &SameColDfa, std::map<ushort, Attribute> &columnNum)
+{
+	Attribute attribute;
+	attribute.pushed = false;
+	
+	typedef std::pair<ushort, Attribute> column_Pair;
+	std::map<ushort, Attribute>::iterator map_iter, map_it;
+
+
+	ushort column, colLocation;
+	CDfa tempDfa;
+	
+	//std::vector<bool> pushed;
+
+	CGroupRes groupRes;
+	groupRes.ReadFromFile("FinalResult.cdt");
+	CDfaArray &CDfaSet = groupRes.GetDfaTable();
+	
+	VECROWSET allCharset;
+	for (size_t i = 0; i < CDfaSet.Size(); ++i)
+	{
+		////ulong nExtraMem = 0;
+		//std::cout << i << std::endl;
+
+		//allCharset.push_back(ROWSET());
+		//for (size_t j = 0; j < SC_DFACOLCNT; ++j)
+		//{
+		//	allCharset.back().push_back(size_t(CDfaSet[i].Char2Group(j)));
+		//}
+		columnNum.insert(column_Pair(CDfaSet[i].GetColumnNum(), attribute));
+		CDfaSet[i].SetId(i + 1);
+	}
+	//for(size_t i = 0; i < columnNum.size(); ++i)
+	//{
+	//	SameColDfa.PushBack(tempDfa);
+	//	//pushed.push_back(false);
+	//}
+	for(map_it = columnNum.begin(); map_it != columnNum.end(); ++map_it)
+	{
+		tempDfa.SetId(map_it->first);
+		SameColDfa.PushBack(tempDfa);
+	}
+	for(size_t i = 0; i < CDfaSet.Size(); ++i)
+	{
+		column = CDfaSet[i].GetColumnNum();
+		map_iter = columnNum.find(column);
+		colLocation = 0;
+		for(map_it = columnNum.begin(); map_it != map_iter; ++map_it, ++colLocation);
+		//CDfaRow rowMatch(CDfaSet[i].Size());
+		rowMatch rowChange(CDfaSet[i].Size());
+		if(map_iter->second.pushed)
+		{
+			size_t plus = SameColDfa[colLocation].Size();
+			size_t originSize = SameColDfa[colLocation].Size(), k;
+			for(size_t j = 0; j < CDfaSet[i].Size(); ++j)
+			{
+				for(k = 0; k < originSize; ++k)
+				{
+					if(CDfaSet[i][j] == SameColDfa[colLocation][k])
+					{
+						//rowMatch[j] = k;
+						rowChange[j] = k;
+						break;
+					}
+				}
+				if(k == originSize)
+				{
+					
+					//push 
+					SameColDfa[colLocation].PushBack(CDfaSet[i][j]);
+					//rowMatch[j] = plus;
+					rowChange[j] = plus;
+					plus++;
+					if(plus > 60000)
+					{
+						std::cout << "much" << std::endl;
+					}
+				}
+			}
+			map_iter->second.id_rowMatch[CDfaSet[i].GetId()] = rowChange;
+		}
+		else
+		{
+			map_iter->second.pushed = true;
+			SameColDfa[colLocation] = CDfaSet[i];
+			for(size_t j = 0; j < rowChange.size(); ++j)
+			{
+					rowChange[j] = j;
+			}
+			map_iter->second.id_rowMatch[CDfaSet[i].GetId()] = rowChange;
+		}
+	}
+
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
