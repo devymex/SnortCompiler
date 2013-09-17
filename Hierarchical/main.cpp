@@ -2,21 +2,20 @@
 
 
 //建立新的映射
-void CreateNewMap(VECROWSET &allCharset, VECROWSET &newCharset, std::vector<std::map<size_t, size_t>> &mapv)
+void CreateNewMap(VECROWSET &allCharset, VECROWSET &newCharset, std::vector<std::map<size_t, size_t>> &mapvO2N)
 {
-
-	std::map<size_t,size_t>::iterator iter;
+	std::map<size_t, size_t>::iterator iter;
 	for (ulong i = 0; i < allCharset.size(); ++i)
 	{
-		std::map<size_t, size_t> m;
+		std::map<size_t, size_t> o2n;
 		size_t cnt = 0;	
 		size_t j = 0;
 		for (size_t index = 0; index < 32; index++)
 		{
-			iter = m.find(allCharset[i][index]);
-			if (iter == m.end())
+			iter = o2n.find(allCharset[i][index]);
+			if (iter == o2n.end())
 			{
-				m.insert(std::map<size_t, size_t>::value_type(allCharset[i][index], cnt));
+				o2n.insert(std::map<size_t, size_t>::value_type(allCharset[i][index], cnt));
 				newCharset[i][index] = cnt;
 				cnt++;
 			}else 
@@ -24,12 +23,13 @@ void CreateNewMap(VECROWSET &allCharset, VECROWSET &newCharset, std::vector<std:
 				newCharset[i][index] = iter->second;
 			}			
 		}
+
 		for (size_t index = 128; index < 256; index++)
 		{
-			iter = m.find(allCharset[i][index]);
-			if (iter == m.end())
+			iter = o2n.find(allCharset[i][index]);
+			if (iter == o2n.end())
 			{
-				m.insert(std::map<size_t, size_t>::value_type(allCharset[i][index], cnt));
+				o2n.insert(std::map<size_t, size_t>::value_type(allCharset[i][index], cnt));			
 				newCharset[i][index] = cnt;
 				cnt++;
 			}else 
@@ -37,12 +37,13 @@ void CreateNewMap(VECROWSET &allCharset, VECROWSET &newCharset, std::vector<std:
 				newCharset[i][index] = iter->second;
 			}			
 		}
+
 		for (size_t index = 32; index < 127; index++)
 		{
-			iter = m.find(allCharset[i][index]);
-			if (iter == m.end())
+			iter = o2n.find(allCharset[i][index]);
+			if (iter == o2n.end())
 			{
-				m.insert(std::map<size_t, size_t>::value_type(allCharset[i][index], cnt));
+				o2n.insert(std::map<size_t, size_t>::value_type(allCharset[i][index], cnt));		
 				newCharset[i][index] = cnt;
 				cnt++;
 			}else 
@@ -50,21 +51,7 @@ void CreateNewMap(VECROWSET &allCharset, VECROWSET &newCharset, std::vector<std:
 				newCharset[i][index] = iter->second;
 			}			
 		}
-		/*for (ROWSET::reverse_iterator ritr = allCharset[i].rbegin(); ritr != allCharset[i].rend(); ++ritr, j--)
-		{
-		iter = m.find(*ritr);
-		if (iter == m.end())
-		{
-		m.insert(std::map<size_t, size_t>::value_type(*ritr, cnt));
-		newCharset[i][j] = cnt;
-		cnt++;
-		}else 
-		{
-		newCharset[i][j] = iter->second;
-		}			
-		}		*/	
-
-		mapv.push_back(m);
+		mapvO2N.push_back(o2n);
 
 	}
 }
@@ -73,24 +60,25 @@ void CreateNewMap(VECROWSET &allCharset, VECROWSET &newCharset, std::vector<std:
 void AdjustDfa(CDfaArray &DfaArr, std::vector<std::map<size_t, size_t>> &mapv)
 {
 	CDfaArray tempArr = DfaArr;
-	std::map<size_t,size_t>::iterator iter;
-	std::map<size_t, size_t> mCnt = mapv[0];
+	std::map<size_t, size_t>::iterator iter;
 	for (ulong i = 0; i < DfaArr.Size(); ++i)
-	{		
+	{	
 		std::map<size_t, size_t> m = mapv[i];
-		/*for (ulong j = 0; j < DfaArr[i].GetGroupCount(); ++j)
-		{*/
-		for (iter = m.begin(); iter != m.end(); iter++)
-		{
-			size_t preCol = iter->first;
-			size_t sufCol = iter->second;
-			// 将DfaArr[i]的第preCOl列复制至tempArr[i]的第sufCol列
-			for (ulong k = 0; k < DfaArr[i].Size(); ++k)
+		for(ulong j = 0; j < DfaArr[i].Size(); ++j)
+		{ 
+			size_t pre = size_t(DfaArr[i].Char2Group(j));
+			iter = m.find(pre);
+			if (iter != m.end())
 			{
-				tempArr[i][k][sufCol] = DfaArr[i][k][preCol];
-			}		
+				size_t preCol = iter->first;
+				size_t sufCol = iter->second;
+				// 将DfaArr[i]的第preCOl列复制至tempArr[i]的第sufCol列
+				for (ulong k = 0; k < DfaArr[i].Size(); ++k)
+				{
+					tempArr[i][k][sufCol] = DfaArr[i][k][preCol];
+				}	
+			}
 		}
-		//}
 	}
 	DfaArr = tempArr;
 }
@@ -192,7 +180,7 @@ void ColMergeCompress(VECROWSET &vecCores, ulong colCnt, byte* colGroup, ulong &
 	}
 }
 
-void Hierarchical(CDfa &dfa, ulong &memSize, VECROWSET &coreMatrix)
+void Hierarchical(CDfa &dfa, ulong &memSize, VECROWSET &coreMatrix, GRAPH &graph)
 {
 	ROWSET rows;
 	for (size_t j = 0; j < dfa.Size(); ++j)
@@ -200,7 +188,7 @@ void Hierarchical(CDfa &dfa, ulong &memSize, VECROWSET &coreMatrix)
 		rows.push_back(j);
 	}
 
-	GRAPH graph;
+	//ywwGRAPH graph;
 	ROWSET weightArg;
 	BuildGraph(dfa, graph, weightArg);
 
@@ -214,7 +202,7 @@ void Hierarchical(CDfa &dfa, ulong &memSize, VECROWSET &coreMatrix)
 }
 
 // 测试
-void SortCharset(VECROWSET &allCharset, size_t threshold)
+size_t SortCharset(VECROWSET &allCharset, size_t threshold)
 {
 	VECROWSET lastCharset;
 	for (NODEARRAY_ITER i = allCharset.begin(); i != allCharset.end(); ++i)
@@ -229,7 +217,7 @@ void SortCharset(VECROWSET &allCharset, size_t threshold)
 	std::sort(lastCharset.begin(), lastCharset.end());
 	lastCharset.erase(std::unique(lastCharset.begin(), lastCharset.end()), lastCharset.end());
 
-	std::cout << lastCharset.size() << std::endl;
+	return lastCharset.size();
 }
 
 void main(int nArgs, char **cArgs)
@@ -240,6 +228,8 @@ void main(int nArgs, char **cArgs)
 	ulong cnt = 0;
 	//字符集映射表大小
 	ulong charBytes = 0;
+	//原字符集映射表大小
+	ulong oricharBytes = 0;
 	//跳转表大小
 	ulong skiptblBytes = 0;
 	//核心矩阵大小
@@ -250,12 +240,12 @@ void main(int nArgs, char **cArgs)
 	groupRes.ReadFromFile(cArgs[1]);
 	CDfaArray &CDfaSet = groupRes.GetDfaTable();
 
+
 	VECROWSET allCharset;
 	for (size_t i = 0; i < CDfaSet.Size(); ++i)
 	{
 		//ulong nExtraMem = 0;
 		std::cout << i << std::endl;
-
 		allCharset.push_back(ROWSET());
 		for (size_t j = 0; j < SC_DFACOLCNT; ++j)
 		{
@@ -264,27 +254,74 @@ void main(int nArgs, char **cArgs)
 	}
 
 	VECROWSET newCharset = allCharset;
-	std::vector<std::map<size_t, size_t>> mapv;	
-	CreateNewMap(allCharset, newCharset, mapv);	
-	SortCharset(newCharset, 32);
-	AdjustDfa(CDfaSet, mapv);
+
+	std::vector<std::map<size_t, size_t>> mapvO2N;
+	/*std::ofstream unflodFile("unflod.txt", std::ios::app);
+	std::ofstream flodFile("flod.txt", std::ios::app);*/
+
+	/*for (size_t i = 0; i < 10; ++i)
+	{
+		CDfa dfa2;
+		unflodFile << "D" << i << std::endl;
+		for (size_t j = 0; j < dfa2.Size(); ++j)
+		{
+			for (size_t k = 0; k < dfa2[j].Size(); ++k)
+			{
+				unflodFile << dfa2[j][k] << "\t";
+			}
+			unflodFile << std::endl;
+		}
+
+	}*/
+	CreateNewMap(allCharset, newCharset, mapvO2N);	
+	size_t comCharNum = SortCharset(newCharset, 32);
+	size_t comMem = comCharNum * 160;
+	size_t priMem = 1588 * 96;
+	charBytes = comMem + priMem;
+	oricharBytes = 1588 * 256;
+	AdjustDfa(CDfaSet, mapvO2N);
+
+
+	/*for (size_t i = 0; i < 10; ++i)
+	{
+		flodFile << "D" << i << std::endl;
+
+		for (size_t j = 0; j < CDfaSet[i].Size(); ++j)
+		{
+			for (size_t k = 0; k < CDfaSet[i][j].Size(); ++k)
+			{
+				flodFile << CDfaSet[i][j][k] << "\t";
+			}
+			flodFile << std::endl;
+		}
+	}*/
+
 
 	for (size_t i = 0; i < CDfaSet.Size(); ++i)
 	{
 		////展开DFA为256列
-		/*CDfa dfa;
-		UnflodDFA(CDfaSet[i], dfa);*/
+		//cdfa dfa2;
+		//unfloddfa(cdfaset[i], dfa2);
 
 		CDfa dfa = CDfaSet[i];
-
 		ulong memSize;
 		VECROWSET coreMatrix;
-		Hierarchical(dfa, memSize, coreMatrix);
+		GRAPH graph1, graph2;
+		Hierarchical(dfa, memSize, coreMatrix, graph1);
+
+		/*ulong memSize2;
+		VECROWSET coreMatrix2;
+		Hierarchical(dfa2, memSize2, coreMatrix2, graph2);*/
+
+		//if(memSize == memSize2)
+		//	std::cout << "the memSize are equal!" << std::endl;
+		//else
+		//	std::cout << memSize  << "   " << memSize2 << std::endl;
 
 		skiptblBytes += (memSize - dfa.GetGroupCount() * coreMatrix.size());
 		coreBytes += dfa.GetGroupCount() * coreMatrix.size();
 		finalBytes += 2 *dfa.GetFinalStates().CountDfaIds();
-		charBytes += 2 * Charset(CDfaSet[i]);
+		//charBytes += 2 * Charset(CDfaSet[i]);
 
 		ulong colNum = 0;
 		byte colGroup[256] = {0};
@@ -292,6 +329,7 @@ void main(int nArgs, char **cArgs)
 		std::vector<CDfaRow> FinalMatrix;
 		//核矩阵列压缩
 		ColMergeCompress(coreMatrix, colCnt, colGroup, colNum, FinalMatrix);
+
 
 		//核矩阵列压缩后存储的空间大小
 		size_t cost = memSize;
@@ -302,14 +340,32 @@ void main(int nArgs, char **cArgs)
 			++cnt;
 		}
 		sumBytes += cost;
-		std::cout << "id" << i << std::endl;
 	}
+
+	/*for (std::vector<std::map<size_t, size_t>>::iterator itr = mapvO2N.begin(); itr != mapvO2N.end(); ++itr)
+	{
+		size_t num = (*itr).size();
+		charBytes += num * sizeof( std::pair<size_t, size_t>);
+	}
+
+	charBytes += sizeof(mapvO2N);*/
+
+	std::cout << "The storage space of various data structure" << std::endl;
+	std::cout << "skip table: " << skiptblBytes << std::endl;
+	std::cout << "skip table and original core matrix: " << skiptblBytes + coreBytes << std::endl;	
+	std::cout << "Original core matrix: " << coreBytes << std::endl;
+
+	std::cout << "skip table and core Matrix: " << sumBytes << std::endl;
+	std::cout << "core matrix: " << sumBytes - skiptblBytes << std::endl;
+	std::cout << "Original map table for the character set: " << oricharBytes << std::endl;
+	std::cout << "Map table for the character set: " << charBytes << std::endl;
+
 	
-	std::cout << "跳转表与核矩阵的存储空间之和: " << sumBytes << std::endl;
-	std::cout << "能够进行列压缩的组数: " << cnt << std::endl;
-	std::cout << "字符集映射表大小: " << charBytes << std::endl;
-	std::cout << "跳转表大小: " << skiptblBytes << std::endl;
-	std::cout << "核心矩阵大小: " << coreBytes << std::endl;
-	std::cout << "终态集大小: " << finalBytes << std::endl;
+	
+	std::cout << "Final set: " << finalBytes << std::endl;
+	std::cout << "The number of the group that can be column compressed: " << cnt << std::endl;
+
+	/*unflodFile.close();
+	flodFile.close();*/
 	system("pause");
 }

@@ -10,6 +10,8 @@
 #include <fstream>
 #include <unordered_map>
 
+
+
 //#define limit 0.5
 
 typedef std::vector<size_t> ROWSET;
@@ -51,7 +53,7 @@ void SplitGraph(CDfa &oneDFA, GRAPH &graph, ROWSET &weightArg, std::vector<BLOCK
 size_t StatisticMemory(const CDfa &oneDfa, const std::vector<BLOCK> &blocks, VECROWSET &vecCore);
 
 //建立新的映射
-void CreateNewMap(VECROWSET &allCharset, VECROWSET &newCharset, std::vector<std::map<size_t, size_t>> &mapv);
+void CreateNewMap(VECROWSET &allCharset, VECROWSET &newCharset, std::vector<std::map<size_t, size_t>> &mapvO2N);
 
 //根据新的映射调整DFA表的列
 void AdjustDfa(CDfaArray &DfaArr, std::vector<std::map<size_t, size_t>> &mapv);
@@ -62,6 +64,6 @@ size_t Charset(CDfa &dfa);
 //核矩阵列字符集压缩
 void ColMergeCompress(VECROWSET &vecCores, ulong colCnt, byte* colGroup, ulong &colNum, std::vector<CDfaRow> &FinalMatrix);
 
-void SortCharset(VECROWSET &allCharset, size_t threshold);
+size_t SortCharset(VECROWSET &allCharset, size_t threshold);
 
 
