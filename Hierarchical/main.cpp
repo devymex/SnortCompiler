@@ -224,18 +224,24 @@ void main(int nArgs, char **cArgs)
 {
 	//核矩阵列映射后，跳转表与核矩阵的存储空间之和
 	ulong sumBytes = 0;
+	ulong orisumBytes = 0;
 	//能够进行列压缩的组数
 	ulong cnt = 0;
+	ulong oricnt = 0;
 	//字符集映射表大小
 	ulong charBytes = 0;
-	//原字符集映射表大小
 	ulong oricharBytes = 0;
 	//跳转表大小
 	ulong skiptblBytes = 0;
+	ulong oriskiptblBytes = 0;
 	//核心矩阵大小
 	ulong coreBytes = 0;
+	ulong oricoreBytes = 0;
 	//终态集合大小
 	ulong finalBytes = 0;
+	ulong orifinalBytes = 0;
+
+	// DFA读入
 	CGroupRes groupRes;
 	groupRes.ReadFromFile(cArgs[1]);
 	CDfaArray &CDfaSet = groupRes.GetDfaTable();
@@ -252,27 +258,43 @@ void main(int nArgs, char **cArgs)
 			allCharset.back().push_back(size_t(CDfaSet[i].Char2Group(j)));
 		}		
 	}
-
 	VECROWSET newCharset = allCharset;
-
 	std::vector<std::map<size_t, size_t>> mapvO2N;
-	/*std::ofstream unflodFile("unflod.txt", std::ios::app);
-	std::ofstream flodFile("flod.txt", std::ios::app);*/
 
-	/*for (size_t i = 0; i < 10; ++i)
+	// 对未调整序列的DFA进行测试
+	for (size_t i = 0; i < CDfaSet.Size(); ++i)
 	{
-		CDfa dfa2;
-		unflodFile << "D" << i << std::endl;
-		for (size_t j = 0; j < dfa2.Size(); ++j)
-		{
-			for (size_t k = 0; k < dfa2[j].Size(); ++k)
-			{
-				unflodFile << dfa2[j][k] << "\t";
-			}
-			unflodFile << std::endl;
-		}
+		
+		CDfa dfa = CDfaSet[i];
+		ulong memSize;
+		VECROWSET coreMatrix;
+		GRAPH graph;
+		Hierarchical(dfa, memSize, coreMatrix, graph);			
+		oriskiptblBytes += (memSize - dfa.GetGroupCount() * coreMatrix.size());
+		oricoreBytes += dfa.GetGroupCount() * coreMatrix.size();
+		orifinalBytes += 2 *dfa.GetFinalStates().CountDfaIds();
+		//charBytes += 2 * Charset(CDfaSet[i]);
 
-	}*/
+		ulong colNum = 0;
+		byte colGroup[256] = {0};
+		ulong colCnt = dfa.GetGroupCount();
+		std::vector<CDfaRow> FinalMatrix;
+		//核矩阵列压缩
+		ColMergeCompress(coreMatrix, colCnt, colGroup, colNum, FinalMatrix);
+
+		//核矩阵列压缩后存储的空间大小
+		size_t cost = memSize;
+		size_t cost2 = memSize - dfa.GetGroupCount() * coreMatrix.size() + colNum * coreMatrix.size();
+		if (cost > cost2)
+		{
+			cost = cost2;
+			++oricnt;
+		}
+		orisumBytes += cost;
+	}
+
+
+	// 调整字符表的序列，相应的调整DFA的序列
 	CreateNewMap(allCharset, newCharset, mapvO2N);	
 	size_t comCharNum = SortCharset(newCharset, 32);
 	size_t comMem = comCharNum * 160;
@@ -281,43 +303,18 @@ void main(int nArgs, char **cArgs)
 	oricharBytes = 1588 * 256;
 	AdjustDfa(CDfaSet, mapvO2N);
 
-
-	/*for (size_t i = 0; i < 10; ++i)
-	{
-		flodFile << "D" << i << std::endl;
-
-		for (size_t j = 0; j < CDfaSet[i].Size(); ++j)
-		{
-			for (size_t k = 0; k < CDfaSet[i][j].Size(); ++k)
-			{
-				flodFile << CDfaSet[i][j][k] << "\t";
-			}
-			flodFile << std::endl;
-		}
-	}*/
-
-
+	
+	// 对调整序列后的DFA进行测试
 	for (size_t i = 0; i < CDfaSet.Size(); ++i)
 	{
-		////展开DFA为256列
-		//cdfa dfa2;
-		//unfloddfa(cdfaset[i], dfa2);
+		
 
 		CDfa dfa = CDfaSet[i];
 		ulong memSize;
 		VECROWSET coreMatrix;
 		GRAPH graph1, graph2;
-		Hierarchical(dfa, memSize, coreMatrix, graph1);
-
-		/*ulong memSize2;
-		VECROWSET coreMatrix2;
-		Hierarchical(dfa2, memSize2, coreMatrix2, graph2);*/
-
-		//if(memSize == memSize2)
-		//	std::cout << "the memSize are equal!" << std::endl;
-		//else
-		//	std::cout << memSize  << "   " << memSize2 << std::endl;
-
+		Hierarchical(dfa, memSize, coreMatrix, graph1);	
+		
 		skiptblBytes += (memSize - dfa.GetGroupCount() * coreMatrix.size());
 		coreBytes += dfa.GetGroupCount() * coreMatrix.size();
 		finalBytes += 2 *dfa.GetFinalStates().CountDfaIds();
@@ -342,30 +339,24 @@ void main(int nArgs, char **cArgs)
 		sumBytes += cost;
 	}
 
-	/*for (std::vector<std::map<size_t, size_t>>::iterator itr = mapvO2N.begin(); itr != mapvO2N.end(); ++itr)
-	{
-		size_t num = (*itr).size();
-		charBytes += num * sizeof( std::pair<size_t, size_t>);
-	}
-
-	charBytes += sizeof(mapvO2N);*/
+	
 
 	std::cout << "The storage space of various data structure" << std::endl;
-	std::cout << "skip table: " << skiptblBytes << std::endl;
-	std::cout << "skip table and original core matrix: " << skiptblBytes + coreBytes << std::endl;	
-	std::cout << "Original core matrix: " << coreBytes << std::endl;
 
-	std::cout << "skip table and core Matrix: " << sumBytes << std::endl;
-	std::cout << "core matrix: " << sumBytes - skiptblBytes << std::endl;
+	std::cout << "Original skip table: " << oriskiptblBytes << std::endl;
+	std::cout << "Original core matrix: " << orisumBytes - oriskiptblBytes << std::endl;
+	std::cout << "Originalskip table and original core matrix: " << orisumBytes << std::endl;		
 	std::cout << "Original map table for the character set: " << oricharBytes << std::endl;
+	std::cout << "Original Final set: " << orifinalBytes << std::endl;	
+	std::cout << "The original number of the group that can be column compressed: " << oricnt << std::endl;
+	std::cout << std::endl;
+	std::cout << "Skip table: " << skiptblBytes << std::endl;
+	std::cout << "Core matrix: " << sumBytes - skiptblBytes << std::endl;
+	std::cout << "Skip table and core Matrix: " << sumBytes << std::endl;
 	std::cout << "Map table for the character set: " << charBytes << std::endl;
-
-	
-	
-	std::cout << "Final set: " << finalBytes << std::endl;
+	std::cout << "Final set: " << finalBytes << std::endl;		
 	std::cout << "The number of the group that can be column compressed: " << cnt << std::endl;
 
-	/*unflodFile.close();
-	flodFile.close();*/
+	
 	system("pause");
 }
