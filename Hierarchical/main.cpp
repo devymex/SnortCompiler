@@ -38,7 +38,7 @@ void CreateNewMap(VECROWSET &allCharset, VECROWSET &newCharset, std::vector<std:
 			}			
 		}
 
-		for (size_t index = 32; index < 127; index++)
+		for (size_t index = 32; index < 128; index++)
 		{
 			iter = o2n.find(allCharset[i][index]);
 			if (iter == o2n.end())
