@@ -80,3 +80,5 @@ size_t SortCharset(VECROWSET &allCharset, size_t threshold);
 
 
 void SameColDfaCombine(CDfaArray &SameColDfa, std::map<ushort, Attribute> &columnNum);
+
+void DiffColDfaCombine(CDfaArray &SameColDfa, std::map<ushort, Attribute> &columnNum, std::map<ushort, Attribute>::iterator lower, std::map<ushort, Attribute>::iterator upper);

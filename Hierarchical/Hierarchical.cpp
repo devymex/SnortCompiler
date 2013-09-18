@@ -374,8 +374,59 @@ void SameColDfaCombine(CDfaArray &SameColDfa, std::map<ushort, Attribute> &colum
 			map_iter->second.id_rowMatch[CDfaSet[i].GetId()] = rowChange;
 		}
 	}
+	std::fstream  fs("SameColDfa.txt", std::ios::out);
+	for(size_t i = 0; i < SameColDfa.Size(); ++i)
+	{
+		fs << "NEXT " << SameColDfa[i].GetColumnNum() << std::endl; 
+		for(size_t j = 0; j < SameColDfa[i].Size(); ++j)
+		{
+			for(size_t k = 0; k < SameColDfa[i][j].Size(); ++k)
+			{
+				fs.width(7);
+				fs << SameColDfa[i][j][k] << " ";
+			}
+			fs << std::endl;
+		}
+		
+	}
 
+	std::fstream fm("id_rowMatch.txt", std::ios::out);
+	std::map<ulong, rowMatch>::iterator it_rowMatch;
+	for(map_it = columnNum.begin(); map_it != columnNum.end(); ++map_it)
+	{
+		fm << "column" << map_it->first << std::endl;
+		for(it_rowMatch = map_it->second.id_rowMatch.begin(); it_rowMatch != map_it->second.id_rowMatch.end(); ++it_rowMatch)
+		{
+			fm << "DfaID ";
+			fm.width(7);
+			fm << it_rowMatch->first;
+			for(size_t i = 0; i < it_rowMatch->second.size(); ++i)
+			{
+				fm.width(7);
+				fm << it_rowMatch->second[i];
+			}
+			fm << std::endl;
+		}
+	}
+	std::fstream fc("result.txt", std::ios::out);
+	size_t j;
+	size_t dfa = 0;
+	for(map_it = columnNum.begin(), j = 0; map_it != columnNum.end(); ++map_it, ++j)
+	{
+		fc << "column " << map_it->first << std::endl;
+		fc << "Dfa num " << map_it->second.id_rowMatch.size() << std::endl;
+		dfa += map_it->second.id_rowMatch.size();
+		fc << "state num " << SameColDfa[j].Size() << std::endl;
+	}
+	std::cout << dfa << std::endl;
+	std::cout << j << std::endl;
+	fc.close();
+	fs.close();
+	fm.close();
 }
 
+void DiffColDfaCombine(CDfaArray &SameColDfa, std::map<ushort, Attribute> &columnNum, std::map<ushort, Attribute>::iterator lower, std::map<ushort, Attribute>::iterator upper)
+{
 
+}
 //////////////////////////////////////////////////////////////////////////////////////////////////
