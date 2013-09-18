@@ -26,6 +26,78 @@ void UnflodDFA(CDfa &flodDfa, CDfa &unflodDfa)
 	unflodDfa.SetStartState(flodDfa.GetStartState());
 	unflodDfa.GetFinalStates() = flodDfa.GetFinalStates();
 }
+//void MinAry(GRAPH matrix, VECROWSET &result)
+//{
+//	VECROWSET ary;
+//	const int N = sqrt(matrix.size());
+//	ary.push_back(result.front());
+//	result.erase(result.begin());
+//	VECROWSET::iterator signState;
+//
+//	while (result.size() != 0)
+//	{
+//		double weight = 0;
+//		for (VECROWSET::iterator i = result.begin(); i != result.end(); ++i)
+//		{
+//			double tmp = 0;	
+//			for (VECROWSET::iterator j = ary.begin(); j != ary.end(); ++j)
+//			{
+//				int number = (int)(i->front()) * N + (int)(j->front());
+//				if(matrix[number] != 0)
+//				{
+//					tmp += matrix[number];
+//				}
+//			}
+//			if(tmp > weight)
+//			{
+//				weight = tmp;
+//				signState = i;	
+//			}
+//		}
+//		ary.push_back(*signState);
+//		result.erase(signState);
+//	}
+//	result.assign(ary.begin(),ary.end());
+//}
+//
+//void StoreWagner(GRAPH &matrix, ROWSET &resultSet)
+//{
+//	const int N = sqrt(matrix.size());
+//	VECROWSET result;
+//	for(int i = 0; i != N; ++i)
+//	{
+//		result.push_back(ROWSET(1,i));
+//	}
+//	double minCutResult = sqrt(matrix.size());
+//
+//	while(result.size() != 1)
+//	{
+//		MinAry(matrix, result);
+//		byte t = (result.end()-1)->front();
+//		byte s = (result.end()-2)->front();
+//		double minCutTmp = matrix[(int)t * N + (int)s];
+//
+//		VECROWSET::iterator i = result.begin();
+//		for(; i != result.end() - 2; ++i)
+//		{
+//			int tCount = (int)t * N + (int)(i->front());
+//			int sCount = (int)s * N + (int)(i->front());
+//			if(matrix[tCount] != 0)
+//			{
+//				minCutTmp += matrix[tCount];
+//				matrix[sCount] += matrix[tCount];
+//				matrix[(int)(i->front()) * N + (int)s] = matrix[sCount];
+//			}
+//		}
+//		if(minCutTmp < minCutResult)
+//		{
+//			minCutResult = minCutTmp;
+//			resultSet.assign((i + 1)->begin(), (i + 1)->end());
+//		}
+//		i->insert(i->end(),(i + 1)->begin(),(i + 1)->end());
+//		result.erase(i + 1);
+//	}
+//}
 
 
 //由DFA表中的行集建无向图，每一行代表图中的一个结点，边的权值为DFA表中两行中相同元素占的比率
@@ -277,6 +349,83 @@ size_t StatisticMemory(const CDfa &oneDFA, const std::vector<BLOCK> &blocks, VEC
 	}
 
 	return nOneMem;
+}
+
+const static size_t threshold = 4;
+
+size_t Estimate(const CDfa &coreMatrix, const ROWSET &partSet)
+{
+	const size_t col = coreMatrix.GetGroupCount();
+	const size_t row = partSet.size();
+	std::vector<bool> sign(row,true);
+	int temp =0;
+	size_t mem = -1;
+	for(size_t i = 0; i != row; ++i)
+	{
+		int result = 0;
+		for(size_t j = 0; j != row && sign[j] == true; ++j)
+		{	
+			int count = 0;
+			for(size_t k = 0; k != col; ++k)
+			{
+				if(coreMatrix[partSet[i]][k] != coreMatrix[partSet[j]][k])
+					++count;
+			}
+			if(count > threshold)
+			{
+				sign[i] = sign[j] = false;
+				result = 0;
+				break;
+			}
+			else
+				result += count;
+		}
+		if(temp < result)
+		{
+			mem = partSet[i];
+			temp =result;
+		}
+	}
+	return mem;
+}
+void update(ROWSET &member, std::map<size_t, ROWSET> &state)
+{
+
+}
+
+void CoreCompress(CDfaArray &corMatrixSets, std::map<size_t, ROWSET> &state)
+{
+	for(size_t l = 0; l != corMatrixSets.Size(); ++l)
+	{
+		CDfa &corMatrix = corMatrixSets[l];
+		 
+		GRAPH graph;
+		ROWSET weightArg;
+		BuildGraph(corMatrix, graph, weightArg);
+		ROWSET nodes;
+		for(size_t i = 0; i != corMatrix.Size(); ++i)
+			nodes.push_back(i);
+		for(ROWSET::reverse_iterator i = weightArg.rbegin(); i != weightArg.rend(); ++i)
+		{
+			VECROWSET partRows;
+			SearchConnectSubgraph(graph, nodes, *i, partRows);
+			ROWSET member;
+			bool sign = true;
+			for(VECROWSET::iterator j = partRows.begin(); j != partRows.end(); ++j)
+			{
+				size_t mem = Estimate(corMatrix, *j);
+				if(mem = -1)
+				{
+					sign = false;
+					break;
+				}
+				else
+					member.push_back(mem);
+			}
+			if(sign = true)
+				update(corMatrix, state[col]
+		}
+	}
 }
 
 
