@@ -26,85 +26,14 @@ void UnflodDFA(CDfa &flodDfa, CDfa &unflodDfa)
 	unflodDfa.SetStartState(flodDfa.GetStartState());
 	unflodDfa.GetFinalStates() = flodDfa.GetFinalStates();
 }
-//void MinAry(GRAPH matrix, VECROWSET &result)
-//{
-//	VECROWSET ary;
-//	const int N = sqrt(matrix.size());
-//	ary.push_back(result.front());
-//	result.erase(result.begin());
-//	VECROWSET::iterator signState;
-//
-//	while (result.size() != 0)
-//	{
-//		double weight = 0;
-//		for (VECROWSET::iterator i = result.begin(); i != result.end(); ++i)
-//		{
-//			double tmp = 0;	
-//			for (VECROWSET::iterator j = ary.begin(); j != ary.end(); ++j)
-//			{
-//				int number = (int)(i->front()) * N + (int)(j->front());
-//				if(matrix[number] != 0)
-//				{
-//					tmp += matrix[number];
-//				}
-//			}
-//			if(tmp > weight)
-//			{
-//				weight = tmp;
-//				signState = i;	
-//			}
-//		}
-//		ary.push_back(*signState);
-//		result.erase(signState);
-//	}
-//	result.assign(ary.begin(),ary.end());
-//}
-//
-//void StoreWagner(GRAPH &matrix, ROWSET &resultSet)
-//{
-//	const int N = sqrt(matrix.size());
-//	VECROWSET result;
-//	for(int i = 0; i != N; ++i)
-//	{
-//		result.push_back(ROWSET(1,i));
-//	}
-//	double minCutResult = sqrt(matrix.size());
-//
-//	while(result.size() != 1)
-//	{
-//		MinAry(matrix, result);
-//		byte t = (result.end()-1)->front();
-//		byte s = (result.end()-2)->front();
-//		double minCutTmp = matrix[(int)t * N + (int)s];
-//
-//		VECROWSET::iterator i = result.begin();
-//		for(; i != result.end() - 2; ++i)
-//		{
-//			int tCount = (int)t * N + (int)(i->front());
-//			int sCount = (int)s * N + (int)(i->front());
-//			if(matrix[tCount] != 0)
-//			{
-//				minCutTmp += matrix[tCount];
-//				matrix[sCount] += matrix[tCount];
-//				matrix[(int)(i->front()) * N + (int)s] = matrix[sCount];
-//			}
-//		}
-//		if(minCutTmp < minCutResult)
-//		{
-//			minCutResult = minCutTmp;
-//			resultSet.assign((i + 1)->begin(), (i + 1)->end());
-//		}
-//		i->insert(i->end(),(i + 1)->begin(),(i + 1)->end());
-//		result.erase(i + 1);
-//	}
-//}
-
 
 //由DFA表中的行集建无向图，每一行代表图中的一个结点，边的权值为DFA表中两行中相同元素占的比率
-void BuildGraph(const CDfa &oneDfa, GRAPH &graph, ROWSET &weightArg)
+void BuildGraph(const CDfa &oneDfa, GRAPH &graph)
 {
 	//DFA表行数，即图中的结点个数
 	size_t nRow = oneDfa.Size();
+	size_t col = oneDfa.GetGroupCount();
+	const size_t weight = col - threshold;
 
 	//申请（结点个数 * 结点个数）大小的矩阵，一维数组存储
 	graph.resize(nRow * nRow);
@@ -117,20 +46,17 @@ void BuildGraph(const CDfa &oneDfa, GRAPH &graph, ROWSET &weightArg)
 		{
 			//DFA表中两行相同元素的个数
 			size_t nEqualCnt = 0;
-			for (size_t k = 0; k < oneDfa.GetGroupCount(); ++k)
+			for (size_t k = 0; k < col; ++k)
 			{
 				if ((oneDfa[i][k] == oneDfa[j][k]))
 				{
 					++nEqualCnt;
 				}
 			}
-			graph[i * nRow + j] = graph[j * nRow + i] = nEqualCnt;
-			weightArg.push_back(nEqualCnt);
+			if(nEqualCnt == weight)
+				graph[i * nRow + j] = graph[j * nRow + i] = nEqualCnt;
 		}
 	}
-
-	std::sort(weightArg.begin(), weightArg.end());
-	weightArg.erase(std::unique(weightArg.begin(), weightArg.end()), weightArg.end());
 }
 
 //图的深度搜索算法
@@ -352,65 +278,44 @@ size_t StatisticMemory(const CDfa &oneDFA, const std::vector<BLOCK> &blocks, VEC
 }
 
 const static size_t threshold = 2;
-const static size_t column = 4;
+//const static size_t column = 4;
 
-//struct stateTable{
-//	ROWSET state;
-//	std::map<size_t, size_t> *sp;
-//};
-
-
-int Estimate(const CDfa &coreMatrix, const ROWSET &partSet)
+bool Estimate(const CDfa &coreMatrix, const ROWSET &partSet, const ROWSET &corRow)
 {
 	const size_t col = coreMatrix.GetGroupCount();
 	const size_t row = partSet.size();
-	std::vector<bool> sign(row,true);
-	int temp =0;
-	int mem = -1;
+	bool result = true;
 	for(size_t i = 0; i != row; ++i)
-	{
-		int result = 0;
-		if(sign[i] == true)
+	{	
+		int count = 0;
+		for(size_t j = 0; j != col; ++j)
 		{
-			for(size_t j = 0; j != row; ++j)
-			{	
-				int count = 0;
-				for(size_t k = 0; k != col; ++k)
-				{
-					if(coreMatrix[partSet[i]][k] != coreMatrix[partSet[j]][k])
-						++count;
-				}
-				if(count > threshold)
-				{
-					sign[i] = sign[j] = false;
-					result = -1;
-					break;
-				}
-				else
-					result += count;
-			}
-			if(temp <= result)
-			{
-				mem = partSet[i];
-				temp =result;
-			}
+			if(coreMatrix[partSet[i]][j] != corRow[j])
+				++count;
+		}
+		if(count > threshold)
+		{
+			result = false;
+			break;
 		}
 	}
-	return mem;
+	return result;
 }
 
-void update(const CDfa &corMatrix, const VECROWSET &partRows, const ROWSET &member, Attribute &dfaID)
+void update(const VECROWSET &partRows, const VECROWSET &corRows, COLUMNCOMBINE &dfaData)
 {
-	std::map<ulong, rowMatch> &state = dfaID.id_rowMatch;
-	const size_t col = corMatrix[0].Size();
-	bool sign = false;
-	for(std::map<ulong, rowMatch>::iterator k = state.begin(); k != state.end(); ++k)
+	const std::vector<std::vector<ushort> > &dfaMatrix = dfaData.sameColumnMatrix; 
+	std::vector<ROWTRANSFORM> &trform = dfaData.rowTrans;
+	std::vector<std::vector<SKIPNODE> > skipTable;
+	const int row = dfaMatrix.size();
+	const int col = dfaData.column;
+	
+	for(std::vector<ROWTRANSFORM>::iterator k = trform.begin(); k != trform.end(); ++k)
 	{
-		std::vector<std::map<size_t, size_t> > skipTable;
-		for(std::vector<ushort>::iterator l = k->second.begin(); l != k->second.end(); ++l)
+		for(std::vector<ushort>::iterator l = k->rowTransform.begin(); l != k->rowTransform.end(); ++l)
 		{
-			std::map<size_t, size_t> value;
-			for(size_t i = 0; i != member.size(); ++i)
+			std::vector<SKIPNODE> skipRow;
+			for(size_t i = 0; i != partRows.size(); ++i)
 			{
 				for(size_t j = 0; j != partRows[i].size(); ++j)
 				{
@@ -418,68 +323,60 @@ void update(const CDfa &corMatrix, const VECROWSET &partRows, const ROWSET &memb
 					{
 						for(size_t m = 0; m != col; ++m)
 						{
-							if(corMatrix[member[i]][m] != corMatrix[*l][m])
+							if(dfaMatrix[partRows[i][j]][m] != corRows[i][m])
 							{
-								std::pair<size_t, size_t> v(m, corMatrix[*l][m]);
-								value[m];
+								SKIPNODE skip;
+								skip.jumpCharacter = static_cast<char>(m);
+								skip.nextNode = dfaMatrix[partRows[i][j]][m];
+								skipRow.push_back(skip);
 							}
 						}
+						skipTable.push_back(skipRow);
+						
 						*l = i;
-						sign = true;
 						break;
 					}
 				}
-				if(sign == true)
-					break;
+				break;
 			}
-			if(sign == true)
-				skipTable.push_back(value);
 		}
-
 	}
 }
 
-void CoreCompress(CDfaArray &corMatrixSets, std::map<ushort, Attribute> &state)
+void CoreCompress(CDfaArray &dfaMatrixSets, std::map<ushort, Attribute> &state)
 {
 	std::map<ushort, Attribute>::iterator dfaIdSet = state.begin();
-	for(ushort l = 0; l != corMatrixSets.Size(); ++l, ++dfaIdSet)
+	for(ushort l = 0; l != dfaMatrixSets.Size(); ++l, ++dfaIdSet)
 	{
-		if(corMatrixSets[l].GetColumnNum() == column)
+		//if(corMatrixSets[l].GetColumnNum() == column)
+		//{
+		CDfa &dfaMatrix = dfaMatrixSets[l];
+		Attribute dfaID = dfaIdSet->second;
+		const ushort col = dfaIdSet->first;
+		GRAPH graph;
+		BuildGraph(dfaMatrix, graph);
+		ROWSET nodes;
+		for(size_t i = 0; i != dfaMatrix.Size(); ++i)
+			nodes.push_back(i);
+		const size_t weight = col - threshold;
+		VECROWSET partRows;
+		SearchConnectSubgraph(graph, nodes, weight, partRows);
+		VECROWSET corMatrix;
+		bool sign = true;
+		for(VECROWSET::iterator j = partRows.begin(); j != partRows.end(); ++j)
 		{
-			CDfa &corMatrix = corMatrixSets[l];
-			Attribute dfaID = dfaIdSet->second;
-			const ushort col = dfaIdSet->first;
-			GRAPH graph;
-			ROWSET weightArg;
-			BuildGraph(corMatrix, graph, weightArg);
-
-			ROWSET nodes;
-			for(size_t i = 0; i != corMatrix.Size(); ++i)
-				nodes.push_back(i);
-			const size_t weight = n - threshold;
+			ROWSET corRow;
+			StatisticVitualCore(dfaMatrix, *j, corRow);
+			int mem = Estimate(dfaMatrix, *j, corRow);
+			if(mem == true)
+				corMatrix.push_back(corRow);
+			else
 			{
-				VECROWSET partRows;
-				SearchConnectSubgraph(graph, nodes, weight, partRows);
-				ROWSET member;
-				bool sign = true;
-				for(VECROWSET::iterator j = partRows.begin(); j != partRows.end(); ++j)
-				{
-					int mem = Estimate(corMatrix, *j);
-					if(mem == -1)
-					{
-						sign = false;
-						member.clear();
-						break;
-					}
-					else
-						member.push_back(mem);
-				}
-				if(sign == true)
-				{
-					update(corMatrix, partRows, member, dfaID);
-					break;
-				}
+				//do something;
+				//corMatrix.push_back(corRow);
 			}
 		}
+		update(dfaMatrix, partRows, corMatrix, dfaID);
+		//}
 	}
 }
