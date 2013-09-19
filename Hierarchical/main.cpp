@@ -2,9 +2,9 @@
 
 void main(int nArgs, char **cArgs)
 {
-	CDfaArray SameColDfa;
+	/*CDfaArray SameColDfa;
 	std::map<ushort, Attribute> columnNum;
-	SameColDfaCombine(SameColDfa, columnNum);
+	SameColDfaCombine(SameColDfa, columnNum);*/
 	CoreCompress(SameColDfa, columnNum);
 	system("pause");
 }

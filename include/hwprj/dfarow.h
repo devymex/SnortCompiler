@@ -85,6 +85,7 @@ public:
 
 	/////////////////////////////////////
 	bool operator==(CDfaRow &rhs);
+	void PushBack(ushort n);
 private:
 	/// @brief		私有成员，仅供内部使用。
 	STATEIDARY* m_pDest;

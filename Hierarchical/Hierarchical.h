@@ -30,6 +30,32 @@ typedef struct
 	//std::map<ulong, CDfaRow> id_rowMatch;
 	std::map<ulong, rowMatch> id_rowMatch;
 } Attribute;
+
+//////////////////////////////////////////////////////////////////////////
+
+typedef struct
+{
+	char jumpCharacter;
+	ushort nextNode;
+} SKIPNODE;
+
+
+typedef struct
+{
+	ushort dfaId;
+	std::vector<ushort> rowTransform;
+	std::vector<SKIPNODE> skipNode;
+} ROWTRANSFORM;
+
+typedef struct
+{
+	ushort column;
+	std::vector<std::vector<ushort> > sameColumnMatrix;
+	std::vector<ROWTRANSFORM> rowTrans;
+} COLUMNCOMBINE;
+
+
+
 ///////////////////////////////////////////////////////////////////////
 
 struct BLOCK
