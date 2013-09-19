@@ -10,7 +10,7 @@
 #include <fstream>
 #include <unordered_map>
 
-
+#include <set>
 
 //#define limit 0.5
 
@@ -21,15 +21,15 @@ typedef std::vector<ROWSET> VECROWSET;
 typedef VECROWSET::iterator NODEARRAY_ITER;
 
 ///////////////////////////////////////////////////////////////////////
-typedef std::vector<ushort> rowMatch;
-typedef struct
-{
-	bool pushed;
-	/*std::vector<ulong> dfaID;
-	CDfa rowMatch;*/
-	//std::map<ulong, CDfaRow> id_rowMatch;
-	std::map<ulong, rowMatch> id_rowMatch;
-} Attribute;
+//typedef std::vector<ushort> rowMatch;
+//typedef struct
+//{
+//	bool pushed;
+//	/*std::vector<ulong> dfaID;
+//	CDfa rowMatch;*/
+//	//std::map<ulong, CDfaRow> id_rowMatch;
+//	std::map<ulong, rowMatch> id_rowMatch;
+//} Attribute;
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -58,6 +58,8 @@ typedef struct
 	std::vector<ROWTRANSFORM> rowTrans;
 } COLUMNCOMBINE;
 
+typedef std::vector<COLUMNCOMBINE> COLCOMBINEARRAY;
+typedef std::vector<COLUMNCOMBINE>::iterator COLCOMBINEARRAY_ITERATOR;
 ///////////////////////////////////////////////////////////////////////
 
 struct BLOCK
@@ -106,12 +108,16 @@ void ColMergeCompress(VECROWSET &vecCores, ulong colCnt, byte* colGroup, ulong &
 
 size_t SortCharset(VECROWSET &allCharset, size_t threshold);
 
-void SameColDfaCombine(CDfaArray &SameColDfa, std::map<ushort, Attribute> &columnNum);
+bool equal(CDfaRow &row, std::vector<ushort> vec);
 
-void DiffColDfaCombine(CDfaArray &SameColDfa, std::map<ushort, Attribute> &columnNum, std::map<ushort, Attribute>::iterator lower, std::map<ushort, Attribute>::iterator upper);
+void SameColDfaCombine(COLCOMBINEARRAY &colCombineArray);
 
 int Estimate(const CDfa &coreMatrix, const ROWSET &partSet);
 
 void update(const CDfa &corMatrix, const VECROWSET &partRows, const ROWSET &member, Attribute &dfaID);
+void ReplaceRowMatchValue(COLUMNCOMBINE &inColCom, ushort old, ushort now);
 
 void CoreCompress(CDfaArray &corMatrixSets, std::map<ushort, Attribute> &state);
+void TwoColDfaCombine(COLUMNCOMBINE &inColCom, COLUMNCOMBINE &outColCom);
+
+void DiffColDfaCombine(COLCOMBINEARRAY &colCombineArray, ushort minCol, ushort maxCol, COLUMNCOMBINE &outCombineArray);
