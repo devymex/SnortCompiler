@@ -82,3 +82,9 @@ void CoreCompress(VECROWSET &coreMatrix, std::map<ushort, ROWSET> &table);
 void SameColDfaCombine(CDfaArray &SameColDfa, std::map<ushort, Attribute> &columnNum);
 
 void DiffColDfaCombine(CDfaArray &SameColDfa, std::map<ushort, Attribute> &columnNum, std::map<ushort, Attribute>::iterator lower, std::map<ushort, Attribute>::iterator upper);
+
+int Estimate(const CDfa &coreMatrix, const ROWSET &partSet);
+
+void update(const CDfa &corMatrix, const VECROWSET &partRows, const ROWSET &member, Attribute &dfaID);
+
+void CoreCompress(CDfaArray &corMatrixSets, std::map<ushort, Attribute> &state);

@@ -154,7 +154,7 @@ int DFS_Visit(const GRAPH &graph, size_t vex, size_t limit, ROWSET &nodes, ROWSE
 
 	for (size_t i = 0; i < nodes.size(); ++i)
 	{
-		if (graph[vex * nVexCnt + nodes[i]] > limit &&
+		if (graph[vex * nVexCnt + nodes[i]] >= limit &&
 			flag[nodes[i]] == 0)
 		{
 			DFS_Visit(graph, nodes[i], limit, nodes, flag, curRow);
@@ -351,79 +351,135 @@ size_t StatisticMemory(const CDfa &oneDFA, const std::vector<BLOCK> &blocks, VEC
 	return nOneMem;
 }
 
-const static size_t threshold = 4;
+const static size_t threshold = 2;
+const static size_t column = 4;
 
-size_t Estimate(const CDfa &coreMatrix, const ROWSET &partSet)
+//struct stateTable{
+//	ROWSET state;
+//	std::map<size_t, size_t> *sp;
+//};
+
+
+int Estimate(const CDfa &coreMatrix, const ROWSET &partSet)
 {
 	const size_t col = coreMatrix.GetGroupCount();
 	const size_t row = partSet.size();
 	std::vector<bool> sign(row,true);
 	int temp =0;
-	size_t mem = -1;
+	int mem = -1;
 	for(size_t i = 0; i != row; ++i)
 	{
 		int result = 0;
-		for(size_t j = 0; j != row && sign[j] == true; ++j)
-		{	
-			int count = 0;
-			for(size_t k = 0; k != col; ++k)
-			{
-				if(coreMatrix[partSet[i]][k] != coreMatrix[partSet[j]][k])
-					++count;
-			}
-			if(count > threshold)
-			{
-				sign[i] = sign[j] = false;
-				result = 0;
-				break;
-			}
-			else
-				result += count;
-		}
-		if(temp < result)
+		if(sign[i] == true)
 		{
-			mem = partSet[i];
-			temp =result;
+			for(size_t j = 0; j != row; ++j)
+			{	
+				int count = 0;
+				for(size_t k = 0; k != col; ++k)
+				{
+					if(coreMatrix[partSet[i]][k] != coreMatrix[partSet[j]][k])
+						++count;
+				}
+				if(count > threshold)
+				{
+					sign[i] = sign[j] = false;
+					result = -1;
+					break;
+				}
+				else
+					result += count;
+			}
+			if(temp <= result)
+			{
+				mem = partSet[i];
+				temp =result;
+			}
 		}
 	}
 	return mem;
 }
-void update(ROWSET &member, std::map<size_t, ROWSET> &state)
-{
 
+void update(const CDfa &corMatrix, const VECROWSET &partRows, const ROWSET &member, Attribute &dfaID)
+{
+	std::map<ulong, rowMatch> &state = dfaID.id_rowMatch;
+	const size_t col = corMatrix[0].Size();
+	bool sign = false;
+	for(std::map<ulong, rowMatch>::iterator k = state.begin(); k != state.end(); ++k)
+	{
+		std::vector<std::map<size_t, size_t> > skipTable;
+		for(std::vector<ushort>::iterator l = k->second.begin(); l != k->second.end(); ++l)
+		{
+			std::map<size_t, size_t> value;
+			for(size_t i = 0; i != member.size(); ++i)
+			{
+				for(size_t j = 0; j != partRows[i].size(); ++j)
+				{
+					if(partRows[i][j] == static_cast<size_t>(*l))
+					{
+						for(size_t m = 0; m != col; ++m)
+						{
+							if(corMatrix[member[i]][m] != corMatrix[*l][m])
+							{
+								std::pair<size_t, size_t> v(m, corMatrix[*l][m]);
+								value[m];
+							}
+						}
+						*l = i;
+						sign = true;
+						break;
+					}
+				}
+				if(sign == true)
+					break;
+			}
+			if(sign == true)
+				skipTable.push_back(value);
+		}
+
+	}
 }
 
-void CoreCompress(CDfaArray &corMatrixSets, std::map<size_t, ROWSET> &state)
+void CoreCompress(CDfaArray &corMatrixSets, std::map<ushort, Attribute> &state)
 {
-	for(size_t l = 0; l != corMatrixSets.Size(); ++l)
+	std::map<ushort, Attribute>::iterator dfaIdSet = state.begin();
+	for(ushort l = 0; l != corMatrixSets.Size(); ++l, ++dfaIdSet)
 	{
-		CDfa &corMatrix = corMatrixSets[l];
-		 
-		GRAPH graph;
-		ROWSET weightArg;
-		BuildGraph(corMatrix, graph, weightArg);
-		ROWSET nodes;
-		for(size_t i = 0; i != corMatrix.Size(); ++i)
-			nodes.push_back(i);
-		for(ROWSET::reverse_iterator i = weightArg.rbegin(); i != weightArg.rend(); ++i)
+		if(corMatrixSets[l].GetColumnNum() == column)
 		{
-			VECROWSET partRows;
-			SearchConnectSubgraph(graph, nodes, *i, partRows);
-			ROWSET member;
-			bool sign = true;
-			for(VECROWSET::iterator j = partRows.begin(); j != partRows.end(); ++j)
+			CDfa &corMatrix = corMatrixSets[l];
+			Attribute dfaID = dfaIdSet->second;
+			const ushort col = dfaIdSet->first;
+			GRAPH graph;
+			ROWSET weightArg;
+			BuildGraph(corMatrix, graph, weightArg);
+
+			ROWSET nodes;
+			for(size_t i = 0; i != corMatrix.Size(); ++i)
+				nodes.push_back(i);
+			const size_t weight = n - threshold;
 			{
-				size_t mem = Estimate(corMatrix, *j);
-				if(mem = -1)
+				VECROWSET partRows;
+				SearchConnectSubgraph(graph, nodes, weight, partRows);
+				ROWSET member;
+				bool sign = true;
+				for(VECROWSET::iterator j = partRows.begin(); j != partRows.end(); ++j)
 				{
-					sign = false;
+					int mem = Estimate(corMatrix, *j);
+					if(mem == -1)
+					{
+						sign = false;
+						member.clear();
+						break;
+					}
+					else
+						member.push_back(mem);
+				}
+				if(sign == true)
+				{
+					update(corMatrix, partRows, member, dfaID);
 					break;
 				}
-				else
-					member.push_back(mem);
 			}
-			if(sign = true)
-				update(corMatrix, state[col]
 		}
 	}
 }
@@ -473,6 +529,7 @@ void SameColDfaCombine(CDfaArray &SameColDfa, std::map<ushort, Attribute> &colum
 		tempDfa.SetId(map_it->first);
 		SameColDfa.PushBack(tempDfa);
 	}
+
 	for(size_t i = 0; i < CDfaSet.Size(); ++i)
 	{
 		column = CDfaSet[i].GetColumnNum();
@@ -523,56 +580,58 @@ void SameColDfaCombine(CDfaArray &SameColDfa, std::map<ushort, Attribute> &colum
 			map_iter->second.id_rowMatch[CDfaSet[i].GetId()] = rowChange;
 		}
 	}
-	std::fstream  fs("SameColDfa.txt", std::ios::out);
-	for(size_t i = 0; i < SameColDfa.Size(); ++i)
-	{
-		fs << "NEXT " << SameColDfa[i].GetColumnNum() << std::endl; 
-		for(size_t j = 0; j < SameColDfa[i].Size(); ++j)
-		{
-			for(size_t k = 0; k < SameColDfa[i][j].Size(); ++k)
-			{
-				fs.width(7);
-				fs << SameColDfa[i][j][k] << " ";
-			}
-			fs << std::endl;
-		}
-		
-	}
+	//std::fstream  fs("SameColDfa.txt", std::ios::out);
+	//for(size_t i = 0; i < SameColDfa.Size(); ++i)
+	//{
+	//	fs << "NEXT " << SameColDfa[i].GetColumnNum() << std::endl; 
+	//	for(size_t j = 0; j < SameColDfa[i].Size(); ++j)
+	//	{
+	//		for(size_t k = 0; k < SameColDfa[i][j].Size(); ++k)
+	//		{
+	//			fs.width(7);
+	//			fs << SameColDfa[i][j][k] << " ";
+	//		}
+	//		fs << std::endl;
+	//	}
+	//	
+	//}
 
-	std::fstream fm("id_rowMatch.txt", std::ios::out);
-	std::map<ulong, rowMatch>::iterator it_rowMatch;
-	for(map_it = columnNum.begin(); map_it != columnNum.end(); ++map_it)
-	{
-		fm << "column" << map_it->first << std::endl;
-		for(it_rowMatch = map_it->second.id_rowMatch.begin(); it_rowMatch != map_it->second.id_rowMatch.end(); ++it_rowMatch)
-		{
-			fm << "DfaID ";
-			fm.width(7);
-			fm << it_rowMatch->first;
-			for(size_t i = 0; i < it_rowMatch->second.size(); ++i)
-			{
-				fm.width(7);
-				fm << it_rowMatch->second[i];
-			}
-			fm << std::endl;
-		}
-	}
-	std::fstream fc("result.txt", std::ios::out);
-	size_t j;
-	size_t dfa = 0;
-	for(map_it = columnNum.begin(), j = 0; map_it != columnNum.end(); ++map_it, ++j)
-	{
-		fc << "column " << map_it->first << std::endl;
-		fc << "Dfa num " << map_it->second.id_rowMatch.size() << std::endl;
-		dfa += map_it->second.id_rowMatch.size();
-		fc << "state num " << SameColDfa[j].Size() << std::endl;
-	}
-	std::cout << dfa << std::endl;
-	std::cout << j << std::endl;
-	fc.close();
-	fs.close();
-	fm.close();
+	//std::fstream fm("id_rowMatch.txt", std::ios::out);
+	//std::map<ulong, rowMatch>::iterator it_rowMatch;
+	//for(map_it = columnNum.begin(); map_it != columnNum.end(); ++map_it)
+	//{
+	//	fm << "column" << map_it->first << std::endl;
+	//	for(it_rowMatch = map_it->second.id_rowMatch.begin(); it_rowMatch != map_it->second.id_rowMatch.end(); ++it_rowMatch)
+	//	{
+	//		fm << "DfaID ";
+	//		fm.width(7);
+	//		fm << it_rowMatch->first;
+	//		for(size_t i = 0; i < it_rowMatch->second.size(); ++i)
+	//		{
+	//			fm.width(7);
+	//			fm << it_rowMatch->second[i];
+	//		}
+	//		fm << std::endl;
+	//	}
+	//}
+
+	//std::fstream fc("result.txt", std::ios::out);
+	//size_t j;
+	//size_t dfa = 0;
+	//for(map_it = columnNum.begin(), j = 0; map_it != columnNum.end(); ++map_it, ++j)
+	//{
+	//	fc << "column " << map_it->first << std::endl;
+	//	fc << "Dfa num " << map_it->second.id_rowMatch.size() << std::endl;
+	//	dfa += map_it->second.id_rowMatch.size();
+	//	fc << "state num " << SameColDfa[j].Size() << std::endl;
+	//}
+	//std::cout << dfa << std::endl;
+	//std::cout << j << std::endl;
+	//fc.close();
+	//fs.close();
+	//fm.close();
 }
+
 
 void DiffColDfaCombine(CDfaArray &SameColDfa, std::map<ushort, Attribute> &columnNum, std::map<ushort, Attribute>::iterator lower, std::map<ushort, Attribute>::iterator upper)
 {
