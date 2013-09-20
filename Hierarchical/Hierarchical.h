@@ -32,20 +32,45 @@ typedef VECROWSET::iterator NODEARRAY_ITER;
 //} Attribute;
 
 //////////////////////////////////////////////////////////////////////////
+typedef struct
+{
+	std::vector<std::vector<ushort> > *m_t;
+	int n;
+} SORTASSITANT;
 
+struct ROWSORT
+{
+	
+	ROWSORT() { }
+	bool operator()(SORTASSITANT p1, SORTASSITANT p2)
+	{
+		return (*p1.m_t)[p1.n] < (*p2.m_t)[p2.n];
+	}
+};
 typedef struct
 {
 	char jumpCharacter;
 	ushort nextNode;
 } SKIPNODE;
 
+typedef struct
+{
+	ushort newNum;
+	std::vector<SKIPNODE> *skipNode;
+}ROWNODE;
 
 typedef struct
 {
 	ushort dfaId;
-	std::vector<ushort> rowTransform;
-	std::vector<SKIPNODE> skipNode;
+	std::vector<ROWNODE> rowTransform;
 } ROWTRANSFORM;
+
+//typedef struct
+//{
+//	ushort dfaId;
+//	std::vector<ushort> rowTransform;
+//	std::vector<SKIPNODE> skipNode;
+//} ROWTRANSFORM;
 
 typedef struct
 {
@@ -105,6 +130,9 @@ void ColMergeCompress(VECROWSET &vecCores, ulong colCnt, byte* colGroup, ulong &
 
 size_t SortCharset(VECROWSET &allCharset, size_t threshold);
 
+void AnotherReplaceRowMatchValue(COLUMNCOMBINE &inColCom, std::vector<ROWTRANSFORM> &row, ushort old, ushort now);
+
+void RemoveTheSame(COLCOMBINEARRAY &colCombineArray);
 
 bool equal(CDfaRow &row, std::vector<ushort> vec);
 

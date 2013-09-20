@@ -461,6 +461,201 @@ bool equal(CDfaRow &row, std::vector<ushort> vec)
 	return true;
 }
 
+//void SameColDfaCombine(COLCOMBINEARRAY &colCombineArray)
+//{
+//	ushort column, colLocation;
+//	
+//	std::vector<int> origin, minus, now;
+//
+//	CGroupRes groupRes;
+//	groupRes.ReadFromFile("FinalResult.cdt");
+//	CDfaArray &CDfaSet = groupRes.GetDfaTable();
+//	
+//	std::set<ushort> allCol;
+//	std::set<ushort>::iterator col_it, col;
+//	COLUMNCOMBINE sameColInform;
+//	for (size_t i = 0; i < CDfaSet.Size(); ++i)
+//	{
+//		allCol.insert(CDfaSet[i].GetColumnNum());
+//		CDfaSet[i].SetId(i + 1);
+//	}
+//	
+//	for(col_it = allCol.begin(); col_it != allCol.end(); ++col_it)
+//	{
+//		sameColInform.column = *col_it;
+//		colCombineArray.push_back(sameColInform);
+//		origin.push_back(0);
+//		minus.push_back(0);
+//		now.push_back(0);
+//	}
+//
+//	for(size_t i = 0; i < CDfaSet.Size(); ++i)
+//	{
+//		column = CDfaSet[i].GetColumnNum();
+//		col_it = allCol.find(column);
+//
+//		colLocation = 0;
+//		for(col = allCol.begin(); col != col_it; col++, colLocation++) ;
+//
+//		///////////////////////////////////////////////////////////////////////////////
+//		origin[colLocation] += CDfaSet[i].Size();
+//
+//		ROWTRANSFORM rowMatch;
+//		rowMatch.dfaId = CDfaSet[i].GetId();
+//		ROWNODE rownode;
+//		size_t originSize, k;
+//		for(size_t j = 0; j < CDfaSet[i].Size(); ++j)
+//		{
+//			originSize = colCombineArray[colLocation].sameColumnMatrix.size();
+//			for(k = 0; k < originSize; ++k)
+//			{
+//				if(equal(CDfaSet[i][j], colCombineArray[colLocation].sameColumnMatrix[k]))
+//				{
+//					rownode.newNum = k;
+//					rowMatch.rowTransform.push_back(rownode);
+//					///////////////////////////////////////////////////////////////
+//					minus[colLocation]++;
+//						
+//					break;
+//				}
+//			}
+//			if(k == originSize)
+//			{
+//				std::vector<ushort> v;
+//				for(size_t t = 0; t < CDfaSet[i][j].Size(); ++t)
+//				{
+//					v.push_back(CDfaSet[i][j][t]);
+//				}
+//				colCombineArray[colLocation].sameColumnMatrix.push_back(v);
+//				//SameColDfa[colLocation].PushBack(CDfaSet[i][j]);
+//				rownode.newNum = originSize;
+//				rowMatch.rowTransform.push_back(rownode);	
+//			}
+//		}
+//		colCombineArray[colLocation].rowTrans.push_back(rowMatch);
+//	}
+//	std::fstream  fs("new SameColDfa.txt", std::ios::out);
+//	std::fstream fm("new id_rowMatch.txt", std::ios::out);
+//	std::fstream fc("new result.txt", std::ios::out);
+//	size_t dfa = 0;
+//	for(size_t i = 0; i < colCombineArray.size(); ++i)
+//	{
+//		/////////////////////////////////////////////////////////////////////////////////
+//		now[i] = colCombineArray[i].sameColumnMatrix.size();
+//
+//		fs << "NEXT " << colCombineArray[i].column << std::endl; 
+//		for(size_t j = 0; j < colCombineArray[i].sameColumnMatrix.size(); ++j)
+//		{
+//			for(size_t k = 0; k < colCombineArray[i].sameColumnMatrix[j].size(); ++k)
+//			{
+//				fs.width(7);
+//				fs << colCombineArray[i].sameColumnMatrix[j][k] << " ";
+//			}
+//			fs << std::endl;
+//		}
+//		
+//		fm << "column" << colCombineArray[i].column << std::endl;
+//		for(size_t j = 0; j < colCombineArray[i].rowTrans.size(); ++j)/*it_rowMatch = map_it->second.id_rowMatch.begin(); it_rowMatch != map_it->second.id_rowMatch.end(); ++it_rowMatch)*/
+//		{
+//			fm << "DfaID ";
+//			fm.width(7);
+//			fm << colCombineArray[i].rowTrans[j].dfaId;
+//			for(size_t k = 0; k < colCombineArray[i].rowTrans[j].rowTransform.size(); ++k)
+//			{
+//				fm.width(7);
+//				fm << colCombineArray[i].rowTrans[j].rowTransform[k].newNum;
+//			}
+//			fm << std::endl;
+//		}
+//
+//		fc << "column\tDfa num\tstate num\torigin\tminus\tnow" << std::endl;
+//		fc << fc.width(6) <<colCombineArray[i].column << "\t";
+//		fc << fc.width(7) << colCombineArray[i].rowTrans.size() << "\t";
+//		dfa += colCombineArray[i].rowTrans.size();
+//		fc << fc.width(9) << colCombineArray[i].sameColumnMatrix.size() << "\t";
+//		fc << fc.width(6) << origin[i] << "\t ";
+//		fc << fc.width(6) << minus[i] << " \t";
+//		fc << fc.width(7) << now[i] << std::endl;
+//	}
+//
+//	std::cout << dfa << std::endl;
+//	fc.close();
+//	fs.close();
+//	fm.close();
+//}
+
+void AnotherReplaceRowMatchValue(COLUMNCOMBINE &inColCom, std::vector<ROWTRANSFORM> &row, ushort old, ushort now)
+{
+	/*std::map<ulong, rowMatch>::iterator rowmatch;
+	for(rowmatch = it->second.id_rowMatch.begin(); rowmatch != it->second.id_rowMatch.end(); ++it)
+	{
+		for(size_t j = 0; j < rowmatch->second.size(); ++j)
+		{
+			if(rowmatch->second[j] == old)
+			{
+				rowmatch->second[j] = now;
+			}
+		}
+	}*/
+	for(size_t i = 0; i < inColCom.rowTrans.size(); ++i)
+	{
+		for(size_t j = 0; j < inColCom.rowTrans[i].rowTransform.size(); ++j)
+		{
+			if(inColCom.rowTrans[i].rowTransform[j].newNum == old)
+			{
+				row[i].rowTransform[j].newNum = now;
+			}
+		}
+	}
+}
+
+void RemoveTheSame(COLCOMBINEARRAY &colCombineArray)
+{
+	std::vector<SORTASSITANT> nVec;
+	SORTASSITANT p;
+	std::vector<std::vector<ushort> > diff;
+	std::vector<ROWTRANSFORM> row;
+	for(size_t i = 0; i < colCombineArray.size(); ++i)
+	{
+		nVec.clear();
+		row = colCombineArray[i].rowTrans;
+		for(size_t j = 0; j < colCombineArray[i].sameColumnMatrix.size(); ++j)
+		{
+			p.n = j;
+			p.m_t = &colCombineArray[i].sameColumnMatrix;
+			nVec.push_back(p);
+		}
+		std::sort(nVec.begin(), nVec.end(), ROWSORT());
+		ushort now = 0;
+		AnotherReplaceRowMatchValue(colCombineArray[i], row, nVec[0].n, now);
+		diff.push_back(colCombineArray[i].sameColumnMatrix[nVec[0].n]);
+		for(size_t j = 1; j < nVec.size(); )
+		{
+			if(colCombineArray[i].sameColumnMatrix[nVec[j - 1].n] != colCombineArray[i].sameColumnMatrix[nVec[j].n])
+			{
+				//now++;
+				now = diff.size();
+				diff.push_back(colCombineArray[i].sameColumnMatrix[nVec[j].n]);
+			}
+			
+			AnotherReplaceRowMatchValue(colCombineArray[i], row, nVec[j].n, now);
+			++j;
+		}
+		/*if(colCombineArray[i].sameColumnMatrix[nVec[nVec.size() - 1].n] != colCombineArray[i].sameColumnMatrix[nVec[nVec.size() - 2].n])
+		{
+			now = colCombineArray[i].sameColumnMatrix.size();
+			
+		}
+		AnotherReplaceRowMatchValue(colCombineArray[i], row, nVec[nVec.size() - 1].n, now);
+		diff.push_back(colCombineArray[i].sameColumnMatrix[nVec[nVec.size() - 1].n]);*/
+
+		colCombineArray[i].rowTrans = row;
+		colCombineArray[i].sameColumnMatrix = diff;
+	}
+}
+
+
+
 void SameColDfaCombine(COLCOMBINEARRAY &colCombineArray)
 {
 	ushort column, colLocation;
@@ -502,36 +697,48 @@ void SameColDfaCombine(COLCOMBINEARRAY &colCombineArray)
 
 		ROWTRANSFORM rowMatch;
 		rowMatch.dfaId = CDfaSet[i].GetId();
-
-		size_t originSize, k;
+		ROWNODE rownode;
+		size_t originSize, k = colCombineArray[colLocation].sameColumnMatrix.size();
 		for(size_t j = 0; j < CDfaSet[i].Size(); ++j)
 		{
-			originSize = colCombineArray[colLocation].sameColumnMatrix.size();
-			for(k = 0; k < originSize; ++k)
+			//originSize = colCombineArray[colLocation].sameColumnMatrix.size();
+			//for(k = 0; k < originSize; ++k)
+			//{
+			//	if(equal(CDfaSet[i][j], colCombineArray[colLocation].sameColumnMatrix[k]))
+			//	{
+			//		rownode.newNum = k;
+			//		rowMatch.rowTransform.push_back(rownode);
+			//		///////////////////////////////////////////////////////////////
+			//		minus[colLocation]++;
+			//			
+			//		break;
+			//	}
+			//}
+			//if(k == originSize)
+			//{
+			//	std::vector<ushort> v;
+			//	for(size_t t = 0; t < CDfaSet[i][j].Size(); ++t)
+			//	{
+			//		v.push_back(CDfaSet[i][j][t]);
+			//	}
+			//	colCombineArray[colLocation].sameColumnMatrix.push_back(v);
+			//	//SameColDfa[colLocation].PushBack(CDfaSet[i][j]);
+			//	rownode.newNum = originSize;
+			//	rowMatch.rowTransform.push_back(rownode);	
+			//}
+			std::vector<ushort> v;
+			for(size_t t = 0; t < CDfaSet[i][j].Size(); ++t)
 			{
-				if(equal(CDfaSet[i][j], colCombineArray[colLocation].sameColumnMatrix[k]))
-				{
-					rowMatch.rowTransform.push_back(k);
-					///////////////////////////////////////////////////////////////
-					minus[colLocation]++;
-						
-					break;
-				}
+				v.push_back(CDfaSet[i][j][t]);
 			}
-			if(k == originSize)
-			{
-				std::vector<ushort> v;
-				for(size_t t = 0; t < CDfaSet[i][j].Size(); ++t)
-				{
-					v.push_back(CDfaSet[i][j][t]);
-				}
-				colCombineArray[colLocation].sameColumnMatrix.push_back(v);
-				//SameColDfa[colLocation].PushBack(CDfaSet[i][j]);
-				rowMatch.rowTransform.push_back(originSize);	
-			}
+			rownode.newNum = k;
+			rowMatch.rowTransform.push_back(rownode);
+			k++;
+			colCombineArray[colLocation].sameColumnMatrix.push_back(v);
 		}
 		colCombineArray[colLocation].rowTrans.push_back(rowMatch);
 	}
+	RemoveTheSame(colCombineArray);
 	std::fstream  fs("new SameColDfa.txt", std::ios::out);
 	std::fstream fm("new id_rowMatch.txt", std::ios::out);
 	std::fstream fc("new result.txt", std::ios::out);
@@ -561,7 +768,7 @@ void SameColDfaCombine(COLCOMBINEARRAY &colCombineArray)
 			for(size_t k = 0; k < colCombineArray[i].rowTrans[j].rowTransform.size(); ++k)
 			{
 				fm.width(7);
-				fm << colCombineArray[i].rowTrans[j].rowTransform[k];
+				fm << colCombineArray[i].rowTrans[j].rowTransform[k].newNum;
 			}
 			fm << std::endl;
 		}
@@ -680,11 +887,11 @@ void ReplaceRowMatchValue(COLUMNCOMBINE &inColCom, ushort old, ushort now)
 	}*/
 	for(size_t i = 0; i < inColCom.rowTrans.size(); ++i)
 	{
-		for(size_t j = 0; j < inColCom.rowTrans[i].rowTransform.size(); ++i)
+		for(size_t j = 0; j < inColCom.rowTrans[i].rowTransform.size(); ++j)
 		{
-			if(inColCom.rowTrans[i].rowTransform[j] == old)
+			if(inColCom.rowTrans[i].rowTransform[j].newNum == old)
 			{
-				inColCom.rowTrans[i].rowTransform[j] == now;
+				inColCom.rowTrans[i].rowTransform[j].newNum = now;
 			}
 		}
 	}
