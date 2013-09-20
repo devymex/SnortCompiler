@@ -19,6 +19,8 @@ typedef std::vector<size_t> ROWSET;
 typedef std::vector<size_t> GRAPH;
 typedef std::vector<ROWSET> VECROWSET;
 typedef VECROWSET::iterator NODEARRAY_ITER;
+typedef unsigned char byte;
+typedef unsigned int uint;
 
 ///////////////////////////////////////////////////////////////////////
 //typedef std::vector<ushort> rowMatch;
@@ -70,23 +72,11 @@ struct BLOCK
 
 extern size_t maxVal;
 
-////建图
-//void BuildGraph(const CDfa &oneDfa, const ROWSET &rows, GRAPH &graph);
-//
-////查找连通子图
-//void SearchConnectSubgraph(const GRAPH &graph, VECROWSET &vecRows);
-//
-////统计虚拟核 ,计算存储空间,每次一个行集
-//size_t StatisticVitualCore(const CDfa &oneDfa, ROWSET &rs, ROWSET &visrow);
-//
-////层次聚类算法
-//size_t HierarchicalCluster(const CDfa &oneDfa, VECROWSET &vecRows, VECROWSET &vecVirtual);
-
 //展开DFA
 void UnflodDFA(CDfa &flodDfa, CDfa &unflodDfa);
 
 //建无向图
-void BuildGraph(const CDfa &oneDfa, GRAPH &graph);
+void BuildGraph(std::vector<std::vector<ushort> > &dfaMatrix, GRAPH &graph);
 
 //划分连通子图
 void SplitGraph(CDfa &oneDFA, GRAPH &graph, ROWSET &weightArg, std::vector<BLOCK> &blocks);
@@ -106,18 +96,22 @@ size_t Charset(CDfa &dfa);
 //核矩阵列字符集压缩
 void ColMergeCompress(VECROWSET &vecCores, ulong colCnt, byte* colGroup, ulong &colNum, std::vector<CDfaRow> &FinalMatrix);
 
+void StatisticVitualCore(const std::vector<std::vector<ushort> > &dfaMatrix, const ROWSET &partRow, ROWSET &corRow);
+
 size_t SortCharset(VECROWSET &allCharset, size_t threshold);
 
 bool equal(CDfaRow &row, std::vector<ushort> vec);
 
 void SameColDfaCombine(COLCOMBINEARRAY &colCombineArray);
 
-int Estimate(const CDfa &coreMatrix, const ROWSET &partSet);
+bool Estimate(const std::vector<std::vector<ushort> > &dfaMatrix, const ROWSET &partRow, ROWSET &corRow);
 
-void update(const CDfa &corMatrix, const VECROWSET &partRows, const ROWSET &member, Attribute &dfaID);
+void update(const VECROWSET &partRows, const VECROWSET &corRows, COLUMNCOMBINE &dfaData, std::vector<std::vector<SKIPNODE> > skipTable);
+
 void ReplaceRowMatchValue(COLUMNCOMBINE &inColCom, ushort old, ushort now);
 
-void CoreCompress(CDfaArray &corMatrixSets, std::map<ushort, Attribute> &state);
+void CoreCompress(std::vector<COLUMNCOMBINE> &allData);
+
 void TwoColDfaCombine(COLUMNCOMBINE &inColCom, COLUMNCOMBINE &outColCom);
 
 void DiffColDfaCombine(COLCOMBINEARRAY &colCombineArray, ushort minCol, ushort maxCol, COLUMNCOMBINE &outCombineArray);

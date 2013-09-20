@@ -3,58 +3,55 @@
 size_t maxVal = 0;
 
 
-void UnflodDFA(CDfa &flodDfa, CDfa &unflodDfa)
+//void UnflodDFA(CDfa &flodDfa, CDfa &unflodDfa)
+//{
+//	BYTE group[SC_DFACOLCNT];
+//	for (int i = 0; i < SC_DFACOLCNT; ++i)
+//	{
+//		group[i] = (BYTE)i;
+//	}
+//	unflodDfa.SetGroups(group);
+//
+//	unflodDfa.Resize(flodDfa.Size(), SC_DFACOLCNT);
+//	for (ULONG i = 0; i < flodDfa.Size(); ++i)
+//	{
+//		for (ULONG j = 0; j < SC_DFACOLCNT; ++j)
+//		{
+//			BYTE z = flodDfa.Char2Group((BYTE)j);
+//			unflodDfa[i][j] = flodDfa[i][z];
+//		}
+//	}
+//
+//	unflodDfa.SetId(flodDfa.GetId());
+//	unflodDfa.SetStartState(flodDfa.GetStartState());
+//	unflodDfa.GetFinalStates() = flodDfa.GetFinalStates();
+//}
+
+void BuildGraph(const std::vector<std::vector<ushort> > &dfaMatrix, GRAPH &graph)
 {
-	BYTE group[SC_DFACOLCNT];
-	for (int i = 0; i < SC_DFACOLCNT; ++i)
-	{
-		group[i] = (BYTE)i;
-	}
-	unflodDfa.SetGroups(group);
+	int row = dfaMatrix.size();
+	int col = dfaMatrix[0].size();
+	const int weight = col - threshold;
 
-	unflodDfa.Resize(flodDfa.Size(), SC_DFACOLCNT);
-	for (ULONG i = 0; i < flodDfa.Size(); ++i)
-	{
-		for (ULONG j = 0; j < SC_DFACOLCNT; ++j)
-		{
-			BYTE z = flodDfa.Char2Group((BYTE)j);
-			unflodDfa[i][j] = flodDfa[i][z];
-		}
-	}
-
-	unflodDfa.SetId(flodDfa.GetId());
-	unflodDfa.SetStartState(flodDfa.GetStartState());
-	unflodDfa.GetFinalStates() = flodDfa.GetFinalStates();
-}
-
-//由DFA表中的行集建无向图，每一行代表图中的一个结点，边的权值为DFA表中两行中相同元素占的比率
-void BuildGraph(const CDfa &oneDfa, GRAPH &graph)
-{
-	//DFA表行数，即图中的结点个数
-	size_t nRow = oneDfa.Size();
-	size_t col = oneDfa.GetGroupCount();
-	const size_t weight = col - threshold;
-
-	//申请（结点个数 * 结点个数）大小的矩阵，一维数组存储
-	graph.resize(nRow * nRow);
+	graph.resize(row * row);
 	std::fill(graph.begin(), graph.end(), 0);
 
-	//任意两行都需要计算相似比率，无向图只需计算下（上）三角
-	for (size_t i = 0; i < nRow; ++i)
+	for (int i = 0; i < row; ++i)
 	{
-		for (size_t j = i + 1; j < nRow; ++j)
+		for (int j = i + 1; j < row; ++j)
 		{
-			//DFA表中两行相同元素的个数
-			size_t nEqualCnt = 0;
-			for (size_t k = 0; k < col; ++k)
+			int nEqualCnt = 0;
+			for (int k = 0; k < col; ++k)
 			{
-				if ((oneDfa[i][k] == oneDfa[j][k]))
+				if ((dfaMatrix[i][k] == dfaMatrix[j][k]))
 				{
 					++nEqualCnt;
 				}
 			}
-			if(nEqualCnt == weight)
-				graph[i * nRow + j] = graph[j * nRow + i] = nEqualCnt;
+			if(nEqualCnt >= weight)
+				graph[i * row + j] = graph[j * row + i] = nEqualCnt;
+			else
+				graph[i * row + j] = graph[j * row + i] = 0;
 		}
 	}
 }
@@ -115,25 +112,23 @@ void SearchConnectSubgraph(const GRAPH &graph, ROWSET &nodes, size_t limit, VECR
 	}
 }
 
-//统计虚拟核,每次一个行集
-void StatisticVitualCore(const CDfa &oneDfa, const ROWSET &rs, ROWSET &virtualRow)
+void StatisticVitualCore(const std::vector<std::vector<ushort> > &dfaMatrix, const ROWSET &partRow, ROWSET &corRow)
 {
-	size_t n_size = rs.size();   //行集大小
-	size_t n_statenum = oneDfa.Size();  //dfa状态数
-	size_t n_dfacol = oneDfa.GetGroupCount();//colnum
+	int row = partRow.size();
+	int col = dfaMatrix[0].size();
 
-	for (size_t col = 0; col < n_dfacol; col++) //dfa列
+	for (int i = 0; i < col; ++i)
 	{
-		std::map<STATEID, size_t> bary;
+		std::map<ushort, int> bary;
 
-		for (size_t i = 0; i< n_size; i++) //统计出现次数
+		for (int j = 0; j< row; ++j)
 		{
-			++bary[oneDfa[STATEID(rs[i])][col]];
+			++bary[dfaMatrix[partRow[j]][i]];
 		}
 
-		STATEID maxindex = bary.begin()->first;
-		size_t max = bary.begin()->second;
-		for (std::map<STATEID, size_t>::iterator i = bary.begin(); i != bary.end(); ++i)
+		ushort maxindex = bary.begin()->first;
+		int max = bary.begin()->second;
+		for (std::map<ushort, int>::iterator i = bary.begin(); i != bary.end(); ++i)
 		{
 			if (i->second > max)
 			{
@@ -141,146 +136,142 @@ void StatisticVitualCore(const CDfa &oneDfa, const ROWSET &rs, ROWSET &virtualRo
 				maxindex = i->first;
 			}
 		}
-		virtualRow.push_back(maxindex); //该列虚拟核
+		corRow.push_back(maxindex);
 	}
 }
 
 //计算存储空间,每次一行
-size_t CalculateMemory(const CDfa &oneDFA, const ROWSET &core, const ROWSET &row, ROWSET &bCntary)
-{
-	size_t n_size = row.size();
-	size_t n_dfacol = oneDFA.GetGroupCount(); //dfa列
-
-	bCntary.resize(n_size);
-	std::fill(bCntary.begin(), bCntary.end(), 0);
-
-	for (size_t col = 0; col < n_dfacol; col++) 
-	{
-		for (size_t i = 0; i < n_size; i++)   //存储跳转状态不同的个数
-		{
-			size_t bt = oneDFA[(STATEID)(row[i])][col];
-			if (core[col] != bt)
-			{
-				bCntary[i]++;
-			}
-		}
-	}
-
-	//计算内存大小,n_size表示每一行都存储对应虚拟行的编号，n_dfacol表示虚拟行大小
-	size_t vsmem = n_size + n_dfacol;
-	for(size_t i = 0; i < n_size; i++)
-	{
-		vsmem += 2 * bCntary[i];
-	}
-
-	return vsmem;
-}
-
+//size_t CalculateMemory(const CDfa &oneDFA, const ROWSET &core, const ROWSET &row, ROWSET &bCntary)
+//{
+//	size_t n_size = row.size();
+//	size_t n_dfacol = oneDFA.GetGroupCount(); //dfa列
+//
+//	bCntary.resize(n_size);
+//	std::fill(bCntary.begin(), bCntary.end(), 0);
+//
+//	for (size_t col = 0; col < n_dfacol; col++) 
+//	{
+//		for (size_t i = 0; i < n_size; i++)   //存储跳转状态不同的个数
+//		{
+//			size_t bt = oneDFA[(STATEID)(row[i])][col];
+//			if (core[col] != bt)
+//			{
+//				bCntary[i]++;
+//			}
+//		}
+//	}
+//
+//	//计算内存大小,n_size表示每一行都存储对应虚拟行的编号，n_dfacol表示虚拟行大小
+//	size_t vsmem = n_size + n_dfacol;
+//	for(size_t i = 0; i < n_size; i++)
+//	{
+//		vsmem += 2 * bCntary[i];
+//	}
+//
+//	return vsmem;
+//}
+//
 //根据不同权值划分图，若划分后的存储空间小于划分前，则进行划分，并限制“特殊跳转”个数 < 8
-void SplitGraph(CDfa &oneDFA, GRAPH &graph, ROWSET &weightArg, std::vector<BLOCK> &blocks)
-{
-	for (std::vector<BLOCK>::iterator i = blocks.begin(); i != blocks.end(); )
-	{
-		if (i->weightIdx < weightArg.size())
-		{
-			ROWSET curCore;
-			ROWSET bCntary;
-			StatisticVitualCore(oneDFA, i->nodes, curCore);
-			//计算当前图的存储空间
-			size_t curMem = CalculateMemory(oneDFA, curCore, i->nodes, bCntary);
-
-			//划分子图，partRows中保存与子图对应的状态集合
-			VECROWSET partRows;
-			SearchConnectSubgraph(graph, i->nodes, weightArg[i->weightIdx], partRows);
-
-			//计算所有划分子图的存储空间
-			size_t partMem = 0;
-			VECROWSET partCnt;
-			for (NODEARRAY_ITER j = partRows.begin(); j != partRows.end() && !j->empty(); ++j)
-			{
-				ROWSET partCore;
-				partCnt.push_back(ROWSET());
-				StatisticVitualCore(oneDFA, *j, partCore);
-				partMem += CalculateMemory(oneDFA, partCore, *j, partCnt.back());
-			}
-
-			//获取下一个用于划分子图的权值
-			++i->weightIdx;
-
-			//统计划分子图中“特殊跳转”的最大个数
-			size_t partMax = 0;
-			for (NODEARRAY_ITER j = partCnt.begin(); j != partCnt.end(); ++j)
-			{
-				size_t tmp = *(std::max_element(j->begin(),j->end()));
-				if (partMax < tmp)
-				{
-					partMax = tmp;
-				}
-			}
-
-			//统计当前图中“特殊跳转”的最大个数
-			size_t curMax = *(std::max_element(bCntary.begin(),bCntary.end()));
-
-			//判断条件：当划分的存储空间比当前存储空间小，
-			//或者划分的“特殊跳转”个数比当前的个数少且少于8个，则进行划分
-			if (curMem > partMem ||
-				(curMax > partMax && curMax >= 8))   //yww (curMax > partMax && 8 > partMax)
-			{
-				std::vector<BLOCK> partBlocks;
-				for (NODEARRAY_ITER j = partRows.begin(); j != partRows.end(); ++j)
-				{
-					partBlocks.push_back(BLOCK());
-					partBlocks.back().weightIdx = i->weightIdx; 
-					partBlocks.back().nodes = *j;
-				}
-
-				size_t Idx = i - blocks.begin();
-				i = blocks.erase(i);
-				blocks.insert(i, partBlocks.begin(), partBlocks.end());
-				i = blocks.begin() + Idx;
-			}
-		}
-		else
-		{
-			//直到每一个划分都遍历完所有的权值，再进行下一个子图的划分
-			++i;
-		}
-	}
-}
-
+//void SplitGraph(CDfa &oneDFA, GRAPH &graph, ROWSET &weightArg, std::vector<BLOCK> &blocks)
+//{
+//	for (std::vector<BLOCK>::iterator i = blocks.begin(); i != blocks.end(); )
+//	{
+//		if (i->weightIdx < weightArg.size())
+//		{
+//			ROWSET curCore;
+//			ROWSET bCntary;
+//			StatisticVitualCore(oneDFA, i->nodes, curCore);
+//			//计算当前图的存储空间
+//			size_t curMem = CalculateMemory(oneDFA, curCore, i->nodes, bCntary);
+//
+//			//划分子图，partRows中保存与子图对应的状态集合
+//			VECROWSET partRows;
+//			SearchConnectSubgraph(graph, i->nodes, weightArg[i->weightIdx], partRows);
+//
+//			//计算所有划分子图的存储空间
+//			size_t partMem = 0;
+//			VECROWSET partCnt;
+//			for (NODEARRAY_ITER j = partRows.begin(); j != partRows.end() && !j->empty(); ++j)
+//			{
+//				ROWSET partCore;
+//				partCnt.push_back(ROWSET());
+//				StatisticVitualCore(oneDFA, *j, partCore);
+//				partMem += CalculateMemory(oneDFA, partCore, *j, partCnt.back());
+//			}
+//
+//			//获取下一个用于划分子图的权值
+//			++i->weightIdx;
+//
+//			//统计划分子图中“特殊跳转”的最大个数
+//			size_t partMax = 0;
+//			for (NODEARRAY_ITER j = partCnt.begin(); j != partCnt.end(); ++j)
+//			{
+//				size_t tmp = *(std::max_element(j->begin(),j->end()));
+//				if (partMax < tmp)
+//				{
+//					partMax = tmp;
+//				}
+//			}
+//
+//			//统计当前图中“特殊跳转”的最大个数
+//			size_t curMax = *(std::max_element(bCntary.begin(),bCntary.end()));
+//
+//			//判断条件：当划分的存储空间比当前存储空间小，
+//			//或者划分的“特殊跳转”个数比当前的个数少且少于8个，则进行划分
+//			if (curMem > partMem ||
+//				(curMax > partMax && curMax >= 8))   //yww (curMax > partMax && 8 > partMax)
+//			{
+//				std::vector<BLOCK> partBlocks;
+//				for (NODEARRAY_ITER j = partRows.begin(); j != partRows.end(); ++j)
+//				{
+//					partBlocks.push_back(BLOCK());
+//					partBlocks.back().weightIdx = i->weightIdx; 
+//					partBlocks.back().nodes = *j;
+//				}
+//
+//				size_t Idx = i - blocks.begin();
+//				i = blocks.erase(i);
+//				blocks.insert(i, partBlocks.begin(), partBlocks.end());
+//				i = blocks.begin() + Idx;
+//			}
+//		}
+//		else
+//		{
+//			//直到每一个划分都遍历完所有的权值，再进行下一个子图的划分
+//			++i;
+//		}
+//	}
+//}
+//
 //计算跳转表和核矩阵存储空间大小
-size_t StatisticMemory(const CDfa &oneDFA, const std::vector<BLOCK> &blocks, VECROWSET &vecCore)
-{
-	size_t nOneMem = 0;
+//size_t StatisticMemory(const CDfa &oneDFA, const std::vector<BLOCK> &blocks, VECROWSET &vecCore)
+//{
+//	size_t nOneMem = 0;
+//
+//	for (std::vector<BLOCK>::const_iterator i = blocks.begin(); i != blocks.end(); ++i)
+//	{
+//		vecCore.push_back(ROWSET());
+//		StatisticVitualCore(oneDFA, i->nodes, vecCore.back());
+//		
+//		//用于存储每个状态“特殊跳转”的个数
+//		VECROWSET vecCnt;
+//		vecCnt.push_back(ROWSET());
+//		nOneMem += CalculateMemory(oneDFA, vecCore.back(), i->nodes, vecCnt.back());
+//		
+//		//for (ROWSET::iterator i = vecCnt.back().begin(); i != vecCnt.back().end(); ++i)
+//		//{
+//		//	maxVal += *i;
+//		//}
+//		//size_t maxTmp = *(std::max_element(vecCnt.back().begin(), vecCnt.back().end()));
+//		//if (max > maxVal)
+//		//{
+//		//	maxVal = max;
+//		//}
+//	}
+//
+//	return nOneMem;
+//}
 
-	for (std::vector<BLOCK>::const_iterator i = blocks.begin(); i != blocks.end(); ++i)
-	{
-		vecCore.push_back(ROWSET());
-		StatisticVitualCore(oneDFA, i->nodes, vecCore.back());
-		
-		//用于存储每个状态“特殊跳转”的个数
-		VECROWSET vecCnt;
-		vecCnt.push_back(ROWSET());
-		nOneMem += CalculateMemory(oneDFA, vecCore.back(), i->nodes, vecCnt.back());
-		
-		//for (ROWSET::iterator i = vecCnt.back().begin(); i != vecCnt.back().end(); ++i)
-		//{
-		//	maxVal += *i;
-		//}
-		//size_t maxTmp = *(std::max_element(vecCnt.back().begin(), vecCnt.back().end()));
-		//if (max > maxVal)
-		//{
-		//	maxVal = max;
-		//}
-	}
-
-	return nOneMem;
-}
-
-const static size_t threshold = 2;
-//const static size_t column = 4;
-
-bool Estimate(const CDfa &coreMatrix, const ROWSET &partSet, const ROWSET &corRow)
 bool equal(CDfaRow &row, std::vector<ushort> vec)
 {
 	if(row.Size() != vec.size())
@@ -419,107 +410,6 @@ void SameColDfaCombine(COLCOMBINEARRAY &colCombineArray)
 	fm.close();
 }
 
-/*
-{
-	const size_t col = coreMatrix.GetGroupCount();
-	const size_t row = partSet.size();
-	bool result = true;
-	for(size_t i = 0; i != row; ++i)
-	{	
-		int count = 0;
-		for(size_t j = 0; j != col; ++j)
-		{
-			if(coreMatrix[partSet[i]][j] != corRow[j])
-				++count;
-		}
-		if(count > threshold)
-		{
-			result = false;
-			break;
-		}
-	}
-	return result;
-}
-
-void update(const VECROWSET &partRows, const VECROWSET &corRows, COLUMNCOMBINE &dfaData)
-{
-	const std::vector<std::vector<ushort> > &dfaMatrix = dfaData.sameColumnMatrix; 
-	std::vector<ROWTRANSFORM> &trform = dfaData.rowTrans;
-	std::vector<std::vector<SKIPNODE> > skipTable;
-	const int row = dfaMatrix.size();
-	const int col = dfaData.column;
-	
-	for(std::vector<ROWTRANSFORM>::iterator k = trform.begin(); k != trform.end(); ++k)
-	{
-		for(std::vector<ushort>::iterator l = k->rowTransform.begin(); l != k->rowTransform.end(); ++l)
-		{
-			std::vector<SKIPNODE> skipRow;
-			for(size_t i = 0; i != partRows.size(); ++i)
-			{
-				for(size_t j = 0; j != partRows[i].size(); ++j)
-				{
-					if(partRows[i][j] == static_cast<size_t>(*l))
-					{
-						for(size_t m = 0; m != col; ++m)
-						{
-							if(dfaMatrix[partRows[i][j]][m] != corRows[i][m])
-							{
-								SKIPNODE skip;
-								skip.jumpCharacter = static_cast<char>(m);
-								skip.nextNode = dfaMatrix[partRows[i][j]][m];
-								skipRow.push_back(skip);
-							}
-						}
-						skipTable.push_back(skipRow);
-						
-						*l = i;
-						break;
-					}
-				}
-				break;
-			}
-		}
-	}
-}
-
-void CoreCompress(CDfaArray &dfaMatrixSets, std::map<ushort, Attribute> &state)
-{
-	std::map<ushort, Attribute>::iterator dfaIdSet = state.begin();
-	for(ushort l = 0; l != dfaMatrixSets.Size(); ++l, ++dfaIdSet)
-	{
-		//if(corMatrixSets[l].GetColumnNum() == column)
-		//{
-		CDfa &dfaMatrix = dfaMatrixSets[l];
-		Attribute dfaID = dfaIdSet->second;
-		const ushort col = dfaIdSet->first;
-		GRAPH graph;
-		BuildGraph(dfaMatrix, graph);
-		ROWSET nodes;
-		for(size_t i = 0; i != dfaMatrix.Size(); ++i)
-			nodes.push_back(i);
-		const size_t weight = col - threshold;
-		VECROWSET partRows;
-		SearchConnectSubgraph(graph, nodes, weight, partRows);
-		VECROWSET corMatrix;
-		bool sign = true;
-		for(VECROWSET::iterator j = partRows.begin(); j != partRows.end(); ++j)
-		{
-			ROWSET corRow;
-			StatisticVitualCore(dfaMatrix, *j, corRow);
-			int mem = Estimate(dfaMatrix, *j, corRow);
-			if(mem == true)
-				corMatrix.push_back(corRow);
-			else
-			{
-				//do something;
-				//corMatrix.push_back(corRow);
-			}
-		}
-		update(dfaMatrix, partRows, corMatrix, dfaID);
-		//}
-	}
-}
-*/
 void ReplaceRowMatchValue(COLUMNCOMBINE &inColCom, ushort old, ushort now)
 {
 	/*std::map<ulong, rowMatch>::iterator rowmatch;
@@ -609,5 +499,178 @@ void DiffColDfaCombine(COLCOMBINEARRAY &colCombineArray, ushort minCol, ushort m
 	{
 		TwoColDfaCombine(colCombineArray[i], outCombineArray);
 		//colCombineArray_it++;
+	}
+}
+
+void Dijkstra(byte *pGraph, uint nNodes, uint nBeg, uint nEnd, std::vector<uint> &path)
+{
+	uint *pDist = new uint[nNodes];
+	uint *pPrev = new uint[nNodes];
+	memset(pDist, 0xFF, sizeof(uint) * nNodes);
+	memset(pDist, 0xFF, sizeof(uint) * nNodes);
+	pDist[nBeg] = 0;
+	std::vector<uint> s, q;
+	for (uint i = 0; i < nNodes; ++i)
+	{
+		q.push_back(i);
+	}
+	for (; !q.empty(); )
+	{
+		std::vector<uint>::iterator u = q.begin(), i;
+		for (i = u + 1; i < q.end(); ++i)
+		{
+			if (pDist[*i] < pDist[*u])
+			{
+				u = i;
+			}
+		}
+		uint cu = *u;
+		q.erase(u);
+		s.push_back(cu);
+		for (uint v = 0; v < nNodes; ++v)
+		{
+			byte edge = pGraph[cu * nNodes + v];
+			if (edge == 0 || cu == v)
+			{
+				continue;
+			}
+			uint nDistU = pDist[cu] + edge;
+			if (pDist[v] > nDistU)
+			{
+				pDist[v] = nDistU;
+				pPrev[v] = cu;
+			}
+		}
+	}
+	for (uint u = nEnd; u != nBeg; u = pPrev[u])
+	{
+		path.push_back(u);
+	}
+	std::reverse(path.begin(), path.end());
+}
+
+uint betweenness(byte *pGraph, uint nNodes, uint u)
+{
+	uint nCnt = 0;
+	for (uint i = 0; i < nNodes; ++i)
+	{
+		if (i != u)
+		{
+			for (uint j = i + 1; j < nNodes; ++j)
+			{
+				if (j != u)
+				{
+					std::vector<uint> path;
+					Dijkstra(pGraph, nNodes, i, j, path);
+					if (path.end() != std::find(path.begin(), path.end(), u))
+					{
+						++nCnt;
+					}
+				}
+			}
+		}
+	}
+	return nCnt;
+}
+
+const static ushort threshold = 2;
+//const static size_t column = 4;
+
+bool Estimate(const std::vector<std::vector<ushort> > &dfaMatrix, const ROWSET &partRow, ROWSET &corRow)
+{
+	const int row = partRow.size();
+	const int col = dfaMatrix[0].size();
+	bool result = true;
+	for(int i = 0; i != row; ++i)
+	{	
+		int count = 0;
+		for(int j = 0; j != col; ++j)
+		{
+			if(dfaMatrix[partRow[i]][j] != corRow[j])
+				++count;
+		}
+		if(count > threshold)
+		{
+			result = false;
+			break;
+		}
+	}
+	return result;
+}
+
+void update(const VECROWSET &partRows, const VECROWSET &corRows, COLUMNCOMBINE &dfaData, std::vector<std::vector<SKIPNODE> > skipTable)
+{
+	const std::vector<std::vector<ushort> > &dfaMatrix = dfaData.sameColumnMatrix; 
+	std::vector<ROWTRANSFORM> &dfaRows = dfaData.rowTrans;
+	const int row = dfaMatrix.size();
+	const int col = dfaData.column;
+	
+	for(std::vector<ROWTRANSFORM>::iterator k = dfaRows.begin(); k != dfaRows.end(); ++k)
+	{
+		for(std::vector<ROWNODE>::iterator l = k->rowTransform.begin(); l != k->rowTransform.end(); ++l)
+		{
+			std::vector<SKIPNODE> skipRow;
+			for(size_t i = 0; i != partRows.size(); ++i)
+			{
+				for(size_t j = 0; j != partRows[i].size(); ++j)
+				{
+					if(partRows[i][j] == static_cast<size_t>(l->newNum))
+					{
+						for(size_t m = 0; m != col; ++m)
+						{
+							if(dfaMatrix[partRows[i][j]][m] != corRows[i][m])
+							{
+								SKIPNODE skip;
+								skip.jumpCharacter = static_cast<char>(m);
+								skip.nextNode = dfaMatrix[partRows[i][j]][m];
+								skipRow.push_back(skip);
+							}
+						}
+						skipTable.push_back(skipRow);
+						l->skipNode = &skipTable.back();
+						l->newNum = i;
+						break;
+					}
+				}
+				break;
+			}
+		}
+	}
+}
+
+void CoreCompress(std::vector<COLUMNCOMBINE> &allData)
+{
+	std::vector<std::vector<SKIPNODE> > skipTable;
+	for(std::vector<COLUMNCOMBINE>::iterator i = allData.begin(); i != allData.end(); ++i)
+	{
+		//if(corMatrixSets[l].GetColumnNum() == column)
+		//{
+		std::vector<std::vector<ushort> > &dfaMatrix = i->sameColumnMatrix;
+		const ushort col = i->column;
+		const ushort weight = col - threshold;
+		GRAPH graph;
+		BuildGraph(dfaMatrix, graph);
+		ROWSET nodes;
+		for(int i = 0; i != dfaMatrix.size(); ++i)
+			nodes.push_back(i);
+		VECROWSET partRows;
+		SearchConnectSubgraph(graph, nodes, weight, partRows);
+		VECROWSET corMatrix;
+		bool sign = true;
+		for(VECROWSET::iterator j = partRows.begin(); j != partRows.end(); ++j)
+		{
+			ROWSET corRow;
+			StatisticVitualCore(dfaMatrix, *j, corRow);
+			bool mem = Estimate(dfaMatrix, *j, corRow);
+			if(mem == true)
+				corMatrix.push_back(corRow);
+			else
+			{
+				//do something;
+				//corMatrix.push_back(corRow);
+			}
+		}
+		update(partRows, corMatrix, *i,skipTable);
+		//}
 	}
 }
