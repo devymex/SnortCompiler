@@ -618,6 +618,7 @@ void RemoveTheSame(COLCOMBINEARRAY &colCombineArray)
 	for(size_t i = 0; i < colCombineArray.size(); ++i)
 	{
 		nVec.clear();
+		diff.clear();
 		row = colCombineArray[i].rowTrans;
 		for(size_t j = 0; j < colCombineArray[i].sameColumnMatrix.size(); ++j)
 		{
@@ -739,54 +740,58 @@ void SameColDfaCombine(COLCOMBINEARRAY &colCombineArray)
 		colCombineArray[colLocation].rowTrans.push_back(rowMatch);
 	}
 	RemoveTheSame(colCombineArray);
-	std::fstream  fs("new SameColDfa.txt", std::ios::out);
-	std::fstream fm("new id_rowMatch.txt", std::ios::out);
-	std::fstream fc("new result.txt", std::ios::out);
-	size_t dfa = 0;
-	for(size_t i = 0; i < colCombineArray.size(); ++i)
-	{
-		/////////////////////////////////////////////////////////////////////////////////
-		now[i] = colCombineArray[i].sameColumnMatrix.size();
+	//std::fstream  fs("new SameColDfa.txt", std::ios::out);
+	//std::fstream fm("new id_rowMatch.txt", std::ios::out);
+	//std::fstream fc("new result.txt", std::ios::out);
+	//size_t dfa = 0;
+	//for(size_t i = 0; i < colCombineArray.size(); ++i)
+	//{
+	//	/////////////////////////////////////////////////////////////////////////////////
+	//	now[i] = colCombineArray[i].sameColumnMatrix.size();
 
-		fs << "NEXT " << colCombineArray[i].column << std::endl; 
-		for(size_t j = 0; j < colCombineArray[i].sameColumnMatrix.size(); ++j)
-		{
-			for(size_t k = 0; k < colCombineArray[i].sameColumnMatrix[j].size(); ++k)
-			{
-				fs.width(7);
-				fs << colCombineArray[i].sameColumnMatrix[j][k] << " ";
-			}
-			fs << std::endl;
-		}
-		
-		fm << "column" << colCombineArray[i].column << std::endl;
-		for(size_t j = 0; j < colCombineArray[i].rowTrans.size(); ++j)/*it_rowMatch = map_it->second.id_rowMatch.begin(); it_rowMatch != map_it->second.id_rowMatch.end(); ++it_rowMatch)*/
-		{
-			fm << "DfaID ";
-			fm.width(7);
-			fm << colCombineArray[i].rowTrans[j].dfaId;
-			for(size_t k = 0; k < colCombineArray[i].rowTrans[j].rowTransform.size(); ++k)
-			{
-				fm.width(7);
-				fm << colCombineArray[i].rowTrans[j].rowTransform[k].newNum;
-			}
-			fm << std::endl;
-		}
+	//	fs << "NEXT " << colCombineArray[i].column << std::endl; 
+	//	for(size_t j = 0; j < colCombineArray[i].sameColumnMatrix.size(); ++j)
+	//	{
+	//		for(size_t k = 0; k < colCombineArray[i].sameColumnMatrix[j].size(); ++k)
+	//		{
+	//			fs.width(7);
+	//			fs << colCombineArray[i].sameColumnMatrix[j][k] << " ";
+	//		}
+	//		fs << std::endl;
+	//	}
+	//}
+	//for(size_t i = 0; i < colCombineArray.size(); ++i)
+	//{
+	//	fm << "column" << colCombineArray[i].column << std::endl;
+	//	for(size_t j = 0; j < colCombineArray[i].rowTrans.size(); ++j)/*it_rowMatch = map_it->second.id_rowMatch.begin(); it_rowMatch != map_it->second.id_rowMatch.end(); ++it_rowMatch)*/
+	//	{
+	//		fm << "DfaID ";
+	//		fm.width(7);
+	//		fm << colCombineArray[i].rowTrans[j].dfaId;
+	//		for(size_t k = 0; k < colCombineArray[i].rowTrans[j].rowTransform.size(); ++k)
+	//		{
+	//			fm.width(7);
+	//			fm << colCombineArray[i].rowTrans[j].rowTransform[k].newNum;
+	//		}
+	//		fm << std::endl;
+	//	}
 
-		fc << "column\tDfa num\tstate num\torigin\tminus\tnow" << std::endl;
-		fc << fc.width(6) <<colCombineArray[i].column << "\t";
-		fc << fc.width(7) << colCombineArray[i].rowTrans.size() << "\t";
-		dfa += colCombineArray[i].rowTrans.size();
-		fc << fc.width(9) << colCombineArray[i].sameColumnMatrix.size() << "\t";
-		fc << fc.width(6) << origin[i] << "\t ";
-		fc << fc.width(6) << minus[i] << " \t";
-		fc << fc.width(7) << now[i] << std::endl;
-	}
+	//for(size_t i = 0; i < colCombineArray.size(); ++i)
+	//{
+	//	fc << "column\tDfa num\tstate num\torigin\tminus\tnow" << std::endl;
+	//	fc << fc.width(6) <<colCombineArray[i].column << "\t";
+	//	fc << fc.width(7) << colCombineArray[i].rowTrans.size() << "\t";
+	//	dfa += colCombineArray[i].rowTrans.size();
+	//	fc << fc.width(9) << colCombineArray[i].sameColumnMatrix.size() << "\t";
+	//	fc << fc.width(6) << origin[i] << "\t ";
+	//	fc << fc.width(6) << minus[i] << " \t";
+	//	fc << fc.width(7) << now[i] << std::endl;
+	//}
 
-	std::cout << dfa << std::endl;
-	fc.close();
-	fs.close();
-	fm.close();
+	//std::cout << dfa << std::endl;
+	//fc.close();
+	//fs.close();
+	//fm.close();
 }
 
 /*
@@ -897,51 +902,65 @@ void ReplaceRowMatchValue(COLUMNCOMBINE &inColCom, ushort old, ushort now)
 	}
 }
 
-void TwoColDfaCombine(COLUMNCOMBINE &inColCom, COLUMNCOMBINE &outColCom) /*, CDfa &inDfa, std::map<ushort, Attribute>::iterator it, CDfa &outDfa)*/
+int TwoColDfaCombine(COLUMNCOMBINE &inColCom, COLUMNCOMBINE &outColCom) /*, CDfa &inDfa, std::map<ushort, Attribute>::iterator it, CDfa &outDfa)*/
 {
+	int minus = 0;
 	size_t i, j, k;
 	bool b = true;
-	for(i = 0; i < inColCom.sameColumnMatrix.size(); ++i)
+
+	if(outColCom.sameColumnMatrix.size() == 0)
 	{
-		b = true;
-		for(j = 0; j < outColCom.sameColumnMatrix.size(); ++j)
+		outColCom = inColCom;
+	}
+	else
+	{
+		for(i = 0; i < inColCom.sameColumnMatrix.size(); ++i)
 		{
-			b = true;
-			for(k = 0; k < inColCom.sameColumnMatrix[i].size(); ++k)
+			for(j = 0; j < outColCom.sameColumnMatrix.size(); ++j)
 			{
-				if(inColCom.sameColumnMatrix[i][k] != outColCom.sameColumnMatrix[j][k])
+				b = true;
+				for(k = 0; k < inColCom.sameColumnMatrix[i].size(); ++k)
 				{
-					b = false;
+					if(inColCom.sameColumnMatrix[i][k] != outColCom.sameColumnMatrix[j][k])
+					{
+						b = false;
+						break;
+					}
+				}
+				if(b == true)
+				{
 					break;
 				}
 			}
-			if(b == true)
+			if(b == true)/*(j != outColCom.sameColumnMatrix.size())*/
 			{
-				break;
+				ReplaceRowMatchValue(inColCom, i, j);
+				minus++;
 			}
-		}
-		if(b == true)
-		{
-			ReplaceRowMatchValue(inColCom, i, j);
-		}
-		else
-		{
-			std::vector<ushort> row = inColCom.sameColumnMatrix[i];
-			if(inColCom.column < outColCom.column)
+			else
 			{
-				for(k = inColCom.column; k < outColCom.column; ++k)
+				std::vector<ushort> row = inColCom.sameColumnMatrix[i];
+				if(inColCom.column < outColCom.column)
 				{
-					row.push_back(outColCom.sameColumnMatrix[0][k]);
+					for(k = inColCom.column; k < outColCom.column; ++k)
+					{
+						row.push_back(outColCom.sameColumnMatrix[0][k]);
+					}
 				}
+				outColCom.sameColumnMatrix.push_back(row);
+				ReplaceRowMatchValue(inColCom, i, outColCom.sameColumnMatrix.size() - 1);				
 			}
-			outColCom.sameColumnMatrix.push_back(row);
-			ReplaceRowMatchValue(inColCom, i, outColCom.sameColumnMatrix.size() - 1);
 		}
 	}
+	return minus;
 }
 
 void DiffColDfaCombine(COLCOMBINEARRAY &colCombineArray, ushort minCol, ushort maxCol, COLUMNCOMBINE &outCombineArray)/*, CDfaArray &SameColDfa, const size_t l, const size_t h, std::map<ushort, Attribute>::iterator upper, CDfa &outComDfa)*/
 {
+	std::fstream fcom("combine result.txt", std::ios::app | std::ios::out);
+	int origin, now, minus;
+	origin = now = minus = 0;
+
 	size_t l = 0, h = 0;
 	COLCOMBINEARRAY_ITERATOR colCombineArray_it;
 	
@@ -959,7 +978,13 @@ void DiffColDfaCombine(COLCOMBINEARRAY &colCombineArray, ushort minCol, ushort m
 	/*std::map<ushort, Attribute>::iterator it = upper;*/
 	for(size_t i = h; i >= l; --i)
 	{
-		TwoColDfaCombine(colCombineArray[i], outCombineArray);
+		origin += colCombineArray[i].sameColumnMatrix.size();
+		minus += TwoColDfaCombine(colCombineArray[i], outCombineArray);
 		//colCombineArray_it++;
 	}
+	now = outCombineArray.sameColumnMatrix.size();
+	fcom.width(7);
+	//fcom << maxCol << "  " << minCol << origin << fcom.width(7) << minus << fcom.width(7) << now << std::endl;
+	fcom << maxCol << "  " << minCol << "\t" << origin << "\t" <<  minus << "\t" <<  now << std::endl;
+	fcom.close();
 }

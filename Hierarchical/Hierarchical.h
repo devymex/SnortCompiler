@@ -142,6 +142,6 @@ void SameColDfaCombine(COLCOMBINEARRAY &colCombineArray);
 
 void ReplaceRowMatchValue(COLUMNCOMBINE &inColCom, ushort old, ushort now);
 
-void TwoColDfaCombine(COLUMNCOMBINE &inColCom, COLUMNCOMBINE &outColCom);
+int TwoColDfaCombine(COLUMNCOMBINE &inColCom, COLUMNCOMBINE &outColCom);
 
 void DiffColDfaCombine(COLCOMBINEARRAY &colCombineArray, ushort minCol, ushort maxCol, COLUMNCOMBINE &outCombineArray);
