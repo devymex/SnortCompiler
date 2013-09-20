@@ -907,25 +907,35 @@ int TwoColDfaCombine(COLUMNCOMBINE &inColCom, COLUMNCOMBINE &outColCom) /*, CDfa
 	int minus = 0;
 	size_t i, j, k;
 	bool b = true;
-
+	int difference = 0, diffLocation, mindiff;
+	std::vector<ROWTRANSFORM> originRow;
 	if(outColCom.sameColumnMatrix.size() == 0)
 	{
 		outColCom = inColCom;
 	}
 	else
 	{
+		originRow = inColCom.rowTrans;
 		for(i = 0; i < inColCom.sameColumnMatrix.size(); ++i)
 		{
+			mindiff = inColCom.sameColumnMatrix[i].size();
+			diffLocation = 0;
 			for(j = 0; j < outColCom.sameColumnMatrix.size(); ++j)
 			{
 				b = true;
+				difference = 0;
 				for(k = 0; k < inColCom.sameColumnMatrix[i].size(); ++k)
 				{
 					if(inColCom.sameColumnMatrix[i][k] != outColCom.sameColumnMatrix[j][k])
 					{
+						difference++;
 						b = false;
-						break;
+						//break;
 					}
+				}
+				if(difference < mindiff)
+				{
+					diffLocation = j;
 				}
 				if(b == true)
 				{
@@ -934,7 +944,8 @@ int TwoColDfaCombine(COLUMNCOMBINE &inColCom, COLUMNCOMBINE &outColCom) /*, CDfa
 			}
 			if(b == true)/*(j != outColCom.sameColumnMatrix.size())*/
 			{
-				ReplaceRowMatchValue(inColCom, i, j);
+				/*ReplaceRowMatchValue(inColCom, i, j);*/
+				AnotherReplaceRowMatchValue(inColCom, originRow, i, j);
 				minus++;
 			}
 			else
@@ -944,13 +955,15 @@ int TwoColDfaCombine(COLUMNCOMBINE &inColCom, COLUMNCOMBINE &outColCom) /*, CDfa
 				{
 					for(k = inColCom.column; k < outColCom.column; ++k)
 					{
-						row.push_back(outColCom.sameColumnMatrix[0][k]);
+						row.push_back(outColCom.sameColumnMatrix[diffLocation][k]);
 					}
 				}
 				outColCom.sameColumnMatrix.push_back(row);
-				ReplaceRowMatchValue(inColCom, i, outColCom.sameColumnMatrix.size() - 1);				
+				/*ReplaceRowMatchValue(inColCom, i, outColCom.sameColumnMatrix.size() - 1);*/
+				AnotherReplaceRowMatchValue(inColCom, originRow, i, outColCom.sameColumnMatrix.size() - 1);
 			}
 		}
+		inColCom.rowTrans = originRow;
 	}
 	return minus;
 }
