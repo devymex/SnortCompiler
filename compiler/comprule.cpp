@@ -19,11 +19,6 @@
 
 ISSPACE g_isSpace;
 
-double rule2pcretime = 0.0;
-double pcre2nfatime = 0.0;
-double nfa2dfatime = 0.0;
-double dfamintimetime = 0.0;
-
 std::map<std::string, std::size_t> KeyTypeMap;
 
 std::string type1Strs[] = //合法的格式"abc";
