@@ -183,15 +183,15 @@ void RemoveTheSame(COLCOMBINEARRAY &colCombineArray)
 
 
 
-void SameColDfaCombine(COLCOMBINEARRAY &colCombineArray)
+void SameColDfaCombine(CDfaArray &CDfaSet, COLCOMBINEARRAY &colCombineArray)
 {
 	ushort column, colLocation;
 	
 	std::vector<int> origin, minus, now;
 
-	CGroupRes groupRes;
-	groupRes.ReadFromFile("FinalResult.cdt");
-	CDfaArray &CDfaSet = groupRes.GetDfaTable();
+	//CGroupRes groupRes;
+	//groupRes.ReadFromFile(/*"FinalResult.cdt"*/);
+	//CDfaArray &CDfaSet = groupRes.GetDfaTable();
 	
 	std::set<ushort> allCol;
 	std::set<ushort>::iterator col_it, col;

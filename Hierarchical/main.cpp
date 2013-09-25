@@ -8,8 +8,13 @@ typedef struct
 
 void main(int nArgs, char **cArgs)
 {
+	
+	CGroupRes groupRes;
+	groupRes.ReadFromFile(cArgs[1]/*"FinalResult.cdt"*/);
+	CDfaArray &CDfaSet = groupRes.GetDfaTable();
+	
 	COLCOMBINEARRAY colCombineArray;
-	SameColDfaCombine(colCombineArray);
+	SameColDfaCombine(CDfaSet, colCombineArray);
 	CoreCompress(colCombineArray);
 	system("pause");
 }

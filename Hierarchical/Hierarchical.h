@@ -94,7 +94,7 @@ void RemoveTheSame(COLCOMBINEARRAY &colCombineArray);
 
 bool equal(CDfaRow &row, std::vector<ushort> vec);
 
-void SameColDfaCombine(COLCOMBINEARRAY &colCombineArray);
+void SameColDfaCombine(CDfaArray &CDfaSet, COLCOMBINEARRAY &colCombineArray);
 
 void ReplaceRowMatchValue(COLUMNCOMBINE &inColCom, ushort old, ushort now);
 
