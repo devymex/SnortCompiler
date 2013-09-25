@@ -55,6 +55,7 @@ struct SIGHASH
 	}
 };
 
+
 HASHMAPHDR extern SIGHASH hash;
 
 typedef std::map<ulong, std::vector<HASHNODE>> HASHRES;

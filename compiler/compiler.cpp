@@ -15,6 +15,11 @@
 #include "p2nmain.h"
 #include <hwprj\compiler.h>
 
+COMPILERHDR double rule2pcretime = 0.0;
+COMPILERHDR double pcre2nfatime = 0.0;
+COMPILERHDR double nfa2dfatime = 0.0;
+COMPILERHDR double dfamintimetime = 0.0;
+
 /*!
 * read rules from a file
 * then process the rules to CSnortRule
@@ -203,6 +208,7 @@ COMPILERHDR void ExtractSequence(const CByteArray &pcResult,
 			str.Clear();
 			return;
 
+			//这是什么情况？
 		case OP_ALT:				/* 113 Start of alternation */
 			strs.clear();
 			return;
@@ -266,7 +272,8 @@ COMPILERHDR void ExtractSequence(const CByteArray &pcResult,
 				str.PushBack(pcResult[cur + 3]);
 			}
 			temp = pcResult[cur + Steps[curCode]];
-			if(((temp == OP_UPTO) || (temp == OP_MINUPTO) || (temp == OP_UPTOI) || (temp == OP_MINUPTOI)) && (pcResult[cur + 3] == pcResult[cur + Steps[curCode] + 3]))
+			if(((temp == OP_UPTO) || (temp == OP_MINUPTO) || (temp == OP_UPTOI) || (temp == OP_MINUPTOI)) 
+				&& (pcResult[cur + 3] == pcResult[cur + Steps[curCode] + 3]))
 			{
 				if(!str.Empty() && (str.Size() >= 4))
 				{
