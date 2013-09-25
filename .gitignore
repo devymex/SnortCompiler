@@ -36,6 +36,7 @@
 *.BASE
 *.REMOTE
 *.conf
+*.xlsx
 
 bin/*
 Debug/*
