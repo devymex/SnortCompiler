@@ -50,5 +50,4 @@ rules/*
 
 */Debug/*
 */Release/*
-graphs/*
 MatchPacket/wpcap/*

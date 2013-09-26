@@ -1,325 +1,316 @@
 #include <iostream>
-#include <fstream>
-#include <algorithm>
-#include <sstream>
-#include <tchar.h>
-#include <filesystem>
 
 #include <hwprj\ctimer.h>
-#include <hwprj\unsary.h>
-#include <hwprj\compiler.h>
 #include <hwprj\compres.h>
 #include <hwprj\groupres.h>
 #include <hwprj\grouping.h>
 #include <hwprj\buildhash.h>
-#include <hwprj\trace.h>
+#include <fstream>
+#include <algorithm>
 
-int main()
+void StatisticErrorRules(CCompileResults &result)
 {
-	//// Defina a path object to express a directory
-	//std::tr2::sys::path rulePath("D:\\Projects\\VS2012\\SnortCompiler\\rules\\");
-	//// Construct a directory iterator for visit this path.
-	//std::tr2::sys::directory_iterator iDirCur(rulePath);
-	////the end iterator for this path.
-	//std::tr2::sys::directory_iterator iDirEnd;
+	std::vector<int> vecCnt;
+	vecCnt.resize(8);
+	std::fill(vecCnt.begin(), vecCnt.end(), 0);
+
+	CSidDfaIds sidDfaIds = result.GetSidDfaIds();
+	ulong sidSize = sidDfaIds.Size();
+	for (size_t i = 0; i < sidSize; ++i)
+	{
+		if (sidDfaIds[i].m_nResult & COMPILEDINFO::RES_EMPTY)
+		{
+			++vecCnt[0];
+		}
+		if (sidDfaIds[i].m_nResult & COMPILEDINFO::RES_EXCEEDLIMIT)
+		{
+			++vecCnt[1];
+		}
+		if (sidDfaIds[i].m_nResult & COMPILEDINFO::RES_HASBYTE)
+		{
+			++vecCnt[2];
+		}
+		if (sidDfaIds[i].m_nResult & COMPILEDINFO::RES_HASNOSIG)
+		{
+			++vecCnt[3];
+		}
+		if (sidDfaIds[i].m_nResult & COMPILEDINFO::RES_HASNOT)
+		{
+			++vecCnt[4];
+		}
+		if (sidDfaIds[i].m_nResult & COMPILEDINFO::RES_OPTIONERROR)
+		{
+			++vecCnt[5];
+		}
+		if (sidDfaIds[i].m_nResult & COMPILEDINFO::RES_PCREERROR)
+		{
+			++vecCnt[6];
+		}
+		if (!(sidDfaIds[i].m_nResult | COMPILEDINFO::RES_SUCCESS))
+		{
+			++vecCnt[7];
+		}
+	}
+
+	//统计结果输出文件
+	std::ofstream fos("errorRules.txt");
+	if (fos.is_open())
+	{
+		fos << "规则总数： " << sidSize << std::endl;
+		int errorRulesCnt = sidDfaIds.Size() - vecCnt[7];
+		fos << "不能处理的规则数： " << errorRulesCnt 
+			<< "; 占规则百分比： " << ((double)errorRulesCnt / (double)sidSize) << std::endl;
+		fos << "规则内容为空的规则数： " 
+			<< vecCnt[0] << "; 占规则百分比： " << ((double)vecCnt[0] / (double)sidSize) << std::endl;
+		fos << "超出状态限制的规则数： " 
+			<< vecCnt[1] << "; 占规则百分比： " << ((double)vecCnt[1] / (double)sidSize) << std::endl;
+		fos << "包含byte_test和byte_jump的规则数： " 
+			<< vecCnt[2] << "; 占规则百分比： " << ((double)vecCnt[2] / (double)sidSize) << std::endl;
+		fos << "没有特征字符串的规则数： " 
+			<< vecCnt[3] << "; 占规则百分比： " << ((double)vecCnt[3] / (double)sidSize) << std::endl;
+		fos << "包含'!'（逻辑非）标识的规则数： " 
+			<< vecCnt[4] << "; 占规则百分比： " << ((double)vecCnt[4] / (double)sidSize) << std::endl;
+		fos << "snort规则选项错误的规则数： " 
+			<< vecCnt[5] << "; 占规则百分比： " << ((double)vecCnt[5] / (double)sidSize) << std::endl;
+		fos << "pcre选项错误的规则数： " 
+			<< vecCnt[6] << "; 占规则百分比： " << ((double)vecCnt[6] / (double)sidSize) << std::endl;
+	}
+	fos.close();
+}
+
+void StatisticChain(CCompileResults &result)
+{
+	CDfaArray dfaTblSet = result.GetDfaTable();
+	CRegRule dfaSigSet = result.GetRegexTbl();
+	ulong stateSum = 0, edgeSum = 0;
+	
+
+	for (size_t i = 0; i < dfaTblSet.Size(); ++i)
+	{
+		ulong TblSize = dfaTblSet[i].Size();
+		stateSum += TblSize;
+		for (size_t j = 0; j < dfaTblSet[i].Size(); ++j)
+		{
+			for (size_t k = 0; k < dfaTblSet[i].GetGroupCount(); ++k)
+			{
+				if (dfaTblSet[i][j][k] != (STATEID)(-1))
+				{
+					++edgeSum;
+				}
+			}
+		}
+	}
+
+	std::vector<ulong> sigSet;
+	for (size_t i = 0; i < dfaSigSet.Size(); ++i)
+	{
+		CUnsignedArray oneDfasig = dfaSigSet[i].GetSigs();
+		for (size_t j = 0; j < oneDfasig.Size(); ++j)
+		{
+			sigSet.push_back(oneDfasig[j]);
+		}
+	}
+	std::sort(sigSet.begin(), sigSet.end());
+	sigSet.erase(std::unique(sigSet.begin(), sigSet.end()), sigSet.end());
+
+	std::ofstream fout("signature.txt");
+	for (std::vector<ulong>::iterator i = sigSet.begin(); i != sigSet.end(); ++i)
+	{
+		fout << *i << std::endl;
+	}
+	fout.close();
+	////统计结果输出文件
+	//std::ofstream fos("chain.txt");
+	//if (fos.is_open())
+	//{
+	//	fos << "所有的链数： " << dfaTblSet.Size() << std::endl;
+	//	fos << "DFA状态总数： " << stateSum << std::endl;
+	//	fos << "DFA迁移边总数： " << edgeSum << std::endl;
+	//	fos << "所有规则Signature总数： " << sigSet.size() << std::endl;
+	//}
+	//fos.close();
+}
+
+void StatisticOneChain(CGroupRes &groupRes)
+{
+	CGroups groups = groupRes.GetGroups();
+	int oneChain = 0;
+	std::vector<ulong> signature;
+	for (size_t i = 0; i < groups.Size(); ++i)
+	{
+		//if (groups[i].DfaIds.Size() == 1)
+		//{
+		//	++oneChain;
+		//}
+		signature.push_back(groups[i].currSig);
+	}
+	std::sort(signature.begin(), signature.end());
+	signature.erase(std::unique(signature.begin(), signature.end()), signature.end());
+
+	std::ofstream fout("groupSignature.txt");
+	for (std::vector<ulong>::iterator i = signature.begin(); i != signature.end(); ++i)
+	{
+		fout << *i << std::endl;
+	}
+	fout.close();
+	//std::cout << "分组中只包含一条链的个数： " << oneChain << std::endl;
+}
+
+void StatisticSigchar(CCompileResults &result)
+{
+	CRegRule dfaSigSet = result.GetRegexTbl();
+	std::vector<ulong> sigSet;
+	for (size_t i = 0; i < dfaSigSet.Size(); ++i)
+	{
+		CUnsignedArray oneDfasig = dfaSigSet[i].GetSigs();
+		for (size_t j = 0; j < oneDfasig.Size(); ++j)
+		{
+			sigSet.push_back(oneDfasig[j]);
+		}
+	}
+	std::sort(sigSet.begin(), sigSet.end());
+	sigSet.erase(std::unique(sigSet.begin(), sigSet.end()), sigSet.end());
+
+	std::vector<std::vector<int>> dvecChar;
+	dvecChar.resize(4);
+	for (size_t i = 0; i < 4; ++i)
+	{
+		dvecChar[i].resize(256);
+		std::fill(dvecChar[i].begin(), dvecChar[i].end(), 0);
+	}
+
+	std::map<unsigned short, int> mapShort;
+
+	for (std::vector<ulong>::iterator i = sigSet.begin(); i != sigSet.end(); ++i)
+	{
+		for (size_t j = 0; j < 4; ++j)
+		{
+			std::vector<int> &curPos = dvecChar[j];
+			unsigned char sig1byte = *(((unsigned char*)&(*i)) + j);
+			++curPos[sig1byte];
+		}
+
+		unsigned short sig2byte = *(unsigned short*)((unsigned char*)&(*i));
+		++mapShort[sig2byte];
+	}
+
+	//int sum = 0, flag = 0;
+	//std::vector<std::pair<int, int>> tmp;
+	//for (std::map<unsigned short, int>::iterator i = mapShort.begin(); i != mapShort.end(); ++i)
+	//{
+	//	if (i->first >= flag && i->first < (512 + flag))
+	//	{
+	//		sum += i->second;
+	//	}
+	//	else
+	//	{
+	//		tmp.push_back(std::pair<int, int>());
+	//		tmp.back().first = flag;
+	//		tmp.back().second = sum;
+	//		flag += 512;
+	//		sum = 0;
+	//	}
+	//}
+
+	//std::ofstream fos("slip512.txt");
+	//for (std::vector<std::pair<int, int>>::iterator i = tmp.begin(); i != tmp.end(); ++i)
+	//{
+	//	fos << i->first << "\t" << i->second << std::endl;
+	//}
+
+	std::ofstream fos("sig1byte.txt");
+	for (size_t j = 0; j < 256; ++j)
+	{
+		fos << j << "\t";
+		for (size_t i = 0; i < 4; ++i)
+		{
+			fos << dvecChar[i][j] << "\t";
+		}
+		fos << std::endl;
+	}
+	fos.close();
+
+	std::ofstream fout("sig2byte.txt");
+	for (std::map<unsigned short, int>::iterator i = mapShort.begin(); i != mapShort.end(); ++i)
+	{
+		fout << i->first << "\t" << i->second << std::endl;
+	}
+	fout.close();
+}
+
+void main(int nArgs, char **pArgs)
+{
+
+	//if (nArgs != 2)
+	//{
+	//	return;
+	//}
+	//
+	//std::string strFile = pArgs[1];
+	////编译结果文件
 
 	//CCompileResults result;
-	//char szExt[] = {'s', 'e', 'l', 'u', 'r'};
-	//for (; iDirCur != iDirEnd; ++iDirCur)
+	////读入编译结果文件
+	//if (0 == result.ReadFromFile(strFile.c_str()))
 	//{
-	//	const std::tr2::sys::path &curPath = *iDirCur;
-	//	if (!std::tr2::sys::is_directory(curPath))
-	//	{
-	//		std::string strFullName = rulePath.directory_string();
-	//		strFullName.append(curPath.directory_string());
-	//		if (strFullName.size() < 5)
-	//		{
-	//			continue;
-	//		}
-	//		std::string::reverse_iterator rb = strFullName.rbegin();
-	//		std::string::reverse_iterator re = rb + 5;
-	//		std::string::reverse_iterator ri = rb;
-	//		for (; ri != re; ++ri)
-	//		{
-	//			if (tolower(*ri) != tolower(szExt[ri - rb]))
-	//			{
-	//				break;
-	//			}
-	//		}
-	//		if (ri != re)
-	//		{
-	//			continue;
-	//		}
-	//		std::cout << strFullName << std::endl;
-	//		try
-	//		{
-	//			CompileRuleFile(strFullName.c_str(), result);
-	//		}
-	//		catch (CTrace &e)
-	//		{
-	//			std::cout << e.File() << " - " << e.Line() << ": " << e.What() << std::endl;
-	//			system("pause");
-	//		}
-	//	}
-	//}
-	//result.WriteToFile("..\\result.cdt");
+	//	//统计错误规则
+	//	//StatisticErrorRules(result);
 
-	//ulong ulRuleCnt = 0;
-	//for (ulong i = 0; i < result.GetSidDfaIds().Size(); ++i)
-	//{
-	//	if (result.GetSidDfaIds()[i].m_nResult == COMPILEDINFO::RES_SUCCESS)
-	//	{
-	//		++ulRuleCnt;
-	//	}
-	//}
-	//std::cout << result.GetSidDfaIds().Size() << ": " << ulRuleCnt << std::endl;
+	//	//统计能编译的链
+	//	StatisticChain(result);
 
-	//CCompileResults result;
-	//result.ReadFromFile("..\\result.cdt");
+	//	//统计signature中字符的分布
+	//	//StatisticSigchar(result);
 
-	//CGroupRes groupRes;
-	//groupRes.ReadFromFile("..\\FinalResult.cdt");
+	//	CTimer t;
+	//	CGroupRes groupRes;
+	//	//分组
+	//	Grouping(result, groupRes);
+	//	//std::cout << "分组过程用时： " << t.Reset() << std::endl;
 
-	//std::ofstream fout("..\\Ids.txt");
-	//for (ulong i = 0; i < groupRes.GetGroups().Size(); ++i)
-	//{
-	//	for (ulong j = 0; j < groupRes.GetGroups()[i].DfaIds.Size(); ++j)
-	//	{
-	//		fout << groupRes.GetGroups()[i].DfaIds[j] << " ";
-	//	}
-	//	fout << std::endl;
-	//}
-	//fout.clear();
-	//fout.close();
+	//	HASHRES HashResMap;
+	//	//哈希
+	//	HashMapping(groupRes, HashResMap);
+	//	//std::cout << "哈希过程用时： " << t.Reset() << std::endl;
 
-	//std::ofstream foutMerge("..\\MergeId.txt");
-	//for (ulong i = 0; i < groupRes.GetGroups().Size(); ++i)
-	//{
-	//	foutMerge << groupRes.GetDfaTable()[groupRes.GetGroups()[i].mergeDfaId].GetFinalStates().CountDfaIds() << std::endl;
-	//}
-	//foutMerge.clear();
-	//foutMerge.close();
+	//	//统计只包含一条链的分组个数
+	//	StatisticOneChain(groupRes);
 
-	//CGroupRes groupRes;
-	//groupRes.ReadFromFile("..\\FinalResult.cdt");
+	//	//存储最终结果的文件
+	//	std::string strWriteFileName(pArgs[1]);
+	//	std::string::iterator iPos = std::find(strWriteFileName.begin(), strWriteFileName.end(), '\\');
+	//	strWriteFileName.erase(iPos + 1, strWriteFileName.end());
+	//	strWriteFileName += "FinalResult.cdt";
 
+	//	//写最终结果文件
+	//	groupRes.WriteToFile(strWriteFileName.c_str());
 
-	//for (ulong i = 0; i < groupRes.GetDfaTable().Size(); ++i)
-	//{
-	//	for (ulong j = 0; j < groupRes.GetDfaTable()[i].Size(); ++j)
-	//	{
-	//		int occurCnt[256] = {0};
-	//		for (ulong k = 0; k < groupRes.GetDfaTable()[i].GetGroupCount(); ++k)
-	//		{
-	//			++occurCnt[groupRes.GetDfaTable()[i][j][k]];
-	//		}
-	//	}
+	//	//总分组数
+	//	std::cout << groupRes.GetGroups().Size() << std::endl;
+	//
+	//	//使用到的哈希槽数
+	//	std::cout << HashResMap.size() << std::endl;
+
+	//	std::cout << "Total time: " << t.Reset() << std::endl;
 	//}
 
-	//ulong nSuccess = 0;
-	//ulong nPcreError = 0;
-	//ulong nOptionError = 0;
-	//ulong nHasByte = 0;
-	//ulong nHasNot = 0;
-	//ulong nEmpty = 0;
-	//ulong nHasNoSig = 0;
-	//ulong nExceedLimit = 0;
-	//std::cout << groupRes.GetSidDfaIds().Size() << std::endl;
-	//std::ofstream fout("..\\test.txt");
-	//for (ulong i = 0; i < groupRes.GetSidDfaIds().Size(); ++i)
-	//{
-	//	if (groupRes.GetSidDfaIds()[i].m_nResult == COMPILEDINFO::RES_SUCCESS)
-	//	{
-	//		++nSuccess;
-	//	}
-	//	if (groupRes.GetSidDfaIds()[i].m_nResult & COMPILEDINFO::RES_PCREERROR)
-	//	{
-	//		++nPcreError;
-	//	}
-	//	if (groupRes.GetSidDfaIds()[i].m_nResult & COMPILEDINFO::RES_OPTIONERROR)
-	//	{
-	//		++nOptionError;
-	//		fout << groupRes.GetSidDfaIds()[i].m_nSid << std::endl;
-	//	}
-	//	if (groupRes.GetSidDfaIds()[i].m_nResult & COMPILEDINFO::RES_HASBYTE)
-	//	{
-	//		++nHasByte;
-	//	}
-	//	if (groupRes.GetSidDfaIds()[i].m_nResult & COMPILEDINFO::RES_HASNOT)
-	//	{
-	//		++nHasNot;
-	//	}
-	//	if (groupRes.GetSidDfaIds()[i].m_nResult & COMPILEDINFO::RES_EMPTY)
-	//	{
-	//		++nEmpty;
-	//	}
-	//	if (groupRes.GetSidDfaIds()[i].m_nResult & COMPILEDINFO::RES_HASNOSIG)
-	//	{
-	//		++nHasNoSig;
-	//	}
-	//	if (groupRes.GetSidDfaIds()[i].m_nResult & COMPILEDINFO::RES_EXCEEDLIMIT)
-	//	{
-	//		++nExceedLimit;
-	//	}
-	//}
-	//std::cout << nSuccess << std::endl;
-	//std::cout << nPcreError << std::endl;
-	//std::cout << nOptionError << std::endl;
-	//std::cout << nHasByte << std::endl;
-	//std::cout << nHasNot << std::endl;
-	//std::cout << nEmpty << std::endl;
-	//std::cout << nHasNoSig << std::endl;
-	//std::cout << nExceedLimit << std::endl;
-
-	//CGroupRes groupRes;
-	//groupRes.ReadFromFile("..\\FinalResult.cdt");
-
-	//ulong nReduce = 0;
-	//ulong nAll = 0;
-	//int* occurCnt = new int[256];
-	//for (ulong i = 0; i < groupRes.GetDfaTable().Size(); ++i)
-	//{
-	//	for (ulong j = 0; j < groupRes.GetDfaTable()[i].Size(); ++j)
-	//	{
-	//		std::fill(occurCnt, occurCnt + 256, 0);
-	//		for (ulong k = 0; k < groupRes.GetDfaTable()[i].GetGroupCount(); ++k)
-	//		{
-	//			ushort nVal = groupRes.GetDfaTable()[i][j][k];
-	//			if (nVal == ushort(-1))
-	//			{
-	//				++occurCnt[255];
-	//			}
-	//			else
-	//			{
-	//				++occurCnt[nVal];
-	//			}
-	//		}
-	//		int max = -1;
-	//		for (ulong k = 0; k < 256; ++k)
-	//		{
-	//			if (max < occurCnt[k])
-	//			{
-	//				max = occurCnt[k];
-	//			}
-	//		}
-	//		nReduce += groupRes.GetDfaTable()[i].GetGroupCount() - 2 * (groupRes.GetDfaTable()[i].GetGroupCount() - max + 1);
-	//		nAll += groupRes.GetDfaTable()[i].GetGroupCount();
-	//	}
-	//}
-	//delete[] occurCnt;
-	//std::cout << nReduce << std::endl;
-	//std::cout << nAll << std::endl;
-	//std::cout << nReduce / double(nAll) << std::endl;
-
-	CTimer ctime;
-	CCompileResults result;
-	try
-	{
-		CompileRuleFile("..\\CanCompile.rule", result);
-	}
-	catch (CTrace &e)
-	{
-		std::cout << e.File() << " - " << e.Line() << ": " << e.What() << std::endl;
-		system("pause");
-	}
-	result.WriteToFile("..\\result.cdt");
-
-	//result.ReadFromFile("..\\result.cdt");
+	std::string strWriteFileName(pArgs[1]);
+	std::string::iterator iPos = std::find(strWriteFileName.begin(), strWriteFileName.end(), '\\');
+	strWriteFileName.erase(iPos + 1, strWriteFileName.end());
+	strWriteFileName += "FinalResult.cdt";
 
 	CGroupRes groupRes;
-	Grouping(result, groupRes);
-	groupRes.WriteToFile("..\\GroupResult.cdt");
-	//groupRes.ReadFromFile("..\\GroupResult.cdt");
+	groupRes.ReadFromFile(strWriteFileName.c_str());
+	hash.nBucketCnt = groupRes.GetBucketCnt();
+	hash.nSigCnt = 2528;
 	HASHRES HashResMap;
-	HashMapping(groupRes, HashResMap);
-	groupRes.WriteToFile("..\\FinalResult.cdt");
-	//for (ulong i = 0; i < groupRes.GetDfaTable().Size(); ++i)
-	//{
-	//	groupRes.GetDfaTable()[i].MergeColumn();
-	//}
-	std::cout << "Total time: " << ctime.Reset() << std::endl;
-	std::cout << groupRes.GetGroups().Size() << std::endl;
-	std::cout << HashResMap.size() << std::endl;
-
-	//CCompileResults result;
-	//result.ReadFromFile("..\\result.cdt");
-	//std::ifstream fin("..\\Ids.txt");
-	//std::ifstream finMerge("..\\MergeId.txt");
-	//std::vector<size_t> mergeDfaSize;
-	//size_t id;
-	//while (finMerge >> id)
-	//{
-	//	mergeDfaSize.push_back(id);
-	//}
-
-	//size_t count = 0;
-	//std::string str;
-	//while (std::getline(fin, str))
-	//{
-	//	//std::cout << count << std::endl;
-	//	std::stringstream ss(str);
-	//	std::vector<size_t> vecIds;
-	//	while (ss >> id)
-	//	{
-	//		vecIds.push_back(id);
-	//	}
-
-	//	CDfaArray vecDfas;
-	//	vecDfas.Resize(2);
-	//	vecDfas[0] = result.GetDfaTable()[vecIds[0]];
-	//	for (ulong i = 1; i < vecIds.size(); ++i)
-	//	{
-	//		vecDfas[1] = result.GetDfaTable()[vecIds[i]];
-	//		CDfa MergeDfa;
-	//		if (!MergeMultipleDfas(vecDfas, MergeDfa))
-	//		{
-	//			std::cout << "error" << std::endl;
-	//		}
-	//		vecDfas[0] = MergeDfa;
-	//	}
-	//	if (vecDfas[0].GetFinalStates().CountDfaIds() != mergeDfaSize[count++])
-	//	{
-	//		std::cout << "error" << std::endl;
-	//	}
-	//}
-
-	//std::ifstream fin("..\\allrules.rule");
-	//std::vector<std::string> vecRules;
-	//std::string str;
-	//while (std::getline(fin, str))
-	//{
-	//	vecRules.push_back(str);
-	//}
-	//fin.clear();
-	//fin.close();
-
-	//CGroupRes groupRes;
-	//groupRes.ReadFromFile("..\\FinalResult.cdt");
-	//std::ofstream fout("..\\CanCompile.rule");
-	//for (ulong i = 0; i < groupRes.GetSidDfaIds().Size(); ++i)
-	//{
-	//	if (groupRes.GetSidDfaIds()[i].m_nResult == COMPILEDINFO::RES_SUCCESS)
-	//	{
-	//		str = "sid:";
-	//		std::string sid;
-	//		std::stringstream ss;
-	//		ss << groupRes.GetSidDfaIds()[i].m_nSid;
-	//		ss >> sid;
-	//		str += sid;
-	//		str += ";";
-	//		for (ulong j = 0; j < vecRules.size(); ++j)
-	//		{
-	//			if (vecRules[j].find(str, 0) != std::string::npos)
-	//			{
-	//				fout << vecRules[j] << std::endl;
-	//			}
-	//		}
-	//	}
-	//}
-	//fout.clear();
-	//fout.close();
-	//std::cout << HashResMap.size() << std::endl;
+	for (ulong i = 0; i < groupRes.GetGroups().Size(); ++i)
+	{
+		HASHNODE node;
+		node.m_sig = groupRes.GetGroups()[i].currSig;
+		node.m_nDfaId = groupRes.GetGroups()[i].mergeDfaId;
+		HashResMap[hash.BlockHash(node.m_sig, hash.nSigCnt)].push_back(node);
+	}
 
 	system("pause");
-	return 0;
 }

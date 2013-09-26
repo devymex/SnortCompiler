@@ -33,18 +33,6 @@ COMPILERHDR void ParseRuleFile(const char *pFileName, RECIEVER recv, void *lpUse
 	{
 		throw 0;
 	}
-
-	std::ofstream fCompileError("CompileError.txt");
-	std::ofstream fParseError("ParseError.txt");
-	std::ofstream fSuccess("Sucess.txt");
-	std::ofstream fPcreError("PcreError.txt");
-	std::ofstream fOptionError("OptionError.txt");
-	std::ofstream fHasByte("HasByte.txt");
-	std::ofstream fHasNot("HasNot.txt");
-	std::ofstream fEmpty("Empty.txt");
-	std::ofstream fHasNoSig("HasNotSig.txt");
-	std::ofstream fExceedLimit("ExceedLimit.txt");
-
 	STRINGVEC rules;
 	if(0 == LoadFile(pFileName, rules))
 	{
@@ -53,24 +41,17 @@ COMPILERHDR void ParseRuleFile(const char *pFileName, RECIEVER recv, void *lpUse
 			for(STRINGVEC_ITER i = rules.begin(); i != rules.end(); ++i)
 			{
 				g_log << "Compiling: " << i - rules.begin() + 1 << g_log.nl;
-				std::string ruleStr = *i;
 				STRING_ITER iBra = std::find(i->begin(), i->end(), '(');
 				if (iBra == i->end())
 				{
-					g_log << "Compile error!" << g_log.nl;
-					fCompileError << ruleStr << std::endl;
-					continue;
-					//TTHROW(TI_INVALIDDATA);
+					TTHROW(TI_INVALIDDATA);
 				}
 				i->erase(i->begin(), iBra + 1);
 
 				iBra = std::find(i->rbegin(), i->rend(), ')').base();
 				if (iBra == i->rend().base())
 				{
-					g_log << "Compile error!" << g_log.nl;
-					fCompileError << ruleStr << std::endl;
-					continue;
-					//TTHROW(TI_INVALIDDATA);
+					TTHROW(TI_INVALIDDATA);
 				}
 				i->erase(iBra - 1, i->end());
 
@@ -82,24 +63,19 @@ COMPILERHDR void ParseRuleFile(const char *pFileName, RECIEVER recv, void *lpUse
 				catch (CTrace &e)
 				{
 					g_log << "ParseOptions error: " << e.What() << g_log.nl;
-					fParseError << ruleStr << std::endl;
-					continue;
-					//throw;
+					throw;
 				}
 				PARSERESULT pr;
 				pr.ulSid = snortRule.GetSid();
 				pr.ulFlag = PARSEFLAG::PARSE_SUCCESS;
-				if (snortRule.GetFlags() == CSnortRule::NORMAL)
+				try
 				{
-					try
-					{
-						Rule2RegRule(snortRule, pr.regRule);
-					}
-					catch (CTrace &e)
-					{
-						pr.ulFlag |= PARSEFLAG::PARSE_ERROR;
-						g_log << "Rule2RegRule error: " << e.What() << g_log.nl;
-					}
+					Rule2RegRule(snortRule, pr.regRule);
+				}
+				catch (CTrace &e)
+				{
+					pr.ulFlag |= PARSEFLAG::PARSE_ERROR;
+					g_log << "Rule2RegRule error: " << e.What() << g_log.nl;
 				}
 				if (snortRule.GetFlags() & CSnortRule::HASBYTE)
 				{
@@ -113,62 +89,10 @@ COMPILERHDR void ParseRuleFile(const char *pFileName, RECIEVER recv, void *lpUse
 				{
 					pr.ulFlag |= PARSEFLAG::PARSE_EMPTY;
 				}
-
-				ulong nr = recv(pr, lpUser);
-
-				if (nr == COMPILEDINFO::RES_SUCCESS)
-				{
-					fSuccess << ruleStr << std::endl;
-				}
-
-				if (nr & COMPILEDINFO::RES_PCREERROR)
-				{
-					fPcreError << ruleStr << std::endl;
-				}
-
-				if (nr & COMPILEDINFO::RES_OPTIONERROR)
-				{
-					fOptionError << ruleStr << std::endl;
-				}
-
-				if (nr & COMPILEDINFO::RES_HASBYTE)
-				{
-					fHasByte << ruleStr << std::endl;
-				}
-
-				if (nr & COMPILEDINFO::RES_HASNOT)
-				{
-					fHasNot << ruleStr << std::endl;
-				}
-
-				if (nr & COMPILEDINFO::RES_EMPTY)
-				{
-					fEmpty << ruleStr << std::endl;
-				}
-
-				if (nr & COMPILEDINFO::RES_HASNOSIG)
-				{
-					fHasNoSig << ruleStr << std::endl;
-				}
-
-				if (nr & COMPILEDINFO::RES_EXCEEDLIMIT)
-				{
-					fExceedLimit << ruleStr << std::endl;
-				}
+				recv(pr, lpUser);
 			}
 		}
 	}
-
-	fCompileError.close();
-	fParseError.close();
-	fSuccess.close();
-	fPcreError.close();
-	fOptionError.close();
-	fHasByte.close();
-	fHasNot.close();
-	fEmpty.close();
-	fHasNoSig.close();
-	fExceedLimit.close();
 }
 
 COMPILERHDR void CompileRuleFile(const char *pFileName, CCompileResults &compRes)
@@ -205,7 +129,7 @@ COMPILERHDR void ExtractSequence(const CByteArray &pcResult,
 			{
 				strs.push_back(str);
 			}
-			str.Clear();
+			str.Empty();
 			return;
 
 			//这是什么情况？
@@ -247,7 +171,6 @@ COMPILERHDR void ExtractSequence(const CByteArray &pcResult,
 			break;
 
 		case OP_POSPLUS:			/* 43 Possessified plus: caseful */
-		case OP_POSPLUSI:
 			str.PushBack(pcResult[cur + 1]);
 			strs.push_back(str);
 

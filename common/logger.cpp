@@ -6,24 +6,18 @@ LOGGERHDR CLogger g_log;
 LOGGERHDR CLogger::CLogger()
 	: nl("\r\n")
 {
-	//m_pLogFile = &std::cout;
-	m_pLogFile = new std::ofstream("compile.log");
+	m_pLogFile = &std::cout;
+	//m_pLogFile = new std::ofstream("compile.log");
 	//m_pLogFile->set_rdbuf(std::cout.rdbuf());
 }
 
 LOGGERHDR CLogger::~CLogger()
 {
-	delete m_pLogFile;
+	//delete m_pLogFile;
 }
 
 LOGGERHDR CLogger::CLogger(const CLogger&)
 {
-}
-
-void CLogger::SetLogFile(const char *pStrFile)
-{
-	delete m_pLogFile;
-	m_pLogFile = new std::ofstream(pStrFile);
 }
 
 LOGGERHDR CLogger& CLogger::operator = (const CLogger&)

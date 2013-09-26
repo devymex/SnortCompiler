@@ -14,110 +14,11 @@
 #include "contopt.h"
 #include <hwprj\pcreopt.h>
 #include "comprule.h"
+#include <hwprj\compiler.h>
 
 #pragma warning(disable:4996)
 
 ISSPACE g_isSpace;
-
-std::map<std::string, std::size_t> KeyTypeMap;
-
-std::string type1Strs[] = //合法的格式"abc";
-{
-	"msg",
-	"content",
-	"uricontent"
-};
-
-std::string type2Strs[] = //合法的格式"ab\"c";
-{
-	"pcre"
-};
-
-std::string type3Strs[] = //合法的格式为;
-{
-	"reference",
-	"gid",
-	"sid",
-	"rev",
-	"classtype",
-	"priority",
-	"metadata",
-	"nocase",
-	"rawbytes",
-	"depth",
-	"offset",
-	"distance",
-	"within",
-	"http_client_body",
-	"http_cookie",
-	"http_raw_cookie",
-	"http_header",
-	"http_raw_header",
-	"http_method",
-	"http_uri",
-	"http_raw_uri",
-	"http_stat_code",
-	"http_stat_msg",
-	"http_encode",
-	"fast_pattern",
-	"urilen",
-	"isdataat",
-	"pkt_data",
-	"file_data",
-	"base64_decode",
-	"base64_data",
-	"byte_test",
-	"byte_jump",
-	"byte_extract",
-	"ftpbounce",
-	"asn1",
-	"cvs",
-	"dce_iface",
-	"dce_opnum",
-	"dce_stub_data",
-	"sip_method",
-	"sip_stat_code",
-	"sip_header",
-	"sip_body",
-	"gtp_type",
-	"gtp_info",
-	"gtp_version",
-	"ssl_version",
-	"ssl_state",
-	"fragoffset",
-	"ttl",
-	"tos",
-	"id",
-	"ipopts",
-	"fragbits",
-	"dsize",
-	"flags",
-	"flow",
-	"flowbits",
-	"seq",
-	"ack",
-	"window",
-	"itype",
-	"icode",
-	"icmp_id",
-	"icmp_seq",
-	"rpc",
-	"ip_proto",
-	"sameip",
-	"stream_reassemble",
-	"stream_size",
-	"logto",
-	"session",
-	"resp",
-	"react",
-	"tag",
-	"activates",
-	"activated_by",
-	"count",
-	"replace",
-	"detection_filter",
-	"threshold"
-};
 
 /*! complie one rule
 
@@ -128,7 +29,7 @@ Arguments:
 Returns:		nothing
 
 */
-ulong __stdcall CompileCallback(const PARSERESULT &parseRes, void *lpVoid)
+void __stdcall CompileCallback(const PARSERESULT &parseRes, void *lpVoid)
 {
 	CCompileResults &result = *(CCompileResults*)lpVoid;
 	
@@ -159,8 +60,6 @@ ulong __stdcall CompileCallback(const PARSERESULT &parseRes, void *lpVoid)
 	{
 		Rule2Dfas(parseRes.regRule, result);
 	}
-
-	return ruleResult.m_nResult;
 }
 
 /*!
@@ -185,147 +84,44 @@ ulong LoadFile(const char *fileName, std::vector<std::string> &rules)
 	return 0;
 }
 
-std::string::iterator FindEndOther(std::string &rule, std::string::iterator iBeg)
-{
-	for (; ; ++iBeg)
-	{
-		iBeg = std::find(iBeg, rule.end(), ';');
-		if (iBeg == rule.end())
-		{
-			TTHROW(TI_INVALIDDATA);
-		}
-		if (*(iBeg - 1) != '\\')
-		{
-			break;
-		}
-	}
-
-	return iBeg;
-}
-
-std::string::iterator FindEndContent(std::string &rule, std::string::iterator iBeg)
-{
-	std::string::iterator iEnd = std::find(iBeg, rule.end(), '\"');
-	if (iEnd == rule.end())
-	{
-		TTHROW(TI_INVALIDDATA);
-	}
-	iEnd = std::find(iEnd + 1, rule.end(), '\"');
-	if (iEnd == rule.end())
-	{
-		TTHROW(TI_INVALIDDATA);
-	}
-
-	return FindEndOther(rule, iEnd + 1);
-}
-
-std::string::iterator FindEndPcre(std::string &rule, std::string::iterator iBeg)
-{
-	std::string::iterator iEnd = std::find(iBeg, rule.end(), '\"');
-	if (iEnd == rule.end())
-	{
-		TTHROW(TI_INVALIDDATA);
-	}
-	for (; ;)
-	{
-		iEnd = std::find(iEnd + 1, rule.end(), '\"');
-		if (iEnd == rule.end())
-		{
-			TTHROW(TI_INVALIDDATA);
-		}
-		if (*(iEnd - 1) != '\\')
-		{
-			break;
-		}
-	}
-	
-	return FindEndOther(rule, iEnd + 1);
-}
-
 void SplitOption(std::string &ruleOptions, std::vector<RULEOPTIONRAW> &options)
 {
-	if (KeyTypeMap.empty())
+	// Split the options of rule with semicolon and extract related options 
+	STRING_ITER temp = ruleOptions.begin();
+	for (STRING_ITER i = ruleOptions.begin(); ;)
 	{
-		for (size_t i = 0; i < sizeof(type1Strs)/sizeof(type1Strs[0]); ++i)
-		{
-			KeyTypeMap[type1Strs[i]] = 1;
-		}
-
-		for (size_t i = 0; i < sizeof(type2Strs)/sizeof(type2Strs[0]); ++i)
-		{
-			KeyTypeMap[type2Strs[i]] = 2;
-		}
-
-		for (size_t i = 0; i < sizeof(type3Strs)/sizeof(type3Strs[0]); ++i)
-		{
-			KeyTypeMap[type3Strs[i]] = 3;
-		}
-	}
-
-	struct ISKEYNAME
-	{
-		bool operator()(char c)
-		{
-			return isalnum(c) || c == '_';
-		}
-	};
-
-	std::string::iterator iBeg = ruleOptions.begin();
-	for (;;)
-	{
-		iBeg = std::find_if(iBeg, ruleOptions.end(), ISKEYNAME());
-		if (iBeg == ruleOptions.end())
+		STRING_ITER iComma = std::find(temp, ruleOptions.end(), ';');
+		if (iComma == ruleOptions.end())
 		{
 			break;
 		}
-		std::string::iterator iEnd = std::find_if_not(iBeg, ruleOptions.end(), ISKEYNAME());
-		if (iEnd == ruleOptions.end())
+		if (*(iComma - 1) != '\\')
 		{
-			TTHROW(TI_INVALIDDATA);
-		}
+			RULEOPTIONRAW or;
+			STRING_ITER iNameBeg = std::find_if(i, iComma, isalpha);
+			STRING_ITER iValueBeg = std::find(iNameBeg + 1, iComma, ':');
+			STRING_ITER iNameEnd = iValueBeg;
+			for (; g_isSpace(*--iNameEnd););
 
-		std::string strName;
-		for (std::string::iterator i = iBeg; i != iEnd; ++i)
-		{
-			strName.push_back(char(tolower(*i)));
+			std::string strName, strValue;
+			strName.assign(iNameBeg, iNameEnd + 1);
+			if(iValueBeg == iComma)
+			{
+				strValue.assign(iValueBeg, iComma);
+			}
+			else
+			{
+				strValue.assign(iValueBeg + 1,iComma);
+			}
+			temp = iComma + 1;
+			if(EstimateOption(strName, strValue))
+			{
+				or.name.swap(strName);
+				or.value.swap(strValue);
+				options.push_back(or);
+				i = temp;
+			}
 		}
-
-		iEnd = std::find_if_not(iEnd, ruleOptions.end(), ISSPACE());
-		if (iEnd == ruleOptions.end())
-		{
-			TTHROW(TI_INVALIDDATA);
-		}
-
-		if (*iEnd == ':')
-		{
-			++iEnd;
-		}
-		else if (*iEnd != ';')
-		{
-			TTHROW(TI_INVALIDDATA);
-		}
-
-		iBeg = iEnd;
-		switch (KeyTypeMap[strName])
-		{
-		case 1:
-			iEnd = FindEndContent(ruleOptions, iEnd);
-			break;
-		case 2:
-			iEnd = FindEndPcre(ruleOptions, iEnd);
-			break;
-		case 3:
-			iEnd = FindEndOther(ruleOptions, iEnd);
-			break;
-		default:
-			TTHROW(TI_INVALIDDATA);
-		}
-
-		RULEOPTIONRAW pr;
-		pr.name = strName;
-		pr.value = std::string(iBeg, iEnd);
-		options.push_back(pr);
-		iBeg = iEnd + 1;
 	}
 }
 
@@ -434,11 +230,7 @@ void ParseOptions(std::string &ruleOptions, CSnortRule &snortRule)
 			snortRule.PushBack(&contOpt);
 		}
 		else if (0 == stricmp("nocase", iOp->name.c_str()))
-		{
-			if (snortRule.Size() == 0)
-			{
-				TTHROW(TI_INVALIDDATA);
-			}
+		{			
 			CContentOption *pCont = dynamic_cast<CContentOption*>(snortRule.Back());
 			if (null == pCont)
 			{
@@ -448,10 +240,6 @@ void ParseOptions(std::string &ruleOptions, CSnortRule &snortRule)
 		}
 		else if (0 == stricmp("offset", iOp->name.c_str()))
 		{
-			if (snortRule.Size() == 0)
-			{
-				TTHROW(TI_INVALIDDATA);
-			}
 			CContentOption *pCont = dynamic_cast<CContentOption*>(snortRule.Back());
 			if (null == pCont)
 			{
@@ -462,10 +250,6 @@ void ParseOptions(std::string &ruleOptions, CSnortRule &snortRule)
 		}
 		else if (0 == stricmp("depth", iOp->name.c_str()))
 		{
-			if (snortRule.Size() == 0)
-			{
-				TTHROW(TI_INVALIDDATA);
-			}
 			CContentOption *pCont = dynamic_cast<CContentOption*>(snortRule.Back());
 			if (NULL == pCont)
 			{
@@ -476,10 +260,6 @@ void ParseOptions(std::string &ruleOptions, CSnortRule &snortRule)
 		}
 		else if (0 == stricmp("distance", iOp->name.c_str()))
 		{
-			if (snortRule.Size() == 0)
-			{
-				TTHROW(TI_INVALIDDATA);
-			}
 			CContentOption *pCont = dynamic_cast<CContentOption*>(snortRule.Back());
 			if (NULL == pCont)
 			{
@@ -490,10 +270,6 @@ void ParseOptions(std::string &ruleOptions, CSnortRule &snortRule)
 		}
 		else if (0 == stricmp("within", iOp->name.c_str()))
 		{
-			if (snortRule.Size() == 0)
-			{
-				TTHROW(TI_INVALIDDATA);
-			}
 			CContentOption *pCont = dynamic_cast<CContentOption*>(snortRule.Back());
 			if (NULL == pCont)
 			{
@@ -748,20 +524,16 @@ Returns:		nothing
 */
 void Rule2Dfas(const CRegRule &rule, CCompileResults &result)
 {
+	CTimer t;
+
 	CRegRule regRule = rule;
 
-	COMPILEDINFO &ruleResult = result.GetSidDfaIds().Back();
-
 	RULECOMPDATA ruleCompData;
-	try
-	{
-		ProcessRule(regRule, ruleCompData);
-	}
-	catch (CTrace &)
-	{
-		ruleResult.m_nResult |= COMPILEDINFO::RES_PCREERROR;
-		return;
-	}
+	t.Reset();
+	ProcessRule(regRule, ruleCompData);
+	rule2pcretime += t.Cur();
+
+	COMPILEDINFO &ruleResult = result.GetSidDfaIds().Back();
 
 	const ulong nOldDfaSize = result.GetDfaTable().Size();
 
@@ -771,7 +543,6 @@ void Rule2Dfas(const CRegRule &rule, CCompileResults &result)
 	const ulong nOldRegexSize = result.GetRegexTbl().Size();
 	result.GetRegexTbl().Resize(nOldRegexSize + nCurRuleSize);
 
-	bool bHasSigs = false;
 	static CNfa nfa;
 	nfa.Reserve(5000);
 	for (ulong i = 0; i < nCurRuleSize; ++i)
@@ -779,6 +550,7 @@ void Rule2Dfas(const CRegRule &rule, CCompileResults &result)
 		CPcreChain &curPcreChain = regRule[i];
 
 		nfa.Clear();
+		t.Reset();
 		for (ulong j = 0; j < curPcreChain.Size(); ++j)
 		{
 			const CPcreOption &curPcre = curPcreChain[j];
@@ -795,13 +567,11 @@ void Rule2Dfas(const CRegRule &rule, CCompileResults &result)
 				break;
 			}
 		}
+		pcre2nfatime += t.Cur();
+
 		if (ruleResult.m_nResult != COMPILEDINFO::RES_SUCCESS)
 		{
 			break;
-		}
-		if (regRule[i].GetSigs().Size() > 0)
-		{
-			bHasSigs = true;
 		}
 
 		ulong nDfaId = nOldDfaSize + i;
@@ -810,7 +580,9 @@ void Rule2Dfas(const CRegRule &rule, CCompileResults &result)
 		CDfa &dfa = result.GetDfaTable()[nDfaId];
 
 		dfa.SetId(nDfaId);
+		t.Reset();
 		ulong nToDFAFlag = dfa.FromNFA(nfa);
+		nfa2dfatime += t.Cur();
 
 		if (nToDFAFlag == -1)
 		{
@@ -821,7 +593,10 @@ void Rule2Dfas(const CRegRule &rule, CCompileResults &result)
 
 		TASSERT(dfa.GetFinalStates().Size() != 0);
 
+		t.Reset();
 		ulong nr = dfa.Minimize();
+		dfamintimetime += t.Cur();
+
 		if (0 != nr || dfa.Size() > SC_MAXDFASIZE)
 		{
 			ruleResult.m_nResult |= COMPILEDINFO::RES_EXCEEDLIMIT;
@@ -831,6 +606,16 @@ void Rule2Dfas(const CRegRule &rule, CCompileResults &result)
 
 		ruleResult.m_dfaIds.PushBack(nDfaId);
 		result.GetRegexTbl()[nChainId] = regRule[i];
+	}
+
+	bool bHasSigs = false;
+	for (ulong i = 0; i < nCurRuleSize; ++i)
+	{
+		if (regRule[i].GetSigs().Size() > 0)
+		{
+			bHasSigs = true;
+			break;
+		}
 	}
 
 	if (!bHasSigs)
@@ -847,5 +632,48 @@ void Rule2Dfas(const CRegRule &rule, CCompileResults &result)
 		ruleResult.m_dfaIds.Clear();
 		result.GetDfaTable().Resize(nOldDfaSize);
 		result.GetRegexTbl().Resize(nOldRegexSize);
+	}
+}
+
+bool EstimateOption (std::string strName, std::string strValue)
+{
+	for(STRING_ITER i = strValue.begin(); i != strValue.end(); ++i)
+	{
+		if(isspace(*i))
+		{
+			strValue.erase(i);
+		}
+	}
+
+	std::string::iterator iterBeg;
+	std::string::reverse_iterator riterEnd;
+	iterBeg = std::find(strValue.begin(), strValue.end(), '\"');
+	riterEnd = std::find(strValue.rbegin(), strValue.rend(), '\"');
+
+	if(0 == strcmp("msg", strName.c_str()) || 0 == strcmp("content", strName.c_str()) || 0 == strcmp("uricontent", strName.c_str()))
+	{		
+		if(riterEnd == strValue.rbegin())
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	else if(0 == strcmp("pcre", strName.c_str()))
+	{
+		if(riterEnd == strValue.rbegin() && *(riterEnd + 1) != '\\')
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	else
+	{
+		return true;
 	}
 }

@@ -41,21 +41,20 @@ SNORTRULEHDR void CPcreOption::FromPattern(const CDllString &strPat)
 
 	STRING str = strTemp.Data();
 
-	STRING_ITER iBeg = str.begin(), iEnd = str.end();
-	STRING strSuffix;
-	if (*iBeg == '/')
+	STRING_ITER iEnd = str.end();
+	STRING_ITER iBeg = std::find(str.begin(), iEnd, '/');
+
+	for(--iEnd; *iEnd != '/' && iEnd != str.begin(); --iEnd);
+
+	if (iBeg >= iEnd)
 	{
-		++iBeg;
-		for(--iEnd; *iEnd != '/' && iEnd != str.begin(); --iEnd);
-		if (iBeg >= iEnd)
-		{
-			TTHROW(TI_INVALIDDATA);
-		}
-		strSuffix = STRING(iEnd + 1, str.end());
+		TTHROW(TI_INVALIDDATA);
 	}
 
-	m_strPcre.Assign(STRING(iBeg, iEnd).c_str());
-	
+	m_strPcre.Assign(STRING(iBeg + 1, iEnd).c_str());
+
+	STRING strSuffix = STRING(iEnd + 1, str.end());
+
 	for(STRING_ITER j = strSuffix.begin(); j != strSuffix.end(); ++j)
 	{
 		switch (*j)
