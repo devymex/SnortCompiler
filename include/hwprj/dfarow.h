@@ -83,9 +83,6 @@ public:
 	/// @brief		获取DFA状态的属性。
 	STATEFLAG GetFlags() const;
 
-	/////////////////////////////////////
-	bool operator==(CDfaRow &rhs);
-	void PushBack(ushort n);
 private:
 	/// @brief		私有成员，仅供内部使用。
 	STATEIDARY* m_pDest;

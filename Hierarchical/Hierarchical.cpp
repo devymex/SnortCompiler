@@ -201,7 +201,7 @@ void SameColDfaCombine(CDfaArray &CDfaSet, COLCOMBINEARRAY &colCombineArray)
 	COLUMNCOMBINE sameColInform;
 	for (size_t i = 0; i < CDfaSet.Size(); ++i)
 	{
-		allCol.insert(CDfaSet[i].GetColumnNum());
+		allCol.insert(CDfaSet[i].GetGroupCount());
 		CDfaSet[i].SetId(i + 1);
 	}
 
@@ -216,7 +216,7 @@ void SameColDfaCombine(CDfaArray &CDfaSet, COLCOMBINEARRAY &colCombineArray)
 
 	for(size_t i = 0; i < CDfaSet.Size(); ++i)
 	{
-		column = CDfaSet[i].GetColumnNum();
+		column = CDfaSet[i].GetGroupCount();
 		col_it = allCol.find(column);
 
 		colLocation = 0;

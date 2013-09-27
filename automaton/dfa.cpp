@@ -49,12 +49,6 @@ DFAHDR CDfa::~CDfa()
 	delete m_pDfa;
 }
 
-//////////////////////////////////////////////////////
-DFAHDR ushort CDfa::GetColumnNum()
-{
-	return m_usColNum;
-}
-//////////////////////////////////////////////////////
 DFAHDR CDfa& CDfa::operator=(const CDfa &other)
 {
 	TASSERT(other.m_pDfa != null);
@@ -604,6 +598,18 @@ ulong CDfa::PartStates(STATEIDARY *pRevTbl)
 	PARTSETVEC partSets;
 	InitPartSet(m_FinStas, ulStaNum, partSets);
 
+	for (std::vector<PARTSET>::iterator i = partSets.begin(); i != partSets.end();)
+	{
+		if (i->StaSet.empty())
+		{
+			i = partSets.erase(i);
+		}
+		else
+		{
+			++i;
+		}
+	}
+
 	for (PARTSETVEC_ITER i = partSets.begin(); i != partSets.end(); ++i)
 	{
 		CalcAbleTo(pRevTbl, nGrpNum, ulStaNum, *i);
@@ -883,10 +889,6 @@ DFAHDR bool MergeMultipleDfas(CDfaArray &inputDfas, CDfa &mergedDfa)
 			//this is a terminal state
 			finFlag = 1;
 			AddTermIntoDFA(nSta, inputDfas[i], 0, mergedDfa);
-			CFinalStates &newFinSta = mergedDfa.GetFinalStates();
-			newFinSta.AddState(0).Append(
-				inputDfas[i].GetFinalStates().GetDfaIdSet(nSta));
-
 		}
 		startVec[i] = nSta;
 	}

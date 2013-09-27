@@ -13,6 +13,11 @@
 #include <hwprj\nfa.h>
 #include <hwprj\compiler.h>
 
+extern double rule2pcretime;
+extern double pcre2nfatime;
+extern double nfa2dfatime;
+extern double dfamintimetime;
+
 struct RULEOPTIONRAW
 {
 	std::string name;
@@ -124,7 +129,7 @@ typedef std::vector<CByteArray>			CHAINCOMPDATA;
 typedef std::vector<CHAINCOMPDATA>		RULECOMPDATA;
 
 
-void __stdcall CompileCallback(const PARSERESULT &parseRes, void *lpVoid);
+ulong __stdcall CompileCallback(const PARSERESULT &parseRes, void *lpVoid);
 
 bool SeqIncBy(const CRegRule &regRule, const RULESEQUENCE &ruleSeq, ulong ulIdx);
 
@@ -151,5 +156,3 @@ void Rule2Dfas(const CSnortRule &rule,
 void AssignSig(CCompileResults &result, ulong BegIdx, ulong EndIdx);
 
 void Rule2Dfas(const CRegRule &rule, CCompileResults &result);
-
-bool EstimateOption (std::string strName, std::string strValue);

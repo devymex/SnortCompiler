@@ -650,16 +650,10 @@ GROUPINGHDR void Grouping(CCompileResults &res, CGroupRes &groupRes)
 	Merge(res, groups);
 	g_log << "Completed in " << t1.Reset() << " Sec." << g_log.nl << g_log.nl;
 
-	g_log << "只能提出一个特征字符串的DFA分组后的个数： " << groups.Size() << g_log.nl;
-	g_log << "提出一个Sig后剩余链数：" << vecWaitForGroup.size() << g_log.nl << g_log.nl;
-
 	//Put dfa in group which have the same signature...
 	g_log << "Put dfa in group which have the same signature..." << g_log.nl;
 	PutInBySig(SigsVec, res, groups, vecWaitForGroup);
 	g_log << "Completed in " << t1.Reset() << " Sec." << g_log.nl << g_log.nl;
-
-	g_log << "调整一个Sig后剩余链数：" << vecWaitForGroup.size() << g_log.nl << g_log.nl;
-
 
 	//Build group which has the same signature...
 	g_log << "Build group which has the same signatures..." << g_log.nl;
@@ -668,9 +662,6 @@ GROUPINGHDR void Grouping(CCompileResults &res, CGroupRes &groupRes)
 	//DfaSizeSort(res, newGroups);
 	Merge(res, newGroups);
 	g_log << "Completed in " << t1.Reset() << " Sec." << g_log.nl << g_log.nl;
-
-	g_log << "包含多个特征字符串的DFA分组的个数： " << newGroups.Size() << g_log.nl;
-	g_log << "多个Sig分组后剩余链数：" << vecWaitForGroup.size() << g_log.nl << g_log.nl;
 
 	//Extract the already used signatures...
 	g_log << "Extract the already used signatures..." << g_log.nl;
@@ -682,9 +673,7 @@ GROUPINGHDR void Grouping(CCompileResults &res, CGroupRes &groupRes)
 	g_log << "Merge group which have the same signatures..." << g_log.nl;
 	MergeGroup(res, vecUsed, newGroups);
 	g_log << "Completed in " << t1.Reset() << " Sec." << g_log.nl << g_log.nl;
-
-	g_log << "组间合并后分组个数： " << newGroups.Size() << g_log.nl << g_log.nl;
-
+	
 	//Add new groups...
 	g_log << "Add new groups..." << g_log.nl;
 	AddNewGroups(newGroups, groups);
