@@ -11,6 +11,37 @@ ulong g_dpktnum = 0;
 ulong ucprnum = 0;
 ulong signum = 0;
 ulong usigtime = 0;
+
+ushort threshold = 2;
+
+void ReadSkipTable(const std::string &str, std::vector<std::vector<std::vector<ushort> > > &skipTable)
+{
+	std::fstream filein(str.c_str(), std::ios::in | std::ios::binary);
+	ushort number;
+	filein.read(reinterpret_cast<char *>(&number), sizeof(ushort));
+	for(ushort i = 0; i != number; ++i)
+	{
+		skipTable.push_back(std::vector<std::vector<ushort> >());
+	}
+	for(ushort i = 0; i != number; ++i)
+	{
+		ushort dfaId, stateNum;
+		filein.read(reinterpret_cast<char *>(&dfaId), sizeof(ushort));
+		filein.read(reinterpret_cast<char *>(&stateNum), sizeof(ushort));
+		for(ushort j = 0; j != stateNum; ++j)
+		{
+			std::vector<ushort> skipNode;
+			for(ushort k = 0; k != threshold; ++k)
+			{
+				char temp;
+				filein.read(reinterpret_cast<char *>(&temp), sizeof(char));
+				skipNode.push_back(static_cast<ushort>(temp));
+			}
+			skipTable[i].push_back(skipNode);
+		}
+	}
+}
+
 void MatchOnedfa(const unsigned char * &data, ulong len, CDfa &dfa,
 				 std::vector<ulong> &matchedDids)
 {

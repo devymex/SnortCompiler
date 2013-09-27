@@ -15,6 +15,9 @@ void main(int nArgs, char **cArgs)
 	std::vector<std::vector<SKIPNODE> > skipTable;
 	COLCOMBINEARRAY colCombineArray;
 	SameColDfaCombine(CDfaSet, colCombineArray);
-	PartitionGraph(colCombineArray, skipTable);
+	CoreCompress(colCombineArray, skipTable);
+	WriteSkipTable(colCombineArray, skipTable, "skipTableResult.ppp");
+	std::vector<std::vector<std::vector<ushort> > > skipTableR;
+	ReadSkipTable("skipTableResult.ppp", skipTableR);
 	system("pause");
 }

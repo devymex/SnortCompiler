@@ -43,14 +43,9 @@ typedef struct
 
 typedef struct
 {
-	ushort newNum;
-	std::vector<SKIPNODE> *skipNode;
-}ROWNODE;
-
-typedef struct
-{
 	ushort dfaId;
-	std::vector<ROWNODE> rowTransform;
+	ushort skipTableNum;
+	std::vector<ushort> rowTransform;
 } ROWTRANSFORM;
 
 typedef struct
@@ -103,6 +98,10 @@ int TwoColDfaCombine(COLUMNCOMBINE &inColCom, COLUMNCOMBINE &outColCom);
 
 void DiffColDfaCombine(COLCOMBINEARRAY &colCombineArray, ushort minCol, ushort maxCol, COLUMNCOMBINE &outCombineArray);
 
-void CoreCompress(std::vector<COLUMNCOMBINE> &allData);
+void CoreCompress(std::vector<COLUMNCOMBINE> &allData, std::vector<std::vector<SKIPNODE> > &skipTable);
 
 void PartitionGraph(std::vector<COLUMNCOMBINE> &allData, std::vector<std::vector<SKIPNODE> > &skipTable);
+
+void WriteSkipTable(std::vector<COLUMNCOMBINE> &allData,const std::vector<std::vector<SKIPNODE> > &skipTable, const std::string &str);
+
+void ReadSkipTable(const std::string &str, std::vector<std::vector<std::vector<ushort> > > &skipTable);

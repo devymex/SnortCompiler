@@ -52,3 +52,4 @@ rules/*
 */Release/*
 MatchPacket/wpcap/*
 MatchPacket/wpcap/*
+*.ppp
