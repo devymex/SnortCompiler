@@ -133,11 +133,14 @@ void AnotherReplaceRowMatchValue(COLUMNCOMBINE &inColCom, std::vector<ROWTRANSFO
 {
 	for(size_t i = 0; i < inColCom.rowTrans.size(); ++i)
 	{
-		for(size_t j = 0; j < inColCom.rowTrans[i].rowTransform.size(); ++j)
+		ROWTRANSFORM &cur =  inColCom.rowTrans[i];
+		size_t temp = cur.rowTransform.size();
+		ROWNODE *p = cur.rowTransform.data();
+		for(size_t j = 0; j < temp; ++j)
 		{
-			if(inColCom.rowTrans[i].rowTransform[j].newNum == old)
+			if(p[j].newNum == old)
 			{
-				row[i].rowTransform[j].newNum = now;
+				p[j].newNum = now;
 			}
 		}
 	}
@@ -172,7 +175,7 @@ void RemoveTheSame(COLCOMBINEARRAY &colCombineArray)
 				now = diff.size();
 				diff.push_back(colCombineArray[i].sameColumnMatrix[nVec[j].n]);
 			}
-			
+
 			AnotherReplaceRowMatchValue(colCombineArray[i], row, nVec[j].n, now);
 			++j;
 		}
@@ -186,22 +189,22 @@ void RemoveTheSame(COLCOMBINEARRAY &colCombineArray)
 void SameColDfaCombine(CDfaArray &CDfaSet, COLCOMBINEARRAY &colCombineArray)
 {
 	ushort column, colLocation;
-	
+
 	std::vector<int> origin, minus, now;
 
 	//CGroupRes groupRes;
 	//groupRes.ReadFromFile(/*"FinalResult.cdt"*/);
 	//CDfaArray &CDfaSet = groupRes.GetDfaTable();
-	
+
 	std::set<ushort> allCol;
 	std::set<ushort>::iterator col_it, col;
 	COLUMNCOMBINE sameColInform;
 	for (size_t i = 0; i < CDfaSet.Size(); ++i)
 	{
-		allCol.insert(CDfaSet[i].GetGroupCount());
+		allCol.insert(CDfaSet[i].GetColumnNum());
 		CDfaSet[i].SetId(i + 1);
 	}
-	
+
 	for(col_it = allCol.begin(); col_it != allCol.end(); ++col_it)
 	{
 		sameColInform.column = *col_it;
@@ -213,7 +216,7 @@ void SameColDfaCombine(CDfaArray &CDfaSet, COLCOMBINEARRAY &colCombineArray)
 
 	for(size_t i = 0; i < CDfaSet.Size(); ++i)
 	{
-		column = CDfaSet[i].GetGroupCount();
+		column = CDfaSet[i].GetColumnNum();
 		col_it = allCol.find(column);
 
 		colLocation = 0;
@@ -272,8 +275,7 @@ void SameColDfaCombine(CDfaArray &CDfaSet, COLCOMBINEARRAY &colCombineArray)
 		cs += ts * i->column;
 	}
 	std::cout << "total states : " << ts << std::endl;
-	double x = static_cast<double>(cs) * 2.0 / pow(1024.0, 2);
-	std::cout << "before compress : " << x << "MBytes" << std::endl;
+	std::cout << "before compress : " << static_cast<double>(cs) * 2.0 / pow(1024.0, 2) << "MB" << std::endl;
 	RemoveTheSame(colCombineArray);
 }
 
@@ -363,7 +365,7 @@ void DiffColDfaCombine(COLCOMBINEARRAY &colCombineArray, ushort minCol, ushort m
 
 	size_t l = 0, h = 0;
 	COLCOMBINEARRAY_ITERATOR colCombineArray_it;
-	
+
 	for(colCombineArray_it = colCombineArray.begin(); colCombineArray_it->column != maxCol; ++colCombineArray_it)
 	{
 		++h;
@@ -403,13 +405,32 @@ bool Estimate(const std::vector<std::vector<ushort> > &dfaMatrix, const ROWSET &
 	return true;
 }
 
+int RandNum(const std::vector<int> &temp, int col)
+{
+	int num;
+	while(true)
+	{
+		num = rand() % col;
+		std::vector<int>::const_iterator i = temp.begin();
+		for(; i != temp.end(); ++i)
+		{
+			if(num == *i)
+				break;
+		}
+		if(i == temp.end())
+		{
+			return num;
+		}
+	}
+}
+
 void update(const VECROWSET &partRows, const VECROWSET &corRows, COLUMNCOMBINE &dfaData, std::vector<std::vector<SKIPNODE> > &skipTable)
 {
 	const std::vector<std::vector<ushort> > &dfaMatrix = dfaData.sameColumnMatrix; 
 	std::vector<ROWTRANSFORM> &dfaRows = dfaData.rowTrans;
 	const int row = dfaMatrix.size();
 	const int col = dfaData.column;
-	
+
 	for(std::vector<ROWTRANSFORM>::iterator k = dfaRows.begin(); k != dfaRows.end(); ++k)
 	{
 		for(std::vector<ROWNODE>::iterator l = k->rowTransform.begin(); l != k->rowTransform.end(); ++l)
@@ -417,29 +438,34 @@ void update(const VECROWSET &partRows, const VECROWSET &corRows, COLUMNCOMBINE &
 			std::vector<SKIPNODE> skipRow;
 			for(size_t i = 0; i != partRows.size(); ++i)
 			{
-				if(corRows[i] != ROWSET())
+				if(corRows[i] != ROWSET() && partRows[i].size() != 1)
 				{
 					for(size_t j = 0; j != partRows[i].size(); ++j)
 					{
 						if(partRows[i][j] == static_cast<size_t>(l->newNum))
 						{
-							bool sign = false;
+							std::vector<int> temp;
 							for(size_t m = 0; m != col; ++m)
 							{
 								if(dfaMatrix[partRows[i][j]][m] != corRows[i][m])
 								{
-									sign = true;
 									SKIPNODE skip;
 									skip.jumpCharacter = static_cast<char>(m);
 									skip.nextNode = dfaMatrix[partRows[i][j]][m];
 									skipRow.push_back(skip);
+									temp.push_back(m);
 								}
 							}
-							if(sign == true)
+							for(int m = 0; m != threshold - temp.size(); ++m)
 							{
-								skipTable.push_back(skipRow);
-								l->skipNode = &skipTable.back();
+								int ranNum = RandNum(temp, col);
+								SKIPNODE skip;
+								skip.jumpCharacter = static_cast<char>(ranNum);
+								skip.nextNode = dfaMatrix[partRows[i][j]][ranNum];
+								skipRow.push_back(skip);
 							}
+							skipTable.push_back(skipRow);
+							l->skipNode = &skipTable.back();
 							l->newNum = i;
 							break;
 						}
@@ -479,47 +505,123 @@ void fileout(const VECROWSET &partRows, const VECROWSET &corRows, COLUMNCOMBINE 
 	fout << "compress rate : " << compressRate << '%' << std::endl;
 }
 
-void CoreCompress(std::vector<COLUMNCOMBINE> &allData)
+void skipout(std::vector<std::vector<SKIPNODE> > &skipTable)
 {
-	std::vector<std::vector<SKIPNODE> > skipTable;
-	size_t st = 0, cr = 0;
-	for(std::vector<COLUMNCOMBINE>::iterator i = allData.begin(); i != allData.end(); ++i)
+	std::fstream fout("skipTable.txt", std::ios::out | std::ios::binary);
+	fout << "skipTable : " << std::endl;
+	for(std::vector<std::vector<SKIPNODE> >::iterator i = skipTable.begin(); i != skipTable.end(); ++i)
 	{
-		std::vector<std::vector<ushort> > &dfaMatrix = i->sameColumnMatrix;
-		const ushort col = i->column;
-		const ushort weight = col - threshold;
-		GRAPH graph;
-		BuildGraph(dfaMatrix, graph);
-		ROWSET nodes;
-		for(int j = 0; j != dfaMatrix.size(); ++j)
-			nodes.push_back(j);
+		for(std::vector<SKIPNODE>::iterator j = i->begin(); j != i->end(); ++j)
+		{
+			fout << j->jumpCharacter << " " << j->nextNode << "\t";
+		}
+		fout << std::endl;
+	}
+}
+
+//void CoreCompress(std::vector<COLUMNCOMBINE> &allData)
+//{
+//	std::vector<std::vector<SKIPNODE> > skipTable;
+//	size_t st = 0, cr = 0;
+//	int count = 0;
+//	for(std::vector<COLUMNCOMBINE>::iterator i = allData.begin(); i != allData.end(); ++i)
+//	{
+//		std::vector<std::vector<ushort> > &dfaMatrix = i->sameColumnMatrix;
+//		const ushort col = i->column;
+//		const ushort weight = col - threshold;
+//		GRAPH graph;
+//		BuildGraph(dfaMatrix, graph);
+//		ROWSET nodes;
+//		for(int j = 0; j != dfaMatrix.size(); ++j)
+//			nodes.push_back(j);
+//		VECROWSET partRows;
+//		SearchConnectSubgraph(graph, nodes, weight, partRows);
+//		VECROWSET corMatrix;
+//		bool sign = true;
+//		for(VECROWSET::iterator j = partRows.begin(); j != partRows.end(); ++j)
+//		{
+//			ROWSET corRow;
+//			StatisticVitualCore(dfaMatrix, *j, corRow);
+//			bool mem = Estimate(dfaMatrix, *j, corRow);
+//			if(mem == true)
+//				corMatrix.push_back(corRow);
+//			else
+//			{
+//
+//			}
+//		}
+//		update(partRows, corMatrix, *i, skipTable);
+//		st += i->sameColumnMatrix.size();
+//		cr += corMatrix.size() * i->column;
+//	}
+//	skipout(skipTable);
+//	std::cout << "Different column numbers : " << allData.size() << std::endl;
+//	std::cout << "all kerinel matrix : " << static_cast<double>(cr) * 2.0 / pow(1024.0, 2) << "MB" << std::endl;
+//	std::cout << "all transition table : " << static_cast<double>(st) * 6.0 / pow(1024.0, 2) << "MB" << std::endl;
+//	std::cout << "!!!" << count << std::endl;
+//}
+
+void PartitionSameColumn(COLUMNCOMBINE &dfas, std::vector<std::vector<SKIPNODE> > &skipTable)
+{
+	std::vector<std::vector<size_t> > part;
+	part.push_back(std::vector<size_t>());
+	for(size_t i = 0; i != dfas.sameColumnMatrix.size(); ++i)
+	{
+		part.back().push_back(i);
+	}
+	std::vector<std::vector<ushort> > &dfaMatrix = dfas.sameColumnMatrix;
+	const ushort col = dfas.column;
+	GRAPH graph;
+	BuildGraph(dfaMatrix, graph);
+	VECROWSET corMatrix;
+	for(size_t i = 0; i != part.size();)
+	{
+		std::vector<size_t> &nodes = part[i];
 		VECROWSET partRows;
-		SearchConnectSubgraph(graph, nodes, weight, partRows);
-		VECROWSET corMatrix;
-		bool sign = true;
+		for(int weight = col - threshold; weight != col; ++weight)
+		{
+			partRows.clear();
+			corMatrix.clear();
+			SearchConnectSubgraph(graph, nodes, weight, partRows);
+			if(partRows.size() == 1)
+			{
+				ROWSET corRow;
+				StatisticVitualCore(dfaMatrix, partRows[0], corRow);
+				if(Estimate(dfaMatrix, partRows[0], corRow))
+				{
+					break;
+				}
+			}
+			else
+			{
+				break;
+			}
+		}
 		for(VECROWSET::iterator j = partRows.begin(); j != partRows.end(); ++j)
 		{
 			ROWSET corRow;
 			StatisticVitualCore(dfaMatrix, *j, corRow);
 			bool mem = Estimate(dfaMatrix, *j, corRow);
 			if(mem == true)
-				corMatrix.push_back(corRow);
+			{
+				corMatrix.insert(corMatrix.begin() + i, corRow);
+				part.insert(part.begin() + i, *j);
+				++i;
+			}
 			else
 			{
-				corMatrix.push_back(ROWSET());
+				part.push_back(*j);
 			}
 		}
-		update(partRows, corMatrix, *i, skipTable);
-
-		st += i->sameColumnMatrix.size();
-		cr += corMatrix.size() * i->column;
+		part.erase(part.begin() + i);
 	}
+	update(part, corMatrix, dfas, skipTable);
+}
 
-	std::cout << "Different column numbers: " << allData.size() << std::endl;
-	double x = static_cast<double>(cr) * 2.0 / pow(1024.0, 2);
-	double y = static_cast<double>(st) * 6.0 / pow(1024.0, 2);
-	std::cout << "All kerinel matrix: " << x << "MBytes" << std::endl;
-	std::cout << "All transition table: " << y << "MBytes" << std::endl;
-	std::cout << "Total: " << x + y << "MBytes = " << (x + y) * 8 << "MBits" << std::endl;
-
+void PartitionGraph(std::vector<COLUMNCOMBINE> &allData, std::vector<std::vector<SKIPNODE> > &skipTable)
+{
+	for(std::vector<COLUMNCOMBINE>::iterator i = allData.begin(); i != allData.end(); ++i)
+	{
+		PartitionSameColumn(*i, skipTable);
+	}
 }

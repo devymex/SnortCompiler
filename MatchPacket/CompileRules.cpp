@@ -39,7 +39,7 @@ MATCHPKT void MchCompile(const char* filename, LPVOID lpVoid)
 	//int sids[4653];
 	//std::memset(sids, 0, sizeof(sids));
 	std::vector<SIGNATURE> sigvec;
-	ParseRuleFile(filename, MyProcess, lpVoid);
+	//ParseRuleFile(filename, MyProcess, lpVoid);
 	REGRULESMAP &rulesmap = *(REGRULESMAP*)lpVoid;
 	std::vector<REGRULES>::iterator mapbegin = rulesmap.result.begin();
 	for (std::vector<REGRULES>::iterator iter = mapbegin; iter != rulesmap.result.end(); ++iter)

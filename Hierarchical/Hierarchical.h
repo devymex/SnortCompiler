@@ -34,6 +34,7 @@ struct ROWSORT
 		return (*p1.m_t)[p1.n] < (*p2.m_t)[p2.n];
 	}
 };
+
 typedef struct
 {
 	char jumpCharacter;
@@ -103,3 +104,5 @@ int TwoColDfaCombine(COLUMNCOMBINE &inColCom, COLUMNCOMBINE &outColCom);
 void DiffColDfaCombine(COLCOMBINEARRAY &colCombineArray, ushort minCol, ushort maxCol, COLUMNCOMBINE &outCombineArray);
 
 void CoreCompress(std::vector<COLUMNCOMBINE> &allData);
+
+void PartitionGraph(std::vector<COLUMNCOMBINE> &allData, std::vector<std::vector<SKIPNODE> > &skipTable);
