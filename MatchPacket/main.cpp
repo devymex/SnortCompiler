@@ -45,7 +45,9 @@ void main(int nArgc, char **pArgs)
 	std::cout << "Total packets: " << g_ulAllDp << std::endl;
 	std::cout << "Hit packets: " << g_ulHashed << std::endl;
 
-	std::cout << "Hit rate of special transition: " << (double)(hitedStState / hitedDfaState) << std::endl;
+	std::cout << "hitedStState: " << hitedStState << std::endl;
+	std::cout << "hitedDfaState: " << hitedDfaState << std::endl;
+	std::cout << "Hit rate of special transition hitedStState / hitedDfaState: " << (double)(hitedStState / hitedDfaState) << std::endl;
 
 	system("pause");
 }

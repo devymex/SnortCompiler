@@ -53,10 +53,10 @@ void EraseSig(CUnsignedArray &ChainSigs, const std::vector<SIGNATURE> &vecNeedEr
 void main(int nArgs, char **pArgs)
 {
 	// ±‡“Î…˙≥…result.cdt
-	std::string resultPath = "D:\\Cplusplus\\Snort\\theResult\\resultCdt\\";
+	std::string resultPath = pArgs[1];
 
 	// Defina a path object to express a directory
-	std::tr2::sys::path rulePath("D:\\Cplusplus\\Snort\\theResult\\rules\\");
+	std::tr2::sys::path rulePath( pArgs[2]);
 	// Construct a directory iterator for visit this path.
 	std::tr2::sys::directory_iterator iDirCur(rulePath);
 	//the end iterator for this path.
@@ -96,7 +96,9 @@ void main(int nArgs, char **pArgs)
 	ulong nSize = Tabl_3.Size();
 
 	std::vector<SIGNATURE> vecNeedEraseSigs;
-	std::ifstream ifile("D:\\Cplusplus\\Snort\\theResult\\Statistics.txt");
+	std::string pathSatic = pArgs[3];
+	pathSatic += "Statistics.txt";
+	std::ifstream ifile(pathSatic);
 	ulong curSig;
 	std::string str;
 	std::ofstream ofile("1.txt");
