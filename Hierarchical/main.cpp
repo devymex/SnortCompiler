@@ -10,7 +10,7 @@ void main(int nArgs, char **cArgs)
 	SameColDfaCombine(CDfaSet, colCombineArray);
 	CoreCompress(colCombineArray, skipTable);
 	WriteSkipTable(colCombineArray, skipTable, cArgs[2]);
-	std::vector<std::vector<std::vector<char> > > skipTableR;
-	ReadSkipTable(cArgs[2], skipTableR);
+	//std::vector<std::vector<std::vector<char> > > skipTableR;
+	//ReadSkipTable(cArgs[2], skipTableR);
 	system("pause");
 }

@@ -47,7 +47,7 @@ void ReadSkipTable(const char *str, std::vector<std::vector<ST> > &skipTable)
 			//	skipNode.push_back(static_cast<ushort>(temp));
 			//}
 
-			skipTable[i].push_back(st);
+			skipTable[dfaId].push_back(st);
 		}
 	}
 }
