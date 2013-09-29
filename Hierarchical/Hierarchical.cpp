@@ -1,23 +1,22 @@
 #include "Hierarchical.h"
 
-size_t maxVal = 0;
-ushort threshold = 2;
+size_t threshold = 2;
 
-void BuildGraph(const std::vector<std::vector<ushort> > &dfaMatrix, GRAPH &graph)
+void BuildGraph(MATRIX &dfaMatrix, std::vector<ushort> &graph)
 {
-	int row = dfaMatrix.size();
-	int col = dfaMatrix[0].size();
-	const int weight = col - threshold;
+	const size_t row = dfaMatrix.size();
+	const size_t col = dfaMatrix[0].size();
+	const ushort weight = static_cast<ushort>(col - threshold);
 
 	graph.resize(row * row);
 	std::fill(graph.begin(), graph.end(), 0);
 
-	for (int i = 0; i < row; ++i)
+	for (size_t i = 0; i < row; ++i)
 	{
-		for (int j = i + 1; j < row; ++j)
+		for (size_t j = i + 1; j < row; ++j)
 		{
-			int nEqualCnt = 0;
-			for (int k = 0; k < col; ++k)
+			ushort nEqualCnt = 0;
+			for (size_t k = 0; k < col; ++k)
 			{
 				if ((dfaMatrix[i][k] == dfaMatrix[j][k]))
 				{
@@ -32,68 +31,62 @@ void BuildGraph(const std::vector<std::vector<ushort> > &dfaMatrix, GRAPH &graph
 	}
 }
 
-int DFS_Visit(const GRAPH &graph, size_t vex, size_t limit, ROWSET &nodes, ROWSET &flag, ROWSET &curRow)
+int DFS_Visit(const std::vector<ushort> &graph, size_t vex, ushort weight, ROWSET &curRow, CORESPOND &visit,  size_t &rowCount, size_t &colCount)
 {
-	if (flag[vex] == 0)
+	const size_t row = static_cast<size_t>(sqrt(graph.size()));
+	if (visit[vex].rowNum == UINT_MAX && visit[vex].colNum == UINT_MAX)
 	{
-		flag[vex] = 1;
+		visit[vex].rowNum = rowCount;
+		visit[vex].colNum = colCount;
+		++colCount;
 		curRow.push_back(vex);
 	}
 	else
 	{
 		return 0;
 	}
-
-	size_t nVexCnt = sqrt(graph.size());
-	if (nVexCnt * nVexCnt != graph.size())
+	for (size_t i = 0; i != row; ++i)
 	{
-		throw 0;
-	}
-
-	for (size_t i = 0; i < nodes.size(); ++i)
-	{
-		if (graph[vex * nVexCnt + nodes[i]] >= limit &&
-			flag[nodes[i]] == 0)
+		if (graph[vex * row + i] >= weight && visit[i].rowNum == UINT_MAX && visit[i].colNum == UINT_MAX)
 		{
-			DFS_Visit(graph, nodes[i], limit, nodes, flag, curRow);
+			DFS_Visit(graph, i, weight, curRow, visit, rowCount, colCount);
 		}
 	}
-
 	return 1;
 }
 
-void SearchConnectSubgraph(const GRAPH &graph, ROWSET &nodes, size_t limit, VECROWSET &partRows)
+void SearchConnectSubgraph(const std::vector<ushort> &graph, ushort weight, VECROWSET &partRows, CORESPOND &visit)
 {
-	size_t nVexCnt = sqrt(graph.size());
-	if (nVexCnt * nVexCnt != graph.size())
-	{
-		throw 0;
-	}
+	const size_t row = static_cast<size_t>(sqrt(graph.size()));
+	visit.resize(row);
+	STATENODE temp;
+	temp.rowNum = UINT_MAX;
+	temp.colNum = UINT_MAX;
+	std::fill(visit.begin(), visit.end(), temp);
 
-	ROWSET visit;
-	visit.resize(nVexCnt);
-	std::fill(visit.begin(), visit.end(), 0);
-
-	for (size_t i = 0; i < nodes.size(); ++i)
+	size_t rowCount = static_cast<size_t>(-1);
+	for (size_t i = 0; i < row; ++i)
 	{
-		if (visit[nodes[i]] == 0)
+		if (visit[i].rowNum == UINT_MAX && visit[i].colNum == UINT_MAX)
 		{
+			++rowCount;
+			size_t colCount = 0;
 			partRows.push_back(ROWSET());
-			DFS_Visit(graph, nodes[i], limit, nodes, visit, partRows.back());
+			DFS_Visit(graph, i, weight, partRows.back(), visit, rowCount, colCount);
 		}
 	}
 }
 
-void StatisticVitualCore(const std::vector<std::vector<ushort> > &dfaMatrix, const ROWSET &partRow, ROWSET &corRow)
+void StatisticVitualCore(const MATRIX &dfaMatrix, const ROWSET &partRow, ROW &corRow)
 {
-	int row = partRow.size();
-	int col = dfaMatrix[0].size();
+	const size_t row = partRow.size();
+	const size_t col = dfaMatrix[0].size();
 
-	for (int i = 0; i < col; ++i)
+	for (size_t i = 0; i < col; ++i)
 	{
 		std::map<ushort, int> bary;
 
-		for (int j = 0; j< row; ++j)
+		for (size_t j = 0; j< row; ++j)
 		{
 			++bary[dfaMatrix[partRow[j]][i]];
 		}
@@ -112,79 +105,6 @@ void StatisticVitualCore(const std::vector<std::vector<ushort> > &dfaMatrix, con
 	}
 }
 
-bool equal(CDfaRow &row, std::vector<ushort> vec)
-{
-	if(row.Size() != vec.size())
-	{
-		return false;
-	}
-	else
-	{
-		for(size_t i = 0; i < vec.size(); ++i)
-		{
-			if(row[i] != vec[i])
-				return false;
-		}
-	}
-	return true;
-}
-
-//void AnotherReplaceRowMatchValue(COLUMNCOMBINE &inColCom, std::vector<ROWTRANSFORM> &row, ushort old, ushort now)
-//{
-//	for(size_t i = 0; i < inColCom.rowTrans.size(); ++i)
-//	{
-//		ROWTRANSFORM &cur =  inColCom.rowTrans[i];
-//		size_t temp = cur.rowTransform.size();
-//		ushort *p = cur.rowTransform.data();
-//		for(size_t j = 0; j < temp; ++j)
-//		{
-//			if(p[j] == old)
-//			{
-//				p[j] = now;
-//			}
-//		}
-//	}
-//}
-//
-//void RemoveTheSame(COLCOMBINEARRAY &colCombineArray)
-//{
-//	std::vector<SORTASSITANT> nVec;
-//	SORTASSITANT p;
-//	std::vector<std::vector<ushort> > diff;
-//	std::vector<ROWTRANSFORM> row;
-//	for(size_t i = 0; i < colCombineArray.size(); ++i)
-//	{
-//		nVec.clear();
-//		diff.clear();
-//		row = colCombineArray[i].rowTrans;
-//		for(size_t j = 0; j < colCombineArray[i].sameColumnMatrix.size(); ++j)
-//		{
-//			p.n = j;
-//			p.m_t = &colCombineArray[i].sameColumnMatrix;
-//			nVec.push_back(p);
-//		}
-//		std::sort(nVec.begin(), nVec.end(), ROWSORT());
-//		ushort now = 0;
-//		AnotherReplaceRowMatchValue(colCombineArray[i], row, nVec[0].n, now);
-//		diff.push_back(colCombineArray[i].sameColumnMatrix[nVec[0].n]);
-//		for(size_t j = 1; j < nVec.size(); )
-//		{
-//			if(colCombineArray[i].sameColumnMatrix[nVec[j - 1].n] != colCombineArray[i].sameColumnMatrix[nVec[j].n])
-//			{
-//				now = diff.size();
-//				diff.push_back(colCombineArray[i].sameColumnMatrix[nVec[j].n]);
-//			}
-//
-//			AnotherReplaceRowMatchValue(colCombineArray[i], row, nVec[j].n, now);
-//			++j;
-//		}
-//		colCombineArray[i].rowTrans = row;
-//		colCombineArray[i].sameColumnMatrix = diff;
-//	}
-//}
-
-
-
 void SameColDfaCombine(CDfaArray &CDfaSet, COLCOMBINEARRAY &colCombineArray)
 {
 	ushort column, colLocation;
@@ -194,6 +114,7 @@ void SameColDfaCombine(CDfaArray &CDfaSet, COLCOMBINEARRAY &colCombineArray)
 	std::set<ushort> allCol;
 	std::set<ushort>::iterator col_it, col;
 	COLUMNCOMBINE sameColInform;
+
 	for (size_t i = 0; i < CDfaSet.Size(); ++i)
 	{
 		allCol.insert(CDfaSet[i].GetGroupCount());
@@ -215,7 +136,7 @@ void SameColDfaCombine(CDfaArray &CDfaSet, COLCOMBINEARRAY &colCombineArray)
 		col_it = allCol.find(column);
 
 		colLocation = 0;
-		for(col = allCol.begin(); col != col_it; col++, colLocation++) ;
+		for(col = allCol.begin(); col != col_it; ++col, ++colLocation) ;
 
 		origin[colLocation] += CDfaSet[i].Size();
 
@@ -231,138 +152,21 @@ void SameColDfaCombine(CDfaArray &CDfaSet, COLCOMBINEARRAY &colCombineArray)
 				v.push_back(CDfaSet[i][j][t]);
 			}
 			rowMatch.rowTransform.push_back(k);
-			k++;
+			++k;
 			colCombineArray[colLocation].sameColumnMatrix.push_back(v);
 		}
 		colCombineArray[colLocation].rowTrans.push_back(rowMatch);
 	}
-	size_t ts = 0, cs = 0;
-	for(std::vector<COLUMNCOMBINE>::iterator i = colCombineArray.begin(); i != colCombineArray.end(); ++i)
-	{
-		ts += i->sameColumnMatrix.size();
-		cs += ts * i->column;
-	}
-	//std::cout << "total states : " << ts << std::endl;
-	//std::cout << "before compress : " << static_cast<double>(cs) * 2.0 / pow(1024.0, 2) << "MB" << std::endl;
-	//RemoveTheSame(colCombineArray);
 }
 
-//void ReplaceRowMatchValue(COLUMNCOMBINE &inColCom, ushort old, ushort now)
-//{
-//	for(size_t i = 0; i < inColCom.rowTrans.size(); ++i)
-//	{
-//		for(size_t j = 0; j < inColCom.rowTrans[i].rowTransform.size(); ++j)
-//		{
-//			if(inColCom.rowTrans[i].rowTransform[j] == old)
-//			{
-//				inColCom.rowTrans[i].rowTransform[j] = now;
-//			}
-//		}
-//	}
-//}
-//
-//int TwoColDfaCombine(COLUMNCOMBINE &inColCom, COLUMNCOMBINE &outColCom) /*, CDfa &inDfa, std::map<ushort, Attribute>::iterator it, CDfa &outDfa)*/
-//{
-//	int minus = 0;
-//	size_t i, j, k;
-//	bool b = true;
-//	int difference = 0, diffLocation, mindiff;
-//	std::vector<ROWTRANSFORM> originRow;
-//	if(outColCom.sameColumnMatrix.size() == 0)
-//	{
-//		outColCom = inColCom;
-//	}
-//	else
-//	{
-//		originRow = inColCom.rowTrans;
-//		for(i = 0; i < inColCom.sameColumnMatrix.size(); ++i)
-//		{
-//			mindiff = inColCom.sameColumnMatrix[i].size();
-//			diffLocation = 0;
-//			for(j = 0; j < outColCom.sameColumnMatrix.size(); ++j)
-//			{
-//				b = true;
-//				difference = 0;
-//				for(k = 0; k < inColCom.sameColumnMatrix[i].size(); ++k)
-//				{
-//					if(inColCom.sameColumnMatrix[i][k] != outColCom.sameColumnMatrix[j][k])
-//					{
-//						difference++;
-//						b = false;
-//						//break;
-//					}
-//				}
-//				if(difference < mindiff)
-//				{
-//					diffLocation = j;
-//				}
-//				if(b == true)
-//				{
-//					break;
-//				}
-//			}
-//			if(b == true)
-//			{
-//				AnotherReplaceRowMatchValue(inColCom, originRow, i, j);
-//				minus++;
-//			}
-//			else
-//			{
-//				std::vector<ushort> row = inColCom.sameColumnMatrix[i];
-//				if(inColCom.column < outColCom.column)
-//				{
-//					for(k = inColCom.column; k < outColCom.column; ++k)
-//					{
-//						row.push_back(outColCom.sameColumnMatrix[diffLocation][k]);
-//					}
-//				}
-//				outColCom.sameColumnMatrix.push_back(row);
-//				AnotherReplaceRowMatchValue(inColCom, originRow, i, outColCom.sameColumnMatrix.size() - 1);
-//			}
-//		}
-//		inColCom.rowTrans = originRow;
-//	}
-//	return minus;
-//}
-//
-//void DiffColDfaCombine(COLCOMBINEARRAY &colCombineArray, ushort minCol, ushort maxCol, COLUMNCOMBINE &outCombineArray)/*, CDfaArray &SameColDfa, const size_t l, const size_t h, std::map<ushort, Attribute>::iterator upper, CDfa &outComDfa)*/
-//{
-//	std::fstream fcom("combine result.txt", std::ios::app | std::ios::out);
-//	int origin, now, minus;
-//	origin = now = minus = 0;
-//
-//	size_t l = 0, h = 0;
-//	COLCOMBINEARRAY_ITERATOR colCombineArray_it;
-//
-//	for(colCombineArray_it = colCombineArray.begin(); colCombineArray_it->column != maxCol; ++colCombineArray_it)
-//	{
-//		++h;
-//	}
-//
-//	for(colCombineArray_it = colCombineArray.begin(); colCombineArray_it->column != minCol; ++colCombineArray_it)
-//	{
-//		++l;
-//	}
-//
-//	for(size_t i = h; i >= l; --i)
-//	{
-//		origin += colCombineArray[i].sameColumnMatrix.size();
-//		minus += TwoColDfaCombine(colCombineArray[i], outCombineArray);
-//	}
-//	now = outCombineArray.sameColumnMatrix.size();
-//	fcom.width(7);
-//	fcom << maxCol << "  " << minCol << "\t" << origin << "\t" <<  minus << "\t" <<  now << std::endl;
-//	fcom.close();
-//}
-
-bool Estimate(const std::vector<std::vector<ushort> > &dfaMatrix, const ROWSET &partRow, ROWSET &corRow)
+bool Estimate(const MATRIX &dfaMatrix, const ROWSET &partRow, ROW &corRow)
 {
-	const int row = partRow.size();
-	const int col = dfaMatrix[0].size();
-	for(int i = 0; i != row; ++i)
+	const size_t row = partRow.size();
+	const size_t col = dfaMatrix[0].size();
+	for(size_t i = 0; i != row; ++i)
 	{	
-		int count = 0;
-		for(int j = 0; j != col; ++j)
+		size_t count = 0;
+		for(size_t j = 0; j != col; ++j)
 		{
 			if(dfaMatrix[partRow[i]][j] != corRow[j])
 				++count;
@@ -373,13 +177,13 @@ bool Estimate(const std::vector<std::vector<ushort> > &dfaMatrix, const ROWSET &
 	return true;
 }
 
-int RandNum(const std::vector<int> &temp, int col)
+size_t RandNum(const ROWSET &temp, size_t col)
 {
-	int num;
+	size_t num;
 	while(true)
 	{
 		num = rand() % col;
-		std::vector<int>::const_iterator i = temp.begin();
+		std::vector<size_t>::const_iterator i = temp.begin();
 		for(; i != temp.end(); ++i)
 		{
 			if(num == *i)
@@ -392,7 +196,7 @@ int RandNum(const std::vector<int> &temp, int col)
 	}
 }
 
-void update(const VECROWSET &partRows, const VECROWSET &corRows, COLUMNCOMBINE &dfaData, std::vector<std::vector<SKIPNODE> > &skipTable)
+void Update(const VECROWSET &partRows, const MATRIX &corMatrix, COLUMNCOMBINE &dfaData, std::vector<std::vector<SKIPNODE> > &skipTable, CORESPOND &visit)
 {
 	const std::vector<std::vector<ushort> > &dfaMatrix = dfaData.sameColumnMatrix; 
 	std::vector<ROWTRANSFORM> &dfaRows = dfaData.rowTrans;
@@ -411,199 +215,144 @@ void update(const VECROWSET &partRows, const VECROWSET &corRows, COLUMNCOMBINE &
 
 	for(std::vector<ROWTRANSFORM>::iterator k = dfaRows.begin(); k != dfaRows.end(); ++k)
 	{
-		for(std::vector<ushort>::iterator l = k->rowTransform.begin(); l != k->rowTransform.end(); ++l)
+		for(ROW::iterator l = k->rowTransform.begin(); l != k->rowTransform.end(); ++l)
 		{
-			bool sign = false;
-			for(size_t i = 0; i != partRows.size(); ++i)
+			size_t r = visit[*l].rowNum, c = visit[*l].colNum;
+			std::vector<SKIPNODE> &skipRow = skipTable[beg + partRows[r][c]];
+			ROWSET temp;
+			for(size_t m = 0; m != col; ++m)
 			{
-				for(size_t j = 0; j != partRows[i].size(); ++j)
+				if(dfaMatrix[partRows[r][c]][m] != corMatrix[r][m])
 				{
-					if(partRows[i][j] == static_cast<size_t>(*l))
-					{
-						std::vector<SKIPNODE> &skipRow = skipTable[beg + partRows[i][j]];
-						sign = true;
-						std::vector<int> temp;
-						for(size_t m = 0; m != col; ++m)
-						{
-							if(dfaMatrix[partRows[i][j]][m] != corRows[i][m])
-							{
-								SKIPNODE skip;
-								skip.jumpCharacter = static_cast<char>(m);
-								skip.nextNode = dfaMatrix[partRows[i][j]][m];
-								skipRow.push_back(skip);
-								temp.push_back(m);
-							}
-						}
-						int p = threshold - temp.size();
-						for(int m = 0; m != p; ++m)
-						{
-							int ranNum = RandNum(temp, col);
-							SKIPNODE skip;
-							skip.jumpCharacter = static_cast<char>(ranNum);
-							skip.nextNode = dfaMatrix[partRows[i][j]][ranNum];
-							skipRow.push_back(skip);
-							temp.push_back(ranNum);
-						}
-						*l = i;
-						break;
-					}
-				}
-				if(sign)
-				{
-					break;
+					SKIPNODE skip;
+					skip.jumpCharacter = static_cast<char>(m);
+					skip.nextNode = dfaMatrix[partRows[r][c]][m];
+					skipRow.push_back(skip);
+					temp.push_back(m);
 				}
 			}
+			size_t p = threshold - temp.size();
+			for(size_t m = 0; m != p; ++m)
+			{
+				size_t ranNum = RandNum(temp, col);
+				SKIPNODE skip;
+				skip.jumpCharacter = static_cast<char>(ranNum);
+				skip.nextNode = dfaMatrix[partRows[r][c]][ranNum];
+				skipRow.push_back(skip);
+				temp.push_back(ranNum);
+			}
+			*l = r;
 		}
 	}
 }
 
-//void fileout(const VECROWSET &partRows, const VECROWSET &corRows, COLUMNCOMBINE &dfaData, std::vector<std::vector<SKIPNODE> > &skipTable, size_t &mergeSR, size_t &unmergeSR, size_t &corMR)
-//{
-//	std::fstream fout("final.txt", std::ios::app | std::ios::out);
-//	size_t stateNum = dfaData.sameColumnMatrix.size();
-//	fout <<"col : " << dfaData.column << std::endl;
-//	fout <<"corMatrix : " << corRows.size() << std::endl;
-//	corMR += corRows.size() * dfaData.column;
-//	size_t merge = 0, unmerge = 0;
-//	for(size_t i = 0; i != corRows.size(); ++i)
-//	{
-//		if(corRows[i] == ROWSET())
-//		{
-//			unmerge += partRows[i].size();
-//			unmergeSR += partRows[i].size();
-//		}
-//		else
-//		{
-//			merge += partRows[i].size();
-//			mergeSR += partRows[i].size();
-//		}
-//	}
-//	double compressRate = static_cast<double>(merge) / static_cast<double>(stateNum) * 100.0;
-//	fout << "sum of state : " << stateNum << std::endl;
-//	fout << "merge state : " << merge << std::endl;
-//	fout << "unmerge state : " << unmerge << std::endl;
-//	fout << "compress rate : " << compressRate << '%' << std::endl;
-//  fout.close();
-//}
-//
-//void skipout(std::vector<std::vector<SKIPNODE> > &skipTable)
-//{
-//	std::fstream fout("skipTable.txt", std::ios::out | std::ios::binary);
-//	fout << "skipTable : " << "\r" << std::endl;
-//	for(std::vector<std::vector<SKIPNODE> >::iterator i = skipTable.begin(); i != skipTable.end(); ++i)
-//	{
-//		for(std::vector<SKIPNODE>::iterator j = i->begin(); j != i->end(); ++j)
-//		{
-//			fout << static_cast<int>(j->jumpCharacter) << "\t" << j->nextNode << "\t";
-//		}
-//		fout << "\r" << std::endl;
-//	}
-// fout.close();
-//}
+void Exception(const MATRIX &dfaMatrix, VECROWSET &partRows, MATRIX &corMatrix, CORESPOND &visit, VECROWSET::iterator &iter, size_t &rowNumber)
+{
+	const size_t col = dfaMatrix[0].size();
+	const size_t n = iter->size();
+	ROWSET temp;
+	temp.assign(iter->begin(), iter->end());
+	for(ROWSET::reverse_iterator i = temp.rbegin(); i != temp.rend(); ++i)
+	{
+		ROWSET member;
+		member.push_back(*i);
+		iter = partRows.insert(iter, member);
+	}
+	size_t number = 0;
+	for(ROWSET::iterator i = temp.begin(); i != temp.end(); ++i)
+	{
+		ROW corRow;
+		for(size_t j = 0; j != col; ++j)
+		{
+			corRow.push_back(dfaMatrix[*i][j]);
+		}
+		corMatrix.push_back(corRow);
+		visit[temp[number]].rowNum = rowNumber + number;
+		visit[temp[number]].colNum = 0;
+		++number;
+	}
+	rowNumber += number;
+	iter = partRows.erase(iter + n);
+	for(VECROWSET::iterator i = iter; i != partRows.end(); ++i)
+	{
+		for(ROWSET::iterator j = i->begin(); j != i->end(); ++j)
+		{
+			visit[*j].rowNum += number - 1;
+		}
+	}
+}
 
 void CoreCompress(std::vector<COLUMNCOMBINE> &allData, std::vector<std::vector<SKIPNODE> > &skipTable)
 {
-	size_t st = 0, cr = 0;
-	int count = 0;
 	for(std::vector<COLUMNCOMBINE>::iterator i = allData.begin(); i != allData.end(); ++i)
 	{
 		std::vector<std::vector<ushort> > &dfaMatrix = i->sameColumnMatrix;
 		const ushort col = i->column;
 		const ushort weight = col - threshold;
-		GRAPH graph;
+		std::vector<ushort> graph;
 		BuildGraph(dfaMatrix, graph);
 		ROWSET nodes;
-		for(int j = 0; j != dfaMatrix.size(); ++j)
-			nodes.push_back(j);
 		VECROWSET partRows;
-		SearchConnectSubgraph(graph, nodes, weight, partRows);
-		VECROWSET corMatrix;
-		for(VECROWSET::iterator j = partRows.begin(); j != partRows.end();)
+		CORESPOND visit;
+		SearchConnectSubgraph(graph, weight, partRows, visit);
+		MATRIX corMatrix;
+		VECROWSET::iterator j = partRows.begin();
+		size_t rowNumber = 0;
+		while(j != partRows.end())
 		{
-			ROWSET corRow;
+			ROW corRow;
 			StatisticVitualCore(dfaMatrix, *j, corRow);
 			if(Estimate(dfaMatrix, *j, corRow))
 			{
 				corMatrix.push_back(corRow);
 				++j;
+				++rowNumber;
 			}
 			else
 			{
-				VECROWSET::iterator iter = j;
-				size_t n = j->size();
-				ROWSET temp;
-				temp.assign(j->rbegin(), j->rend());
-				for(ROWSET::iterator m = temp.begin(); m != temp.end(); ++m)
-				{
-					ROWSET member;
-					member.push_back(*m);
-					iter = partRows.insert(iter, member);
-				}
-				for(ROWSET::reverse_iterator m = temp.rbegin(); m != temp.rend(); ++m)
-				{
-					ROWSET corNode;
-					for(size_t l = 0; l != col; ++l)
-					{
-						corNode.push_back(static_cast<size_t>(dfaMatrix[*m][l]));
-					}
-					corMatrix.push_back(corNode);
-				}
-				 j = partRows.erase(iter + n);
+				Exception(dfaMatrix, partRows, corMatrix, visit, j, rowNumber);
 			}
 		}
-		update(partRows, corMatrix, *i, skipTable);
-		//st += i->sameColumnMatrix.size();
-		//cr += corMatrix.size() * i->column;
+		Update(partRows, corMatrix, *i, skipTable, visit);
 	}
-	//skipout(skipTable);
-	//std::cout << "Different column numbers : " << allData.size() << std::endl;
-	//std::cout << "all kerinel matrix : " << static_cast<double>(cr) * 2.0 / pow(1024.0, 2) << "MB" << std::endl;
-	//std::cout << "all transition table : " << static_cast<double>(st) * 6.0 / pow(1024.0, 2) << "MB" << std::endl;
-	//std::cout << "!!!" << count << std::endl;
 }
 
-void WriteSkipTable(std::vector<COLUMNCOMBINE> &allData,const std::vector<std::vector<SKIPNODE> > &skipTable, const std::string &str)
+void WriteSkipTable(std::vector<COLUMNCOMBINE> &allData,const std::vector<std::vector<SKIPNODE> > &skipTable, const char *str)
 {
-	std::fstream fileout(str.c_str(), std::ios::out | std::ios::binary);
+	std::fstream fileout(str, std::ios::out | std::ios::binary);
 	ushort number = 0;
 	for(std::vector<COLUMNCOMBINE>::iterator i = allData.begin(); i != allData.end(); ++i)
 	{
 		number += i->rowTrans.size();
 	}
 	fileout.write(reinterpret_cast<char *>(&number), sizeof(ushort));
-	for(ushort i = 0; i != number; ++i)
+	for(std::vector<COLUMNCOMBINE>::iterator j = allData.begin(); j != allData.end(); ++j)
 	{
-		for(std::vector<COLUMNCOMBINE>::iterator j = allData.begin(); j != allData.end(); ++j)
+		for(std::vector<ROWTRANSFORM>::iterator k = j->rowTrans.begin(); k != j->rowTrans.end(); ++k)
 		{
-			for(std::vector<ROWTRANSFORM>::iterator k = j->rowTrans.begin(); k != j->rowTrans.end(); ++k)
+			fileout.write(reinterpret_cast<char *>(&(k->dfaId)), sizeof(ushort));
+			ushort dfaSize = k->rowTransform.size();
+			fileout.write(reinterpret_cast<char *>(&dfaSize), sizeof(ushort));
+			for(ulong m = k->skipTableNum; m != k->skipTableNum + dfaSize; ++m)
 			{
-				if(k->dfaId == i)
+				for(ushort l = 0; l != threshold; ++l)
 				{
-					fileout.write(reinterpret_cast<char *>(&i), sizeof(ushort));
-					ushort dfaSize = k->rowTransform.size();
-					fileout.write(reinterpret_cast<char *>(&dfaSize), sizeof(ushort));
-					for(ushort m = k->skipTableNum; m != k->skipTableNum + k->rowTransform.size(); ++m)
-					{
-						for(ushort l = 0; l != threshold; ++l)
-						{
-							char temp = skipTable[m][l].jumpCharacter;
-							fileout.write(reinterpret_cast<char *>(&temp), sizeof(char));
-						}
-					}
+					char temp = skipTable[m][l].jumpCharacter;
+					fileout.write(reinterpret_cast<char *>(&temp), sizeof(char));
 				}
 			}
 		}
 	}	
 }
 
-void ReadSkipTable(const std::string &str, std::vector<std::vector<std::vector<ushort> > > &skipTable)
+void ReadSkipTable(const char *str, std::vector<std::vector<std::vector<char> > > &skipTable)
 {
-	std::fstream filein(str.c_str(), std::ios::in | std::ios::binary);
+	std::fstream filein(str, std::ios::in | std::ios::binary);
 	ushort number;
 	filein.read(reinterpret_cast<char *>(&number), sizeof(ushort));
 	for(ushort i = 0; i != number; ++i)
 	{
-		skipTable.push_back(std::vector<std::vector<ushort> >());
+		skipTable.push_back(std::vector<std::vector<char> >());
 	}
 	for(ushort i = 0; i != number; ++i)
 	{
@@ -612,14 +361,14 @@ void ReadSkipTable(const std::string &str, std::vector<std::vector<std::vector<u
 		filein.read(reinterpret_cast<char *>(&stateNum), sizeof(ushort));
 		for(ushort j = 0; j != stateNum; ++j)
 		{
-			std::vector<ushort> skipNode;
+			std::vector<char> skipNode;
 			for(ushort k = 0; k != threshold; ++k)
 			{
 				char temp;
 				filein.read(reinterpret_cast<char *>(&temp), sizeof(char));
-				skipNode.push_back(static_cast<ushort>(temp));
+				skipNode.push_back(temp);
 			}
-			skipTable[i].push_back(skipNode);
+			skipTable[dfaId].push_back(skipNode);
 		}
 	}
 }
