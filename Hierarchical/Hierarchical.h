@@ -9,31 +9,24 @@
 #include <map>
 #include <fstream>
 #include <unordered_map>
+#include <limits>
 
 #include <set>
 
 typedef std::vector<size_t> ROWSET;
-typedef std::vector<size_t> GRAPH;
 typedef std::vector<ROWSET> VECROWSET;
 typedef VECROWSET::iterator NODEARRAY_ITER;
 typedef unsigned char byte;
 typedef unsigned int uint;
+typedef unsigned long ulong;
+typedef std::vector<ushort> ROW;
+typedef std::vector<ROW> MATRIX;
 
 typedef struct
 {
-	std::vector<std::vector<ushort> > *m_t;
-	int n;
-} SORTASSITANT;
-
-struct ROWSORT
-{
-	
-	ROWSORT() { }
-	bool operator()(SORTASSITANT p1, SORTASSITANT p2)
-	{
-		return (*p1.m_t)[p1.n] < (*p2.m_t)[p2.n];
-	}
-};
+	size_t rowNum;
+	size_t colNum;
+}STATENODE;
 
 typedef struct
 {
@@ -44,7 +37,7 @@ typedef struct
 typedef struct
 {
 	ushort dfaId;
-	ushort skipTableNum;
+	ulong skipTableNum;
 	std::vector<ushort> rowTransform;
 } ROWTRANSFORM;
 
@@ -57,56 +50,12 @@ typedef struct
 
 typedef std::vector<COLUMNCOMBINE> COLCOMBINEARRAY;
 typedef std::vector<COLUMNCOMBINE>::iterator COLCOMBINEARRAY_ITERATOR;
-
-struct BLOCK
-{
-	size_t weightIdx;
-	std::vector<size_t> nodes;
-};
-
-struct  ST
-{
-	char ch[2];
-};
-
-extern size_t maxVal;
-
-void UnflodDFA(CDfa &flodDfa, CDfa &unflodDfa);
-
-void BuildGraph(const std::vector<std::vector<ushort> > &dfaMatrix, GRAPH &graph);
-
-void SplitGraph(CDfa &oneDFA, GRAPH &graph, ROWSET &weightArg, std::vector<BLOCK> &blocks);
-
-size_t StatisticMemory(const CDfa &oneDfa, const std::vector<BLOCK> &blocks, VECROWSET &vecCore);
-
-void CreateNewMap(VECROWSET &allCharset, VECROWSET &newCharset, std::vector<std::map<size_t, size_t>> &mapvO2N);
-
-void AdjustDfa(CDfaArray &DfaArr, std::vector<std::map<size_t, size_t>> &mapv);
-
-size_t Charset(CDfa &dfa);
-
-void ColMergeCompress(VECROWSET &vecCores, ulong colCnt, byte* colGroup, ulong &colNum, std::vector<CDfaRow> &FinalMatrix);
-
-void StatisticVitualCore(const std::vector<std::vector<ushort> > &dfaMatrix, const ROWSET &partRow, ROWSET &corRow);
-
-void AnotherReplaceRowMatchValue(COLUMNCOMBINE &inColCom, std::vector<ROWTRANSFORM> &row, ushort old, ushort now);
-
-void RemoveTheSame(COLCOMBINEARRAY &colCombineArray);
-
-bool equal(CDfaRow &row, std::vector<ushort> vec);
+typedef std::vector<STATENODE> CORESPOND;
 
 void SameColDfaCombine(CDfaArray &CDfaSet, COLCOMBINEARRAY &colCombineArray);
 
-void ReplaceRowMatchValue(COLUMNCOMBINE &inColCom, ushort old, ushort now);
-
-int TwoColDfaCombine(COLUMNCOMBINE &inColCom, COLUMNCOMBINE &outColCom);
-
-void DiffColDfaCombine(COLCOMBINEARRAY &colCombineArray, ushort minCol, ushort maxCol, COLUMNCOMBINE &outCombineArray);
-
 void CoreCompress(std::vector<COLUMNCOMBINE> &allData, std::vector<std::vector<SKIPNODE> > &skipTable);
 
-void PartitionGraph(std::vector<COLUMNCOMBINE> &allData, std::vector<std::vector<SKIPNODE> > &skipTable);
+void WriteSkipTable(std::vector<COLUMNCOMBINE> &allData,const std::vector<std::vector<SKIPNODE> > &skipTable, const char * str);
 
-void WriteSkipTable(std::vector<COLUMNCOMBINE> &allData,const std::vector<std::vector<SKIPNODE> > &skipTable, const std::string &str);
-
-void ReadSkipTable(const std::string &str, std::vector<std::vector<ST > > &skipTable);
+void ReadSkipTable(const char *str, std::vector<std::vector<std::vector<char> > > &skipTable);

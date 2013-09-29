@@ -1,23 +1,16 @@
 #include "Hierarchical.h"
 
-typedef struct
-{
-	ushort maxcol;
-	ushort mincol;
-} MINMAX;
-
 void main(int nArgs, char **cArgs)
-{
-	
+{	
 	CGroupRes groupRes;
-	groupRes.ReadFromFile(cArgs[1]/*"FinalResult.cdt"*/);
+	groupRes.ReadFromFile(cArgs[1]);
 	CDfaArray &CDfaSet = groupRes.GetDfaTable();
 	std::vector<std::vector<SKIPNODE> > skipTable;
 	COLCOMBINEARRAY colCombineArray;
 	SameColDfaCombine(CDfaSet, colCombineArray);
 	CoreCompress(colCombineArray, skipTable);
-	WriteSkipTable(colCombineArray, skipTable, "skipTableResult.ppp");
-	std::vector<std::vector<ST > > skipTableR;
-	ReadSkipTable("skipTableResult.ppp", skipTableR);
+	WriteSkipTable(colCombineArray, skipTable, cArgs[2]);
+	std::vector<std::vector<std::vector<char> > > skipTableR;
+	ReadSkipTable(cArgs[2], skipTableR);
 	system("pause");
 }
