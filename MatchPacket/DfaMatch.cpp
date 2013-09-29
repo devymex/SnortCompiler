@@ -4,6 +4,9 @@
 #include <hwprj\dfa.h>
 #include "DfaMatch.h"
 
+ulong64 hitedDfaState = 0;
+ulong64 hitedStState  = 0;
+
 ulong64 g_ulAllDp;
 ulong64 g_ulHashed;
 
@@ -14,14 +17,17 @@ ulong usigtime = 0;
 
 ushort threshold = 2;
 
-void ReadSkipTable(const std::string &str, std::vector<std::vector<std::vector<ushort> > > &skipTable)
+std::vector<std::vector<ST> > skipTable;
+
+
+void ReadSkipTable(const char *str, std::vector<std::vector<ST> > &skipTable)
 {
-	std::fstream filein(str.c_str(), std::ios::in | std::ios::binary);
+	std::fstream filein(str, std::ios::in | std::ios::binary);
 	ushort number;
 	filein.read(reinterpret_cast<char *>(&number), sizeof(ushort));
 	for(ushort i = 0; i != number; ++i)
 	{
-		skipTable.push_back(std::vector<std::vector<ushort> >());
+		skipTable.push_back(std::vector<ST>());
 	}
 	for(ushort i = 0; i != number; ++i)
 	{
@@ -30,14 +36,18 @@ void ReadSkipTable(const std::string &str, std::vector<std::vector<std::vector<u
 		filein.read(reinterpret_cast<char *>(&stateNum), sizeof(ushort));
 		for(ushort j = 0; j != stateNum; ++j)
 		{
-			std::vector<ushort> skipNode;
-			for(ushort k = 0; k != threshold; ++k)
-			{
-				char temp;
-				filein.read(reinterpret_cast<char *>(&temp), sizeof(char));
-				skipNode.push_back(static_cast<ushort>(temp));
-			}
-			skipTable[i].push_back(skipNode);
+			ST st;
+			filein.read(reinterpret_cast<char *>(&st), sizeof(st));
+
+			//std::vector<ushort> skipNode;
+			//for(ushort k = 0; k != threshold; ++k)
+			//{
+			//	char temp;
+			//	filein.read(reinterpret_cast<char *>(&temp), sizeof(char));
+			//	skipNode.push_back(static_cast<ushort>(temp));
+			//}
+
+			skipTable[i].push_back(st);
 		}
 	}
 }
@@ -58,6 +68,10 @@ void MatchOnedfa(const unsigned char * &data, ulong len, CDfa &dfa,
 		finStas.GetDfaIdSet(nStaId).CopyTo(dfaids[nStaId]);
 	}
 
+
+
+
+
 	STATEID curSta = dfa.GetStartState();
 	for (size_t edgeiter = 0; edgeiter != len; ++edgeiter)
 	{
@@ -67,6 +81,16 @@ void MatchOnedfa(const unsigned char * &data, ulong len, CDfa &dfa,
 		{
 			if (dfa[curSta][group] != (STATEID)-1)
 			{
+				// 累加命中dfa的所有状态数
+				++hitedDfaState;
+
+				// 累加命中dfa的特跳次数
+				ST &st = skipTable[dfa.GetId()][group];
+				if (curSta == st.ch[0] || curSta == st.ch[1])
+				{
+					++hitedStState;
+				}
+
 				curSta = dfa[curSta][group];
 			}
 			else

@@ -17,7 +17,7 @@ void main(int nArgs, char **cArgs)
 	SameColDfaCombine(CDfaSet, colCombineArray);
 	CoreCompress(colCombineArray, skipTable);
 	WriteSkipTable(colCombineArray, skipTable, "skipTableResult.ppp");
-	std::vector<std::vector<std::vector<ushort> > > skipTableR;
+	std::vector<std::vector<ST > > skipTableR;
 	ReadSkipTable("skipTableResult.ppp", skipTableR);
 	system("pause");
 }

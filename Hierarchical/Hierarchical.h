@@ -64,6 +64,11 @@ struct BLOCK
 	std::vector<size_t> nodes;
 };
 
+struct  ST
+{
+	char ch[2];
+};
+
 extern size_t maxVal;
 
 void UnflodDFA(CDfa &flodDfa, CDfa &unflodDfa);
@@ -104,4 +109,4 @@ void PartitionGraph(std::vector<COLUMNCOMBINE> &allData, std::vector<std::vector
 
 void WriteSkipTable(std::vector<COLUMNCOMBINE> &allData,const std::vector<std::vector<SKIPNODE> > &skipTable, const std::string &str);
 
-void ReadSkipTable(const std::string &str, std::vector<std::vector<std::vector<ushort> > > &skipTable);
+void ReadSkipTable(const std::string &str, std::vector<std::vector<ST > > &skipTable);

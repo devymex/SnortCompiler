@@ -596,14 +596,14 @@ void WriteSkipTable(std::vector<COLUMNCOMBINE> &allData,const std::vector<std::v
 	}	
 }
 
-void ReadSkipTable(const std::string &str, std::vector<std::vector<std::vector<ushort> > > &skipTable)
+void ReadSkipTable(const std::string &str, std::vector<std::vector<ST > > &skipTable)
 {
 	std::fstream filein(str.c_str(), std::ios::in | std::ios::binary);
 	ushort number;
 	filein.read(reinterpret_cast<char *>(&number), sizeof(ushort));
 	for(ushort i = 0; i != number; ++i)
 	{
-		skipTable.push_back(std::vector<std::vector<ushort> >());
+		skipTable.push_back(std::vector<ST >());
 	}
 	for(ushort i = 0; i != number; ++i)
 	{
@@ -612,14 +612,16 @@ void ReadSkipTable(const std::string &str, std::vector<std::vector<std::vector<u
 		filein.read(reinterpret_cast<char *>(&stateNum), sizeof(ushort));
 		for(ushort j = 0; j != stateNum; ++j)
 		{
-			std::vector<ushort> skipNode;
-			for(ushort k = 0; k != threshold; ++k)
-			{
-				char temp;
-				filein.read(reinterpret_cast<char *>(&temp), sizeof(char));
-				skipNode.push_back(static_cast<ushort>(temp));
-			}
-			skipTable[i].push_back(skipNode);
+			ST st;
+			filein.read(reinterpret_cast<char *>(&st), sizeof(st));
+			//std::vector<ushort> skipNode;
+			//for(ushort k = 0; k != threshold; ++k)
+			//{
+			//	char temp;
+			//	filein.read(reinterpret_cast<char *>(&temp), sizeof(char));
+			//	skipNode.push_back(static_cast<ushort>(temp));
+			//}
+			skipTable[i].push_back(st);
 		}
 	}
 }

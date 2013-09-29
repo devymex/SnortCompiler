@@ -31,6 +31,11 @@ struct PCREDFA
 	REGRULESMAP rulesmap;
 };
 
+struct  ST
+{
+	char ch[2];
+};
+
 void MatchOnedfa(const u_char * &data, size_t len, CDfa &dfa, std::vector<size_t> &matchedDids);
 
 void MchDfaHdler(u_char *param, const struct pcap_pkthdr *header, const u_char *pkt_data);
@@ -57,4 +62,9 @@ typedef unsigned long long ulong64;
 extern ulong64 g_ulAllDp;
 extern ulong64 g_ulHashed;
 
-void ReadSkipTable(const std::string &str, std::vector<std::vector<std::vector<ushort> > > &skipTable);
+void ReadSkipTable(const std::string &str, std::vector<std::vector<ST > > &skipTable);
+
+
+extern std::vector<std::vector<ST> > skipTable;
+extern ulong64 hitedDfaState;
+extern ulong64 hitedStState;

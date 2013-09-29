@@ -53,3 +53,4 @@ rules/*
 MatchPacket/wpcap/*
 MatchPacket/wpcap/*
 *.ppp
+*.stt

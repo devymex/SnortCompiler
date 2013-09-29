@@ -14,6 +14,10 @@
 
 void main(int nArgc, char **pArgs)
 {
+	// ¶ÁÈ¡Ìø×ª±í
+	std::string pathSkipTable = pArgs[2];
+	ReadSkipTable(pathSkipTable.c_str(), skipTable);
+
 	PCREDFA pcredfa;
 
 	DFAMCH &dfamch = pcredfa.dfamch;
@@ -40,6 +44,8 @@ void main(int nArgc, char **pArgs)
 
 	std::cout << "Total packets: " << g_ulAllDp << std::endl;
 	std::cout << "Hit packets: " << g_ulHashed << std::endl;
+
+	std::cout << "Hit rate of special transition: " << (double)(hitedStState / hitedDfaState) << std::endl;
 
 	system("pause");
 }
