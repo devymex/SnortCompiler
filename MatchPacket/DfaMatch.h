@@ -62,9 +62,9 @@ typedef unsigned long long ulong64;
 extern ulong64 g_ulAllDp;
 extern ulong64 g_ulHashed;
 
-void ReadSkipTable(const std::string &str, std::vector<std::vector<ST > > &skipTable);
-
 
 extern std::vector<std::vector<ST> > skipTable;
 extern ulong64 hitedDfaState;
 extern ulong64 hitedStState;
+
+void ReadSkipTable(const char *str, std::vector<std::vector<ST > > &skipTable);

@@ -14,9 +14,19 @@
 
 void main(int nArgc, char **pArgs)
 {
+	std::string pathCdtAndStt = pArgs[1];
+	if (pathCdtAndStt.back() != '\\')
+	{
+		pathCdtAndStt.push_back('\\');
+	}
+
+	std::string pathCdt = pathCdtAndStt + "resultHash.cdt";
+	std::string pathStt = pathCdtAndStt + "skipTableResult.stt";
+
 	// 读取跳转表
-	std::string pathSkipTable = pArgs[2];
-	ReadSkipTable(pathSkipTable.c_str(), skipTable);
+	//std::string pathSkipTable = pArgs[2];
+	//ReadSkipTable(pathSkipTable.c_str(), skipTable);
+	ReadSkipTable(pathStt.c_str(), skipTable);
 
 	PCREDFA pcredfa;
 
@@ -24,7 +34,7 @@ void main(int nArgc, char **pArgs)
 	//dfamch.resultFolder = "..\\..\\output\\dmatchresult"; //一个数据包文件对应一个txt结果
 	CGroupRes &groupRes = dfamch.mergedDfas;
 	HASHRES &hashResMap = dfamch.hashtable;
-	groupRes.ReadFromFile(pArgs[1]); //输入的编译DFA
+	groupRes.ReadFromFile(pathCdt.c_str()); //输入的编译DFA
 	hash.nBucketCnt = groupRes.GetBucketCnt();
 	for(size_t i = 0; i < groupRes.GetGroups().Size(); ++i)
 	{
@@ -40,14 +50,19 @@ void main(int nArgc, char **pArgs)
 	//rulesmap.resultpath = "..\\..\\output\\pmatchresult";
 
 	std::string path = pArgs[2]; //输入的数据包路径 *.cap
+	if (path.back() != '\\')
+	{
+		path.push_back('\\');
+	}
+
 	PDHandleAllFile(path, &pcredfa);
 
 	std::cout << "Total packets: " << g_ulAllDp << std::endl;
-	std::cout << "Hit packets: " << g_ulHashed << std::endl;
+	std::cout << "Hit DFAs: " << g_ulHashed << std::endl;
 
-	std::cout << "hitedStState: " << hitedStState << std::endl;
-	std::cout << "hitedDfaState: " << hitedDfaState << std::endl;
-	std::cout << "Hit rate of special transition hitedStState / hitedDfaState: " << (double)(hitedStState / hitedDfaState) << std::endl;
+	std::cout << "Hited special transition states: " << hitedStState << std::endl;
+	std::cout << "Hited total states: " << hitedDfaState << std::endl;
+	std::cout << "Hit rate of special transition hitedStState / hitedDfaState: " << (double)((double)hitedStState / (double)hitedDfaState) << std::endl;
 
 	system("pause");
 }

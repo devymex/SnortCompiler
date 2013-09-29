@@ -59,3 +59,5 @@ void CoreCompress(std::vector<COLUMNCOMBINE> &allData, std::vector<std::vector<S
 void WriteSkipTable(std::vector<COLUMNCOMBINE> &allData,const std::vector<std::vector<SKIPNODE> > &skipTable, const char * str);
 
 void ReadSkipTable(const char *str, std::vector<std::vector<std::vector<char> > > &skipTable);
+
+void ExceptionResult(MATRIX &dfaMatrix, ROWSET &partRow);

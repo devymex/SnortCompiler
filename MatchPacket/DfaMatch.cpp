@@ -69,9 +69,6 @@ void MatchOnedfa(const unsigned char * &data, ulong len, CDfa &dfa,
 	}
 
 
-
-
-
 	STATEID curSta = dfa.GetStartState();
 	for (size_t edgeiter = 0; edgeiter != len; ++edgeiter)
 	{
@@ -193,7 +190,7 @@ MATCHPKT void DfaMatchPkt(const u_char *data, ulong len, DFAMCH &dfamch)
 
 	//matchresult << g_dpktnum << " : ";
 	std::vector<ulong> matchdfas;
-	//std::vector<ulong> matcheddfaids;
+	std::vector<ulong> matcheddfaids;
 
 	GetMchDfas(data, len, dfamch.hashtable, matchdfas);
 	g_ulHashed += matchdfas.size();
@@ -214,10 +211,13 @@ MATCHPKT void DfaMatchPkt(const u_char *data, ulong len, DFAMCH &dfamch)
 
 	//	signum = 0;
 	//}
-	//for (std::vector<ulong>::iterator iter = matchdfas.begin(); iter != matchdfas.end(); ++iter)
-	//{
-	//	MatchOnedfa(data, len, dfamch.mergedDfas.GetDfaTable()[*iter], matcheddfaids);
-	//}
+	CDfaArray &dfaAry = dfamch.mergedDfas.GetDfaTable();
+	for (std::vector<ulong>::iterator iter = matchdfas.begin(); iter != matchdfas.end(); ++iter)
+	{
+		CDfa &dfa = dfaAry[*iter];
+		dfa.SetId(*iter);
+		MatchOnedfa(data, len, dfa, matcheddfaids);
+	}
 
 	//if (!matcheddfaids.empty())
 	//{
@@ -351,7 +351,7 @@ MATCHPKT void PDHandleAllFile(const std::string &path, void* user)
 
 	WIN32_FIND_DATAA wfda;
 	const std::string ext = "*.*";
-	std::string str = path + std::string("\\");
+	std::string str = path; // + std::string("\\");
 	std::string pat = str + ext;
 	HANDLE hff = ::FindFirstFileA(pat.c_str(), &wfda);
 	if(hff == INVALID_HANDLE_VALUE)

@@ -310,6 +310,7 @@ void CoreCompress(std::vector<COLUMNCOMBINE> &allData, std::vector<std::vector<S
 			}
 			else
 			{
+				ExceptionResult(dfaMatrix, *j);
 				Exception(dfaMatrix, partRows, corMatrix, visit, j, rowNumber);
 			}
 		}
@@ -345,30 +346,46 @@ void WriteSkipTable(std::vector<COLUMNCOMBINE> &allData,const std::vector<std::v
 	}	
 }
 
-void ReadSkipTable(const char *str, std::vector<std::vector<std::vector<char> > > &skipTable)
+//void ReadSkipTable(const char *str, std::vector<std::vector<std::vector<char> > > &skipTable)
+//{
+//	std::fstream filein(str, std::ios::in | std::ios::binary);
+//	ushort number;
+//	filein.read(reinterpret_cast<char *>(&number), sizeof(ushort));
+//	for(ushort i = 0; i != number; ++i)
+//	{
+//		skipTable.push_back(std::vector<std::vector<char> >());
+//	}
+//	for(ushort i = 0; i != number; ++i)
+//	{
+//		ushort dfaId, stateNum;
+//		filein.read(reinterpret_cast<char *>(&dfaId), sizeof(ushort));
+//		filein.read(reinterpret_cast<char *>(&stateNum), sizeof(ushort));
+//		for(ushort j = 0; j != stateNum; ++j)
+//		{
+//			std::vector<char> skipNode;
+//			for(ushort k = 0; k != threshold; ++k)
+//			{
+//				char temp;
+//				filein.read(reinterpret_cast<char *>(&temp), sizeof(char));
+//				skipNode.push_back(temp);
+//			}
+//			skipTable[dfaId].push_back(skipNode);
+//		}
+//	}
+//}
+
+void ExceptionResult(MATRIX &dfaMatrix, ROWSET &partRow)
 {
-	std::fstream filein(str, std::ios::in | std::ios::binary);
-	ushort number;
-	filein.read(reinterpret_cast<char *>(&number), sizeof(ushort));
-	for(ushort i = 0; i != number; ++i)
+	std::fstream fo("exceptionResult.txt", std::ios::out | std::ios::app);
+	const size_t col = dfaMatrix[0].size();
+	fo << "The Number of Col : " << col << '\n' << std::endl;
+	for(size_t i = 0; i != partRow.size(); ++i)
 	{
-		skipTable.push_back(std::vector<std::vector<char> >());
-	}
-	for(ushort i = 0; i != number; ++i)
-	{
-		ushort dfaId, stateNum;
-		filein.read(reinterpret_cast<char *>(&dfaId), sizeof(ushort));
-		filein.read(reinterpret_cast<char *>(&stateNum), sizeof(ushort));
-		for(ushort j = 0; j != stateNum; ++j)
+		fo << '\t';
+		for(size_t j = 0; j != col; ++j)
 		{
-			std::vector<char> skipNode;
-			for(ushort k = 0; k != threshold; ++k)
-			{
-				char temp;
-				filein.read(reinterpret_cast<char *>(&temp), sizeof(char));
-				skipNode.push_back(temp);
-			}
-			skipTable[dfaId].push_back(skipNode);
+			fo << dfaMatrix[partRow[i]][j] << "\t";
 		}
+		fo << '\n' << std::endl;
 	}
 }
