@@ -4,6 +4,8 @@
 #include <hwprj\dfa.h>
 #include "DfaMatch.h"
 
+#include <hwprj\MultiLevelHash.h>
+
 ulong64 hitedDfaState = 0;
 ulong64 hitedStState  = 0;
 
@@ -18,6 +20,9 @@ ulong usigtime = 0;
 ushort threshold = 2;
 
 std::vector<std::vector<ST> > skipTable;
+
+CMultiLevelHash multiLevelHash;
+
 
 
 void ReadSkipTable(const char *str, std::vector<std::vector<ST> > &skipTable)
@@ -144,18 +149,23 @@ void MchDfaHdler(u_char *param, const struct pcap_pkthdr *header, const u_char *
 	pParam->pFunc(ih, pkt_data, pParam->pUser);
 }
 
-void GetMchDfas(const u_char *data, ulong len, HASHRES &hashtable, std::vector<ulong> &matchdfas)
+//void GetMchDfas(const u_char *data, ulong len, HASHRES &hashtable, std::vector<ulong> &matchdfas)
+void GetMchDfas(const u_char *data, ulong len, ulong dfaSize, std::vector<ulong> &matchdfas)
 {
+	CUnsignedArray matchResultArr;
+	matchResultArr.Resize(dfaSize);
+	matchResultArr.Fill(0);
+
+
 	if (len > 3)
 	{
 		std::ofstream sigfile;
 		sigfile.open("..\\..\\output\\sigfile.txt", std::ofstream::app);
 		SIGNATURE sig;
 		u_char csig[4];
-		char flags[3000];
-		std::memset(flags, 0, sizeof(flags));
 
 		ulong signum = 0;
+		CUnsignedArray sigArray;
 		for (const u_char* iter = data; iter != &data[len - 3]; ++iter)
 		{
 			for (size_t i = 0; i < 4; ++i)
@@ -163,22 +173,39 @@ void GetMchDfas(const u_char *data, ulong len, HASHRES &hashtable, std::vector<u
 				csig[i] = tolower(*(iter + i));
 			}
 			sig = *(SIGNATURE *)csig;
+			sigArray.PushBack(sig);
 
-			size_t hashsig = hash(sig);
-			if (hashtable.count(hashsig))
-			{
-				++signum;
-				for (std::vector<HASHNODE>::iterator iter = hashtable[hashsig].begin(); iter != hashtable[hashsig].end(); ++iter)
-				{
-					if ((sig == iter->m_sig) && (flags[iter->m_nDfaId] == 0))
-					{
-						matchdfas.push_back(iter->m_nDfaId);
-						flags[iter->m_nDfaId] = 1;
-					}
-				}
-			}
+			//size_t hashsig = hash(sig);
+			//if (hashtable.count(hashsig))
+			//{
+			//	++signum;
+			//	for (std::vector<HASHNODE>::iterator iter = hashtable[hashsig].begin(); iter != hashtable[hashsig].end(); ++iter)
+			//	{
+			//		if ((sig == iter->m_sig) && (flags[iter->m_nDfaId] == 0))
+			//		{
+			//			matchdfas.push_back(iter->m_nDfaId);
+			//			flags[iter->m_nDfaId] = 1;
+			//		}
+			//	}
+			//}
 		}
 
+		sigArray.Unique();
+		int sigArrSize = sigArray.Size();
+		for (int i = 0; i != sigArrSize; ++i)
+		{
+			multiLevelHash.MatchOneSig(sigArray[i], matchResultArr);
+		}
+
+		// 遍历一个dfaSize大小的表，如果满足条件则标记为精匹配
+		for (int i = 0; i != dfaSize; ++i)
+		{
+			if (matchResultArr[i] >= multiLevelHash.GetMin(i))
+				matchdfas.push_back(i);
+		}
+
+		// 记录该数据包命中的DFA个数
+		++PacketHitedDfaRecord[matchdfas.size()];
 	}
 }
 
@@ -192,7 +219,8 @@ MATCHPKT void DfaMatchPkt(const u_char *data, ulong len, DFAMCH &dfamch)
 	std::vector<ulong> matchdfas;
 	std::vector<ulong> matcheddfaids;
 
-	GetMchDfas(data, len, dfamch.hashtable, matchdfas);
+	//GetMchDfas(data, len, dfamch.hashtable, matchdfas);
+	GetMchDfas(data, len, dfamch.mergedDfas.GetDfaTable().Size(), matchdfas);
 	g_ulHashed += matchdfas.size();
 	//if (signum > 8)
 	//{
@@ -216,7 +244,7 @@ MATCHPKT void DfaMatchPkt(const u_char *data, ulong len, DFAMCH &dfamch)
 	{
 		CDfa &dfa = dfaAry[*iter];
 		dfa.SetId(*iter);
-		MatchOnedfa(data, len, dfa, matcheddfaids);
+		//MatchOnedfa(data, len, dfa, matcheddfaids);
 	}
 
 	//if (!matcheddfaids.empty())
@@ -264,7 +292,7 @@ MATCHPKT void DfaMatchPkt(const u_char *data, ulong len, DFAMCH &dfamch)
 void __stdcall DPktParam(const ip_header *ih, const byte *data, void* user)
 {
 	++g_dpktnum;
-	
+
 	DFAMCH &dfamch = *(DFAMCH *)user;
 
 	std::ofstream matchresult;
@@ -274,7 +302,7 @@ void __stdcall DPktParam(const ip_header *ih, const byte *data, void* user)
 		matchresult << "-----------------------" << dfamch.resultPath << "-----------------------" << std::endl;
 	}
 	u_short  _ihl = (ih->ver_ihl & 0x0f) * 4;
-	
+
 	u_short _tlen = ih->tlen;
 	std::swap(((byte*)&_tlen)[0], ((byte*)&_tlen)[1]);
 
@@ -315,7 +343,7 @@ void __stdcall DPktParam(const ip_header *ih, const byte *data, void* user)
 			break;
 		}
 	}
-	
+
 	if (g_dpktnum % 10000 == 0)
 	{
 		std::cout << g_dpktnum << std::endl;

@@ -5,6 +5,7 @@
 #include <hwprj\buildhash.h>
 #include <hwprj\unsary.h>
 #include <hwprj\siddfaids.h>
+#include <hwprj\MultiLevelHash.h>
 #include "MatchPkt.h"
 
 extern ulong g_dpktnum;
@@ -40,7 +41,9 @@ void MatchOnedfa(const u_char * &data, size_t len, CDfa &dfa, std::vector<size_t
 
 void MchDfaHdler(u_char *param, const struct pcap_pkthdr *header, const u_char *pkt_data);
 
-void GetMchDfas(const u_char *data, size_t len, HASHRES &hashtable, std::vector<size_t> &matchdfas);
+//void GetMchDfas(const u_char *data, size_t len, HASHRES &hashtable, std::vector<size_t> &matchdfas);
+
+void GetMchDfas(const u_char *data, size_t len, ulong dfaSize, std::vector<size_t> &matchdfas);
 
 MATCHPKT void DfaMatchPkt(const u_char *data, size_t len, DFAMCH &dfamch);
 
@@ -68,3 +71,8 @@ extern ulong64 hitedDfaState;
 extern ulong64 hitedStState;
 
 void ReadSkipTable(const char *str, std::vector<std::vector<ST > > &skipTable);
+
+extern CMultiLevelHash multiLevelHash;
+
+
+extern std::vector<ulong> PacketHitedDfaRecord;

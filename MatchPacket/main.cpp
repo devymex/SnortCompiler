@@ -12,21 +12,27 @@
 //	std::size_t mergeDfaId;
 //};
 
+std::vector<ulong> PacketHitedDfaRecord;
+
 void main(int nArgc, char **pArgs)
 {
-	std::string pathCdtAndStt = pArgs[1];
-	if (pathCdtAndStt.back() != '\\')
-	{
-		pathCdtAndStt.push_back('\\');
-	}
 
-	std::string pathCdt = pathCdtAndStt + "resultHash.cdt";
-	std::string pathStt = pathCdtAndStt + "skipTableResult.stt";
+	clock_t start, finish, duration;
+	start = clock();
+
+	//std::string pathCdtAndStt = pArgs[1];
+	//if (pathCdtAndStt.back() != '\\')
+	//{
+	//	pathCdtAndStt.push_back('\\');
+	//}
+
+	//std::string pathCdt = pathCdtAndStt + "resultHash.cdt";
+	//std::string pathStt = pathCdtAndStt + "skipTableResult.stt";
 
 	// 读取跳转表
 	//std::string pathSkipTable = pArgs[2];
 	//ReadSkipTable(pathSkipTable.c_str(), skipTable);
-	ReadSkipTable(pathStt.c_str(), skipTable);
+	//ReadSkipTable(pathStt.c_str(), skipTable);
 
 	PCREDFA pcredfa;
 
@@ -34,8 +40,9 @@ void main(int nArgc, char **pArgs)
 	//dfamch.resultFolder = "..\\..\\output\\dmatchresult"; //一个数据包文件对应一个txt结果
 	CGroupRes &groupRes = dfamch.mergedDfas;
 	HASHRES &hashResMap = dfamch.hashtable;
-	groupRes.ReadFromFile(pathCdt.c_str()); //输入的编译DFA
+	groupRes.ReadFromFile("D:\\test\\FinalResultUnErase0.cdt"); //输入的编译DFA
 	hash.nBucketCnt = groupRes.GetBucketCnt();
+	
 	for(size_t i = 0; i < groupRes.GetGroups().Size(); ++i)
 	{
 		HASHNODE hashnode;
@@ -49,12 +56,17 @@ void main(int nArgc, char **pArgs)
 	//MchCompile("..\\..\\input\\CanCompile.rule", &rulesmap);
 	//rulesmap.resultpath = "..\\..\\output\\pmatchresult";
 
-	std::string path = pArgs[2]; //输入的数据包路径 *.cap
+	//std::string path = pArgs[2]; //输入的数据包路径 *.cap
+	std::string path = "D:\\test";
 	if (path.back() != '\\')
 	{
 		path.push_back('\\');
 	}
 
+	ulong dfaSz = groupRes.GetGroups().Size();
+	PacketHitedDfaRecord.resize(dfaSz, 0);
+
+	multiLevelHash.Init(groupRes);
 	PDHandleAllFile(path, &pcredfa);
 
 	std::cout << "Total packets: " << g_ulAllDp << std::endl;
@@ -63,6 +75,22 @@ void main(int nArgc, char **pArgs)
 	std::cout << "Hited special transition states: " << hitedStState << std::endl;
 	std::cout << "Hited total states: " << hitedDfaState << std::endl;
 	std::cout << "Hit rate of special transition hitedStState / hitedDfaState: " << (double)((double)hitedStState / (double)hitedDfaState) << std::endl;
+
+
+	std::ofstream os("..\\..\\PacketHitedDfaRecord_hashdeepth1.txt");
+
+	for (int i = 0; i != dfaSz; ++i)
+	{
+		//os << "命中" << i << "个DFA的数据包有：" << PacketHitedDfaRecord[i] << "个" << std::endl;
+
+		//os << i << " " << PacketHitedDfaRecord[i] << std::endl;
+		os << i << std::endl;
+	}
+
+	finish = clock();
+	duration = finish - start;
+
+	std::cout << duration << std::endl;
 
 	system("pause");
 }

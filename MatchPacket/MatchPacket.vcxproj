@@ -59,7 +59,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ModuleDefinitionFile>
       </ModuleDefinitionFile>
-      <AdditionalDependencies>automaton.lib;common.lib;compiler.lib;grouphash.lib;wpcap.lib</AdditionalDependencies>
+      <AdditionalDependencies>automaton.lib;common.lib;compiler.lib;grouphash.lib;wpcap.lib;hash.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -79,11 +79,14 @@
       <OptimizeReferences>true</OptimizeReferences>
       <ModuleDefinitionFile>
       </ModuleDefinitionFile>
-      <AdditionalDependencies>automaton.lib;common.lib;compiler.lib;grouphash.lib;wpcap.lib</AdditionalDependencies>
+      <AdditionalDependencies>automaton.lib;common.lib;compiler.lib;grouphash.lib;wpcap.lib;hash.lib</AdditionalDependencies>
     </Link>
     <Bscmake>
       <PreserveSbr>true</PreserveSbr>
     </Bscmake>
+    <PreBuildEvent>
+      <Command>copydll.bat  $(Configuration)</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="CompileRules.cpp" />
